@@ -32,12 +32,12 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.action.UsernameTokenAction;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.action.UsernameTokenAction;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandler;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.junit.Test;
 
 public class WSS4JOutInterceptorTest extends AbstractSecurityTest {

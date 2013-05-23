@@ -19,7 +19,7 @@
 
 package org.apache.cxf.sts.token.provider;
 
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**
  * Implementation of this interface updates SAML tokens in any custom way before it will be signed by
@@ -28,5 +28,5 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
  */
 public interface SamlCustomHandler {
 
-    void handle(AssertionWrapper assertionWrapper, TokenProviderParameters tokenParameters);
+    void handle(SamlAssertionWrapper assertionWrapper, TokenProviderParameters tokenParameters);
 }

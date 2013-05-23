@@ -21,12 +21,16 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -42,14 +46,22 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.HttpsToken;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.HttpsToken;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
+import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**
  * 
  */
 public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(HttpsTokenInterceptorProvider.class);
     
     private static final long serialVersionUID = -13951002554477036L;
 
@@ -79,12 +91,13 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
-                    assertHttps(ais, message);
+                    assertHttps(aim, ais, message);
                 } else {
                     //server side should be checked on the way in
                     for (AssertionInfo ai : ais) {
@@ -93,7 +106,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 }
             }
         }
-        private void assertHttps(Collection<AssertionInfo> ais, Message message) {
+        private void assertHttps(AssertionInfoMap aim, Collection<AssertionInfo> ais, Message message) {
             for (AssertionInfo ai : ais) {
                 HttpsToken token = (HttpsToken)ai.getAssertion();
                 String scheme = (String)message.get("http.scheme");
@@ -101,7 +114,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);
                 
                 if ("https".equals(scheme)) {
-                    if (token.isRequireClientCertificate()) {
+                    if (token.getAuthenticationType() 
+                        == HttpsToken.AuthenticationType.RequireClientCertificate) {
                         final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
                         MessageTrustDecider trust = new MessageTrustDecider() {
                             public void establishTrust(String conduitName,
@@ -122,20 +136,25 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             }
                         };
                         message.put(MessageTrustDecider.class, trust);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                     }
-                    if (token.isHttpBasicAuthentication()) {
+                    if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Basic")) {
                             ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
+                        } else {
+                            NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                         }
                     }
-                    if (token.isHttpDigestAuthentication()) {
+                    if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Digest")) {
                             ai.setNotAsserted("HttpDigestAuthentication is set, but not being used");
-                        }                        
+                        } else {
+                            NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                        }
                     }
                 } else {
                     ai.setNotAsserted("Not an HTTPs connection");
@@ -157,12 +176,17 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (!isRequestor(message)) {
-                    assertHttps(ais, message);
+                    try {
+                        assertHttps(aim, ais, message);
+                    } catch (XMLSecurityException e) {
+                        LOG.fine(e.getMessage());
+                    }
                     // Store the TLS principal on the message context
                     SecurityContext sc = message.get(SecurityContext.class);
                     if (sc == null || sc.getUserPrincipal() == null) {
@@ -182,45 +206,113 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     //client side should be checked on the way out
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
-                    }                    
+                    }
+                    
+                    NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                    NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
+                    NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                 }
             }
         }
         
-        private void assertHttps(Collection<AssertionInfo> ais, Message message) {
+        private void assertHttps(
+            AssertionInfoMap aim, 
+            Collection<AssertionInfo> ais, 
+            Message message
+        ) throws XMLSecurityException {
+            List<SecurityEvent> securityEvents = getSecurityEventList(message);
+            AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
+            
             for (AssertionInfo ai : ais) {
                 boolean asserted = true;
                 HttpsToken token = (HttpsToken)ai.getAssertion();
                 
+                HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+                
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);                
-                if (token.isHttpBasicAuthentication()) {
+                if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                     List<String> auth = headers.get("Authorization");
                     if (auth == null || auth.size() == 0 
                         || !auth.get(0).startsWith("Basic")) {
                         asserted = false;
+                    } else {
+                        httpsTokenSecurityEvent.setAuthenticationType(
+                            HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication
+                        );
+                        HttpsSecurityTokenImpl httpsSecurityToken = 
+                            new HttpsSecurityTokenImpl(true, policy.getUserName());
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                     }
                 }
-                if (token.isHttpDigestAuthentication()) {
+                if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
                     List<String> auth = headers.get("Authorization");
                     if (auth == null || auth.size() == 0 
                         || !auth.get(0).startsWith("Digest")) {
                         asserted = false;
-                    }                        
+                    } else {
+                        httpsTokenSecurityEvent.setAuthenticationType(
+                            HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication
+                        );
+                        HttpsSecurityTokenImpl httpsSecurityToken = 
+                            new HttpsSecurityTokenImpl(false, policy.getUserName());
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                    }
                 }
 
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);                
                 if (tlsInfo != null) {
-                    if (token.isRequireClientCertificate()
-                        && (tlsInfo.getPeerCertificates() == null 
-                            || tlsInfo.getPeerCertificates().length == 0)) {
-                        asserted = false;
+                    if (token.getAuthenticationType() 
+                        == HttpsToken.AuthenticationType.RequireClientCertificate) {
+                        if (tlsInfo.getPeerCertificates() == null 
+                            || tlsInfo.getPeerCertificates().length == 0) {
+                            asserted = false;
+                        } else {
+                            NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                        }
+                    }
+                    
+                    if (tlsInfo.getPeerCertificates() != null && tlsInfo.getPeerCertificates().length > 0) {
+                        httpsTokenSecurityEvent.setAuthenticationType(
+                            HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication
+                        );
+                        HttpsSecurityTokenImpl httpsSecurityToken = 
+                            new HttpsSecurityTokenImpl((X509Certificate)tlsInfo.getPeerCertificates()[0]);
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+                    } else {
+                        httpsTokenSecurityEvent.setAuthenticationType(
+                            HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
+                        );
+                        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                     }
                 } else {
                     asserted = false;
                 }                
                 
                 ai.setAsserted(asserted);
+                
+                if (asserted) {
+                    securityEvents.add(httpsTokenSecurityEvent);
+                }
             }
+        }
+        
+        private List<SecurityEvent> getSecurityEventList(Message message) {
+            @SuppressWarnings("unchecked")
+            List<SecurityEvent> securityEvents = 
+                (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".out");
+            if (securityEvents == null) {
+                securityEvents = new ArrayList<SecurityEvent>();
+                message.getExchange().put(SecurityEvent.class.getName() + ".out", securityEvents);
+            }
+            
+            return securityEvents;
         }
         
         private SecurityContext createSecurityContext(final Principal p) {

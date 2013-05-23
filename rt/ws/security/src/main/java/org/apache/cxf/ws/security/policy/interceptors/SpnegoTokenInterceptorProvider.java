@@ -30,14 +30,14 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSSConfig;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 /**
  * 
@@ -79,7 +79,7 @@ public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         AlgorithmSuite suite = NegotiationUtils.getAlgorithmSuite(aim);
         if (suite != null) {
             client.setAlgorithmSuite(suite);
-            int x = suite.getMaximumSymmetricKeyLength();
+            int x = suite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength();
             if (x < 256) {
                 client.setKeySize(x);
             }

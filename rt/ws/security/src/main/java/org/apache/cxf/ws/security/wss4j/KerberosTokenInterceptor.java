@@ -36,21 +36,22 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.processor.BinarySecurityTokenProcessor;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor;
+import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * An interceptor to add a Kerberos token to the security header of an outbound request, and to
@@ -86,7 +87,10 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
                         WSHandlerResult rResult = new WSHandlerResult(null, bstResults);
                         results.add(0, rResult);
 
-                        assertTokens(message, SP12Constants.KERBEROS_TOKEN, false);
+                        assertTokens(message, SPConstants.KERBEROS_TOKEN, false);
+                        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                        assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                        assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
                         
                         Principal principal = 
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -128,8 +132,8 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
                     }
                 } catch (RuntimeException t) {
                     throw t;
-                } catch (Throwable t) {
-                    throw new WSSecurityException(t.getMessage(), t);
+                } catch (Exception ex) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
                 return super.getValidator(qName);
             }
@@ -142,8 +146,11 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
         return results;
     }
     
-    protected Token assertTokens(SoapMessage message) {
-        return assertTokens(message, SP12Constants.KERBEROS_TOKEN, true);
+    protected AbstractToken assertTokens(SoapMessage message) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, "WssKerberosV5ApReqToken11");
+        assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
+        return assertTokens(message, SPConstants.KERBEROS_TOKEN, true);
     }
 
     protected void addToken(SoapMessage message) {

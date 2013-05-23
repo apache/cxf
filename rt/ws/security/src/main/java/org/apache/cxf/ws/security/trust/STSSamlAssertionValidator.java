@@ -19,11 +19,11 @@
 
 package org.apache.cxf.ws.security.trust;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 
 /**
  * This class validates a SAML Assertion by invoking the SamlAssertionValidator in WSS4J. It 
@@ -56,7 +56,7 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
      */
     @Override
     protected Credential verifySignedAssertion(
-        AssertionWrapper assertion,
+        SamlAssertionWrapper assertion,
         RequestData data
     ) throws WSSecurityException {
         try {

@@ -82,10 +82,6 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.trust.TrustException;
@@ -93,27 +89,33 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.dkalgo.P_SHA1;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.processor.EncryptedKeyProcessor;
-import org.apache.ws.security.processor.X509Util;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.derivedKey.P_SHA1;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
+import org.apache.wss4j.dom.processor.X509Util;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
 import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * A primitive STSClient for batch tokens. Note that this contains a number of hacks and should NOT be
@@ -414,8 +416,8 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             while (i.hasNext() && algorithmSuite == null) {
                 List<PolicyComponent> p = CastUtils.cast((List<?>)i.next());
                 for (PolicyComponent p2 : p) {
-                    if (p2 instanceof Binding) {
-                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
+                    if (p2 instanceof AbstractBinding) {
+                        algorithmSuite = ((AbstractBinding)p2).getAlgorithmSuite();
                     }
                 }
             }
@@ -660,8 +662,9 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             if (algorithmSuite == null) {
                 requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
             } else {
+                AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
                 requestorEntropy = WSSecurityUtil
-                    .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                    .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
             }
             writer.writeCharacters(Base64.encode(requestorEntropy));
 
@@ -840,7 +843,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     }
 
     protected SecurityToken createSecurityToken(Element el, byte[] requestorEntropy)
-        throws WSSecurityException {
+        throws WSSecurityException, Base64DecodingException {
 
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
@@ -921,7 +924,8 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
                     int length = (keySize > 0) ? keySize : 256;
                     if (algorithmSuite != null) {
-                        length = (keySize > 0) ? keySize : algorithmSuite.getMaximumSymmetricKeyLength();
+                        AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                        length = (keySize > 0) ? keySize : algType.getMaximumSymmetricKeyLength();
                     }
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
@@ -942,7 +946,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         return token;
     }
     
-    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
+    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException, Base64DecodingException {
         String encryptionAlgorithm = X509Util.getEncAlgo(child);
         // For the SPNEGO case just return the decoded cipher value and decrypt it later
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
@@ -959,7 +963,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                 }
             }
             if (cipherValue == null) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
             }
             return cipherValue;
         } else {

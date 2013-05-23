@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -91,16 +92,6 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.ProtectionToken;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
-import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
 import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
@@ -111,27 +102,39 @@ import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.dkalgo.P_SHA1;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.processor.EncryptedKeyProcessor;
-import org.apache.ws.security.processor.X509Util;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.derivedKey.P_SHA1;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
+import org.apache.wss4j.dom.processor.X509Util;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SPConstants.SPVersion;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.ProtectionToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
 import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * An abstract class with some functionality to invoke on a SecurityTokenService (STS) via the
@@ -159,7 +162,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected AlgorithmSuite algorithmSuite;
     protected String namespace = STSUtils.WST_NS_05_12;
     protected String addressingNamespace = "http://www.w3.org/2005/08/addressing";
-    protected String wspNamespace = SPConstants.P_NS;
+    protected String wspNamespace = "http://www.w3.org/ns/ws-policy";
     protected Object onBehalfOf;
     protected boolean enableAppliesTo = true;
 
@@ -440,8 +443,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             while (i.hasNext() && algorithmSuite == null) {
                 List<PolicyComponent> p = CastUtils.cast((List<?>)i.next());
                 for (PolicyComponent p2 : p) {
-                    if (p2 instanceof Binding) {
-                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
+                    if (p2 instanceof AbstractBinding) {
+                        algorithmSuite = ((AbstractBinding)p2).getAlgorithmSuite();
                     }
                 }
             }
@@ -812,8 +815,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             if (algorithmSuite == null) {
                 requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
             } else {
+                AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
                 requestorEntropy = WSSecurityUtil
-                    .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                    .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
             }
             writer.writeCharacters(Base64.encode(requestorEntropy));
 
@@ -1050,38 +1054,52 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             All all = new All();
             one.addPolicyComponent(all);
             all.addAssertion(getAddressingAssertion());
+
+            final SecureConversationToken secureConversationToken = 
+                new SecureConversationToken(
+                    SPConstants.SPVersion.SP12,
+                    SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+                    null,
+                    null,
+                    null,
+                    null
+                );
+            secureConversationToken.setOptional(true);
             
-            PolicyBuilder pbuilder = bus.getExtension(PolicyBuilder.class);
-            SymmetricBinding binding = new SymmetricBinding(pbuilder);
+            class InternalProtectionToken extends ProtectionToken {
+                public InternalProtectionToken(SPVersion version, Policy nestedPolicy) {
+                    super(version, nestedPolicy);
+                    super.setToken(secureConversationToken);
+                }
+            }
+            
+            DefaultSymmetricBinding binding = 
+                new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, new Policy());
             all.addAssertion(binding);
             all.addAssertion(getAddressingAssertion());
-            ProtectionToken ptoken = new ProtectionToken(pbuilder);
-            binding.setProtectionToken(ptoken);
+            binding.setProtectionToken(
+                new InternalProtectionToken(SPConstants.SPVersion.SP12, new Policy())
+            );
             binding.setIncludeTimestamp(true);
-            binding.setEntireHeadersAndBodySignatures(true);
-            binding.setTokenProtection(false);
-            AlgorithmSuite suite = new AlgorithmSuite();
-            binding.setAlgorithmSuite(suite);
-            SecureConversationToken sct = new SecureConversationToken();
-            sct.setOptional(true);
-            ptoken.setToken(sct);
-            
-            SignedEncryptedParts parts = new SignedEncryptedParts(true);
-            parts.setOptional(true);
-            parts.setBody(true);
+            binding.setOnlySignEntireHeadersAndBody(true);
+            binding.setProtectTokens(false);
             
             String addrNamespace = addressingNamespace;
             if (addrNamespace == null) {
                 addrNamespace = "http://www.w3.org/2005/08/addressing";
             }
             
-            parts.addHeader(new Header("To", addrNamespace));
-            parts.addHeader(new Header("From", addrNamespace));
-            parts.addHeader(new Header("FaultTo", addrNamespace));
-            parts.addHeader(new Header("ReplyTo", addrNamespace));
-            parts.addHeader(new Header("Action", addrNamespace));
-            parts.addHeader(new Header("MessageID", addrNamespace));
-            parts.addHeader(new Header("RelatesTo", addrNamespace));
+            List<Header> headers = new ArrayList<Header>();
+            headers.add(new Header("To", addrNamespace));
+            headers.add(new Header("From", addrNamespace));
+            headers.add(new Header("FaultTo", addrNamespace));
+            headers.add(new Header("ReplyTo", addrNamespace));
+            headers.add(new Header("Action", addrNamespace));
+            headers.add(new Header("MessageID", addrNamespace));
+            headers.add(new Header("RelatesTo", addrNamespace));
+            
+            SignedParts parts = new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
+            parts.setOptional(true);
             all.addPolicyComponent(parts);
             
             client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, cancelPolicy);
@@ -1223,7 +1241,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
 
     protected SecurityToken createSecurityToken(Element el, byte[] requestorEntropy)
-        throws WSSecurityException {
+        throws WSSecurityException, Base64DecodingException {
 
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
@@ -1337,7 +1355,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         return token;
     }
     
-    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
+    protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException, Base64DecodingException {
         String encryptionAlgorithm = X509Util.getEncAlgo(child);
         // For the SPNEGO case just return the decoded cipher value and decrypt it later
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
@@ -1354,7 +1372,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 }
             }
             if (cipherValue == null) {
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
             }
             return cipherValue;
         } else {

@@ -38,7 +38,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Cache the first security header and then use it instead of all subsequent security headers, until

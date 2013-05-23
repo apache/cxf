@@ -59,22 +59,23 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.DOM2Writer;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens.
@@ -792,21 +793,25 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains(SAML2Constants.CONF_HOLDER_KEY));
         
         // Test that the (encrypted) secret sent in Entropy was used in the SAML Subject KeyInfo
-        AssertionWrapper assertionWrapper = new AssertionWrapper(assertion);
+        SamlAssertionWrapper assertionWrapper = new SamlAssertionWrapper(assertion);
         RequestData data = new RequestData();
         
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "sspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "servicestore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "sspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "servicestore.jks");
         
         data.setDecCrypto(CryptoFactory.getInstance(properties));
         data.setCallbackHandler(new PasswordCallbackHandler());
         data.setWssConfig(WSSConfig.getNewInstance());
         
-        assertionWrapper.parseHOKSubject(data, new WSDocInfo(assertion.getOwnerDocument()));
+        assertionWrapper.parseHOKSubject(
+            new WSSSAMLKeyInfoProcessor(data, new WSDocInfo(assertion.getOwnerDocument())), 
+                                        data.getSigVerCrypto(), data.getCallbackHandler()
+        );
+        
         SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
         assertTrue(Arrays.equals(secret, samlKeyInfo.getSecret()));
     }
@@ -1019,12 +1024,13 @@ public class IssueSamlUnitTest extends org.junit.Assert {
     }
     
     private Properties getEncryptionProperties() {
+        WSSConfig.init();
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         
         return properties;
     }

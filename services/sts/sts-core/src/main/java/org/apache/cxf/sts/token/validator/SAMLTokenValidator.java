@@ -41,20 +41,23 @@ import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.SAMLTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.ValidatorSuite;
 
@@ -141,9 +144,9 @@ public class SAMLTokenValidator implements TokenValidator {
         
         try {
             Element validateTargetElement = (Element)validateTarget.getToken();
-            AssertionWrapper assertion = new AssertionWrapper(validateTargetElement);
+            SamlAssertionWrapper assertion = new SamlAssertionWrapper(validateTargetElement);
             
-            SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
+            SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipalImpl(assertion);
             response.setPrincipal(samlPrincipal);
             
             SecurityToken secToken = null;
@@ -167,23 +170,26 @@ public class SAMLTokenValidator implements TokenValidator {
                     return response;
                 }
                 
+                // Verify the signature
+                Signature sig = assertion.getSignature();
+                KeyInfo keyInfo = sig.getKeyInfo();
+                SAMLKeyInfo samlKeyInfo = 
+                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
+                        keyInfo.getDOM(), sigCrypto
+                    );
+                assertion.verifySignature(samlKeyInfo);
+                
                 RequestData requestData = new RequestData();
-                requestData.setSigCrypto(sigCrypto);
+                requestData.setSigVerCrypto(sigCrypto);
                 WSSConfig wssConfig = WSSConfig.getNewInstance();
                 requestData.setWssConfig(wssConfig);
                 requestData.setCallbackHandler(callbackHandler);
-                
-                // Verify the signature
-                assertion.verifySignature(
-                    requestData, new WSDocInfo(validateTargetElement.getOwnerDocument())
-                );
                 
                 // Validate the assertion against schemas/profiles
                 validateAssertion(assertion);
 
                 // Now verify trust on the signature
                 Credential trustCredential = new Credential();
-                SAMLKeyInfo samlKeyInfo = assertion.getSignatureKeyInfo();
                 trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
                 trustCredential.setCertificates(samlKeyInfo.getCerts());
     
@@ -228,9 +234,9 @@ public class SAMLTokenValidator implements TokenValidator {
                 );
             }
             
-            // Add the AssertionWrapper to the properties, as the claims are required to be transformed
+            // Add the SamlAssertionWrapper to the properties, as the claims are required to be transformed
             Map<String, Object> addProps = new HashMap<String, Object>();
-            addProps.put(AssertionWrapper.class.getName(), assertion);
+            addProps.put(SamlAssertionWrapper.class.getName(), assertion);
             response.setAdditionalProperties(addProps);
             
             validateTarget.setState(STATE.VALID);
@@ -244,7 +250,7 @@ public class SAMLTokenValidator implements TokenValidator {
     /**
      * Validate the assertion against schemas/profiles
      */
-    protected void validateAssertion(AssertionWrapper assertion) throws WSSecurityException {
+    protected void validateAssertion(SamlAssertionWrapper assertion) throws WSSecurityException {
         if (assertion.getSaml1() != null) {
             ValidatorSuite schemaValidators = 
                 org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
@@ -255,7 +261,7 @@ public class SAMLTokenValidator implements TokenValidator {
                 specValidators.validate(assertion.getSaml1());
             } catch (ValidationException e) {
                 LOG.fine("Saml Validation error: " + e.getMessage());
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         } else if (assertion.getSaml2() != null) {
             ValidatorSuite schemaValidators = 
@@ -267,13 +273,13 @@ public class SAMLTokenValidator implements TokenValidator {
                 specValidators.validate(assertion.getSaml2());
             } catch (ValidationException e) {
                 LOG.fine("Saml Validation error: " + e.getMessage());
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
     }
     
     protected boolean validateConditions(
-        AssertionWrapper assertion, ReceivedToken validateTarget
+        SamlAssertionWrapper assertion, ReceivedToken validateTarget
     ) {
         DateTime validFrom = null;
         DateTime validTill = null;
@@ -297,7 +303,7 @@ public class SAMLTokenValidator implements TokenValidator {
     
     private void storeTokenInCache(
         TokenStore tokenStore, 
-        AssertionWrapper assertion, 
+        SamlAssertionWrapper assertion, 
         Principal principal,
         String tokenRealm
     ) throws WSSecurityException {

@@ -44,17 +44,17 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.message.token.DOMX509Data;
-import org.apache.ws.security.message.token.DOMX509IssuerSerial;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.UUIDGenerator;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.DOMX509Data;
+import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.EncryptionConstants;
 
 public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
@@ -131,12 +131,12 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 
                 userName = SecurityUtils.getUserName(crypto, userName);
                 if (StringUtils.isEmpty(userName)) {
-                    throw new WSSecurityException("User name is not available");
+                    throw new Exception("User name is not available");
                 }
                 receiverCert = getReceiverCertificateFromCrypto(crypto, userName);
             }
             if (receiverCert == null) {
-                throw new WSSecurityException("Receiver certificate is not available");
+                throw new Exception("Receiver certificate is not available");
             }
 
             String keyEncAlgo = encProps.getEncryptionKeyTransportAlgo() == null
@@ -156,7 +156,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         Document result = xmlCipher.doFinal(payloadDoc, payloadDoc.getDocumentElement(), false);
         NodeList list = result.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherValue");
         if (list.getLength() != 1) {
-            throw new WSSecurityException("Payload CipherData is missing", null);
+            throw new Exception("Payload CipherData is missing");
         }
         String cipherText = ((Element)list.item(0)).getTextContent().trim();
         Element cipherValue = 
@@ -201,9 +201,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             }
             return keyGen;
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, e
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e);
         }
     }
     
@@ -222,7 +220,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             String message = "Public key algorithm too weak to encrypt symmetric key";
             LOG.severe(message);
             throw new WSSecurityException(
-                WSSecurityException.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE,
                 "unsupportedKeyTransp",
                 new Object[] {message}
             );
@@ -232,15 +230,15 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             encryptedEphemeralKey = cipher.doFinal(keyBytes);
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         } catch (IllegalBlockSizeException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         } catch (BadPaddingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, ex
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, ex
             );
         }
        
@@ -258,7 +256,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         
         String encodedKey = Base64Utility.encode(encryptedKey);
         Element encryptedKeyElement = createEncryptedKeyElement(doc, keyEncAlgo, digestAlgo);
-        String encKeyId = "EK-" + UUIDGenerator.getUUID();
+        String encKeyId = IDGenerator.generateID("EK-");
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
                 
         Element keyInfoElement = createKeyInfoElement(doc, cert);
@@ -310,7 +308,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 data = remoteCert.getEncoded();
             } catch (CertificateEncodingException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.SECURITY_TOKEN_UNAVAILABLE, "encodeError", null, e
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
                 );
             }
             Text text = encryptedDataDoc.createTextNode(Base64.encode(data));
@@ -332,7 +330,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             DOMX509Data domX509Data = new DOMX509Data(encryptedDataDoc, domIssuerSerial);
             keyIdentifierNode = domX509Data.getElement();
         } else {
-            throw new WSSecurityException("Unsupported key identifier:" + keyIdType);
+            throw new Exception("Unsupported key identifier:" + keyIdType);
         }
  
         keyInfoElement.appendChild(keyIdentifierNode);

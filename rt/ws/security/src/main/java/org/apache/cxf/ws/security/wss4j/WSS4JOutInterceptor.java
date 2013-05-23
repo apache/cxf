@@ -41,13 +41,13 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.action.Action;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.action.Action;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     

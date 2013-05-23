@@ -27,8 +27,8 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSConfig;
 
 public abstract class AbstractSamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
@@ -46,7 +46,7 @@ public abstract class AbstractSamlOutInterceptor extends AbstractPhaseIntercepto
         useDeflateEncoding = deflate;
     }
     
-    protected AssertionWrapper createAssertion(Message message) throws Fault {
+    protected SamlAssertionWrapper createAssertion(Message message) throws Fault {
         return SAMLUtils.createAssertion(message);
         
     }

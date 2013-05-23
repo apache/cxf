@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -44,9 +45,11 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.policy.model.IssuedToken;
 
 /**
  * 
@@ -102,12 +105,18 @@ public final class STSUtils {
             if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {
                 client.setSoap12();
             }
-            if ((itok != null) && (itok.getIssuerEpr() != null)) {
+            if ((itok != null) && (itok.getIssuer() != null)) {
+                EndpointReferenceType epr = null;
+                try {
+                    epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
+                } catch (JAXBException e) {
+                    throw new IllegalArgumentException(e);
+                }
                 //configure via mex
                 boolean useEPRWSAAddrAsMEXLocation = !Boolean.valueOf(
                         (String)message.getContextualProperty(
                          SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
-                client.configureViaEPR(itok.getIssuerEpr(), useEPRWSAAddrAsMEXLocation);
+                client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
             }
         }
         return client;

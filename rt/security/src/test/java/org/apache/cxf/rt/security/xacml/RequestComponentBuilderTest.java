@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;

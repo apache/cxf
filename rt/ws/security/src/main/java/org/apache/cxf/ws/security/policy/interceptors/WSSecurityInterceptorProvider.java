@@ -25,9 +25,12 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 
 /**
  * 
@@ -41,6 +44,10 @@ public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProv
         ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
         ASSERTION_TYPES.add(SP12Constants.ASYMMETRIC_BINDING);
         ASSERTION_TYPES.add(SP12Constants.SYMMETRIC_BINDING);
+        
+        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
+        ASSERTION_TYPES.add(SP11Constants.ASYMMETRIC_BINDING);
+        ASSERTION_TYPES.add(SP11Constants.SYMMETRIC_BINDING);
     }
 
     public WSSecurityInterceptorProvider() {
@@ -49,5 +56,10 @@ public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProv
         this.getOutFaultInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
         this.getInInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
         this.getInFaultInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
+        
+        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
+        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
+        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
     }
 }

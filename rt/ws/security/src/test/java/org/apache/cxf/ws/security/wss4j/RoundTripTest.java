@@ -29,7 +29,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class RoundTripTest extends AbstractSecurityTest {
         service.getOutInterceptors().add(new LoggingOutInterceptor());
 
         wsIn = new WSS4JInInterceptor();
-        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 

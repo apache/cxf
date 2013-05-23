@@ -41,8 +41,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
 import org.junit.Test;
 
@@ -170,8 +170,8 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an invalid Timestamp");
         } catch (SoapFault fault) {
-            assertTrue(fault.getReason().startsWith(
-                "The message has expired"));
+            assertTrue(fault.getReason().contains(
+                " The security semantics of the message have expired"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
             assertTrue(fault.getFaultCode().equals(faultCode));
         }

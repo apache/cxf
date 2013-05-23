@@ -35,12 +35,12 @@ import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.SecurityContextToken;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
 /**
  * This class cancels a SecurityContextToken.

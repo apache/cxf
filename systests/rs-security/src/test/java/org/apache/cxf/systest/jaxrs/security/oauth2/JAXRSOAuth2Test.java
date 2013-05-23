@@ -43,7 +43,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Crypto;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

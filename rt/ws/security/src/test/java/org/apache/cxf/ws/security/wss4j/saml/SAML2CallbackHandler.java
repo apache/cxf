@@ -24,13 +24,14 @@ import java.io.IOException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.bean.KeyInfoBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -38,6 +39,8 @@ import org.opensaml.common.SAMLVersion;
  * authentication assertion using Sender Vouches.
  */
 public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
+    
+    private boolean signAssertion;
     
     public SAML2CallbackHandler() throws Exception {
         if (certs == null) {
@@ -62,6 +65,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
+                callback.setIssuer("www.example.com");
                 callback.setSamlVersion(SAMLVersion.VERSION_20);
                 SubjectBean subjectBean = 
                     new SubjectBean(
@@ -77,10 +81,28 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 }
                 callback.setSubject(subjectBean);
                 createAndSetStatement(null, callback);
+                
+                try {
+                    Crypto crypto = CryptoFactory.getInstance("outsecurity.properties");
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("myalias");
+                    callback.setIssuerKeyPassword("myAliasPassword");
+                    callback.setSignAssertion(signAssertion);
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
+    }
+    
+    public boolean isSignAssertion() {
+        return signAssertion;
+    }
+
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
     }
     
 }

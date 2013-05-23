@@ -33,47 +33,48 @@ import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
-import org.apache.cxf.ws.security.policy.model.KerberosToken;
-import org.apache.cxf.ws.security.policy.model.KeyValueToken;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
-import org.apache.cxf.ws.security.policy.model.SpnegoContextToken;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.TokenWrapper;
-import org.apache.cxf.ws.security.policy.model.TransportBinding;
-import org.apache.cxf.ws.security.policy.model.TransportToken;
-import org.apache.cxf.ws.security.policy.model.UsernameToken;
-import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.message.WSSecDKSign;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.KerberosToken;
+import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SignedElements;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
+import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.TransportBinding;
+import org.apache.wss4j.policy.model.TransportToken;
+import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.X509Token;;
 
 /**
  * 
@@ -91,9 +92,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         this.tbinding = binding;
     }
     
-    private void addSignedSupportingTokens(SupportingToken sgndSuppTokens) 
+    private void addSignedSupportingTokens(SupportingTokens sgndSuppTokens) 
         throws Exception {
-        for (Token token : sgndSuppTokens.getTokens()) {
+        for (AbstractToken token : sgndSuppTokens.getTokens()) {
             if (token instanceof UsernameToken) {
                 WSSecUsernameToken utBuilder = addUsernameToken((UsernameToken)token);
                 if (utBuilder != null) {
@@ -103,12 +104,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             } else if (token instanceof IssuedToken || token instanceof KerberosToken) {
                 SecurityToken secTok = getSecurityToken();
                 
-                if (includeToken(token.getInclusion())) {
+                if (includeToken(token.getIncludeTokenType())) {
                     //Add the token
                     addEncryptedKeyElement(cloneElement(secTok.getToken()));
                 }
             } else if (token instanceof SamlToken) {
-                AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
                 if (assertionWrapper != null) {
                     addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                 }
@@ -133,7 +134,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             if (this.isRequestor()) {
                 TransportToken transportTokenWrapper = tbinding.getTransportToken();
                 if (transportTokenWrapper != null) {
-                    Token transportToken = transportTokenWrapper.getToken();
+                    AbstractToken transportToken = transportTokenWrapper.getToken();
                     if (transportToken instanceof IssuedToken) {
                         SecurityToken secToken = getSecurityToken();
                         if (secToken == null) {
@@ -142,7 +143,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         } else {
                             policyAsserted(transportToken);
                         }
-                        if (includeToken(transportToken.getInclusion())) {
+                        if (includeToken(transportToken.getIncludeTokenType())) {
                             Element el = secToken.getToken();
                             addEncryptedKeyElement(cloneElement(el));
                         } 
@@ -168,10 +169,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private void handleNonEndorsingSupportingTokens() throws Exception {
         Collection<AssertionInfo> ais;
         
-        ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.SIGNED_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
-                SupportingToken sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                SupportingTokens sgndSuppTokens = (SupportingTokens)ai.getAssertion();
                 if (sgndSuppTokens != null) {
                     addSignedSupportingTokens(sgndSuppTokens);
                 }
@@ -179,10 +180,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-        ais = aim.get(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
-                SupportingToken sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                SupportingTokens sgndSuppTokens = (SupportingTokens)ai.getAssertion();
                 if (sgndSuppTokens != null) {
                     addSignedSupportingTokens(sgndSuppTokens);
                 }
@@ -190,10 +191,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-        ais = aim.get(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
-                SupportingToken encrSuppTokens = (SupportingToken)ai.getAssertion();
+                SupportingTokens encrSuppTokens = (SupportingTokens)ai.getAssertion();
                 if (encrSuppTokens != null) {
                     addSignedSupportingTokens(encrSuppTokens);
                 }
@@ -201,10 +202,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-        ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
-                SupportingToken suppTokens = (SupportingToken)ai.getAssertion();
+                SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
                 if (suppTokens != null && suppTokens.getTokens() != null 
                     && suppTokens.getTokens().size() > 0) {
                     handleSupportingTokens(suppTokens, false);
@@ -220,58 +221,58 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private void handleEndorsingSupportingTokens() throws Exception {
         Collection<AssertionInfo> ais;
         
-        ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-        if (ais != null) {
-            SupportingToken sgndSuppTokens = null;
+        ais = getAllAssertionsByLocalname(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
+            SupportingTokens sgndSuppTokens = null;
             for (AssertionInfo ai : ais) {
-                sgndSuppTokens = (SupportingToken)ai.getAssertion();
+                sgndSuppTokens = (SupportingTokens)ai.getAssertion();
                 ai.setAsserted(true);
             }
             if (sgndSuppTokens != null) {
-                for (Token token : sgndSuppTokens.getTokens()) {
+                for (AbstractToken token : sgndSuppTokens.getTokens()) {
                     handleEndorsingToken(token, sgndSuppTokens);
                 }
             }
         }
         
-        ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-        if (ais != null) {
-            SupportingToken endSuppTokens = null;
+        ais = getAllAssertionsByLocalname(SPConstants.ENDORSING_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
+            SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {
-                endSuppTokens = (SupportingToken)ai.getAssertion();
+                endSuppTokens = (SupportingTokens)ai.getAssertion();
                 ai.setAsserted(true);
             } 
             
             if (endSuppTokens != null) {
-                for (Token token : endSuppTokens.getTokens()) {
+                for (AbstractToken token : endSuppTokens.getTokens()) {
                     handleEndorsingToken(token, endSuppTokens);
                 }
             }
         }
-        ais = aim.get(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        if (ais != null) {
-            SupportingToken endSuppTokens = null;
+        ais = getAllAssertionsByLocalname(SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
+            SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {
-                endSuppTokens = (SupportingToken)ai.getAssertion();
+                endSuppTokens = (SupportingTokens)ai.getAssertion();
                 ai.setAsserted(true);
             } 
             
             if (endSuppTokens != null) {
-                for (Token token : endSuppTokens.getTokens()) {
+                for (AbstractToken token : endSuppTokens.getTokens()) {
                     handleEndorsingToken(token, endSuppTokens);
                 }
             }
         }
-        ais = aim.get(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        if (ais != null) {
-            SupportingToken endSuppTokens = null;
+        ais = getAllAssertionsByLocalname(SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        if (!ais.isEmpty()) {
+            SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {
-                endSuppTokens = (SupportingToken)ai.getAssertion();
+                endSuppTokens = (SupportingTokens)ai.getAssertion();
                 ai.setAsserted(true);
             } 
             
             if (endSuppTokens != null) {
-                for (Token token : endSuppTokens.getTokens()) {
+                for (AbstractToken token : endSuppTokens.getTokens()) {
                     handleEndorsingToken(token, endSuppTokens);
                 }
             }
@@ -279,7 +280,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     }
     
     private void handleEndorsingToken(
-        Token token, SupportingToken wrapper
+        AbstractToken token, SupportingTokens wrapper
     ) throws Exception {
         if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
@@ -291,7 +292,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             || token instanceof KeyValueToken) {
             addSig(doX509TokenSignature(token, wrapper));
         } else if (token instanceof SamlToken) {
-            AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+            SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
             assertionWrapper.toDOM(saaj.getSOAPPart());
             storeAssertionAsSecurityToken(assertionWrapper);
             addSig(doIssuedTokenSignature(token, wrapper));
@@ -315,7 +316,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     }
     
 
-    private byte[] doX509TokenSignature(Token token, SupportingToken wrapper) 
+    private byte[] doX509TokenSignature(AbstractToken token, SupportingTokens wrapper) 
         throws Exception {
         
         Document doc = saaj.getSOAPPart();
@@ -323,7 +324,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts = 
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
-        if (token.isDerivedKeys()) {
+        if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             WSSecEncryptedKey encrKey = getEncryptedKeyBuilder(wrapper, token);
             
             Element bstElem = encrKey.getBinarySecurityTokenElement();
@@ -334,9 +335,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
             
-            dkSig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
+            dkSig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
             dkSig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
-            dkSig.setDerivedKeyLength(binding.getAlgorithmSuite().getSignatureDerivedKeyLength() / 8);
+            AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
+            dkSig.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
             
             dkSig.setExternalKey(encrKey.getEphemeralKey(), encrKey.getId());
             
@@ -373,17 +375,20 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     }
 
     private byte[] doIssuedTokenSignature(
-        Token token, SupportingToken wrapper
+        AbstractToken token, SupportingTokens wrapper
     ) throws Exception {
         boolean tokenIncluded = false;
         // Get the issued token
         SecurityToken secTok = getSecurityToken();
         if (secTok == null) {
             LOG.fine("The retrieved SecurityToken was null");
-            throw new WSSecurityException("The retrieved SecurityToken was null");
+            Exception ex = new Exception("The retrieved SecurityToken was null");
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, ex
+            );
         }
         
-        if (includeToken(token.getInclusion())) {
+        if (includeToken(token.getIncludeTokenType())) {
             //Add the token
             Element el = cloneElement(secTok.getToken());
             //if (securityTok != null) {
@@ -399,7 +404,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         List<WSEncryptionPart> sigParts = 
                 signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
-        if (token.isDerivedKeys()) {
+        if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             return doDerivedKeySignature(tokenIncluded, secTok, token, sigParts);
         } else {
             return doSignature(tokenIncluded, secTok, token, wrapper, sigParts);
@@ -409,7 +414,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private byte[] doDerivedKeySignature(
         boolean tokenIncluded,
         SecurityToken secTok,
-        Token token,
+        AbstractToken token,
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         //Do Signature with derived keys
@@ -436,8 +441,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
         // Set the algo info
         dkSign.setSignatureAlgorithm(algorithmSuite.getSymmetricSignature());
-        dkSign.setDerivedKeyLength(algorithmSuite.getSignatureDerivedKeyLength() / 8);
-        if (token.getSPConstants() == SP12Constants.INSTANCE) {
+        AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
+        dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
+        if (token.getVersion() == SPConstants.SPVersion.SP12) {
             dkSign.setWscVersion(ConversationConstants.VERSION_05_12);
         }
         Document doc = saaj.getSOAPPart();
@@ -457,8 +463,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private byte[] doSignature(
         boolean tokenIncluded,
         SecurityToken secTok,
-        Token token,
-        TokenWrapper wrapper,
+        AbstractToken token,
+        SupportingTokens wrapper,
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         WSSecSignature sig = new WSSecSignature(wssConfig);
@@ -473,7 +479,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         if (ref != null) {
             SecurityTokenReference secRef = 
-                new SecurityTokenReference(cloneElement(ref), false);
+                new SecurityTokenReference(cloneElement(ref), new BSPEnforcer());
             sig.setSecurityTokenReference(secRef);
             sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         } else if (token instanceof UsernameToken) {
@@ -520,7 +526,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
                 uname = (String)message.getContextualProperty(userNameKey);
             }
-            String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+            String password = getPassword(uname, token, WSPasswordCallback.Usage.SIGNATURE);
             if (password == null) {
                 password = "";
             }
@@ -531,7 +537,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             sig.setSecretKey(secTok.getSecret());
             sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
         }
-        sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
+        sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
         Document doc = saaj.getSOAPPart();
         sig.prepare(doc, crypto, secHeader);
@@ -555,8 +561,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
      * Identifies the portions of the message to be signed/encrypted.
      */
     private List<WSEncryptionPart> signPartsAndElements(
-        SignedEncryptedParts signedParts,
-        SignedEncryptedElements signedElements
+        SignedParts signedParts,
+        SignedElements signedElements
     ) throws SOAPException {
         
         List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
@@ -594,8 +600,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             try {
                 result.addAll(
                     this.getElements(
-                        "Element", signedElements.getXPathExpressions(), 
-                        signedElements.getDeclaredNamespaces(), found, true
+                        "Element", signedElements.getXPaths(), found, true
                     )
                 );
             } catch (XPathExpressionException e) {

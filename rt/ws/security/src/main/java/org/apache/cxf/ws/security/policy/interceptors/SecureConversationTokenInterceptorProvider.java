@@ -29,18 +29,17 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SupportingTokens;
 
 /**
  * 
@@ -53,7 +52,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
 
     public SecureConversationTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.SECURE_CONVERSATION_TOKEN,
-                            SP12Constants.SECURE_CONVERSATION_TOKEN));
+                            SP12Constants.SECURE_CONVERSATION_TOKEN,
+                            SP12Constants.BOOTSTRAP_POLICY,
+                            SP11Constants.BOOTSTRAP_POLICY));
         this.getOutInterceptors().add(new SecureConversationOutInterceptor());
         this.getOutFaultInterceptors().add(new SecureConversationOutInterceptor());
         this.getInInterceptors().add(new SecureConversationInInterceptor());
@@ -67,7 +68,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             boolean endorse) {
         client.setTrust(NegotiationUtils.getTrust10(aim));
         client.setTrust(NegotiationUtils.getTrust13(aim));
-        Policy pol = itok.getBootstrapPolicy();
+        Policy pol = itok.getBootstrapPolicy().getPolicy();
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
         p.addPolicyComponent(ea);
@@ -76,10 +77,10 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         ea.addPolicyComponent(all);
         
         if (endorse) {
-            SupportingToken st = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING,
-                                                     SP12Constants.INSTANCE,
-                                                     message.getExchange()
-                                                         .getBus().getExtension(PolicyBuilder.class));
+            SupportingTokens st = 
+                new SupportingTokens(SPConstants.SPVersion.SP12, 
+                                     SP12Constants.SupportingTokenTypes.EndorsingSupportingTokens,
+                                     new Policy());
             st.addToken(itok);
             all.addPolicyComponent(st);
         }
@@ -94,7 +95,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         AlgorithmSuite suite = NegotiationUtils.getAlgorithmSuite(aim);
         if (suite != null) {
             client.setAlgorithmSuite(suite);
-            int x = suite.getMaximumSymmetricKeyLength();
+            int x = suite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength();
             if (x < 256) {
                 client.setKeySize(x);
             }

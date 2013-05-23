@@ -20,54 +20,23 @@
 package org.apache.cxf.ws.security.policy;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ws.policy.AssertionBuilderLoader;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderLoader;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
-import org.apache.cxf.ws.security.policy.builders.AlgorithmSuiteBuilder;
-import org.apache.cxf.ws.security.policy.builders.AsymmetricBindingBuilder;
-import org.apache.cxf.ws.security.policy.builders.ContentEncryptedElementsBuilder;
-import org.apache.cxf.ws.security.policy.builders.EncryptedElementsBuilder;
-import org.apache.cxf.ws.security.policy.builders.EncryptedPartsBuilder;
-import org.apache.cxf.ws.security.policy.builders.HttpsTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.InitiatorEncryptionTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.InitiatorSignatureTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.InitiatorTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.IssuedTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.KerberosTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.KeyValueTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.LayoutBuilder;
-import org.apache.cxf.ws.security.policy.builders.ProtectionTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.RecipientEncryptionTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.RecipientSignatureTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.RecipientTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.RequiredElementsBuilder;
-import org.apache.cxf.ws.security.policy.builders.RequiredPartsBuilder;
-import org.apache.cxf.ws.security.policy.builders.SamlTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.SecureConversationTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.SecurityContextTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.SignedElementsBuilder;
-import org.apache.cxf.ws.security.policy.builders.SignedPartsBuilder;
-import org.apache.cxf.ws.security.policy.builders.SpnegoContextTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.SupportingTokens12Builder;
-import org.apache.cxf.ws.security.policy.builders.SupportingTokensBuilder;
-import org.apache.cxf.ws.security.policy.builders.SymmetricBindingBuilder;
-import org.apache.cxf.ws.security.policy.builders.TransportBindingBuilder;
-import org.apache.cxf.ws.security.policy.builders.TransportTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.Trust10Builder;
-import org.apache.cxf.ws.security.policy.builders.Trust13Builder;
-import org.apache.cxf.ws.security.policy.builders.UsernameTokenBuilder;
-import org.apache.cxf.ws.security.policy.builders.WSS10Builder;
-import org.apache.cxf.ws.security.policy.builders.WSS11Builder;
-import org.apache.cxf.ws.security.policy.builders.X509TokenBuilder;
+import org.apache.cxf.ws.security.policy.custom.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.KerberosTokenInterceptorProvider;
@@ -77,6 +46,49 @@ import org.apache.cxf.ws.security.policy.interceptors.SpnegoTokenInterceptorProv
 import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SP13Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
+import org.apache.wss4j.policy.builders.BootstrapPolicyBuilder;
+import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
+import org.apache.wss4j.policy.builders.EncryptedElementsBuilder;
+import org.apache.wss4j.policy.builders.EncryptedPartsBuilder;
+import org.apache.wss4j.policy.builders.HttpsTokenBuilder;
+import org.apache.wss4j.policy.builders.InitiatorEncryptionTokenBuilder;
+import org.apache.wss4j.policy.builders.InitiatorSignatureTokenBuilder;
+import org.apache.wss4j.policy.builders.InitiatorTokenBuilder;
+import org.apache.wss4j.policy.builders.IssuedTokenBuilder;
+import org.apache.wss4j.policy.builders.KerberosTokenBuilder;
+import org.apache.wss4j.policy.builders.KeyValueTokenBuilder;
+import org.apache.wss4j.policy.builders.LayoutBuilder;
+import org.apache.wss4j.policy.builders.ProtectionTokenBuilder;
+import org.apache.wss4j.policy.builders.RecipientEncryptionTokenBuilder;
+import org.apache.wss4j.policy.builders.RecipientSignatureTokenBuilder;
+import org.apache.wss4j.policy.builders.RecipientTokenBuilder;
+import org.apache.wss4j.policy.builders.RequiredElementsBuilder;
+import org.apache.wss4j.policy.builders.RequiredPartsBuilder;
+import org.apache.wss4j.policy.builders.SamlTokenBuilder;
+import org.apache.wss4j.policy.builders.SecureConversationTokenBuilder;
+import org.apache.wss4j.policy.builders.SecurityContextTokenBuilder;
+import org.apache.wss4j.policy.builders.SignedElementsBuilder;
+import org.apache.wss4j.policy.builders.SignedPartsBuilder;
+import org.apache.wss4j.policy.builders.SpnegoContextTokenBuilder;
+import org.apache.wss4j.policy.builders.SupportingTokensBuilder;
+import org.apache.wss4j.policy.builders.SymmetricBindingBuilder;
+import org.apache.wss4j.policy.builders.TransportBindingBuilder;
+import org.apache.wss4j.policy.builders.TransportTokenBuilder;
+import org.apache.wss4j.policy.builders.Trust10Builder;
+import org.apache.wss4j.policy.builders.Trust13Builder;
+import org.apache.wss4j.policy.builders.UsernameTokenBuilder;
+import org.apache.wss4j.policy.builders.WSS10Builder;
+import org.apache.wss4j.policy.builders.WSS11Builder;
+import org.apache.wss4j.policy.builders.X509TokenBuilder;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 @NoJSR250Annotations
 public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
@@ -100,43 +112,42 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         if (reg == null) {
             return;
         }
-        PolicyBuilder pbuild = bus.getExtension(PolicyBuilder.class);
         reg.registerBuilder(new AlgorithmSuiteBuilder(bus));
-        reg.registerBuilder(new AsymmetricBindingBuilder(pbuild));
+        reg.registerBuilder(new AsymmetricBindingBuilder());
         reg.registerBuilder(new ContentEncryptedElementsBuilder());
         reg.registerBuilder(new EncryptedElementsBuilder());
         reg.registerBuilder(new EncryptedPartsBuilder());
-        reg.registerBuilder(new HttpsTokenBuilder(pbuild));
-        reg.registerBuilder(new InitiatorTokenBuilder(pbuild));
-        reg.registerBuilder(new InitiatorSignatureTokenBuilder(pbuild));
-        reg.registerBuilder(new InitiatorEncryptionTokenBuilder(pbuild));
-        reg.registerBuilder(new IssuedTokenBuilder(pbuild));
+        reg.registerBuilder(new HttpsTokenBuilder());
+        reg.registerBuilder(new InitiatorTokenBuilder());
+        reg.registerBuilder(new InitiatorSignatureTokenBuilder());
+        reg.registerBuilder(new InitiatorEncryptionTokenBuilder());
+        reg.registerBuilder(new IssuedTokenBuilder());
         reg.registerBuilder(new LayoutBuilder());
-        reg.registerBuilder(new ProtectionTokenBuilder(pbuild));
-        reg.registerBuilder(new RecipientTokenBuilder(pbuild));
-        reg.registerBuilder(new RecipientSignatureTokenBuilder(pbuild));
-        reg.registerBuilder(new RecipientEncryptionTokenBuilder(pbuild));
+        reg.registerBuilder(new ProtectionTokenBuilder());
+        reg.registerBuilder(new RecipientTokenBuilder());
+        reg.registerBuilder(new RecipientSignatureTokenBuilder());
+        reg.registerBuilder(new RecipientEncryptionTokenBuilder());
         reg.registerBuilder(new RequiredElementsBuilder());
         reg.registerBuilder(new RequiredPartsBuilder());
-        reg.registerBuilder(new SamlTokenBuilder(pbuild));
-        reg.registerBuilder(new KerberosTokenBuilder(pbuild));
-        reg.registerBuilder(new SecureConversationTokenBuilder(pbuild));
+        reg.registerBuilder(new SamlTokenBuilder());
+        reg.registerBuilder(new KerberosTokenBuilder());
+        reg.registerBuilder(new SecureConversationTokenBuilder());
+        reg.registerBuilder(new BootstrapPolicyBuilder());
         reg.registerBuilder(new SecurityContextTokenBuilder());
         reg.registerBuilder(new SignedElementsBuilder());
         reg.registerBuilder(new SignedPartsBuilder());
-        reg.registerBuilder(new SpnegoContextTokenBuilder(pbuild));
-        reg.registerBuilder(new SupportingTokens12Builder(pbuild));
-        reg.registerBuilder(new SupportingTokensBuilder(pbuild));
-        reg.registerBuilder(new SymmetricBindingBuilder(pbuild));
-        reg.registerBuilder(new TransportBindingBuilder(pbuild, bus));
-        reg.registerBuilder(new TransportTokenBuilder(pbuild));
+        reg.registerBuilder(new SpnegoContextTokenBuilder());
+        reg.registerBuilder(new SupportingTokensBuilder());
+        reg.registerBuilder(new SymmetricBindingBuilder());
+        reg.registerBuilder(new TransportBindingBuilder());
+        reg.registerBuilder(new TransportTokenBuilder());
         reg.registerBuilder(new Trust10Builder());
         reg.registerBuilder(new Trust13Builder());
-        reg.registerBuilder(new UsernameTokenBuilder(pbuild));
+        reg.registerBuilder(new UsernameTokenBuilder());
         reg.registerBuilder(new KeyValueTokenBuilder());
         reg.registerBuilder(new WSS10Builder());
         reg.registerBuilder(new WSS11Builder());
-        reg.registerBuilder(new X509TokenBuilder(pbuild));
+        reg.registerBuilder(new X509TokenBuilder());
         
         //add generic assertions for these known things to prevent warnings
         List<QName> others = Arrays.asList(new QName[] {
@@ -165,14 +176,106 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP11Constants.REQUIRE_INTERNAL_REFERENCE,
             SP12Constants.REQUIRE_ISSUER_SERIAL_REFERENCE,
             SP11Constants.REQUIRE_ISSUER_SERIAL_REFERENCE,
-            new QName(SP12Constants.SP_NS, SP12Constants.ENCRYPT_BEFORE_SIGNING),
-            new QName(SP11Constants.SP_NS, SP11Constants.ENCRYPT_BEFORE_SIGNING),
-            new QName(SP12Constants.SP_NS, SP12Constants.SIGN_BEFORE_ENCRYPTING),
-            new QName(SP11Constants.SP_NS, SP11Constants.SIGN_BEFORE_ENCRYPTING),
+            SP12Constants.REQUIRE_EMBEDDED_TOKEN_REFERENCE,
+            SP11Constants.REQUIRE_EMBEDDED_TOKEN_REFERENCE,
+            SP12Constants.ENCRYPT_BEFORE_SIGNING,
+            SP11Constants.ENCRYPT_BEFORE_SIGNING,
+            SP12Constants.SIGN_BEFORE_ENCRYPTING,
+            SP11Constants.SIGN_BEFORE_ENCRYPTING,
             SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
+            SP12Constants.PROTECT_TOKENS,
+            SP11Constants.PROTECT_TOKENS,
+            SP12Constants.RSA_KEY_VALUE,
+            
+            // Layout
+            SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST, SP11Constants.STRICT, 
+            SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST, SP12Constants.STRICT,
+            
+            // UsernameToken
+            SP11Constants.WSS_USERNAME_TOKEN10, SP12Constants.WSS_USERNAME_TOKEN10,  
+            SP11Constants.WSS_USERNAME_TOKEN11, SP12Constants.WSS_USERNAME_TOKEN11,
+            SP12Constants.HASH_PASSWORD, SP12Constants.NO_PASSWORD,
+            SP13Constants.CREATED, SP13Constants.NONCE,
+            
+            SP12Constants.REQUIRE_INTERNAL_REFERENCE, SP11Constants.REQUIRE_INTERNAL_REFERENCE,
+            SP12Constants.REQUIRE_EXTERNAL_REFERNCE, SP11Constants.REQUIRE_EXTERNAL_REFERNCE,
+            
+            // Kerberos
+            new QName(SP11Constants.SP_NS, "WssKerberosV5ApReqToken11"),
+            new QName(SP12Constants.SP_NS, "WssKerberosV5ApReqToken11"),
+            new QName(SP11Constants.SP_NS, "WssGssKerberosV5ApReqToken11"),
+            new QName(SP12Constants.SP_NS, "WssGssKerberosV5ApReqToken11"),
+            
+            // Spnego
+            SP12Constants.MUST_NOT_SEND_AMEND,
+            SP12Constants.MUST_NOT_SEND_CANCEL,
+            SP12Constants.MUST_NOT_SEND_RENEW,            
+            
+            // Backwards compatibility thing
+            new QName("http://schemas.microsoft.com/ws/2005/07/securitypolicy", SPConstants.MUST_NOT_SEND_CANCEL),
+            
+            // SCT
+            SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE,
+            SP12Constants.SC13_SECURITY_CONTEXT_TOKEN,
+            SP11Constants.SC10_SECURITY_CONTEXT_TOKEN,
+            
+            // WSS10
+            SP12Constants.MUST_SUPPORT_REF_KEY_IDENTIFIER, SP11Constants.MUST_SUPPORT_REF_KEY_IDENTIFIER,
+            SP12Constants.MUST_SUPPORT_REF_ISSUER_SERIAL, SP11Constants.MUST_SUPPORT_REF_ISSUER_SERIAL,
+            SP12Constants.MUST_SUPPORT_REF_EXTERNAL_URI, SP12Constants.MUST_SUPPORT_REF_EXTERNAL_URI,
+            SP12Constants.MUST_SUPPORT_REF_EMBEDDED_TOKEN, SP11Constants.MUST_SUPPORT_REF_EMBEDDED_TOKEN,
+            
+            // WSS11
+            SP12Constants.MUST_SUPPORT_REF_THUMBPRINT, SP11Constants.MUST_SUPPORT_REF_THUMBPRINT,
+            SP12Constants.MUST_SUPPORT_REF_ENCRYPTED_KEY, SP11Constants.MUST_SUPPORT_REF_ENCRYPTED_KEY,
+            SP12Constants.REQUIRE_SIGNATURE_CONFIRMATION, SP11Constants.REQUIRE_SIGNATURE_CONFIRMATION,
+            
+            // SAML
+            new QName(SP11Constants.SP_NS, "WssSamlV11Token10"),
+            new QName(SP12Constants.SP_NS, "WssSamlV11Token10"),
+            new QName(SP11Constants.SP_NS, "WssSamlV11Token11"),
+            new QName(SP12Constants.SP_NS, "WssSamlV11Token11"),
+            new QName(SP11Constants.SP_NS, "WssSamlV20Token11"),
+            new QName(SP12Constants.SP_NS, "WssSamlV20Token11"),
+            
+            // HTTPs
+            SP12Constants.HTTP_BASIC_AUTHENTICATION,
+            SP12Constants.HTTP_DIGEST_AUTHENTICATION,
+            SP12Constants.REQUIRE_CLIENT_CERTIFICATE,
+            
+            // Trust13
+            SP12Constants.MUST_SUPPORT_CLIENT_CHALLENGE, SP11Constants.MUST_SUPPORT_CLIENT_CHALLENGE,
+            SP12Constants.MUST_SUPPORT_SERVER_CHALLENGE, SP11Constants.MUST_SUPPORT_SERVER_CHALLENGE,
+            SP12Constants.REQUIRE_CLIENT_ENTROPY, SP11Constants.REQUIRE_CLIENT_ENTROPY,
+            SP12Constants.REQUIRE_SERVER_ENTROPY, SP11Constants.REQUIRE_SERVER_ENTROPY,
+            SP12Constants.MUST_SUPPORT_ISSUED_TOKENS, SP11Constants.MUST_SUPPORT_ISSUED_TOKENS,
+            SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION,
+            SP12Constants.REQUIRE_APPLIES_TO,
+            SP13Constants.SCOPE_POLICY_15,
+            SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE,
+            
         });
-        reg.registerBuilder(new PrimitiveAssertionBuilder(others));
+        final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+        for (QName q : others) {
+            assertions.put(q, new PrimitiveAssertion(q));
+        }
+        for (String s : AlgorithmSuite.getSupportedAlgorithmSuiteNames()) {
+            QName q = new QName(SP11Constants.SP_NS, s);
+            assertions.put(q, new PrimitiveAssertion(q));
+            q = new QName(SP12Constants.SP_NS, s);
+            assertions.put(q, new PrimitiveAssertion(q));
+        }
+        reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
+            public Assertion build(Element element, AssertionBuilderFactory fact) {
+                if (XMLPrimitiveAssertionBuilder.isOptional(element)
+                    || XMLPrimitiveAssertionBuilder.isIgnorable(element)) {
+                    return super.build(element, fact);
+                }
+                QName q = new QName(element.getNamespaceURI(), element.getLocalName());
+                return assertions.get(q);
+            }            
+        });
     }
     
     public void registerProviders() {

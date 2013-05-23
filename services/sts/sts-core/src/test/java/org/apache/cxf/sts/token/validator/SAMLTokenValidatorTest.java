@@ -54,13 +54,13 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
 
@@ -485,10 +485,10 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         
         return properties;
     }
@@ -496,10 +496,10 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
     private Properties getEveCryptoProperties() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "evespass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "eve.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "evespass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
         
         return properties;
     }

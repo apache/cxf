@@ -20,9 +20,9 @@ package org.apache.cxf.ws.security.wss4j;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.junit.Test;
 
 public class CustomPolicyAlgorithmsTest extends AbstractPolicySecurityTest {
@@ -46,27 +46,6 @@ public class CustomPolicyAlgorithmsTest extends AbstractPolicySecurityTest {
 
         assertNotNull(sigMethod);
         assertEquals(rsaSha2SigMethod, sigMethod);
-    }
-    
-    @Test
-    public void testSHA256DigestAlgorithm() throws Exception {
-
-        final String sha256 = "http://www.w3.org/2001/04/xmlenc#sha256";
-        String policyName = "signed_elements_policy.xml";
-        Policy policy = policyBuilder.getPolicy(this.getResourceAsStream(policyName)); 
-        AssertionInfoMap aim = new AssertionInfoMap(policy);
-
-        AssertionInfo assertInfo = aim.get(SP12Constants.ASYMMETRIC_BINDING).iterator().next();
-
-        AsymmetricBinding binding = (AsymmetricBinding) assertInfo.getAssertion();
-
-        // set Digest Algorithm to SHA-256
-        binding.getAlgorithmSuite().setDigest(sha256);
-
-        String digestMethod = binding.getAlgorithmSuite().getDigest();
-
-        assertNotNull(digestMethod);
-        assertEquals(sha256, digestMethod);
     }
   
 }

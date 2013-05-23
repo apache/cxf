@@ -85,7 +85,7 @@
      
     </jaxws:endpoint> 
     
-    <bean id="crypto" class="org.apache.ws.security.components.crypto.CryptoFactory" 
+    <bean id="crypto" class="org.apache.wss4j.common.crypto.CryptoFactory" 
         factory-method="getInstance">
         <constructor-arg>
             <util:properties id="cryptoProperties" 

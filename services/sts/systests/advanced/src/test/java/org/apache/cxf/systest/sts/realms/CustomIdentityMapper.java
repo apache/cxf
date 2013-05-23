@@ -21,7 +21,7 @@ package org.apache.cxf.systest.sts.realms;
 import java.security.Principal;
 
 import org.apache.cxf.sts.IdentityMapper;
-import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 /**
  * A test implementation of RealmParser.

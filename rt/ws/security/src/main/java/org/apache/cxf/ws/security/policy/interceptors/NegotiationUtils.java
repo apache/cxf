@@ -20,9 +20,12 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -47,25 +50,26 @@ import org.apache.cxf.ws.policy.EndpointPolicy;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.SecurityContextToken;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 
 /**
  * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation 
@@ -78,19 +82,16 @@ final class NegotiationUtils {
     }
 
     static Trust10 getTrust10(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_10);
-        if (ais == null || ais.isEmpty()) {
-            ais = aim.get(SP11Constants.TRUST_10);
-        }
-        if (ais == null || ais.isEmpty()) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+        if (ais.isEmpty()) {
             return null;
         }
         return (Trust10)ais.iterator().next().getAssertion();
     }
     
     static Trust13 getTrust13(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_13);
-        if (ais == null || ais.isEmpty()) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+        if (ais.isEmpty()) {
             return null;
         }
         return (Trust13)ais.iterator().next().getAssertion();
@@ -146,23 +147,24 @@ final class NegotiationUtils {
     }
 
     static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
-        Binding transport = null;
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        if (ais != null) {
+        AbstractBinding transport = null;
+        Collection<AssertionInfo> ais = 
+            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
-                transport = (Binding)ai.getAssertion();
+                transport = (AbstractBinding)ai.getAssertion();
             }                    
         } else {
-            ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-            if (ais != null) {
+            ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+            if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
-                    transport = (Binding)ai.getAssertion();
+                    transport = (AbstractBinding)ai.getAssertion();
                 }                    
             } else {
-                ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-                if (ais != null) {
+                ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+                if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
-                        transport = (Binding)ai.getAssertion();
+                        transport = (AbstractBinding)ai.getAssertion();
                     }                    
                 }
             }
@@ -302,4 +304,48 @@ final class NegotiationUtils {
         return handler;
     }
     
+    static boolean assertPolicy(AssertionInfoMap aim, QName name) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    static boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    static Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
+        }
+            
+        return Collections.emptySet();
+    }
+
 }

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.sts.token.realm;
 
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 
 /**
@@ -28,10 +28,10 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 public interface SAMLRealmCodec {
     
     /**
-     * Get the realm associated with the AssertionWrapper parameter
+     * Get the realm associated with the SamlAssertionWrapper parameter
      * @param assertion a SAML Assertion wrapper object
-     * @return the realm associated with the AssertionWrapper parameter
+     * @return the realm associated with the SamlAssertionWrapper parameter
      */
-    String getRealmFromToken(AssertionWrapper assertion);
+    String getRealmFromToken(SamlAssertionWrapper assertion);
     
 }

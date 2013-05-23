@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -33,27 +35,31 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.EncryptionToken;
-import org.apache.cxf.ws.security.policy.model.Layout;
-import org.apache.cxf.ws.security.policy.model.ProtectionToken;
-import org.apache.cxf.ws.security.policy.model.SignatureToken;
-import org.apache.cxf.ws.security.policy.model.SymmetricAsymmetricBindingBase;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.TokenWrapper;
-import org.apache.cxf.ws.security.policy.model.X509Token;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.Timestamp;
-import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.PKIPathSecurity;
+import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
+import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding.ProtectionOrder;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
+import org.apache.wss4j.policy.model.AbstractTokenWrapper;
+import org.apache.wss4j.policy.model.EncryptionToken;
+import org.apache.wss4j.policy.model.Layout;
+import org.apache.wss4j.policy.model.ProtectionToken;
+import org.apache.wss4j.policy.model.SignatureToken;
+import org.apache.wss4j.policy.model.X509Token;
 
 /**
  * Some abstract functionality for validating a security binding.
@@ -78,7 +84,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         Message message
     ) {
         List<WSSecurityEngineResult> timestampResults = 
-            WSS4JUtils.fetchAllActionResults(results, WSConstants.TS);
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.TS);
         
         // Check whether we received a timestamp and compare it to the policy
         if (includeTimestamp && timestampResults.size() != 1) {
@@ -150,7 +156,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Check various properties set in the policy of the binding
      */
     protected boolean checkProperties(
-        SymmetricAsymmetricBindingBase binding, 
+        AbstractSymmetricAsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim,
         List<WSSecurityEngineResult> results,
@@ -162,15 +168,23 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
             return false;
         }
+        assertPolicy(aim, binding.getAlgorithmSuite());
+        String namespace = binding.getAlgorithmSuite().getAlgorithmSuiteType().getNamespace();
+        String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
+        Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
+        if (algSuiteAis != null) {
+            for (AssertionInfo algSuiteAi : algSuiteAis) {
+                algSuiteAi.setAsserted(true);
+            }
+        }
         
         // Check the IncludeTimestamp
         if (!validateTimestamp(binding.isIncludeTimestamp(), false, results, signedResults, message)) {
             String error = "Received Timestamp does not match the requirements";
-            notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
+        assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
         
         // Check the Layout
         Layout layout = binding.getLayout();
@@ -182,20 +196,27 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, layout);
+        assertPolicy(aim, SPConstants.LAYOUT_LAX);
+        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
+        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
+        assertPolicy(aim, SPConstants.LAYOUT_STRICT);
         
         // Check the EntireHeaderAndBodySignatures property
-        if (binding.isEntireHeadersAndBodySignatures()
+        if (binding.isOnlySignEntireHeadersAndBody()
             && !validateEntireHeaderAndBodySignatures(signedResults)) {
             String error = "OnlySignEntireHeadersAndBody does not match the requirements";
             ai.setNotAsserted(error);
             return false;
         }
+        assertPolicy(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         
         // Check whether the signatures were encrypted or not
-        if (binding.isSignatureProtection() && !isSignatureEncrypted(results)) {
+        if (binding.isEncryptSignature() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
+        assertPolicy(aim, SPConstants.ENCRYPT_SIGNATURE);
+        assertPolicy(aim, SPConstants.PROTECT_TOKENS);
         
         /*
         // Check ProtectTokens
@@ -212,18 +233,24 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Check the Protection Order of the binding
      */
     protected boolean checkProtectionOrder(
-        SymmetricAsymmetricBindingBase binding, 
+        AbstractSymmetricAsymmetricBinding binding, 
+        AssertionInfoMap aim,
         AssertionInfo ai,
         List<WSSecurityEngineResult> results
     ) {
-        if (binding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-            if (!binding.isSignatureProtection() && isSignedBeforeEncrypted(results)) {
+        ProtectionOrder protectionOrder = binding.getProtectionOrder();
+        if (protectionOrder == ProtectionOrder.EncryptBeforeSigning) {
+            if (!binding.isProtectTokens() && isSignedBeforeEncrypted(results)) {
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
-        } else if (isEncryptedBeforeSigned(results)) {
-            ai.setNotAsserted("Not signed before encrypted");
-            return false;
+            assertPolicy(aim, SPConstants.ENCRYPT_BEFORE_SIGNING);
+        } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) { 
+            if (isEncryptedBeforeSigned(results)) {
+                ai.setNotAsserted("Not signed before encrypted");
+                return false;
+            }
+            assertPolicy(aim, SPConstants.SIGN_BEFORE_ENCRYPTING);
         }
         return true;
     }
@@ -284,14 +311,15 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Check the derived key requirement.
      */
     protected boolean checkDerivedKeys(
-        TokenWrapper tokenWrapper, 
+        AbstractTokenWrapper tokenWrapper, 
         boolean hasDerivedKeys,
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Token token = tokenWrapper.getToken();
+        AbstractToken token = tokenWrapper.getToken();
+        boolean isDerivedKeys = token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys;
         // If derived keys are not required then just return
-        if (!(token instanceof X509Token && token.isDerivedKeys())) {
+        if (!(token instanceof X509Token && isDerivedKeys)) {
             return true;
         }
         if (tokenWrapper instanceof EncryptionToken 
@@ -381,8 +409,8 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 }
             } else if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                AssertionWrapper assertionWrapper = 
-                    (AssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                SamlAssertionWrapper assertionWrapper = 
+                    (SamlAssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
                 if (samlKeyInfo != null) {
                     X509Certificate[] subjectCerts = samlKeyInfo.getCerts();
@@ -472,6 +500,17 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         }
     }
     
+    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
     protected boolean assertPolicy(AssertionInfoMap aim, QName q) {
         Collection<AssertionInfo> ais = aim.get(q);
         if (ais != null && !ais.isEmpty()) {
@@ -490,5 +529,26 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 ai.setNotAsserted(msg);
             }    
         }
+    }
+    
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
+        }
+            
+        return Collections.emptySet();
     }
 }

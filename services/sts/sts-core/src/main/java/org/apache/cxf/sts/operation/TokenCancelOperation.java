@@ -45,7 +45,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedTokenCancelledType;
 import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.springframework.context.ApplicationEvent;
 
 /**

@@ -22,8 +22,6 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -33,7 +31,8 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
-import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 
 /**
  * Interceptor verifies critical policy security assertions for client side
@@ -59,37 +58,43 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
         if (MessageUtils.isRequestor(message)) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             if (aim != null) {
-                Collection<AssertionInfo> aisTransport = aim.get(SP12Constants.TRANSPORT_BINDING);
-                Collection<AssertionInfo> aisAssymetric = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-                Collection<AssertionInfo> aisSymetric = aim.get(SP12Constants.SYMMETRIC_BINDING);
-                if (((aisTransport == null) || aisTransport.isEmpty()) 
-                    && ((aisAssymetric == null) || aisAssymetric.isEmpty()) 
-                    && ((aisSymetric == null) || aisSymetric.isEmpty())) {
+                Collection<AssertionInfo> aisTransport = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+                Collection<AssertionInfo> aisAssymetric = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+                Collection<AssertionInfo> aisSymetric = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+                
+                if (aisTransport.isEmpty() && aisAssymetric.isEmpty() && aisSymetric.isEmpty()) {
                     
-                    Collection<AssertionInfo> aisSignedParts = aim.get(SP12Constants.SIGNED_PARTS);
-                    checkAssertion(aisSignedParts, SP12Constants.SIGNED_PARTS);
+                    Collection<AssertionInfo> aisSignedParts = 
+                        NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+                    checkAssertion(aisSignedParts, SPConstants.SIGNED_PARTS);
+                    
                     Collection<AssertionInfo> aisSignedElements = aim.get(SP12Constants.SIGNED_ELEMENTS);
-                    checkAssertion(aisSignedElements, SP12Constants.SIGNED_ELEMENTS);
+                    checkAssertion(aisSignedElements, SPConstants.SIGNED_ELEMENTS);
                     
                     Collection<AssertionInfo> aisEncryptedParts = aim.get(SP12Constants.ENCRYPTED_PARTS);
-                    checkAssertion(aisEncryptedParts, SP12Constants.ENCRYPTED_PARTS);
+                    checkAssertion(aisEncryptedParts, SPConstants.ENCRYPTED_PARTS);
+                    
                     Collection<AssertionInfo> aisEncryptedElements = 
                         aim.get(SP12Constants.ENCRYPTED_ELEMENTS);
-                    checkAssertion(aisEncryptedElements, SP12Constants.ENCRYPTED_ELEMENTS);
+                    checkAssertion(aisEncryptedElements, SPConstants.ENCRYPTED_ELEMENTS);
+                    
                     Collection<AssertionInfo> aisContentEncryptedElements = 
                         aim.get(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
-                    checkAssertion(aisContentEncryptedElements, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+                    checkAssertion(aisContentEncryptedElements, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
                 }
             }
         }
     }
 
-    private void checkAssertion(Collection<AssertionInfo> ais, QName assertion) {
+    private void checkAssertion(Collection<AssertionInfo> ais, String assertionName) {
         if ((ais != null) && (!ais.isEmpty())) {
             String error = String
                 .format("%s assertion cannot be fulfilled without binding. "
                         + "At least one binding assertion (%s, %s, %s) must be specified in policy.",
-                        assertion.getLocalPart(), SP12Constants.TRANSPORT_BINDING.getLocalPart(),
+                        assertionName, SP12Constants.TRANSPORT_BINDING.getLocalPart(),
                         SP12Constants.ASYMMETRIC_BINDING.getLocalPart(),
                         SP12Constants.SYMMETRIC_BINDING.getLocalPart());
             AssertionInfo info = ais.iterator().next();

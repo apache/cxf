@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -48,11 +49,13 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * An abstract interceptor that can be used to form the basis of an interceptor to add and process
@@ -70,6 +73,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         super(Phase.PRE_PROTOCOL);
         addAfter(PolicyBasedWSS4JOutInterceptor.class.getName());
         addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
+        addAfter(PolicyBasedWSS4JStaxInInterceptor.class.getName());
     }
     
     public Set<QName> getUnderstoodHeaders() {
@@ -78,6 +82,12 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
 
     public void handleMessage(SoapMessage message) throws Fault {
 
+        boolean enableStax = 
+            MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+        if (enableStax) {
+            return;
+        }
+        
         boolean isReq = MessageUtils.isRequestor(message);
         boolean isOut = MessageUtils.isOutbound(message);
         
@@ -106,26 +116,64 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     
     protected abstract void addToken(SoapMessage message);
     
-    protected abstract Token assertTokens(SoapMessage message);
+    protected abstract AbstractToken assertTokens(SoapMessage message);
     
-    protected Token assertTokens(SoapMessage message, QName assertion, boolean signed) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(assertion);
-        Token tok = null;
-        for (AssertionInfo ai : ais) {
-            tok = (Token)ai.getAssertion();
-            ai.setAsserted(true);                
-        }
-        ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
-        
-        if (signed || isTLSInUse(message)) {
-            ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    protected boolean assertPolicy(AssertionInfoMap aim, QName name) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
             }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
+        }
+            
+        return Collections.emptySet();
+    }
+    
+    protected AbstractToken assertTokens(SoapMessage message, String localname, boolean signed) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        AbstractToken tok = null;
+        for (AssertionInfo ai : ais) {
+            tok = (AbstractToken)ai.getAssertion();
+            ai.setAsserted(true);                
+        }
+        
+        assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
+        
+        if (signed || isTLSInUse(message)) {
+            assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         }
         return tok;
     }
@@ -190,7 +238,8 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         return sh;
     }
     
-    protected String getPassword(String userName, Token info, int type, SoapMessage message) {
+    protected String getPassword(String userName, AbstractToken info, 
+                                 WSPasswordCallback.Usage usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
     
         CallbackHandler handler = getCallback(message);
@@ -199,7 +248,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             return null;
         }
         
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, type)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, usage)};
         try {
             handler.handle(cb);
         } catch (Exception e) {
@@ -210,14 +259,13 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         return cb[0].getPassword();
     }
     
-    protected void policyNotAsserted(Token assertion, String reason, SoapMessage message) {
+    protected void policyNotAsserted(AbstractToken assertion, String reason, SoapMessage message) {
         if (assertion == null) {
             return;
         }
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
 
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {
@@ -230,13 +278,12 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         }
     }
     
-    protected void policyNotAsserted(Token assertion, Exception reason, SoapMessage message) {
+    protected void policyNotAsserted(AbstractToken assertion, Exception reason, SoapMessage message) {
         if (assertion == null) {
             return;
         }
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {

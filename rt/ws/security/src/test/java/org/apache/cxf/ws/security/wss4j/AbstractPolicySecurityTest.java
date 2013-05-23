@@ -58,22 +58,23 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
 
 public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     protected PolicyBuilder policyBuilder;
@@ -385,7 +386,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             }
         }
         inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
+        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, 
                 "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
                 "insecurity.properties");
@@ -444,8 +445,8 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
 
-        final List<WSSecurityEngineResult> protectionResults =
-            WSS4JUtils.fetchAllActionResults(handlerResults.get(0).getResults(), WSConstants.ENCR);
+        final List<WSSecurityEngineResult> protectionResults = 
+            WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(), WSConstants.ENCR);
         assertNotNull(protectionResults);
         
         //
@@ -466,8 +467,9 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         
         final AsymmetricBinding binding = (AsymmetricBinding) assertInfo.getAssertion();
         final String expectedSignatureMethod = binding.getAlgorithmSuite().getAsymmetricSignature();
-        final String expectedDigestAlgorithm = binding.getAlgorithmSuite().getDigest();
-        final String expectedCanonAlgorithm  = binding.getAlgorithmSuite().getInclusiveC14n();
+        final String expectedDigestAlgorithm = 
+            binding.getAlgorithmSuite().getAlgorithmSuiteType().getDigest();
+        final String expectedCanonAlgorithm  = binding.getAlgorithmSuite().getC14n().getValue();
             
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();

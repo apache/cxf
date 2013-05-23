@@ -43,7 +43,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.test.AbstractCXFTest;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 
 
 public abstract class AbstractSecurityTest extends AbstractCXFTest {

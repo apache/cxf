@@ -39,20 +39,21 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.xml.EncryptionUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.SAMLUtil;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
-import org.apache.ws.security.validate.SignatureTrustValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
@@ -97,14 +98,14 @@ public class SAMLProtocolResponseValidator {
         if (samlResponse.getStatus() == null
             || samlResponse.getStatus().getStatusCode() == null) {
             LOG.fine("Either the SAML Response Status or StatusCode is null");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         if (!SAML2_STATUSCODE_SUCCESS.equals(samlResponse.getStatus().getStatusCode().getValue())) {
             LOG.fine(
                 "SAML Status code of " + samlResponse.getStatus().getStatusCode().getValue()
                 + "does not equal " + SAML2_STATUSCODE_SUCCESS
             );
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         validateResponseAgainstSchemas(samlResponse);
@@ -119,13 +120,13 @@ public class SAMLProtocolResponseValidator {
             
             Element decAssertion = decryptAssertion(encryptedDataDOM, sigCrypto, callbackHandler);
             
-            AssertionWrapper wrapper = new AssertionWrapper(decAssertion);
+            SamlAssertionWrapper wrapper = new SamlAssertionWrapper(decAssertion);
             samlResponse.getAssertions().add(wrapper.getSaml2());
         }
 
         // Validate Assertions
         for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
-            AssertionWrapper wrapper = new AssertionWrapper(assertion);
+            SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertion);
             validateAssertion(wrapper, sigCrypto, callbackHandler, doc);
         }
     }
@@ -147,7 +148,7 @@ public class SAMLProtocolResponseValidator {
             || samlResponse.getStatus().getStatusCode() == null
             || samlResponse.getStatus().getStatusCode().getValue() == null) {
             LOG.fine("Either the SAML Response Status or StatusCode is null");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         String statusValue = samlResponse.getStatus().getStatusCode().getValue().getLocalPart();
         if (!SAML1_STATUSCODE_SUCCESS.equals(statusValue)) {
@@ -155,7 +156,7 @@ public class SAMLProtocolResponseValidator {
                 "SAML Status code of " + samlResponse.getStatus().getStatusCode().getValue()
                 + "does not equal " + SAML1_STATUSCODE_SUCCESS
             );
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
         validateResponseAgainstSchemas(samlResponse);
@@ -163,7 +164,7 @@ public class SAMLProtocolResponseValidator {
 
         // Validate Assertions
         for (org.opensaml.saml1.core.Assertion assertion : samlResponse.getAssertions()) {
-            AssertionWrapper wrapper = new AssertionWrapper(assertion);
+            SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertion);
             validateAssertion(
                 wrapper, sigCrypto, callbackHandler, samlResponse.getDOM().getOwnerDocument()
             );
@@ -183,7 +184,7 @@ public class SAMLProtocolResponseValidator {
             schemaValidators.validate(samlResponse);
         } catch (ValidationException e) {
             LOG.log(Level.FINE, "Saml Validation error: " + e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
@@ -200,7 +201,7 @@ public class SAMLProtocolResponseValidator {
             schemaValidators.validate(samlResponse);
         } catch (ValidationException e) {
             LOG.log(Level.FINE, "Saml Validation error: " + e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
@@ -250,19 +251,17 @@ public class SAMLProtocolResponseValidator {
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
         RequestData requestData = new RequestData();
-        requestData.setSigCrypto(sigCrypto);
+        requestData.setSigVerCrypto(sigCrypto);
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);
-        WSDocInfo docInfo = new WSDocInfo(doc);
         
         KeyInfo keyInfo = signature.getKeyInfo();
         SAMLKeyInfo samlKeyInfo = null;
         try {
             samlKeyInfo = 
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), requestData, docInfo, 
-                    requestData.getWssConfig().isWsiBSPCompliant()
+                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)), sigCrypto
                 );
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, "Error in getting KeyInfo from SAML Response: " + ex.getMessage(), ex);
@@ -270,7 +269,7 @@ public class SAMLProtocolResponseValidator {
         }
         if (samlKeyInfo == null) {
             LOG.fine("No KeyInfo supplied in the SAMLResponse signature");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // Validate Signature against profiles
@@ -285,7 +284,7 @@ public class SAMLProtocolResponseValidator {
             signatureValidator.validate(trustCredential, requestData);
         } catch (WSSecurityException e) {
             LOG.log(Level.FINE, "Error in validating signature on SAML Response: " + e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
@@ -302,7 +301,7 @@ public class SAMLProtocolResponseValidator {
             validator.validate(signature);
         } catch (ValidationException ex) {
             LOG.log(Level.FINE, "Error in validating the SAML Signature: " + ex.getMessage(), ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
         BasicX509Credential credential = new BasicX509Credential();
@@ -312,14 +311,14 @@ public class SAMLProtocolResponseValidator {
             credential.setPublicKey(samlKeyInfo.getPublicKey());
         } else {
             LOG.fine("Can't get X509Certificate or PublicKey to verify signature");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         SignatureValidator sigValidator = new SignatureValidator(credential);
         try {
             sigValidator.validate(signature);
         } catch (ValidationException ex) {
             LOG.log(Level.FINE, "Error in validating the SAML Signature: " + ex.getMessage(), ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
@@ -327,16 +326,16 @@ public class SAMLProtocolResponseValidator {
      * Validate an internal Assertion
      */
     private void validateAssertion(
-        AssertionWrapper assertion,
+        SamlAssertionWrapper assertion,
         Crypto sigCrypto,
         CallbackHandler callbackHandler,
         Document doc
     ) throws WSSecurityException {
         Credential credential = new Credential();
-        credential.setAssertion(assertion);
+        credential.setSamlAssertion(assertion);
         
         RequestData requestData = new RequestData();
-        requestData.setSigCrypto(sigCrypto);
+        requestData.setSigVerCrypto(sigCrypto);
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);
@@ -350,11 +349,22 @@ public class SAMLProtocolResponseValidator {
             
             // Verify the signature
             try {
-                assertion.verifySignature(requestData, new WSDocInfo(doc));
+                Signature sig = assertion.getSignature();
+                KeyInfo keyInfo = sig.getKeyInfo();
+                SAMLKeyInfo samlKeyInfo = 
+                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
+                        keyInfo.getDOM(), sigCrypto
+                    );
+                assertion.verifySignature(samlKeyInfo);
+                
+                assertion.parseHOKSubject(
+                    new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)),
+                    requestData.getSigVerCrypto(), 
+                    requestData.getCallbackHandler()
+                );
             } catch (WSSecurityException e) {
-                e.printStackTrace();
                 LOG.log(Level.FINE, "Assertion failed signature validation", e);
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw e;
             }
         }
         
@@ -363,7 +373,7 @@ public class SAMLProtocolResponseValidator {
             assertionValidator.validate(credential, requestData);
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, "Assertion validation failed: " + ex.getMessage(), ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw ex;
         }
     }
     
@@ -373,13 +383,13 @@ public class SAMLProtocolResponseValidator {
         Element encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
         if (encKeyElement == null) {
             LOG.log(Level.FINE, "EncryptedKey element is not available");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         X509Certificate cert = loadCertificate(sigCrypto, encKeyElement);
         if (cert == null) {
             LOG.fine("X509Certificate cannot be retrieved from EncryptedKey element");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // now start decrypting
@@ -389,12 +399,12 @@ public class SAMLProtocolResponseValidator {
         Element cipherValue = getNode(encKeyElement, WSConstants.ENC_NS, "CipherValue", 0);
         if (cipherValue == null) {
             LOG.fine("CipherValue element is not available");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
         if (callbackHandler == null) {
             LOG.fine("A CallbackHandler must be configured to decrypt encrypted Assertions");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         PrivateKey key = null;
@@ -402,7 +412,7 @@ public class SAMLProtocolResponseValidator {
             key = sigCrypto.getPrivateKey(cert, callbackHandler);
         } catch (Exception ex) {
             LOG.log(Level.FINE, "Encrypted key can not be decrypted", ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         Cipher cipher = 
                 EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
@@ -412,10 +422,10 @@ public class SAMLProtocolResponseValidator {
             decryptedBytes = cipher.doFinal(encryptedBytes);
         } catch (Base64Exception ex) {
             LOG.log(Level.FINE, "Base64 decoding has failed", ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         } catch (Exception ex) {
             LOG.log(Level.FINE, "Encrypted key can not be decrypted", ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
@@ -425,7 +435,7 @@ public class SAMLProtocolResponseValidator {
             decryptedPayload = decryptPayload(encryptedDataDOM, decryptedBytes, symKeyAlgo);
         } catch (Exception ex) {
             LOG.log(Level.FINE, "Payload can not be decrypted", ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         Document payloadDoc = null;
@@ -435,7 +445,7 @@ public class SAMLProtocolResponseValidator {
             return payloadDoc.getDocumentElement();
         } catch (Exception ex) {
             LOG.log(Level.FINE, "Payload document can not be created", ex);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
         
@@ -456,7 +466,7 @@ public class SAMLProtocolResponseValidator {
                 return SecurityUtils.loadX509Certificate(crypto, certNode);
             } catch (Exception ex) {
                 LOG.log(Level.FINE, "X509Certificate can not be created", ex);
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
     
@@ -466,7 +476,7 @@ public class SAMLProtocolResponseValidator {
                 return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
             } catch (Exception ex) {
                 LOG.log(Level.FINE, "X509Certificate can not be created", ex);
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
 
@@ -477,7 +487,7 @@ public class SAMLProtocolResponseValidator {
         Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
         if (encMethod == null) {
             LOG.fine("EncryptionMethod element is not available");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         return encMethod.getAttribute("Algorithm");
     }
@@ -503,9 +513,7 @@ public class SAMLProtocolResponseValidator {
                 EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);
             return xmlCipher.decryptToByteArray(root);
         } catch (XMLEncryptionException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }
     }
 

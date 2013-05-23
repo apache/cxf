@@ -43,7 +43,6 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -52,12 +51,13 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.SecurityContextToken;
-import org.apache.ws.security.spnego.SpnegoTokenContext;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.spnego.SpnegoTokenContext;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SpnegoContextTokenInInterceptor.class);
@@ -70,8 +70,9 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SPNEGO_CONTEXT_TOKEN);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             if (isRequestor(message)) {
@@ -348,8 +349,9 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.SPNEGO_CONTEXT_TOKEN);
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 for (AssertionInfo inf : ais) {

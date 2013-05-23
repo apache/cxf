@@ -28,16 +28,17 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Wss11;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.Wss11;
 
 /**
  * Validate a WSS11 policy.
  */
-public class WSS11PolicyValidator implements TokenPolicyValidator {
+public class WSS11PolicyValidator 
+    extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
     
     public boolean validatePolicy(
         AssertionInfoMap aim,
@@ -46,13 +47,25 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.WSS11);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.WSS11);
+        if (!ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+            
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
+            assertPolicy(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
         }
         
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,  
+        List<WSSecurityEngineResult> results
+    ) {
         List<WSSecurityEngineResult> scResults =
-            WSS4JUtils.fetchAllActionResults(results, WSConstants.SC);
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC);
         
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();
@@ -70,7 +83,6 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
                 continue;
             }
         }
-        return true;
     }
     
 }

@@ -45,19 +45,22 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
-import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.KerberosSecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.dom.message.token.PKIPathSecurity;
+import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.policy.model.EncryptedElements;
+import org.apache.wss4j.policy.model.EncryptedParts;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.RequiredElements;
+import org.apache.wss4j.policy.model.SignedElements;
+import org.apache.wss4j.policy.model.SignedParts;
 
 /**
  * A base class to use to validate various SupportingToken policies.
@@ -79,10 +82,10 @@ public abstract class AbstractSupportingTokenPolicyValidator
     private boolean encrypted;
     private boolean derived;
     private boolean endorsed; 
-    private SignedEncryptedElements signedElements;
-    private SignedEncryptedElements encryptedElements;
-    private SignedEncryptedParts signedParts;
-    private SignedEncryptedParts encryptedParts;
+    private SignedElements signedElements;
+    private EncryptedElements encryptedElements;
+    private SignedParts signedParts;
+    private EncryptedParts encryptedParts;
 
     /**
      * Set the list of UsernameToken results
@@ -584,8 +587,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 }
             } else if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                AssertionWrapper assertionWrapper = 
-                    (AssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                SamlAssertionWrapper assertionWrapper = 
+                    (SamlAssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
                 if (samlKeyInfo != null) {
                     X509Certificate[] subjectCerts = samlKeyInfo.getCerts();
@@ -621,7 +624,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Validate the SignedParts or EncryptedParts policies
      */
     private boolean validateSignedEncryptedParts(
-        SignedEncryptedParts parts,
+        SignedParts parts,
         boolean content,
         List<WSSecurityEngineResult> protResults,
         List<WSSecurityEngineResult> tokenResults
@@ -701,7 +704,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Validate SignedElements or EncryptedElements policies
      */
     private boolean validateSignedEncryptedElements(
-        SignedEncryptedElements elements,
+        RequiredElements elements,
         boolean content,
         List<WSSecurityEngineResult> protResults,
         List<WSSecurityEngineResult> tokenResults
@@ -710,15 +713,18 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return true;
         }
         
-        Map<String, String> namespaces = elements.getDeclaredNamespaces();
-        List<String> xpaths = elements.getXPathExpressions();
+        List<org.apache.wss4j.policy.model.XPath> xpaths = elements.getXPaths();
+        
+        //Map<String, String> namespaces = elements.getDeclaredNamespaces();
+        //List<String> xpaths = elements.getXPathExpressions();
         
         if (xpaths != null) {
             SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
             Element soapEnvelope = soapMessage.getSOAPPart().getDocumentElement();
             
-            for (String xPath : xpaths) {
-                if (!checkXPathResult(soapEnvelope, xPath, namespaces, protResults, tokenResults)) {
+            for (org.apache.wss4j.policy.model.XPath xPath : xpaths) {
+                if (!checkXPathResult(soapEnvelope, xPath.getXPath(), xPath.getPrefixNamespaceMap(), 
+                                      protResults, tokenResults)) {
                     return false;
                 }
             }
@@ -823,19 +829,19 @@ public abstract class AbstractSupportingTokenPolicyValidator
         this.timestamp = timestamp;
     }
 
-    public void setSignedElements(SignedEncryptedElements signedElements) {
+    public void setSignedElements(SignedElements signedElements) {
         this.signedElements = signedElements;
     }
 
-    public void setEncryptedElements(SignedEncryptedElements encryptedElements) {
+    public void setEncryptedElements(EncryptedElements encryptedElements) {
         this.encryptedElements = encryptedElements;
     }
 
-    public void setSignedParts(SignedEncryptedParts signedParts) {
+    public void setSignedParts(SignedParts signedParts) {
         this.signedParts = signedParts;
     }
 
-    public void setEncryptedParts(SignedEncryptedParts encryptedParts) {
+    public void setEncryptedParts(EncryptedParts encryptedParts) {
         this.encryptedParts = encryptedParts;
     }
     

@@ -19,7 +19,7 @@
 package org.apache.cxf.sts.operation;
 
 import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
  * This class defines a pluggable way to return a realm associated with a UsernameToken.

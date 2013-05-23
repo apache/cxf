@@ -63,7 +63,6 @@ import org.apache.cxf.sts.token.realm.RelationshipResolver;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
-
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -73,16 +72,15 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.ReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.WSSecEncrypt;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;

@@ -21,18 +21,18 @@ package org.apache.cxf.rs.security.common;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 
 public class TrustValidator {
     public void validateTrust(Crypto crypto, X509Certificate cert, PublicKey publicKey) 
         throws WSSecurityException {
         SignatureTrustValidator validator = new SignatureTrustValidator();
         RequestData data = new RequestData();
-        data.setSigCrypto(crypto);
+        data.setSigVerCrypto(crypto);
         
         Credential trustCredential = new Credential();
         trustCredential.setPublicKey(publicKey);

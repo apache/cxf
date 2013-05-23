@@ -28,13 +28,15 @@ import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP13Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
 
 /**
  * Validate a UsernameToken policy.
@@ -49,22 +51,36 @@ public class UsernameTokenPolicyValidator
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        if (!ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+            
+            assertPolicy(aim, SP13Constants.CREATED);
+            assertPolicy(aim, SP13Constants.NONCE);
+            assertPolicy(aim, SPConstants.NO_PASSWORD);
+            assertPolicy(aim, SPConstants.HASH_PASSWORD);
+            assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+            assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
         }
         
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results
+    ) {
         final List<Integer> actions = new ArrayList<Integer>(2);
         actions.add(WSConstants.UT);
         actions.add(WSConstants.UT_NOPASSWORD);
         List<WSSecurityEngineResult> utResults = 
-            WSS4JUtils.fetchAllActionResults(results, actions);
+            WSSecurityUtil.fetchAllActionResults(results, actions);
         
         for (AssertionInfo ai : ais) {
-            org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy = 
-                (org.apache.cxf.ws.security.policy.model.UsernameToken)ai.getAssertion();
+            org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
+                (org.apache.wss4j.policy.model.UsernameToken)ai.getAssertion();
             ai.setAsserted(true);
-
             if (!isTokenRequired(usernameTokenPolicy, message)) {
                 continue;
             }
@@ -80,39 +96,43 @@ public class UsernameTokenPolicyValidator
                 continue;
             }
         }
-        return true;
     }
     
     /**
      * All UsernameTokens must conform to the policy
      */
     public boolean checkTokens(
-        org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy,
+        org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy,
         AssertionInfo ai,
         List<WSSecurityEngineResult> utResults
     ) {
         for (WSSecurityEngineResult result : utResults) {
             UsernameToken usernameToken = 
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
-            if (usernameTokenPolicy.isHashPassword() != usernameToken.isHashed()) {
+            PasswordType passwordType = usernameTokenPolicy.getPasswordType();
+            boolean isHashPassword = passwordType == PasswordType.HashPassword;
+            boolean isNoPassword = passwordType == PasswordType.NoPassword;
+            if (isHashPassword != usernameToken.isHashed()) {
                 ai.setNotAsserted("Password hashing policy not enforced");
                 return false;
             }
-            if (usernameTokenPolicy.isNoPassword() && (usernameToken.getPassword() != null)) {
+            
+            if (isNoPassword && (usernameToken.getPassword() != null)) {
                 ai.setNotAsserted("Username Token NoPassword policy not enforced");
                 return false;
-            } else if (!usernameTokenPolicy.isNoPassword() && (usernameToken.getPassword() == null)
+            } else if (!isNoPassword && (usernameToken.getPassword() == null)
                 && isNonEndorsingSupportingToken(usernameTokenPolicy)) {
                 ai.setNotAsserted("Username Token No Password supplied");
                 return false;
             }
             
-            if (usernameTokenPolicy.isRequireCreated() 
+            if (usernameTokenPolicy.isCreated()
                 && (usernameToken.getCreated() == null || usernameToken.isHashed())) {
                 ai.setNotAsserted("Username Token Created policy not enforced");
                 return false;
             }
-            if (usernameTokenPolicy.isRequireNonce() 
+            
+            if (usernameTokenPolicy.isNonce() 
                 && (usernameToken.getNonce() == null || usernameToken.isHashed())) {
                 ai.setNotAsserted("Username Token Nonce policy not enforced");
                 return false;
@@ -126,15 +146,16 @@ public class UsernameTokenPolicyValidator
      * true then the corresponding UsernameToken must have a password element.
      */
     private boolean isNonEndorsingSupportingToken(
-        org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy
+        org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy
     ) {
-        SupportingToken supportingToken = usernameTokenPolicy.getSupportingToken();
-        if (supportingToken != null) {
-            SPConstants.SupportTokenType type = supportingToken.getTokenType();
-            if (type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SUPPORTING
-                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED
-                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED
-                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED) {
+        AbstractSecurityAssertion parentAssertion = usernameTokenPolicy.getParentAssertion();
+        if (parentAssertion instanceof SupportingTokens) {
+            SupportingTokens supportingToken = (SupportingTokens)parentAssertion;
+            String localname = supportingToken.getName().getLocalPart();
+            if (localname.equals(SPConstants.SUPPORTING_TOKENS)
+                || localname.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
+                || localname.equals(SPConstants.ENCRYPTED_SUPPORTING_TOKENS)
+                || localname.equals(SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS)) {
                 return true;
             }
         }

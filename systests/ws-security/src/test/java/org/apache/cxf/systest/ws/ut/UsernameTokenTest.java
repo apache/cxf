@@ -37,7 +37,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for Username Tokens over the Transport Binding.
+ * A set of tests for Username Tokens over the Transport Binding. It tests both DOM + StAX clients against the 
+ * DOM server
  */
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -78,6 +79,16 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -101,6 +112,16 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -124,6 +145,16 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -147,6 +178,16 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -169,6 +210,17 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
+        
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -191,6 +243,17 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
+        
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -213,6 +276,17 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
+        
+        // DOM
+        utPort.doubleIt(25);
+        
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -236,6 +310,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
+        // DOM
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no UsernameToken");
@@ -243,6 +318,24 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error));
         }
+
+        /*
+        // TODO
+        // Streaming
+        ((BindingProvider)utPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)utPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        try {
+            utPort.doubleIt(25);
+            fail("Failure expected on no UsernameToken");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        */
         
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
@@ -341,8 +434,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
         
+        // DOM
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
-        
         utPort.doubleIt(25);
         
         try {
@@ -353,6 +446,22 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             String error = "Unauthorized";
             assertTrue(ex.getMessage().contains(error));
         }
+        
+        // Streaming
+        /*
+        // TODO
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
+        utPort.doubleIt(25);
+        
+        try {
+            ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
+            utPort.doubleIt(30);
+            fail("Failure expected on a user with the wrong role");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Unauthorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        */
         
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);

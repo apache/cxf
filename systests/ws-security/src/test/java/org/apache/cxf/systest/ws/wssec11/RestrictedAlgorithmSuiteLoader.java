@@ -18,13 +18,13 @@
  */
 package org.apache.cxf.systest.ws.wssec11;
 
-import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.custom.AlgorithmSuiteLoader;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 /**
  * This class retrieves a custom AlgorithmSuite for use with restricted security policies
@@ -35,14 +35,41 @@ public class RestrictedAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         bus.setExtension(this, AlgorithmSuiteLoader.class);
     }
 
-    public AlgorithmSuite getAlgorithmSuite(Element policyElement, SPConstants consts) {
-        if (policyElement != null) {
-            RestrictedAlgorithmSuite algorithmSuite = new RestrictedAlgorithmSuite(consts);
-            String algorithmSuiteName = DOMUtils.getFirstElement(policyElement).getLocalName();
-            algorithmSuite.setAlgorithmSuite(algorithmSuiteName);
-            return algorithmSuite;
-        }
-        return null;
+    public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
+        return new CustomAlgorithmSuite(version, nestedPolicy); 
     }
 
+    private static class CustomAlgorithmSuite extends AlgorithmSuite {
+
+        CustomAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
+            super(version, nestedPolicy);
+        }
+
+        @Override
+        protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
+            return new CustomAlgorithmSuite(getVersion(), nestedPolicy);
+        }
+
+        @Override
+        protected void parseCustomAssertion(Assertion assertion) {
+            String assertionName = assertion.getName().getLocalPart();
+            
+            AlgorithmSuiteType algorithmSuiteType = algorithmSuiteTypes.get(assertionName);
+            
+            setAlgorithmSuiteType(new AlgorithmSuiteType(
+                    assertionName,
+                    algorithmSuiteType.getDigest(),
+                    algorithmSuiteType.getEncryption(),
+                    algorithmSuiteType.getSymmetricKeyWrap(),
+                    algorithmSuiteType.getAsymmetricKeyWrap(),
+                    algorithmSuiteType.getEncryptionKeyDerivation(),
+                    algorithmSuiteType.getSignatureKeyDerivation(),
+                    algorithmSuiteType.getEncryptionDerivedKeyLength(),
+                    algorithmSuiteType.getSignatureDerivedKeyLength(),
+                    algorithmSuiteType.getMinimumSymmetricKeyLength(),
+                    algorithmSuiteType.getMaximumSymmetricKeyLength(),
+                    512,
+                    algorithmSuiteType.getMaximumAsymmetricKeyLength()));
+        }
+    }
 }

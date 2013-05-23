@@ -44,15 +44,16 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.dkalgo.P_SHA1;
-import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.derivedKey.P_SHA1;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * An abstract Invoker used by the Spnego and SecureConversationInInterceptors.
@@ -169,7 +170,8 @@ abstract class STSInvoker implements Invoker {
     }
 
     private SecurityToken findCancelToken(Exchange exchange, Element el) throws WSSecurityException {
-        SecurityTokenReference ref = new SecurityTokenReference(DOMUtils.getFirstElement(el));
+        SecurityTokenReference ref = 
+            new SecurityTokenReference(DOMUtils.getFirstElement(el), new BSPEnforcer());
         String uri = ref.getReference().getURI();
         TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                 .getProperty(TokenStore.class.getName());

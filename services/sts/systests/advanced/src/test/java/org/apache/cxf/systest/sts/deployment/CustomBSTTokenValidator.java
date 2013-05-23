@@ -25,8 +25,8 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.util.Base64;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.xml.security.utils.Base64;
 
 
 /**

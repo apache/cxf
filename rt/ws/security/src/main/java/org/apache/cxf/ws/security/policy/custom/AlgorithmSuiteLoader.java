@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.ws.security.policy.custom;
 
-import org.w3c.dom.Element;
-
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
+import org.apache.cxf.Bus;
+import org.apache.neethi.Policy;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 /**
  * This interface defines a way of retrieving an AlgorithmSuite object from the policy element
@@ -29,6 +29,6 @@ import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
  */
 public interface AlgorithmSuiteLoader {
 
-    AlgorithmSuite getAlgorithmSuite(Element policyElement, SPConstants consts);
+    AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy);
 
 }

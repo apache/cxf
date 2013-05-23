@@ -25,8 +25,9 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.SamlTokenInterceptor;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 
 /**
  * 
@@ -38,6 +39,7 @@ public class SamlTokenInterceptorProvider extends AbstractPolicyInterceptorProvi
         ASSERTION_TYPES = new ArrayList<QName>();
         
         ASSERTION_TYPES.add(SP12Constants.SAML_TOKEN);
+        ASSERTION_TYPES.add(SP11Constants.SAML_TOKEN);
     }
 
     public SamlTokenInterceptorProvider() {

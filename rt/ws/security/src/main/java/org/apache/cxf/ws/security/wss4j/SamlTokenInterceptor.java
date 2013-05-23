@@ -48,25 +48,27 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.processor.SAMLTokenProcessor;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
+import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -104,24 +106,24 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
                         boolean signed = false;
                         for (WSSecurityEngineResult result : samlResults) {
-                            AssertionWrapper wrapper = 
-                                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                            SamlAssertionWrapper wrapper = 
+                                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                             if (wrapper.isSigned()) {
                                 signed = true;
                                 break;
                             }
                         }
-                        assertTokens(message, SP12Constants.SAML_TOKEN, signed);
+                        assertTokens(message, SPConstants.SAML_TOKEN, signed);
                         
                         // Check version against policy
                         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                        for (AssertionInfo ai : aim.getAssertionInfo(SP12Constants.SAML_TOKEN)) {
+                        for (AssertionInfo ai : getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN)) {
                             SamlToken samlToken = (SamlToken)ai.getAssertion();
                             for (WSSecurityEngineResult result : samlResults) {
-                                AssertionWrapper assertionWrapper = 
-                                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                                SamlAssertionWrapper assertionWrapper = 
+                                    (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
 
-                                if (!checkVersion(samlToken, assertionWrapper)) {
+                                if (!checkVersion(aim, samlToken, assertionWrapper)) {
                                     ai.setNotAsserted("Wrong SAML Version");
                                 }
                             }
@@ -173,8 +175,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         }
                     } catch (RuntimeException t) {
                         throw t;
-                    } catch (Throwable t) {
-                        throw new WSSecurityException(t.getMessage(), t);
+                    } catch (Exception ex) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                     }
                 }
                 return super.getValidator(qName);
@@ -188,8 +190,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         return results;
     }
 
-    protected Token assertTokens(SoapMessage message) {
-        return assertTokens(message, SP12Constants.SAML_TOKEN, true);
+    protected AbstractToken assertTokens(SoapMessage message) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, "WssSamlV11Token10");
+        assertPolicy(aim, "WssSamlV11Token11");
+        assertPolicy(aim, "WssSamlV20Token11");
+        return assertTokens(message, SPConstants.SAML_TOKEN, true);
     }
 
     protected void addToken(SoapMessage message) {
@@ -198,10 +204,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
         Header h = findSecurityHeader(message, true);
         try {
-            AssertionWrapper wrapper = addSamlToken(tok, message);
+            SamlAssertionWrapper wrapper = addSamlToken(tok, message);
             if (wrapper == null) {
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SAML_TOKEN);
+                Collection<AssertionInfo> ais = 
+                    getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
                 for (AssertionInfo ai : ais) {
                     if (ai.isAsserted()) {
                         ai.setAsserted(false);
@@ -217,7 +224,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     
-    private AssertionWrapper addSamlToken(
+    private SamlAssertionWrapper addSamlToken(
         SamlToken token, SoapMessage message
     ) throws WSSecurityException {
         //
@@ -240,14 +247,21 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             return null;
         }
 
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
-        if (token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11()) {
-            samlParms.setSAMLVersion(SAMLVersion.VERSION_11);
-        } else if (token.isUseSamlVersion20Profile11()) {
-            samlParms.setSAMLVersion(SAMLVersion.VERSION_20);
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SamlTokenType tokenType = token.getSamlTokenType();
+        if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
+            samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+            assertPolicy(aim, "WssSamlV11Token10");
+            assertPolicy(aim, "WssSamlV11Token11");
+            
+        } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
+            samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            assertPolicy(aim, "WssSamlV20Token11");
         }
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
 
         boolean selfSignAssertion = 
             MessageUtils.getContextualBoolean(
@@ -275,7 +289,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                password = getPassword(user, token, WSPasswordCallback.SIGNATURE, message);
+                password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE, message);
             }
             if (password == null) {
                 password = "";
@@ -356,15 +370,21 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     /**
      * Check the policy version against the received assertion
      */
-    private boolean checkVersion(SamlToken samlToken, AssertionWrapper assertionWrapper) {
-        if ((samlToken.isUseSamlVersion11Profile10()
-            || samlToken.isUseSamlVersion11Profile11())
+    private boolean checkVersion(
+        AssertionInfoMap aim,
+        SamlToken samlToken, 
+        SamlAssertionWrapper assertionWrapper
+    ) {
+        SamlTokenType tokenType = samlToken.getSamlTokenType();
+        if ((tokenType == SamlTokenType.WssSamlV11Token10 
+            || tokenType == SamlTokenType.WssSamlV11Token11)
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
             return false;
-        } else if (samlToken.isUseSamlVersion20Profile11()
+        } else if (tokenType == SamlTokenType.WssSamlV20Token11
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }
+        assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), tokenType.name()));
         return true;
     }
     

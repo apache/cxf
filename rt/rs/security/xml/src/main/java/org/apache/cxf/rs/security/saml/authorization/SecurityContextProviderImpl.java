@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.rs.security.saml.assertion.Claims;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 public class SecurityContextProviderImpl implements SecurityContextProvider {
 
@@ -35,7 +35,7 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
     private static final String ROLE_NAMEFORMAT_PROPERTY = "org.apache.cxf.saml.claims.role.nameformat";
     
     public SecurityContext getSecurityContext(Message message,
-            AssertionWrapper wrapper) {
+            SamlAssertionWrapper wrapper) {
         Claims claims = getClaims(wrapper);
         Subject subject = getSubject(message, wrapper, claims);
         SecurityContext securityContext = doGetSecurityContext(message, subject, claims);
@@ -46,11 +46,11 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
         return securityContext;
     }
 
-    protected Claims getClaims(AssertionWrapper wrapper) {
+    protected Claims getClaims(SamlAssertionWrapper wrapper) {
         return SAMLUtils.getClaims(wrapper);
     }
     
-    protected Subject getSubject(Message message, AssertionWrapper wrapper, Claims claims) {
+    protected Subject getSubject(Message message, SamlAssertionWrapper wrapper, Claims claims) {
         return SAMLUtils.getSubject(message, wrapper);
     }
     

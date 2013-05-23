@@ -29,9 +29,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion. This
@@ -72,10 +72,9 @@ public class SamlElementCallbackHandler implements CallbackHandler {
      * @throws Exception 
      */
     private Element getSAMLAssertion(Document doc) throws Exception {
-        SAMLParms parms = new SAMLParms();
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(saml2);
-        parms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertionWrapper = new AssertionWrapper(parms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(new SamlCallbackHandler(saml2), samlCallback);
+        SamlAssertionWrapper assertionWrapper = new SamlAssertionWrapper(samlCallback);
 
         return assertionWrapper.toDOM(doc);
     }

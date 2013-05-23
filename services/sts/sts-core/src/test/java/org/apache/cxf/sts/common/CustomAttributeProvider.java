@@ -35,12 +35,13 @@ import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
-import org.apache.ws.security.SAMLTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.bean.AttributeBean;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.AttributeBean;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A custom AttributeStatementProvider implementation for use in the tests.
@@ -162,8 +163,8 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
                 Collections.singletonList(((UsernameTokenType)parameter).getUsername().getValue())
             );
         } else if (parameter instanceof Element) {
-            AssertionWrapper wrapper = new AssertionWrapper((Element)parameter);
-            SAMLTokenPrincipal principal = new SAMLTokenPrincipal(wrapper);
+            SamlAssertionWrapper wrapper = new SamlAssertionWrapper((Element)parameter);
+            SAMLTokenPrincipal principal = new SAMLTokenPrincipalImpl(wrapper);
             parameterBean.setAttributeValues(Collections.singletonList(principal.getName()));
         }
 

@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -72,14 +73,14 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.dom.WSConstants;
 
 
 /**
@@ -493,7 +494,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
-        AssertionWrapper assertionWrapper = new AssertionWrapper(assertion);
+        SamlAssertionWrapper assertionWrapper = new SamlAssertionWrapper(assertion);
         assertEquals(assertionWrapper.getSaml2().getSubject().getNameID().getValue().toLowerCase(), "alice");
     }
 
@@ -613,7 +614,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
         assertTrue(tokenString.toLowerCase().contains("aliceclaim"));
-        AssertionWrapper assertionWrapper = new AssertionWrapper(assertion);
+        SamlAssertionWrapper assertionWrapper = new SamlAssertionWrapper(assertion);
         assertEquals(assertionWrapper.getSaml2().getSubject().getNameID().getValue().toLowerCase(), "alice");
     }
 
@@ -728,10 +729,10 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
-                "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+                "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
 
         return properties;
     }

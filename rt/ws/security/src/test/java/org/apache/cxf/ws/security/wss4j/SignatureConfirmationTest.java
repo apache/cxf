@@ -41,9 +41,9 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 
 /**
@@ -122,7 +122,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
 
         inHandler.handleMessage(inmsg);

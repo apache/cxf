@@ -19,10 +19,20 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
-import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * Some abstract functionality for validating a Security Token.
@@ -36,10 +46,10 @@ public abstract class AbstractTokenPolicyValidator {
      * @return true if the token is required
      */
     protected boolean isTokenRequired(
-        Token token,
+        AbstractToken token,
         Message message
     ) {
-        IncludeTokenType inclusion = token.getInclusion();
+        IncludeTokenType inclusion = token.getIncludeTokenType();
         if (inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             return false;
         } else if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
@@ -56,4 +66,46 @@ public abstract class AbstractTokenPolicyValidator {
         }
     }
     
+    protected boolean assertPolicy(AssertionInfoMap aim, QName name) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
+        if (aim != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
+        }
+            
+        return Collections.emptySet();
+    }
 }

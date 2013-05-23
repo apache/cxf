@@ -20,8 +20,8 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,30 +63,30 @@ import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.cache.ReplayCache;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.validate.NoOpValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.validate.NoOpValidator;
+import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * Performs WS-Security inbound actions.
@@ -144,16 +144,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             secEngineOverride = createSecurityEngine(validatorMap);
         }
     }
-
-    @Override
-    public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>>
-    getAdditionalInterceptors() {
-        List<PhaseInterceptor<? extends org.apache.cxf.message.Message>> extras 
-            = new ArrayList<PhaseInterceptor<? extends org.apache.cxf.message.Message>>(1);
-        extras.add(SAAJInInterceptor.SAAJPreInInterceptor.INSTANCE);
-        return extras;
-    }
-
     
     public void setIgnoreActions(boolean i) {
         ignoreActions = i;
@@ -239,11 +229,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             reqData.setCallbackHandler(getCallback(reqData, doAction, utWithCallbacks));
             
-            String passwordTypeStrict = (String)getOption(WSHandlerConstants.PASSWORD_TYPE_STRICT);
-            if (passwordTypeStrict == null) {
-                setProperty(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
-            }
-            
             // Configure replay caching
             ReplayCache nonceCache = 
                 getReplayCache(
@@ -255,6 +240,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
                 );
             reqData.setTimestampReplayCache(timestampCache);
+            
+            TLSSessionInfo tlsInfo = msg.get(TLSSessionInfo.class);
+            if (tlsInfo != null) {
+                Certificate[] tlsCerts = tlsInfo.getPeerCertificates();
+                reqData.setTlsCerts(tlsCerts);
+            }
 
             /*
              * Get and check the Signature specific parameters first because
@@ -328,9 +319,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             msg.put(SECURITY_PROCESSED, Boolean.TRUE);
 
         } catch (WSSecurityException e) {
-            LOG.log(Level.WARNING, "", e);
-            SoapFault fault = createSoapFault(version, e);
-            throw fault;
+            throw createSoapFault(version, e);
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
         } catch (SOAPException e) {
@@ -356,7 +345,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         // now check the security actions: do they match, in any order?
         if (!checkReceiverResultsAnyOrder(wsResult, actions)) {
             LOG.warning("Security processing failed (actions mismatch)");
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         // Now check to see if SIGNATURE_PARTS are specified
@@ -369,15 +358,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             LOG.warning(warning);
         }
         
-        // Now check SAML SenderVouches + Holder Of Key requirements
-        boolean validateSAMLSubjectConf = 
-            MessageUtils.getContextualBoolean(
-                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
-            );
-        if (validateSAMLSubjectConf) {
-            SAMLUtils.validateSAMLResults(wsResult, msg, body);
-        }
-        
     }
     
     private void storeSignature(
@@ -385,7 +365,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     ) throws WSSecurityException {
         // Extract the signature action result from the action list
         List<WSSecurityEngineResult> signatureResults = 
-            WSS4JUtils.fetchAllActionResults(wsResult, WSConstants.SIGN);
+            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN);
 
         // Store the last signature result
         if (!signatureResults.isEmpty()) {
@@ -398,7 +378,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     ) throws WSSecurityException {
         // Extract the timestamp action result from the action list
         List<WSSecurityEngineResult> timestampResults = 
-            WSS4JUtils.fetchAllActionResults(wsResult, WSConstants.TS);
+            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS);
 
         if (!timestampResults.isEmpty()) {
             msg.put(TIMESTAMP_RESULT, timestampResults.get(timestampResults.size() - 1));
@@ -661,7 +641,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 try {
                     o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
                 } catch (Exception e) {
-                    throw new WSSecurityException(e.getMessage(), e);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
             }            
             if (o instanceof CallbackHandler) {
@@ -826,8 +806,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     }
                 } catch (RuntimeException t) {
                     throw t;
-                } catch (Throwable t) {
-                    throw new WSSecurityException(t.getMessage(), t);
+                } catch (Exception ex) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
             }
             return super.getValidator(qName);

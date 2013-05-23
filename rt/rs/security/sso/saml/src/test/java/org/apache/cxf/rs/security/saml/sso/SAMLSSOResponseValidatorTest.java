@@ -25,13 +25,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.joda.time.DateTime;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Status;
@@ -222,9 +223,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         conditions.setAudienceURI("http://service.apache.org");
         callbackHandler.setConditions(conditions);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         response.getAssertions().add(assertion.getSaml2());
         

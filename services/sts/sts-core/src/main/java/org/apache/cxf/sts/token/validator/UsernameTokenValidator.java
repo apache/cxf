@@ -44,21 +44,22 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
-
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * This class validates a wsse UsernameToken.
@@ -67,7 +68,7 @@ public class UsernameTokenValidator implements TokenValidator {
     
     private static final Logger LOG = LogUtils.getL7dLogger(UsernameTokenValidator.class);
     
-    private Validator validator = new org.apache.ws.security.validate.UsernameTokenValidator();
+    private Validator validator = new org.apache.wss4j.dom.validate.UsernameTokenValidator();
     
     private UsernameTokenRealmCodec usernameTokenRealmCodec;
     
@@ -167,9 +168,9 @@ public class UsernameTokenValidator implements TokenValidator {
         try {
             boolean allowNamespaceQualifiedPasswordTypes = 
                 wssConfig.getAllowNamespaceQualifiedPasswordTypes();
-            boolean bspCompliant = wssConfig.isWsiBSPCompliant();
             UsernameToken ut = 
-                new UsernameToken(usernameTokenElement, allowNamespaceQualifiedPasswordTypes, bspCompliant);
+                new UsernameToken(usernameTokenElement, allowNamespaceQualifiedPasswordTypes, 
+                                  new BSPEnforcer());
             // The parsed principal is set independent whether validation is successful or not
             response.setPrincipal(new CustomTokenPrincipal(ut.getName()));
             if (ut.getPassword() == null) {
@@ -228,6 +229,8 @@ public class UsernameTokenValidator implements TokenValidator {
             validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
+        } catch (Base64DecodingException ex) {
+            LOG.log(Level.WARNING, "", ex);
         }
         
         return response;
@@ -235,6 +238,7 @@ public class UsernameTokenValidator implements TokenValidator {
     
     /**
      * Create a principal based on the authenticated UsernameToken.
+     * @throws Base64DecodingException 
      */
     private Principal createPrincipal(
         String username,
@@ -242,13 +246,13 @@ public class UsernameTokenValidator implements TokenValidator {
         String passwordType,
         String nonce,
         String createdTime
-    ) {
+    ) throws Base64DecodingException {
         boolean hashed = false;
         if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
         }
-        WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(username, hashed);
-        principal.setNonce(nonce);
+        WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(username, hashed);
+        principal.setNonce(Base64.decode(nonce));
         principal.setPassword(passwordValue);
         principal.setCreatedTime(createdTime);
         principal.setPasswordType(passwordType);

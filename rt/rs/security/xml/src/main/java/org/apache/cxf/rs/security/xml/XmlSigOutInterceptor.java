@@ -39,9 +39,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
@@ -110,11 +110,11 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         String user = SecurityUtils.getUserName(message, crypto, userNameKey);
          
         if (StringUtils.isEmpty(user) || SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(user)) {
-            throw new WSSecurityException("User name is not available");
+            throw new Exception("User name is not available");
         }
 
         String password = 
-            SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
+            SecurityUtils.getPassword(message, user, WSPasswordCallback.Usage.SIGNATURE, this.getClass());
     
         X509Certificate[] issuerCerts = SecurityUtils.getCertificates(crypto, user);
         
@@ -131,7 +131,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         } catch (Exception ex) {
             String errorMessage = "Private key can not be loaded, user:" + user;
             LOG.severe(errorMessage);
-            throw new WSSecurityException(errorMessage, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
         
         String id = UUID.randomUUID().toString();

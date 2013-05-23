@@ -19,30 +19,13 @@
 
 package org.apache.cxf.ws.security.wss4j;
 
-import java.security.Principal;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.security.transport.TLSSessionInfo;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.xml.XMLObject;
 
@@ -51,25 +34,23 @@ import org.opensaml.xml.XMLObject;
  */
 public final class SAMLUtils {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(SAMLUtils.class);
-    
     private SAMLUtils() {
     }
     
     public static List<String> parseRolesInAssertion(Object assertion, String roleAttributeName) {
-        if (((AssertionWrapper) assertion).getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-            return parseRolesInAssertion(((AssertionWrapper)assertion).getSaml2(), roleAttributeName);
+        if (((SamlAssertionWrapper) assertion).getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            return parseRolesInAssertion(((SamlAssertionWrapper)assertion).getSaml2(), roleAttributeName);
         } else {
-            return parseRolesInAssertion(((AssertionWrapper)assertion).getSaml1(), roleAttributeName);
+            return parseRolesInAssertion(((SamlAssertionWrapper)assertion).getSaml1(), roleAttributeName);
         }
     }
     
     public static String getIssuer(Object assertion) {
-        return ((AssertionWrapper)assertion).getIssuerString();
+        return ((SamlAssertionWrapper)assertion).getIssuerString();
     }
     
     public static Element getAssertionElement(Object assertion) {
-        return ((AssertionWrapper)assertion).getElement();
+        return ((SamlAssertionWrapper)assertion).getElement();
     }
     
     //
@@ -148,217 +129,4 @@ public final class SAMLUtils {
         return Collections.unmodifiableList(roles);
     }
     
-    public static void validateSAMLResults(
-        List<WSSecurityEngineResult> results,
-        Message message,
-        Element body
-    ) throws WSSecurityException {
-        final List<Integer> samlActions = new ArrayList<Integer>(2);
-        samlActions.add(WSConstants.ST_SIGNED);
-        samlActions.add(WSConstants.ST_UNSIGNED);
-        List<WSSecurityEngineResult> samlResults = 
-            WSS4JUtils.fetchAllActionResults(results, samlActions);
-        
-        if (samlResults.isEmpty()) {
-            return;
-        }
-        
-        final List<Integer> signedActions = new ArrayList<Integer>(2);
-        signedActions.add(WSConstants.SIGN);
-        signedActions.add(WSConstants.UT_SIGN);
-        List<WSSecurityEngineResult> signedResults = 
-            WSS4JUtils.fetchAllActionResults(results, signedActions);
-        
-        for (WSSecurityEngineResult samlResult : samlResults) {
-            AssertionWrapper assertionWrapper = 
-                (AssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-            
-            TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
-            Certificate[] tlsCerts = null;
-            if (tlsInfo != null) {
-                tlsCerts = tlsInfo.getPeerCertificates();
-            }
-            if (!SAMLUtils.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
-                LOG.warning("Assertion fails holder-of-key requirements");
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
-            }
-            if (!SAMLUtils.checkSenderVouches(assertionWrapper, tlsCerts, body, signedResults)) {
-                LOG.warning("Assertion fails sender-vouches requirements");
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
-            }
-        }
-        
-    }
-    
-    /**
-     * Check the holder-of-key requirements against the received assertion. The subject
-     * credential of the SAML Assertion must have been used to sign some portion of
-     * the message, thus showing proof-of-possession of the private/secret key. Alternatively,
-     * the subject credential of the SAML Assertion must match a client certificate credential
-     * when 2-way TLS is used.
-     * @param assertionWrapper the SAML Assertion wrapper object
-     * @param signedResults a list of all of the signed results
-     */
-    public static boolean checkHolderOfKey(
-        AssertionWrapper assertionWrapper,
-        List<WSSecurityEngineResult> signedResults,
-        Certificate[] tlsCerts
-    ) {
-        List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
-        for (String confirmationMethod : confirmationMethods) {
-            if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
-                if (tlsCerts == null && (signedResults == null || signedResults.isEmpty())) {
-                    return false;
-                }
-                SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-                if (!compareCredentials(subjectKeyInfo, signedResults, tlsCerts)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Compare the credentials of the assertion to the credentials used in 2-way TLS or those
-     * used to verify signatures.
-     * Return true on a match
-     * @param subjectKeyInfo the SAMLKeyInfo object
-     * @param signedResults a list of all of the signed results
-     * @return true if the credentials of the assertion were used to verify a signature
-     */
-    public static boolean compareCredentials(
-        SAMLKeyInfo subjectKeyInfo,
-        List<WSSecurityEngineResult> signedResults,
-        Certificate[] tlsCerts
-    ) {
-        X509Certificate[] subjectCerts = subjectKeyInfo.getCerts();
-        PublicKey subjectPublicKey = subjectKeyInfo.getPublicKey();
-        byte[] subjectSecretKey = subjectKeyInfo.getSecret();
-        
-        //
-        // Try to match the TLS certs first
-        //
-        if (tlsCerts != null && tlsCerts.length > 0 && subjectCerts != null 
-            && subjectCerts.length > 0 && tlsCerts[0].equals(subjectCerts[0])) {
-            return true;
-        } else if (tlsCerts != null && tlsCerts.length > 0 && subjectPublicKey != null
-            && tlsCerts[0].getPublicKey().equals(subjectPublicKey)) {
-            return true;
-        }
-        
-        //
-        // Now try the message-level signatures
-        //
-        for (WSSecurityEngineResult signedResult : signedResults) {
-            X509Certificate[] certs =
-                (X509Certificate[])signedResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-            PublicKey publicKey =
-                (PublicKey)signedResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-            byte[] secretKey =
-                (byte[])signedResult.get(WSSecurityEngineResult.TAG_SECRET);
-            if (certs != null && certs.length > 0 && subjectCerts != null
-                && subjectCerts.length > 0 && certs[0].equals(subjectCerts[0])) {
-                return true;
-            }
-            if (publicKey != null && publicKey.equals(subjectPublicKey)) {
-                return true;
-            }
-            if (checkSecretKey(secretKey, subjectSecretKey, signedResult)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private static boolean checkSecretKey(
-        byte[] secretKey,
-        byte[] subjectSecretKey,
-        WSSecurityEngineResult signedResult
-    ) {
-        if (secretKey != null && subjectSecretKey != null) {
-            if (Arrays.equals(secretKey, subjectSecretKey)) {
-                return true;
-            } else {
-                Principal principal =
-                    (Principal)signedResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                if (principal instanceof WSDerivedKeyTokenPrincipal) {
-                    secretKey = ((WSDerivedKeyTokenPrincipal)principal).getSecret();
-                    if (Arrays.equals(secretKey, subjectSecretKey)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Check the sender-vouches requirements against the received assertion. The SAML
-     * Assertion and the SOAP Body must be signed by the same signature.
-     */
-    public static boolean checkSenderVouches(
-        AssertionWrapper assertionWrapper,
-        Certificate[] tlsCerts,
-        Element body,
-        List<WSSecurityEngineResult> signed
-    ) {
-        //
-        // If we have a 2-way TLS connection, then we don't have to check that the
-        // assertion + SOAP body are signed
-        //
-        if (tlsCerts != null && tlsCerts.length > 0) {
-            return true;
-        }
-        List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
-        for (String confirmationMethod : confirmationMethods) {
-            if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
-                if (signed == null || signed.isEmpty()) {
-                    return false;
-                }
-                if (!checkAssertionAndBodyAreSigned(assertionWrapper, body, signed)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Return true if there is a signature which references the Assertion and the SOAP Body.
-     * @param assertionWrapper the AssertionWrapper object
-     * @param body The SOAP body
-     * @param signed The List of signed results
-     * @return true if there is a signature which references the Assertion and the SOAP Body.
-     */
-    private static boolean checkAssertionAndBodyAreSigned(
-        AssertionWrapper assertionWrapper,
-        Element body,
-        List<WSSecurityEngineResult> signed
-    ) {
-        for (WSSecurityEngineResult signedResult : signed) {
-            List<WSDataRef> sl =
-                CastUtils.cast((List<?>)signedResult.get(
-                    WSSecurityEngineResult.TAG_DATA_REF_URIS
-                ));
-            boolean assertionIsSigned = false;
-            boolean bodyIsSigned = false;
-            if (sl != null) {
-                for (WSDataRef dataRef : sl) {
-                    Element se = dataRef.getProtectedElement();
-                    if (se == assertionWrapper.getElement()) {
-                        assertionIsSigned = true;
-                    }
-                    if (se == body) {
-                        bodyIsSigned = true;
-                    }
-                    if (assertionIsSigned && bodyIsSigned) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
 }

@@ -32,14 +32,14 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 
 class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public SecureConversationOutInterceptor() {
@@ -49,8 +49,9 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             if (isRequestor(message)) {
@@ -79,8 +80,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN, tok);
                     NegotiationUtils.getTokenStore(message).add(tok);
-                    
                 }
+                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             } else {
                 //server side should be checked on the way in
                 for (AssertionInfo ai : ais) {

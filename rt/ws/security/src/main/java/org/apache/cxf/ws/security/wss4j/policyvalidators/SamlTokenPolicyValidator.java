@@ -24,19 +24,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
-import org.apache.cxf.ws.security.wss4j.SAMLUtils;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -54,25 +57,39 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SAML_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
-        }
-        
         body = soapBody;
         signed = signedResults;
         
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+        if (!ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results, signedResults);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim, 
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
         final List<Integer> actions = new ArrayList<Integer>(2);
         actions.add(WSConstants.ST_SIGNED);
         actions.add(WSConstants.ST_UNSIGNED);
         List<WSSecurityEngineResult> samlResults = 
-            WSS4JUtils.fetchAllActionResults(results, actions);
+            WSSecurityUtil.fetchAllActionResults(results, actions);
         
         for (AssertionInfo ai : ais) {
             SamlToken samlToken = (SamlToken)ai.getAssertion();
             ai.setAsserted(true);
 
             if (!isTokenRequired(samlToken, message)) {
+                assertPolicy(
+                    aim, 
+                    new QName(samlToken.getVersion().getNamespace(), samlToken.getSamlTokenType().name())
+                );
                 continue;
             }
 
@@ -85,10 +102,10 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             
             // All of the received SAML Assertions must conform to the policy
             for (WSSecurityEngineResult result : samlResults) {
-                AssertionWrapper assertionWrapper = 
-                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                SamlAssertionWrapper assertionWrapper = 
+                    (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 
-                if (!checkVersion(samlToken, assertionWrapper)) {
+                if (!checkVersion(aim, samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
                     continue;
                 }
@@ -101,7 +118,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                     ai.setNotAsserted("Assertion fails holder-of-key requirements");
                     continue;
                 }
-                if (!SAMLUtils.checkSenderVouches(assertionWrapper, tlsCerts, body, signed)) {
+                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, body, signed)) {
                     ai.setNotAsserted("Assertion fails sender-vouches requirements");
                     continue;
                 }
@@ -112,8 +129,6 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                  */
             }
         }
-        
-        return true;
     }
     
     /**
@@ -133,15 +148,22 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
     /**
      * Check the policy version against the received assertion
      */
-    private boolean checkVersion(SamlToken samlToken, AssertionWrapper assertionWrapper) {
-        if ((samlToken.isUseSamlVersion11Profile10()
-            || samlToken.isUseSamlVersion11Profile11())
+    private boolean checkVersion(
+        AssertionInfoMap aim,
+        SamlToken samlToken, 
+        SamlAssertionWrapper assertionWrapper
+    ) {
+        SamlTokenType samlTokenType = samlToken.getSamlTokenType();
+        if ((samlTokenType == SamlTokenType.WssSamlV11Token10
+            || samlTokenType == SamlTokenType.WssSamlV11Token11)
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
             return false;
-        } else if (samlToken.isUseSamlVersion20Profile11()
+        } else if (samlTokenType == SamlTokenType.WssSamlV20Token11
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }
+        
+        assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
         return true;
     }
     

@@ -52,23 +52,24 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AbstractSamlPolicyValidator;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
-import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
-import org.apache.ws.security.util.UUIDGenerator;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
+import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml1.core.Audience;
@@ -177,7 +178,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         }
         
         try {
-            AssertionWrapper assertion = new AssertionWrapper((Element)tokenToRenew.getToken());
+            SamlAssertionWrapper assertion = new SamlAssertionWrapper((Element)tokenToRenew.getToken());
             
             byte[] oldSignature = assertion.getSignatureValue();
             int hash = Arrays.hashCode(oldSignature);
@@ -190,7 +191,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
             // Validate the Assertion
             validateAssertion(assertion, tokenToRenew, cachedToken, tokenParameters);
             
-            AssertionWrapper renewedAssertion = new AssertionWrapper(assertion.getXmlObject());
+            SamlAssertionWrapper renewedAssertion = new SamlAssertionWrapper(assertion.getXmlObject());
             String oldId = createNewId(renewedAssertion);
             // Remove the previous token (now expired) from the cache
             tokenStore.remove(oldId);
@@ -284,7 +285,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     }
     
     private void validateAssertion(
-        AssertionWrapper assertion,
+        SamlAssertionWrapper assertion,
         ReceivedToken tokenToRenew,
         SecurityToken token,
         TokenRenewerParameters tokenParameters
@@ -337,10 +338,12 @@ public class SAMLTokenRenewer implements TokenRenewer {
             requestData.setWssConfig(wssConfig);
             requestData.setCallbackHandler(callbackHandler);
             // Parse the HOK subject if it exists
+            
+            WSDocInfo docInfo = new WSDocInfo(((Element)tokenToRenew.getToken()).getOwnerDocument());
             assertion.parseHOKSubject(
-                requestData, new WSDocInfo(((Element)tokenToRenew.getToken()).getOwnerDocument())
+                new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto, callbackHandler
             );
-        
+            
             SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
             if (keyInfo == null) {
                 keyInfo = new SAMLKeyInfo((byte[])null);
@@ -421,7 +424,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     }
     
     private void signAssertion(
-        AssertionWrapper assertion,
+        SamlAssertionWrapper assertion,
         TokenRenewerParameters tokenParameters
     ) throws Exception {
         if (signToken) {
@@ -487,7 +490,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 LOG.fine("Signature alias is null so using default alias: " + alias);
             }
             // Get the password
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE)};
             LOG.fine("Creating SAML Token");
             callbackHandler.handle(cb);
             String password = cb[0].getPassword();
@@ -507,7 +510,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         
     }
     
-    private void createNewConditions(AssertionWrapper assertion, TokenRenewerParameters tokenParameters) {
+    private void createNewConditions(SamlAssertionWrapper assertion, TokenRenewerParameters tokenParameters) {
         ConditionsBean conditions = 
             conditionsProvider.getConditions(
                 tokenParameters.getAppliesToAddress(),
@@ -533,17 +536,17 @@ public class SAMLTokenRenewer implements TokenRenewer {
         }
     }
     
-    private String createNewId(AssertionWrapper assertion) {
+    private String createNewId(SamlAssertionWrapper assertion) {
         if (assertion.getSaml1() != null) {
             org.opensaml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
             String oldId = saml1Assertion.getID();
-            saml1Assertion.setID("_" + UUIDGenerator.getUUID());
+            saml1Assertion.setID(IDGenerator.generateID("_"));
             
             return oldId;
         } else {
             org.opensaml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
             String oldId = saml2Assertion.getID();
-            saml2Assertion.setID("_" + UUIDGenerator.getUUID());
+            saml2Assertion.setID(IDGenerator.generateID("_"));
             
             return oldId;
         }
@@ -551,7 +554,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     
     private void storeTokenInCache(
         TokenStore tokenStore, 
-        AssertionWrapper assertion, 
+        SamlAssertionWrapper assertion, 
         Principal principal,
         String tokenRealm
     ) throws WSSecurityException {
@@ -583,7 +586,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     }
 
     
-    private DateTime getExpiryDate(AssertionWrapper assertion) {
+    private DateTime getExpiryDate(SamlAssertionWrapper assertion) {
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             return assertion.getSaml2().getConditions().getNotOnOrAfter();
         } else {
@@ -605,9 +608,11 @@ public class SAMLTokenRenewer implements TokenRenewer {
             if (handlerResults != null && handlerResults.size() > 0) {
                 WSHandlerResult handlerResult = handlerResults.get(0);
                 List<WSSecurityEngineResult> results = handlerResult.getResults();
+                final List<Integer> signedActions = new ArrayList<Integer>(2);
+                signedActions.add(WSConstants.SIGN);
+                signedActions.add(WSConstants.UT_SIGN);
                 
-                WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
-                WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
+                signedResults.addAll(WSSecurityUtil.fetchAllActionResults(results, signedActions));
             }
             
             TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class.getName());

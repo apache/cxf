@@ -35,11 +35,11 @@ import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.validate.UsernameTokenValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.UsernameTokenValidator;
+import org.apache.wss4j.dom.validate.Validator;
 
 
 /**
@@ -139,13 +139,15 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         } catch (Exception ex) {
             String errorMessage = "Failed Authentication : Subject has not been created";
             LOG.severe(errorMessage);
-            throw new WSSecurityException(errorMessage, ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, 
+                                          ex);
         }
         if (subject == null || subject.getPrincipals().size() == 0
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
             String errorMessage = "Failed Authentication : Invalid Subject";
             LOG.severe(errorMessage);
-            throw new WSSecurityException(errorMessage);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, 
+                                          new Exception(errorMessage));
         }
         msg.put(Subject.class, subject);
     }
@@ -182,7 +184,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyCustomPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
@@ -192,7 +194,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyPlaintextPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
@@ -202,11 +204,11 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyDigestPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             if (!supportDigestPasswords) {
-                throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
             String user = usernameToken.getName();
             String password = usernameToken.getPassword();
@@ -220,7 +222,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         
         @Override
         protected void verifyUnknownPassword(
-            org.apache.ws.security.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(

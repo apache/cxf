@@ -26,7 +26,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 
 public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
     

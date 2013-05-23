@@ -22,12 +22,12 @@ package org.apache.cxf.systest.ws.ut.server;
 import javax.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimpleGroup;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.UsernameTokenValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 
 /**
  * A custom UsernameToken Validator that wraps the default Validator in WSS4J and set a Subject
@@ -40,8 +40,8 @@ public class CustomUTValidator extends UsernameTokenValidator {
         Credential cred = super.validate(credential, data);
         
         UsernameToken ut = credential.getUsernametoken();
-        WSUsernameTokenPrincipal principal = 
-            new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
+        WSUsernameTokenPrincipalImpl principal = 
+            new WSUsernameTokenPrincipalImpl(ut.getName(), ut.isHashed());
         principal.setCreatedTime(ut.getCreated());
         principal.setNonce(principal.getNonce());
         principal.setPassword(ut.getPassword());

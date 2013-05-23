@@ -28,8 +28,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -64,11 +64,11 @@ public final class EncryptionUtils {
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
             );
         } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
             );
         }
         return cipher;
@@ -94,11 +94,11 @@ public final class EncryptionUtils {
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
             );
         } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
-                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, null, null, e
             );
         }
         return cipher;
@@ -150,9 +150,7 @@ public final class EncryptionUtils {
             cipher.init(mode, key);
             return cipher;
         } catch (XMLEncryptionException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }
     }
     

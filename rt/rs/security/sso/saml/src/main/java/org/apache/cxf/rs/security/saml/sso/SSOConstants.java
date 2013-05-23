@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 
 public final class SSOConstants {
     public static final String SAML_REQUEST = "SAMLRequest";

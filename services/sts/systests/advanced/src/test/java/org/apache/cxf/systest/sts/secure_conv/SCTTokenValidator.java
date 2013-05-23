@@ -21,12 +21,13 @@ package org.apache.cxf.systest.sts.secure_conv;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.ws.security.trust.STSTokenValidator;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.validate.Credential;
 
 /**
  * This class validates a SecurityContextToken by dispatching it to an STS. It then
@@ -37,14 +38,18 @@ public class SCTTokenValidator extends STSTokenValidator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         
-        AssertionWrapper transformedToken = validatedCredential.getTransformedToken();
+        SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"DoubleItSTSIssuer".equals(transformedToken.getIssuerString())) {
-            throw new WSSecurityException(WSSecurityException.FAILURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
 
         Document doc = transformedToken.getElement().getOwnerDocument();
-        transformedToken.parseHOKSubject(data, new WSDocInfo(doc));
+        
+        transformedToken.parseHOKSubject(
+            new WSSSAMLKeyInfoProcessor(data, new WSDocInfo(doc)), data.getSigVerCrypto(), 
+            data.getCallbackHandler()
+        );
         SAMLKeyInfo keyInfo = transformedToken.getSubjectKeyInfo();
         byte[] secret = keyInfo.getSecret();
         validatedCredential.setSecretKey(secret);

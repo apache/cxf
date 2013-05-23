@@ -29,8 +29,8 @@ import org.w3c.dom.Element;
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -175,7 +175,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         if (sc instanceof SAMLSecurityContext) {
             Element assertionElement = ((SAMLSecurityContext)sc).getAssertionElement();
             if (assertionElement != null) {
-                AssertionWrapper wrapper = new AssertionWrapper(assertionElement);
+                SamlAssertionWrapper wrapper = new SamlAssertionWrapper(assertionElement);
                 return wrapper.getIssuerString();
             }
         }

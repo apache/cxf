@@ -27,17 +27,17 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.AttributeBean;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-import org.apache.ws.security.saml.ext.builder.SAML1Constants;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.bean.AttributeBean;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.KeyInfoBean;
+import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.opensaml.common.SAMLVersion;
 
 /**

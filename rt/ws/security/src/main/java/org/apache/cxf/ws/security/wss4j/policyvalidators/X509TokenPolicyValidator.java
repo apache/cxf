@@ -27,13 +27,13 @@ import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.X509Token;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.policy.model.X509Token.TokenType;
 
 /**
  * Validate an X509 Token policy.
@@ -50,13 +50,28 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.X509_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
+        if (!ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+            
+            assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
+            assertPolicy(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
+            assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN10);
+            assertPolicy(aim, SPConstants.WSS_X509_V1_TOKEN11);
+            assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN10);
+            assertPolicy(aim, SPConstants.WSS_X509_V3_TOKEN11);
         }
         
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results
+    ) {
         List<WSSecurityEngineResult> bstResults = 
-            WSS4JUtils.fetchAllActionResults(results, WSConstants.BST);
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST);
         
         for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();
@@ -73,19 +88,18 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 continue;
             }
 
-            if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType(), bstResults)) {
+            if (!checkTokenType(x509TokenPolicy.getTokenType(), bstResults)) {
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
                 continue;
             }
         }
-        return true;
     }
     
     /**
      * Check that at least one received token matches the token type.
      */
     private boolean checkTokenType(
-        String requiredVersionAndType,
+        TokenType tokenType,
         List<WSSecurityEngineResult> bstResults
     ) {
         if (bstResults.isEmpty()) {
@@ -93,8 +107,8 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         }
 
         String requiredType = X509_V3_VALUETYPE;
-        if (SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10.equals(requiredVersionAndType)
-            || SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11.equals(requiredVersionAndType)) {
+        if (tokenType == TokenType.WssX509PkiPathV1Token10
+            || tokenType == TokenType.WssX509PkiPathV1Token11) {
             requiredType = PKI_VALUETYPE;
         }
 

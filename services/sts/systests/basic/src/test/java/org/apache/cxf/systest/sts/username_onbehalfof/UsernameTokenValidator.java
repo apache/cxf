@@ -24,7 +24,7 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
-import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 public class UsernameTokenValidator implements TokenValidator {
     

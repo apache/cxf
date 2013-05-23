@@ -27,7 +27,7 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.realm.RelationshipResolver;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Crypto;
 
 /**
  * This MBean represents the properties associated with the STS. It contains a single operation

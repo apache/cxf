@@ -28,13 +28,13 @@ import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.TokenWrapper;
-import org.apache.cxf.ws.security.policy.model.X509Token;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractTokenWrapper;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.X509Token;
 
 /**
  * Validate an AsymmetricBinding policy.
@@ -49,11 +49,23 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-        if (ais == null || ais.isEmpty()) {                       
-            return true;
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {
+            parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
         }
         
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim,
+        Collection<AssertionInfo> ais,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
+    ) {
         boolean hasDerivedKeys = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -68,7 +80,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, ai, results)) {
+            if (!checkProtectionOrder(binding, aim, ai, results)) {
                 continue;
             }
             
@@ -82,10 +94,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
                 continue;
             }
         }
-        
-        return true;
     }
-    
     
     /**
      * Check various tokens of the binding
@@ -128,7 +137,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
     }
     
     private boolean checkInitiatorTokens(
-        TokenWrapper wrapper, 
+        AbstractTokenWrapper wrapper, 
         AsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim, 
@@ -136,7 +145,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults) {
 
-        Token token = wrapper.getToken();
+        AbstractToken token = wrapper.getToken();
         if (token instanceof X509Token) {
             boolean foundCert = false;
             for (WSSecurityEngineResult result : signedResults) {
@@ -159,12 +168,15 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
+        assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+        assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+        assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
 
         return true;
     }
 
     private boolean checkRecipientTokens(
-        TokenWrapper wrapper, 
+        AbstractTokenWrapper wrapper, 
         AsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim, 
@@ -177,6 +189,9 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
+        assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+        assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+        assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
 
         return true;
     }

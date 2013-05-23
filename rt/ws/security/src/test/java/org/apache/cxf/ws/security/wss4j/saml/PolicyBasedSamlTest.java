@@ -21,9 +21,9 @@ package org.apache.cxf.ws.security.wss4j.saml;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.AbstractPolicySecurityTest;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.wss4j.policy.SP12Constants;
 import org.junit.Test;
 
 /**

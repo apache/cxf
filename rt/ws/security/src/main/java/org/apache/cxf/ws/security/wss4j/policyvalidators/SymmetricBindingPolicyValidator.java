@@ -27,10 +27,10 @@ import org.w3c.dom.Element;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.SymmetricBinding;
 
 /**
  * Validate a SymmetricBinding policy.
@@ -45,11 +45,23 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-        if (ais == null || ais.isEmpty()) {                       
-            return true;
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {                       
+            parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
         }
         
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim,
+        Collection<AssertionInfo> ais, 
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
+    ) {
         boolean hasDerivedKeys = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -64,7 +76,7 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, ai, results)) {
+            if (!checkProtectionOrder(binding, aim, ai, results)) {
                 continue;
             }
             
@@ -78,8 +90,6 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 continue;
             }
         }
-        
-        return true;
     }
     
     /**
@@ -101,6 +111,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
+            assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
         }
         
         if (binding.getSignatureToken() != null) {
@@ -111,6 +124,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
+            assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
         }
         
         if (binding.getProtectionToken() != null) {
@@ -121,6 +137,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
+            assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
         }
         
         return true;

@@ -33,13 +33,13 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
  * This CallbackHandler implementation obtains the previously received message from a 
@@ -97,8 +97,8 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                AssertionWrapper assertion = 
-                    (AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                SamlAssertionWrapper assertion = 
+                    (SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 return assertion.getElement();
             } else if (actInt.intValue() == WSConstants.UT
                 || actInt.intValue() == WSConstants.UT_NOPASSWORD) {

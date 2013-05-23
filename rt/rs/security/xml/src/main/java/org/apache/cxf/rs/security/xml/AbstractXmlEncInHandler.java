@@ -42,14 +42,13 @@ import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
-
 
 public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     
@@ -265,9 +264,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
                 EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);
             return xmlCipher.decryptToByteArray(root);
         } catch (XMLEncryptionException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }
         
     }

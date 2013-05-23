@@ -57,9 +57,9 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.xml.XMLObject;
 
 @Path("sso")

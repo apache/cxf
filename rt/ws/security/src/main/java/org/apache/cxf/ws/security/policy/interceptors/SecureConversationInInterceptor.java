@@ -19,9 +19,13 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
+
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
@@ -41,19 +45,10 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.ProtectionToken;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
-import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -61,8 +56,17 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.message.token.SecurityContextToken;
-import org.apache.ws.security.util.Base64;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SPConstants.SPVersion;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.ProtectionToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SecureConversationInInterceptor.class);
@@ -70,19 +74,21 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     
     public SecureConversationInInterceptor() {
         super(Phase.PRE_PROTOCOL);
+        getBefore().add(WSS4JInInterceptor.class.getName());
     }
-    private Binding getBinding(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-        if (ais != null && !ais.isEmpty()) {
-            return (Binding)ais.iterator().next().getAssertion();
+    private AbstractBinding getBinding(AssertionInfoMap aim) {
+        Collection<AssertionInfo> ais = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
-        ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-        if (ais != null && !ais.isEmpty()) {
-            return (Binding)ais.iterator().next().getAssertion();
+        ais = NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
-        ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        if (ais != null && !ais.isEmpty()) {
-            return (Binding)ais.iterator().next().getAssertion();
+        ais = NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (!ais.isEmpty()) {
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         return null;
     }
@@ -91,15 +97,17 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             if (isRequestor(message)) {
                 //client side should be checked on the way out
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
-                }      
+                }
+                assertPolicies(aim);
                 
                 Object s = message.getContextualProperty(SecurityConstants.STS_TOKEN_DO_CANCEL);
                 if (s != null && (Boolean.TRUE.equals(s) || "true".equalsIgnoreCase(s.toString()))) {
@@ -126,7 +134,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
                 SecureConversationToken tok = (SecureConversationToken)ais.iterator()
                     .next().getAssertion();
-                Policy pol = tok.getBootstrapPolicy();
+                Policy pol = tok.getBootstrapPolicy().getPolicy();
                 if (s.endsWith("Cancel") || s.endsWith("/Renew")) {
                     //Cancel and Renew just sign with the token
                     Policy p = new Policy();
@@ -136,31 +144,52 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
-                    PolicyBuilder pbuilder = message.getExchange().getBus()
-                        .getExtension(PolicyBuilder.class);
-                    SymmetricBinding binding = new SymmetricBinding(SP12Constants.INSTANCE, pbuilder);
-                    binding.setIncludeTimestamp(true);
-                    ProtectionToken token = new ProtectionToken(SP12Constants.INSTANCE, pbuilder);
-                    token.setToken(new SecureConversationToken(SP12Constants.INSTANCE));
-                    binding.setProtectionToken(token);
-                    binding.setEntireHeadersAndBodySignatures(true);
                     
-                    Binding origBinding = getBinding(aim);
+                    final SecureConversationToken secureConversationToken = 
+                        new SecureConversationToken(
+                            SPConstants.SPVersion.SP12,
+                            SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+                            null,
+                            null,
+                            null,
+                            null
+                        );
+                    secureConversationToken.setOptional(true);
+                    
+                    class InternalProtectionToken extends ProtectionToken {
+                        public InternalProtectionToken(SPVersion version, Policy nestedPolicy) {
+                            super(version, nestedPolicy);
+                            super.setToken(secureConversationToken);
+                        }
+                    }
+                    
+                    DefaultSymmetricBinding binding = 
+                        new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, new Policy());
+                    binding.setProtectionToken(
+                        new InternalProtectionToken(SPConstants.SPVersion.SP12, new Policy())
+                    );
+                    binding.setIncludeTimestamp(true);
+                    binding.setOnlySignEntireHeadersAndBody(true);
+                    binding.setProtectTokens(false);
+                    
+                    AbstractBinding origBinding = getBinding(aim);
                     binding.setAlgorithmSuite(origBinding.getAlgorithmSuite());
                     all.addPolicyComponent(binding);
                     
-                    SignedEncryptedParts parts = new SignedEncryptedParts(true, 
-                                                                          SP12Constants.INSTANCE);
-                    parts.setBody(true);
+                    List<Header> headers = null;
                     if (addNs != null) {
-                        parts.addHeader(new Header("To", addNs));
-                        parts.addHeader(new Header("From", addNs));
-                        parts.addHeader(new Header("FaultTo", addNs));
-                        parts.addHeader(new Header("ReplyTO", addNs));
-                        parts.addHeader(new Header("MessageID", addNs));
-                        parts.addHeader(new Header("RelatesTo", addNs));
-                        parts.addHeader(new Header("Action", addNs));
+                        headers = new ArrayList<Header>();
+                        headers.add(new Header("To", addNs));
+                        headers.add(new Header("From", addNs));
+                        headers.add(new Header("FaultTo", addNs));
+                        headers.add(new Header("ReplyTo", addNs));
+                        headers.add(new Header("Action", addNs));
+                        headers.add(new Header("MessageID", addNs));
+                        headers.add(new Header("RelatesTo", addNs));
                     }
+                    
+                    SignedParts parts = 
+                        new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
                     all.addPolicyComponent(parts);
                     pol = p;
                     message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
@@ -187,7 +216,22 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             } else {
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
+            
+            assertPolicies(aim);
         }
+    }
+    
+    private void assertPolicies(AssertionInfoMap aim) {
+        NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_AMEND);
+        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_CANCEL);
+        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_RENEW);
+        QName oldCancelQName = 
+            new QName(
+                "http://schemas.microsoft.com/ws/2005/07/securitypolicy", 
+                SPConstants.MUST_NOT_SEND_CANCEL
+            );
+        NegotiationUtils.assertPolicy(aim, oldCancelQName);
     }
 
     private void unmapSecurityProps(Message message) {
@@ -311,8 +355,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 for (AssertionInfo inf : ais) {
@@ -341,8 +386,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (aim == null) {
                 return;
             }
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             

@@ -35,8 +35,8 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
 import org.junit.Test;
 

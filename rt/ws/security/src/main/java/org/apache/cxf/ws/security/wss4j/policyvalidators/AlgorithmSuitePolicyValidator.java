@@ -28,12 +28,13 @@ import java.util.List;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.transform.STRTransform;
+import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.transform.STRTransform;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or
@@ -85,7 +86,7 @@ public class AlgorithmSuitePolicyValidator {
         }
         String c14nMethod = 
             (String)result.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
-        if (!algorithmPolicy.getInclusiveC14n().equals(c14nMethod)) {
+        if (!algorithmPolicy.getC14n().getValue().equals(c14nMethod)) {
             ai.setNotAsserted(
                 "The c14n method does not match the requirement"
             );
@@ -113,9 +114,10 @@ public class AlgorithmSuitePolicyValidator {
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai
     ) {
+        AlgorithmSuiteType algorithmSuiteType = algorithmPolicy.getAlgorithmSuiteType();
         for (WSDataRef dataRef : dataRefs) {
             String digestMethod = dataRef.getDigestAlgorithm();
-            if (!algorithmPolicy.getDigest().equals(digestMethod)) {
+            if (!algorithmSuiteType.getDigest().equals(digestMethod)) {
                 ai.setNotAsserted(
                     "The digest method does not match the requirement"
                 );
@@ -129,7 +131,7 @@ public class AlgorithmSuitePolicyValidator {
                 return false;
             }
             for (String transformAlgorithm : transformAlgorithms) {
-                if (!(algorithmPolicy.getInclusiveC14n().equals(transformAlgorithm)
+                if (!(algorithmPolicy.getC14n().getValue().equals(transformAlgorithm)
                     || STRTransform.TRANSFORM_URI.equals(transformAlgorithm))) {
                     ai.setNotAsserted("The transform algorithms do not match the requirement");
                     return false;
@@ -147,11 +149,12 @@ public class AlgorithmSuitePolicyValidator {
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai
     ) {
+        AlgorithmSuiteType algorithmSuiteType = algorithmPolicy.getAlgorithmSuiteType();
         String transportMethod = 
             (String)result.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD);
         if (transportMethod != null 
-            && !algorithmPolicy.getSymmetricKeyWrap().equals(transportMethod)
-            && !algorithmPolicy.getAsymmetricKeyWrap().equals(transportMethod)) {
+            && !algorithmSuiteType.getSymmetricKeyWrap().equals(transportMethod)
+            && !algorithmSuiteType.getAsymmetricKeyWrap().equals(transportMethod)) {
             ai.setNotAsserted(
                 "The Key transport method does not match the requirement"
             );
@@ -163,7 +166,7 @@ public class AlgorithmSuitePolicyValidator {
         if (dataRefs != null) {
             for (WSDataRef dataRef : dataRefs) {
                 String encryptionAlgorithm = dataRef.getAlgorithm();
-                if (!algorithmPolicy.getEncryption().equals(encryptionAlgorithm)) {
+                if (!algorithmSuiteType.getEncryption().equals(encryptionAlgorithm)) {
                     ai.setNotAsserted(
                         "The encryption algorithm does not match the requirement"
                     );
@@ -199,11 +202,12 @@ public class AlgorithmSuitePolicyValidator {
             return false;
         }
         
+        AlgorithmSuiteType algorithmSuiteType = algorithmPolicy.getAlgorithmSuiteType();
         byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         if (signature) {
             Principal principal = (Principal)result.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             if (principal instanceof WSDerivedKeyTokenPrincipal) {
-                int requiredLength = algorithmPolicy.getSignatureDerivedKeyLength();
+                int requiredLength = algorithmSuiteType.getSignatureDerivedKeyLength();
                 if (secret == null || secret.length != (requiredLength / 8)) {
                     ai.setNotAsserted(
                         "The signature derived key length does not match the requirement"
@@ -211,16 +215,16 @@ public class AlgorithmSuitePolicyValidator {
                     return false;
                 }
             } else if (secret != null 
-                && (secret.length < (algorithmPolicy.getMinimumSymmetricKeyLength() / 8)
-                    || secret.length > (algorithmPolicy.getMaximumSymmetricKeyLength() / 8))) {
+                && (secret.length < (algorithmSuiteType.getMinimumSymmetricKeyLength() / 8)
+                    || secret.length > (algorithmSuiteType.getMaximumSymmetricKeyLength() / 8))) {
                 ai.setNotAsserted(
                     "The symmetric key length does not match the requirement"
                 );
                 return false;
             }
         } else if (secret != null 
-            && (secret.length < (algorithmPolicy.getMinimumSymmetricKeyLength() / 8)
-                || secret.length > (algorithmPolicy.getMaximumSymmetricKeyLength() / 8))) {
+            && (secret.length < (algorithmSuiteType.getMinimumSymmetricKeyLength() / 8)
+                || secret.length > (algorithmSuiteType.getMaximumSymmetricKeyLength() / 8))) {
             ai.setNotAsserted(
                 "The symmetric key length does not match the requirement"
             );
@@ -238,10 +242,11 @@ public class AlgorithmSuitePolicyValidator {
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai
     ) {
+        AlgorithmSuiteType algorithmSuiteType = algorithmPolicy.getAlgorithmSuiteType();
         if (publicKey instanceof RSAPublicKey) {
             int modulus = ((RSAPublicKey)publicKey).getModulus().bitLength();
-            if (modulus < algorithmPolicy.getMinimumAsymmetricKeyLength()
-                || modulus > algorithmPolicy.getMaximumAsymmetricKeyLength()) {
+            if (modulus < algorithmSuiteType.getMinimumAsymmetricKeyLength()
+                || modulus > algorithmSuiteType.getMaximumAsymmetricKeyLength()) {
                 ai.setNotAsserted(
                     "The asymmetric key length does not match the requirement"
                 );
@@ -249,8 +254,8 @@ public class AlgorithmSuitePolicyValidator {
             }
         } else if (publicKey instanceof DSAPublicKey) {
             int length = ((DSAPublicKey)publicKey).getParams().getP().bitLength();
-            if (length < algorithmPolicy.getMinimumAsymmetricKeyLength()
-                || length > algorithmPolicy.getMaximumAsymmetricKeyLength()) {
+            if (length < algorithmSuiteType.getMinimumAsymmetricKeyLength()
+                || length > algorithmSuiteType.getMaximumAsymmetricKeyLength()) {
                 ai.setNotAsserted(
                     "The asymmetric key length does not match the requirement"
                 );

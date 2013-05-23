@@ -42,11 +42,6 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
@@ -55,15 +50,21 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 
 /**
  * 
@@ -136,9 +137,11 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
+            
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
@@ -179,15 +182,17 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         private Trust10 getTrust10(AssertionInfoMap aim) {
-            Collection<AssertionInfo> ais = aim.get(SP11Constants.TRUST_10);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+            if (ais.isEmpty()) {
                 return null;
             }
             return (Trust10)ais.iterator().next().getAssertion();
         }
         private Trust13 getTrust13(AssertionInfoMap aim) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_13);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+            if (ais.isEmpty()) {
                 return null;
             }
             return (Trust13)ais.iterator().next().getAssertion();
@@ -342,10 +347,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) throws Exception {
             client.setTrust(getTrust10(aim));
             client.setTrust(getTrust13(aim));
-            client.setTemplate(itok.getRstTemplate());
-            Element policy = itok.getPolicy();
-            if (policy != null && policy.getNamespaceURI() != null) {
-                client.setWspNamespace(policy.getNamespaceURI());
+            client.setTemplate(itok.getRequestSecurityTokenTemplate());
+            if (itok.getPolicy() != null && itok.getPolicy().getNamespace() != null) {
+                client.setWspNamespace(itok.getPolicy().getNamespace());
             }
             if (maps != null && maps.getNamespaceURI() != null) {
                 client.setAddressingNamespace(maps.getNamespaceURI());
@@ -402,7 +406,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     client.setTrust(getTrust10(aim));
                     client.setTrust(getTrust13(aim));
                     
-                    client.setTemplate(itok.getRstTemplate());
+                    client.setTemplate(itok.getRequestSecurityTokenTemplate());
                     return client.renewSecurityToken(tok);
                 } catch (RuntimeException e) {
                     throw e;
@@ -494,8 +498,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (!isRequestor(message)) {
@@ -519,13 +524,14 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             AssertionInfoMap aim
         ) {
             List<WSSecurityEngineResult> signedResults = 
-                WSS4JUtils.fetchAllActionResults(rResult.getResults(), WSConstants.SIGN);
+                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), WSConstants.SIGN);
             
             IssuedTokenPolicyValidator issuedValidator = 
                 new IssuedTokenPolicyValidator(signedResults, message);
-            Collection<AssertionInfo> issuedAis = aim.get(SP12Constants.ISSUED_TOKEN);
+            Collection<AssertionInfo> issuedAis = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
 
-            for (AssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
+            for (SamlAssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
                 if (valid) {
                     SecurityToken token = createSecurityToken(assertionWrapper);
@@ -547,15 +553,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         
-        private List<AssertionWrapper> findSamlTokenResults(
+        private List<SamlAssertionWrapper> findSamlTokenResults(
             List<WSSecurityEngineResult> wsSecEngineResults
         ) {
-            List<AssertionWrapper> results = new ArrayList<AssertionWrapper>();
+            List<SamlAssertionWrapper> results = new ArrayList<SamlAssertionWrapper>();
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                    results.add((AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION));
+                    results.add((SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION));
                 }
             }
             return results;
@@ -575,7 +581,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         }
         
         private SecurityToken createSecurityToken(
-            AssertionWrapper assertionWrapper
+            SamlAssertionWrapper assertionWrapper
         ) {
             SecurityToken token = new SecurityToken(assertionWrapper.getId());
 

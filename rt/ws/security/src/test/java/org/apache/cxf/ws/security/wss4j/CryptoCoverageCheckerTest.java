@@ -40,7 +40,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.junit.Test;
 
 
@@ -228,13 +228,14 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
         final String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         
         inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
+        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, 
                 "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
                 "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
                 TestPwdCallback.class.getName());
         inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inHandler.setProperty(WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
         
         return inHandler;
     }

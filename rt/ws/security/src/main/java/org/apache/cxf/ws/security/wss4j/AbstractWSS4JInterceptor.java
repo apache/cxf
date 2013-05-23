@@ -40,13 +40,13 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandler;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandler;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
@@ -190,6 +190,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (certConstraints != null) {
             msg.setContextualProperty(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
         }
+        
+        // Now set SAML SenderVouches + Holder Of Key requirements
+        boolean validateSAMLSubjectConf = 
+            MessageUtils.getContextualBoolean(
+                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
+            );
+        msg.setContextualProperty(
+            WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
+            Boolean.toString(validateSAMLSubjectConf)
+        );
     }
 
     @Override

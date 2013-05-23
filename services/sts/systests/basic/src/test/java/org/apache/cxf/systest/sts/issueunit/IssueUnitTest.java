@@ -39,19 +39,18 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.processor.SAMLTokenProcessor;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.junit.BeforeClass;
 
 /**
@@ -120,8 +119,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         List<WSSecurityEngineResult> results = processToken(token);
 
         assertTrue(results != null && results.size() == 1);
-        AssertionWrapper assertion = 
-            (AssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml1() != null && assertion.getSaml2() == null);
         assertTrue(assertion.isSigned());
@@ -160,8 +159,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Process the token
         List<WSSecurityEngineResult> results = processToken(token);
         assertTrue(results != null && results.size() == 1);
-        AssertionWrapper assertion = 
-            (AssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml1() == null && assertion.getSaml2() != null);
         assertTrue(assertion.isSigned());
@@ -199,8 +198,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Process the token
         List<WSSecurityEngineResult> results = processToken(token);
         assertTrue(results != null && results.size() == 1);
-        AssertionWrapper assertion = 
-            (AssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml1() != null && assertion.getSaml2() == null);
         assertTrue(assertion.isSigned());
@@ -249,8 +248,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Process the token
         List<WSSecurityEngineResult> results = processToken(token);
         assertTrue(results != null && results.size() == 1);
-        AssertionWrapper assertion = 
-            (AssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml1() == null && assertion.getSaml2() != null);
         assertTrue(assertion.isSigned());
@@ -309,8 +308,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Process the token
         List<WSSecurityEngineResult> results = processToken(token);
         assertTrue(results != null && results.size() == 1);
-        AssertionWrapper assertion = 
-            (AssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml1() != null && assertion.getSaml2() == null);
         assertTrue(assertion.isSigned());
@@ -346,8 +345,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Process the token
         List<WSSecurityEngineResult> results = processToken(token);
         assertTrue(results != null && results.size() == 1);
-        AssertionWrapper assertion = 
-            (AssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(assertion != null);
         assertTrue(assertion.getSaml1() != null && assertion.getSaml2() == null);
         assertTrue(assertion.isSigned());
@@ -468,14 +467,12 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     
     private List<WSSecurityEngineResult> processToken(SecurityToken token) throws Exception {
         RequestData requestData = new RequestData();
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setWsiBSPCompliant(false);
-        requestData.setWssConfig(wssConfig);
+        requestData.setDisableBSPEnforcement(true);
         CallbackHandler callbackHandler = new org.apache.cxf.systest.sts.common.CommonCallbackHandler();
         requestData.setCallbackHandler(callbackHandler);
         Crypto crypto = CryptoFactory.getInstance("serviceKeystore.properties");
         requestData.setDecCrypto(crypto);
-        requestData.setSigCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
         
         Processor processor = new SAMLTokenProcessor();
         return processor.handleToken(

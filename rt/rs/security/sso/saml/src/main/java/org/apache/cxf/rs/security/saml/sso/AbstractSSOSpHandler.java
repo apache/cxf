@@ -35,10 +35,10 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 
 public class AbstractSSOSpHandler {
     private static final Logger LOG = 

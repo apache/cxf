@@ -36,10 +36,10 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.realm.RelationshipResolver;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSSConfig;
 
 /**
  * A static implementation of the STSPropertiesMBean.

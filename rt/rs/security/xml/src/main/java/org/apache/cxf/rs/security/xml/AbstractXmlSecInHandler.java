@@ -35,7 +35,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
-import org.apache.ws.security.WSSConfig;
+import org.apache.wss4j.dom.WSSConfig;
 
 
 public abstract class AbstractXmlSecInHandler {

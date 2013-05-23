@@ -31,7 +31,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
  * This CallbackHandler implementation obtains a username via the jaxws property 

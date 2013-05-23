@@ -38,31 +38,34 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.WSSecBase;
-import org.apache.ws.security.message.WSSecDKEncrypt;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecEncrypt;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.WSSecBase;
+import org.apache.wss4j.dom.message.WSSecDKEncrypt;
+import org.apache.wss4j.dom.message.WSSecDKSign;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
+import org.apache.wss4j.policy.model.AbstractTokenWrapper;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.SamlToken;
 
 /**
  * 
@@ -92,22 +95,25 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
         
-        if (abinding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
+        if (abinding.getProtectionOrder() 
+            == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
+            policyAsserted(SPConstants.ENCRYPT_BEFORE_SIGNING);
         } else {
             doSignBeforeEncrypt();
+            policyAsserted(SPConstants.SIGN_BEFORE_ENCRYPTING);
         }
     }
 
     private void doSignBeforeEncrypt() {
         try {
-            TokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
+            AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
             if (initiatorWrapper == null) {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
             boolean attached = false;
             if (initiatorWrapper != null) {
-                Token initiatorToken = initiatorWrapper.getToken();
+                AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken secToken = getSecurityToken();
                     if (secToken == null) {
@@ -116,16 +122,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     } else {
                         policyAsserted(initiatorToken);
                         
-                        if (includeToken(initiatorToken.getInclusion())) {
+                        if (includeToken(initiatorToken.getIncludeTokenType())) {
                             Element el = secToken.getToken();
                             this.addEncryptedKeyElement(cloneElement(el));
                             attached = true;
                         } 
                     }
                 } else if (initiatorToken instanceof SamlToken) {
-                    AssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
+                    SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null) {
-                        if (includeToken(initiatorToken.getInclusion())) {
+                        if (includeToken(initiatorToken.getIncludeTokenType())) {
                             addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                             storeAssertionAsSecurityToken(assertionWrapper);
                         }
@@ -150,7 +156,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 //confirm sig
                 addSignatureConfirmation(sigs);
                 
-                TokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
+                AbstractTokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
                 if (recipientSignatureToken == null) {
                     recipientSignatureToken = abinding.getRecipientToken();
                 }
@@ -162,7 +168,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             List<WSEncryptionPart> enc = getEncryptedParts();
             
             //Check for signature protection
-            if (abinding.isSignatureProtection()) {
+            if (abinding.isEncryptSignature()) {
                 if (mainSigId != null) {
                     WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
                     sigPart.setElement(bottomUpElement);
@@ -171,10 +177,11 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (sigConfList != null && !sigConfList.isEmpty()) {
                     enc.addAll(sigConfList);
                 }
+                policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
             }
             
             //Do encryption
-            TokenWrapper encToken;
+            AbstractTokenWrapper encToken;
             if (isRequestor()) {
                 enc.addAll(encryptedTokensList);
                 encToken = abinding.getRecipientEncryptionToken();
@@ -197,8 +204,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     }
 
     private void doEncryptBeforeSign() {
-        TokenWrapper wrapper;
-        Token encryptionToken = null;
+        AbstractTokenWrapper wrapper;
+        AbstractToken encryptionToken = null;
         if (isRequestor()) {
             wrapper = abinding.getRecipientEncryptionToken();
             if (wrapper == null) {
@@ -212,13 +219,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
         encryptionToken = wrapper.getToken();
         
-        TokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
+        AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
         if (initiatorWrapper == null) {
             initiatorWrapper = abinding.getInitiatorToken();
         }
         boolean attached = false;
         if (initiatorWrapper != null) {
-            Token initiatorToken = initiatorWrapper.getToken();
+            AbstractToken initiatorToken = initiatorWrapper.getToken();
             if (initiatorToken instanceof IssuedToken) {
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
@@ -227,7 +234,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else {
                     policyAsserted(initiatorToken);
                     
-                    if (includeToken(initiatorToken.getInclusion())) {
+                    if (includeToken(initiatorToken.getIncludeTokenType())) {
                         Element el = secToken.getToken();
                         this.addEncryptedKeyElement(cloneElement(el));
                         attached = true;
@@ -235,9 +242,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             } else if (initiatorToken instanceof SamlToken) {
                 try {
-                    AssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
+                    SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null) {
-                        if (includeToken(initiatorToken.getInclusion())) {
+                        if (includeToken(initiatorToken.getIncludeTokenType())) {
                             addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                             storeAssertionAsSecurityToken(assertionWrapper);
                         }
@@ -290,7 +297,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if ((sigParts.size() > 0) && initiatorWrapper != null && isRequestor()) {
                     doSignature(initiatorWrapper, sigParts, attached);
                 } else if (!isRequestor()) {
-                    TokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
+                    AbstractTokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
                     if (recipientSignatureToken == null) {
                         recipientSignatureToken = abinding.getRecipientToken(); 
                     }
@@ -313,9 +320,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     }
     
     
-    private void checkForSignatureProtection(Token encryptionToken, WSSecBase encrBase) {
+    private void checkForSignatureProtection(AbstractToken encryptionToken, WSSecBase encrBase) {
         // Check for signature protection
-        if (abinding.isSignatureProtection()) {
+        if (abinding.isEncryptSignature()) {
+            policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
             List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
 
             // Now encrypt the signature using the above token
@@ -333,7 +341,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 secondEncrParts.addAll(encryptedTokensList);
             }
 
-            if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()
+            if (encryptionToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys && !secondEncrParts.isEmpty()
                 && encrBase instanceof WSSecDKEncrypt) {
                 try {
                     Element secondRefList 
@@ -359,16 +367,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }        
     }
     
-    private WSSecBase doEncryption(TokenWrapper recToken,
+    private WSSecBase doEncryption(AbstractTokenWrapper recToken,
                                     List<WSEncryptionPart> encrParts,
                                     boolean externalRef) {
         //Do encryption
         if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
-            Token encrToken = recToken.getToken();
+            AbstractToken encrToken = recToken.getToken();
             policyAsserted(recToken);
             policyAsserted(encrToken);
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
-            if (encrToken.isDerivedKeys()) {
+            if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 try {
                     WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
                     
@@ -380,8 +388,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     dkEncr.setParts(encrParts);
                     dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                             + WSConstants.ENC_KEY_VALUE_TYPE);
-                    dkEncr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
-                    dkEncr.setDerivedKeyLength(algorithmSuite.getEncryptionDerivedKeyLength() / 8);
+                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                    dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
+                    dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
                     dkEncr.prepare(saaj.getSOAPPart());
                     
                     addDerivedKeyElement(dkEncr.getdktElement());
@@ -415,8 +424,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                 + "Make sure jaxws:client element is configured " 
                                 + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
                     }
-                    encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
-                    encr.setKeyEncAlgo(algorithmSuite.getAsymmetricKeyWrap());
+                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                    encr.setSymmetricEncAlgorithm(algType.getEncryption());
+                    encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
                     encr.prepare(saaj.getSOAPPart(), crypto);
                     
                     if (encr.getBSTTokenId() != null) {
@@ -445,7 +455,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         return null;
     }    
     
-    private void assertUnusedTokens(TokenWrapper wrapper) {
+    private void assertUnusedTokens(AbstractTokenWrapper wrapper) {
         if (wrapper == null) {
             return;
         }
@@ -467,7 +477,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
     }
     
-    private void doSignature(TokenWrapper wrapper, List<WSEncryptionPart> sigParts, boolean attached) 
+    private void doSignature(AbstractTokenWrapper wrapper, List<WSEncryptionPart> sigParts, boolean attached) 
         throws WSSecurityException, SOAPException {
         
         if (!isRequestor()) {
@@ -480,17 +490,17 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertUnusedTokens(abinding.getRecipientSignatureToken());
         }
         
-        Token sigToken = wrapper.getToken();
+        AbstractToken sigToken = wrapper.getToken();
         sigParts.addAll(this.getSignedParts());
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
-            if (!attached && includeToken(sigToken.getInclusion())) {
+            if (!attached && includeToken(sigToken.getIncludeTokenType())) {
                 WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
                 sig.prependBSTElementToHeader(secHeader);
             } 
             return;
         }
-        if (sigToken.isDerivedKeys()) {
+        if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             // Set up the encrypted key to use
             setupEncryptedKey(wrapper, sigToken);
             
@@ -500,15 +510,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             // Set the algo info
             dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite()
                     .getSymmetricSignature());
-            dkSign.setDerivedKeyLength(abinding.getAlgorithmSuite()
-                    .getSignatureDerivedKeyLength() / 8);
+            AlgorithmSuiteType algType = abinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
             dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                     + WSConstants.ENC_KEY_VALUE_TYPE);
             
             try {
                 dkSign.prepare(saaj.getSOAPPart(), secHeader);
 
-                if (abinding.isTokenProtection()) {
+                if (abinding.isProtectTokens()) {
+                    policyAsserted(SPConstants.PROTECT_TOKENS);
                     if (bstElement != null) {
                         WSEncryptionPart bstPart = 
                             new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
@@ -546,7 +557,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
                       
             // This action must occur before sig.prependBSTElementToHeader
-            if (abinding.isTokenProtection()) {
+            if (abinding.isProtectTokens()) {
+                policyAsserted(SPConstants.PROTECT_TOKENS);
                 if (sig.getBSTTokenId() != null) {
                     WSEncryptionPart bstPart = 
                         new WSEncryptionPart(sig.getBSTTokenId());
@@ -577,8 +589,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
     }
 
-    private void setupEncryptedKey(TokenWrapper wrapper, Token token) throws WSSecurityException {
-        if (!isRequestor() && token.isDerivedKeys()) {
+    private void setupEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken token) throws WSSecurityException {
+        if (!isRequestor() && token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             //If we already have them, simply return
             if (encryptedKeyId != null && encryptedKeyValue != null) {
                 return;
@@ -651,7 +663,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         return null;
     }
     
-    private void createEncryptedKey(TokenWrapper wrapper, Token token)
+    private void createEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken token)
         throws WSSecurityException {
         //Set up the encrypted key to use
         encrKey = this.getEncryptedKeyBuilder(wrapper, token);

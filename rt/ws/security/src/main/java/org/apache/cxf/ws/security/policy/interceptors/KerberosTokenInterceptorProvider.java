@@ -37,8 +37,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.kerberos.KerberosClient;
 import org.apache.cxf.ws.security.kerberos.KerberosUtils;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
@@ -46,12 +44,15 @@ import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.KerberosSecurity;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 
 /**
  * 
@@ -102,8 +103,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.KERBEROS_TOKEN);
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
@@ -134,6 +136,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         ai.setAsserted(true);
                     }                    
                 }
+                
+                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         
@@ -150,8 +155,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.KERBEROS_TOKEN);
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (!isRequestor(message)) {
@@ -166,6 +172,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         ai.setAsserted(true);
                     }                    
                 }
+                
+                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         

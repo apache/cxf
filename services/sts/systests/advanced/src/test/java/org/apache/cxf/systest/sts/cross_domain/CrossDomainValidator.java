@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.systest.sts.cross_domain;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 
 /**
  * This class validates a SAML Assertion by checking the issuer name.
@@ -32,10 +32,10 @@ public class CrossDomainValidator extends SamlAssertionValidator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         
-        AssertionWrapper token = validatedCredential.getAssertion();
+        SamlAssertionWrapper token = validatedCredential.getSamlAssertion();
         if (token == null || token.getSaml2() == null
             || !"b-issuer".equals(token.getIssuerString())) {
-            throw new WSSecurityException(WSSecurityException.FAILURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
 
         return validatedCredential;

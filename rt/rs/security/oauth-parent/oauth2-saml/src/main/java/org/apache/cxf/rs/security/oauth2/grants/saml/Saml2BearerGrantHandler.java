@@ -58,13 +58,18 @@ import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.validate.Validator;
+
+import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.Signature;
 
 /**
  * The "SAML2 Bearer" grant handler
@@ -117,7 +122,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
         try {   
             InputStream tokenStream = decodeAssertion(assertion);
             Element token = readToken(tokenStream);
-            AssertionWrapper assertionWrapper = new AssertionWrapper(token);
+            SamlAssertionWrapper assertionWrapper = new SamlAssertionWrapper(token);
             
             Message message = PhaseInterceptorChain.getCurrentMessage();
     
@@ -134,7 +139,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
         }
     }
 
-    protected UserSubject getGrantSubject(Message message, AssertionWrapper wrapper) {
+    protected UserSubject getGrantSubject(Message message, SamlAssertionWrapper wrapper) {
         SecurityContext sc = scProvider.getSecurityContext(message, wrapper);
         if (sc instanceof JAXRSSAMLSecurityContext) {
             JAXRSSAMLSecurityContext jaxrsSc = (JAXRSSAMLSecurityContext)sc;
@@ -174,7 +179,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
         }
     }
 
-    protected void validateToken(Message message, AssertionWrapper assertion) {
+    protected void validateToken(Message message, SamlAssertionWrapper assertion) {
         try {
             RequestData data = new RequestData();
             if (assertion.isSigned()) {
@@ -182,7 +187,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                 data.setWssConfig(cfg);
                 data.setCallbackHandler(SecurityUtils.getCallbackHandler(message, this.getClass()));
                 try {
-                    data.setSigCrypto(new CryptoLoader().getCrypto(message,
+                    data.setSigVerCrypto(new CryptoLoader().getCrypto(message,
                                                 SecurityConstants.SIGNATURE_CRYPTO,
                                                 SecurityConstants.SIGNATURE_PROPERTIES));
                 } catch (IOException ex) {
@@ -190,14 +195,22 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                 }
                 data.setEnableRevocation(MessageUtils.isTrue(
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
-                assertion.verifySignature(data, null);
+                
+                Signature sig = assertion.getSignature();
+                KeyInfo keyInfo = sig.getKeyInfo();
+                SAMLKeyInfo samlKeyInfo = 
+                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
+                        keyInfo.getDOM(), data.getSigVerCrypto()
+                    );
+                assertion.verifySignature(samlKeyInfo);
+                
             } else if (getTLSCertificates(message) == null) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
             
             if (samlValidator != null) {
                 Credential credential = new Credential();
-                credential.setAssertion(assertion);
+                credential.setSamlAssertion(assertion);
                 samlValidator.validate(credential, data);
             }
             samlOAuthValidator.validate(message, assertion);
@@ -211,7 +224,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
         return tlsInfo != null ? tlsInfo.getPeerCertificates() : null;
     }
     
-    protected void setSecurityContext(Message message, AssertionWrapper wrapper) {
+    protected void setSecurityContext(Message message, SamlAssertionWrapper wrapper) {
         if (scProvider != null) {
             SecurityContext sc = scProvider.getSecurityContext(message, wrapper);
             message.put(SecurityContext.class, sc);

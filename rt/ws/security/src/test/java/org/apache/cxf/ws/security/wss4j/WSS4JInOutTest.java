@@ -56,13 +56,13 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.junit.Test;
 
@@ -102,7 +102,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -129,7 +129,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -243,9 +243,9 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         final Principal p1 = (Principal)protectionResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         final Principal p2 = (Principal)protectionResults.get(1).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(p1 instanceof WSUsernameTokenPrincipal || p2 instanceof WSUsernameTokenPrincipal);
+        assertTrue(p1 instanceof UsernameTokenPrincipal || p2 instanceof UsernameTokenPrincipal);
         
-        Principal utPrincipal = p1 instanceof WSUsernameTokenPrincipal ? p1 : p2;
+        Principal utPrincipal = p1 instanceof UsernameTokenPrincipal ? p1 : p2;
         
         Principal secContextPrincipal = (Principal)inmsg.get(WSS4JInInterceptor.PRINCIPAL_RESULT);
         assertSame(secContextPrincipal, utPrincipal);
@@ -262,7 +262,6 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "false");
         inProperties.put(
             WSHandlerConstants.PW_CALLBACK_CLASS, 
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
@@ -272,16 +271,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
 
         //
-        // This should pass, as even though passwordType is set to digest, we are 
-        // overriding the default handler behaviour of requiring a strict password
-        // type
-        //
-        makeInvocation(outProperties, xpaths, inProperties);
-        
-        //
         // This should fail, as we are requiring a digest password type
         //
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
         try {
             makeInvocation(outProperties, xpaths, inProperties);
             fail("Failure expected on the wrong password type");
@@ -444,7 +435,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "cxfca.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -487,7 +478,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             WSHandlerConstants.PW_CALLBACK_CLASS, 
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");

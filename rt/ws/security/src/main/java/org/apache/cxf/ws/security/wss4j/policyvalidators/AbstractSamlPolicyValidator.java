@@ -24,12 +24,12 @@ import java.util.List;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.wss4j.SAMLUtils;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * Some abstract functionality for validating SAML Assertions
@@ -43,10 +43,10 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
      * @return true if the token is required
      */
     protected boolean isTokenRequired(
-        Token token,
+        AbstractToken token,
         Message message
     ) {
-        IncludeTokenType inclusion = token.getInclusion();
+        IncludeTokenType inclusion = token.getIncludeTokenType();
         if (inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             return false;
         } else if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
@@ -73,11 +73,11 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
      * @param signedResults a list of all of the signed results
      */
     public boolean checkHolderOfKey(
-        AssertionWrapper assertionWrapper,
+        SamlAssertionWrapper assertionWrapper,
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
-        return SAMLUtils.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts);
+        return DOMSAMLUtil.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
-        return SAMLUtils.compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
+        return DOMSAMLUtil.compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
     }
     
 }

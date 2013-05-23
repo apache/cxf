@@ -35,12 +35,11 @@ import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.xml.security.x509.BasicX509Credential;
@@ -126,7 +125,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         cryptoType.setAlias(signatureUser);
         X509Certificate[] issuerCerts = crypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
-            throw new WSSecurityException(
+            throw new Exception(
                 "No issuer certs were found to sign the request using name: " + signatureUser
             );
         }
@@ -140,17 +139,12 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         LOG.fine("Using Signature algorithm " + sigAlgo);
         
         // Get the password
-        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.SIGNATURE)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.Usage.SIGNATURE)};
         callbackHandler.handle(cb);
         String password = cb[0].getPassword();
         
         // Get the private key
-        PrivateKey privateKey = null;
-        try {
-            privateKey = crypto.getPrivateKey(signatureUser, password);
-        } catch (Exception ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
-        }
+        PrivateKey privateKey = crypto.getPrivateKey(signatureUser, password);
         
         // Create the signature
         Signature signature = OpenSAMLUtil.buildSignature();
@@ -170,7 +164,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
             KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
             signature.setKeyInfo(keyInfo);
         } catch (org.opensaml.xml.security.SecurityException ex) {
-            throw new WSSecurityException(
+            throw new Exception(
                     "Error generating KeyInfo from signing credential", ex);
         }
         

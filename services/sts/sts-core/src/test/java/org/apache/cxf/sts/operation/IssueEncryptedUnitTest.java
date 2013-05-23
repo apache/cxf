@@ -45,9 +45,9 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for issuing encrypted tokens.
@@ -550,13 +550,13 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         if (unrestrictedPoliciesInstalled) {
-            properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+            properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         } else {
-            properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "restricted/stsstore.jks");
+            properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "restricted/stsstore.jks");
         }
         
         return properties;
