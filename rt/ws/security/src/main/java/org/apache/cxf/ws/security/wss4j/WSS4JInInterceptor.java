@@ -469,7 +469,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                         new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType)
                     );
                 } else {
-                    msg.put(SecurityContext.class, new DefaultSecurityContext(subject));
+                    msg.put(SecurityContext.class, new DefaultSecurityContext(p, subject));
                 }
                 break;
             } else if (p != null && isSecurityContextPrincipal(p, wsResult)) {
