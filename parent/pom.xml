@@ -164,7 +164,7 @@
         
         <!-- various OSGi related versions -->
         <cxf.aries.version>1.0.0</cxf.aries.version>
-        <cxf.aries.version.range>[0.3,2)</cxf.aries.version.range>
+        <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
         <cxf.karaf.version>2.2.9</cxf.karaf.version>
 
