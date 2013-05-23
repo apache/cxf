@@ -41,9 +41,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.service.AddNumbersException;
@@ -61,6 +64,7 @@ import org.apache.cxf.jaxws.service.QuerySummary;
 import org.apache.cxf.jaxws.service.SayHi;
 import org.apache.cxf.jaxws.service.SayHiImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingInfo;
@@ -195,8 +199,6 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         Hello serviceImpl = new Hello();
         EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
         ep.publish("local://localhost:9090/hello");
-        ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "HelloService");
         QName portName = new QName("http://service.jaxws.cxf.apache.org/", "HelloPort");
         
@@ -204,7 +206,15 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
         service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello"); 
         
-        HelloInterface proxy = service.getPort(portName, HelloInterface.class);
+        HelloInterface proxy = service.getPort(portName, HelloInterface.class, new LoggingFeature());
+        Client client = ClientProxy.getClient(proxy);
+        boolean found = false;
+        for (Interceptor<? extends Message> i : client.getOutInterceptors()) {
+            if (i instanceof LoggingOutInterceptor) {
+                found = true;
+            }
+        }
+        assertTrue(found);
         assertEquals("Get the wrong result", "hello", proxy.sayHi("hello"));
         String[] strInput = new String[2];
         strInput[0] = "Hello";

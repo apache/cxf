@@ -20,6 +20,8 @@ package org.apache.cxf.feature;
 
 import java.util.List;
 
+import javax.xml.ws.WebServiceFeature;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
@@ -34,7 +36,11 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * If you're simply adding interceptors to a Server, Client, or Bus, this allows you to add
  * them easily.
  */
-public abstract class AbstractFeature implements Feature {
+public abstract class AbstractFeature extends WebServiceFeature implements Feature {
+    public String getID() {
+        return getClass().getName();
+    }
+    
     public void initialize(Server server, Bus bus) {
         initializeProvider(server.getEndpoint(), bus);
     }

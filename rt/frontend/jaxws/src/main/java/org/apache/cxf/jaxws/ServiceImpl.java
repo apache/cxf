@@ -213,15 +213,15 @@ public class ServiceImpl extends ServiceDelegate {
         portInfos.put(portName, portInfo);
     }
 
-    private WebServiceFeature[] getAllFeatures(WebServiceFeature features[]) {
-        if (serviceFeatures == null || serviceFeatures.length == 0) {
-            return features;
-        } else if (features == null || features.length == 0) {
-            return serviceFeatures;
+    private List<WebServiceFeature> getAllFeatures(WebServiceFeature features[]) {
+        List<WebServiceFeature> f = new ArrayList<WebServiceFeature>();
+        if (features != null) {
+            f.addAll(Arrays.asList(features));
         }
-        List<WebServiceFeature> f = new ArrayList<WebServiceFeature>(Arrays.asList(features));
-        f.addAll(Arrays.asList(serviceFeatures));
-        return f.toArray(new WebServiceFeature[f.size()]);
+        if (serviceFeatures != null) {
+            f.addAll(Arrays.asList(serviceFeatures));
+        }
+        return f;
     }
     
     private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf, 
@@ -407,11 +407,12 @@ public class ServiceImpl extends ServiceDelegate {
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         JaxWsClientFactoryBean clientFac = (JaxWsClientFactoryBean) proxyFac.getClientFactoryBean();
         JaxWsServiceFactoryBean serviceFactory = (JaxWsServiceFactoryBean) proxyFac.getServiceFactory();
+        List<WebServiceFeature> f = getAllFeatures(features);
         proxyFac.initFeatures();
-        WebServiceFeature f[] = getAllFeatures(features);
         if (f != null) {
-            serviceFactory.setWsFeatures(Arrays.asList(f));
+            serviceFactory.setWsFeatures(f);
         }
+
         
         proxyFac.setBus(bus);
         proxyFac.setServiceClass(serviceEndpointInterface);

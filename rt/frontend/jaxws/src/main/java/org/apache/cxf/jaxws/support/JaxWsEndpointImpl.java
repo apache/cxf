@@ -138,11 +138,20 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         throws EndpointException {
         super(bus, s, ei);
         this.implInfo = implementorInfo;
-        this.wsFeatures = wf;
+        this.wsFeatures = new ArrayList<WebServiceFeature>();
         if (af != null) {
             features = CastUtils.cast(af);
         } else {
             features = new ArrayList<Feature>();
+        }
+        if (wf != null) {
+            for (WebServiceFeature f : wf) {
+                if (f instanceof Feature) {
+                    features.add((Feature)f);
+                } else {
+                    wsFeatures.add(f);
+                }
+            }
         }
         createJaxwsBinding();
         
