@@ -19,7 +19,6 @@
 
 package org.apache.cxf.bus.blueprint;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +29,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.aries.blueprint.services.ExtendedBlueprintContainer;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
 import org.osgi.service.blueprint.container.BlueprintContainer;
@@ -111,67 +110,17 @@ public class ConfigurerImpl implements Configurer {
             configureWithWildCard(bn, beanInstance);
         }
         
-        
-        Method m = ReflectionUtil.findMethod(container.getClass(), "injectBeanInstance",
-                                             BeanMetadata.class, Object.class);
-        try {
-            if (m != null) {
-                //Aries blueprint 0.4.1+
-                ComponentMetadata cm = null;
-                try {
-                    cm = container.getComponentMetadata(bn);
-                } catch (NoSuchComponentException nsce) {
-                    cm = null;
-                }
-                if (cm instanceof BeanMetadata) {
-                    ReflectionUtil.setAccessible(m);
-                    m.invoke(container, cm, beanInstance);
-                }
-            } else {
-                //Aries blueprint 0.3.x
-                m = ReflectionUtil.findMethod(container.getClass(), "getRepository");
-                Object o = ReflectionUtil.setAccessible(m).invoke(container);
-                m = ReflectionUtil.findMethod(o.getClass(), "getRecipe", String.class);
-                Object xc = o;
-                o = ReflectionUtil.setAccessible(m).invoke(o, bn);  //returns the recipe
-                if (o != null) {
-                    m = ReflectionUtil.findMethod(o.getClass(), "setProperties", Object.class);
-                    if (m != null) {
-                        Method xcm = findSetExecutionContextMethod(o.getClass().getClassLoader());
-                        if (xcm != null) {
-                            Object oxc = xcm.invoke(null, xc);
-                            try {
-                                ReflectionUtil.setAccessible(m).invoke(o, beanInstance);
-                            } finally {
-                                xcm.invoke(null, oxc);
-                            }
-                        }
-                    }
-                }
+        if (container instanceof ExtendedBlueprintContainer) {
+            ComponentMetadata cm = null;
+            try {
+                cm = container.getComponentMetadata(bn);
+            } catch (NoSuchComponentException nsce) {
+                cm = null;
             }
-        } catch (InvocationTargetException ite) {
-            Throwable t = ite.getCause();
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException)t;
-            } else {
-                throw new RuntimeException(t);
+            if (cm instanceof BeanMetadata) {
+                ((ExtendedBlueprintContainer)container).injectBeanInstance((BeanMetadata)cm, beanInstance);
             }
-        } catch (Exception ex) {
-            LOG.log(Level.FINE, "Could not configure object " + bn, ex);
         }
-    }
-    
-    // for Aries blueprint 0.3.1
-    private Method findSetExecutionContextMethod(ClassLoader cl) {
-        Method m = null;
-        try {
-            m = Class.forName("org.apache.aries.blueprint.di.ExecutionContext$Holder", false, cl).
-                getDeclaredMethod("setContext", 
-                                  Class.forName("org.apache.aries.blueprint.di.ExecutionContext", false, cl));
-        } catch (Exception e) {
-            LOG.log(Level.FINE, "Could not find the ExecutionContext$Holder.setContext method", e);
-        }
-        return m;
     }
     
     private void configureWithWildCard(String bn, Object beanInstance) {

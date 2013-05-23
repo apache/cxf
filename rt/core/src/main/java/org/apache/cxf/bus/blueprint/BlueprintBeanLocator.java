@@ -19,7 +19,6 @@
 
 package org.apache.cxf.bus.blueprint;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,9 +28,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.aries.blueprint.ExtendedBeanMetadata;
+import org.apache.aries.blueprint.services.ExtendedBlueprintContainer;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -69,11 +68,10 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             if (bm instanceof ExtendedBeanMetadata) {
                 cls = ((ExtendedBeanMetadata)bm).getRuntimeClass();
             } 
-            if (cls == null) {
+            if (cls == null && container instanceof ExtendedBlueprintContainer) {
                 try {
-                    Method m = ReflectionUtil.findMethod(container.getClass(), "loadClass", String.class);
-                    cls = (Class<?>)ReflectionUtil.setAccessible(m).invoke(container, bm.getClassName());
-                } catch (Exception e) {
+                    cls = ((ExtendedBlueprintContainer)container).loadClass(bm.getClassName());
+                } catch (ClassNotFoundException cnfe) {
                     //ignore
                 }
             }
