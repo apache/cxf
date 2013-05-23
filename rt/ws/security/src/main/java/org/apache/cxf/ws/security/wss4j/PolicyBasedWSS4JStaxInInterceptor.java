@@ -37,6 +37,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -445,15 +446,21 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             operationPolicies.add(operationPolicy);
         }
         
+        String soapAction = SoapActionInInterceptor.getSoapAction(msg);
+        if (soapAction == null) {
+            soapAction = "";
+        }
+        
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
-        // TODO Soap Action
-        PolicyEnforcer securityEventListener = new PolicyEnforcer(operationPolicies, "", isRequestor(msg)) {
-            @Override
-            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                incomingSecurityEventList.add(securityEvent);
-                super.registerSecurityEvent(securityEvent);
-            }
-        };
+        PolicyEnforcer securityEventListener = 
+            new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg)) {
+            
+                @Override
+                public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+                    incomingSecurityEventList.add(securityEvent);
+                    super.registerSecurityEvent(securityEvent);
+                }
+            };
         
         msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
