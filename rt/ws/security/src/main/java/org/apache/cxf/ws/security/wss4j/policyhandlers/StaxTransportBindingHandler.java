@@ -34,6 +34,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
@@ -53,6 +54,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     
     private static final Logger LOG = LogUtils.getL7dLogger(StaxTransportBindingHandler.class);
+    private TransportBinding tbinding;
 
     public StaxTransportBindingHandler(Map<String, Object> properties, SoapMessage msg) {
         super(properties, msg);
@@ -64,8 +66,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         configureLayout(aim);
         
         if (this.isRequestor()) {
-            TransportBinding binding = (TransportBinding)getBinding(aim);
-            TransportToken token = binding.getTransportToken();
+            tbinding = (TransportBinding)getBinding(aim);
+            TransportToken token = tbinding.getTransportToken();
             if (token.getToken() instanceof IssuedToken) {
                 // TODO
             }
@@ -149,7 +151,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 }
             } */
             } else if (token instanceof SamlToken) {
-                addSamlToken((SamlToken)token);
+                addSamlToken((SamlToken)token, false, false);
             } else {
                 //REVISIT - not supported for signed.  Exception?
             }
@@ -234,12 +236,16 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         if (token instanceof X509Token
             || token instanceof KeyValueToken) {
             doX509TokenSignature(token, wrapper);
-        } /* TODO else if (token instanceof SamlToken) {
-            SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
-            assertionWrapper.toDOM(saaj.getSOAPPart());
-            storeAssertionAsSecurityToken(assertionWrapper);
-            addSig(doIssuedTokenSignature(token, wrapper));
-        } TODO else if (token instanceof UsernameToken) {
+        } else if (token instanceof SamlToken) {
+            addSamlToken((SamlToken)token, false, true);
+            signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
+            
+            Map<String, Object> config = getProperties();
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                       tbinding.getAlgorithmSuite().getAsymmetricSignature());
+            AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
+        } /*TODO else if (token instanceof UsernameToken) {
             // Create a UsernameToken object for derived keys and store the security token
             WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, true);
             String id = usernameToken.getId();

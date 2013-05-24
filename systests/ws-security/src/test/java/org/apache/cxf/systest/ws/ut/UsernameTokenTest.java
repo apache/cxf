@@ -83,12 +83,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -116,12 +111,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -149,12 +139,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -182,12 +167,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -215,12 +195,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -248,12 +223,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -281,12 +251,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         utPort.doubleIt(25);
         
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -322,12 +287,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         /*
         // TODO
         // Streaming
-        ((BindingProvider)utPort).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
-        ((BindingProvider)utPort).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
-        );
+        SecurityTestUtil.enableStreaming(utPort);
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no UsernameToken");
@@ -450,6 +410,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         // Streaming
         /*
         // TODO
+        SecurityTestUtil.enableStreaming(utPort);
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
         utPort.doubleIt(25);
         

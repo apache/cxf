@@ -992,27 +992,29 @@ public abstract class AbstractBindingBuilder {
             MessageUtils.getContextualBoolean(
                 message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
             );
-        if (selfSignAssertion) {
-            Crypto crypto = getSignatureCrypto(null);
+        if (selfSignAssertion || samlCallback.isSignAssertion()) {
+            String issuerName = samlCallback.getIssuerKeyName();
+            if (issuerName == null) {
+                String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
+                issuerName = (String)message.getContextualProperty(userNameKey);
+            }
+            String password = samlCallback.getIssuerKeyPassword();
+            if (password == null) {
+                password = getPassword(issuerName, token, WSPasswordCallback.Usage.SIGNATURE);
+            }
+            Crypto crypto = samlCallback.getIssuerCrypto();
+            if (crypto == null) {
+                crypto = getSignatureCrypto(null);
+            }
             
-            String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
-            String user = (String)message.getContextualProperty(userNameKey);
-            if (crypto != null && StringUtils.isEmpty(user)) {
-                try {
-                    user = crypto.getDefaultX509Identifier();
-                } catch (WSSecurityException e1) {
-                    throw new Fault(e1);
-                }
-            }
-            if (StringUtils.isEmpty(user)) {
-                policyNotAsserted(token, "No username found.");
-                return null;
-            }
-    
-            String password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE);
-         
-            // TODO configure using a KeyValue here
-            assertion.signAssertion(user, password, crypto, false);
+            assertion.signAssertion(
+                    issuerName,
+                    password,
+                    crypto,
+                    samlCallback.isSendKeyValue(),
+                    samlCallback.getCanonicalizationAlgorithm(),
+                    samlCallback.getSignatureAlgorithm()
+            );
         }
         
         return assertion;

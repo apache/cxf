@@ -39,7 +39,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for SAML Tokens using the streaming interceptors.
+ * A set of tests for SAML Tokens using the streaming interceptors. It tests both DOM + StAX 
+ * clients against the StAX server
  */
 public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(StaxServer.class);
@@ -126,6 +127,69 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml1OverTransportStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml1Port);
+        
+        try {
+            saml1Port.doubleIt(25);
+            fail("Expected failure on an invocation with no SAML Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
+        }
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        );
+        try {
+            saml1Port.doubleIt(25);
+            fail("Expected failure on an invocation with a SAML2 Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // assertTrue(ex.getMessage().contains("Policy enforces SamlVersion11Profile11 but we got 2.0"));
+        }
+
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        // Don't send any Token...failure expected
+        portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort2");
+        saml1Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml1Port);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        
+        try {
+            saml1Port.doubleIt(25);
+            fail("Failure expected on no token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SamlToken not satisfied";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml1ElementOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -147,6 +211,41 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
+        }
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlElementCallbackHandler(false)
+        );
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml1ElementOverTransportStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml1Port);
+        
+        try {
+            saml1Port.doubleIt(25);
+            fail("Expected failure on an invocation with no SAML Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
@@ -218,11 +317,9 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    /**
-     * Some negative tests. Send a sender-vouches assertion as a SupportingToken...this will
-     * fail as the provider will demand that there is a signature covering both the assertion
-     * and the message body.
-     */
+    // Some negative tests. Send a sender-vouches assertion as a SupportingToken...this will
+    // fail as the provider will demand that there is a signature covering both the assertion
+    // and the message body.
     // TODO See WSS-442
     @org.junit.Test
     @org.junit.Ignore
@@ -348,6 +445,34 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml1SelfSignedOverTransportStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SelfSignedTransportPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml1Port);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
+        );
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml1SelfSignedOverTransportSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -366,6 +491,34 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml1SelfSignedOverTransportSP11Streaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SelfSignedTransportSP11Port");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml1Port);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -434,7 +587,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // NPE in outbound DOM because of SignatureConfirmation - should be fixed with StaX out
+    // See WSS-446
     @org.junit.Test
     @org.junit.Ignore
     public void testSaml2EndorsingOverTransport() throws Exception {
@@ -466,7 +619,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // NPE in outbound DOM because of SignatureConfirmation - should be fixed with StaX out
+    // See WSS-446
     @org.junit.Test
     @org.junit.Ignore
     public void testSaml2EndorsingPKOverTransport() throws Exception {
@@ -517,6 +670,37 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml2Port, PORT2);
         
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
+        );
+
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml2EndorsingOverTransportSP11Streaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportSP11Port");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml2Port);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
@@ -644,6 +828,36 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = "SamlToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testNoSamlTokenStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItInlinePolicyPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT2);
+        SecurityTestUtil.enableStreaming(saml2Port);
+        
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected on no SamlToken");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SamlToken not satisfied";
+            // assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)saml2Port).close();

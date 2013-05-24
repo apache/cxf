@@ -123,7 +123,11 @@ public abstract class AbstractStaxBindingHandler {
         return new SecurePart(WSSConstants.TAG_wsse_UsernameToken, Modifier.Element);
     }
     
-    protected SecurePart addSamlToken(SamlToken token) throws WSSecurityException {
+    protected SecurePart addSamlToken(
+        SamlToken token, 
+        boolean signed,
+        boolean endorsing
+    ) throws WSSecurityException {
         IncludeTokenType includeToken = token.getIncludeTokenType();
         if (!isTokenRequired(includeToken)) {
             return null;
@@ -154,12 +158,8 @@ public abstract class AbstractStaxBindingHandler {
         config.put(ConfigurationConstants.SAML_CALLBACK_REF, handler);
         
         // Action
-        boolean selfSignAssertion = 
-            MessageUtils.getContextualBoolean(
-                message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
-            );
         String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
-        if (selfSignAssertion) {
+        if (signed || endorsing) {
             samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
         }
         
@@ -170,7 +170,6 @@ public abstract class AbstractStaxBindingHandler {
             config.put(ConfigurationConstants.ACTION, samlAction);
         }
         
-        // TODO -> Set SAML Type from policy?
         QName qname = WSSConstants.TAG_saml2_Assertion;
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
@@ -559,7 +558,7 @@ public abstract class AbstractStaxBindingHandler {
                 }
                 ret.put(token, new SecurePart(WSSConstants.TAG_dsig_Signature, Modifier.Element));
             } else if (token instanceof SamlToken) {
-                SecurePart securePart = addSamlToken((SamlToken)token);
+                SecurePart securePart = addSamlToken((SamlToken)token, false, endorse);
                 if (securePart != null) {
                     ret.put(token, securePart);
                     if (suppTokens.isEncryptedToken()) {

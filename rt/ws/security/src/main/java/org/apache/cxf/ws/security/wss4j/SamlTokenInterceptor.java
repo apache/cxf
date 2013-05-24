@@ -267,38 +267,37 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             MessageUtils.getContextualBoolean(
                 message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
             );
-        if (selfSignAssertion) {
-            Crypto crypto = 
-                getCrypto(
-                    token, SecurityConstants.SIGNATURE_CRYPTO,
-                    SecurityConstants.SIGNATURE_PROPERTIES, message
-                );
-
-            String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
-            String user = (String)message.getContextualProperty(userNameKey);
-            if (crypto != null && StringUtils.isEmpty(user)) {
-                try {
-                    user = crypto.getDefaultX509Identifier();
-                } catch (WSSecurityException e1) {
-                    throw new Fault(e1);
+        if (selfSignAssertion || samlCallback.isSignAssertion()) {
+            String issuerName = samlCallback.getIssuerKeyName();
+            if (issuerName == null) {
+                String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
+                issuerName = (String)message.getContextualProperty(userNameKey);
+            }
+            String password = samlCallback.getIssuerKeyPassword();
+            if (password == null) {
+                password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+                if (StringUtils.isEmpty(password)) {
+                    password = 
+                        getPassword(issuerName, token, WSPasswordCallback.Usage.SIGNATURE, message);
                 }
             }
-            if (StringUtils.isEmpty(user)) {
-                return null;
+            Crypto crypto = samlCallback.getIssuerCrypto();
+            if (crypto == null) {
+                crypto = 
+                    getCrypto(token, SecurityConstants.SIGNATURE_CRYPTO, 
+                              SecurityConstants.SIGNATURE_PROPERTIES, message);
             }
-
-            String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
-            if (StringUtils.isEmpty(password)) {
-                password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE, message);
-            }
-            if (password == null) {
-                password = "";
-            }
-
-            // TODO configure using a KeyValue here
-            assertion.signAssertion(user, password, crypto, false);
+            
+            assertion.signAssertion(
+                    issuerName,
+                    password,
+                    crypto,
+                    samlCallback.isSendKeyValue(),
+                    samlCallback.getCanonicalizationAlgorithm(),
+                    samlCallback.getSignatureAlgorithm()
+            );
         }
-
+        
         return assertion;
     }
 
