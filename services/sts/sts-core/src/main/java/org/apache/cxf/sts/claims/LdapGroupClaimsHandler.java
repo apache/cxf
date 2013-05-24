@@ -203,7 +203,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
         }
         
         if (LOG.isLoggable(Level.FINER)) {
-            LOG.finest("Retrieve groups for user " + user);
+            LOG.finer("Retrieve groups for user " + user);
         }
         
         List<String> groups = null;
@@ -212,15 +212,22 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
         
         if (groups == null || groups.size() == 0) {
             if (LOG.isLoggable(Level.INFO)) {
-                LOG.finest("No groups found for user '" + user + "'");
+                LOG.info("No groups found for user '" + user + "'");
             }
             return new ClaimCollection();
+        }
+        
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Groups for user '" + parameters.getPrincipal().getName() + "': " + groups);
         }
         
         String scope = null;
         if (getAppliesToScopeMapping() != null && getAppliesToScopeMapping().size() > 0
             && parameters.getAppliesToAddress() != null) {
             scope = getAppliesToScopeMapping().get(parameters.getAppliesToAddress());
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("AppliesTo matchs with scope: " + scope);
+            }
         }
         
         String regex = this.groupNameGlobalFilter;
@@ -258,6 +265,12 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
             }
         }
         
+        LOG.info("Filtered groups: " + filteredGroups);
+        if (filteredGroups.size() == 0) {
+            LOG.info("No matching groups found for user '" + principal + "'");
+            return new ClaimCollection();
+        }
+        
         ClaimCollection claimsColl = new ClaimCollection();
         Claim c = new Claim();
         c.setClaimType(URI.create(this.groupURI));
@@ -278,4 +291,3 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
     }
     
 }
-

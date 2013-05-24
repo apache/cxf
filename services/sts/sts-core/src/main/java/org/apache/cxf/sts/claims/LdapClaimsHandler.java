@@ -155,10 +155,6 @@ public class LdapClaimsHandler implements ClaimsHandler {
             LOG.finest("Retrieve claims for user " + user);
         }
         
-        
-
-
-        
         Map<String, Attribute> ldapAttributes = null;
         if (useLdapLookup) {
             AttributesMapper mapper = 
