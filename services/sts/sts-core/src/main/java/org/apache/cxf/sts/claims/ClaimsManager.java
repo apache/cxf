@@ -47,6 +47,15 @@ public class ClaimsManager {
     private List<ClaimsParser> claimParsers;
     private List<ClaimsHandler> claimHandlers;
     private List<URI> supportedClaimTypes = new ArrayList<URI>();
+    private boolean stopProcessingOnException = true;
+
+    public boolean isStopProcessingOnException() {
+        return stopProcessingOnException;
+    }
+
+    public void setStopProcessingOnException(boolean stopProcessingOnException) {
+        this.stopProcessingOnException = stopProcessingOnException;
+    }
 
     public List<URI> getSupportedClaimTypes() {
         return supportedClaimTypes;
@@ -127,7 +136,18 @@ public class ClaimsManager {
                     if (supportedClaims.isEmpty()) {
                         continue;
                     }
-                    ClaimCollection claimCollection = handler.retrieveClaimValues(supportedClaims, parameters);
+                    
+                    ClaimCollection claimCollection = null;
+                    try {
+                        claimCollection = handler.retrieveClaimValues(claims, parameters);
+                    } catch (Exception ex) {
+                        LOG.log(Level.INFO, "Failed retrieving claims from ClaimsHandler "
+                                + handler.getClass().getName(), ex);
+                        if (this.isStopProcessingOnException()) {
+                            throw ex;
+                        }
+                    }
+                    
                     if (claimCollection != null && claimCollection.size() != 0) {
                         returnCollection.addAll(claimCollection);
                     }
