@@ -54,7 +54,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
     private String groupNameGlobalFilter = ROLE;
     private String groupNameScopedFilter = SCOPE + "_" + ROLE;
     private Map<String, String> appliesToScopeMapping;
-    private boolean useFullGroupNameAsValue = false;
+    private boolean useFullGroupNameAsValue;
     
     
     public boolean isUseFullGroupNameAsValue() {

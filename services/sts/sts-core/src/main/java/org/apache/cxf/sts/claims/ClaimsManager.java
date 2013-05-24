@@ -140,7 +140,7 @@ public class ClaimsManager {
                     ClaimCollection claimCollection = null;
                     try {
                         claimCollection = handler.retrieveClaimValues(claims, parameters);
-                    } catch (Exception ex) {
+                    } catch (RuntimeException ex) {
                         LOG.log(Level.INFO, "Failed retrieving claims from ClaimsHandler "
                                 + handler.getClass().getName(), ex);
                         if (this.isStopProcessingOnException()) {
