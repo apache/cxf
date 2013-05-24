@@ -54,8 +54,17 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
     private String groupNameGlobalFilter = ROLE;
     private String groupNameScopedFilter = SCOPE + "_" + ROLE;
     private Map<String, String> appliesToScopeMapping;
+    private boolean useFullGroupNameAsValue = false;
     
     
+    public boolean isUseFullGroupNameAsValue() {
+        return useFullGroupNameAsValue;
+    }
+
+    public void setUseFullGroupNameAsValue(boolean useFullGroupNameAsValue) {
+        this.useFullGroupNameAsValue = useFullGroupNameAsValue;
+    }
+
     public String getUserObjectClass() {
         return userObjectClass;
     }
@@ -251,14 +260,26 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
                 //  Demo_User -> Role=User
                 //  Demo_Admin -> Role=Admin
                 String filter = this.groupNameScopedFilter;
-                filteredGroups.add(parseRole(group, filter.replaceAll(SCOPE, scope)));
+                String role = null;
+                if (isUseFullGroupNameAsValue()) {
+                    role = group;
+                } else {
+                    role = parseRole(group, filter.replaceAll(SCOPE, scope));
+                }
+                filteredGroups.add(role);
             } else {
                 if (globalPattern.matcher(group).matches()) {
                     //Group matches the global filter
                     //ex. (default groupNameGlobalFilter)
                     //  User -> Role=User
                     //  Admin -> Role=Admin
-                    filteredGroups.add(parseRole(group, this.groupNameGlobalFilter));
+                    String role = null;
+                    if (isUseFullGroupNameAsValue()) {
+                        role = group;
+                    } else {
+                        role = parseRole(group, this.groupNameGlobalFilter);
+                    }
+                    filteredGroups.add(role);
                 } else {
                     LOG.finer("Group '" + group + "' doesn't match scoped and global group filter");
                 }
