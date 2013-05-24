@@ -106,19 +106,21 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             params = new Object[0];
         }        
         
-        BindingOperationInfo oi = dispatcher.getBindingOperation(method, endpoint);
-        if (oi == null) {
-            // check for method on BindingProvider and Object
+        
+        try {
             if (method.getDeclaringClass().equals(BindingProvider.class)
                 || method.getDeclaringClass().equals(Object.class)
                 || method.getDeclaringClass().equals(Closeable.class)) {
-                try {
-                    return method.invoke(this, params);
-                } catch (InvocationTargetException e) {
-                    throw e.getCause();
-                }
+                return method.invoke(this, params);
+            } else if (method.getDeclaringClass().isInstance(client)) {
+                return method.invoke(client, params);
             }
-
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+        
+        BindingOperationInfo oi = dispatcher.getBindingOperation(method, endpoint);
+        if (oi == null) {
             Message msg = new Message("NO_BINDING_OPERATION_INFO", LOG, method.getName());
             throw new WebServiceException(msg.toString());
         }

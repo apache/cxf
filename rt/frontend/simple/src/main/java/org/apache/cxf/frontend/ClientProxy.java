@@ -59,17 +59,17 @@ public class ClientProxy implements InvocationHandler, Closeable {
         if (client == null) {
             throw new IllegalStateException("The client has been closed.");
         }
+        if (method.getDeclaringClass().equals(Object.class)
+            || method.getDeclaringClass().equals(Closeable.class)) {
+            return method.invoke(this);
+        } else if (method.getDeclaringClass().isInstance(client)) {
+            return method.invoke(client, args);
+        }
         
         MethodDispatcher dispatcher = (MethodDispatcher)endpoint.getService().get(MethodDispatcher.class
                                                                                       .getName());
         BindingOperationInfo oi = dispatcher.getBindingOperation(method, endpoint);
         if (oi == null) {
-            // check for method on BindingProvider and Object
-            if (method.getDeclaringClass().equals(Object.class)
-                || method.getDeclaringClass().equals(Closeable.class)) {
-                return method.invoke(this);
-            }
-
             throw new Fault(new Message("NO_OPERATION_INFO", LOG, method.getName()));
         }
 
