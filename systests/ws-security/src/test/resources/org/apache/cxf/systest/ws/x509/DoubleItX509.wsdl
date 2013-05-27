@@ -959,7 +959,7 @@
                 <sp:EndorsingSupportingTokens>
                    <wsp:Policy>
                         <sp:KeyValueToken
-                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                            <wsp:Policy>
                               <sp:RsaKeyValue />
                            </wsp:Policy>

@@ -162,15 +162,15 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         }
         
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
+            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
             message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
     }
@@ -202,15 +202,15 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         }
         
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
+            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
             message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
     }
@@ -247,7 +247,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
             
@@ -256,7 +256,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
         } else {
@@ -265,7 +265,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
             
@@ -274,7 +274,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
         }
