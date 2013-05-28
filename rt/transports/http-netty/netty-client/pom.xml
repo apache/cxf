@@ -34,10 +34,6 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <netty-version>3.6.5.Final</netty-version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -48,7 +44,6 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>${netty-version}</version>
         </dependency>
 
         <dependency>
