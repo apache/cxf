@@ -24,6 +24,12 @@ public interface ResponseTimeCounterMBean {
     Number getNumLogicalRuntimeFaults();
     Number getNumRuntimeFaults();
     Number getNumUnCheckedApplicationFaults();
+    
+    /**
+     * Get the Average Response Time
+     * NOTE: if the invocation number is 0, this method
+     * will return -1
+     */
     Number getAvgResponseTime();
     Number getMaxResponseTime();
     Number getMinResponseTime();   
