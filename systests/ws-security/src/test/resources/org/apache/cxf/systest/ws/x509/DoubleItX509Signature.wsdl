@@ -224,7 +224,6 @@
                         <sp:Lax/>
                      </wsp:Policy>
                   </sp:Layout>
-                  <sp:OnlySignEntireHeadersAndBody/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
                         <sp:Basic128/>

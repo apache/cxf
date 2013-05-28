@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,16 +32,21 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -53,12 +59,16 @@ import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.EncryptedParts;
+import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
+import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
 import org.apache.wss4j.policy.model.Wss10;
@@ -76,6 +86,12 @@ public abstract class AbstractStaxBindingHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractStaxBindingHandler.class);
     protected boolean timestampAdded;
     protected Set<SecurePart> encryptedTokensList = new HashSet<SecurePart>();
+    
+    protected Map<AbstractToken, SecurePart> endEncSuppTokMap;
+    protected Map<AbstractToken, SecurePart> endSuppTokMap;
+    protected Map<AbstractToken, SecurePart> sgndEndEncSuppTokMap;
+    protected Map<AbstractToken, SecurePart> sgndEndSuppTokMap;
+    
     private final Map<String, Object> properties;
     private final SoapMessage message;
     
@@ -364,23 +380,36 @@ public abstract class AbstractStaxBindingHandler {
             sig.setCustomTokenId(sigTokId);
         } else {
         */
-        config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
-        /*
-         * TODO
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        AbstractBinding binding = getBinding(aim);
+        if (binding instanceof SymmetricBinding) {
+            config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKeySHA1");
+        } else {
+            config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
+        }
+        
         // Find out do we also need to include the token as per the Inclusion requirement
         if (token instanceof X509Token 
             && token.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER
-            && (sig.getKeyIdentifierType() != WSConstants.BST_DIRECT_REFERENCE
-            && sig.getKeyIdentifierType() != WSConstants.KEY_VALUE)) {
-            alsoIncludeToken = true;
+            && ("IssuerSerial".equals(config.get(ConfigurationConstants.SIG_KEY_ID))
+                || "Thumbprint".equals(config.get(ConfigurationConstants.SIG_KEY_ID)))) {
+            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
         }
-        */
-        // }
 
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        AbstractBinding binding = getBinding(aim);
-        config.put(ConfigurationConstants.SIG_ALGO, 
-                   binding.getAlgorithmSuite().getAsymmetricSignature());
+        String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
+        if (binding instanceof SymmetricBinding) {
+            userNameKey = SecurityConstants.ENCRYPT_USERNAME;
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                       binding.getAlgorithmSuite().getSymmetricSignature());
+        } else {
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                       binding.getAlgorithmSuite().getAsymmetricSignature());
+        }
+        String sigUser = (String)message.getContextualProperty(userNameKey);
+        if (sigUser != null) {
+            config.put(ConfigurationConstants.SIGNATURE_USER, sigUser);
+        }
+
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
         config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
         // sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
@@ -390,7 +419,28 @@ public abstract class AbstractStaxBindingHandler {
         //}
     }
     
-    private String getKeyIdentifierType(AbstractTokenWrapper wrapper, AbstractToken token) {
+    protected final TokenStore getTokenStore() {
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
+            if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
+            }
+            if (tokenStore == null) {
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
+                if (info.getName() != null) {
+                    cacheKey += "-" + info.getName().toString().hashCode();
+                }
+                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
+            }
+            return tokenStore;
+        }
+    }
+    
+    protected String getKeyIdentifierType(AbstractTokenWrapper wrapper, AbstractToken token) {
 
         String identifier = null;
         if (token instanceof X509Token) {
@@ -446,11 +496,11 @@ public abstract class AbstractStaxBindingHandler {
         return null;
     }
     
-    protected Map<AbstractToken, Object> handleSupportingTokens(
+    protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         Collection<Assertion> tokens, 
         boolean endorse
     ) throws WSSecurityException {
-        Map<AbstractToken, Object> ret = new HashMap<AbstractToken, Object>();
+        Map<AbstractToken, SecurePart> ret = new HashMap<AbstractToken, SecurePart>();
         if (tokens != null) {
             for (Assertion pa : tokens) {
                 if (pa instanceof SupportingTokens) {
@@ -461,17 +511,17 @@ public abstract class AbstractStaxBindingHandler {
         return ret;
     }
                                                             
-    protected Map<AbstractToken, Object> handleSupportingTokens(
+    protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         SupportingTokens suppTokens,
         boolean endorse
     ) throws WSSecurityException {
-        return handleSupportingTokens(suppTokens, endorse, new HashMap<AbstractToken, Object>());
+        return handleSupportingTokens(suppTokens, endorse, new HashMap<AbstractToken, SecurePart>());
     }
                                                             
-    protected Map<AbstractToken, Object> handleSupportingTokens(
+    protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         SupportingTokens suppTokens, 
         boolean endorse,
-        Map<AbstractToken, Object> ret
+        Map<AbstractToken, SecurePart> ret
     ) throws WSSecurityException {
         if (suppTokens == null) {
             return ret;
@@ -571,7 +621,7 @@ public abstract class AbstractStaxBindingHandler {
     }
 
     protected void handleUsernameTokenSupportingToken(
-         UsernameToken token, boolean endorse, boolean encryptedToken, Map<AbstractToken, Object> ret
+         UsernameToken token, boolean endorse, boolean encryptedToken, Map<AbstractToken, SecurePart> ret
     ) throws WSSecurityException {
         if (endorse) {
             /* TODO
@@ -604,6 +654,93 @@ public abstract class AbstractStaxBindingHandler {
         }
     }
     
+    protected Collection<Assertion> findAndAssertPolicy(QName n) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
+        if (ais != null && !ais.isEmpty()) {
+            List<Assertion> p = new ArrayList<Assertion>(ais.size());
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+                p.add(ai.getAssertion());
+            }
+            return p;
+        }
+        return null;
+    } 
+    
+    protected void addSupportingTokens() throws WSSecurityException {
+        
+        Collection<Assertion> sgndSuppTokens = 
+            findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+        Map<AbstractToken, SecurePart> sigSuppTokMap = 
+            this.handleSupportingTokens(sgndSuppTokens, false);
+        sgndSuppTokens = findAndAssertPolicy(SP11Constants.SIGNED_SUPPORTING_TOKENS);
+        sigSuppTokMap.putAll(this.handleSupportingTokens(sgndSuppTokens, false));
+        
+        Collection<Assertion> endSuppTokens = 
+            findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        endSuppTokMap = this.handleSupportingTokens(endSuppTokens, true);
+        endSuppTokens = findAndAssertPolicy(SP11Constants.ENDORSING_SUPPORTING_TOKENS);
+        endSuppTokMap.putAll(this.handleSupportingTokens(endSuppTokens, true));
+
+        Collection<Assertion> sgndEndSuppTokens 
+            = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true);
+        sgndEndSuppTokens = findAndAssertPolicy(SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        sgndEndSuppTokMap.putAll(this.handleSupportingTokens(sgndEndSuppTokens, true));
+        
+        Collection<Assertion> sgndEncryptedSuppTokens 
+            = findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        Map<AbstractToken, SecurePart> sgndEncSuppTokMap = 
+            this.handleSupportingTokens(sgndEncryptedSuppTokens, false);
+        
+        Collection<Assertion> endorsingEncryptedSuppTokens 
+            = findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        endEncSuppTokMap 
+            = this.handleSupportingTokens(endorsingEncryptedSuppTokens, true);
+
+        Collection<Assertion> sgndEndEncSuppTokens 
+            = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        sgndEndEncSuppTokMap = this.handleSupportingTokens(sgndEndEncSuppTokens, true);
+
+        Collection<Assertion> supportingToks 
+            = findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
+        this.handleSupportingTokens(supportingToks, false);
+        supportingToks = findAndAssertPolicy(SP11Constants.SUPPORTING_TOKENS);
+        this.handleSupportingTokens(supportingToks, false);
+
+        Collection<Assertion> encryptedSupportingToks 
+            = findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+        this.handleSupportingTokens(encryptedSupportingToks, false);
+
+        //Setup signature parts
+        addSignatureParts(sigSuppTokMap);
+        addSignatureParts(sgndEncSuppTokMap);
+        addSignatureParts(sgndEndSuppTokMap);
+        addSignatureParts(sgndEndEncSuppTokMap);
+    }
+    
+    protected void addSignatureParts(Map<AbstractToken, SecurePart> tokenMap) {
+        for (AbstractToken token : tokenMap.keySet()) {
+            SecurePart part = tokenMap.get(token);
+
+            String parts = "";
+            Map<String, Object> config = getProperties();
+            if (config.containsKey(ConfigurationConstants.SIGNATURE_PARTS)) {
+                parts = (String)config.get(ConfigurationConstants.SIGNATURE_PARTS);
+                if (!parts.endsWith(";")) {
+                    parts += ";";
+                }
+            }
+
+            QName name = part.getName();
+            parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+
+            config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
+        }
+        
+    }
+    
     protected void addSignatureConfirmation(List<SecurePart> sigParts) {
         Wss10 wss10 = getWss10();
         
@@ -623,4 +760,102 @@ public abstract class AbstractStaxBindingHandler {
             sigParts.add(securePart);
         }
     }
+    
+    /**
+     * Identifies the portions of the message to be signed
+     */
+    protected List<SecurePart> getSignedParts() throws SOAPException {
+        SignedParts parts = null;
+        // SignedElements elements = null;
+        
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                parts = (SignedParts)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        /*
+        ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                elements = (SignedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        */
+        
+        List<SecurePart> signedParts = new ArrayList<SecurePart>();
+        if (parts != null) {
+            if (parts.isBody()) {
+                QName soapBody = new QName(WSSConstants.NS_SOAP12, "Body");
+                SecurePart securePart = new SecurePart(soapBody, Modifier.Element);
+                signedParts.add(securePart);
+            }
+            for (Header head : parts.getHeaders()) {
+                QName qname = new QName(head.getNamespace(), head.getName());
+                SecurePart securePart = new SecurePart(qname, Modifier.Element);
+                signedParts.add(securePart);
+            }
+        }
+        
+        // TODO Elements
+        
+        return signedParts;
+    }
+    
+    /**
+     * Identifies the portions of the message to be encrypted
+     */
+    protected List<SecurePart> getEncryptedParts() throws SOAPException {
+        EncryptedParts parts = null;
+        // EncryptedElements elements = null;
+        
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                parts = (EncryptedParts)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        /*
+        ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                elements = (EncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        */
+        
+        /*ais = getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                celements = (ContentEncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }*/
+        
+        List<SecurePart> encryptedParts = new ArrayList<SecurePart>();
+        if (parts != null) {
+            if (parts.isBody()) {
+                QName soapBody = new QName(WSSConstants.NS_SOAP12, "Body");
+                SecurePart securePart = new SecurePart(soapBody, Modifier.Content);
+                encryptedParts.add(securePart);
+            }
+            for (Header head : parts.getHeaders()) {
+                QName qname = new QName(head.getNamespace(), head.getName());
+                SecurePart securePart = new SecurePart(qname, Modifier.Content);
+                encryptedParts.add(securePart);
+            }
+        }
+        
+        // TODO Elements
+        
+        return encryptedParts;
+    }
+    
+      
 }
