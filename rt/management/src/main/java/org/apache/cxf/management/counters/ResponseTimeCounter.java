@@ -102,6 +102,9 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     }
 
     public Number getAvgResponseTime() {        
+        if (invocations.get() == 0) {
+            return -1; //return -1 if invocation number is 0;
+        }
         return (int)(totalHandlingTime / invocations.get());
     }
     
