@@ -120,8 +120,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             try {
                 Properties props = new Properties();
                 props.load(is);
-                for (String name : props.stringPropertyNames()) {
-                    staticContentTypes.put(name, props.getProperty(name));
+                for (Object name : props.keySet()) {
+                    staticContentTypes.put((String)name, props.getProperty((String)name));
                 }
             } catch (IOException ex) {
                 String message = new org.apache.cxf.common.i18n.Message("STATIC_RESOURCES_MAP_LOAD_FAILURE",
