@@ -125,14 +125,25 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
             map.put(KEYS.DURATION.name(), String.valueOf(baseEvent.getDuration()) + "ms");
             
             TokenProviderParameters params = event.getTokenParameters();
-            HttpServletRequest req = (HttpServletRequest)params.getWebServiceContext().
-                getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
-            map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
-            map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
-            map.put(KEYS.URL.name(), (String)params.getWebServiceContext().
-                    getMessageContext().get("org.apache.cxf.request.url"));
+            try {
+                HttpServletRequest req = (HttpServletRequest)params.getWebServiceContext().
+                    getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
+                map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
+                map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
+                map.put(KEYS.URL.name(), (String)params.getWebServiceContext().
+                        getMessageContext().get("org.apache.cxf.request.url"));
+            } catch (NullPointerException ex) {
+                map.put(KEYS.REMOTE_HOST.name(), "N.A.");
+                map.put(KEYS.REMOTE_PORT.name(), "N.A.");
+                map.put(KEYS.URL.name(), "N.A.");
+            }
             
-            map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
+            try {
+                map.put(KEYS.TOKENTYPE.name(), params.getTokenRequirements().getTokenType());
+            } catch (NullPointerException ex) {
+                map.put(KEYS.TOKENTYPE.name(), "N.A.");
+            }
+            
             try {
                 if (params.getTokenRequirements().getOnBehalfOf() != null) {
                     map.put(KEYS.ONBEHALFOF_PRINCIPAL.name(),
