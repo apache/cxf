@@ -119,19 +119,19 @@
                                     <xsd>${basedir}/src/main/resources/schemas/eventing.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.eventing</packagename>
                                     <bindingFile>${basedir}/src/main/resources/schemas/eventing.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/eventdescriptions.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.eventing.descriptions</packagename>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/ws-addr.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.eventing.addressing</packagename>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>

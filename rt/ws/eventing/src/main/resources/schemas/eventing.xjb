@@ -18,8 +18,6 @@
         <bindings node="//xs:element[@name='RetryAfter']">
             <class name="EvtRetryAfter" />
         </bindings>
-    </bindings>
-    <bindings schemaLocation="eventing.xsd">
         <bindings node="//xs:element[@name='NotifyTo']">
             <class implClass="org.apache.cxf.ws.eventing.addressing.EndpointReferenceType" />
         </bindings>
