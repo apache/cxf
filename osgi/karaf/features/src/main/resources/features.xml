@@ -136,6 +136,17 @@
         <bundle start-level='40'> mvn:org.apache.httpcomponents/httpasyncclient-osgi/${cxf.httpcomponents.asyncclient.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-hc/${project.version}</bundle>
     </feature>
+    <feature name="cxf-http-netty-client" version="${project.version}" resolver='(obr)'>
+         <feature version="[3,4)">cxf-http</feature>
+         <bundle start-level='40'> mvn:io.netty/netty/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-netty-client/${project.version}</bundle>
+    </feature>
+    <feature name="cxf-http-netty-server" version="${project.version}" resolver='(obr)'>
+         <feature version="[3,4)">cxf-http</feature>
+         <bundle start-level='40'> mvn:io.netty/netty/${cxf.netty.version}</bund
+le>
+         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-netty-server/${project.version}</bundle>
+    </feature>
     <feature name="cxf-bindings-soap" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-bindings-xml/${project.version}</bundle>
