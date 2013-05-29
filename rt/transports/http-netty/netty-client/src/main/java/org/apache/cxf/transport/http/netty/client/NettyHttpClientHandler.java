@@ -35,6 +35,7 @@ public class NettyHttpClientHandler extends SimpleChannelHandler {
         throws Exception {
         HttpResponse response = (HttpResponse)e.getMessage();
         Channel ch = ctx.getChannel();
+        @SuppressWarnings("unchecked")
         BlockingQueue<NettyHttpClientRequest> sendedQueue = (BlockingQueue<NettyHttpClientRequest>)ch.getAttachment();
         NettyHttpClientRequest request = sendedQueue.poll();
         request.setResponse(response);
@@ -51,6 +52,7 @@ public class NettyHttpClientHandler extends SimpleChannelHandler {
         if (p instanceof NettyHttpClientRequest) {
             NettyHttpClientRequest request = (NettyHttpClientRequest)e.getMessage();
             Channel ch = ctx.getChannel();
+            @SuppressWarnings("unchecked")
             BlockingQueue<NettyHttpClientRequest> sendedQueue = 
                 (BlockingQueue<NettyHttpClientRequest>)ch.getAttachment();
             if (sendedQueue == null) {
