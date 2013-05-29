@@ -153,6 +153,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
                 .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                      "http://localhost:" + PORT2 + "/jaxws/soap12/add");
             port.addNumbers(1, 2);
+            fail("expected SOAPFaultException");
         } catch (SOAPFaultException e) {
             assertTrue("expected non-anonymous required message",
                        e.getMessage().contains("Found anonymous address but non-anonymous required"));
