@@ -21,7 +21,10 @@ package org.apache.cxf.ws.eventing.base;
 
 import javax.xml.bind.JAXBElement;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -67,6 +70,7 @@ public abstract class SimpleEventingIntegrationTest {
 
     static Server eventSource;
     static Server subscriptionManager;
+    static Bus bus;
     protected EventSourceEndpoint eventSourceClient;
 
     protected NotificatorService createNotificatorService() {
@@ -85,6 +89,7 @@ public abstract class SimpleEventingIntegrationTest {
 
     protected Server createEndToEndpoint(String address) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingEndToEndpointImpl());
         factory.setAddress(address);
         factory.getHandlers().add(new WSAActionAssertingHandler(EventingConstants.ACTION_SUBSCRIPTION_END));
@@ -94,6 +99,7 @@ public abstract class SimpleEventingIntegrationTest {
     protected Server createEndToEndpointWithReferenceParametersAssertion(String address,
                                                                          ReferenceParametersType params) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingEndToEndpointImpl());
         factory.setAddress(address);
         factory.getHandlers().add(new ReferenceParametersAssertingHandler(params));
@@ -103,6 +109,7 @@ public abstract class SimpleEventingIntegrationTest {
 
     protected Server createEventSink(String address) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingEventSinkImpl());
         factory.setAddress(address);
         return factory.create();
@@ -110,6 +117,7 @@ public abstract class SimpleEventingIntegrationTest {
     
     protected Server createWrappedEventSink(String address) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingWrappedEventSinkImpl());
         factory.setAddress(address);
         return factory.create();
@@ -117,6 +125,7 @@ public abstract class SimpleEventingIntegrationTest {
 
     protected Server createEventSinkWithWSAActionAssertion(String address, String action) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingEventSinkImpl());
         factory.setAddress(address);
         factory.getHandlers().add(new WSAActionAssertingHandler(action));
@@ -125,6 +134,7 @@ public abstract class SimpleEventingIntegrationTest {
 
     protected Server createEventSinkWithReferenceParametersAssertion(String address, ReferenceParametersType params) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingEventSinkImpl());
         factory.setAddress(address);
         factory.getHandlers().add(new ReferenceParametersAssertingHandler(params));
@@ -137,8 +147,10 @@ public abstract class SimpleEventingIntegrationTest {
      */
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        bus = BusFactory.getDefaultBus();
         // create and publish event source
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingEventSource());
         factory.setAddress(URL_EVENT_SOURCE);
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
@@ -146,21 +158,27 @@ public abstract class SimpleEventingIntegrationTest {
 
         // create and publish subscription manager
         factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestingSubscriptionManager());
         factory.setAddress(URL_SUBSCRIPTION_MANAGER);
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         subscriptionManager = factory.create();
+        new LoggingFeature().initialize(subscriptionManager, bus);
+
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         eventSource.destroy();
         subscriptionManager.destroy();
+        bus.shutdown(true);
+        bus = null;
     }
 
     @Before
     public void createClient() {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setBus(bus);
         factory.getInInterceptors().add(new LoggingInInterceptor());
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         factory.setServiceClass(EventSourceEndpoint.class);
@@ -186,6 +204,7 @@ public abstract class SimpleEventingIntegrationTest {
      */
     public SubscriptionManagerEndpoint createSubscriptionManagerClient(ReferenceParametersType refs) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setBus(bus);
         factory.setServiceClass(SubscriptionManagerEndpoint.class);
         factory.setAddress(URL_SUBSCRIPTION_MANAGER);
         factory.getInInterceptors().add(new LoggingInInterceptor());
