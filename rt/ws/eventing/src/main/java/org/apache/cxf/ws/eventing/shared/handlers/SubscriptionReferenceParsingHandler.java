@@ -81,8 +81,8 @@ public class SubscriptionReferenceParsingHandler implements SOAPHandler<SOAPMess
                     && el.getLocalName().equals(elementName)) {
                     LOG.log(Level.FINE, "found UUID parameter in header, uuid={0}", el.getTextContent());
                     context.put("uuid", el.getTextContent());
-                    el = DOMUtils.getNextElement(el);
                 }
+                el = DOMUtils.getNextElement(el);
             }
         } catch (SOAPException e) {
             throw new RuntimeException(e);
