@@ -19,15 +19,18 @@
 
 package org.apache.cxf.systest.ws.addr_feature;
 
+import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
-    static final String PORT = allocatePort(Server.class);
+    public static final String PORT = TestUtil.getPortNumber(Server.class, 1);
+    public static final String PORT2 = TestUtil.getPortNumber(Server.class, 2);
     EndpointImpl ep;
     protected void run()  { 
         setBus(BusFactory.getDefaultBus());
@@ -38,6 +41,20 @@ public class Server extends AbstractBusTestServerBase {
         ep = (EndpointImpl) Endpoint.create(implementor);
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
+        
+        
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
+                                           implementor, 
+                                           null, 
+                                           getWsdl());
+        ep.setServiceName(new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersService"));
+        ep.setEndpointName(new QName("http://apache.org/cxf/systest/ws/addr_feature/",
+                                     "AddNumbersNonAnonPort"));
+        String address12 = "http://localhost:" + PORT2 + "/jaxws/soap12/add";       
+        ep.getFeatures().add(new WSAddressingFeature());
+        ep.publish(address12);
+        
+        
     }
     
     public void tearDown() {
@@ -55,5 +72,14 @@ public class Server extends AbstractBusTestServerBase {
         } finally {
             System.out.println("done!");
         }
+    }
+    private String getWsdl() {
+        try {
+            java.net.URL wsdl = getClass().getResource("/wsdl_systest_soap12/add_numbers_soap12.wsdl");
+            return wsdl.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
