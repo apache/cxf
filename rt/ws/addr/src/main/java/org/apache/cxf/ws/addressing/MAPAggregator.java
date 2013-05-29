@@ -35,6 +35,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.WebFault;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.Soap12;
+import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -464,11 +466,27 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 
             if (hasAnonymous && hasNonAnon && !hasAnon) {
                 message.put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
+                if (isSOAP12(message)) {
+                    SoapFault soap12Fault = new SoapFault(
+                                                          "Found anonymous address but non-anonymous required",
+                                                          Soap12.getInstance().getSender());
+                    soap12Fault.addSubCode(new QName(Names.WSA_NAMESPACE_NAME,
+                                                     "OnlyNonAnonymousAddressSupported"));
+                    throw soap12Fault;
+                }
                 throw new SoapFault("Found anonymous address but non-anonymous required",
                                     new QName(Names.WSA_NAMESPACE_NAME,
                                               "OnlyNonAnonymousAddressSupported"));
             } else if (!onlyAnonymous && !hasNonAnon && hasAnon) {
                 message.put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
+                if (isSOAP12(message)) {
+                    SoapFault soap12Fault = new SoapFault(
+                                                          "Found non-anonymous address but only anonymous supported",
+                                                          Soap12.getInstance().getSender());
+                    soap12Fault.addSubCode(new QName(Names.WSA_NAMESPACE_NAME,
+                                                     "OnlyAnonymousAddressSupported"));
+                    throw soap12Fault;
+                }
                 throw new SoapFault("Found non-anonymous address but only anonymous supported",
                                     new QName(Names.WSA_NAMESPACE_NAME,
                                               "OnlyAnonymousAddressSupported"));
@@ -573,6 +591,13 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 // must be aggregated
                 //isFault = true;
                 //aggregate(message, isFault);
+                if (isSOAP12(message)) {
+                    SoapFault soap12Fault = new SoapFault(ContextUtils.retrieveMAPFaultReason(message),
+                                                          Soap12.getInstance().getSender());
+                    soap12Fault.setSubCode(new QName(Names.WSA_NAMESPACE_NAME, ContextUtils
+                        .retrieveMAPFaultName(message)));
+                    throw soap12Fault;
+                }
                 throw new SoapFault(ContextUtils.retrieveMAPFaultReason(message),
                                     new QName(Names.WSA_NAMESPACE_NAME,
                                               ContextUtils.retrieveMAPFaultName(message)));
@@ -1284,6 +1309,16 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                 new QName(Names.WSA_NAMESPACE_NAME,
                                           Names.WSA_NONE_ADDRESS));
         }
+    }
+    
+    private boolean isSOAP12(Message message) {
+        if (message.getExchange().getBinding() instanceof SoapBinding) {
+            SoapBinding binding = (SoapBinding)message.getExchange().getBinding();
+            if (binding.getSoapVersion() == Soap12.getInstance()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
