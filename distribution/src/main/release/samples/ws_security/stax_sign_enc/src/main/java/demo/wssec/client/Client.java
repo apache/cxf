@@ -101,7 +101,8 @@ public final class Client {
                 new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
             );
             properties.addSignaturePart(
-                new SecurePart(new QName("http://www.w3.org/2005/08/addressing", "ReplyTo"), SecurePart.Modifier.Element)
+                new SecurePart(new QName("http://www.w3.org/2005/08/addressing", "ReplyTo"),
+                    SecurePart.Modifier.Element)
             );
             properties.setCallbackHandler(new UTPasswordCallback());
             
