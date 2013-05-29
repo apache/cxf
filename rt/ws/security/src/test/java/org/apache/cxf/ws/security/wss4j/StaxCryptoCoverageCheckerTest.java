@@ -70,6 +70,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.ENCRYPT});
         properties.setEncryptionUser("myalias");
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -167,6 +168,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         );
         properties.setEncryptionUser("myalias");
         properties.setTokenUser("username");
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -403,6 +405,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         );
         properties.setEncryptionUser("myalias");
         properties.setSignatureUser("myalias");
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());

@@ -408,6 +408,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.ENCRYPT});
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         properties.setEncryptionUser("myalias");
         
         Properties outCryptoProperties = 
@@ -441,6 +442,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         Map<String, Object> outConfig = new HashMap<String, Object>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
+        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, WSSConstants.NS_XENC_AES128);
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
@@ -479,6 +481,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         );
         properties.setEncryptionUser("myalias");
         properties.setTokenUser("username");
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -521,6 +524,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, WSSConstants.NS_XENC_AES128);
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
         
         client.getOutInterceptors().add(ohandler);
@@ -924,6 +928,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         );
         properties.setEncryptionUser("myalias");
         properties.setSignatureUser("myalias");
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -965,6 +970,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, WSSConstants.NS_XENC_AES128);
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
         
         client.getOutInterceptors().add(ohandler);

@@ -71,6 +71,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties cryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -107,6 +108,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
         );
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties cryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -143,6 +145,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier
         );
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties cryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -180,6 +183,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier
         );
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties cryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -216,6 +220,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier
         );
+        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
         
         Properties cryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
