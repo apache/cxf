@@ -28,7 +28,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
-import javax.servlet.http.HttpSessionContext;
 
 import org.apache.cxf.transport.http.netty.server.util.Utils;
 
@@ -57,6 +56,7 @@ public class NettyHttpSession implements HttpSession {
         return attributes != null ? attributes.get(name) : null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getAttributeNames() {
         return Utils.enumerationFromKeys(attributes);
@@ -83,8 +83,9 @@ public class NettyHttpSession implements HttpSession {
         return null;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public HttpSessionContext getSessionContext() {
+    public javax.servlet.http.HttpSessionContext getSessionContext() {
         throw new IllegalStateException(
                 "As of Version 2.1, this method is deprecated and has no replacement.");
     }

@@ -61,6 +61,7 @@ public class NettyServletContext implements ServletContext {
         return attributes != null ? attributes.get(name) : null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getAttributeNames() {
         return Utils.enumerationFromKeys(attributes);
@@ -111,6 +112,7 @@ public class NettyServletContext implements ServletContext {
         return this.initParameters.get(name);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getInitParameterNames() {
         return Utils.enumerationFromKeys(this.initParameters);
@@ -161,12 +163,14 @@ public class NettyServletContext implements ServletContext {
                 "Deprecated as of Java Servlet API 2.1, with no direct replacement!");
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getServletNames() {
         throw new IllegalStateException(
                 "Method 'getServletNames' deprecated as of Java Servlet API 2.0, with no replacement.");
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getServlets() {
         throw new IllegalStateException(
@@ -184,6 +188,7 @@ public class NettyServletContext implements ServletContext {
 
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Set getResourcePaths(String path) {
         throw new IllegalStateException(

@@ -133,11 +133,13 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         return HttpHeaders.getHeader(this.originalRequest, name);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getHeaderNames() {
         return Utils.enumeration(this.originalRequest.getHeaderNames());
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getHeaders(String name) {
         return Utils.enumeration(this.originalRequest.getHeaders(name));
@@ -214,11 +216,13 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         return values != null ? values[0] : null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Map getParameterMap() {
         return this.queryStringDecoder.getParameters();
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getParameterNames() {
         return Utils.enumerationFromKeys(this.queryStringDecoder
@@ -247,6 +251,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getAttributeNames() {
         return Utils.enumerationFromKeys(this.attributes);
@@ -384,6 +389,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         this.characterEncoding = env;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getLocales() {
         Collection<Locale> locales = Utils
