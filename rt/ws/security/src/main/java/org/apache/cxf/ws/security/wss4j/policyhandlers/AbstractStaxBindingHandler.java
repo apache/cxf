@@ -499,7 +499,7 @@ public abstract class AbstractStaxBindingHandler {
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         Collection<Assertion> tokens, 
         boolean endorse
-    ) throws WSSecurityException {
+    ) throws Exception {
         Map<AbstractToken, SecurePart> ret = new HashMap<AbstractToken, SecurePart>();
         if (tokens != null) {
             for (Assertion pa : tokens) {
@@ -514,7 +514,7 @@ public abstract class AbstractStaxBindingHandler {
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         SupportingTokens suppTokens,
         boolean endorse
-    ) throws WSSecurityException {
+    ) throws Exception {
         return handleSupportingTokens(suppTokens, endorse, new HashMap<AbstractToken, SecurePart>());
     }
                                                             
@@ -522,7 +522,7 @@ public abstract class AbstractStaxBindingHandler {
         SupportingTokens suppTokens, 
         boolean endorse,
         Map<AbstractToken, SecurePart> ret
-    ) throws WSSecurityException {
+    ) throws Exception {
         if (suppTokens == null) {
             return ret;
         }
@@ -622,21 +622,9 @@ public abstract class AbstractStaxBindingHandler {
 
     protected void handleUsernameTokenSupportingToken(
          UsernameToken token, boolean endorse, boolean encryptedToken, Map<AbstractToken, SecurePart> ret
-    ) throws WSSecurityException {
+    ) throws Exception {
         if (endorse) {
-            /* TODO
-            WSSecUsernameToken utBuilder = addDKUsernameToken(token, true);
-            if (utBuilder != null) {
-                utBuilder.prepare(saaj.getSOAPPart());
-                addSupportingElement(utBuilder.getUsernameTokenElement());
-                ret.put(token, utBuilder);
-                if (encryptedToken) {
-                    WSEncryptionPart part = new WSEncryptionPart(utBuilder.getId(), "Element");
-                    part.setElement(utBuilder.getUsernameTokenElement());
-                    encryptedTokensList.add(part);
-                }
-            }
-            */
+            throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
         } else {
             SecurePart securePart = addUsernameToken(token);
             if (securePart != null) {
@@ -668,7 +656,7 @@ public abstract class AbstractStaxBindingHandler {
         return null;
     } 
     
-    protected void addSupportingTokens() throws WSSecurityException {
+    protected void addSupportingTokens() throws Exception {
         
         Collection<Assertion> sgndSuppTokens = 
             findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);

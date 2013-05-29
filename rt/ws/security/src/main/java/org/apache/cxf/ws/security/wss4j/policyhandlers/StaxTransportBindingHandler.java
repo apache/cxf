@@ -34,6 +34,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.IssuedToken;
@@ -153,7 +154,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             } else if (token instanceof SamlToken) {
                 addSamlToken((SamlToken)token, false, false);
             } else {
-                //REVISIT - not supported for signed.  Exception?
+                throw new Exception(token.getName() + " is not supported in the streaming code");
             }
         }
         
@@ -245,23 +246,9 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                        tbinding.getAlgorithmSuite().getAsymmetricSignature());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
-        } /*TODO else if (token instanceof UsernameToken) {
-            // Create a UsernameToken object for derived keys and store the security token
-            WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, true);
-            String id = usernameToken.getId();
-            byte[] secret = usernameToken.getDerivedKey();
-
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + 300000);
-            SecurityToken tempTok = 
-                new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
-            tempTok.setSecret(secret);
-            getTokenStore().add(tempTok);
-            message.setContextualProperty(SecurityConstants.TOKEN_ID, tempTok.getId());
-            
-            addSig(doIssuedTokenSignature(token, wrapper));
-        }*/
+        } else if (token instanceof UsernameToken) {
+            throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
+        }
     }
     
     private void doX509TokenSignature(AbstractToken token, SupportingTokens wrapper) 
@@ -271,46 +258,23 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         
         // Action
         Map<String, Object> config = getProperties();
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, 
-                       action + " " + ConfigurationConstants.SIGNATURE);
-        } else {
-            config.put(ConfigurationConstants.ACTION, 
-                       ConfigurationConstants.SIGNATURE);
+        String actionToPerform = ConfigurationConstants.SIGNATURE;
+        if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+            actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
         }
         
-        /*TODO if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            WSSecEncryptedKey encrKey = getEncryptedKeyBuilder(wrapper, token);
-            
-            Element bstElem = encrKey.getBinarySecurityTokenElement();
-            if (bstElem != null) {
-                addTopDownElement(bstElem);
-            }
-            encrKey.appendToHeader(secHeader);
-            
-            WSSecDKSign dkSig = new WSSecDKSign(wssConfig);
-            
-            dkSig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
-            dkSig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
-            AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
-            dkSig.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
-            
-            dkSig.setExternalKey(encrKey.getEphemeralKey(), encrKey.getId());
-            
-            dkSig.prepare(doc, secHeader);
-            
-            dkSig.setParts(sigParts);
-            List<Reference> referenceList = dkSig.addReferencesToSign(sigParts, secHeader);
-            
-            //Do signature
-            dkSig.appendDKElementToHeader(secHeader);
-            dkSig.computeSignature(referenceList, false, null);
-            
-            return dkSig.getSignatureValue();
-        } else {*/
+        if (config.containsKey(ConfigurationConstants.ACTION)) {
+            String action = (String)config.get(ConfigurationConstants.ACTION);
+            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+        } else {
+            config.put(ConfigurationConstants.ACTION, actionToPerform);
+        }
+        
         configureSignature(wrapper, token, false);
-        // }
+        if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                   tbinding.getAlgorithmSuite().getSymmetricSignature());
+        }
     }
     
     /**

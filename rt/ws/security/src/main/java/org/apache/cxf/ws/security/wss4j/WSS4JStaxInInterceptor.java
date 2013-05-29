@@ -174,11 +174,21 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             WSS4JUtils.getReplayCache(
                 msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
             );
-        if (nonceCache != null) {
-            if (securityProperties != null) {
-                securityProperties.setNonceReplayCache(nonceCache);
+        if (nonceCache == null) {
+            if (config != null) {
+                config.put(ConfigurationConstants.ENABLE_NONCE_CACHE, "false");
+                config.remove(ConfigurationConstants.NONCE_CACHE_INSTANCE);
             } else {
+                securityProperties.setEnableNonceReplayCache(false);
+                securityProperties.setNonceReplayCache(null);
+            }
+        } else {
+            if (config != null) {
+                config.put(ConfigurationConstants.ENABLE_NONCE_CACHE, "true");
                 config.put(ConfigurationConstants.NONCE_CACHE_INSTANCE, nonceCache);
+            } else {
+                securityProperties.setEnableNonceReplayCache(true);
+                securityProperties.setNonceReplayCache(nonceCache);
             }
         }
         
@@ -186,11 +196,21 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             WSS4JUtils.getReplayCache(
                 msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
             );
-        if (timestampCache != null) {
-            if (securityProperties != null) {
-                securityProperties.setTimestampReplayCache(timestampCache);
+        if (timestampCache == null) {
+            if (config != null) {
+                config.put(ConfigurationConstants.ENABLE_TIMESTAMP_CACHE, "false");
+                config.remove(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE);
             } else {
+                securityProperties.setEnableTimestampReplayCache(false);
+                securityProperties.setTimestampReplayCache(null);
+            }
+        } else {
+            if (config != null) {
+                config.put(ConfigurationConstants.ENABLE_TIMESTAMP_CACHE, "true");
                 config.put(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE, timestampCache);
+            } else {
+                securityProperties.setEnableTimestampReplayCache(true);
+                securityProperties.setTimestampReplayCache(timestampCache);
             }
         }
         

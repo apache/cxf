@@ -38,6 +38,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
@@ -69,7 +70,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         if (abinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
-            // doEncryptBeforeSign();
+            doEncryptBeforeSign();
         } else {
             doSignBeforeEncrypt();
         }
@@ -138,20 +139,14 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             List<SecurePart> enc = getEncryptedParts();
-            /*
+            
             //Check for signature protection
             if (abinding.isEncryptSignature()) {
-                if (mainSigId != null) {
-                    WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
-                    sigPart.setElement(bottomUpElement);
-                    enc.add(sigPart);
-                }
-                if (sigConfList != null && !sigConfList.isEmpty()) {
-                    enc.addAll(sigConfList);
-                }
-                policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
+                SecurePart part = 
+                    new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
+                enc.add(part);
             }
-            */
+            
             //Do encryption
             AbstractTokenWrapper encToken;
             if (isRequestor()) {
@@ -174,98 +169,98 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             throw new Fault(e);
         }
     }
-/*
+
     private void doEncryptBeforeSign() {
-        AbstractTokenWrapper wrapper;
-        AbstractToken encryptionToken = null;
-        if (isRequestor()) {
-            wrapper = abinding.getRecipientEncryptionToken();
-            if (wrapper == null) {
-                wrapper = abinding.getRecipientToken();
-            }            
-        } else {
-            wrapper = abinding.getInitiatorEncryptionToken();
-            if (wrapper == null) {
-                wrapper = abinding.getInitiatorToken();
-            }
-        }
-        encryptionToken = wrapper.getToken();
-        
-        AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
-        if (initiatorWrapper == null) {
-            initiatorWrapper = abinding.getInitiatorToken();
-        }
-        boolean attached = false;
-        if (initiatorWrapper != null) {
-            AbstractToken initiatorToken = initiatorWrapper.getToken();
-            if (initiatorToken instanceof IssuedToken) {
-                SecurityToken secToken = getSecurityToken();
-                if (secToken == null) {
-                    policyNotAsserted(initiatorToken, "Security token is not found or expired");
-                    return;
-                } else {
-                    policyAsserted(initiatorToken);
-                    
-                    if (includeToken(initiatorToken.getIncludeTokenType())) {
-                        Element el = secToken.getToken();
-                        this.addEncryptedKeyElement(cloneElement(el));
-                        attached = true;
-                    } 
-                }
-            } else if (initiatorToken instanceof SamlToken) {
-                try {
-                    SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
-                    if (assertionWrapper != null) {
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
-                            addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
-                            storeAssertionAsSecurityToken(assertionWrapper);
-                        }
-                        policyAsserted(initiatorToken);
-                    }
-                } catch (Exception e) {
-                    String reason = e.getMessage();
-                    LOG.log(Level.FINE, "Encrypt before sign failed due to : " + reason);
-                    throw new Fault(e);
-                }
-            }
-        }
-        
-        List<WSEncryptionPart> encrParts = null;
-        List<WSEncryptionPart> sigParts = null;
         try {
-            encrParts = getEncryptedParts();
-            //Signed parts are determined before encryption because encrypted signed  headers
-            //will not be included otherwise
-            sigParts = getSignedParts();
-        } catch (SOAPException ex) {
-            throw new Fault(ex);
-        }
-        
-        //if (encryptionToken == null && encrParts.size() > 0) {
-            //REVISIT - no token to encrypt with  
-        //}
-        
-        if (encryptionToken != null && encrParts.size() > 0) {
-            WSSecBase encrBase = doEncryption(wrapper, encrParts, true);
-            handleEncryptedSignedHeaders(encrParts, sigParts);
-            
-            if (timestampEl != null) {
-                WSEncryptionPart timestampPart = 
-                    convertToEncryptionPart(timestampEl.getElement());
-                sigParts.add(timestampPart);
-            }
-            
+            AbstractTokenWrapper wrapper;
+            AbstractToken encryptionToken = null;
             if (isRequestor()) {
-                try {
-                    addSupportingTokens(sigParts);
-                } catch (WSSecurityException ex) {
-                    policyNotAsserted(encryptionToken, ex);
-                }
+                wrapper = abinding.getRecipientEncryptionToken();
+                if (wrapper == null) {
+                    wrapper = abinding.getRecipientToken();
+                }            
             } else {
-                addSignatureConfirmation(sigParts);
+                wrapper = abinding.getInitiatorEncryptionToken();
+                if (wrapper == null) {
+                    wrapper = abinding.getInitiatorToken();
+                }
+            }
+            encryptionToken = wrapper.getToken();
+            
+            AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
+            if (initiatorWrapper == null) {
+                initiatorWrapper = abinding.getInitiatorToken();
             }
             
+            boolean attached = false;
+            /*
+            if (initiatorWrapper != null) {
+                AbstractToken initiatorToken = initiatorWrapper.getToken();
+                if (initiatorToken instanceof IssuedToken) {
+                    SecurityToken secToken = getSecurityToken();
+                    if (secToken == null) {
+                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                        return;
+                    } else {
+                        policyAsserted(initiatorToken);
+                        
+                        if (includeToken(initiatorToken.getIncludeTokenType())) {
+                            Element el = secToken.getToken();
+                            this.addEncryptedKeyElement(cloneElement(el));
+                            attached = true;
+                        } 
+                    }
+                } else if (initiatorToken instanceof SamlToken) {
+                    try {
+                        SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
+                        if (assertionWrapper != null) {
+                            if (includeToken(initiatorToken.getIncludeTokenType())) {
+                                addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                                storeAssertionAsSecurityToken(assertionWrapper);
+                            }
+                            policyAsserted(initiatorToken);
+                        }
+                    } catch (Exception e) {
+                        String reason = e.getMessage();
+                        LOG.log(Level.FINE, "Encrypt before sign failed due to : " + reason);
+                        throw new Fault(e);
+                    }
+                }
+            }
+            */
+            
+            List<SecurePart> encrParts = null;
+            List<SecurePart> sigParts = null;
             try {
+                encrParts = getEncryptedParts();
+                //Signed parts are determined before encryption because encrypted signed headers
+                //will not be included otherwise
+                sigParts = getSignedParts();
+            } catch (SOAPException ex) {
+                throw new Fault(ex);
+            }
+            
+            if (encryptionToken != null && encrParts.size() > 0) {
+                //Check for signature protection
+                if (abinding.isEncryptSignature()) {
+                    SecurePart part = 
+                        new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
+                    encrParts.add(part);
+                }
+                
+                doEncryption(wrapper, encrParts, true);
+                if (timestampAdded) {
+                    SecurePart part = 
+                        new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
+                    sigParts.add(part);
+                }
+                
+                if (isRequestor()) {
+                    addSupportingTokens();
+                } else {
+                    addSignatureConfirmation(sigParts);
+                }
+                
                 if ((sigParts.size() > 0) && initiatorWrapper != null && isRequestor()) {
                     doSignature(initiatorWrapper, sigParts, attached);
                 } else if (!isRequestor()) {
@@ -277,68 +272,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         doSignature(recipientSignatureToken, sigParts, attached);
                     }
                 }
-            } catch (WSSecurityException ex) {
-                throw new Fault(ex);
-            } catch (SOAPException ex) {
-                throw new Fault(ex);
+    
+                //if (isRequestor()) {
+                //    doEndorse();
+                //}
             }
-
-            if (isRequestor()) {
-                doEndorse();
-            }
-            
-            checkForSignatureProtection(encryptionToken, encrBase);
+        } catch (Exception e) {
+            String reason = e.getMessage();
+            LOG.log(Level.WARNING, "Encrypt before signing failed due to : " + reason);
+            throw new Fault(e);
         }
     }
-    
-    private void checkForSignatureProtection(AbstractToken encryptionToken, WSSecBase encrBase) {
-        // Check for signature protection
-        if (abinding.isEncryptSignature()) {
-            policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
-            List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
 
-            // Now encrypt the signature using the above token
-            if (mainSigId != null) {
-                WSEncryptionPart sigPart = new WSEncryptionPart(mainSigId, "Element");
-                sigPart.setElement(bottomUpElement);
-                secondEncrParts.add(sigPart);
-            }
-            
-            if (sigConfList != null && !sigConfList.isEmpty()) {
-                secondEncrParts.addAll(sigConfList);
-            }
-            
-            if (isRequestor()) {
-                secondEncrParts.addAll(encryptedTokensList);
-            }
-
-            if (encryptionToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys && !secondEncrParts.isEmpty()
-                && encrBase instanceof WSSecDKEncrypt) {
-                try {
-                    Element secondRefList 
-                        = ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
-                    ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
-
-                } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
-                }
-            } else if (!secondEncrParts.isEmpty() && encrBase instanceof WSSecEncrypt) {
-                try {
-                    // Encrypt, get hold of the ref list and add it
-                    Element secondRefList = saaj.getSOAPPart()
-                        .createElementNS(WSConstants.ENC_NS,
-                                         WSConstants.ENC_PREFIX + ":ReferenceList");
-                    this.insertBeforeBottomUp(secondRefList);
-                    ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
-                    
-                } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
-                }
-            }
-        }        
-    }
-    */
-    
     private void doEncryption(AbstractTokenWrapper recToken,
                                     List<SecurePart> encrParts,
                                     boolean externalRef) throws SOAPException {
@@ -349,13 +294,16 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             // Action
             Map<String, Object> config = getProperties();
+            String actionToPerform = ConfigurationConstants.ENCRYPT;
+            if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                actionToPerform = ConfigurationConstants.ENCRYPT_DERIVED;
+            }
+            
             if (config.containsKey(ConfigurationConstants.ACTION)) {
                 String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, 
-                           action + " " + ConfigurationConstants.ENCRYPT);
+                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
             } else {
-                config.put(ConfigurationConstants.ACTION, 
-                           ConfigurationConstants.ENCRYPT);
+                config.put(ConfigurationConstants.ACTION, actionToPerform);
             }
             
             String parts = "";
@@ -375,34 +323,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             config.put(ConfigurationConstants.ENCRYPTION_PARTS, parts);
-            
-            /*
-            if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                try {
-                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt(wssConfig);
-                    
-                    if (encrKey == null) {
-                        setupEncryptedKey(recToken, encrToken);
-                    }
-                    
-                    dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
-                    dkEncr.setParts(encrParts);
-                    dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                            + WSConstants.ENC_KEY_VALUE_TYPE);
-                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
-                    dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
-                    dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
-                    dkEncr.prepare(saaj.getSOAPPart());
-                    
-                    addDerivedKeyElement(dkEncr.getdktElement());
-                    Element refList = dkEncr.encryptForExternalRef(null, encrParts);
-                    insertBeforeBottomUp(refList);
-                    return dkEncr;
-                } catch (Exception e) {
-                    policyNotAsserted(recToken, e);
-                }
-            } else {
-             */
+    
             config.put(ConfigurationConstants.ENC_KEY_ID, 
                        getKeyIdentifierType(recToken, encrToken));
 
@@ -423,13 +344,16 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         // Action
         Map<String, Object> config = getProperties();
+        String actionToPerform = ConfigurationConstants.SIGNATURE;
+        if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+            actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
+        }
+        
         if (config.containsKey(ConfigurationConstants.ACTION)) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, 
-                       action + " " + ConfigurationConstants.SIGNATURE);
+            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
         } else {
-            config.put(ConfigurationConstants.ACTION, 
-                       ConfigurationConstants.SIGNATURE);
+            config.put(ConfigurationConstants.ACTION, actionToPerform);
         }
         
         String parts = "";
@@ -457,62 +381,10 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         configureSignature(wrapper, sigToken, false);
         
-        /*
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            // Set up the encrypted key to use
-            setupEncryptedKey(wrapper, sigToken);
-            
-            WSSecDKSign dkSign = new WSSecDKSign(wssConfig);
-            dkSign.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
-
-            // Set the algo info
-            dkSign.setSignatureAlgorithm(abinding.getAlgorithmSuite()
-                    .getSymmetricSignature());
-            AlgorithmSuiteType algType = abinding.getAlgorithmSuite().getAlgorithmSuiteType();
-            dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
-            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                    + WSConstants.ENC_KEY_VALUE_TYPE);
-            
-            try {
-                dkSign.prepare(saaj.getSOAPPart(), secHeader);
-
-                if (abinding.isProtectTokens()) {
-                    policyAsserted(SPConstants.PROTECT_TOKENS);
-                    if (bstElement != null) {
-                        WSEncryptionPart bstPart = 
-                            new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
-                        bstPart.setElement(bstElement);
-                        sigParts.add(bstPart);
-                    } else {
-                        WSEncryptionPart ekPart = 
-                            new WSEncryptionPart(encrKey.getId());
-                        ekPart.setElement(encrKey.getEncryptedKeyElement());
-                        sigParts.add(ekPart);
-                    }
-                }
-
-                dkSign.setParts(sigParts);
-
-                List<Reference> referenceList = dkSign.addReferencesToSign(sigParts, secHeader);
-
-                // Add elements to header
-                addDerivedKeyElement(dkSign.getdktElement());
-                
-                //Do signature
-                if (bottomUpElement == null) {
-                    dkSign.computeSignature(referenceList, false, null);
-                } else {
-                    dkSign.computeSignature(referenceList, true, bottomUpElement);
-                }
-                bottomUpElement = dkSign.getSignatureElement();
-                signatures.add(dkSign.getSignatureValue());
-                
-                mainSigId = dkSign.getSignatureId();
-            } catch (Exception ex) {
-                throw new Fault(ex);
-            }
-        } else {
-        */
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                   abinding.getAlgorithmSuite().getSymmetricSignature());
+        }
     }
 
 }

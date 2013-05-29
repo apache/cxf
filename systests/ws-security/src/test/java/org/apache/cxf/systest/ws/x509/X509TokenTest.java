@@ -274,6 +274,62 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testAsymmetricEncryptBeforeSigning() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptBeforeSigningPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT);
+        
+        // DOM
+        x509Port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(x509Port);
+        x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAsymmetricEncryptSignature() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptSignaturePort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT);
+        
+        // DOM
+        x509Port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(x509Port);
+        x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testAsymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -464,9 +520,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO Failing due to a caching issue
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -494,9 +548,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO Failing due to a caching issue
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricSignatureSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

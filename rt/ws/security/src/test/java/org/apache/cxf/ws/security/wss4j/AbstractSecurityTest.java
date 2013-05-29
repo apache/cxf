@@ -124,7 +124,9 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
             if (tmpFiles != null) {
                 for (File tmpFile : tmpFiles) {
                     if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache.instance")
-                            || tmpFile.getName().startsWith("ws-security.timestamp.cache.instance"))) {
+                            || tmpFile.getName().startsWith("wss4j-nonce-cache")
+                            || tmpFile.getName().startsWith("ws-security.timestamp.cache.instance")
+                            || tmpFile.getName().startsWith("wss4j-timestamp-cache"))) {
                         tmpFile.delete();
                     }
                 }

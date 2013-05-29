@@ -247,7 +247,6 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    
     // TODO See WSS-449
     @org.junit.Test
     @org.junit.Ignore
@@ -273,6 +272,63 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         // Streaming
         SecurityTestUtil.enableStreaming(x509Port);
         x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAsymmetricEncryptBeforeSigning() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxX509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptBeforeSigningPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT);
+        
+        // DOM
+        x509Port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(x509Port);
+        x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testAsymmetricEncryptSignature() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxX509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptSignaturePort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT);
+        
+        // DOM
+        x509Port.doubleIt(25);
+        
+        // Streaming
+        // TODO See WSS-450
+        // SecurityTestUtil.enableStreaming(x509Port);
+        // x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -330,7 +386,6 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     */
-    
     @org.junit.Test
     public void testTransportEndorsing() throws Exception {
 
