@@ -19,8 +19,8 @@
 
 package org.apache.cxf.ws.eventing.shared.handlers;
 
-import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -30,7 +30,9 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 
 /**
@@ -72,15 +74,14 @@ public class SubscriptionReferenceParsingHandler implements SOAPHandler<SOAPMess
         }
         try {
             // read headers
-            Iterator headerElements = context.getMessage().getSOAPHeader().examineAllHeaderElements();
-            Element o;
             LOG.finer("Examining header elements");
-            while (headerElements.hasNext()) {
-                o = (Element)headerElements.next();
-                if (o.getNamespaceURI().equals(namespace)
-                        && o.getLocalName().equals(elementName)) {
-                    LOG.fine("found UUID parameter in header, uuid=" + o.getTextContent());
-                    context.put("uuid", o.getTextContent());
+            Element el = DOMUtils.getFirstElement(context.getMessage().getSOAPHeader());
+            while (el != null) {
+                if (el.getNamespaceURI().equals(namespace)
+                    && el.getLocalName().equals(elementName)) {
+                    LOG.log(Level.FINE, "found UUID parameter in header, uuid={0}", el.getTextContent());
+                    context.put("uuid", el.getTextContent());
+                    el = DOMUtils.getNextElement(el);
                 }
             }
         } catch (SOAPException e) {

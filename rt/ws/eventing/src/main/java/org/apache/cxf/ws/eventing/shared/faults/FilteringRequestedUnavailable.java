@@ -28,6 +28,8 @@ public class FilteringRequestedUnavailable extends WSEventingFault {
     public static final String REASON = "The requested filter dialect is not supported.";
     public static final String LOCAL_PART = "FilteringRequestedUnavailable";
 
+    private static final long serialVersionUID = 1L;
+
     public FilteringRequestedUnavailable() {
         super(REASON,
                 null,

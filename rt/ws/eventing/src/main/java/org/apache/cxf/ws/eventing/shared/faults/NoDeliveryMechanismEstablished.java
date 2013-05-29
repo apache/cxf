@@ -28,6 +28,8 @@ public class NoDeliveryMechanismEstablished extends WSEventingFault {
     public static final String REASON = "No delivery mechanism specified.";
     public static final String LOCAL_PART = "NoDeliveryMechanismEstablished";
 
+    private static final long serialVersionUID = 1L;
+
     public NoDeliveryMechanismEstablished() {
         super(REASON,
                 null,

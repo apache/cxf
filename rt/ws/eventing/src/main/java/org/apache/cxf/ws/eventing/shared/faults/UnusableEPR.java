@@ -28,6 +28,8 @@ public class UnusableEPR extends WSEventingFault {
     public static final String REASON = "An EPR in the Subscribe request message is unusable.";
     public static final String LOCAL_PART = "UnusableEPR";
 
+    private static final long serialVersionUID = 1L;
+
     public UnusableEPR() {
         super(REASON,
                 null,

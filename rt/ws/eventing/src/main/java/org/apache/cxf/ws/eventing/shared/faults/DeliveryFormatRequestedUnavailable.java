@@ -28,6 +28,8 @@ public class DeliveryFormatRequestedUnavailable extends WSEventingFault {
     public static final String REASON = "The requested delivery format is not supported.";
     public static final String LOCAL_PART = "DeliveryFormatRequestedUnavailable";
 
+    private static final long serialVersionUID = 1L;
+
     public DeliveryFormatRequestedUnavailable() {
         super(REASON,
                 null,

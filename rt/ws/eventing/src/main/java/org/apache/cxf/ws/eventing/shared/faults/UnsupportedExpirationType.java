@@ -28,6 +28,8 @@ public class UnsupportedExpirationType extends WSEventingFault {
     public static final String REASON = "Only expiration durations are supported.";
     public static final String LOCAL_PART = "UnsupportedExpirationType";
 
+    private static final long serialVersionUID = 1L;
+
     public UnsupportedExpirationType() {
         super(REASON,
                 null,

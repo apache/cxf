@@ -24,10 +24,12 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 
 public class CannotProcessFilter extends WSEventingFault {
-
+    
     public static final String REASON = "Cannot filter as requested.";
     public static final String LOCAL_PART = "CannotProcessFilter";
 
+    private static final long serialVersionUID = 1L;
+    
     public CannotProcessFilter() {
         super(REASON,
                 null,

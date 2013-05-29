@@ -28,6 +28,8 @@ public class UnknownSubscription extends WSEventingFault {
     public static final String REASON = "The subscription is not known.";
     public static final String LOCAL_PART = "UnknownSubscription";
 
+    private static final long serialVersionUID = 1L;
+
     public UnknownSubscription() {
         super(REASON,
                 null,

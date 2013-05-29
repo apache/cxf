@@ -28,6 +28,8 @@ public class UnsupportedExpirationValue extends WSEventingFault {
     public static final String REASON = "The expiration time requested is not within the min/max range.";
     public static final String LOCAL_PART = "UnsupportedExpirationValue";
 
+    private static final long serialVersionUID = 1L;
+
     public UnsupportedExpirationValue() {
         super(REASON,
                 null,

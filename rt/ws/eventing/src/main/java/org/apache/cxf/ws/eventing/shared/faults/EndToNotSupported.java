@@ -28,6 +28,8 @@ public class EndToNotSupported extends WSEventingFault {
     public static final String REASON = "wse:EndTo semantics is not supported.";
     public static final String LOCAL_PART = "EndToNotSupported";
 
+    private static final long serialVersionUID = 1L;
+
     public EndToNotSupported() {
         super(REASON,
                 null,

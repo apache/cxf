@@ -32,6 +32,8 @@ import org.apache.cxf.ws.eventing.shared.EventingConstants;
 @FaultAction(EventingConstants.ACTION_FAULT)
 public abstract class WSEventingFault extends SoapFault {
 
+    private static final long serialVersionUID = 1L;
+
     public WSEventingFault(String reason, Element detail, QName faultCode) {
         super(reason, faultCode);
         if (detail != null) {

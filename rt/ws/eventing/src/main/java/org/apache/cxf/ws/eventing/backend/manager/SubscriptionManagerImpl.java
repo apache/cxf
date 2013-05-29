@@ -224,9 +224,10 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         subscriptionManagerReference.setAddress(getSubscriptionManagerAddress());
         // generate a ID for this subscription
         UUID uuid = UUID.randomUUID();
-        JAXBElement idqn = new JAXBElement(new QName(subscriptionIdNamespace, subscriptionIdElementName),
-                String.class,
-                uuid.toString());
+        JAXBElement<String> idqn 
+            = new JAXBElement<String>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
+                    String.class,
+                    uuid.toString());
         subscriptionManagerReference.setReferenceParameters(new ReferenceParametersType());
         subscriptionManagerReference.getReferenceParameters().getAny().add(idqn);
         ticket.setUuid(uuid);

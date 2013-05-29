@@ -28,6 +28,8 @@ public class EmptyFilter extends WSEventingFault {
     public static final String REASON = "The wse:Filter would result in zero notifications.";
     public static final String LOCAL_PART = "EmptyFilter";
 
+    private static final long serialVersionUID = 1L;
+
     public EmptyFilter() {
         super(REASON,
                 null,

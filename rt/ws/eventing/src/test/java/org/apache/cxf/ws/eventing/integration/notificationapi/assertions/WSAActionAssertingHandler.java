@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.eventing.integration.notificationapi.assertions;
 
-import java.util.Iterator;
 import java.util.Set;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -28,6 +27,8 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.w3c.dom.Element;
+
+import com.ibm.wsdl.util.xml.DOMUtils;
 
 /**
  * Handler that asserts a particular value of WS-Addressing Action in the headers
@@ -57,11 +58,8 @@ public class WSAActionAssertingHandler implements SOAPHandler<SOAPMessageContext
             return true;
         }
         try {
-            Iterator i = context.getMessage().getSOAPHeader().examineAllHeaderElements();
-            Object header;
-            while (i.hasNext()) {
-                header = i.next();
-                Element elm = (Element)header;
+            Element elm = DOMUtils.getFirstChildElement(context.getMessage().getSOAPHeader());
+            while (elm != null) {
                 if (elm.getTagName().equals("Action") && elm.getNamespaceURI().contains("addressing")) {
                     if (!elm.getTextContent().equals(action)) {
                         throw new RuntimeException("The event sink should have received "
@@ -70,6 +68,7 @@ public class WSAActionAssertingHandler implements SOAPHandler<SOAPMessageContext
                     }
                     return true;
                 }
+                elm = DOMUtils.getNextSiblingElement(elm);
             }
         } catch (SOAPException e) {
             throw new RuntimeException(e);
