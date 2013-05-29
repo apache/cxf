@@ -83,6 +83,7 @@ public class ASMHelper {
         if (cwClass == null) {
             //try the "real" asm first, then the others
             tryClass("org.objectweb.asm.ClassWriter"); 
+            tryClass("org.apache.xbean.asm4.ClassWriter"); 
             tryClass("org.apache.xbean.asm.ClassWriter"); 
             tryClass("org.springframework.asm.ClassWriter");
             if (cwClass == null) {
