@@ -19,16 +19,18 @@
 
 package org.apache.cxf.ws.eventing.base;
 
+import javax.xml.bind.JAXBElement;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.cxf.ws.eventing.AttributedURIType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
-import org.apache.cxf.ws.eventing.NotifyTo;
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
+import org.apache.cxf.ws.eventing.ObjectFactory;
 import org.apache.cxf.ws.eventing.backend.database.SubscriptionTicket;
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManagerInterfaceForNotificators;
 import org.apache.cxf.ws.eventing.backend.notification.EventSinkInterfaceNotificatorService;
@@ -193,14 +195,12 @@ public abstract class SimpleEventingIntegrationTest {
         return (SubscriptionManagerEndpoint)factory.create();
     }
 
-    protected NotifyTo createDummyNotifyTo() {
-        NotifyTo ret = new NotifyTo();
+    protected JAXBElement<EndpointReferenceType> createDummyNotifyTo() {
         EndpointReferenceType eventSinkERT = new EndpointReferenceType();
         AttributedURIType eventSinkAddr = new AttributedURIType();
         eventSinkAddr.setValue("local://dummy-sink");
         eventSinkERT.setAddress(eventSinkAddr);
-        ret.setValue(eventSinkERT);
-        return ret;
+        return new ObjectFactory().createNotifyTo(eventSinkERT);
     }
     
     protected static String allocatePort(Class<?> cls) {

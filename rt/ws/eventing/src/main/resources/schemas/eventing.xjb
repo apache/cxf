@@ -1,32 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bindings version="2.0" xmlns="http://java.sun.com/xml/ns/jaxb"
-          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-          xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-          extensionBindingPrefixes="xjc">
-<!--    <globalBindings>
-        <javaType name="java.util.Calendar" xmlType="xs:date"
-                       parseMethod="javax.xml.bind.DatatypeConverter.parseDate"
-                       printMethod="javax.xml.bind.DatatypeConverter.printDate"/>
-        <javaType name="java.util.Calendar" xmlType="xs:time"
-                       parseMethod="javax.xml.bind.DatatypeConverter.parseTime"
-                       printMethod="javax.xml.bind.DatatypeConverter.printTime"/>
-        <javaType name="java.util.Calendar" xmlType="xs:dateTime"
-                       parseMethod="javax.xml.bind.DatatypeConverter.parseDateTime"
-                       printMethod="javax.xml.bind.DatatypeConverter.printDateTime"/>
-    </globalBindings>-->
-    <bindings schemaLocation="eventing.xsd">
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!--bindings schemaLocation="eventing.xsd">
         <bindings node="//xs:element[@name='RetryAfter']">
             <class name="EvtRetryAfter" />
         </bindings>
         <bindings node="//xs:element[@name='NotifyTo']">
             <class implClass="org.apache.cxf.ws.eventing.addressing.EndpointReferenceType" />
         </bindings>
-    </bindings>
-    <!-- use it or not? -->
-<!--    <bindings schemaLocation="eventing.xsd">
-        <bindings node="//xs:simpleType[@name='DurationDateTime']">
-            <xjc:javaType name="org.apache.cxf.ws.eventing.shared.jaxbutils.DurationDateTime"
-                          adapter="org.apache.cxf.ws.eventing.shared.jaxbutils.DurationDateTimeAdapter" />
+    </bindings-->
+    <bindings schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd">
+        <schemaBindings map="false"/>
+        <bindings node="//xs:complexType[@name='EndpointReferenceType']">
+            <class ref="org.apache.cxf.ws.addressing.EndpointReferenceType"/>
         </bindings>
-    </bindings>-->
+        <bindings node="//xs:element[@name='EndpointReference']">
+            <class ref="org.apache.cxf.ws.addressing.EndpointReferenceType"/>
+        </bindings>
+    </bindings>
 </bindings>

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 
 import com.ibm.wsdl.util.xml.DOMUtils;
 
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 
 public class ReferenceParametersAssertingHandler implements SOAPHandler<SOAPMessageContext> {
 

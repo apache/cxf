@@ -29,11 +29,11 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.ws.eventing.AttributedURIType;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
-import org.apache.cxf.ws.eventing.NotifyTo;
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
+import org.apache.cxf.ws.eventing.ObjectFactory;
 import org.apache.cxf.ws.eventing.Subscribe;
 import org.apache.cxf.ws.eventing.SubscribeResponse;
 import org.apache.cxf.ws.eventing.backend.notification.NotificatorService;
@@ -60,8 +60,7 @@ public class SubscriptionEndTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(eventSinkURL);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         JAXBElement<String> idqn 
             = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter"),

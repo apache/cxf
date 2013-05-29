@@ -23,8 +23,8 @@ import java.util.UUID;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.FilterType;
 import org.apache.cxf.ws.eventing.shared.faults.FilteringRequestedUnavailable;
 import org.apache.cxf.ws.eventing.shared.utils.FilteringUtil;

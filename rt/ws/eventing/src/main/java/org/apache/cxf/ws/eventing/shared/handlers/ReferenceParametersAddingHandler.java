@@ -29,7 +29,8 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
+
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 
 public class ReferenceParametersAddingHandler implements SOAPHandler<SOAPMessageContext> {
 

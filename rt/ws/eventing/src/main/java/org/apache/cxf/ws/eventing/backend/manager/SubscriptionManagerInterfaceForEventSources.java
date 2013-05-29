@@ -21,8 +21,8 @@ package org.apache.cxf.ws.eventing.backend.manager;
 
 import java.util.List;
 
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.ExpirationType;
 import org.apache.cxf.ws.eventing.FilterType;
 import org.apache.cxf.ws.eventing.FormatType;

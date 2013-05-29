@@ -33,14 +33,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.ws.eventing.AttributedURIType;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.ExpirationType;
 import org.apache.cxf.ws.eventing.FilterType;
 import org.apache.cxf.ws.eventing.FormatType;
-import org.apache.cxf.ws.eventing.NotifyTo;
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.backend.database.SubscriptionDatabase;
 import org.apache.cxf.ws.eventing.backend.database.SubscriptionDatabaseImpl;
 import org.apache.cxf.ws.eventing.backend.database.SubscriptionTicket;
@@ -206,7 +205,9 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
                                    SubscriptionTicketGrantingResponse response) {
         // check if there is any usable EPR in the Delivery part
         try {
-            NotifyTo notifyTo = (NotifyTo)request.getContent().get(0);
+            @SuppressWarnings("unchecked")
+            JAXBElement<EndpointReferenceType> notifyTo 
+                = (JAXBElement<EndpointReferenceType>)request.getContent().get(0);
             if (!EPRInspectionTool.containsUsableEPR(notifyTo.getValue())) {
                 throw new NoDeliveryMechanismEstablished();
             }

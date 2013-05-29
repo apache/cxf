@@ -21,12 +21,14 @@ package org.apache.cxf.ws.eventing.backend.database;
 
 import java.util.GregorianCalendar;
 import java.util.UUID;
+
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.FilterType;
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.shared.faults.FilteringRequestedUnavailable;
 import org.apache.cxf.ws.eventing.shared.utils.FilteringUtil;
 
@@ -110,8 +112,10 @@ public class SubscriptionTicket {
      * @return
      */
     public String getTargetURL() {
-        return ((org.apache.cxf.ws.eventing.NotifyTo)this.getDelivery().getContent().get(0)).getValue()
-                .getAddress().getValue().trim();
+        @SuppressWarnings("unchecked")
+        JAXBElement<EndpointReferenceType> el 
+            = (JAXBElement<EndpointReferenceType>)this.getDelivery().getContent().get(0);
+        return el.getValue().getAddress().getValue().trim();
     }
 
     /**
@@ -144,8 +148,10 @@ public class SubscriptionTicket {
     }
 
     public ReferenceParametersType getNotificationReferenceParams() {
-        return ((org.apache.cxf.ws.eventing.NotifyTo)this
-                .getDelivery().getContent().get(0)).getValue().getReferenceParameters();
+        @SuppressWarnings("unchecked")
+        JAXBElement<EndpointReferenceType> el 
+            = (JAXBElement<EndpointReferenceType>)this.getDelivery().getContent().get(0);
+        return el.getValue().getReferenceParameters();
     }
 
     public boolean isNonExpiring() {

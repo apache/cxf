@@ -25,14 +25,14 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.ws.eventing.AttributedURIType;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.ExpirationType;
 import org.apache.cxf.ws.eventing.FilterType;
 import org.apache.cxf.ws.eventing.FormatType;
-import org.apache.cxf.ws.eventing.NotifyTo;
-import org.apache.cxf.ws.eventing.ReferenceParametersType;
+import org.apache.cxf.ws.eventing.ObjectFactory;
 import org.apache.cxf.ws.eventing.Subscribe;
 import org.apache.cxf.ws.eventing.backend.notification.NotificatorService;
 import org.apache.cxf.ws.eventing.backend.notification.emitters.Emitter;
@@ -68,8 +68,8 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
+        subscribe.getDelivery().getContent()
+            .add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
 
         eventSourceClient.subscribeOp(subscribe);
@@ -115,12 +115,10 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
         FormatType formatType = new FormatType();
         formatType.setName(EventingConstants.DELIVERY_FORMAT_WRAPPED);
         subscribe.setFormat(formatType);
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
-
 
         eventSourceClient.subscribeOp(subscribe);
         eventSourceClient.subscribeOp(subscribe);
@@ -165,9 +163,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
-
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         eventSourceClient.subscribeOp(subscribe);
 
@@ -220,9 +216,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
-
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         eventSourceClient.subscribeOp(subscribe);
 
@@ -271,9 +265,8 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
-
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
+        
         subscribe.setFilter(new FilterType());
         subscribe.getFilter().getContent().add("//*[local-name()='fire' and "
                 + "namespace-uri()='http://www.events.com']/location[text()='Canada']");
@@ -325,8 +318,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         subscribe.setFilter(new FilterType());
         subscribe.getFilter().getContent().add("/*[local-name()='fire']/location[text()='Russia']");
@@ -376,8 +368,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         subscribe.setFilter(new FilterType());
         subscribe.getFilter().getContent()
@@ -437,9 +428,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkAddr.setValue(url);
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
-        subscribe.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)subscribe.getDelivery().getContent().get(0)).setValue(eventSinkERT);
-
+        subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         eventSourceClient.subscribeOp(subscribe);
 

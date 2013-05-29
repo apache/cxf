@@ -132,11 +132,6 @@
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
                                 </xsdOption>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/schemas/ws-addr.xsd</xsd>
-                                    <packagename>org.apache.cxf.ws.eventing.addressing</packagename>
-                                    <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
-                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                     </execution>

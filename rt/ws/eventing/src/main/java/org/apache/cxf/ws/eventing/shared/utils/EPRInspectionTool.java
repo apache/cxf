@@ -20,7 +20,7 @@
 
 package org.apache.cxf.ws.eventing.shared.utils;
 
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public final class EPRInspectionTool {
 
