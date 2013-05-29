@@ -41,7 +41,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSAClientServerTest extends AbstractWSATestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = Server.PORT;
+    static final String PORT2 = Server.PORT2;
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                                 "AddNumbersService");
@@ -143,6 +144,42 @@ public class WSAClientServerTest extends AbstractWSATestBase {
                        ex.getMessage().indexOf("A header representing a Message Addressing") > -1);
         }         
     }
+    
+    
+    @Test
+    public void testNonAnonSoap12Fault() throws Exception {
+        try {
+            AddNumbersPortType port = getNonAnonPort();
+            ((BindingProvider)port).getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                     "http://localhost:" + PORT2 + "/jaxws/soap12/add");
+            port.addNumbers(1, 2);
+        } catch (SOAPFaultException e) {
+            assertTrue("expected non-anonymous required message",
+                       e.getMessage().contains("Found anonymous address but non-anonymous required"));
+            assertTrue("expected sender faultCode", e.getFault().getFaultCode().contains("Sender"));
+            assertTrue("expected OnlyNonAnonymousAddressSupported fault subcode",
+                       e.getFault()
+                           .getFaultSubcodes()
+                           .next()
+                           .toString()
+                           .contains("{http://www.w3.org/2005/08/addressing}OnlyNonAnonymousAddressSupported"));
+
+        }
+
+    }
+
+  
+    private AddNumbersPortType getNonAnonPort() {
+        URL wsdl = getClass().getResource("/wsdl_systest_soap12/add_numbers_soap12.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+
+        AddNumbersService service = new AddNumbersService(wsdl, serviceName);
+        assertNotNull("Service is null ", service);
+        return service.getAddNumbersNonAnonPort(new AddressingFeature());
+    }
+    
+    
     
     private AddNumbersPortType getPort() throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
