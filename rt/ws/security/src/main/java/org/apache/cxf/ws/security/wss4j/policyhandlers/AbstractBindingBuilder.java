@@ -165,9 +165,9 @@ public abstract class AbstractBindingBuilder {
     protected Element bottomUpElement;
     protected Element topDownElement;
     protected Element bstElement;
+    protected Element lastEncryptedKeyElement;
     
     private Element lastSupportingTokenElement;
-    private Element lastEncryptedKeyElement;
     private Element lastDerivedKeyElement;
     
     public AbstractBindingBuilder(
@@ -186,7 +186,7 @@ public abstract class AbstractBindingBuilder {
         message.getExchange().put(WSHandlerConstants.SEND_SIGV, signatures);
     }
     
-    private void insertAfter(Element child, Element sib) {
+    protected void insertAfter(Element child, Element sib) {
         if (sib.getNextSibling() == null) {
             secHeader.getSecurityHeader().appendChild(child);
         } else {
