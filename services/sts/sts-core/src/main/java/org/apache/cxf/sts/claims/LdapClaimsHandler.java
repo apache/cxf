@@ -38,10 +38,11 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 
-public class LdapClaimsHandler implements ClaimsHandler {
+public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
 
     private static final Logger LOG = LogUtils.getL7dLogger(LdapClaimsHandler.class);
 
@@ -52,7 +53,17 @@ public class LdapClaimsHandler implements ClaimsHandler {
     private boolean x500FilterEnabled = true;
     private String objectClass = "person";
     private String userNameAttribute = "cn";
+    private List<String> supportedRealms;
+    private String realm;
     
+    
+    public void setSupportedRealms(List<String> supportedRealms) {
+        this.supportedRealms = supportedRealms;
+    }
+
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
     
     public String getObjectClass() {
         return objectClass;
@@ -257,7 +268,15 @@ public class LdapClaimsHandler implements ClaimsHandler {
         return claimsColl;
     }
 
-    
+    @Override
+    public List<String> getSupportedRealms() {
+        return supportedRealms;
+    }
+
+    @Override
+    public String getHandlerRealm() {
+        return realm;
+    }  
 
 }
 
