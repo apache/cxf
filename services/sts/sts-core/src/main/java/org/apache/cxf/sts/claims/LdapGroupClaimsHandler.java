@@ -34,9 +34,10 @@ import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.springframework.ldap.core.LdapTemplate;
 
-public class LdapGroupClaimsHandler implements ClaimsHandler {
+public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
 
     private static final Logger LOG = LogUtils.getL7dLogger(LdapGroupClaimsHandler.class);
 
@@ -55,7 +56,17 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
     private String groupNameScopedFilter = SCOPE + "_" + ROLE;
     private Map<String, String> appliesToScopeMapping;
     private boolean useFullGroupNameAsValue;
+    private List<String> supportedRealms;
+    private String realm;
     
+    
+    public void setSupportedRealms(List<String> supportedRealms) {
+        this.supportedRealms = supportedRealms;
+    }
+
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }    
     
     public boolean isUseFullGroupNameAsValue() {
         return useFullGroupNameAsValue;
@@ -304,6 +315,16 @@ public class LdapGroupClaimsHandler implements ClaimsHandler {
 
         return claimsColl;
     }
+    
+    @Override
+    public List<String> getSupportedRealms() {
+        return supportedRealms;
+    }
+
+    @Override
+    public String getHandlerRealm() {
+        return realm;
+    }  
 
     private String parseRole(String group, String filter) {
         int roleStart = filter.indexOf(ROLE);
