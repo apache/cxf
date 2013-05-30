@@ -286,6 +286,26 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="AsymmetricUsernameToken"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricUsernameToken" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricUsernameTokenPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="SymmetricProtectTokens"
        address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricProtect" 
        serviceName="s:DoubleItService"

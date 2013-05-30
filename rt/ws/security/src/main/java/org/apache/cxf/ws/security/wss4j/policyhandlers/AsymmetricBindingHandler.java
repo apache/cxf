@@ -308,15 +308,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 doEndorse();
             }
             
-            checkForSignatureProtection(encryptionToken, encrBase);
+            encryptTokensInSecurityHeader(encryptionToken, encrBase);
         }
     }
     
     
-    private void checkForSignatureProtection(Token encryptionToken, WSSecBase encrBase) {
+    private void encryptTokensInSecurityHeader(Token encryptionToken, WSSecBase encrBase) {
+        List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
+        
         // Check for signature protection
         if (abinding.isSignatureProtection()) {
-            List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
 
             // Now encrypt the signature using the above token
             if (mainSigId != null) {
@@ -328,35 +329,43 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (sigConfList != null && !sigConfList.isEmpty()) {
                 secondEncrParts.addAll(sigConfList);
             }
+        }
             
-            if (isRequestor()) {
-                secondEncrParts.addAll(encryptedTokensList);
+        // Add any SupportingTokens that need to be encrypted
+        if (isRequestor()) {
+            secondEncrParts.addAll(encryptedTokensList);
+        }
+        
+        if (secondEncrParts.isEmpty()) {
+            return;
+        }
+
+        // Perform encryption
+        if (encryptionToken.isDerivedKeys() && encrBase instanceof WSSecDKEncrypt) {
+            try {
+                Element secondRefList = 
+                    ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
+                ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
+            } catch (WSSecurityException ex) {
+                throw new Fault(ex);
             }
-
-            if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()
-                && encrBase instanceof WSSecDKEncrypt) {
-                try {
-                    Element secondRefList 
-                        = ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
-                    ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
-
-                } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
-                }
-            } else if (!secondEncrParts.isEmpty() && encrBase instanceof WSSecEncrypt) {
-                try {
-                    // Encrypt, get hold of the ref list and add it
-                    Element secondRefList = saaj.getSOAPPart()
-                        .createElementNS(WSConstants.ENC_NS,
-                                         WSConstants.ENC_PREFIX + ":ReferenceList");
+        } else if (encrBase instanceof WSSecEncrypt) {
+            try {
+                // Encrypt, get hold of the ref list and add it
+                Element secondRefList = saaj.getSOAPPart()
+                    .createElementNS(WSConstants.ENC_NS,
+                                     WSConstants.ENC_PREFIX + ":ReferenceList");
+                if (lastEncryptedKeyElement != null) {
+                    insertAfter(secondRefList, lastEncryptedKeyElement);
+                } else {
                     this.insertBeforeBottomUp(secondRefList);
-                    ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
-                    
-                } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
                 }
+                ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
+
+            } catch (WSSecurityException ex) {
+                throw new Fault(ex);
             }
-        }        
+        }
     }
     
     private WSSecBase doEncryption(TokenWrapper recToken,

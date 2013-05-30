@@ -281,6 +281,29 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testAsymmetricUsernameToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricUsernameTokenPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT);
+        
+        x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
