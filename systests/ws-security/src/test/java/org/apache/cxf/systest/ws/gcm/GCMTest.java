@@ -33,7 +33,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for GCM algorithms using custom WS-SecurityPolicy expressions.
+ * A set of tests for GCM algorithms using custom WS-SecurityPolicy expressions. It tests both 
+ * DOM + StAX clients against the DOM server
  */
 public class GCMTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -87,7 +88,14 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         DoubleItPortType gcmPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(gcmPort, PORT);
+        
+        // DOM
         gcmPort.doubleIt(25);
+        
+        // Streaming
+        // TODO - See WSS-442
+        // SecurityTestUtil.enableStreaming(gcmPort);
+        // gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
@@ -124,7 +132,14 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         DoubleItPortType gcmPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(gcmPort, PORT);
+        
+        // DOM
         gcmPort.doubleIt(25);
+        
+        // Streaming
+        // TODO - See WSS-442
+        // SecurityTestUtil.enableStreaming(gcmPort);
+        // gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
@@ -161,10 +176,18 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         DoubleItPortType gcmPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(gcmPort, PORT);
+        
+        // DOM
         gcmPort.doubleIt(25);
+        
+        // Streaming
+        // TODO - See WSS-442
+        // SecurityTestUtil.enableStreaming(gcmPort);
+        // gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
     }
+    
     
 }
