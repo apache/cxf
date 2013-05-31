@@ -130,7 +130,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
                 if (suppTokens != null && suppTokens.getTokens() != null 
                     && suppTokens.getTokens().size() > 0) {
-                    handleSupportingTokens(suppTokens, false);
+                    handleSupportingTokens(suppTokens, false, false);
                 }
                 ai.setAsserted(true);
             }

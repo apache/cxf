@@ -725,10 +725,9 @@
                   <sp:RecipientToken>
                      <wsp:Policy>
                         <sp:X509Token
-                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToInitiator">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
-                              <sp:RequireIssuerSerialReference />
                            </wsp:Policy>
                         </sp:X509Token>
                      </wsp:Policy>
@@ -835,10 +834,9 @@
                   <sp:RecipientToken>
                      <wsp:Policy>
                         <sp:X509Token
-                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToInitiator">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
-                              <sp:RequireIssuerSerialReference />
                            </wsp:Policy>
                         </sp:X509Token>
                      </wsp:Policy>
@@ -895,10 +893,9 @@
                   <sp:RecipientToken>
                      <wsp:Policy>
                         <sp:X509Token
-                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToInitiator">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
-                              <sp:RequireIssuerSerialReference />
                            </wsp:Policy>
                         </sp:X509Token>
                      </wsp:Policy>
@@ -996,7 +993,6 @@
             </sp:EncryptedParts>
             <sp:SignedParts>
                <sp:Body/>
-               <sp:Header Namespace="http://WSSec/saml"/>
             </sp:SignedParts>
          </wsp:All>
       </wsp:ExactlyOne>

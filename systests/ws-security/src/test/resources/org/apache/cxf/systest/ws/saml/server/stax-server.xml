@@ -145,8 +145,8 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
-           <entry key="ws-security.saml2.validator" 
-                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
+           <!--<entry key="ws-security.saml2.validator" 
+                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>-->
            <entry key="ws-security.enable.streaming" value="true"/>
        </jaxws:properties> 
      
@@ -169,8 +169,8 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
-           <entry key="ws-security.saml2.validator" 
-                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
+           <!--<entry key="ws-security.saml2.validator" 
+                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>-->
            <entry key="ws-security.enable.streaming" value="true"/>
        </jaxws:properties>
        <jaxws:features>
@@ -283,8 +283,8 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-           <entry key="ws-security.saml2.validator" 
-                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
+           <!--<entry key="ws-security.saml2.validator" 
+                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>-->
            <entry key="ws-security.enable.streaming" value="true"/>
        </jaxws:properties> 
      
@@ -327,8 +327,8 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-           <entry key="ws-security.saml2.validator" 
-                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
+           <!--<entry key="ws-security.saml2.validator" 
+                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>-->
            <entry key="ws-security.enable.streaming" value="true"/>
        </jaxws:properties> 
      

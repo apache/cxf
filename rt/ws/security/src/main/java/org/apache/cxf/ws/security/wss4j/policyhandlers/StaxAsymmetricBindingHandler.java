@@ -352,7 +352,9 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+            if (!action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)) {
+                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+            }
         } else {
             config.put(ConfigurationConstants.ACTION, actionToPerform);
         }

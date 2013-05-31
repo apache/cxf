@@ -116,13 +116,11 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
                 
                 try {
-                    if (signAssertion) {
-                        String file = "org/apache/cxf/systest/ws/wssec10/client/alice.properties";
-                        Crypto crypto = CryptoFactory.getInstance(file);
-                        callback.setIssuerCrypto(crypto);
-                        callback.setIssuerKeyName("alice");
-                        callback.setIssuerKeyPassword("password");
-                    }
+                    String file = "org/apache/cxf/systest/ws/wssec10/client/alice.properties";
+                    Crypto crypto = CryptoFactory.getInstance(file);
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("alice");
+                    callback.setIssuerKeyPassword("password");
                     callback.setSignAssertion(signAssertion);
                 } catch (WSSecurityException e) {
                     throw new IOException(e);

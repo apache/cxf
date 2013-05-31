@@ -498,13 +498,14 @@ public abstract class AbstractStaxBindingHandler {
     
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         Collection<Assertion> tokens, 
+        boolean signed,
         boolean endorse
     ) throws Exception {
         Map<AbstractToken, SecurePart> ret = new HashMap<AbstractToken, SecurePart>();
         if (tokens != null) {
             for (Assertion pa : tokens) {
                 if (pa instanceof SupportingTokens) {
-                    handleSupportingTokens((SupportingTokens)pa, endorse, ret);
+                    handleSupportingTokens((SupportingTokens)pa, signed, endorse, ret);
                 }
             }
         }
@@ -513,13 +514,15 @@ public abstract class AbstractStaxBindingHandler {
                                                             
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         SupportingTokens suppTokens,
+        boolean signed,
         boolean endorse
     ) throws Exception {
-        return handleSupportingTokens(suppTokens, endorse, new HashMap<AbstractToken, SecurePart>());
+        return handleSupportingTokens(suppTokens, signed, endorse, new HashMap<AbstractToken, SecurePart>());
     }
                                                             
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         SupportingTokens suppTokens, 
+        boolean signed,
         boolean endorse,
         Map<AbstractToken, SecurePart> ret
     ) throws Exception {
@@ -608,7 +611,7 @@ public abstract class AbstractStaxBindingHandler {
                 }
                 ret.put(token, new SecurePart(WSSConstants.TAG_dsig_Signature, Modifier.Element));
             } else if (token instanceof SamlToken) {
-                SecurePart securePart = addSamlToken((SamlToken)token, false, endorse);
+                SecurePart securePart = addSamlToken((SamlToken)token, signed, endorse);
                 if (securePart != null) {
                     ret.put(token, securePart);
                     if (suppTokens.isEncryptedToken()) {
@@ -661,45 +664,45 @@ public abstract class AbstractStaxBindingHandler {
         Collection<Assertion> sgndSuppTokens = 
             findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
         Map<AbstractToken, SecurePart> sigSuppTokMap = 
-            this.handleSupportingTokens(sgndSuppTokens, false);
+            this.handleSupportingTokens(sgndSuppTokens, true, false);
         sgndSuppTokens = findAndAssertPolicy(SP11Constants.SIGNED_SUPPORTING_TOKENS);
-        sigSuppTokMap.putAll(this.handleSupportingTokens(sgndSuppTokens, false));
+        sigSuppTokMap.putAll(this.handleSupportingTokens(sgndSuppTokens, true, false));
         
         Collection<Assertion> endSuppTokens = 
             findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-        endSuppTokMap = this.handleSupportingTokens(endSuppTokens, true);
+        endSuppTokMap = this.handleSupportingTokens(endSuppTokens, false, true);
         endSuppTokens = findAndAssertPolicy(SP11Constants.ENDORSING_SUPPORTING_TOKENS);
-        endSuppTokMap.putAll(this.handleSupportingTokens(endSuppTokens, true));
+        endSuppTokMap.putAll(this.handleSupportingTokens(endSuppTokens, false, true));
 
         Collection<Assertion> sgndEndSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true);
+        sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true, true);
         sgndEndSuppTokens = findAndAssertPolicy(SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
-        sgndEndSuppTokMap.putAll(this.handleSupportingTokens(sgndEndSuppTokens, true));
+        sgndEndSuppTokMap.putAll(this.handleSupportingTokens(sgndEndSuppTokens, true, true));
         
         Collection<Assertion> sgndEncryptedSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         Map<AbstractToken, SecurePart> sgndEncSuppTokMap = 
-            this.handleSupportingTokens(sgndEncryptedSuppTokens, false);
+            this.handleSupportingTokens(sgndEncryptedSuppTokens, true, false);
         
         Collection<Assertion> endorsingEncryptedSuppTokens 
             = findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         endEncSuppTokMap 
-            = this.handleSupportingTokens(endorsingEncryptedSuppTokens, true);
+            = this.handleSupportingTokens(endorsingEncryptedSuppTokens, false, true);
 
         Collection<Assertion> sgndEndEncSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        sgndEndEncSuppTokMap = this.handleSupportingTokens(sgndEndEncSuppTokens, true);
+        sgndEndEncSuppTokMap = this.handleSupportingTokens(sgndEndEncSuppTokens, true, true);
 
         Collection<Assertion> supportingToks 
             = findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
-        this.handleSupportingTokens(supportingToks, false);
+        this.handleSupportingTokens(supportingToks, false, false);
         supportingToks = findAndAssertPolicy(SP11Constants.SUPPORTING_TOKENS);
-        this.handleSupportingTokens(supportingToks, false);
+        this.handleSupportingTokens(supportingToks, false, false);
 
         Collection<Assertion> encryptedSupportingToks 
             = findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
-        this.handleSupportingTokens(encryptedSupportingToks, false);
+        this.handleSupportingTokens(encryptedSupportingToks, false, false);
 
         //Setup signature parts
         addSignatureParts(sigSuppTokMap);
@@ -722,7 +725,13 @@ public abstract class AbstractStaxBindingHandler {
             }
 
             QName name = part.getName();
-            parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            String action = (String)config.get(ConfigurationConstants.ACTION);
+            // Don't add a signed SAML Token as a part, as it will be automatically signed by WSS4J
+            if (!((WSSConstants.TAG_saml_Assertion.equals(name) 
+                || WSSConstants.TAG_saml2_Assertion.equals(name))
+                && action != null && action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED))) {
+                parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            }
 
             config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
         }
