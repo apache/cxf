@@ -133,6 +133,7 @@ public class DynamicClientFactory {
     private boolean allowRefs;
     
     private Map<String, Object> jaxbContextProperties;
+    private String[] schemaCompilerOptions;
     
     protected DynamicClientFactory(Bus bus) {
         this.bus = bus;
@@ -150,6 +151,10 @@ public class DynamicClientFactory {
         allowRefs = b;
     }
 
+    public void setSchemaCompilerOptions(String[] options) {
+        this.schemaCompilerOptions = options;
+    }
+    
     /**
      * Create a new instance using a specific <tt>Bus</tt>.
      * 
@@ -278,8 +283,6 @@ public class DynamicClientFactory {
         return createClient(wsdlUrl.toString(), service, classLoader, port, bindingFiles);
     }
     
-    
-    
     public Client createClient(String wsdlUrl, QName service,
                                ClassLoader classLoader, QName port,
                                List<String> bindingFiles) {
@@ -300,8 +303,7 @@ public class DynamicClientFactory {
         //all SI's should have the same schemas
         SchemaCollection schemas = svc.getServiceInfos().get(0).getXmlSchemaCollection();
 
-        SchemaCompiler compiler = 
-            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<String>());
+        SchemaCompiler compiler = createSchemaCompiler();
         
         InnerErrorListener listener = new InnerErrorListener(wsdlUrl);
         Object elForRun = ReflectionInvokationHandler
@@ -414,6 +416,15 @@ public class DynamicClientFactory {
     }
     protected boolean allowWrapperOps() {
         return false;
+    }
+    
+    protected SchemaCompiler createSchemaCompiler() {
+        SchemaCompiler compiler = 
+            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<String>());
+        if (schemaCompilerOptions != null && schemaCompilerOptions.length > 0) {
+            compiler.getOptions().parseArguments(schemaCompilerOptions);
+        }
+        return compiler;
     }
     
     private void addBindingFiles(List<String> bindingFiles, SchemaCompiler compiler) {
@@ -795,8 +806,7 @@ public class DynamicClientFactory {
     public void setJaxbContextProperties(Map<String, Object> jaxbContextProperties) {
         this.jaxbContextProperties = jaxbContextProperties;
     }
-    
-    
+
     private void hackInNewInternalizationLogic(SchemaCompiler schemaCompiler,
                                                final OASISCatalogManager catalog) {
         try {
