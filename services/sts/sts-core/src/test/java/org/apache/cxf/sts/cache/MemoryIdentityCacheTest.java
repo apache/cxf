@@ -34,7 +34,6 @@ public class MemoryIdentityCacheTest extends org.junit.Assert {
     // tests TokenStore apis for storing in the cache.
     @org.junit.Test
     public void testOneMapping() throws Exception {
-        System.out.println("***************");
         IdentityMapper mapper = new CacheIdentityMapper();
         MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
         
@@ -47,7 +46,6 @@ public class MemoryIdentityCacheTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testTwoDistinctMappings() {
-        System.out.println("***************");
         IdentityMapper mapper = new CacheIdentityMapper();
         MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
         
@@ -63,7 +61,6 @@ public class MemoryIdentityCacheTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testTwoDistinctAndOneRelatedMapping() {
-        System.out.println("***************");
         IdentityMapper mapper = new CacheIdentityMapper();
         MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
         
@@ -84,7 +81,6 @@ public class MemoryIdentityCacheTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testTwoDistinctAndTwoRelatedMapping() {
-        System.out.println("***************");
         IdentityMapper mapper = new CacheIdentityMapper();
         MemoryIdentityCache cache = new MemoryIdentityCache(mapper);
         
