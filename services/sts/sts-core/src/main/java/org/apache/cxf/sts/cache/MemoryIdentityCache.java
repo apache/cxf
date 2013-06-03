@@ -174,7 +174,6 @@ public class MemoryIdentityCache implements IdentityCache, IdentityMapper {
             this.add(targetPrincipal.getName(), targetRealm, identities);
             this.add(sourcePrincipal.getName(), sourceRealm, identities);
         }
-        System.out.println("Cache content: " + this.cache.toString());
         return targetPrincipal;
     }
     
