@@ -29,14 +29,9 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.Principal;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
@@ -47,7 +42,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
-import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -116,7 +110,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         // need to socket connection timeout
 
         message.put(NettyHttpClientRequest.class, request);
-        bootstrap.setPipelineFactory(new NettyHttpClientPipelineFactory());
+        bootstrap.setPipelineFactory(new NettyHttpClientPipelineFactory(getTlsClientParameters()));
     }
 
     protected OutputStream createOutputStream(Message message,
