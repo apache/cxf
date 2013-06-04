@@ -156,6 +156,8 @@ public class SourceGenerator {
         XSD_SPECIFIC_TYPE_MAP = new HashMap<String, String>();
         XSD_SPECIFIC_TYPE_MAP.put("string", "String");
         XSD_SPECIFIC_TYPE_MAP.put("integer", "long");
+        XSD_SPECIFIC_TYPE_MAP.put("float", "float");
+        XSD_SPECIFIC_TYPE_MAP.put("doable", "doable");
         XSD_SPECIFIC_TYPE_MAP.put("int", "int");
         XSD_SPECIFIC_TYPE_MAP.put("long", "long");
         XSD_SPECIFIC_TYPE_MAP.put("byte", "byte");

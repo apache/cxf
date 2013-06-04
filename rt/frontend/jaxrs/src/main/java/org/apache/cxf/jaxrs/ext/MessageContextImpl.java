@@ -81,10 +81,15 @@ public class MessageContextImpl implements MessageContext {
             return m.getExchange().getOutMessage().get(Message.ATTACHMENTS);
         }
         Object value = m.get(key);
-        if (value == null && m.getExchange() != null) {
-            Message inMessage = m.getExchange().getInMessage();
-            if (inMessage != null && inMessage != m) {
-                value = inMessage.get(key);
+        if (value == null) {
+            if (Message.class.getName().equals(key)) {
+                return m;
+            }
+            if (m.getExchange() != null) {
+                Message inMessage = m.getExchange().getInMessage();
+                if (inMessage != null && inMessage != m) {
+                    value = inMessage.get(key);
+                }
             }
         } 
         return value;

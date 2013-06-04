@@ -162,8 +162,8 @@ public final class InjectionUtils {
                                         final Object v) {
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
-                f.setAccessible(true);
                 try {
+                    f.setAccessible(true);
                     f.set(o, v);
                 } catch (IllegalAccessException ex) {
                     reportServerError("FIELD_ACCESS_FAILURE", 
@@ -179,8 +179,8 @@ public final class InjectionUtils {
                                         final Object o) {
         return AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
-                f.setAccessible(true);
                 try {
+                    f.setAccessible(true);
                     return f.get(o);
                 } catch (IllegalAccessException ex) {
                     reportServerError("FIELD_ACCESS_FAILURE", 
