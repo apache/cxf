@@ -39,6 +39,8 @@ public class Client {
     
     private boolean isConfidential;
     private List<String> allowedGrantTypes = new LinkedList<String>();
+    private List<String> registeredScopes = new LinkedList<String>();
+    
     private List<Property> properties = new LinkedList<Property>();
     private UserSubject subject;
         
@@ -229,5 +231,26 @@ public class Client {
      */
     public void setProperties(List<Property> properties) {
         this.properties = properties;
+    }
+
+    /**
+     * Get the list of registered scopes
+     * @return scopes
+     */
+    public List<String> getRegisteredScopes() {
+        return registeredScopes;
+    }
+
+    /**
+     * Set the list of registered scopes. 
+     * Registering the scopes will allow the clients not to include the scopes
+     * and delegate to the runtime to enforce that the current request scopes are
+     * a subset of the pre-registered scopes.
+     * 
+     * Client Registration service is expected to reject unknown scopes. 
+     * @param registeredScopes the scopes
+     */
+    public void setRegisteredScopes(List<String> registeredScopes) {
+        this.registeredScopes = registeredScopes;
     }
 }
