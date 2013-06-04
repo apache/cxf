@@ -19,12 +19,13 @@
 
 package org.apache.cxf.transport.http.netty.server;
 
-
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -53,6 +54,14 @@ public class NettyHttpServerEngine implements ServerEngine {
     private NettyHttpServletPipelineFactory servletPipeline;
 
     private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<String, NettyHttpContextHandler>();
+    
+    /**
+     * This field holds the TLS ServerParameters that are programatically
+     * configured. The tlsServerParamers (due to JAXB) holds the struct
+     * placed by SpringConfig.
+     */
+    private TLSServerParameters tlsServerParameters;
+    
 
     public NettyHttpServerEngine(
             String host,
@@ -68,7 +77,30 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }
-
+    
+    
+    /**
+     * This method is used to programmatically set the TLSServerParameters.
+     * This method may only be called by the factory.
+     * @throws IOException 
+     */
+    public void setTlsServerParameters(TLSServerParameters params) {
+        
+        tlsServerParameters = params;
+        
+    }
+    
+    /**
+     * This method returns the programmatically set TLSServerParameters, not
+     * the TLSServerParametersType, which is the JAXB generated type used 
+     * in SpringConfiguration.
+     * @return
+     */
+    public TLSServerParameters getTlsServerParameters() {
+        return tlsServerParameters;
+    } 
+    
+   
     protected Channel startServer() {
         // TODO Configure the server.
         final ServerBootstrap bootstrap = new ServerBootstrap(
@@ -76,7 +108,7 @@ public class NettyHttpServerEngine implements ServerEngine {
                         .newCachedThreadPool(), Executors.newCachedThreadPool()));
 
         // Set up the event pipeline factory.
-        servletPipeline = new NettyHttpServletPipelineFactory(handlerMap);
+        servletPipeline = new NettyHttpServletPipelineFactory(tlsServerParameters, handlerMap);
         bootstrap.setPipelineFactory(servletPipeline);
         InetSocketAddress address = null;
         if (host == null) {

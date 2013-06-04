@@ -21,10 +21,18 @@ package org.apache.cxf.transport.http.netty.server;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.net.ssl.SSLEngine;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.http.netty.server.interceptor.ChannelInterceptor;
 import org.apache.cxf.transport.http.netty.server.interceptor.HttpSessionInterceptor;
 import org.apache.cxf.transport.http.netty.server.session.DefaultHttpSessionStore;
 import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
+import org.apache.cxf.transport.https.SSLUtils;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -37,12 +45,15 @@ import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.execution.ExecutionHandler;
 import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
+import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 
 public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
-
+    private static final Logger LOG =
+        LogUtils.getL7dLogger(NettyHttpServletPipelineFactory.class);
+    
     private final ChannelGroup allChannels = new DefaultChannelGroup();
 
     private final HttpSessionWatchdog watchdog;
@@ -50,6 +61,8 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
     private final ChannelHandler idleStateHandler;
 
     private final Timer timer;
+    
+    private final TLSServerParameters tlsServerParameters;
 
     // TODO we may need to configure the thread pool from outside
     private final ExecutionHandler executionHandler =
@@ -57,12 +70,14 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
 
     private final Map<String, NettyHttpContextHandler> handlerMap;
 
-    public NettyHttpServletPipelineFactory(Map<String, NettyHttpContextHandler> handlerMap) {
+    public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters,
+                                           Map<String, NettyHttpContextHandler> handlerMap) {
 
         this.timer = new HashedWheelTimer();
         this.idleStateHandler = new IdleStateHandler(this.timer, 60, 30, 0);
         this.watchdog = new HttpSessionWatchdog();
         this.handlerMap = handlerMap;
+        this.tlsServerParameters = tlsServerParameters;
         new Thread(watchdog).start();
     }
 
@@ -85,7 +100,7 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         }
         return null;
     }
-
+    
     public void shutdown() {
         this.watchdog.stopWatching();
         this.timer.stop();
@@ -113,10 +128,18 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         return handler;
     }
 
-    protected ChannelPipeline getDefaulHttpChannelPipeline() {
+    protected ChannelPipeline getDefaulHttpChannelPipeline() throws Exception {
 
         // Create a default pipeline implementation.
         ChannelPipeline pipeline = Channels.pipeline();
+        
+        SslHandler sslHandler = configureServerSSLOnDemand();
+        if (sslHandler != null) {
+            LOG.log(Level.FINE, 
+                    "Server SSL handler configured and added as an interceptor against the ChannelPipeline: {}"
+                    , sslHandler);
+            pipeline.addLast("ssl", sslHandler);
+        }
 
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));
@@ -128,6 +151,15 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         pipeline.addLast("idle", this.idleStateHandler);
 
         return pipeline;
+    }
+
+    private SslHandler configureServerSSLOnDemand() throws Exception {
+        if (tlsServerParameters != null) {
+            SSLEngine sslEngine = SSLUtils.createServerSSLEngine(tlsServerParameters);
+            return new SslHandler(sslEngine);
+        } else {
+            return null;
+        }
     }
 
     private class HttpSessionWatchdog implements Runnable {
