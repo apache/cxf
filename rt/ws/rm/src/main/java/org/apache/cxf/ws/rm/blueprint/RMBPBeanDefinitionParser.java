@@ -70,10 +70,11 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
                 new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
                 "RMAssertion",
                 org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
-        mapElementToJaxbProperty(context, bean, element,
-                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
-                "RMAssertion",
-                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
+        // TODO: handle
+//        mapElementToJaxbProperty(context, bean, element,
+//                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
+//                "RMAssertion",
+//                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
 
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);

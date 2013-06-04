@@ -38,12 +38,9 @@ import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,7 +54,7 @@ public class DestinationSequenceTest extends Assert {
     private EndpointReferenceType ref;
     private Destination destination;
     private RMManager manager;
-    private RMAssertion rma;
+    private RMConfiguration config;
     private AcksPolicyType ap;
     private DestinationPolicyType dp;
  
@@ -76,7 +73,7 @@ public class DestinationSequenceTest extends Assert {
         ref = null;
         destination = null;
         manager = null;
-        rma = null;
+        config = null;
         dp = null;
         ap = null;
         
@@ -426,10 +423,7 @@ public class DestinationSequenceTest extends Assert {
         control.replay();
         
         ap.setIntraMessageThreshold(0);
-        AcknowledgementInterval ai = new org.apache.cxf.ws.rmp.v200502.ObjectFactory()
-            .createRMAssertionAcknowledgementInterval();
-        ai.setMilliseconds(new Long(200));
-        rma.setAcknowledgementInterval(ai);        
+        config.setAcknowledgementInterval(new Long(200));        
 
         assertTrue(!seq.sendAcknowledgement());   
               
@@ -473,9 +467,9 @@ public class DestinationSequenceTest extends Assert {
         List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
         AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
         EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
-        DeliveryAssuranceType da = control.createMock(DeliveryAssuranceType.class);
-        EasyMock.expect(manager.getDeliveryAssurance()).andReturn(da);
-        EasyMock.expect(da.isSetAtMostOnce()).andReturn(true);                    
+        DeliveryAssuranceType assure = new DeliveryAssuranceType();
+        assure.setAtMostOnce(new DeliveryAssuranceType.AtMostOnce());
+        config.setDeliveryAssurance(assure);
         
         control.replay();        
         DestinationSequence ds = new DestinationSequence(id, ref, 0, ack, ProtocolVariation.RM10WSA200408);
@@ -486,8 +480,7 @@ public class DestinationSequenceTest extends Assert {
         control.reset();
         ranges.add(r);
         EasyMock.expect(destination.getManager()).andReturn(manager);
-        EasyMock.expect(manager.getDeliveryAssurance()).andReturn(da);
-        EasyMock.expect(da.isSetAtMostOnce()).andReturn(true);            
+        EasyMock.expect(manager.getConfiguration()).andReturn(config);
         EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
         EasyMock.expect(r.getLower()).andReturn(new Long(5));
         EasyMock.expect(r.getUpper()).andReturn(new Long(15));
@@ -511,11 +504,9 @@ public class DestinationSequenceTest extends Assert {
             messages[i] = setUpMessage(Integer.toString(i + 1));                                           
         }
         
-        DeliveryAssuranceType da = control.createMock(DeliveryAssuranceType.class);
-        EasyMock.expect(manager.getDeliveryAssurance()).andReturn(da).anyTimes();
-        EasyMock.expect(da.isSetAtMostOnce()).andReturn(false).anyTimes();
-        EasyMock.expect(da.isSetAtLeastOnce()).andReturn(true).anyTimes();
-        EasyMock.expect(da.isSetInOrder()).andReturn(true).anyTimes(); 
+        DeliveryAssuranceType assure = new DeliveryAssuranceType();
+        assure.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
+        config.setDeliveryAssurance(assure);
         
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
         List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
@@ -594,9 +585,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(rme.getLastApplicationMessage()).andReturn(arrival);
 
         control.replay();
-        InactivityTimeout iat = new RMAssertion.InactivityTimeout();
-        iat.setMilliseconds(new Long(200));
-        rma.setInactivityTimeout(iat); 
+        config.setInactivityTimeout(new Long(200)); 
         
         seq.acknowledge(message);
         
@@ -734,15 +723,10 @@ public class DestinationSequenceTest extends Assert {
         ap = cfgFactory.createAcksPolicyType();
         dp.setAcksPolicy(ap);
         
-        org.apache.cxf.ws.rmp.v200502.ObjectFactory policyFactory =
-            new org.apache.cxf.ws.rmp.v200502.ObjectFactory();
-        rma = policyFactory.createRMAssertion();
-        BaseRetransmissionInterval bri =
-            policyFactory.createRMAssertionBaseRetransmissionInterval();
-        bri.setMilliseconds(new Long(3000));
-        rma.setBaseRetransmissionInterval(bri);  
+        config = new RMConfiguration();
+        config.setBaseRetransmissionInterval(new Long(3000));
+        EasyMock.expect(manager.getConfiguration()).andReturn(config).anyTimes();
 
-        EasyMock.expect(manager.getRMAssertion()).andReturn(rma).anyTimes();
         EasyMock.expect(manager.getDestinationPolicy()).andReturn(dp).anyTimes();
         EasyMock.expect(manager.getStore()).andReturn(null).anyTimes();
         

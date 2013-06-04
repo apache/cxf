@@ -59,6 +59,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
+import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
@@ -71,9 +72,6 @@ import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.ExponentialBackoff;
 
 /**
  * 
@@ -105,14 +103,11 @@ public class RMManager {
     private RetransmissionQueue retransmissionQueue;
     private Map<Endpoint, RMEndpoint> reliableEndpoints = new HashMap<Endpoint, RMEndpoint>();
     private AtomicReference<Timer> timer = new AtomicReference<Timer>();
-    private RMAssertion rmAssertion;
-    private DeliveryAssuranceType deliveryAssurance;
+    private RMConfiguration configuration;
     private SourcePolicyType sourcePolicy;
     private DestinationPolicyType destinationPolicy;
     private InstrumentationManager instrumentationManager;
     private ManagedRMManager managedManager;
-    private String rmNamespace = RM10Constants.NAMESPACE_URI;
-    private RM10AddressingNamespaceType rm10AddressingNamespace;
     
     // ServerLifeCycleListener
     
@@ -131,17 +126,12 @@ public class RMManager {
             return;
         }        
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint(), getBus());
-        Collection<SourceSequence> sss = store.getSourceSequences(id);
+        Collection<SourceSequence> sss = store.getSourceSequences(id/*, protocol*/);
         if (null == sss || 0 == sss.size()) {                        
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
-        recoverReliableEndpoint(client.getEndpoint(), client.getConduit());
-    }
-
-    private ProtocolVariation getConfiguredProtocol() {
-        String addrns = rm10AddressingNamespace == null ? null : rm10AddressingNamespace.getUri();
-        return ProtocolVariation.findVariant(getRMNamespace(), addrns);
+        recoverReliableEndpoint(client.getEndpoint(), client.getConduit()/*, protocol*/);
     }
     
     public void clientDestroyed(Client client) {
@@ -150,20 +140,14 @@ public class RMManager {
 
     // Configuration
 
-    public String getRMNamespace() {
-        return rmNamespace;
-    }
-
     public void setRMNamespace(String uri) {
-        rmNamespace = uri;
-    }
-
-    public RM10AddressingNamespaceType getRMAddressingNamespace() {
-        return rm10AddressingNamespace;
+        RMConfiguration cfg = forceConfiguration();
+        cfg.setRMNamespace(uri);
     }
 
     public void setRM10AddressingNamespace(RM10AddressingNamespaceType addrns) {
-        rm10AddressingNamespace = addrns;
+        RMConfiguration cfg = forceConfiguration();
+        cfg.setRM10AddressingNamespace(addrns);
     }
     
     public Bus getBus() {
@@ -219,19 +203,14 @@ public class RMManager {
     public BindingFaultFactory getBindingFaultFactory(Binding binding) {
         return new SoapFaultFactory(binding);
     }
-    
-    /**  
-     * @return Returns the deliveryAssurance.
-     */
-    public DeliveryAssuranceType getDeliveryAssurance() {
-        return deliveryAssurance;
-    }
 
     /**
      * @param deliveryAssurance The deliveryAssurance to set.
      */
-    public void setDeliveryAssurance(DeliveryAssuranceType deliveryAssurance) {
-        this.deliveryAssurance = deliveryAssurance;
+    public void setDeliveryAssurance(DeliveryAssuranceType da) {
+        RMConfiguration cfg = forceConfiguration();
+        cfg.setExactlyOnce(da.isSetExactlyOnce());
+        cfg.setDeliveryAssurance(da);
     }
 
     /**
@@ -248,31 +227,48 @@ public class RMManager {
         this.destinationPolicy = destinationPolicy;
     }
 
-    /** 
-     * @return Returns the rmAssertion.
+    /**
+     * @return configuration (non-<code>null</code>)
      */
-    public RMAssertion getRMAssertion() {
-        return rmAssertion;
+    public RMConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * @param configuration (non-<code>null</code>)
+     */
+    public void setConfiguration(RMConfiguration configuration) {
+        this.configuration = configuration;
+    }
+    
+    RMConfiguration forceConfiguration() {
+        if (configuration == null) {
+            configuration = new RMConfiguration();
+        }
+        return configuration;
     }
 
     /**
      * @param rma The rmAssertion to set.
      */
-    public void setRMAssertion(RMAssertion rma) {
-        if (null == rma) {
-            rma = new RMAssertion();
-            rma.setExponentialBackoff(new ExponentialBackoff());
+    public void setRMAssertion(org.apache.cxf.ws.rmp.v200502.RMAssertion rma) {
+        RMConfiguration cfg = forceConfiguration();
+        cfg.setExponentialBackoff(rma.getExponentialBackoff() != null);
+        org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout inactTimeout
+            = rma.getInactivityTimeout();
+        if (inactTimeout != null) {
+            cfg.setInactivityTimeout(inactTimeout.getMilliseconds());
         }
-        BaseRetransmissionInterval bri = rma.getBaseRetransmissionInterval();
-        if (null == bri) {
-            bri = new BaseRetransmissionInterval();
-            rma.setBaseRetransmissionInterval(bri);
+        org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval bri
+            = rma.getBaseRetransmissionInterval();
+        if (bri != null) {
+            cfg.setBaseRetransmissionInterval(bri.getMilliseconds());
         }
-        if (null == bri.getMilliseconds()) {
-            bri.setMilliseconds(Long.valueOf(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL));
+        org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval ackInterval
+            = rma.getAcknowledgementInterval();
+        if (ackInterval != null) {
+            cfg.setAcknowledgementInterval(ackInterval.getMilliseconds());
         }
-
-        rmAssertion = rma;
     }
 
     /** 
@@ -353,7 +349,7 @@ public class RMManager {
                 addrUri = maps.getNamespaceURI();
             }
             if (addrUri == null) {
-                addrUri = getConfiguredProtocol().getWSANamespace();
+                addrUri = configuration.getConfiguredProtocol().getWSANamespace();
             }
         }
         return addrUri;
@@ -374,7 +370,7 @@ public class RMManager {
                 rmUri = rmps.getNamespaceURI();
             }
             if (rmUri == null) {
-                rmUri = getRMNamespace();
+                rmUri = configuration.getRMNamespace();
             }
         }
         return rmUri;
@@ -410,7 +406,7 @@ public class RMManager {
             RelatesToType relatesTo = null;
             if (isServer) {
                 AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);
-                inMaps.exposeAs(getConfiguredProtocol().getWSANamespace());
+                inMaps.exposeAs(configuration.getConfiguredProtocol().getWSANamespace());
                 acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();
                 source.getReliableEndpoint().getServant().setUnattachedIdentifier(inSeqId);
@@ -610,29 +606,29 @@ public class RMManager {
     
     @PostConstruct
     void initialise() {
-        if (null == rmAssertion) {
-            setRMAssertion(null);
+        if (configuration == null) {
+            configuration = new RMConfiguration();
+            configuration.setExponentialBackoff(true);
         }
-        org.apache.cxf.ws.rm.manager.ObjectFactory factory = new org.apache.cxf.ws.rm.manager.ObjectFactory();
-        DeliveryAssuranceType da = factory.createDeliveryAssuranceType();
-        if (null == deliveryAssurance) {
-            da.setAtLeastOnce(factory.createDeliveryAssuranceTypeAtLeastOnce());
-            setDeliveryAssurance(da);
+        DeliveryAssuranceType deliveryAssurance = configuration.getDeliveryAssurance();
+        if (deliveryAssurance == null) {
+            DeliveryAssuranceType da = new DeliveryAssuranceType();
+            da.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
+            configuration.setDeliveryAssurance(da);
         } else if (deliveryAssurance.getExactlyOnce() != null) {
             if (deliveryAssurance.getAtMostOnce() == null) {
-                deliveryAssurance.setAtMostOnce(factory.createDeliveryAssuranceTypeAtMostOnce());
+                deliveryAssurance.setAtMostOnce(new DeliveryAssuranceType.AtMostOnce());
             }
             if (deliveryAssurance.getAtLeastOnce() == null) {
-                deliveryAssurance.setAtLeastOnce(factory.createDeliveryAssuranceTypeAtLeastOnce());
+                deliveryAssurance.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
             }
         }
         if (null == sourcePolicy) {
             setSourcePolicy(null);
-
         }       
         if (null == destinationPolicy) {
-            DestinationPolicyType dp = factory.createDestinationPolicyType();
-            dp.setAcksPolicy(factory.createAcksPolicyType());
+            DestinationPolicyType dp = new DestinationPolicyType();
+            dp.setAcksPolicy(new AcksPolicyType());
             setDestinationPolicy(dp);
         }
         if (null == retransmissionQueue) {

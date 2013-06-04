@@ -27,6 +27,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -36,7 +37,6 @@ import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -62,7 +62,6 @@ public class RetransmissionQueueImplTest extends Assert {
     private List<SequenceType> sequences = new ArrayList<SequenceType>();
     private List<Identifier> identifiers = new ArrayList<Identifier>();
     private List<Object> mocks = new ArrayList<Object>();
-    private RMAssertion rma;
     
     @Before
     public void setUp() {
@@ -72,7 +71,6 @@ public class RetransmissionQueueImplTest extends Assert {
         resender = new TestResender();
         queue.replaceResender(resender);
         executor = createMock(Executor.class);
-        rma = createMock(RMAssertion.class);
         assertNotNull(executor);
     }
     
@@ -368,13 +366,10 @@ public class RetransmissionQueueImplTest extends Assert {
     
     private void setupMessagePolicies(Message message) {
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
-        EasyMock.expect(manager.getRMAssertion()).andReturn(rma);
-        RMAssertion.BaseRetransmissionInterval bri = 
-            createMock(RMAssertion.BaseRetransmissionInterval.class);
-        EasyMock.expect(rma.getBaseRetransmissionInterval()).andReturn(bri);
-        EasyMock.expect(bri.getMilliseconds()).andReturn(new Long(5000));
-        RMAssertion.ExponentialBackoff eb = createMock(RMAssertion.ExponentialBackoff.class);
-        EasyMock.expect(rma.getExponentialBackoff()).andReturn(eb);        
+        RMConfiguration cfg = new RMConfiguration();
+        EasyMock.expect(manager.getConfiguration()).andReturn(cfg);
+        cfg.setBaseRetransmissionInterval(new Long(5000));
+        cfg.setExponentialBackoff(true);
     }
     
     private void setupRetryPolicy(Message message) {

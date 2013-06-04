@@ -92,7 +92,7 @@ public class RMFeature extends AbstractFeature {
             manager.setRMAssertion(rmAssertion);
         }
         if (null != deliveryAssurance) {
-            manager.setDeliveryAssurance(deliveryAssurance);
+            manager.getConfiguration().setDeliveryAssurance(deliveryAssurance);
         }
         if (null != sourcePolicy) {
             manager.setSourcePolicy(sourcePolicy);
@@ -104,10 +104,10 @@ public class RMFeature extends AbstractFeature {
             manager.setStore(store);
         }
         if (null != rmNamespace) {
-            manager.setRMNamespace(rmNamespace);
+            manager.getConfiguration().setRMNamespace(rmNamespace);
         }
         if (null != rm10AddressingNamespace) {
-            manager.setRM10AddressingNamespace(rm10AddressingNamespace);
+            manager.getConfiguration().setRM10AddressingNamespace(rm10AddressingNamespace);
         }
 
         rmLogicalIn.setBus(bus);

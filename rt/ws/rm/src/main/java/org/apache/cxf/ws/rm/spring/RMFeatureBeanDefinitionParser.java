@@ -46,10 +46,11 @@ public class RMFeatureBeanDefinitionParser extends AbstractBeanDefinitionParser 
                 new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
                 "RMAssertion",
                 org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
-        mapElementToJaxbProperty(element, bean, 
-                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
-                "RMAssertion",
-                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
+        // TODO: handle
+//        mapElementToJaxbProperty(element, bean, 
+//                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
+//                "RMAssertion",
+//                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
         
         super.parseChildElements(element, ctx, bean);                
         ctx.getDelegate().parsePropertyElements(element, bean.getBeanDefinition());

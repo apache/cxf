@@ -41,14 +41,11 @@ import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
+import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
 
 public class DestinationSequence extends AbstractSequence {
     
@@ -177,26 +174,13 @@ public class DestinationSequence extends AbstractSequence {
             store.persistIncoming(this, msg);
         }
         
-        RMAssertion rma = RM10PolicyUtils.getRMAssertion(destination.getManager().getRMAssertion(), message);
-        long acknowledgementInterval = 0;
-        AcknowledgementInterval ai = rma.getAcknowledgementInterval();
-        if (null != ai) {
-            Long val = ai.getMilliseconds(); 
-            if (null != val) {
-                acknowledgementInterval = val.longValue();
-            }
-        }
+        RMConfiguration cfg = destination.getManager().getConfiguration();
+        cfg = RMPolicyUtilities.getRMConfiguration(cfg, message);
         
+        long acknowledgementInterval = cfg.getAcknowledgementIntervalTime();
         scheduleAcknowledgement(acknowledgementInterval);
        
-        long inactivityTimeout = 0;
-        InactivityTimeout iat = rma.getInactivityTimeout();
-        if (null != iat) {
-            Long val = iat.getMilliseconds(); 
-            if (null != val) {
-                inactivityTimeout = val.longValue();
-            }
-        }
+        long inactivityTimeout = cfg.getInactivityTimeoutTime();
         scheduleSequenceTermination(inactivityTimeout);
         
     }
@@ -253,7 +237,7 @@ public class DestinationSequence extends AbstractSequence {
      */
     boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
-        DeliveryAssuranceType da = destination.getManager().getDeliveryAssurance();
+        DeliveryAssuranceType da = destination.getManager().getConfiguration().getDeliveryAssurance();
         boolean canSkip = !da.isSetAtLeastOnce() && !da.isSetExactlyOnce();
         boolean robust = false;
         boolean robustDelivering = false;

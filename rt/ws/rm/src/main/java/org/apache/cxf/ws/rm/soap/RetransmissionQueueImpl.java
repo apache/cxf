@@ -56,6 +56,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.ProtocolVariation;
+import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
@@ -68,7 +69,7 @@ import org.apache.cxf.ws.rm.RetryStatus;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
+import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
@@ -504,12 +505,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             message = m;
             retries = 0;
             out = m.getContent(OutputStream.class);
-            org.apache.cxf.ws.rmp.v200502.RMAssertion rma = 
-                RM10PolicyUtils.getRMAssertion(manager.getRMAssertion(), message);
+            RMConfiguration cfg = RMPolicyUtilities.getRMConfiguration(manager.getConfiguration(), message);
             long baseRetransmissionInterval = 
-                rma.getBaseRetransmissionInterval().getMilliseconds().longValue();
-            backoff = null != rma.getExponentialBackoff() 
-                ? RetransmissionQueue.DEFAULT_EXPONENTIAL_BACKOFF : 1;
+                cfg.getBaseRetransmissionInterval().longValue();
+            backoff = cfg.isExponentialBackoff()  ? RetransmissionQueue.DEFAULT_EXPONENTIAL_BACKOFF : 1;
             next = new Date(System.currentTimeMillis() + baseRetransmissionInterval);
             nextInterval = baseRetransmissionInterval * backoff;
             RetryPolicyType rmrp = null != manager.getSourcePolicy() 

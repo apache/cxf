@@ -58,12 +58,12 @@ public class RMManagerConfigurationTest extends Assert {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("org/apache/cxf/ws/rm/exactly-once.xml", false);
         RMManager manager = bus.getExtension(RMManager.class);
-        assertNotNull(manager.getDeliveryAssurance().getAtLeastOnce());
-        assertTrue(manager.getDeliveryAssurance().isSetAtLeastOnce());
-        assertNotNull(manager.getDeliveryAssurance().getAtMostOnce());
-        assertTrue(manager.getDeliveryAssurance().isSetAtMostOnce());
-        assertNotNull(manager.getDeliveryAssurance().getExactlyOnce());
-        assertTrue(manager.getDeliveryAssurance().isSetExactlyOnce());
+        RMConfiguration cfg = manager.getConfiguration();
+        assertNotNull(cfg.getDeliveryAssurance().getAtLeastOnce());
+        assertTrue(cfg.getDeliveryAssurance().isSetAtLeastOnce());
+        assertNotNull(cfg.getDeliveryAssurance().getAtMostOnce());
+        assertTrue(cfg.getDeliveryAssurance().isSetAtMostOnce());
+        assertTrue(cfg.isExactlyOnce());
     }
     
     @Test
@@ -79,14 +79,13 @@ public class RMManagerConfigurationTest extends Assert {
         assertTrue(manager.getSourcePolicy().getSequenceTerminationPolicy().isTerminateOnShutdown());
         assertEquals(0L, manager.getDestinationPolicy().getAcksPolicy().getIntraMessageThreshold());
         assertEquals(2000L, manager.getDestinationPolicy().getAcksPolicy().getImmediaAcksTimeout());
-        assertEquals(10000L, manager.getRMAssertion().getBaseRetransmissionInterval()
-                     .getMilliseconds().longValue());
-        assertEquals(10000L, manager.getRMAssertion().getAcknowledgementInterval()
-                     .getMilliseconds().longValue());        
-        assertEquals("http://www.w3.org/2005/08/addressing", manager.getRMAddressingNamespace().getUri());
+        assertEquals(10000L, manager.getConfiguration().getBaseRetransmissionInterval().longValue());
+        assertEquals(10000L, manager.getConfiguration().getAcknowledgementInterval().longValue());        
+        assertEquals("http://www.w3.org/2005/08/addressing",
+            manager.getConfiguration().getRM10AddressingNamespace().getUri());
         TestStore store = (TestStore)manager.getStore();
         assertEquals("here", store.getLocation());     
-        assertNotNull(manager.getDeliveryAssurance().getInOrder());
+        assertNotNull(manager.getConfiguration().getDeliveryAssurance().getInOrder());
     }
 
     static class TestStore implements RMStore {

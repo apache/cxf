@@ -59,10 +59,10 @@ import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,23 +103,22 @@ public class RMManagerTest extends Assert {
     @Test
     public void testInitialisation() {
         manager = new RMManager();
-        assertNull("RMAssertion is set.", manager.getRMAssertion());
+        assertNull("RMConfiguration is set.", manager.getConfiguration());
         assertNull("sourcePolicy is set.", manager.getSourcePolicy());
         assertNull("destinationPolicy is set.", manager.getDestinationPolicy());
-        assertNull("deliveryAssirance is set.", manager.getDeliveryAssurance());
         
         manager.initialise();
         
-        assertNotNull("RMAssertion is not set.", manager.getRMAssertion());
+        RMConfiguration cfg = manager.getConfiguration();
+        assertNotNull("RMAssertion is not set.", cfg);
         assertNotNull("sourcePolicy is not set.", manager.getSourcePolicy());
         assertNotNull("destinationPolicy is not set.", manager.getDestinationPolicy());
-        assertNotNull("deliveryAssirance is not set.", manager.getDeliveryAssurance());
+        assertNotNull("deliveryAssirance is not set.", cfg.getDeliveryAssurance());
         
-        RMAssertion rma = manager.getRMAssertion();
-        assertTrue(rma.isSetExponentialBackoff());
-        assertEquals(3000L, rma.getBaseRetransmissionInterval().getMilliseconds().longValue());
-        assertTrue(!rma.isSetAcknowledgementInterval());
-        assertTrue(!rma.isSetInactivityTimeout());   
+        assertTrue(cfg.isExponentialBackoff());
+        assertEquals(3000L, cfg.getBaseRetransmissionInterval().longValue());
+        assertNull(cfg.getAcknowledgementInterval());
+        assertNull(cfg.getInactivityTimeout());   
         
         SourcePolicyType sp = manager.getSourcePolicy();
         assertEquals(0L, sp.getSequenceExpiration().getTimeInMillis(new Date()));
