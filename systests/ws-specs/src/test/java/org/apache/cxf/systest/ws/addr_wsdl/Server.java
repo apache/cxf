@@ -67,7 +67,7 @@ public class Server extends AbstractBusTestServerBase {
         eps.add(Endpoint.publish(address + "-providernows", new AddNumberProviderNoWsdl()));
     }
     public void tearDown() {
-        for (Endpoint ep: eps) {
+        for (Endpoint ep : eps) {
             ep.stop();
         }
         eps = null;

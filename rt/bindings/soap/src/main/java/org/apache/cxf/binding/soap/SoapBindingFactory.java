@@ -443,7 +443,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         }
         
         if (binding.getService() != null) {
-            for (EndpointInfo ei: binding.getService().getEndpoints()) {
+            for (EndpointInfo ei : binding.getService().getEndpoints()) {
                 if (ei.getAddress() != null && ei.getAddress().startsWith("soap.udp")) {
                     setupUDP(sb, ei);
                 }
