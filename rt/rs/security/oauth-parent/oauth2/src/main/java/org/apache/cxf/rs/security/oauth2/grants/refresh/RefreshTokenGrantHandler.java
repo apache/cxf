@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     private OAuthDataProvider dataProvider;
+    private boolean partialMatchScopeValidation;
     
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
@@ -49,8 +50,14 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
             throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
         String refreshToken = params.getFirst(OAuthConstants.REFRESH_TOKEN);
-        List<String> requestedScopes = OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE));
+        List<String> requestedScopes = OAuthUtils.getRequestedScopes(client,
+                                            params.getFirst(OAuthConstants.SCOPE),
+                                            partialMatchScopeValidation);
         
         return dataProvider.refreshAccessToken(client, refreshToken, requestedScopes);
+    }
+
+    public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
+        this.partialMatchScopeValidation = partialMatchScopeValidation;
     }
 }

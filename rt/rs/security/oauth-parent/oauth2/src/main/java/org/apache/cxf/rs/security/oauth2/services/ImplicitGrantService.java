@@ -46,8 +46,11 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 @Path("/authorize-implicit")
 public class ImplicitGrantService extends RedirectionBasedGrantService {
+    // For a client to validate that this client is a targeted recipient.
+    private boolean reportClientId;
+    
     public ImplicitGrantService() {
-        super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT, false);
+        super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_GRANT);
     }
     
     protected Response createGrant(MultivaluedMap<String, String> params,
@@ -81,6 +84,10 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
         sb.append("&")
             .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(token.getTokenType());
+        if (reportClientId) {
+            sb.append("&")
+                .append(OAuthConstants.CLIENT_ID).append("=").append(client.getClientId());
+        }
         if (isWriteOptionalParameters()) {
             sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
                 .append("=").append(token.getExpiresIn());
@@ -117,6 +124,20 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             sb.append(OAuthConstants.STATE).append("=").append(state);   
         }
         return sb;
+    }
+
+    public void setReportClientId(boolean reportClientId) {
+        this.reportClientId = reportClientId;
+    }
+
+    @Override
+    protected boolean canSupportPublicClient(Client c) {
+        return true;
+    }
+    
+    @Override
+    protected boolean canRedirectUriBeEmpty(Client c) {
+        return false;
     }
     
 }

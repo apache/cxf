@@ -100,9 +100,17 @@ public final class OAuthUtils {
     }
 
     public static String generateRandomTokenKey() throws OAuthServiceException {
+        return generateRandomTokenKey(null);
+    }
+    
+    public static String generateRandomTokenKey(String digestAlgo) throws OAuthServiceException {
         try {
             byte[] bytes = UUID.randomUUID().toString().getBytes("UTF-8");
-            return new MD5SequenceGenerator().generate(bytes);
+            MessageDigestGenerator gen = new MessageDigestGenerator();
+            if (digestAlgo != null) {
+                gen.setAlgorithm(digestAlgo);
+            }
+            return gen.generate(bytes);
         } catch (Exception ex) {
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, ex);
         }
@@ -131,4 +139,42 @@ public final class OAuthUtils {
         return false;
     }
     
+    public static List<String> getRequestedScopes(Client client, String scopeParameter, 
+                                                  boolean partialMatchScopeValidation) {
+        List<String> requestScopes = parseScope(scopeParameter);
+        List<String> registeredScopes = client.getRegisteredScopes();
+        if (requestScopes.isEmpty()) {
+            requestScopes.addAll(registeredScopes);
+            return requestScopes;
+        }
+        if (!validateScopes(requestScopes, registeredScopes, partialMatchScopeValidation)) {
+            throw new OAuthServiceException("Unexpected scope");
+        }
+        return requestScopes;
+    }
+    
+    public static boolean validateScopes(List<String> requestScopes, List<String> registeredScopes,
+                                         boolean partialMatchScopeValidation) {
+        if (!registeredScopes.isEmpty()) {
+            // if it is a strict validation then pre-registered scopes have to contains all 
+            // the current request scopes
+            if (!partialMatchScopeValidation) {
+                return registeredScopes.containsAll(requestScopes);
+            } else {
+                for (String requestScope : requestScopes) {
+                    boolean match = false;
+                    for (String registeredScope : registeredScopes) { 
+                        if (requestScope.startsWith(registeredScope)) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    if (!match) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }
