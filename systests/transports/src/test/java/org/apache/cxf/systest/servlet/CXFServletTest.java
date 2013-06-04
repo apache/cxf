@@ -19,10 +19,13 @@
 package org.apache.cxf.systest.servlet;
 
 
+
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.jws.WebService;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLReader;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
@@ -39,6 +42,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
 import org.junit.Before;
@@ -47,7 +51,7 @@ import org.junit.Test;
 
 public class CXFServletTest extends AbstractServletTest {
     
-    
+       
     @Before
     public void setUp() throws Exception {
         BusFactory.setDefaultBus(null);
@@ -97,7 +101,7 @@ public class CXFServletTest extends AbstractServletTest {
         
         
         WebLink[] links = res.getLinks();
-        assertEquals("Wrong number of service links", 4, links.length);
+        assertEquals("Wrong number of service links", 6, links.length);
         
         Set<String> links2 = new HashSet<String>();
         for (WebLink l : links) {
@@ -118,7 +122,7 @@ public class CXFServletTest extends AbstractServletTest {
             links2.add(l.getURLString());
         }
         
-        assertEquals("Wrong number of service links", 4, links.length);
+        assertEquals("Wrong number of service links", 6, links.length);
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter?wsdl"));       
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter2?wsdl")); 
         assertTrue(links2.contains("http://cxf.apache.org/MyGreeter?wsdl")); 
@@ -178,9 +182,34 @@ public class CXFServletTest extends AbstractServletTest {
         assertEquals("text/xml", res.getContentType());
         Document doc = DOMUtils.readXml(res.getInputStream());
         assertNotNull(doc);
+        XMLUtils.printDOM(doc);
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);
         assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/greeter']", doc);
+    }
+    
+    
+    @Test
+    public void testGetWSDLWithMultiplePublishedEndpointUrl() throws Exception {
+        ServletUnitClient client = newClient();
+        client.setExceptionsThrownOnErrorStatus(true);
+        
+        WebRequest req = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/greeter5?wsdl");
+        
+        WebResponse res = client.getResponse(req); 
+        assertEquals(200, res.getResponseCode());
+        assertEquals("text/xml", res.getContentType());
+        Document doc = DOMUtils.readXml(res.getInputStream());
+        assertNotNull(doc);
+        WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
+        wsdlReader.setFeature("javax.wsdl.verbose", false);
+        
+        
+        assertValid("//wsdl:service[@name='SOAPService']/wsdl:port[@name='SoapPort']/wsdlsoap:address[@location='" 
+            + "http://cxf.apache.org/publishedEndpointUrl1']", doc);
+        assertValid("//wsdl:service[@name='SOAPService']/wsdl:port[@name='SoapPort1']/wsdlsoap:address[@location='" 
+            + "http://cxf.apache.org/publishedEndpointUrl2']", doc);
+        
     }
     @Test
     public void testGetWSDLWithIncludes() throws Exception {
