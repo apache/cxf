@@ -24,20 +24,22 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 /**
- * The utility MD5 sequence generator which can be used for generating
+ * The utility Message Digest generator which can be used for generating
  * random values
  */
-public class MD5SequenceGenerator {
+public class MessageDigestGenerator {
+    private String algorithm = "MD5";
+        
     public String generate(byte[] input) throws OAuthServiceException {
         if (input == null) {
             throw new OAuthServiceException("You have to pass input to Token Generator");
         }
 
         try {
-            MessageDigest algorithm = MessageDigest.getInstance("MD5");
-            algorithm.reset();
-            algorithm.update(input);
-            byte[] messageDigest = algorithm.digest();
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            md.reset();
+            md.update(input);
+            byte[] messageDigest = md.digest();
             StringBuffer hexString = new StringBuffer();
             for (int i = 0; i < messageDigest.length; i++) {
                 hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
@@ -47,5 +49,9 @@ public class MD5SequenceGenerator {
         } catch (NoSuchAlgorithmException e) {
             throw new OAuthServiceException("server_error", e);
         }
+    }
+
+    public void setAlgorithm(String algo) {
+        this.algorithm = algo;
     }
 }
