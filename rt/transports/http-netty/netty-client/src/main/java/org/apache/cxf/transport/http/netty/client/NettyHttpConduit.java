@@ -29,9 +29,15 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -41,10 +47,12 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
+import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.buffer.ChannelBufferOutputStream;
@@ -52,19 +60,29 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 public class NettyHttpConduit extends URLConnectionHTTPConduit {
     public static final String USE_ASYNC = "use.async.http.conduit";
     final NettyHttpConduitFactory factory;
+    private final ClientBootstrap bootstrap;
+    
     public NettyHttpConduit(Bus b, EndpointInfo ei, EndpointReferenceType t, NettyHttpConduitFactory conduitFactory)
         throws IOException {
         super(b, ei, t);
         factory = conduitFactory;
+        bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory());
     }
 
     public NettyHttpConduitFactory getNettyHttpConduitFactory() {
         return factory;
+    }
+    
+    public void close() {
+        super.close();
+        // clean up the resource that ClientChannelFactory used
+        bootstrap.shutdown();
     }
 
     // Using Netty API directly
@@ -98,6 +116,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         // need to socket connection timeout
 
         message.put(NettyHttpClientRequest.class, request);
+        bootstrap.setPipelineFactory(new NettyHttpClientPipelineFactory());
     }
 
     protected OutputStream createOutputStream(Message message,
@@ -238,7 +257,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         protected void connect(boolean output) {
 
             ChannelFuture connFuture = 
-                factory.getBootstrap().connect(new InetSocketAddress(url.getHost(), url.getPort()));
+                bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort()));
 
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
@@ -274,7 +293,40 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
 
         @Override
         protected HttpsURLConnectionInfo getHttpsURLConnectionInfo() throws IOException {
-            // TODO to setup the SSL info
+            if ("http".equals(outMessage.get("http.scheme"))) {
+                return null;
+            }
+            connect(true);
+            // TODO need to find a way to inject the SSLSession
+            /*
+            HostnameVerifier verifier;
+            if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
+                verifier = HttpsURLConnection.getDefaultHostnameVerifier();
+            } else if (tlsClientParameters.isDisableCNCheck()) {
+                verifier = CertificateHostnameVerifier.ALLOW_ALL;
+            } else {
+                verifier = CertificateHostnameVerifier.DEFAULT;
+            }
+            
+            if (!verifier.verify(url.getHost(), session)) {
+                throw new IOException("Could not verify host " + url.getHost());
+            }
+            
+            String method = (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
+            String cipherSuite = null;
+            Certificate[] localCerts = null;
+            Principal principal = null;
+            Certificate[] serverCerts = null;
+            Principal peer = null;
+            if (session != null) {
+                cipherSuite = session.getCipherSuite();
+                localCerts = session.getLocalCertificates();
+                principal = session.getLocalPrincipal();
+                serverCerts = session.getPeerCertificates();
+                peer = session.getPeerPrincipal();
+            }
+            
+            return new HttpsURLConnectionInfo(url, method, cipherSuite, localCerts, principal, serverCerts, peer);*/
             return null;
         }
 

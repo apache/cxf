@@ -30,21 +30,13 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPConduitFactory {
 
     boolean isShutdown;
 
-    private final ClientBootstrap bootstrap;
-
     public NettyHttpConduitFactory() {
-        //TODO setup the bootstrap thread pool according to the configuration
-        bootstrap = new ClientBootstrap(
-                new NioClientSocketChannelFactory());
-        bootstrap.setPipelineFactory(new NettyHttpClientPipelineFactory());
     }
 
     public NettyHttpConduitFactory(Bus b) {
@@ -79,16 +71,11 @@ public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPCondui
 
     @Override
     public void postShutdown() {
-        // shutdown the bootstrap
-        bootstrap.shutdown();
+        // TODO Do we need to keep the track of the NettyHttpConduit?
     }
 
     public boolean isShutdown() {
         return isShutdown;
-    }
-
-    public ClientBootstrap getBootstrap() {
-        return bootstrap;
     }
 
 }
