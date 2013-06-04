@@ -57,5 +57,24 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     </jaxws:properties>
   </jaxws:endpoint>
 
+  <jaxws:endpoint
+    id="greeter5"
+    address="/greeter5"
+    publishedEndpointUrl="http://cxf.apache.org/publishedEndpointUrl1"
+        implementor="org.apache.hello_world_soap_http.GreeterImpl"
+        wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"
+        serviceName="e:SOAPService"
+        endpointName="e:SoapPort" 
+        xmlns:e="http://apache.org/hello_world_soap_http"     />
+ 
+  <jaxws:endpoint
+    id="greeter6"
+    address="/greeter6"
+    publishedEndpointUrl="http://cxf.apache.org/publishedEndpointUrl2"
+        implementor="org.apache.hello_world_soap_http.GreeterImpl"
+        wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"      
+        serviceName="e:SOAPService"
+        endpointName="e:SoapPort1"
+        xmlns:e="http://apache.org/hello_world_soap_http"    />
   
 </beans>
