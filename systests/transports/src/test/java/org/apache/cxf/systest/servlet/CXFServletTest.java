@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.jws.WebService;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
@@ -52,10 +51,7 @@ import org.junit.Test;
 
 public class CXFServletTest extends AbstractServletTest {
     
-    public static final QName SERVICE_NAME = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
-   
-    
-    
+       
     @Before
     public void setUp() throws Exception {
         BusFactory.setDefaultBus(null);
@@ -208,7 +204,6 @@ public class CXFServletTest extends AbstractServletTest {
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
         wsdlReader.setFeature("javax.wsdl.verbose", false);
         
-        XMLUtils.printDOM(doc);
         
         assertValid("//wsdl:service[@name='SOAPService']/wsdl:port[@name='SoapPort']/wsdlsoap:address[@location='" 
             + "http://cxf.apache.org/publishedEndpointUrl1']", doc);
