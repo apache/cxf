@@ -95,8 +95,8 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             bus.getOutFaultInterceptors().add(logOut);
             bus.getOutFaultInterceptors().add(logOut);
             
-            bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-                .setMilliseconds(new Long(60000));
+            bus.getExtension(RMManager.class).getConfiguration()
+                .setBaseRetransmissionInterval(new Long(60000));
             
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + port + "/SoapContext/GreeterPort";
@@ -161,8 +161,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
 
     void populateStore() throws Exception {
         
-        bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(new Long(60000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(60000));
         bus.getOutInterceptors().add(new MessageLossSimulator());
                 
         greeter.greetMeOneWay("one");
@@ -229,8 +228,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
       
     void populateStoreAfterRestart() throws Exception {
         
-        bus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(new Long(60000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(60000));
 
         greeter.greetMeOneWay("five");
 

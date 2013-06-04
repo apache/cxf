@@ -59,8 +59,7 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/atmostonce.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            bus.getExtension(RMManager.class).getRMAssertion().getAcknowledgementInterval()
-                .setMilliseconds(0L);
+            bus.getExtension(RMManager.class).getConfiguration().setAcknowledgementInterval(new Long(0));
 
             // add some intentional processing delay at inbound
             SlowProcessingSimulator sps = new SlowProcessingSimulator();
@@ -95,8 +94,7 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/seqlength1.xml");
         // set the client retry interval much shorter than the slow processing delay
         RMManager manager = bus.getExtension(RMManager.class); 
-        manager.getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(3000L);
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(3000));
 
         BusFactory.setDefaultBus(bus);
         GreeterService gs = new GreeterService();

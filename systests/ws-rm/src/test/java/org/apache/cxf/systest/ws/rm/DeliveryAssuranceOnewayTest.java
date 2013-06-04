@@ -101,7 +101,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -140,7 +140,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -174,7 +174,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -213,7 +213,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -245,7 +245,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
@@ -278,7 +278,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         String[] callArgs = new String[] {"one", "two", "three", "four"};
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);

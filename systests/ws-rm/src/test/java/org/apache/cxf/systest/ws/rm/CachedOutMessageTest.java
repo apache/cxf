@@ -108,7 +108,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
         MessageLossSimulator mls = new MessageLossSimulator();
         bus.getOutInterceptors().add(mls);
         RMManager manager = bus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         
         bus.getOutFaultInterceptors().add(out);
         

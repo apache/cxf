@@ -755,7 +755,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
         greeterBus.getOutInterceptors().add(new MessageNumberInterceptor());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         
         greeter.greetMe("one");
         try {
@@ -822,7 +822,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
         greeterBus.getOutInterceptors().add(new SequenceIdInterceptor());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
        
         try {
             greeter.greetMe("one");
@@ -921,7 +921,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
         
         greeter.greetMeOneWay("one");
         greeter.greetMeOneWay("two");
@@ -982,7 +982,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getRMAssertion().getBaseRetransmissionInterval().setMilliseconds(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
 
         greeter.greetMe("one");
         greeter.greetMe("two");
@@ -1276,8 +1276,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             }
         }
         // avoid client side resends
-        greeterBus.getExtension(RMManager.class).getRMAssertion().getBaseRetransmissionInterval()
-            .setMilliseconds(new Long(60000));
+        greeterBus.getExtension(RMManager.class).getConfiguration()
+            .setBaseRetransmissionInterval(new Long(60000));
 
         greeter.greetMe("one");
         greeter.greetMe("two");
