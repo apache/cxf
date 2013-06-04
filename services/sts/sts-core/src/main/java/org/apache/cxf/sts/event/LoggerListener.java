@@ -19,9 +19,6 @@
 
 package org.apache.cxf.sts.event;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,7 +63,8 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
         RENEW_PRINCIPAL,
         REMOTE_HOST,
         REMOTE_PORT,
-        URL
+        URL,
+        STACKTRACE
     };
     
     private static final Logger LOG = LogUtils.getL7dLogger(LoggerListener.class);
@@ -76,7 +74,10 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
     private boolean logFieldname;
     private Level logLevel = Level.FINE;
     private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+    private StacktraceFormatter stacktraceFormatter = new StacktraceDefaultFormatter();
     
+    
+
     public LoggerListener() {
         fieldOrder.add(KEYS.TIME.name());
         fieldOrder.add(KEYS.STATUS.name());
@@ -97,6 +98,7 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
         fieldOrder.add(KEYS.CLAIMS_PRIMARY.name());
         fieldOrder.add(KEYS.CLAIMS_SECONDARY.name());
         fieldOrder.add(KEYS.EXCEPTION.name());
+        fieldOrder.add(KEYS.STACKTRACE.name());
     }
     
     @Override
@@ -181,13 +183,9 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
             if (event instanceof AbstractSTSFailureEvent) {
                 map.put(KEYS.STATUS.name(), "FAILURE");
                 Exception ex = ((AbstractSTSFailureEvent)event).getException();
-                if (this.isLogStacktrace()) {
-                    final Writer result = new StringWriter();
-                    final PrintWriter printWriter = new PrintWriter(result);
-                    ex.printStackTrace(printWriter);
-                    map.put(KEYS.EXCEPTION.name(), result.toString());
-                } else {
-                    map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                if (this.isLogStacktrace() && stacktraceFormatter != null) {
+                    map.put(KEYS.STACKTRACE.name(), stacktraceFormatter.format(ex));
                 }
             } else {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
@@ -226,13 +224,9 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
             if (event instanceof AbstractSTSFailureEvent) {
                 map.put(KEYS.STATUS.name(), "FAILURE");
                 Exception ex = ((AbstractSTSFailureEvent)event).getException();
-                if (this.isLogStacktrace()) {
-                    final Writer result = new StringWriter();
-                    final PrintWriter printWriter = new PrintWriter(result);
-                    ex.printStackTrace(printWriter);
-                    map.put(KEYS.EXCEPTION.name(), result.toString());
-                } else {
-                    map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                if (this.isLogStacktrace() && stacktraceFormatter != null) {
+                    map.put(KEYS.STACKTRACE.name(), stacktraceFormatter.format(ex));
                 }
             } else {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
@@ -271,13 +265,9 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
             if (event instanceof AbstractSTSFailureEvent) {
                 map.put(KEYS.STATUS.name(), "FAILURE");
                 Exception ex = ((AbstractSTSFailureEvent)event).getException();
-                if (this.isLogStacktrace()) {
-                    final Writer result = new StringWriter();
-                    final PrintWriter printWriter = new PrintWriter(result);
-                    ex.printStackTrace(printWriter);
-                    map.put(KEYS.EXCEPTION.name(), result.toString());
-                } else {
-                    map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                if (this.isLogStacktrace() && stacktraceFormatter != null) {
+                    map.put(KEYS.STACKTRACE.name(), stacktraceFormatter.format(ex));
                 }
             } else {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
@@ -316,13 +306,9 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
             if (event instanceof AbstractSTSFailureEvent) {
                 map.put(KEYS.STATUS.name(), "FAILURE");
                 Exception ex = ((AbstractSTSFailureEvent)event).getException();
-                if (this.isLogStacktrace()) {
-                    final Writer result = new StringWriter();
-                    final PrintWriter printWriter = new PrintWriter(result);
-                    ex.printStackTrace(printWriter);
-                    map.put(KEYS.EXCEPTION.name(), result.toString());
-                } else {
-                    map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                map.put(KEYS.EXCEPTION.name(), ex.getMessage());
+                if (this.isLogStacktrace() && stacktraceFormatter != null) {
+                    map.put(KEYS.STACKTRACE.name(), stacktraceFormatter.format(ex));
                 }
             } else {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
@@ -380,6 +366,14 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
 
     public void setLogLevel(String logLevel) {
         this.logLevel = Level.parse(logLevel);
+    }
+    
+    public StacktraceFormatter getStacktraceFormatter() {
+        return stacktraceFormatter;
+    }
+
+    public void setStacktraceFormatter(StacktraceFormatter stacktraceFormatter) {
+        this.stacktraceFormatter = stacktraceFormatter;
     }
     
 }
