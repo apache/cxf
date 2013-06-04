@@ -162,7 +162,7 @@ public class TLSClientParameters extends TLSParameterBase {
         if (os == null) {
             return i;
         }
-        for (Object o: os) {
+        for (Object o : os) {
             i = hash(i, o);
         }
         return i;

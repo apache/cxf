@@ -195,10 +195,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (clazz.getPackage() != null) {
             XmlJavaTypeAdapters adapt = clazz.getPackage().getAnnotation(XmlJavaTypeAdapters.class);
             if (adapt != null) {
-                for (XmlJavaTypeAdapter a: adapt.value()) {
+                for (XmlJavaTypeAdapter a : adapt.value()) {
                     globalAdapters.add(a.type());
                 }
-                for (XmlJavaTypeAdapter a: adapt.value()) {
+                for (XmlJavaTypeAdapter a : adapt.value()) {
                     Type t = Utils.getTypeFromXmlAdapter(a);
                     if (t != null) {
                         addType(t);

@@ -155,7 +155,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         if (o instanceof QName) {
             ht.getTypes().add((QName)o);
         } else if (o instanceof List) {
-            for (Object o2: (List<?>)o) {
+            for (Object o2 : (List<?>)o) {
                 if (o2 instanceof QName) {
                     ht.getTypes().add((QName)o2);
                 } else if (o2 instanceof String) {

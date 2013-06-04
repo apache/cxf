@@ -92,7 +92,7 @@ public class Server extends AbstractBusTestServerBase {
     }
     
     public void tearDown() {
-        for (EndpointImpl ep: eps) {
+        for (EndpointImpl ep : eps) {
             ep.stop();
         }
         eps = null;
