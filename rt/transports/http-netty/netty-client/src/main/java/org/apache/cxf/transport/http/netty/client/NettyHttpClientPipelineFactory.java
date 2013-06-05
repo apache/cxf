@@ -60,7 +60,7 @@ public class NettyHttpClientPipelineFactory implements ChannelPipelineFactory {
         }
 
         pipeline.addLast("decoder", new HttpResponseDecoder());
-        pipeline.addLast("aggregator", new HttpChunkAggregator(65536));
+        pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));
         pipeline.addLast("encoder", new HttpRequestEncoder());
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
         pipeline.addLast("client", new NettyHttpClientHandler());
