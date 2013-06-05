@@ -19,15 +19,22 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
+import javax.crypto.SecretKey;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -42,6 +49,8 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyStaxActionInInterceptor;
+import org.apache.cxf.ws.security.wss4j.StaxSecurityContextInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
 import org.apache.wss4j.dom.WSConstants;
@@ -53,6 +62,11 @@ import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**
  * 
@@ -64,10 +78,13 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     public KerberosTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.KERBEROS_TOKEN, SP12Constants.KERBEROS_TOKEN));
        
-        this.getOutInterceptors().add(new KerberosTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new KerberosTokenOutInterceptor());
-        this.getInInterceptors().add(new KerberosTokenInInterceptor());
-        this.getInFaultInterceptors().add(new KerberosTokenInInterceptor());
+        this.getOutInterceptors().add(new KerberosTokenDOMOutInterceptor());
+        this.getOutFaultInterceptors().add(new KerberosTokenDOMOutInterceptor());
+        this.getInInterceptors().add(new KerberosTokenDOMInInterceptor());
+        this.getInFaultInterceptors().add(new KerberosTokenDOMInInterceptor());
+        
+        this.getInInterceptors().add(new KerberosTokenStaxInInterceptor());
+        this.getInFaultInterceptors().add(new KerberosTokenStaxInInterceptor());
         
         this.getOutInterceptors().add(new KerberosTokenInterceptor());
         this.getInInterceptors().add(new KerberosTokenInterceptor());
@@ -95,14 +112,16 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         }
     }
 
-    static class KerberosTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        public KerberosTokenOutInterceptor() {
+    static class KerberosTokenDOMOutInterceptor extends AbstractPhaseInterceptor<Message> {
+        public KerberosTokenDOMOutInterceptor() {
             super(Phase.PREPARE_SEND);
         }
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
-            if (aim != null) {
+            boolean enableStax = 
+                MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            if (aim != null && !enableStax) {
                 Collection<AssertionInfo> ais = 
                     NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
                 if (ais.isEmpty()) {
@@ -144,8 +163,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         
     }
     
-    static class KerberosTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
-        public KerberosTokenInInterceptor() {
+    static class KerberosTokenDOMInInterceptor extends AbstractPhaseInterceptor<Message> {
+        public KerberosTokenDOMInInterceptor() {
             super(Phase.PRE_PROTOCOL);
             addAfter(WSS4JInInterceptor.class.getName());
             addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
@@ -154,7 +173,10 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
-            if (aim != null) {
+            
+            boolean enableStax = 
+                MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            if (aim != null && !enableStax) {
                 Collection<AssertionInfo> ais = 
                     NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
                 if (ais.isEmpty()) {
@@ -215,6 +237,91 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 }
             }
             return results;
+        }
+    }
+    
+    static class KerberosTokenStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
+        
+        private static final Logger LOG = 
+            LogUtils.getL7dLogger(KerberosTokenStaxInInterceptor.class);
+        
+        public KerberosTokenStaxInInterceptor() {
+            super(Phase.PRE_PROTOCOL);
+            addAfter(PolicyStaxActionInInterceptor.class.getName());
+            getBefore().add(StaxSecurityContextInInterceptor.class.getName());
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+            // extract Assertion information
+            
+            boolean enableStax = 
+                MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            if (aim != null && enableStax) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+                if (ais.isEmpty()) {
+                    return;
+                }
+                if (!isRequestor(message)) {
+                    SecurityEvent event = findKerberosEvent(message);
+                    if (event != null) {
+                        for (AssertionInfo ai : ais) {
+                            ai.setAsserted(true);
+                        }
+                        KerberosServiceSecurityToken kerberosToken = 
+                            ((KerberosTokenSecurityEvent)event).getSecurityToken();
+                        if (kerberosToken != null) {
+                            SecurityToken token = new SecurityToken(kerberosToken.getId());
+                            token.setTokenType(kerberosToken.getKerberosTokenValueType());
+
+                            byte[] secret = getSecretKeyFromToken(kerberosToken);
+                            token.setSecret(secret);
+                            getTokenStore(message).add(token);
+                            message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
+                        }
+                    }
+                } else {
+                    //client side should be checked on the way out
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
+                    }                    
+                }
+                
+                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
+            }
+        }
+        
+        private SecurityEvent findKerberosEvent(Message message) {
+            @SuppressWarnings("unchecked")
+            final List<SecurityEvent> incomingEventList = 
+                (List<SecurityEvent>)message.get(SecurityEvent.class.getName() + ".in");
+            if (incomingEventList != null) {
+                for (SecurityEvent incomingEvent : incomingEventList) {
+                    if (WSSecurityEventConstants.KerberosToken 
+                        == incomingEvent.getSecurityEventType()) {
+                        return incomingEvent;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        private byte[] getSecretKeyFromToken(KerberosServiceSecurityToken kerberosToken) {
+            try {
+                Map<String, Key> secretKeys = kerberosToken.getSecretKey();
+                if (secretKeys != null) {
+                    for (String key : kerberosToken.getSecretKey().keySet()) {
+                        if (secretKeys.get(key) instanceof SecretKey) {
+                            return ((SecretKey)secretKeys.get(key)).getEncoded();
+                        }
+                    }
+                }
+            } catch (XMLSecurityException e) {
+                LOG.fine(e.getMessage());
+            }
+            return null;
         }
     }
     
