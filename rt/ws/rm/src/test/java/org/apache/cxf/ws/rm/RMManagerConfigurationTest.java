@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -72,6 +73,11 @@ public class RMManagerConfigurationTest extends Assert {
         bus = factory.createBus("org/apache/cxf/ws/rm/feature.xml");
         RMManager manager = bus.getExtension(RMManager.class);
         verifyManager(manager);
+
+        // verify additional properties not verified by verifyManager.
+        RetryPolicyType rmrp = manager.getSourcePolicy().getRetryPolicy();
+        assertNotNull(rmrp);
+        assertEquals(3, rmrp.getMaxRetries());
     }
     
     private void verifyManager(RMManager manager) {
