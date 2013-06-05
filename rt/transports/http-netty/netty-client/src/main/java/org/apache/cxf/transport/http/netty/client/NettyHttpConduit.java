@@ -29,9 +29,16 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.StringUtils;
@@ -42,6 +49,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
+import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -56,6 +64,7 @@ import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.ssl.SslHandler;
 
 public class NettyHttpConduit extends URLConnectionHTTPConduit {
     public static final String USE_ASYNC = "use.async.http.conduit";
@@ -137,6 +146,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         volatile HttpResponse httpResponse;
         volatile Throwable exception;
         volatile Channel channel;
+        volatile SSLSession session;
         boolean isAsync;
         ChannelBuffer outBuffer;
         OutputStream outputStream;
@@ -255,11 +265,24 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
 
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
+                
+                private final AtomicBoolean handshakeDone = new AtomicBoolean(false);
 
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         setChannel(future.getChannel());
+                        SslHandler sslHandler = channel.getPipeline().get(SslHandler.class);
+                        if (!handshakeDone.getAndSet(true) && (sslHandler != null)) {
+                            sslHandler.handshake().addListener(this);
+                            return;
+                        } else {
+                            if (sslHandler != null) {
+                                // setup the session for use
+                                session = sslHandler.getEngine().getSession();
+                            }
+                        }
+
                     } else {
                         setException((Exception) future.getCause());
                     }
@@ -291,8 +314,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 return null;
             }
             connect(true);
-            // TODO need to find a way to inject the SSLSession
-            /*
+           
             HostnameVerifier verifier;
             if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
                 verifier = HttpsURLConnection.getDefaultHostnameVerifier();
@@ -320,8 +342,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 peer = session.getPeerPrincipal();
             }
             
-            return new HttpsURLConnectionInfo(url, method, cipherSuite, localCerts, principal, serverCerts, peer);*/
-            return null;
+            return new HttpsURLConnectionInfo(url, method, cipherSuite, localCerts, principal, serverCerts, peer);
         }
 
         @Override
