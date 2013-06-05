@@ -274,14 +274,11 @@ public class RequestImplTest extends Assert {
         metadata.putSingle("If-Modified-Since", "Tue, 21 Oct 2008 14:00:00 GMT");
         
         Date lastModified = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
-            .parse("Mon, 20 Oct 2008 14:00:00 GMT");
+            .parse("Mon, 22 Oct 2008 14:00:00 GMT");
         
         ResponseBuilder rb = 
-            new RequestImpl(m).evaluatePreconditions(lastModified, new EntityTag("123"));
-        assertNotNull("Precondition is not met", rb);
-        
-        Response r = rb.build();
-        assertEquals("If-Modified-Since precondition was not met", 304, r.getStatus());
+            new RequestImpl(m).evaluatePreconditions(lastModified, new EntityTag("\"123\""));
+        assertNull("Precondition is not met", rb);
     }
     
     @Test
@@ -294,7 +291,7 @@ public class RequestImplTest extends Assert {
         
         ResponseBuilder rb = 
             new RequestImpl(m).evaluatePreconditions(lastModified, new EntityTag("124"));
-        assertNull("Dates must not be checked if tags do not match", rb);
+        assertNotNull("Dates must not be checked if tags do not match", rb);
     }
    
 }
