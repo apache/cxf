@@ -110,7 +110,7 @@
         <cxf.geronimo.servlet.version>1.0</cxf.geronimo.servlet.version>
         <cxf.geronimo.servlet25.version>1.1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
-        <cxf.javax.ws.rs.version>2.0-rc3</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.0</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
         <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
