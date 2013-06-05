@@ -845,8 +845,15 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 } else if (!MessageUtils.getContextualBoolean(message,
                                           "org.apache.cxf.ws.addressing.MAPAggregator.addressingDisabled",
                                           false)) {
-                    LOG.log(Level.WARNING, "CORRELATION_FAILURE_MSG");
-                    message.getInterceptorChain().abort();
+                    //see if it can directly be correlated with the out message:
+                    Message outmsg = message.getExchange().getOutMessage();
+                    AddressingProperties outp = outmsg != null 
+                        ? ContextUtils.retrieveMAPs(outmsg, false, true, false) : null;
+                    if (outp == null 
+                        || !outp.getMessageID().getValue().equals(maps.getRelatesTo().getValue())) {
+                        LOG.log(Level.WARNING, "CORRELATION_FAILURE_MSG");
+                        message.getInterceptorChain().abort();
+                    }
                 }
             }
         } else if (maps == null && isRequestor(message)) {
