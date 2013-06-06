@@ -19,30 +19,25 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
-import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -50,14 +45,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * OAuth2 Access Token Service implementation
  */
 @Path("/token")
-public class AccessTokenService extends AbstractOAuthService {
+public class AccessTokenService extends AbstractTokenService {
     private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
-    private boolean writeCustomErrors;
-    private boolean canSupportPublicClients;
-    
-    public void setWriteCustomErrors(boolean write) {
-        writeCustomErrors = write;
-    }
     
     /**
      * Sets the list of optional grant handlers
@@ -91,11 +80,7 @@ public class AccessTokenService extends AbstractOAuthService {
         try {
             serverToken = handler.createAccessToken(client, params);
         } catch (OAuthServiceException ex) {
-            OAuthError customError = ex.getError();
-            if (writeCustomErrors && customError != null) {
-                return createErrorResponseFromBean(customError);
-            }
-
+            return handleException(ex, OAuthConstants.INVALID_GRANT);
         }
         if (serverToken == null) {
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
@@ -122,71 +107,6 @@ public class AccessTokenService extends AbstractOAuthService {
     }
     
     /**
-     * Make sure the client is authenticated
-     */
-    private Client authenticateClientIfNeeded(MultivaluedMap<String, String> params) {
-        Client client = null;
-        SecurityContext sc = getMessageContext().getSecurityContext();
-        
-        if (params.containsKey(OAuthConstants.CLIENT_ID)) {
-            // both client_id and client_secret are expected in the form payload
-            client = getAndValidateClient(params.getFirst(OAuthConstants.CLIENT_ID),
-                                          params.getFirst(OAuthConstants.CLIENT_SECRET));
-        } else if (sc.getUserPrincipal() != null) {
-            // client has already authenticated
-            Principal p = sc.getUserPrincipal();
-            String scheme = sc.getAuthenticationScheme();
-            if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(scheme)) {
-                // section 2.3.1
-                client = getClient(p.getName());
-            } else {
-                // section 2.3.2
-                // the client has authenticated itself using some other scheme
-                // in which case the mapping between the scheme and the client_id
-                // should've been done and the client_id is expected
-                // on the current message
-                Object clientIdProp = getMessageContext().get(OAuthConstants.CLIENT_ID);
-                if (clientIdProp != null) {
-                    client = getClient(clientIdProp.toString());
-                    // TODO: consider matching client.getUserSubject().getLoginName() 
-                    // against principal.getName() ?
-                }
-            }
-        } else {
-            // the client id and secret are expected to be in the Basic scheme data
-            String[] parts = 
-                AuthorizationUtils.getAuthorizationParts(getMessageContext());
-            if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(parts[0])) {
-                String[] authInfo = AuthorizationUtils.getBasicAuthParts(parts[1]);
-                client = getAndValidateClient(authInfo[0], authInfo[1]);
-            }
-        }
-        
-        if (client == null) {
-            throw new NotAuthorizedException(Response.status(401).build());
-        }
-        return client;
-    }
-    
-    // Get the Client and check the id and secret
-    private Client getAndValidateClient(String clientId, String clientSecret) {
-        Client client = getClient(clientId);
-        if (canSupportPublicClients 
-            && !client.isConfidential() 
-            && client.getClientSecret() == null 
-            && client.getRedirectUris().isEmpty()
-            && clientSecret == null) {
-            return client;
-        }
-        if (clientSecret == null || client.getClientSecret() == null 
-            || !client.getClientId().equals(clientId) 
-            || !client.getClientSecret().equals(clientSecret)) {
-            throw new NotAuthorizedException(Response.status(401).build());
-        }
-        return client;
-    }
-    
-    /**
      * Find the mathcing grant handler
      */
     protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {
@@ -209,38 +129,5 @@ public class AccessTokenService extends AbstractOAuthService {
         }
         
         return null;
-    }
-    
-    protected Response createErrorResponse(MultivaluedMap<String, String> params,
-                                           String error) {
-        return createErrorResponseFromBean(new OAuthError(error));
-    }
-    
-    protected Response createErrorResponseFromBean(OAuthError errorBean) {
-        return Response.status(400).entity(errorBean).build();
-    }
-    
-    /**
-     * Get the {@link Client} reference
-     * @param clientId the provided client id
-     * @return Client the client reference 
-     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found
-     */
-    protected Client getClient(String clientId) {
-        Client client = null;
-        try {
-            client = getValidClient(clientId);
-        } catch (OAuthServiceException ex) {
-            // log it
-        }
-        if (client == null) {
-            reportInvalidRequestError("Client ID is invalid");
-        }
-        return client;
-        
-    }
-    
-    public void setCanSupportPublicClients(boolean support) {
-        this.canSupportPublicClients = support;
     }
 }

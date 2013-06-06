@@ -86,11 +86,20 @@ public interface OAuthDataProvider {
         throws OAuthServiceException;
 
     /**
-     * Removes the token
+     * Removes the access token
+     * The runtime will call this method if it finds that a token has expired
      * @param accessToken the token
      * @throws OAuthServiceException
      */
     void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;
+    
+    /**
+     * Revokes a refresh or access token
+     * @param token token identifier
+     * @param tokenTypeHint 
+     * @throws OAuthServiceException
+     */
+    void revokeToken(Client client, String token, String tokenTypeHint) throws OAuthServiceException;
 
     /**
      * Converts the requested scope to the list of permissions  

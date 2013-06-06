@@ -98,6 +98,11 @@ public final class OAuthConstants {
     public static final String INVALID_SCOPE = "invalid_scope";
     public static final String ACCESS_DENIED = "access_denied";
     
+    // Token Revocation
+    public static final String REVOKED_TOKEN_ID = "token";
+    public static final String REVOKED_TOKEN_TYPE_HINT = "token_type_hint";
+    public static final String UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
+    
     // CXF-Specific parameters
     public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
     // End Of CXF-Specific
