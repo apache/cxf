@@ -103,7 +103,7 @@
         <cxf.httpcomponents.core.version.range>[4.2.1,4.3.0)</cxf.httpcomponents.core.version.range>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.mina.version>2.0.7</cxf.mina.version>
-        <cxf.javax.annotation-api.version>1.2-b02</cxf.javax.annotation-api.version>
+        <cxf.javax.annotation-api.version>1.2-b04</cxf.javax.annotation-api.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
