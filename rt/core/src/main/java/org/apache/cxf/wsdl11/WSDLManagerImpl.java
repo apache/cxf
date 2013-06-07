@@ -260,8 +260,14 @@ public class WSDLManagerImpl implements WSDLManager {
     private void registerInitialXmlExtensions(String resource) throws BusException {
         Properties initialExtensions = null;
         try {
-            initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
-                  this.getClass().getClassLoader());
+            ClassLoader cl = null;
+            if (bus != null) {
+                cl = bus.getExtension(ClassLoader.class);
+            }
+            if (cl != null) {
+                initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, cl);
+            }
+            
             //use TCCL as fallback so that can load resources from other bundles in OSGi
             if (initialExtensions == null || initialExtensions.size() == 0) {
                 initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
