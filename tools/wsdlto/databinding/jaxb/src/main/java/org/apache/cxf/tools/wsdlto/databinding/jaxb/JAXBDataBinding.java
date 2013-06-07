@@ -727,7 +727,13 @@ public class JAXBDataBinding implements DataBindingProfile {
                 is.setPublicId(key);
                 opts.addGrammar(is);
                 try {
-                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele, key));
+                    XMLStreamReader reader = new StreamReaderDelegate(StaxUtils.createXMLStreamReader(ele, key)) {
+                        public int next() throws XMLStreamException {
+                            int i = super.next();
+                            return i == XMLStreamReader.CDATA ? XMLStreamReader.CHARACTERS : i;
+                        }
+                    };
+                    schemaCompiler.parseSchema(key, reader);
                 } catch (XMLStreamException e) {
                     throw new RuntimeException(e);
                 }
