@@ -43,7 +43,7 @@
 			</bean>
 		</simple:dataBinding>
 		<simple:serviceFactory>
-			<bean class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+			<bean class='org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean'>
 
 			</bean>
 		</simple:serviceFactory>

@@ -40,11 +40,11 @@ import org.apache.cxf.jaxws.service.HelloExcludeImpl;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.junit.Test;
 

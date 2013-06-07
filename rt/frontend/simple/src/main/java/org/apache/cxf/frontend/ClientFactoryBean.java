@@ -28,11 +28,11 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.service.factory.FactoryBeanListener;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {

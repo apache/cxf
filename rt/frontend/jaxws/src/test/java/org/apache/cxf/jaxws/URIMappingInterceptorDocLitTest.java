@@ -37,11 +37,12 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
+
 import org.junit.Before;
 import org.junit.Test;
 

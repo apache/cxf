@@ -49,9 +49,9 @@ import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 /**
  * Factory for creating JAX-WS proxies, This class provides access to the 

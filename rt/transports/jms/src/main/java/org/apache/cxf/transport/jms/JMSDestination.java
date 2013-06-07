@@ -63,7 +63,7 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.continuations.JMSContinuation;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.springframework.jms.connection.JmsResourceHolder;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;

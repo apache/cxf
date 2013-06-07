@@ -57,7 +57,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 /**
  * Perform databinding of the SOAP headers.

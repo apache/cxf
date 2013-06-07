@@ -57,6 +57,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.discovery.wsdl.AppSequenceType;
@@ -70,7 +71,6 @@ import org.apache.cxf.ws.discovery.wsdl.ResolveMatchType;
 import org.apache.cxf.ws.discovery.wsdl.ResolveMatchesType;
 import org.apache.cxf.ws.discovery.wsdl.ResolveType;
 import org.apache.cxf.ws.discovery.wsdl.ScopesType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 /**
  * 

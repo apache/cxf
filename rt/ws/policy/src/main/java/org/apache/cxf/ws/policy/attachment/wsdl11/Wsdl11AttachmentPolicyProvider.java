@@ -49,7 +49,6 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.attachment.AbstractPolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.LocalServiceModelReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
-import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyReference;
@@ -302,7 +301,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         if (null == di) {
             return null;
         }
-        Definition def = (Definition)di.getProperty(WSDLServiceBuilder.WSDL_DEFINITION);
+        Definition def = (Definition)di.getProperty("org.apache.cxf.wsdl11.WSDLServiceBuilder.DEFINITION");
         if (null == def) {
             return null;
         }

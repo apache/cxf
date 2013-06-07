@@ -32,7 +32,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.service.factory.FactoryBeanListener;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.invoker.FactoryInvoker;
@@ -41,6 +40,7 @@ import org.apache.cxf.service.invoker.SingletonFactory;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 

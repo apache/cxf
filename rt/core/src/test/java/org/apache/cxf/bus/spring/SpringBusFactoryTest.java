@@ -48,7 +48,6 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
-import org.apache.cxf.wsdl.WSDLManager;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -71,7 +70,6 @@ public class SpringBusFactoryTest extends Assert {
         assertNotNull("No resource manager", bus.getExtension(ResourceManager.class));
         assertNotNull("No destination factory manager", bus.getExtension(DestinationFactoryManager.class));
         assertNotNull("No conduit initiator manager", bus.getExtension(ConduitInitiatorManager.class));
-        assertNotNull("No wsdl manager", bus.getExtension(WSDLManager.class));
         assertNotNull("No phase manager", bus.getExtension(PhaseManager.class));
         assertNotNull("No workqueue manager", bus.getExtension(WorkQueueManager.class));
         assertNotNull("No lifecycle manager", bus.getExtension(BusLifeCycleManager.class));

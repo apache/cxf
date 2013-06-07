@@ -37,6 +37,7 @@ import javax.jws.WebService;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
@@ -86,7 +87,6 @@ import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -95,9 +95,10 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl.http.AddressType;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
 public class ServiceImpl extends ServiceDelegate {
@@ -189,6 +190,8 @@ public class ServiceImpl extends ServiceDelegate {
                         address = ((SOAP12Address)e).getLocationURI();
                     } else if (e instanceof SOAPAddress) {
                         address = ((SOAPAddress)e).getLocationURI();                        
+                    } else if (e instanceof HTTPAddress) {
+                        address = ((HTTPAddress)e).getLocationURI();
                     }
                 }
                 addPort(name, bindingID, address);

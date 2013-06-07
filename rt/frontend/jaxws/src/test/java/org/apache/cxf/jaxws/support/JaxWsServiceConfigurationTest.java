@@ -34,11 +34,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;

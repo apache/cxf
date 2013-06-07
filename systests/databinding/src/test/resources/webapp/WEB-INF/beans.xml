@@ -57,13 +57,13 @@ http://cxf.apache.org/schemas/jaxws.xsd">
       <bean class="org.apache.cxf.authservice.AuthServiceImpl" />
     </simple:serviceBean>
     <simple:serviceFactory>
-    	<bean class="org.apache.cxf.service.factory.ReflectionServiceFactoryBean">
+    	<bean class="org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean">
     		<property name="serviceConfigurations">
     			<list>
     				<bean class="org.apache.cxf.aegis.databinding.AegisServiceConfiguration">
     					<property name="serviceNamespace" value="http://foo.bar.com"/>
     				</bean>
-    				<bean class="org.apache.cxf.service.factory.DefaultServiceConfiguration"/>
+    				<bean class="org.apache.cxf.wsdl.service.factory.DefaultServiceConfiguration"/>
     			</list>
     		</property>
     	</bean>

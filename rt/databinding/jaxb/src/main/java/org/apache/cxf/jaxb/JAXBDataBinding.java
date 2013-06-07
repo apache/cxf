@@ -83,7 +83,6 @@ import org.apache.cxf.jaxb.io.DataWriterImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -221,11 +220,10 @@ public class JAXBDataBinding extends AbstractDataBinding
         contextClasses.addAll(Arrays.asList(classes));
         setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
     }
-    public JAXBDataBinding(ReflectionServiceFactoryBean b) throws JAXBException {
-        this(b.isQualifyWrapperSchema());
-        Map<String, Object> props = b.getProperties();
+    public JAXBDataBinding(boolean qualified, Map<String, Object> props) throws JAXBException {
+        this(qualified);
         if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-            Object o = b.getProperties().get("jaxb.additionalContextClasses");
+            Object o = props.get("jaxb.additionalContextClasses");
             if (o instanceof Class) {
                 o = new Class[] {(Class<?>)o};
             }

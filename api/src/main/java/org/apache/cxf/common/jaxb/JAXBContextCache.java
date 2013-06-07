@@ -146,9 +146,11 @@ public final class JAXBContextCache {
         JAXBUtils.scanPackages(classes, OBJECT_FACTORY_CACHE);
     }
     
-    public static CachedContextAndSchemas getCachedContextAndSchemas(Class<?> cls) throws JAXBException {
+    public static CachedContextAndSchemas getCachedContextAndSchemas(Class<?> ... cls) throws JAXBException {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(cls);
+        for (Class<?> c : cls) {
+            classes.add(c);
+        }
         scanPackages(classes);
         return JAXBContextCache.getCachedContextAndSchemas(classes, null, null, null, false);
     }

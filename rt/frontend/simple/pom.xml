@@ -36,6 +36,7 @@
     <properties>
         <cxf.osgi.import>
             org.apache.aries*;version="${cxf.aries.version.range}",
+            com.sun.tools*;resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
     </properties>
@@ -106,10 +107,22 @@
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-wsdl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>

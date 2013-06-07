@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
@@ -46,6 +45,8 @@ import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
+import org.apache.cxf.wsdl.WSDLHelper;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

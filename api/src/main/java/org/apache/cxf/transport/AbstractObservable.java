@@ -25,7 +25,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public abstract class AbstractObservable implements Observable {
 

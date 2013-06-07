@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 @WebService(serviceName = "NumberService", 
             endpointInterface = "org.apache.cxf.factory_pattern.Number", 

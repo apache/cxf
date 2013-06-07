@@ -174,7 +174,7 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
             binding.addExtensibilityElement(getWSDLPlugin("xml", Binding.class).createExtension(null));
         } catch (WSDLException wse) {
             Message msg = new Message("FAIL_TO_CREATE_XMLBINDING", LOG);
-            throw new ToolException(msg);
+            throw new ToolException(msg, wse);
         }
     }
 

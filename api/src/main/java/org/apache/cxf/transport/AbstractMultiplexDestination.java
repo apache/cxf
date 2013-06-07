@@ -27,8 +27,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
 
 public abstract class AbstractMultiplexDestination extends AbstractDestination implements

@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
 
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class WebServiceProviderConfiguration extends JaxWsServiceConfiguration {
 

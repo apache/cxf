@@ -36,7 +36,6 @@ public class XFireXmlParamTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
     private Java5TypeCreator creator;
 
-    @SuppressWarnings("deprecation")
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -44,7 +43,7 @@ public class XFireXmlParamTypeTest extends AbstractAegisTest {
         tm = new DefaultTypeMapping(null, DefaultTypeMapping.createDefaultTypeMapping(false, false));
         creator = new Java5TypeCreator();
         creator.setNextCreator(new DefaultTypeCreator());
-        creator.setConfiguration(new org.apache.cxf.aegis.type.Configuration());
+        creator.setConfiguration(new org.apache.cxf.aegis.type.TypeCreationOptions());
         tm.setTypeCreator(creator);
     }
 

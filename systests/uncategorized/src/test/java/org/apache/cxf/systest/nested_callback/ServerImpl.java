@@ -32,7 +32,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.nested_callback.CallbackPortType;

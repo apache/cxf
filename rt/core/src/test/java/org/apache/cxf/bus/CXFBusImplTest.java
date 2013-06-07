@@ -32,7 +32,6 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.wsdl.WSDLManager;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
@@ -47,7 +46,6 @@ public class CXFBusImplTest extends Assert {
         assertNotNull(bus.getExtension(BindingFactoryManager.class));
         assertNotNull(bus.getExtension(ConduitInitiatorManager.class));   
         assertNotNull(bus.getExtension(DestinationFactoryManager.class));
-        assertNotNull(bus.getExtension(WSDLManager.class));
         assertNotNull(bus.getExtension(PhaseManager.class));
     }
     
@@ -56,7 +54,6 @@ public class CXFBusImplTest extends Assert {
         
         IMocksControl control;
         BindingFactoryManager bindingFactoryManager;
-        WSDLManager wsdlManager;
         InstrumentationManager instrumentationManager;
         PhaseManager phaseManager;
         
@@ -64,19 +61,16 @@ public class CXFBusImplTest extends Assert {
         
         Map<Class<?>, Object> extensions = new HashMap<Class<?>, Object>();
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        wsdlManager = control.createMock(WSDLManager.class);
         instrumentationManager = control.createMock(InstrumentationManager.class);
         phaseManager = control.createMock(PhaseManager.class);
         
         extensions.put(BindingFactoryManager.class, bindingFactoryManager);
-        extensions.put(WSDLManager.class, wsdlManager);
         extensions.put(InstrumentationManager.class, instrumentationManager);
         extensions.put(PhaseManager.class, phaseManager);
         
         Bus bus = new ExtensionManagerBus(extensions);
         
         assertSame(bindingFactoryManager, bus.getExtension(BindingFactoryManager.class));
-        assertSame(wsdlManager, bus.getExtension(WSDLManager.class));
         assertSame(instrumentationManager, bus.getExtension(InstrumentationManager.class));
         assertSame(phaseManager, bus.getExtension(PhaseManager.class));
   

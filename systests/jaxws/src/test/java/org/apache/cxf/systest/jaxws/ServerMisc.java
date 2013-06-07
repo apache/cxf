@@ -29,12 +29,12 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolderImpl;
-import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.PerRequestFactory;
 import org.apache.cxf.service.invoker.PooledFactory;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 
 
 public class ServerMisc extends AbstractBusTestServerBase {

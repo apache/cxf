@@ -42,7 +42,6 @@ import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.ObjectFactory;
 import org.apache.cxf.ws.addressing.v200408.Relationship;
 import org.apache.cxf.ws.addressing.v200408.ServiceNameType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 /**
  * This class is responsible for transforming between the native 

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.addressing.impl;
 
-import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.bind.JAXBException;
 
 import org.apache.cxf.Bus;
@@ -42,7 +41,7 @@ public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader 
     }
     public void createExtensor(WSDLManager manager,
                                 Class<?> parentType,
-                                Class<? extends ExtensibilityElement> elementType) {
+                                Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
                                               parentType, 

@@ -26,9 +26,9 @@ import org.w3c.dom.Node;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Test;
 

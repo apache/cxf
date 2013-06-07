@@ -104,17 +104,25 @@ public class ASMHelper {
         public static int CHECKCAST = 0;
         public static int INVOKEINTERFACE = 0;
         public static int GETFIELD = 0;
+        public static int GETSTATIC = 0;
         public static int ASTORE = 0;
         public static int PUTFIELD = 0;
+        public static int PUTSTATIC = 0;
         public static int RETURN = 0;
+        public static int F_APPEND = 0;
+        public static int F_SAME = 0;
+        public static int F_SAME1 = 0;
         public static int INVOKESPECIAL = 0;
         public static int ACC_PUBLIC = 0;
         public static int ACC_FINAL = 0;
         public static int ACC_SUPER = 0;
         public static int ACC_PRIVATE = 0;
+        public static int ACC_STATIC = 0;
         public static int V1_5 = 0;
+        public static int V1_6 = 0;
         public static int ACC_ABSTRACT = 0;
         public static int ACC_INTERFACE = 0;
+        public static int ACC_SYNTHETIC = 0;
         public static int ILOAD = 0;
         public static int IRETURN = 0;
         public static int NEW = 0;
@@ -153,7 +161,7 @@ public class ASMHelper {
         return buf.toString();
     }
     
-    protected static String periodToSlashes(String s) {
+    public static String periodToSlashes(String s) {
         char ch[] = s.toCharArray();
         for (int x = 0; x < ch.length; x++) {
             if (ch[x] == '.') {
@@ -433,6 +441,10 @@ public class ASMHelper {
         void visitFieldInsn(int getfield, String periodToSlashes,
                             String string, String string2);
         void visitJumpInsn(int ifnonnull, @UnwrapParam(typeMethodName = "realType") Label nonNullLabel);
+        void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack);
+        
+        @WrapReturn(AnnotationVisitor.class)
+        AnnotationVisitor visitAnnotation(String cls, boolean b);
     }
     public interface AnnotationVisitor {
         void visit(String arg0, @UnwrapParam(typeMethodName = "realType") ASMType arg1);

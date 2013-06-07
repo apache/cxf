@@ -20,14 +20,21 @@ package org.apache.cxf.tools.java2ws;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
+import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 
+import junit.framework.AssertionFailedError;
+
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
 import org.junit.After;
 import org.junit.Before;
@@ -39,12 +46,6 @@ public class AegisTest extends ToolTestBase {
     private String cp;
     private File inputData;
     
-    private void checkStdErr() {
-        String err = getStdErr();
-        if (err != null) {
-            assertEquals("errors: ", "", err);
-        }
-    }
 
     @Before
     public void startUp() throws Exception {
@@ -80,21 +81,18 @@ public class AegisTest extends ToolTestBase {
         File wsdlFile = null;
         wsdlFile = outputFile("aegis.wsdl");
         JavaToWS.main(args);
-        checkStdErr();
         assertTrue("wsdl is not generated", wsdlFile.exists());
     
         WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
         Definition def = reader.readWSDL(wsdlFile.toURI().toURL().toString());
         Document wsdl = WSDLFactory.newInstance().newWSDLWriter().getDocument(def);
-        addNamespace("ns0", "http://aegis2ws.fortest.tools.cxf.apache.org/");
         assertValid("//xsd:element[@type='ns0:Something']", wsdl);
     }
     
     @Test 
-    @org.junit.Ignore("Failed on Windows Vista")
     public void testAegisReconfigureDatabinding() throws Exception {
-        final String sei = "org.apache.cxf.tools.fortest.aegis2ws.TestAegisSEI";
+        final String sei = org.apache.cxf.tools.fortest.aegis2ws.TestAegisSEI.class.getName();
         String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/aegis.wsdl", 
                                       "-beans",
                                       new File(inputData, "revisedAegisDefaultBeans.xml").
@@ -105,21 +103,43 @@ public class AegisTest extends ToolTestBase {
         File wsdlFile = null;
         wsdlFile = outputFile("aegis.wsdl");
         JavaToWS.main(args);
-        checkStdErr();
         assertTrue("wsdl is not generated", wsdlFile.exists());
     
         WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
         Definition def = reader.readWSDL(wsdlFile.toURI().toURL().toString());
         Document wsdl = WSDLFactory.newInstance().newWSDLWriter().getDocument(def);
-        addNamespace("ns0", "http://aegis2ws.fortest.tools.cxf.apache.org/");
         assertValid("//xsd:element[@type='ns0:Something']", wsdl);
-        assertXPathEquals("//xsd:complexType[@name='Something']/" 
-                          + "xsd:sequence/xsd:element[@name='multiple']/@minOccurs", 
-                          "50", wsdl);
-        assertInvalid("//xsd:complexType[@name='Something']/" 
-                          + "xsd:sequence/xsd:element[@name='singular']/@minOccurs", 
-                          wsdl);
+        XPathUtils xpu = new XPathUtils(getNSMap());
+        
+        String s = (String)xpu.getValue("//xsd:complexType[@name='takeSomething']/"
+                                + "xsd:sequence/xsd:element[@name='arg0']/@minOccurs",
+                                wsdl, XPathConstants.STRING);
+        assertEquals("50", s);
+        assertFalse(xpu.isExist("//xsd:complexType[@name='Something']/xsd:sequence/"
+                                + "xsd:element[@name='singular']/@minOccurs",
+                         wsdl, XPathConstants.NODE));
     }
 
+
+    private Map<String, String> getNSMap() {
+        Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
+        namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        namespaces.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        namespaces.put("wsdlsoap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        namespaces.put("soap", "http://schemas.xmlsoap.org/soap/");
+        namespaces.put("soap12env", "http://www.w3.org/2003/05/soap-envelope");
+        namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
+        namespaces.put("ns0", "http://aegis2ws.fortest.tools.cxf.apache.org/");
+        return namespaces;
+    }
+    
+    private void assertValid(String xpathExpression, Document doc) {
+        XPathUtils xpu = new XPathUtils(getNSMap());
+        if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
+            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
+                                           + " from document:\n" + XMLUtils.toString(doc));
+        }
+    }    
 }

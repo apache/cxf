@@ -23,7 +23,6 @@ import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.transport.AbstractDestination;
-import org.apache.cxf.wsdl.WSDLLibrary;
 import org.apache.cxf.wsdl.http.AddressType;
 
 public final class BaseUrlHelper {
@@ -58,8 +57,7 @@ public final class BaseUrlHelper {
 
     public static void setAddress(AbstractDestination dest, String absAddress) {
         dest.getEndpointInfo().setAddress(absAddress);
-        if (WSDLLibrary.isAvailable() 
-            && dest.getEndpointInfo().getExtensor(AddressType.class) != null) {
+        if (dest.getEndpointInfo().getExtensor(AddressType.class) != null) {
             dest.getEndpointInfo().getExtensor(AddressType.class).setLocation(absAddress);
         }
     }

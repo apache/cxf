@@ -43,7 +43,6 @@ import javax.wsdl.extensions.mime.MIMEPart;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -108,13 +107,14 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl.binding.AbstractWSDLBindingFactory;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 
 
 @NoJSR250Annotations(unlessNull = { "bus" })
-public class SoapBindingFactory extends AbstractBindingFactory {
+public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://schemas.xmlsoap.org/soap/",
         "http://schemas.xmlsoap.org/wsdl/soap/",

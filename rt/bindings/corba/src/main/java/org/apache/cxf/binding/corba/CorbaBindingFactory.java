@@ -30,7 +30,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultInInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultOutInterceptor;
@@ -49,9 +48,10 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.wsdl.binding.AbstractWSDLBindingFactory;
 
 @NoJSR250Annotations(unlessNull = { "bus" })
-public class CorbaBindingFactory extends AbstractBindingFactory
+public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     implements ConduitInitiator, DestinationFactory {
 
     public static final Collection<String> DEFAULT_NAMESPACES 

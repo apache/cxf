@@ -21,11 +21,11 @@ package org.apache.cxf.frontend;
 import java.io.File;
 
 import org.apache.cxf.service.ServiceBuilder;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public abstract class AbstractServiceFactory extends AbstractWSDLBasedEndpointFactory implements

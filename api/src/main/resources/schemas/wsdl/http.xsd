@@ -35,44 +35,32 @@ No other rights are granted by implication, estoppel or otherwise.
         xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
         targetNamespace="http://schemas.xmlsoap.org/wsdl/http/">
 
-	<import namespace = "http://schemas.xmlsoap.org/wsdl/" 
-        schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
-
    	<element name="address" type="http:addressType"/>
 
    	<complexType name="addressType">
-		<complexContent>
-		<extension base="wsdl:tExtensibilityElement">
-			<sequence/>
-   			<attribute name="location" type="anyURI" use="required"/>
-		</extension>
-		</complexContent>
+		<sequence/>
+		<attribute name="location" type="anyURI" use="required"/>
+        <anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
    	</complexType>
 
    	<element name="binding" type="http:bindingType"/>
    	<complexType name="bindingType">
-		<complexContent>
-		<extension base="wsdl:tExtensibilityElement">
-			<sequence/>
-	      		<attribute name="verb" type="NMTOKEN" use="required"/>
-		</extension>
-		</complexContent>
+		<sequence/>
+   		<attribute name="verb" type="NMTOKEN" use="required"/>
+        <anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
    	</complexType>
 
    	<element name="operation" type="http:operationType"/>
    	<complexType name="operationType">
-		<complexContent>
-		<extension base="wsdl:tExtensibilityElement">
-			<sequence/>
-	      		<attribute name="location" type="anyURI" use="required"/>
-		</extension>
-		</complexContent>
+    	<sequence/>
+		<attribute name="location" type="anyURI" use="required"/>
+        <anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
 	</complexType>
 
    	<element name="urlEncoded">
-      		<complexType/>  		
+   		<complexType/>  		
    	</element>
    	<element name="urlReplacement">
-      		<complexType/>
-     	</element>
+   		<complexType/>
+   	</element>
 </schema>

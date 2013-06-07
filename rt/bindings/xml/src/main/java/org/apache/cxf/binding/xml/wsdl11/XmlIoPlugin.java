@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.wsdl.AbstractWSDLPlugin;
+import org.apache.cxf.wsdl.JAXBExtensibilityElement;
 
 public final class XmlIoPlugin extends AbstractWSDLPlugin {
 
@@ -36,8 +37,13 @@ public final class XmlIoPlugin extends AbstractWSDLPlugin {
         Class<?> clz = getOption(args, Class.class);
         QName qname = getOption(args, QName.class);
 
-        xmlFormat = (XMLBindingMessageFormat)registry.createExtension(clz, ToolConstants.XML_FORMAT);
+        ExtensibilityElement ext = registry.createExtension(clz, ToolConstants.XML_FORMAT);
+        if (ext instanceof JAXBExtensibilityElement) {
+            xmlFormat = (XMLBindingMessageFormat)((JAXBExtensibilityElement)ext).getValue();
+        } else {
+            xmlFormat = (XMLBindingMessageFormat)ext;
+        }
         xmlFormat.setRootNode(qname);
-        return xmlFormat;
+        return ext;
     }
 }

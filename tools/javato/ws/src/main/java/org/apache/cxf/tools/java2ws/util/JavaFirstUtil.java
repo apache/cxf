@@ -24,7 +24,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -35,6 +34,7 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaReturn;
 import org.apache.cxf.tools.common.model.JavaType.Style;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public final class JavaFirstUtil {
     private JavaFirstUtil() {

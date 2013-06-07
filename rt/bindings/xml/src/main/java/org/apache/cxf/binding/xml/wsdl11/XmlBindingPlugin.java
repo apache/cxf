@@ -24,18 +24,12 @@ import javax.wsdl.Binding;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 
-import org.apache.cxf.bindings.xformat.XMLFormatBinding;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.wsdl.AbstractWSDLPlugin;
 
 public final class XmlBindingPlugin extends AbstractWSDLPlugin {
 
     public ExtensibilityElement createExtension(final Map<String, Object> args) throws WSDLException {
-        XMLFormatBinding xmlBinding = null;
-
-        xmlBinding = (XMLFormatBinding)registry.createExtension(Binding.class,
-                                                                ToolConstants.XML_BINDING_FORMAT);
-
-        return xmlBinding;
+        return registry.createExtension(Binding.class, ToolConstants.XML_BINDING_FORMAT);
     }
 }

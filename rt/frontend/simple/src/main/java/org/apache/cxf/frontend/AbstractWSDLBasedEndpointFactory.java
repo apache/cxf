@@ -35,9 +35,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.FactoryBeanListener;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -48,6 +46,8 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointFactory {

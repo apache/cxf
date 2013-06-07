@@ -37,13 +37,13 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public WrapperClassOutInterceptor() {

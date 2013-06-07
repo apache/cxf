@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -49,8 +48,6 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";
-    public static final String BUS_EXTENSION_RESOURCE_XML = "META-INF/cxf/bus-extensions.xml";
-    public static final String BUS_EXTENSION_RESOURCE_OLD_XML = "bus-extensions.xml";
     public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.txt";
     
     private final ClassLoader loader;
@@ -61,8 +58,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
     public ExtensionManagerImpl(ClassLoader cl, Map<Class<?>, Object> initialExtensions, 
                                 ResourceManager rm, Bus b) {
-        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_XML,
-                           BUS_EXTENSION_RESOURCE_OLD_XML},
+        this(new String[] {BUS_EXTENSION_RESOURCE},
                  cl, initialExtensions, rm, b);
     }
     public ExtensionManagerImpl(String resource, 
@@ -153,7 +149,6 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         load(resource, loader);
     }
-    @SuppressWarnings("deprecation")
     final synchronized void load(String resource, ClassLoader l) throws IOException {
         
         Enumeration<URL> urls = l.getResources(resource);
@@ -162,14 +157,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             URL url = urls.nextElement();
             InputStream is = url.openStream();
             try {
-                List<Extension> exts;
-                if (resource.endsWith("xml")) {
-                    LOG.log(Level.WARNING, "DEPRECATED_EXTENSIONS", 
-                            new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
-                    exts = new XmlExtensionFragmentParser().getExtensions(is);
-                } else {
-                    exts = new TextExtensionFragmentParser().getExtensions(is);
-                }
+                List<Extension> exts = new TextExtensionFragmentParser().getExtensions(is);
                 for (Extension e : exts) {
                     if (loader != l) {
                         e.classloader = l;

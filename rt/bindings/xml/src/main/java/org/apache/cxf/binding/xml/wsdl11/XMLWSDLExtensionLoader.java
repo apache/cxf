@@ -24,7 +24,6 @@ import javax.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
-import org.apache.cxf.wsdl.TExtensibilityElementImpl;
 import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
@@ -53,7 +52,7 @@ public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
     
     public static void createExtensor(WSDLManager manager,
                                 Class<?> parentType,
-                                Class<? extends TExtensibilityElementImpl> elementType) {
+                                Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
                                               parentType, 

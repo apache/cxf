@@ -69,10 +69,8 @@ import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
-import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.FactoryBeanListener.Event;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
@@ -86,6 +84,8 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 /**

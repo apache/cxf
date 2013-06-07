@@ -45,7 +45,6 @@ import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 import static org.apache.cxf.message.Message.ASYNC_POST_RESPONSE_DISPATCH;
 import static org.apache.cxf.message.Message.REQUESTOR_ROLE;

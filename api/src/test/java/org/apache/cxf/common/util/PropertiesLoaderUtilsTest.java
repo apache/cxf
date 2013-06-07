@@ -53,13 +53,4 @@ public class PropertiesLoaderUtilsTest extends Assert {
 
     }
 
-    @Test
-    public void testGetPropertyNames() throws Exception {
-        Collection<String> names = PropertiesLoaderUtils.getPropertyNames(properties, soapBindingFactory);
-        assertNotNull(names);
-        assertEquals(3, names.size());
-        assertTrue(names.contains("http://schemas.xmlsoap.org/wsdl/soap/"));
-        assertTrue(names.contains("http://schemas.xmlsoap.org/wsdl/soap/http"));
-        assertTrue(names.contains("http://cxf.apache.org/transports/jms"));
-    }
 }

@@ -24,30 +24,22 @@
 	elementFormDefault="qualified"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0">
 
-	<xs:import namespace="http://schemas.xmlsoap.org/wsdl/" 
-        schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" />
-
 	<xs:complexType name="XMLBindingMessageFormat">
-		<xs:complexContent>
-			<xs:extension base="wsdl:tExtensibilityElement">
-				<xs:sequence />
-				<xs:attribute name="rootNode" type="xs:QName"
-					use="optional">
-					<xs:annotation>
-						<xs:documentation>Specifies the QName of the root element used to wrap the message passed across the wire</xs:documentation>
-					</xs:annotation>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
+    
+		<xs:sequence />
+		<xs:attribute name="rootNode" type="xs:QName"
+			use="optional">
+			<xs:annotation>
+				<xs:documentation>Specifies the QName of the root element used to wrap the message passed across the wire</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+        <xs:anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
 	</xs:complexType>
 
 	
 	<xs:complexType name="XMLFormatBinding">
-		<xs:complexContent>
-			<xs:extension base="wsdl:tExtensibilityElement">
-				<xs:sequence />
-			</xs:extension>
-		</xs:complexContent>
+ 		<xs:sequence />
+        <xs:anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
 	</xs:complexType>
 
 	<xs:element name="body" type="xformat:XMLBindingMessageFormat">

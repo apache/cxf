@@ -41,11 +41,11 @@
     
     <xs:attribute name="Action" type="xs:anyURI"/>
     
-    <xs:element name="UsingAddressing">
-        <xs:complexType>
-            <xs:anyAttribute namespace="##other" processContents="lax"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="UsingAddressing" type="tns:UsingAddressing"/>
+    <xs:complexType name="UsingAddressing">
+        <xs:sequence/>
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
     
     <xs:simpleType name="AnonymousType">
         <xs:restriction base="xs:token">

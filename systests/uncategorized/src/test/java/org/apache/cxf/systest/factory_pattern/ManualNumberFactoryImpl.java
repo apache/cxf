@@ -27,7 +27,7 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 @WebService(serviceName = "NumberFactoryService", 
             portName = "NumberFactoryPort", 

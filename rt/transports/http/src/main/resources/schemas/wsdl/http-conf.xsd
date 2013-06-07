@@ -44,351 +44,345 @@
         <xs:annotation>
             <xs:documentation>Properties used for configuring a server-side HTTP prort</xs:documentation>
         </xs:annotation>
+        <xs:sequence></xs:sequence>
 
-        <xs:complexContent>
-            <xs:extension base="wsdl:tExtensibilityElement">
+        <xs:attribute name="ReceiveTimeout" type="xs:unsignedInt" use="optional" default="30000">
+            <xs:annotation>
+                <xs:documentation>
+                Receive timeout in milliseconds, 0 is infinite
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ReceiveTimeout" type="xs:unsignedInt" use="optional" default="30000">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Receive timeout in milliseconds, 0 is infinite
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="SuppressClientSendErrors" type="xs:boolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                When set to false, exceptions will be thrown when an error is encountered 
+                receiving a request from the client.  When set to true these errors will 
+                be suppressed. The default is false.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="SuppressClientSendErrors" type="xs:boolean" use="optional" default="false">
-                    <xs:annotation>
-                        <xs:documentation>
-                        When set to false, exceptions will be thrown when an error is encountered 
-                        receiving a request from the client.  When set to true these errors will 
-                        be suppressed. The default is false.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="SuppressClientReceiveErrors" type="xs:boolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                When set to false, exceptions will be thrown when an error is encountered 
+                sending a reply from to client.  When set to true these errors will be 
+                suppressed. The default is false.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="SuppressClientReceiveErrors" type="xs:boolean" use="optional" default="false">
-                    <xs:annotation>
-                        <xs:documentation>
-                        When set to false, exceptions will be thrown when an error is encountered 
-                        sending a reply from to client.  When set to true these errors will be 
-                        suppressed. The default is false.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="HonorKeepAlive" type="xs:boolean" use="optional" default="true">
+            <xs:annotation>
+                <xs:documentation>
+                When set to true, the request socket will remain open after the reply is 
+                sent to the client, if the client has requested keep-alive and is using 
+                at least version 1.1 of HTTP.  If set to false, the socket will be closed 
+                after each reply is sent, even if the client requests the server to keep 
+                the connection alive.  Keep-Alive improves performance for the client 
+                requesting such behavior, but can limit overall scalability of the server 
+                for handling many clients. The Default is true.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:attribute name="KeepAliveParameters" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                If KeepAlive connections are turned on, this allows sending additional
+                parameters back to the client via the Keep-Alive header.   Common 
+                parameters are timeout and max to specify how long the client should
+                hold open the connection and how many connections to hold open.   Different
+                clients may have different defaults.   For Java HTTPUrlConnection, the 
+                defaults would be timeout=5, max=5
+                                        
+                Example:  timeout=60, max=5;
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        
+        <xs:attribute name="RedirectURL" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                A URL to which clients are redirected (if the ReplyCode and ReplyDescription 
+                are not set, ReplyCode will be set to 302, and  ReplyDescription will be set 
+                to 'Object Moved').
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="HonorKeepAlive" type="xs:boolean" use="optional" default="true">
-                    <xs:annotation>
-                        <xs:documentation>
-                        When set to true, the request socket will remain open after the reply is 
-                        sent to the client, if the client has requested keep-alive and is using 
-                        at least version 1.1 of HTTP.  If set to false, the socket will be closed 
-                        after each reply is sent, even if the client requests the server to keep 
-                        the connection alive.  Keep-Alive improves performance for the client 
-                        requesting such behavior, but can limit overall scalability of the server 
-                        for handling many clients. The Default is true.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                <xs:attribute name="KeepAliveParameters" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        If KeepAlive connections are turned on, this allows sending additional
-                        parameters back to the client via the Keep-Alive header.   Common 
-                        parameters are timeout and max to specify how long the client should
-                        hold open the connection and how many connections to hold open.   Different
-                        clients may have different defaults.   For Java HTTPUrlConnection, the 
-                        defaults would be timeout=5, max=5
-                                                
-                        Example:  timeout=60, max=5;
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                
-                <xs:attribute name="RedirectURL" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        A URL to which clients are redirected (if the ReplyCode and ReplyDescription 
-                        are not set, ReplyCode will be set to 302, and  ReplyDescription will be set 
-                        to 'Object Moved').
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="CacheControl" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Most commonly used to specify no-cache, however the standard supports a 
+                dozen or so caching related directives for responses. 
+                </xs:documentation>
+            </xs:annotation>      
 
-                <xs:attribute name="CacheControl" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Most commonly used to specify no-cache, however the standard supports a 
-                        dozen or so caching related directives for responses. 
-                        </xs:documentation>
-                    </xs:annotation>      
+        </xs:attribute>
 
-                </xs:attribute>
+        <xs:attribute name="ContentLocation" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the URL representing the resource used to satisfy the request(e.g., to inform that default.htm document was used.)
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ContentLocation" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the URL representing the resource used to satisfy the request(e.g., to inform that default.htm document was used.)
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="ContentType" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the MIME type used for responses.  The default is set by the binding.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ContentType" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the MIME type used for responses.  The default is set by the binding.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="ContentEncoding" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies any additional encoding applied to the response. Values are specified using IANA labels.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ContentEncoding" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies any additional encoding applied to the response. Values are specified using IANA labels.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-
-                <xs:attribute name="ServerType" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies an optional value for the HTTP ServerType property.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+        <xs:attribute name="ServerType" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies an optional value for the HTTP ServerType property.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
+        
     </xs:complexType>
 
     <xs:complexType name="HTTPClientPolicy">
         <xs:annotation>
             <xs:documentation>Properties used to configure a client-side HTTP port</xs:documentation>
         </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="ConnectionTimeout" type="ptp:ParameterizedUInt" use="optional" default="30000">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. 0 is infinite.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-        <xs:complexContent>
-            <xs:extension base="wsdl:tExtensibilityElement">
+        <xs:attribute name="ReceiveTimeout" type="ptp:ParameterizedUInt" use="optional" default="60000">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. 0 is infinite.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ConnectionTimeout" type="ptp:ParameterizedUInt" use="optional" default="30000">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. 0 is infinite.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="AsyncExecuteTimeout" type="ptp:ParameterizedUInt" use="optional" default="5000">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the amount of time, in milliseconds, that a conduit will try and enqueue the response on the workqueue.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:attribute name="AsyncExecuteTimeoutRejection" type="ptp:ParameterizedBoolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies whether the conduit should throw and exception if it fails to enqueue the async response handling onto the workqueue. 
+                By default, if the conduit fails to enqueue the response handling on the workqueue, it will process the response on the current thread.  Set this to true to raise and exception instead.  
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        
+        <xs:attribute name="AutoRedirect" type="ptp:ParameterizedBoolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>
+               Specifies if the consumer will automatically follow a server issued redirection.
+                (name is not part of standard)
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ReceiveTimeout" type="ptp:ParameterizedUInt" use="optional" default="60000">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. 0 is infinite.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="MaxRetransmits" type="ptp:ParameterizedInt" use="optional" default="-1">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the maximum amount of retransmits that are allowed for redirects. Retransmits for 
+                authorization is included in the retransmit count. Each redirect may cause another 
+                retransmit for a UNAUTHORIZED response code, ie. 401. 
+                Any negative number indicates unlimited retransmits,
+                although, loop protection is provided. 
+                The default is unlimited. 
+                (name is not part of standard)
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="AsyncExecuteTimeout" type="ptp:ParameterizedUInt" use="optional" default="5000">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the amount of time, in milliseconds, that a conduit will try and enqueue the response on the workqueue.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                <xs:attribute name="AsyncExecuteTimeoutRejection" type="ptp:ParameterizedBoolean" use="optional" default="false">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies whether the conduit should throw and exception if it fails to enqueue the async response handling onto the workqueue. 
-                        By default, if the conduit fails to enqueue the response handling on the workqueue, it will process the response on the current thread.  Set this to true to raise and exception instead.  
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                
-                <xs:attribute name="AutoRedirect" type="ptp:ParameterizedBoolean" use="optional" default="false">
-                    <xs:annotation>
-                        <xs:documentation>
-                       Specifies if the consumer will automatically follow a server issued redirection.
-                        (name is not part of standard)
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="AllowChunking" type="ptp:ParameterizedBoolean" use="optional" default="true">
+            <xs:annotation>
+                <xs:documentation>
+                If true, the client is free to use chunking streams if it wants, but it is not 
+                required to use chunking streams. If false, the client 
+                must use regular, non-chunked requests in all cases.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:attribute name="ChunkingThreshold" type="ptp:ParameterizedInt" use="optional" default="4096">
+            <xs:annotation>
+                <xs:documentation>
+                If AllowChunking is true, this sets the threshold at which messages start
+                getting chunked. Messages under this limit do not get chunked.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:attribute name="ChunkLength" type="ptp:ParameterizedInt" use="optional" default="-1">
+            <xs:annotation>
+                <xs:documentation>Specifies the chunk length for a HttpURLConnection. This value is used in java.net.HttpURLConnection.setChunkedStreamingMode(int chunklen). chunklen indicates the number of bytes to write in each chunk. If chunklen is less than or equal to zero, a default value will be used.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="Accept" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the MIME types the client is prepared to handle (e.g., HTML, JPEG, GIF, etc.)
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="MaxRetransmits" type="ptp:ParameterizedInt" use="optional" default="-1">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the maximum amount of retransmits that are allowed for redirects. Retransmits for 
-                        authorization is included in the retransmit count. Each redirect may cause another 
-                        retransmit for a UNAUTHORIZED response code, ie. 401. 
-                        Any negative number indicates unlimited retransmits,
-                        although, loop protection is provided. 
-                        The default is unlimited. 
-                        (name is not part of standard)
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="AcceptLanguage" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the language the client desires (e.g., English, French, etc.)
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="AllowChunking" type="ptp:ParameterizedBoolean" use="optional" default="true">
-                    <xs:annotation>
-                        <xs:documentation>
-                        If true, the client is free to use chunking streams if it wants, but it is not 
-                        required to use chunking streams. If false, the client 
-                        must use regular, non-chunked requests in all cases.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                <xs:attribute name="ChunkingThreshold" type="ptp:ParameterizedInt" use="optional" default="4096">
-                    <xs:annotation>
-                        <xs:documentation>
-                        If AllowChunking is true, this sets the threshold at which messages start
-                        getting chunked. Messages under this limit do not get chunked.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                <xs:attribute name="ChunkLength" type="ptp:ParameterizedInt" use="optional" default="-1">
-                    <xs:annotation>
-                        <xs:documentation>Specifies the chunk length for a HttpURLConnection. This value is used in java.net.HttpURLConnection.setChunkedStreamingMode(int chunklen). chunklen indicates the number of bytes to write in each chunk. If chunklen is less than or equal to zero, a default value will be used.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="Accept" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the MIME types the client is prepared to handle (e.g., HTML, JPEG, GIF, etc.)
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="AcceptEncoding" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the encoding the client is prepared to handle (e.g., gzip)
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="AcceptLanguage" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the language the client desires (e.g., English, French, etc.)
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="ContentType" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the content type of the stream being sent in a post request. 
+                (this should be text/xml for web services, or can be set to 
+                application/x-www-form-urlencoded if the client is sending form data).
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="AcceptEncoding" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the encoding the client is prepared to handle (e.g., gzip)
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="Host" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the Internet host and port number of the resource on which the request is being invoked.
+                This is sent by default based upon the URL. Certain DNS scenarios or
+                application designs may request you to set this, but typically it is
+                not required.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="ContentType" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the content type of the stream being sent in a post request. 
-                        (this should be text/xml for web services, or can be set to 
-                        application/x-www-form-urlencoded if the client is sending form data).
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="Connection" type="http-conf:connectionType" use="optional" default="Keep-Alive">
+            <xs:annotation>
+                <xs:documentation>
+                The connection disposition. If close the connection to the server is closed 
+                after each request/response dialog. If Keep-Alive the client requests the server 
+                to keep the connection open, and if the server honors the keep alive request, 
+                the connection is reused. Many servers and proxies do not honor keep-alive requests.
+                </xs:documentation>
+            </xs:annotation>      
 
-                <xs:attribute name="Host" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the Internet host and port number of the resource on which the request is being invoked.
-                        This is sent by default based upon the URL. Certain DNS scenarios or
-                        application designs may request you to set this, but typically it is
-                        not required.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        </xs:attribute>
 
-                <xs:attribute name="Connection" type="http-conf:connectionType" use="optional" default="Keep-Alive">
-                    <xs:annotation>
-                        <xs:documentation>
-                        The connection disposition. If close the connection to the server is closed 
-                        after each request/response dialog. If Keep-Alive the client requests the server 
-                        to keep the connection open, and if the server honors the keep alive request, 
-                        the connection is reused. Many servers and proxies do not honor keep-alive requests.
-                        </xs:documentation>
-                    </xs:annotation>      
+        <xs:attribute name="CacheControl" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Most commonly used to specify no-cache, however the standard supports a 
+                dozen or so caching related directives for requests 
+                </xs:documentation>
+            </xs:annotation>      
 
-                </xs:attribute>
+        </xs:attribute>
 
-                <xs:attribute name="CacheControl" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Most commonly used to specify no-cache, however the standard supports a 
-                        dozen or so caching related directives for requests 
-                        </xs:documentation>
-                    </xs:annotation>      
+        <xs:attribute name="Cookie" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies a cookie to send to the server. Some stateful session designs will use cookies to identify a session.
+                If the cookie is static, you can supply it here. If it is dynamic,
+                it will need to be set by the server on first access, and can be handled
+                automatically by the runtime.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                </xs:attribute>
+        <xs:attribute name="BrowserType" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                aka User-Agent
+                Specifies the type of browser is sending the request. This is usually only 
+                needed when sites have HTML customized to Netscape vs IE, etc, but can
+                also be used to optimize for different SOAP stacks.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="Cookie" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies a cookie to send to the server. Some stateful session designs will use cookies to identify a session.
-                        If the cookie is static, you can supply it here. If it is dynamic,
-                        it will need to be set by the server on first access, and can be handled
-                        automatically by the runtime.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+        <xs:attribute name="Referer" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the URL that referred us to this URL. This is 
+                sent automatically with auto redirect.
 
-                <xs:attribute name="BrowserType" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        aka User-Agent
-                        Specifies the type of browser is sending the request. This is usually only 
-                        needed when sites have HTML customized to Netscape vs IE, etc, but can
-                        also be used to optimize for different SOAP stacks.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
+                May allow the server to optimize processing based upon
+                previous task flow.  However, typically not used in 
+                web services applications.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                <xs:attribute name="Referer" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the URL that referred us to this URL. This is 
-                        sent automatically with auto redirect.
+        <xs:attribute name="DecoupledEndpoint" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the URL of a decoupled endpoint for the receipt of responses over a separate provider-&gt;consumer connection.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
 
-                        May allow the server to optimize processing based upon
-                        previous task flow.  However, typically not used in 
-                        web services applications.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-
-                <xs:attribute name="DecoupledEndpoint" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the URL of a decoupled endpoint for the receipt of responses over a separate provider-&gt;consumer connection.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-
-                <!--Proxy server attributes-->
-                <xs:attribute name="ProxyServer" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the address of proxy server if one is used.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                <xs:attribute name="ProxyServerPort" type="ptp:ParameterizedInt" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the port number used by the proxy server.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-                <xs:attribute name="NonProxyHosts" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the list of hostnames that will not use the proxy configuration.
-                        Examples of value:
-                          * "localhost" -> A single hostname
-                          * "localhost|www.google.com" -> 2 hostnames that will not use the proxy configuration
-                          * "localhost|www.google.*|*.apache.org" -> It's also possible to use a pattern-like value
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="ProxyServerType" type="http-conf:proxyServerType" use="optional" default="HTTP">
-                    <xs:annotation>
-                        <xs:documentation>
-                        Specifies the type of the proxy server. Can be either HTTP or SOCKS.
-                        </xs:documentation>
-                    </xs:annotation>      
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
+        <!--Proxy server attributes-->
+        <xs:attribute name="ProxyServer" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the address of proxy server if one is used.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:attribute name="ProxyServerPort" type="ptp:ParameterizedInt" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the port number used by the proxy server.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:attribute name="NonProxyHosts" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the list of hostnames that will not use the proxy configuration.
+                Examples of value:
+                  * "localhost" -> A single hostname
+                  * "localhost|www.google.com" -> 2 hostnames that will not use the proxy configuration
+                  * "localhost|www.google.*|*.apache.org" -> It's also possible to use a pattern-like value
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="ProxyServerType" type="http-conf:proxyServerType" use="optional" default="HTTP">
+            <xs:annotation>
+                <xs:documentation>
+                Specifies the type of the proxy server. Can be either HTTP or SOCKS.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
+        <xs:anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
     </xs:complexType>
     
 

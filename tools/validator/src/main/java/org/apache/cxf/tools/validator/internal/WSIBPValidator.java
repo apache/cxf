@@ -43,8 +43,8 @@ import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.tools.common.ToolException;
+import org.apache.cxf.wsdl.WSDLHelper;
 
 public class WSIBPValidator extends AbstractDefinitionValidator {
     private List<String> operationMap = new ArrayList<String>();

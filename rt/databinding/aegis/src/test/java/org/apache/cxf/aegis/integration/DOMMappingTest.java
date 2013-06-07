@@ -33,7 +33,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.junit.Before;
 import org.junit.Test;

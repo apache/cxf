@@ -24,15 +24,14 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.AbstractBaseBindingFactory;
+import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
-import org.apache.cxf.binding.xml.XMLBinding;
-import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
+import org.apache.cxf.jaxrs.interceptor.JAXBDefaultFaultOutInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor;
 import org.apache.cxf.service.Service;
@@ -45,7 +44,7 @@ import org.apache.cxf.transport.Destination;
  * CXF JAX-RS interceptors with the runtime.
  */
 @NoJSR250Annotations(unlessNull = { "bus" })
-public class JAXRSBindingFactory extends AbstractBaseBindingFactory {
+public class JAXRSBindingFactory extends AbstractBindingFactory {
     public static final String JAXRS_BINDING_ID = "http://apache.org/cxf/binding/jaxrs";
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSBindingFactory.class);
@@ -58,17 +57,19 @@ public class JAXRSBindingFactory extends AbstractBaseBindingFactory {
     }
 
     public Binding createBinding(BindingInfo bi) {
-        XMLBinding binding = new XMLBinding(bi);
+        JAXRSBinding binding = new JAXRSBinding(bi);
 
         binding.getInInterceptors().add(new JAXRSInInterceptor());
         
         binding.getOutInterceptors().add(new JAXRSOutInterceptor());
         
-        binding.getOutFaultInterceptors().add(new XMLFaultOutInterceptor());
+        binding.getOutFaultInterceptors().add(new JAXBDefaultFaultOutInterceptor());
         binding.getOutFaultInterceptors().add(new StaxOutInterceptor());
 
         return binding;
     }
+    
+    
 
     /*
      * The concept of Binding can not be applied to JAX-RS. Here we use

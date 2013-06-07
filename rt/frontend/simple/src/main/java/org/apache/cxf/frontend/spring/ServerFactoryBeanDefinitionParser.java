@@ -30,7 +30,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;

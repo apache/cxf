@@ -32,11 +32,11 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 
 import org.apache.hello_world.Greeter;

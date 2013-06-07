@@ -56,7 +56,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 			<ref bean="mtomImpl" />
 		</simple:serviceBean>
 		<simple:serviceFactory>
-			<bean class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+			<bean class='org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean'>
 				<property name="properties">
 					<map>
 						<entry key="mtom-enabled">
@@ -83,7 +83,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 			<ref bean="mtomImpl" />
 		</simple:serviceBean>
 		<simple:serviceFactory>
-			<bean class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+			<bean class='org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean'>
 				<property name="properties">
 					<map>
 						<entry key="mtom-enabled">

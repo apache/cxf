@@ -46,7 +46,7 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
 
     @Test
     public void testAllDefault() throws Exception {
-        String[] args = new String[] {"-i", "Greeter", "-d", output.getCanonicalPath(),
+        String[] args = new String[] {"-verbose", "-i", "Greeter", "-d", output.getCanonicalPath(),
                                       getLocation("/misctools_wsdl/hello_world.wsdl")};
         WSDLToXML.main(args);
 

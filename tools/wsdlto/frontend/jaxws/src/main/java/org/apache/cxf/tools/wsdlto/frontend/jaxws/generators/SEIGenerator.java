@@ -85,7 +85,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 if (penv.isVerbose()) {
                     System.out.println(msg.toString());
                 }
-                return;
+                continue;
             }
             for (JavaInterface intf : interfaces.values()) {
     

@@ -158,10 +158,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
@@ -248,27 +244,6 @@
                             </xsdOptions>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>xsdtojava-tests</goal>
-                        </goals>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/test/resources/schemas/wsdl/test-conf.xsd</xsd>
-                                    <bindingFile>${basedir}/src/test/resources/schemas/wsdl/test-conf.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
-                                    <deleteDirs>
-                                        <deleteDir>${basedir}/target/generated/src/test/java/org/apache/cxf/wsdl</deleteDir>
-                                    </deleteDirs>
-                                </xsdOption>
-                            </xsdOptions>
-                        </configuration>
-                    </execution>
-
                 </executions>
 
                 <configuration>

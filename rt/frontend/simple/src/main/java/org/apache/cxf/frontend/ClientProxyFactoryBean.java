@@ -42,7 +42,7 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.service.factory.FactoryBeanListener;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 /**
  * This class will create a client for you which implements the specified

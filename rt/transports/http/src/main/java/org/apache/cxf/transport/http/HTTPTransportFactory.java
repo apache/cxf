@@ -31,9 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
-import javax.wsdl.extensions.http.HTTPAddress;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -51,8 +48,6 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.servlet.ServletDestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.http.AddressType;
-import org.apache.cxf.wsdl11.WSDLEndpointFactory;
-
 
 /**
  *
@@ -60,7 +55,7 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 @NoJSR250Annotations(unlessNull = "bus")
 public class HTTPTransportFactory 
     extends AbstractTransportFactory 
-    implements WSDLEndpointFactory, ConduitInitiator, DestinationFactory {
+    implements ConduitInitiator, DestinationFactory {
     
 
     public static final List<String> DEFAULT_NAMESPACES 
@@ -134,15 +129,7 @@ public class HTTPTransportFactory
             for (Iterator<?> itr = ees.iterator(); itr.hasNext();) {
                 Object extensor = itr.next();
     
-                if (extensor instanceof HTTPAddress) {
-                    final HTTPAddress httpAdd = (HTTPAddress)extensor;
-    
-                    EndpointInfo info = new HttpEndpointInfo(serviceInfo, 
-                                "http://schemas.xmlsoap.org/wsdl/http/");
-                    info.setAddress(httpAdd.getLocationURI());
-                    info.addExtensor(httpAdd);
-                    return info;
-                } else if (extensor instanceof AddressType) {
+                if (extensor instanceof AddressType) {
                     final AddressType httpAdd = (AddressType)extensor;
     
                     EndpointInfo info = 
@@ -157,7 +144,7 @@ public class HTTPTransportFactory
         
         HttpEndpointInfo hei = new HttpEndpointInfo(serviceInfo, 
             "http://schemas.xmlsoap.org/wsdl/http/");
-        AddressType at = new HttpAddressType();
+        AddressType at = new AddressType();
         hei.addExtensor(at);
         
         return hei;
@@ -210,25 +197,6 @@ public class HTTPTransportFactory
             }
         }
     }    
-    
-    private static class HttpAddressType extends AddressType 
-        implements HTTPAddress, SOAPAddress {
-        private static final long serialVersionUID = 7048265985129995746L;
-
-        public HttpAddressType() {
-            super();
-            setElementType(new QName("http://schemas.xmlsoap.org/wsdl/soap/", "address"));
-        }
-        
-        public String getLocationURI() {
-            return getLocation();
-        }
-
-        public void setLocationURI(String locationURI) {
-            setLocation(locationURI);
-        }
-        
-    }
     
     /**
      * This call creates a new HTTPConduit for the endpoint. It is equivalent

@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
@@ -76,9 +75,9 @@ public class XMLFormatValidator extends ServiceValidator {
             if (needRootNode) {
                 String path = "Binding(" + binding.getName().getLocalPart()
                     + "):BindingOperation(" + bo.getName() + ")";
-                List<ExtensibilityElement> inExtensors =
-                    bo.getInput().getExtensors(ExtensibilityElement.class);
-                Iterator<ExtensibilityElement> itIn = null;
+                List<XMLBindingMessageFormat> inExtensors =
+                    bo.getInput().getExtensors(XMLBindingMessageFormat.class);
+                Iterator<XMLBindingMessageFormat> itIn = null;
                 if (inExtensors != null) {
                     itIn = inExtensors.iterator();
                 }
@@ -93,9 +92,9 @@ public class XMLFormatValidator extends ServiceValidator {
                         needRootNode = true;
                     }
                     if (needRootNode) {
-                        List<ExtensibilityElement> outExtensors =
-                            bo.getOutput().getExtensors(ExtensibilityElement.class);
-                        Iterator<ExtensibilityElement> itOut = null;
+                        List<XMLBindingMessageFormat> outExtensors =
+                            bo.getOutput().getExtensors(XMLBindingMessageFormat.class);
+                        Iterator<XMLBindingMessageFormat> itOut = null;
                         if (outExtensors != null) {
                             itOut = outExtensors.iterator();
                         }
@@ -111,20 +110,17 @@ public class XMLFormatValidator extends ServiceValidator {
         return true;
     }
 
-    private boolean findXMLFormatRootNode(Iterator<ExtensibilityElement> it, 
+    private boolean findXMLFormatRootNode(Iterator<XMLBindingMessageFormat> it, 
                                           BindingOperationInfo bo,
                                           String errorPath) {
         while (it != null && it.hasNext()) {
-            ExtensibilityElement ext = it.next();
-            if (ext instanceof XMLBindingMessageFormat) {
-                XMLBindingMessageFormat xmlFormat = (XMLBindingMessageFormat)ext;
-                if (xmlFormat.getRootNode() == null) {
-                    QName rootNodeName = bo.getName();
-                    addErrorMessage(errorPath
-                                    + ": empty value of rootNode attribute, the value should be "
-                                    + rootNodeName);
-                    return false;                    
-                }
+            XMLBindingMessageFormat xmlFormat = it.next();
+            if (xmlFormat.getRootNode() == null) {
+                QName rootNodeName = bo.getName();
+                addErrorMessage(errorPath
+                                + ": empty value of rootNode attribute, the value should be "
+                                + rootNodeName);
+                return false;                    
             }
         }
         return true;

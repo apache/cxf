@@ -27,7 +27,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.cxf.factory_pattern.IsEvenResponse;
 import org.apache.cxf.factory_pattern.ObjectFactory;
 import org.apache.cxf.transport.jms.JMSConstants;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 @WebService(serviceName = "NumberService",
             endpointInterface = "org.apache.cxf.factory_pattern.Number", 

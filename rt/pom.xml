@@ -34,6 +34,7 @@
 
     <modules>
         <module>core</module>
+        <module>wsdl</module>
         <module>transports/local</module>
         <module>databinding/jaxb</module>
         <module>databinding/xmlbeans</module>

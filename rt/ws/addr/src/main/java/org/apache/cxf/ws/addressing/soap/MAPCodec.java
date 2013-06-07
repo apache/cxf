@@ -61,6 +61,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
@@ -68,7 +69,6 @@ import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 
 /**

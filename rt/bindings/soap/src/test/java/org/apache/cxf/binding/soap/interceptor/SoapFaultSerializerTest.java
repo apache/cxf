@@ -21,16 +21,21 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import junit.framework.AssertionFailedError;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
@@ -42,15 +47,33 @@ import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12F
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor.SAAJPreInInterceptor;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.test.AbstractCXFTest;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-public class SoapFaultSerializerTest extends AbstractCXFTest {
+public class SoapFaultSerializerTest extends Assert {
+    private void assertValid(String xpathExpression, Document doc) {
+        Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
+        namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        namespaces.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        namespaces.put("wsdlsoap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        namespaces.put("soap", "http://schemas.xmlsoap.org/soap/");
+        namespaces.put("soap12env", "http://www.w3.org/2003/05/soap-envelope");
+        namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
+        XPathUtils xpu = new XPathUtils(namespaces);
+        if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
+            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
+                                           + " from document:\n" + XMLUtils.toString(doc));
+        }
+    }
     
     @Test
     public void testSoap11Out() throws Exception {
@@ -200,7 +223,6 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         assertEquals(fault.getMessage(), fault2.getMessage());        
         assertEquals(fault.getSubCodes(), fault2.getSubCodes());
     }
-
     @Test
     public void testFaultToSoapFault() throws Exception {
         Exception ex = new Exception();

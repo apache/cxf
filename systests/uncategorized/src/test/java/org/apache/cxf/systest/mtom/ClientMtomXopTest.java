@@ -52,10 +52,10 @@ import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 import org.apache.cxf.mtom_xop.TestMtomImpl;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

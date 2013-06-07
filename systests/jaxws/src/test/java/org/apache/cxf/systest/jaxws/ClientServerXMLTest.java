@@ -94,6 +94,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         try {
             Greeter greeter = service.getPort(barePortName, Greeter.class);
             updateAddressPort(greeter, REG_PORT);
+
             String username = System.getProperty("user.name");
             String reply = greeter.greetMe(username);
 

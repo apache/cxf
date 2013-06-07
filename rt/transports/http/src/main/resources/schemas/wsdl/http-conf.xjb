@@ -22,14 +22,6 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema" 
   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
   jaxb:extensionBindingPrefixes="xjc">
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" node="/xs:schema">
-        <jaxb:schemaBindings>
-            <jaxb:package name="org.apache.cxf.wsdl"/>
-        </jaxb:schemaBindings>
         <jaxb:globalBindings generateIsSetMethod="true"/>
-    </jaxb:bindings>
-    <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" node="/xs:schema/xs:complexType[@name='tExtensibilityElement']">
-        <jaxb:class implClass="org.apache.cxf.wsdl.TExtensibilityElementImpl"/>
-    </jaxb:bindings>
 
 </jaxb:bindings>

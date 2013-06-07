@@ -23,7 +23,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +35,6 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -74,7 +71,6 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.workqueue.SynchronousExecutor;
-import org.apache.cxf.wsdl.WSDLServiceFactory;
 
 public class ClientImpl
     extends AbstractBasicInterceptorProvider
@@ -117,57 +113,6 @@ public class ClientImpl
         outFaultObserver = new ClientOutFaultObserver(bus);
         getConduitSelector(sc).setEndpoint(e);
         notifyLifecycleManager();
-    }
-
-    public ClientImpl(URL wsdlUrl) {
-        this(BusFactory.getThreadDefaultBus(), wsdlUrl, (QName)null, 
-             null, SimpleEndpointImplFactory.getSingleton());
-    }
-
-    public ClientImpl(URL wsdlUrl, QName port) {
-        this(BusFactory.getThreadDefaultBus(), wsdlUrl, (QName)null, 
-             port, SimpleEndpointImplFactory.getSingleton());
-    }
-
-    /**
-     * Create a Client that uses the default EndpointImpl.
-     * @param bus
-     * @param wsdlUrl
-     * @param service
-     * @param port
-     */
-    public ClientImpl(Bus bus, URL wsdlUrl, QName service, QName port) {
-        this(bus, wsdlUrl, service, port, SimpleEndpointImplFactory.getSingleton());
-    }
-
-    /**
-     * Create a Client that uses a specific EndpointImpl.
-     * @param bus
-     * @param wsdlUrl
-     * @param service
-     * @param port
-     * @param endpointImplFactory
-     */
-    public ClientImpl(Bus bus, URL wsdlUrl, QName service,
-                      QName port, EndpointImplFactory endpointImplFactory) {
-        this.bus = bus;
-        outFaultObserver = new ClientOutFaultObserver(bus);
-
-        Service svc = service == null 
-            ? bus.getExtension(WSDLServiceFactory.class).create(wsdlUrl)
-                : bus.getExtension(WSDLServiceFactory.class).create(wsdlUrl, service);
-        EndpointInfo epfo = findEndpoint(svc, port);
-
-        try {
-            if (endpointImplFactory != null) {
-                getConduitSelector().setEndpoint(endpointImplFactory.newEndpointImpl(bus, svc, epfo));
-            } else {
-                getConduitSelector().setEndpoint(new EndpointImpl(bus, svc, epfo));
-            }
-        } catch (EndpointException epex) {
-            throw new IllegalStateException("Unable to create endpoint: " + epex.getMessage(), epex);
-        }
-        notifyLifecycleManager();        
     }
     
     /**
@@ -255,24 +200,16 @@ public class ClientImpl
                 for (EndpointInfo e : svcfo.getEndpoints()) {
                     BindingInfo bfo = e.getBinding();
                     String bid = bfo.getBindingId();
-                    if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)) {
+                    if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)
+                        || "http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
                         for (Object o : bfo.getExtensors().get()) {
-                            if (o instanceof SOAPBinding) {
-                                SOAPBinding soapB = (SOAPBinding)o;
-                                if ("http://schemas.xmlsoap.org/soap/http".equals(soapB.getTransportURI())) {
-                                    epfo = e;
-                                    break;
+                            try {
+                                String s = (String)o.getClass().getMethod("getTransportURI").invoke(o);
+                                if (s != null && s.endsWith("http")) {
+                                    return e;
                                 }
-                            }
-                        }
-                    } else if ("http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
-                        for (Object o : bfo.getExtensors().get()) {
-                            if (o instanceof SOAP12Binding) {
-                                SOAP12Binding soapB = (SOAP12Binding)o;
-                                if ("http://schemas.xmlsoap.org/soap/http".equals(soapB.getTransportURI())) {
-                                    epfo = e;
-                                    break;
-                                }
+                            } catch (Throwable t) {
+                                //ignore
                             }
                         }
                     }
@@ -280,7 +217,7 @@ public class ClientImpl
             }
             if (epfo == null) {
                 throw new UnsupportedOperationException(
-                     "Only document-style SOAP 1.1 http are supported "
+                     "Only document-style SOAP 1.1 and 1.2 http are supported "
                      + "for auto-selection of endpoint; none were found.");
             }
         }

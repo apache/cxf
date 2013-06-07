@@ -57,13 +57,13 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.JaxWsConfigurationException;
-import org.apache.cxf.service.factory.AbstractServiceConfiguration;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 

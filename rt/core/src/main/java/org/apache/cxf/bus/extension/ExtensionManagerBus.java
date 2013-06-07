@@ -165,11 +165,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         if (null == this.getExtension(BindingFactoryManager.class)) {
             new BindingFactoryManagerImpl(this);
         }
-        extensionManager.load(new String[] {
-            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
-            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_XML,
-            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_OLD_XML});
-        
+        extensionManager.load(new String[] {ExtensionManagerImpl.BUS_EXTENSION_RESOURCE});
         extensionManager.activateAllByType(ResourceResolver.class);
         
         extensions.put(ExtensionManager.class, extensionManager);        

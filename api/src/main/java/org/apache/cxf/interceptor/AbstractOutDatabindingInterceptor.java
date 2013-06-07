@@ -45,7 +45,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
 

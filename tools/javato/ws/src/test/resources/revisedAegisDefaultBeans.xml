@@ -22,17 +22,12 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-<bean id="AegisDatabindingBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding"  >
-	<property name="typeMappingRegistry">
-		<bean class="org.apache.cxf.aegis.type.DefaultTypeMappingRegistry">
-		    <constructor-arg index="0" value="true"/>
-			<property name="configuration">
-				<bean class="org.apache.cxf.aegis.type.Configuration">
-					<property name="defaultMinOccurs" value="50"/>
-				</bean>
-			</property>
-		</bean>
-	</property>
-</bean>
+    <bean id="AegisDatabindingBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding"  >
+        <property name="configuration">
+            <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
+                <property name="defaultMinOccurs" value="50"/>
+            </bean>
+        </property>
+    </bean>
 
 </beans>

@@ -78,7 +78,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
             dataBinding = (DataBinding)applicationContext.getBean(databindingBeanName);
         } catch (RuntimeException e) {
             throw new ToolException("Cannot get databinding bean " + databindingBeanName
-                                    + " for databinding " + databindingName);
+                                    + " for databinding " + databindingName, e);
         }
 
         String beanName = getBuilderBeanName(s);

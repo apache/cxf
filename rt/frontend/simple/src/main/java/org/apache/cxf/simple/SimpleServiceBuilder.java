@@ -20,7 +20,7 @@
 package org.apache.cxf.simple;
 
 import org.apache.cxf.frontend.AbstractServiceFactory;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class SimpleServiceBuilder extends AbstractServiceFactory {
     

@@ -26,7 +26,7 @@
 	<bean id="aegisBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding"
 		scope='prototype'>
 		<property name='configuration'>
-			<bean class='org.apache.cxf.aegis.type.Configuration'>
+			<bean class='org.apache.cxf.aegis.type.TypeCreationOptions'>
 				<property name='defaultMinOccurs' value='1' />
 				<property name='defaultNillable' value='false' />
 			</bean>

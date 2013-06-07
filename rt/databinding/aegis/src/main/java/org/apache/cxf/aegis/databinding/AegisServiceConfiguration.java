@@ -19,7 +19,7 @@
 package org.apache.cxf.aegis.databinding;
 
 import org.apache.cxf.aegis.util.NamespaceHelper;
-import org.apache.cxf.service.factory.AbstractServiceConfiguration;
+import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 /**
  * Obsolete copy of {@link XFireCompatibilityServiceConfiguration}.
  * @deprecated 2.1

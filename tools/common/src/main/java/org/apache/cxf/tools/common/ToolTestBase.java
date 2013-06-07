@@ -24,11 +24,12 @@ import java.io.File;
 import java.io.PrintStream;
 
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.test.AbstractCXFTest;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class ToolTestBase extends AbstractCXFTest {
+public abstract class ToolTestBase extends Assert {
 
     protected PrintStream oldStdErr; 
     protected PrintStream oldStdOut; 

@@ -73,6 +73,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
@@ -81,8 +82,6 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
-
 
 /**
  * Logical Handler responsible for aggregating the Message Addressing 

@@ -29,8 +29,9 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
+import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
+
 import org.junit.Before;
 import org.junit.Test;
 
