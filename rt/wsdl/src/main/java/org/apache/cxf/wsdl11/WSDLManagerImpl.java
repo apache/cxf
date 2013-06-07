@@ -89,6 +89,9 @@ public class WSDLManagerImpl implements WSDLManager {
     private Bus bus;
 
     public WSDLManagerImpl() throws BusException {
+        this(null);
+    }
+    private WSDLManagerImpl(Bus b) throws BusException {
         try {
             factory = WSDLFactory.newInstance();
             registry = factory.newPopulatedExtensionRegistry();
@@ -116,10 +119,7 @@ public class WSDLManagerImpl implements WSDLManager {
         definitionsMap = new CacheMap<Object, Definition>();
         schemaCacheMap = new CacheMap<Object, ServiceSchemaInfo>();
 
-        registerInitialExtensions();
-    }
-    public WSDLManagerImpl(Bus b) throws BusException {
-        this();
+        registerInitialExtensions(b);
         setBus(b);
     }
     
@@ -265,16 +265,16 @@ public class WSDLManagerImpl implements WSDLManager {
         return def;
     }
 
-    private void registerInitialExtensions() throws BusException {
-        registerInitialXmlExtensions(EXTENSIONS_RESOURCE_COMPAT);
-        registerInitialXmlExtensions(EXTENSIONS_RESOURCE);
+    private void registerInitialExtensions(Bus b) throws BusException {
+        registerInitialXmlExtensions(EXTENSIONS_RESOURCE_COMPAT, b);
+        registerInitialXmlExtensions(EXTENSIONS_RESOURCE, b);
     }
-    private void registerInitialXmlExtensions(String resource) throws BusException {
+    private void registerInitialXmlExtensions(String resource, Bus b) throws BusException {
         Properties initialExtensions = null;
         try {
             ClassLoader cl = null;
-            if (bus != null) {
-                cl = bus.getExtension(ClassLoader.class);
+            if (b != null) {
+                cl = b.getExtension(ClassLoader.class);
             }
             if (cl != null) {
                 initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, cl);
