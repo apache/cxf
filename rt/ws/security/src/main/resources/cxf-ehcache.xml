@@ -1,4 +1,4 @@
-<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true">
+<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true" name="cxfSecurityCache">
 
     <diskStore path="java.io.tmpdir"/>
 
