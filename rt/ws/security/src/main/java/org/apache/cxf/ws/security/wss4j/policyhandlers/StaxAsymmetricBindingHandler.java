@@ -46,6 +46,8 @@ import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -57,8 +59,12 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
     private AsymmetricBinding abinding;
     private SoapMessage message;
     
-    public StaxAsymmetricBindingHandler(Map<String, Object> properties, SoapMessage msg) {
-        super(properties, msg);
+    public StaxAsymmetricBindingHandler(
+        Map<String, Object> properties, 
+        SoapMessage msg,
+        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+    ) {
+        super(properties, msg, outboundTokens);
         this.message = msg;
     }
     

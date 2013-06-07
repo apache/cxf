@@ -78,8 +78,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     public KerberosTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.KERBEROS_TOKEN, SP12Constants.KERBEROS_TOKEN));
        
-        this.getOutInterceptors().add(new KerberosTokenDOMOutInterceptor());
-        this.getOutFaultInterceptors().add(new KerberosTokenDOMOutInterceptor());
+        this.getOutInterceptors().add(new KerberosTokenOutInterceptor());
+        this.getOutFaultInterceptors().add(new KerberosTokenOutInterceptor());
         this.getInInterceptors().add(new KerberosTokenDOMInInterceptor());
         this.getInFaultInterceptors().add(new KerberosTokenDOMInInterceptor());
         
@@ -112,16 +112,14 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         }
     }
 
-    static class KerberosTokenDOMOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        public KerberosTokenDOMOutInterceptor() {
+    static class KerberosTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
+        public KerberosTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
         }
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
-            boolean enableStax = 
-                MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
-            if (aim != null && !enableStax) {
+            if (aim != null) {
                 Collection<AssertionInfo> ais = 
                     NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
                 if (ais.isEmpty()) {

@@ -39,7 +39,7 @@ import org.junit.BeforeClass;
  * "/etc/bob.keytab" (this can all be edited in src/test/resource/kerberos.jaas". Then disable the
  * @Ignore annotations and run the tests with:
  *  
- * mvn test -Pnochecks -Dtest=KerberosTokenTest 
+ * mvn test -Pnochecks -Dtest=StaxKerberosTokenTest 
  *     -Djava.security.auth.login.config=src/test/resources/kerberos.jaas
  * 
  * See here for more information:
@@ -96,9 +96,9 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         kerberosPort.doubleIt(25);
         
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -190,16 +190,15 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         kerberosPort.doubleIt(25);
         
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverTransportEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -220,9 +219,9 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         kerberosPort.doubleIt(25);
         
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -370,9 +369,9 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         kerberosPort.doubleIt(25);
         
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);

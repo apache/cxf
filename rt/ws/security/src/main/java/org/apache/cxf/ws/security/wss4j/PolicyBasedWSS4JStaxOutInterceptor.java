@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -52,6 +53,8 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -328,23 +331,25 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     }
     
     @Override
-    protected void configureProperties(SoapMessage msg) throws WSSecurityException {
+    protected void configureProperties(
+        SoapMessage msg, Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+    ) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         checkAsymmetricBinding(aim, msg);
         checkSymmetricBinding(aim, msg);
         checkTransportBinding(aim, msg);
         
-        super.configureProperties(msg);
+        super.configureProperties(msg, outboundTokens);
         
         Collection<AssertionInfo> ais = 
             getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (!ais.isEmpty()) {
-            new StaxTransportBindingHandler(getProperties(), msg).handleBinding();
+            new StaxTransportBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
         }
         
         ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (!ais.isEmpty()) {
-            new StaxAsymmetricBindingHandler(getProperties(), msg).handleBinding();
+            new StaxAsymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
         }
     }
     

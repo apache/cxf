@@ -38,6 +38,7 @@ import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SignedElements;
@@ -48,6 +49,8 @@ import org.apache.wss4j.policy.model.TransportToken;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -57,8 +60,12 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(StaxTransportBindingHandler.class);
     private TransportBinding tbinding;
 
-    public StaxTransportBindingHandler(Map<String, Object> properties, SoapMessage msg) {
-        super(properties, msg);
+    public StaxTransportBindingHandler(
+        Map<String, Object> properties, 
+        SoapMessage msg,
+        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+    ) {
+        super(properties, msg, outboundTokens);
     }
     
     public void handleBinding() {
@@ -143,7 +150,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             if (token instanceof UsernameToken) {
                 addUsernameToken((UsernameToken)token);
             /*TODO 
-              else if (token instanceof IssuedToken || token instanceof KerberosToken) {
+              else if (token instanceof IssuedToken) {
                 SecurityToken secTok = getSecurityToken();
                 
                 if (includeToken(token.getIncludeTokenType())) {
@@ -151,6 +158,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                     addEncryptedKeyElement(cloneElement(secTok.getToken()));
                 }
             } */
+            } else if (token instanceof KerberosToken) {
+                addKerberosToken((KerberosToken)token, false, false);
             } else if (token instanceof SamlToken) {
                 addSamlToken((SamlToken)token, false, false);
             } else {
@@ -230,7 +239,6 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         /* TODO if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
-            || token instanceof KerberosToken
             || token instanceof SpnegoContextToken) {
             addSig(doIssuedTokenSignature(token, wrapper));
         } else */ 
@@ -248,6 +256,15 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
         } else if (token instanceof UsernameToken) {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
+        } else if (token instanceof KerberosToken) {
+            addKerberosToken((KerberosToken)token, false, true);
+            signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
+            
+            Map<String, Object> config = getProperties();
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                       tbinding.getAlgorithmSuite().getSymmetricSignature());
+            AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
         }
     }
     

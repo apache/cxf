@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.tokenstore;
 
 import java.io.Serializable;
+import java.security.Key;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
@@ -90,6 +91,16 @@ public class SecurityToken implements Serializable {
      * The secret associated with the Token
      */
     private byte[] secret;
+    
+    /**
+     * Some binary data associated with the token
+     */
+    private byte[] data;
+    
+    /**
+     * A key associated with the token
+     */
+    private transient Key key;
     
     /**
      * Created time
@@ -508,6 +519,22 @@ public class SecurityToken implements Serializable {
      */
     public SecurityContext getSecurityContext() {
         return securityContext;
+    }
+
+    public Key getKey() {
+        return key;
+    }
+
+    public void setKey(Key key) {
+        this.key = key;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
     
 } 

@@ -45,6 +45,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.neethi.Assertion;
@@ -61,6 +62,7 @@ import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.EncryptedParts;
 import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
@@ -76,8 +78,11 @@ import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * 
@@ -91,13 +96,19 @@ public abstract class AbstractStaxBindingHandler {
     protected Map<AbstractToken, SecurePart> endSuppTokMap;
     protected Map<AbstractToken, SecurePart> sgndEndEncSuppTokMap;
     protected Map<AbstractToken, SecurePart> sgndEndSuppTokMap;
+    protected Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens;
     
     private final Map<String, Object> properties;
     private final SoapMessage message;
     
-    public AbstractStaxBindingHandler(Map<String, Object> properties, SoapMessage msg) {
+    public AbstractStaxBindingHandler(
+        Map<String, Object> properties, 
+        SoapMessage msg,
+        Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+    ) {
         this.properties = properties;
         this.message = msg;
+        this.outboundTokens = outboundTokens;
     }
 
     protected SecurePart addUsernameToken(UsernameToken usernameToken) {
@@ -137,6 +148,65 @@ public abstract class AbstractStaxBindingHandler {
         }
         
         return new SecurePart(WSSConstants.TAG_wsse_UsernameToken, Modifier.Element);
+    }
+    
+    protected SecurePart addKerberosToken(
+        KerberosToken token, boolean signed, boolean endorsing
+    ) throws WSSecurityException {
+        IncludeTokenType includeToken = token.getIncludeTokenType();
+        if (!isTokenRequired(includeToken)) {
+            return null;
+        }
+
+        SecurityToken secToken = getSecurityToken();
+        if (secToken == null) {
+            policyNotAsserted(token, "Could not find KerberosToken");
+        }
+        
+        // Convert to WSS4J token
+        final KerberosClientSecurityToken wss4jToken = 
+            new KerberosClientSecurityToken(secToken.getData(), secToken.getKey(), secToken.getId());
+        
+        final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
+            new SecurityTokenProvider<OutboundSecurityToken>() {
+
+                @Override
+                public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
+                    return wss4jToken;
+                }
+
+                @Override
+                public String getId() {
+                    return wss4jToken.getId();
+                }
+            };
+        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_BST, 
+                           kerberosSecurityTokenProvider);
+        
+        // Action
+        Map<String, Object> config = getProperties();
+        String actionToPerform = ConfigurationConstants.KERBEROS_TOKEN;
+        if (endorsing) {
+            actionToPerform = ConfigurationConstants.SIGNATURE_WITH_KERBEROS_TOKEN;
+        }
+        
+        if (config.containsKey(ConfigurationConstants.ACTION)) {
+            String action = (String)config.get(ConfigurationConstants.ACTION);
+            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+        } else {
+            config.put(ConfigurationConstants.ACTION, actionToPerform);
+        }
+        
+        /*
+        if (endorsing) {
+            String action = (String)config.get(ConfigurationConstants.ACTION);
+            config.put(ConfigurationConstants.ACTION,
+                ConfigurationConstants.SIGNATURE_WITH_KERBEROS_TOKEN  + " " + action);
+            // config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        }
+        */
+        
+        return new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
     }
     
     protected SecurePart addSamlToken(
@@ -602,6 +672,14 @@ public abstract class AbstractStaxBindingHandler {
                 }
 
             } */
+            } else if (isRequestor() && token instanceof KerberosToken) {
+                SecurePart securePart = addKerberosToken((KerberosToken)token, signed, endorse);
+                if (securePart != null) {
+                    ret.put(token, securePart);
+                    if (suppTokens.isEncryptedToken()) {
+                        encryptedTokensList.add(securePart);
+                    }
+                }
             } else if (token instanceof X509Token || token instanceof KeyValueToken) {
                 configureSignature(suppTokens, token, false);
                 if (suppTokens.isEncryptedToken()) {
@@ -644,6 +722,22 @@ public abstract class AbstractStaxBindingHandler {
             }
         }
     }
+    
+    protected SecurityToken getSecurityToken() {
+        SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+        if (st == null) {
+            String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+            if (id != null) {
+                st = getTokenStore().getToken(id);
+            }
+        }
+        if (st != null) {
+            getTokenStore().add(st);
+            return st;
+        }
+        return null;
+    }
+
     
     protected Collection<Assertion> findAndAssertPolicy(QName n) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
@@ -854,5 +948,4 @@ public abstract class AbstractStaxBindingHandler {
         return encryptedParts;
     }
     
-      
 }

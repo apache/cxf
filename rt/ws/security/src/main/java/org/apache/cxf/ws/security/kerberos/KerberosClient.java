@@ -138,8 +138,10 @@ public class KerberosClient implements Configurable {
         SecurityToken token = new SecurityToken(bst.getID());
         token.setToken(bst.getElement());
         token.setWsuId(bst.getID());
+        token.setData(bst.getToken());
         SecretKey secretKey = bst.getSecretKey();
         if (secretKey != null) {
+            token.setKey(secretKey);
             token.setSecret(secretKey.getEncoded());
         }
         String sha1 = Base64.encode(WSSecurityUtil.generateDigest(bst.getToken()));
