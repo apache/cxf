@@ -264,6 +264,11 @@ public class WSDLManagerImpl implements WSDLManager {
         try {
             initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
                   this.getClass().getClassLoader());
+            //use TCCL as fallback so that can load resources from other bundles in OSGi
+            if (initialExtensions == null || initialExtensions.size() == 0) {
+                initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
+                    Thread.currentThread().getContextClassLoader());
+            }
         } catch (IOException ex) {
             throw new BusException(ex);
         }
