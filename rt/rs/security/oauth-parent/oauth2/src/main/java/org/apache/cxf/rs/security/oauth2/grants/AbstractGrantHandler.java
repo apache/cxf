@@ -41,11 +41,10 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     
     private String supportedGrant;
     private OAuthDataProvider dataProvider;
-    private boolean isClientConfidential;
     private boolean partialMatchScopeValidation;
-    protected AbstractGrantHandler(String grant, boolean isClientConfidential) {
+    private boolean canSupportPublicClients;
+    protected AbstractGrantHandler(String grant) {
         supportedGrant = grant;
-        this.isClientConfidential = isClientConfidential;
     }
     
     public void setDataProvider(OAuthDataProvider dataProvider) {
@@ -60,7 +59,9 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     }
     
     protected void checkIfGrantSupported(Client client) {
-        if (!OAuthUtils.isGrantSupportedForClient(client, isClientConfidential, supportedGrant)) {
+        if (!OAuthUtils.isGrantSupportedForClient(client, 
+                                                  canSupportPublicClients,
+                                                  OAuthConstants.AUTHORIZATION_CODE_GRANT)) {
             throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
     }
@@ -91,5 +92,13 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
+    }
+    
+    public void setCanSupportPublicClients(boolean support) {
+        canSupportPublicClients = support;
+    }
+    
+    public boolean isCanSupportPublicClients() {
+        return canSupportPublicClients;
     }
 }
