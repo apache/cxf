@@ -217,9 +217,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
     }
     */
     
-    // TODO - See WSS-442
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricIssuerSerial() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -247,9 +245,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-449
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricThumbprint() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -334,9 +330,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - See WSS-442
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -615,9 +609,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-442
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricEncryption() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

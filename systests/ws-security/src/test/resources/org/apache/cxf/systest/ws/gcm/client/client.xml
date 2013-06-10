@@ -64,6 +64,7 @@
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.is-bsp-compliant" value="false"/>
        </jaxws:properties>
     </jaxws:client>
     

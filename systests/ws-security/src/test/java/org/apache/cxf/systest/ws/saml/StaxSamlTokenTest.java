@@ -258,7 +258,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-442
+    // TODO
     @org.junit.Test
     @org.junit.Ignore
     public void testSaml2OverSymmetric() throws Exception {
@@ -320,7 +320,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     // Some negative tests. Send a sender-vouches assertion as a SupportingToken...this will
     // fail as the provider will demand that there is a signature covering both the assertion
     // and the message body.
-    // TODO See WSS-442
+    // TODO 
     @org.junit.Test
     @org.junit.Ignore
     public void testSaml2OverSymmetricSupporting() throws Exception {
@@ -588,9 +588,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-442
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricSamlInitiator() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -619,7 +617,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-442
+    // TODO 
     @org.junit.Test
     @org.junit.Ignore
     public void testSaml2OverSymmetricSignedElements() throws Exception {
@@ -981,7 +979,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     
     // In this test-case, the WSP is configured with a XACML PEP interceptor, which in this
     // case just mocks the call to the PDP + enforces the decision
-    // TODO See WSS-442
+    // TODO
     @org.junit.Test
     @org.junit.Ignore
     public void testSaml2PEP() throws Exception {

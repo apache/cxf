@@ -93,9 +93,8 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         gcmPort.doubleIt(25);
         
         // Streaming
-        // TODO - See WSS-442
-        // SecurityTestUtil.enableStreaming(gcmPort);
-        // gcmPort.doubleIt(25);
+        SecurityTestUtil.enableStreaming(gcmPort);
+        gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
@@ -137,9 +136,8 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         gcmPort.doubleIt(25);
         
         // Streaming
-        // TODO - See WSS-442
-        // SecurityTestUtil.enableStreaming(gcmPort);
-        // gcmPort.doubleIt(25);
+        SecurityTestUtil.enableStreaming(gcmPort);
+        gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
@@ -181,9 +179,8 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         gcmPort.doubleIt(25);
         
         // Streaming
-        // TODO - See WSS-442
-        // SecurityTestUtil.enableStreaming(gcmPort);
-        // gcmPort.doubleIt(25);
+        SecurityTestUtil.enableStreaming(gcmPort);
+        gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);

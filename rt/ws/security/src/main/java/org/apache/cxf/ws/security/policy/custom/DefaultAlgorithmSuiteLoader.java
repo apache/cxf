@@ -68,7 +68,51 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         return new GCMAlgorithmSuite(version, nestedPolicy);
     }
     
-    private static class GCMAlgorithmSuite extends AlgorithmSuite {
+    public static class GCMAlgorithmSuite extends AlgorithmSuite {
+        
+        static {
+            algorithmSuiteTypes.put(
+                "Basic128GCM", 
+                new AlgorithmSuiteType(
+                    "Basic128GCM",
+                    SPConstants.SHA1,
+                    "http://www.w3.org/2009/xmlenc11#aes128-gcm",
+                    SPConstants.KW_AES128,
+                    SPConstants.KW_RSA_OAEP,
+                    SPConstants.P_SHA1_L128,
+                    SPConstants.P_SHA1_L128,
+                    128, 128, 128, 256, 1024, 4096
+                )
+            );
+            
+            algorithmSuiteTypes.put(
+                "Basic192GCM", 
+                new AlgorithmSuiteType(
+                    "Basic192GCM",
+                    SPConstants.SHA1,
+                    "http://www.w3.org/2009/xmlenc11#aes192-gcm",
+                    SPConstants.KW_AES192,
+                    SPConstants.KW_RSA_OAEP,
+                    SPConstants.P_SHA1_L192,
+                    SPConstants.P_SHA1_L192,
+                    192, 192, 192, 256, 1024, 4096
+                )
+            );
+            
+            algorithmSuiteTypes.put(
+                "Basic256GCM", 
+                new AlgorithmSuiteType(
+                    "Basic256GCM",
+                    SPConstants.SHA1,
+                    "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+                    SPConstants.KW_AES256,
+                    SPConstants.KW_RSA_OAEP,
+                    SPConstants.P_SHA1_L256,
+                    SPConstants.P_SHA1_L192,
+                    256, 192, 256, 256, 1024, 4096
+                )
+            );        
+        }
 
         GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
             super(version, nestedPolicy);
@@ -88,38 +132,13 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             }
 
             if ("Basic128GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(new AlgorithmSuiteType(
-                        "Basic128GCM",
-                        SPConstants.SHA1,
-                        "http://www.w3.org/2009/xmlenc11#aes128-gcm",
-                        SPConstants.KW_AES128,
-                        SPConstants.KW_RSA_OAEP,
-                        SPConstants.P_SHA1_L128,
-                        SPConstants.P_SHA1_L128,
-                        128, 128, 128, 256, 1024, 4096
-                ));
+                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic128GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             } else if ("Basic192GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(new AlgorithmSuiteType(
-                        "Basic192GCM",
-                        SPConstants.SHA1,
-                        "http://www.w3.org/2009/xmlenc11#aes192-gcm",
-                        SPConstants.KW_AES192,
-                        SPConstants.KW_RSA_OAEP,
-                        SPConstants.P_SHA1_L192,
-                        SPConstants.P_SHA1_L192,
-                        192, 192, 192, 256, 1024, 4096));
+                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic192GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             } else if ("Basic256GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(new AlgorithmSuiteType(
-                        "Basic256GCM",
-                        SPConstants.SHA1,
-                        "http://www.w3.org/2009/xmlenc11#aes256-gcm",
-                        SPConstants.KW_AES256,
-                        SPConstants.KW_RSA_OAEP,
-                        SPConstants.P_SHA1_L256,
-                        SPConstants.P_SHA1_L192,
-                        256, 192, 256, 256, 1024, 4096));
+                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic256GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }

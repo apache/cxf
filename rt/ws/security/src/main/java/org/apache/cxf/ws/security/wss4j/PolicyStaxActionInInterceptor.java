@@ -34,6 +34,7 @@ import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
@@ -167,9 +168,8 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
         
         assertAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
-        for (String s : AlgorithmSuite.getSupportedAlgorithmSuiteNames()) {
-            assertAllAssertionsByLocalname(aim, s);
-        }
+        assertAllAlgorithmSuites(SP11Constants.SP_NS, aim);
+        assertAllAlgorithmSuites(SP12Constants.SP_NS, aim);
         
         assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
         assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_EXTERNAL_REFERENCE);
@@ -207,5 +207,29 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
             }
         }
     }
+    
+    private void assertAllAlgorithmSuites(String spNamespace, AssertionInfoMap aim) {
+        Collection<AssertionInfo> sp11Ais = 
+            aim.get(new QName(spNamespace, SPConstants.ALGORITHM_SUITE));
+        if (sp11Ais != null) {
+            for (AssertionInfo ai : sp11Ais) {
+                ai.setAsserted(true);
+                AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
+                AlgorithmSuiteType algorithmSuiteType = algorithmSuite.getAlgorithmSuiteType();
+                String namespace = algorithmSuiteType.getNamespace();
+                if (namespace == null) {
+                    namespace = spNamespace;
+                }
+                Collection<AssertionInfo> algAis = 
+                    aim.get(new QName(namespace, algorithmSuiteType.getName()));
+                if (algAis != null) {
+                    for (AssertionInfo algAi : algAis) {
+                        algAi.setAsserted(true);
+                    }
+                }
+            }
+        }
+    }
+
 
 }
