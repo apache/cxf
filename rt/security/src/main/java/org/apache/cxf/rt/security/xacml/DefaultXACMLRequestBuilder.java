@@ -95,32 +95,36 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         attributes.add(subjectIdAttribute);
         
         for (String role : roles) {
-            AttributeValueType subjectRoleAttributeValue = 
-                RequestComponentBuilder.createAttributeValueType(role);
-            AttributeType subjectRoleAttribute = 
-                RequestComponentBuilder.createAttributeType(
-                        XACMLConstants.SUBJECT_ROLE,
-                        XACMLConstants.XS_ANY_URI,
-                        issuer,
-                        Collections.singletonList(subjectRoleAttributeValue)
-                );
-            attributes.add(subjectRoleAttribute);
+            if (role != null) {
+                AttributeValueType subjectRoleAttributeValue = 
+                    RequestComponentBuilder.createAttributeValueType(role);
+                AttributeType subjectRoleAttribute = 
+                    RequestComponentBuilder.createAttributeType(
+                            XACMLConstants.SUBJECT_ROLE,
+                            XACMLConstants.XS_ANY_URI,
+                            issuer,
+                            Collections.singletonList(subjectRoleAttributeValue)
+                    );
+                attributes.add(subjectRoleAttribute);
+            }
         }
         SubjectType subjectType = RequestComponentBuilder.createSubjectType(attributes, null);
         
         // Resource
         attributes.clear();
         for (String resource : resources) {
-            AttributeValueType resourceAttributeValue = 
-                RequestComponentBuilder.createAttributeValueType(resource);
-            AttributeType resourceAttribute = 
-                RequestComponentBuilder.createAttributeType(
-                        XACMLConstants.RESOURCE_ID,
-                        XACMLConstants.XS_STRING,
-                        null,
-                        Collections.singletonList(resourceAttributeValue)
-                );
-            attributes.add(resourceAttribute);
+            if (resource != null) {
+                AttributeValueType resourceAttributeValue = 
+                    RequestComponentBuilder.createAttributeValueType(resource);
+                AttributeType resourceAttribute = 
+                    RequestComponentBuilder.createAttributeType(
+                            XACMLConstants.RESOURCE_ID,
+                            XACMLConstants.XS_STRING,
+                            null,
+                            Collections.singletonList(resourceAttributeValue)
+                    );
+                attributes.add(resourceAttribute);
+            }
         }
         ResourceType resourceType = RequestComponentBuilder.createResourceType(attributes, null);
         
