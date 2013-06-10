@@ -79,7 +79,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return createErrorResponse(params, redirectUri, OAuthConstants.ACCESS_DENIED);
         }
         
-        if (!client.isConfidential()) {
+        if (redirectUri == null) {
             OOBAuthorizationResponse oobResponse = new OOBAuthorizationResponse();
             oobResponse.setClientId(client.getClientId());
             oobResponse.setAuthorizationCode(grant.getCode());

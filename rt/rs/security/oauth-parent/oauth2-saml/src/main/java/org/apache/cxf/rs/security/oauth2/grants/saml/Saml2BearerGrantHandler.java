@@ -80,7 +80,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     private SecurityContextProvider scProvider = new SecurityContextProviderImpl(); 
     
     public Saml2BearerGrantHandler() {
-        super(Constants.SAML2_BEARER_GRANT, true);
+        super(Constants.SAML2_BEARER_GRANT);
     }
     
     @Override

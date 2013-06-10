@@ -79,11 +79,13 @@ public final class OAuthUtils {
     }
     
     public static boolean isGrantSupportedForClient(Client client, 
-                                                    boolean isConfidential, 
+                                                    boolean canSupportPublicClients, 
                                                     String grantType) {
+        if (!client.isConfidential() && !canSupportPublicClients) {
+            return false;
+        }
         List<String> allowedGrants = client.getAllowedGrantTypes();
-        return isConfidential == client.isConfidential()
-            && (allowedGrants.isEmpty() || allowedGrants.contains(grantType));
+        return allowedGrants.isEmpty() || allowedGrants.contains(grantType);
     }
     
     public static List<String> parseScope(String requestedScope) {

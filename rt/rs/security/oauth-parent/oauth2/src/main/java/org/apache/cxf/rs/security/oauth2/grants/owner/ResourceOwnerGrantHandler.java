@@ -35,7 +35,7 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
     private ResourceOwnerLoginHandler loginHandler;
     
     public ResourceOwnerGrantHandler() {
-        super(OAuthConstants.RESOURCE_OWNER_GRANT, true);
+        super(OAuthConstants.RESOURCE_OWNER_GRANT);
     }
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
