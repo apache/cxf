@@ -187,4 +187,34 @@ public final class RMUtils {
         // Added the instance id to make the ObjectName unique
         buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(ep.hashCode());
     }
+
+    /**
+     * Utility method to compare two (possibly-null) String values.
+     * 
+     * @param aval
+     * @param bval
+     * @return <code>true</code> if equal, <code>false</code> if not
+     */
+    public static boolean equalStrings(String aval, String bval) {
+        if (null != aval) {
+            return aval.equals(bval);
+        } else {
+            return null == bval;
+        }
+    }
+
+    /**
+     * Utility method to compare two (possibly-null) Long values.
+     * 
+     * @param aval
+     * @param bval
+     * @return <code>true</code> if equal, <code>false</code> if not
+     */
+    public static boolean equalLongs(Long aval, Long bval) {
+        if (null != aval) {
+            return aval.equals(bval);
+        } else {
+            return null == bval;
+        }
+    }
 }

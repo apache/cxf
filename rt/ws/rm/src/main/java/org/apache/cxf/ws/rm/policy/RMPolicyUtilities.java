@@ -25,16 +25,17 @@ import java.util.Collection;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConfiguration;
+import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.policy.RM12Assertion.Order;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
 /**
- * Policy assertion builder for WS-RMP 1.0 (submission). Since this version of WS-RMP nests everything as
- * direct child elements of the RMAssertion JAXB can be used directly to convert to/from XML.
+ * Utilities for working with policies and configurations.
  */
 public final class RMPolicyUtilities {
     
@@ -42,8 +43,8 @@ public final class RMPolicyUtilities {
     }
     
     /**
-     * Returns an RMAssertion that is compatible with the default value
-     * and all RMAssertions pertaining to the message (can never be null).
+     * Returns an RMAssertion that is compatible with the default value and all RMAssertions pertaining to the
+     * message (can never be null).
      * 
      * @param rma the default value (non-<code>null</code>)
      * @param message the message
@@ -53,8 +54,8 @@ public final class RMPolicyUtilities {
         RMConfiguration compatible = defaultValue;
         Collection<AssertionInfo> ais = collectRMAssertions(message.get(AssertionInfoMap.class));
         for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() instanceof RM10AssertionBuilder.RMPolicyAssertion) {
-                RMAssertion rma = ((RM10AssertionBuilder.RMPolicyAssertion)ai.getAssertion()).getData();
+            if (ai.getAssertion() instanceof JaxbAssertion<?>) {
+                RMAssertion rma = (RMAssertion)((JaxbAssertion<?>)ai.getAssertion()).getData();
                 compatible = intersect(rma, compatible);
             } else if (ai.getAssertion() instanceof RM12Assertion) {
                 RM12Assertion rma = (RM12Assertion) ai.getAssertion();
@@ -85,14 +86,6 @@ public final class RMPolicyUtilities {
         return mergedAsserts;
     }
 
-    static boolean equalLongs(Long aval, Long bval) {
-        if (null != aval) {
-            return aval.equals(bval);
-        } else {
-            return false;
-        }
-    }
-    
     public static boolean equals(RMAssertion a, RMAssertion b) {
         if (a == b) {
             return true;
@@ -106,7 +99,7 @@ public final class RMPolicyUtilities {
         if (null != b.getInactivityTimeout()) {
             bval = b.getInactivityTimeout().getMilliseconds();            
         }
-        if (!equalLongs(aval, bval)) {
+        if (!RMUtils.equalLongs(aval, bval)) {
             return false;
         }
             
@@ -118,7 +111,7 @@ public final class RMPolicyUtilities {
         if (null != b.getBaseRetransmissionInterval()) {
             bval = b.getBaseRetransmissionInterval().getMilliseconds();            
         }
-        if (!equalLongs(aval, bval)) {
+        if (!RMUtils.equalLongs(aval, bval)) {
             return false;
         }
         
@@ -130,13 +123,55 @@ public final class RMPolicyUtilities {
         if (null != b.getAcknowledgementInterval()) {
             bval = b.getAcknowledgementInterval().getMilliseconds(); 
         }
-        if (!equalLongs(aval, bval)) {
+        if (!RMUtils.equalLongs(aval, bval)) {
             return false;
         }
         
         return null == a.getExponentialBackoff()
             ? null == b.getExponentialBackoff() 
             : null != b.getExponentialBackoff();         
+    }
+    
+    public static boolean equals(RMConfiguration a, RMConfiguration b) {
+        if (a == b) {
+            return true;
+        }
+        if (a == null) {
+            return b == null;
+        } else if (b == null) {
+            return false;
+        }
+        if (a.getDeliveryAssurance() == null) {
+            if (b.getDeliveryAssurance() != null) {
+                return false;
+            }
+        } else if (b.getDeliveryAssurance() == null) {
+            return false;
+        } else if (a.getDeliveryAssurance().isSetAtLeastOnce() != b.getDeliveryAssurance().isSetAtLeastOnce()
+                || a.getDeliveryAssurance().isSetAtMostOnce() != b.getDeliveryAssurance().isSetAtMostOnce()
+                || a.getDeliveryAssurance().isSetInOrder() != b.getDeliveryAssurance().isSetInOrder()) {
+            return false;
+        }
+        if (a.getRM10AddressingNamespace() == null) {
+            if (b.getRM10AddressingNamespace() != null) {
+                return false;
+            }
+        } else if (b.getRM10AddressingNamespace() == null) {
+            return false;
+        } else if (!RMUtils.equalStrings(a.getRM10AddressingNamespace().getUri(),
+                                         b.getRM10AddressingNamespace().getUri())) {
+            return false;
+        }
+        if (!RMUtils.equalStrings(a.getRMNamespace(), b.getRMNamespace())) {
+            return false;
+        }
+        return a.isExactlyOnce() == b.isExactlyOnce()
+               && a.isExponentialBackoff() == b.isExponentialBackoff()
+               && a.isSequenceSTRRequired() == b.isSequenceSTRRequired()
+               && a.isSequenceTransportSecurityRequired() == b.isSequenceTransportSecurityRequired()
+               && RMUtils.equalLongs(a.getAcknowledgementInterval(), b.getAcknowledgementInterval())
+               && RMUtils.equalLongs(a.getBaseRetransmissionInterval(), b.getBaseRetransmissionInterval())
+               && RMUtils.equalLongs(a.getInactivityTimeout(), b.getInactivityTimeout());
     }
     
     /**
@@ -220,7 +255,7 @@ public final class RMPolicyUtilities {
         if (null != asser.getInactivityTimeout()) {
             aval = asser.getInactivityTimeout().getMilliseconds();            
         }
-        if (!equalLongs(cfg.getInactivityTimeout(), aval)) {
+        if (!RMUtils.equalLongs(cfg.getInactivityTimeout(), aval)) {
             return false;
         }
             
@@ -228,7 +263,7 @@ public final class RMPolicyUtilities {
         if (null != asser.getBaseRetransmissionInterval()) {
             aval = asser.getBaseRetransmissionInterval().getMilliseconds();            
         }
-        if (!equalLongs(cfg.getBaseRetransmissionInterval(), aval)) {
+        if (!RMUtils.equalLongs(cfg.getBaseRetransmissionInterval(), aval)) {
             return false;
         }
         
@@ -236,7 +271,7 @@ public final class RMPolicyUtilities {
         if (null != asser.getAcknowledgementInterval()) {
             aval = asser.getAcknowledgementInterval().getMilliseconds(); 
         }
-        if (!equalLongs(cfg.getAcknowledgementInterval(), aval)) {
+        if (!RMUtils.equalLongs(cfg.getAcknowledgementInterval(), aval)) {
             return false;
         }
         

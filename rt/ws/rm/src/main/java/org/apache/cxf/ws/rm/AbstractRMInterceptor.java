@@ -33,7 +33,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
+import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 
 /**
  * Interceptor responsible for implementing exchange of RM protocol messages,
@@ -113,7 +113,7 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
      */
     void assertReliability(Message message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = RM10PolicyUtils.collectRMAssertions(aim);
+        Collection<AssertionInfo> ais = RMPolicyUtilities.collectRMAssertions(aim);
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
         }

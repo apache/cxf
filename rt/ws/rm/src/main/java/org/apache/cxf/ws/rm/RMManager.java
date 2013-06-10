@@ -231,19 +231,26 @@ public class RMManager {
      * @return configuration (non-<code>null</code>)
      */
     public RMConfiguration getConfiguration() {
-        return configuration;
+        return forceConfiguration();
     }
 
     /**
      * @param configuration (non-<code>null</code>)
      */
     public void setConfiguration(RMConfiguration configuration) {
+        if (configuration.getBaseRetransmissionInterval() == null) {
+            Long value = new Long(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL);
+            configuration.setBaseRetransmissionInterval(value);
+        }
+        if (configuration.getRMNamespace() == null) {
+            configuration.setRMNamespace(RM10Constants.NAMESPACE_URI);
+        }
         this.configuration = configuration;
     }
     
     RMConfiguration forceConfiguration() {
         if (configuration == null) {
-            configuration = new RMConfiguration();
+            setConfiguration(new RMConfiguration());
         }
         return configuration;
     }
@@ -349,7 +356,7 @@ public class RMManager {
                 addrUri = maps.getNamespaceURI();
             }
             if (addrUri == null) {
-                addrUri = configuration.getConfiguredProtocol().getWSANamespace();
+                addrUri = forceConfiguration().getConfiguredProtocol().getWSANamespace();
             }
         }
         return addrUri;
@@ -370,7 +377,7 @@ public class RMManager {
                 rmUri = rmps.getNamespaceURI();
             }
             if (rmUri == null) {
-                rmUri = configuration.getRMNamespace();
+                rmUri = getConfiguration().getRMNamespace();
             }
         }
         return rmUri;
@@ -406,7 +413,7 @@ public class RMManager {
             RelatesToType relatesTo = null;
             if (isServer) {
                 AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);
-                inMaps.exposeAs(configuration.getConfiguredProtocol().getWSANamespace());
+                inMaps.exposeAs(getConfiguration().getConfiguredProtocol().getWSANamespace());
                 acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();
                 source.getReliableEndpoint().getServant().setUnattachedIdentifier(inSeqId);
@@ -607,8 +614,7 @@ public class RMManager {
     @PostConstruct
     void initialise() {
         if (configuration == null) {
-            configuration = new RMConfiguration();
-            configuration.setExponentialBackoff(true);
+            forceConfiguration().setExponentialBackoff(true);
         }
         DeliveryAssuranceType deliveryAssurance = configuration.getDeliveryAssurance();
         if (deliveryAssurance == null) {

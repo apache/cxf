@@ -69,7 +69,7 @@ public class RM10AssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
             }
             JaxbAssertion<RMAssertion> other = 
                     JaxbAssertion.cast((Assertion)policyComponent);            
-            return RM10PolicyUtils.equals(this.getData(), other.getData());  
+            return RMPolicyUtilities.equals(this.getData(), other.getData());  
         }
         
         @Override

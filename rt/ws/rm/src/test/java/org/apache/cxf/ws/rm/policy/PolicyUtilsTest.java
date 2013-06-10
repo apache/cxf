@@ -27,6 +27,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.RM10Constants;
+import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
@@ -54,87 +55,81 @@ public class PolicyUtilsTest extends Assert {
     @Test
     public void testRMAssertionEquals() {
         RMAssertion a = new RMAssertion();
-        assertTrue(RM10PolicyUtils.equals(a, a));
+        assertTrue(RMPolicyUtilities.equals(a, a));
         
         RMAssertion b = new RMAssertion();
-        assertTrue(RM10PolicyUtils.equals(a, b));
+        assertTrue(RMPolicyUtilities.equals(a, b));
         
         InactivityTimeout iat = new RMAssertion.InactivityTimeout();
         iat.setMilliseconds(new Long(10));
         a.setInactivityTimeout(iat);
-        assertTrue(!RM10PolicyUtils.equals(a, b));
+        assertTrue(!RMPolicyUtilities.equals(a, b));
         b.setInactivityTimeout(iat);
-        assertTrue(RM10PolicyUtils.equals(a, b));
+        assertTrue(RMPolicyUtilities.equals(a, b));
         
         ExponentialBackoff eb = new RMAssertion.ExponentialBackoff();
         a.setExponentialBackoff(eb);
-        assertTrue(!RM10PolicyUtils.equals(a, b));
+        assertTrue(!RMPolicyUtilities.equals(a, b));
         b.setExponentialBackoff(eb);
-        assertTrue(RM10PolicyUtils.equals(a, b));    
+        assertTrue(RMPolicyUtilities.equals(a, b));    
     }
     
     @Test
     public void testIntersect() {
-        RMAssertion a = new RMAssertion();
-        RMAssertion b = new RMAssertion();
-        assertSame(a, RM10PolicyUtils.intersect(a, b));
+        RMAssertion rma = new RMAssertion();
+        RMConfiguration cfg0 = new RMConfiguration();
+        assertTrue(RMPolicyUtilities.equals(cfg0, RMPolicyUtilities.intersect(rma, cfg0)));
         
         InactivityTimeout aiat = new RMAssertion.InactivityTimeout();
-        aiat.setMilliseconds(new Long(3600000));
-        a.setInactivityTimeout(aiat);
-        InactivityTimeout biat = new RMAssertion.InactivityTimeout();
-        biat.setMilliseconds(new Long(7200000));
-        b.setInactivityTimeout(biat);
+        aiat.setMilliseconds(new Long(7200000));
+        rma.setInactivityTimeout(aiat);
+        cfg0.setInactivityTimeout(new Long(3600000));
         
-        RMAssertion c = RM10PolicyUtils.intersect(a, b);
-        assertEquals(7200000L, c.getInactivityTimeout().getMilliseconds().longValue());
-        assertNull(c.getBaseRetransmissionInterval());
-        assertNull(c.getAcknowledgementInterval());
-        assertNull(c.getExponentialBackoff());
+        RMConfiguration cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
+        assertEquals(7200000L, cfg1.getInactivityTimeout().longValue());
+        assertNull(cfg1.getBaseRetransmissionInterval());
+        assertNull(cfg1.getAcknowledgementInterval());
+        assertFalse(cfg1.isExponentialBackoff());
         
         BaseRetransmissionInterval abri = new RMAssertion.BaseRetransmissionInterval();
-        abri.setMilliseconds(new Long(10000));
-        a.setBaseRetransmissionInterval(abri);
-        BaseRetransmissionInterval bbri = new RMAssertion.BaseRetransmissionInterval();
-        bbri.setMilliseconds(new Long(20000));
-        b.setBaseRetransmissionInterval(bbri);
+        abri.setMilliseconds(new Long(20000));
+        rma.setBaseRetransmissionInterval(abri);
+        cfg0.setBaseRetransmissionInterval(new Long(10000));
         
-        c = RM10PolicyUtils.intersect(a, b);
-        assertEquals(7200000L, c.getInactivityTimeout().getMilliseconds().longValue());
-        assertEquals(20000L, c.getBaseRetransmissionInterval().getMilliseconds().longValue());
-        assertNull(c.getAcknowledgementInterval());
-        assertNull(c.getExponentialBackoff());
+        cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
+        assertEquals(7200000L, cfg1.getInactivityTimeout().longValue());
+        assertEquals(20000L, cfg1.getBaseRetransmissionInterval().longValue());
+        assertNull(cfg1.getAcknowledgementInterval());
+        assertFalse(cfg1.isExponentialBackoff());
        
         AcknowledgementInterval aai = new RMAssertion.AcknowledgementInterval();
         aai.setMilliseconds(new Long(2000));
-        a.setAcknowledgementInterval(aai);
+        rma.setAcknowledgementInterval(aai);
         
-        c = RM10PolicyUtils.intersect(a, b);
-        assertEquals(7200000L, c.getInactivityTimeout().getMilliseconds().longValue());
-        assertEquals(20000L, c.getBaseRetransmissionInterval().getMilliseconds().longValue());
-        assertEquals(2000L, c.getAcknowledgementInterval().getMilliseconds().longValue());
-        assertNull(c.getExponentialBackoff());
+        cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
+        assertEquals(7200000L, cfg1.getInactivityTimeout().longValue());
+        assertEquals(20000L, cfg1.getBaseRetransmissionInterval().longValue());
+        assertEquals(2000L, cfg1.getAcknowledgementInterval().longValue());
+        assertFalse(cfg1.isExponentialBackoff());
         
-        b.setExponentialBackoff(new RMAssertion.ExponentialBackoff());
-        c = RM10PolicyUtils.intersect(a, b);
-        assertEquals(7200000L, c.getInactivityTimeout().getMilliseconds().longValue());
-        assertEquals(20000L, c.getBaseRetransmissionInterval().getMilliseconds().longValue());
-        assertEquals(2000L, c.getAcknowledgementInterval().getMilliseconds().longValue());
-        assertNotNull(c.getExponentialBackoff());    
+        cfg0.setExponentialBackoff(true);
+        cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
+        assertEquals(7200000L, cfg1.getInactivityTimeout().longValue());
+        assertEquals(20000L, cfg1.getBaseRetransmissionInterval().longValue());
+        assertEquals(2000L, cfg1.getAcknowledgementInterval().longValue());
+        assertTrue(cfg1.isExponentialBackoff());    
     }
     
     @Test
-    public void testGetRMAssertion() {
-        RMAssertion a = new RMAssertion();
-        BaseRetransmissionInterval abri = new RMAssertion.BaseRetransmissionInterval();
-        abri.setMilliseconds(new Long(3000));
-        a.setBaseRetransmissionInterval(abri);
-        a.setExponentialBackoff(new RMAssertion.ExponentialBackoff());
+    public void testGetRMConfiguration() {
+        RMConfiguration cfg = new RMConfiguration();
+        cfg.setBaseRetransmissionInterval(new Long(3000));
+        cfg.setExponentialBackoff(true);
         
         Message message = control.createMock(Message.class);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
         control.replay();
-        assertSame(a, RM10PolicyUtils.getRMAssertion(a, message));
+        assertSame(cfg, RMPolicyUtilities.getRMConfiguration(cfg, message));
         control.verify();
         
         control.reset();
@@ -143,7 +138,7 @@ public class PolicyUtilsTest extends Assert {
         Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
         EasyMock.expect(aim.get(RM10Constants.RMASSERTION_QNAME)).andReturn(ais);
         control.replay();
-        assertSame(a, RM10PolicyUtils.getRMAssertion(a, message));
+        assertSame(cfg, RMPolicyUtilities.getRMConfiguration(cfg, message));
         control.verify();
         
         control.reset();
@@ -159,11 +154,11 @@ public class PolicyUtilsTest extends Assert {
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
         EasyMock.expect(aim.get(RM10Constants.RMASSERTION_QNAME)).andReturn(ais);
         control.replay();
-        RMAssertion c = RM10PolicyUtils.getRMAssertion(a, message);
-        assertNull(c.getAcknowledgementInterval());
-        assertNull(c.getInactivityTimeout());
-        assertEquals(2000L, c.getBaseRetransmissionInterval().getMilliseconds().longValue());
-        assertNotNull(c.getExponentialBackoff());   
+        RMConfiguration cfg1 = RMPolicyUtilities.getRMConfiguration(cfg, message);
+        assertNull(cfg1.getAcknowledgementInterval());
+        assertNull(cfg1.getInactivityTimeout());
+        assertEquals(2000L, cfg1.getBaseRetransmissionInterval().longValue());
+        assertTrue(cfg1.isExponentialBackoff());   
         control.verify();
     }
     

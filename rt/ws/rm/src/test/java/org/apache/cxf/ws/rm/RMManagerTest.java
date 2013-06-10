@@ -103,14 +103,13 @@ public class RMManagerTest extends Assert {
     @Test
     public void testInitialisation() {
         manager = new RMManager();
-        assertNull("RMConfiguration is set.", manager.getConfiguration());
         assertNull("sourcePolicy is set.", manager.getSourcePolicy());
         assertNull("destinationPolicy is set.", manager.getDestinationPolicy());
         
         manager.initialise();
         
         RMConfiguration cfg = manager.getConfiguration();
-        assertNotNull("RMAssertion is not set.", cfg);
+        assertNotNull("RMConfiguration is not set.", cfg);
         assertNotNull("sourcePolicy is not set.", manager.getSourcePolicy());
         assertNotNull("destinationPolicy is not set.", manager.getDestinationPolicy());
         assertNotNull("deliveryAssirance is not set.", cfg.getDeliveryAssurance());

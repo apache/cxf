@@ -39,11 +39,9 @@ public class RMConfiguration {
     private RM10AddressingNamespaceType rm10AddressingNamespace;
     
     /**
-     * Constructor just sets defaults.
+     * Constructor.
      */
     public RMConfiguration() {
-        baseRetransmissionInterval = new Long(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL);
-        rmNamespace = RM10Constants.NAMESPACE_URI;
     }
     
     /**
