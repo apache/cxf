@@ -35,14 +35,13 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     public AuthorizationCodeGrantHandler() {
-        super(OAuthConstants.AUTHORIZATION_CODE_GRANT, true);
+        super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
     
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
         throws OAuthServiceException {
-        // Only confidential clients can use it
         checkIfGrantSupported(client);
-        
+                
         // Get the grant representation from the provider 
         String codeValue = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         ServerAuthorizationCodeGrant grant = 
@@ -59,14 +58,19 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         }
         // redirect URIs must match too
         String expectedRedirectUri = grant.getRedirectUri();
-        if (expectedRedirectUri != null) {
-            String providedRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);
-            
-            if (providedRedirectUri != null && !providedRedirectUri.equals(expectedRedirectUri)) {
+        String providedRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);
+        if (providedRedirectUri != null) {
+            if (expectedRedirectUri == null || !providedRedirectUri.equals(expectedRedirectUri)) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
+        } else if (expectedRedirectUri == null && !isCanSupportPublicClients()
+            || expectedRedirectUri != null 
+                && (client.getRedirectUris().size() != 1 
+                || !client.getRedirectUris().contains(expectedRedirectUri))) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         return doCreateAccessToken(client, grant.getSubject(), grant.getApprovedScopes());
     }
+    
     
 }

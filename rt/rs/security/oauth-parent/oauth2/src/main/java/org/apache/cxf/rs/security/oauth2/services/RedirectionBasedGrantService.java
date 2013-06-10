@@ -58,6 +58,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private String supportedResponseType;
     private String supportedGrantType;
     private boolean partialMatchScopeValidation;
+    private boolean useRegisteredRedirectUriIfPossible = true;
     private SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider;
     private SubjectCreator subjectCreator;
     private ResourceOwnerNameProvider resourceOwnerNameProvider;
@@ -164,7 +165,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     
         // Return the authorization challenge data to the end user 
         OAuthAuthorizationData data = 
-            createAuthorizationData(client, params, permissions);
+            createAuthorizationData(client, params, redirectUri, permissions);
         personalizeData(data, userSubject);
         return Response.ok(data).build();
         
@@ -174,7 +175,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      * Create the authorization challenge data 
      */
     protected OAuthAuthorizationData createAuthorizationData(
-        Client client, MultivaluedMap<String, String> params, List<OAuthPermission> perms) {
+        Client client, MultivaluedMap<String, String> params, String redirectUri, List<OAuthPermission> perms) {
         
         OAuthAuthorizationData secData = new OAuthAuthorizationData();
         
@@ -183,7 +184,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         secData.setPermissions(perms);
         secData.setProposedScope(OAuthUtils.convertPermissionsToScope(perms));
         secData.setClientId(client.getClientId());
-        secData.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
+        if (redirectUri != null) {
+            secData.setRedirectUri(redirectUri);
+        }
         secData.setState(params.getFirst(OAuthConstants.STATE));
         
         secData.setApplicationName(client.getApplicationName()); 
@@ -313,10 +316,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             if (!uris.contains(redirectUri)) {
                 redirectUri = null;
             } 
-        } else if (uris.size() == 1) {
+        } else if (uris.size() == 1 && useRegisteredRedirectUriIfPossible) {
             redirectUri = uris.get(0);
         }
-        if (redirectUri == null && !canRedirectUriBeEmpty(client)) {
+        if (redirectUri == null && uris.size() == 0 && !canRedirectUriBeEmpty(client)) {
             reportInvalidRequestError("Client Redirect Uri is invalid");    
         }
         return redirectUri;
@@ -384,6 +387,14 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
 
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
+    }
+    /**
+     * If a client does not include a redirect_uri parameter but has an exactly one
+     * pre-registered redirect_uri then use that redirect_uri
+     * @param use allows to use a single registered redirect_uri if set to true (default)
+     */
+    public void setUseRegisteredRedirectUriIfPossible(boolean use) {
+        this.useRegisteredRedirectUriIfPossible = use;
     }
     
     protected abstract boolean canSupportPublicClient(Client c);

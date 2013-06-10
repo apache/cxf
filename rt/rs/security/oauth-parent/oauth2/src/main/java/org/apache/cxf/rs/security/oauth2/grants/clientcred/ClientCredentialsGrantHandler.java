@@ -34,7 +34,7 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
    
     
     public ClientCredentialsGrantHandler() {
-        super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, true);
+        super(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
     }
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
