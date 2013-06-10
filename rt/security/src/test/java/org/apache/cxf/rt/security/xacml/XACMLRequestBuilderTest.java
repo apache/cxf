@@ -73,7 +73,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
             builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
-        assertEquals(operation, builder.getResource(msg));
+        assertTrue(builder.getResources(msg).contains(operation));
         
         operation = "user/list.json";
         msg = new MessageImpl();
@@ -82,7 +82,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
-        assertEquals(operation, builder.getResource(msg));
+        assertTrue(builder.getResources(msg).contains(operation));
         
         operation = "https://localhost:8080/user/list.json";
         msg = new MessageImpl();
@@ -92,7 +92,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
-        assertEquals(operation, builder.getResource(msg));
+        assertTrue(builder.getResources(msg).contains(operation));
     }
     
     @org.junit.Test
