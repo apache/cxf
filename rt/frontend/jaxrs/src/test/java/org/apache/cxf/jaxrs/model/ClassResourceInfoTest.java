@@ -48,7 +48,7 @@ public class ClassResourceInfoTest extends Assert {
     @Path("/bar")
     @Produces("test/bar")
     @Consumes("test/foo")
-    static class TestClass {
+    public static class TestClass {
         @Context UriInfo u;
         @Context HttpHeaders h;
         @Resource HttpServletRequest req;
@@ -73,6 +73,16 @@ public class ClassResourceInfoTest extends Assert {
         @GET
         public void getIt() { 
             
+        }
+      
+        @Path("/same")
+        public TestClass2 getThis() { 
+            return this;
+        }
+        
+        @Path("sub")
+        public TestClass3 getTestClass3() { 
+            return new TestClass3();
         }
     }
     
@@ -99,7 +109,7 @@ public class ClassResourceInfoTest extends Assert {
     
     @Test
     public void testGetHttpContexts() {
-        ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
+        ClassResourceInfo c = new ClassResourceInfo(TestClass.class, false);
         List<Field> fields = c.getContextFields();
         assertEquals("Only root classes should check these fields", 0, fields.size());
         
@@ -191,4 +201,18 @@ public class ClassResourceInfoTest extends Assert {
         assertEquals(2, methods.size());
         assertTrue(methods.contains("HEAD") && methods.contains("GET"));
     }
+    
+    @Test
+    public void testSubresourceInheritProduces() {
+        ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
+                                  TestClass2.class, TestClass2.class, true, true);
+        assertEquals("test/bar", c.getProduceMime().get(0).toString());
+        ClassResourceInfo sub = c.getSubResource(TestClass2.class, TestClass3.class);
+        assertNotNull(sub);
+        assertEquals("test/bar", sub.getProduceMime().get(0).toString());
+        sub = c.getSubResource(TestClass2.class, TestClass2.class);
+        assertNotNull(sub);
+        assertEquals("test/bar", sub.getProduceMime().get(0).toString());
+    }
+    
 }
