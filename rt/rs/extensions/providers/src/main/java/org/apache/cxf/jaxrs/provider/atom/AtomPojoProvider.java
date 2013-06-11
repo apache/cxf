@@ -88,6 +88,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     private MessageContext mc;   
     private boolean formattedOutput;
     private boolean useJaxbForContent = true;
+    private boolean autodetectCharset;
     private String entryContentMethodName = DEFAULT_ENTRY_CONTENT_METHOD;
     
     public void setUseJaxbForContent(boolean use) {
@@ -601,8 +602,10 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         if (isFeed) {
             return readFromFeed(cls, mt, headers, is);
         } else {
-            Entry entry = new AtomEntryProvider().readFrom(Entry.class, Entry.class, 
-                                                           new Annotation[]{}, mt, headers, is);
+            AtomEntryProvider p = new AtomEntryProvider();
+            p.setAutodetectCharset(autodetectCharset);
+            Entry entry = p.readFrom(Entry.class, Entry.class, 
+                                     new Annotation[]{}, mt, headers, is);
             return readFromEntry(entry, cls, mt, headers, is);
         }
     }
@@ -613,6 +616,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         throws IOException {
         
         AtomFeedProvider p = new AtomFeedProvider();
+        p.setAutodetectCharset(autodetectCharset);
         Feed feed = p.readFrom(Feed.class, Feed.class, new Annotation[]{}, mt, headers, is);
         
         AtomElementReader<?, ?> reader = getAtomReader(cls);
@@ -655,6 +659,10 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
         }
         return null;
+    }
+
+    public void setAutodetectCharset(boolean autodetectCharset) {
+        this.autodetectCharset = autodetectCharset;
     }
 
     

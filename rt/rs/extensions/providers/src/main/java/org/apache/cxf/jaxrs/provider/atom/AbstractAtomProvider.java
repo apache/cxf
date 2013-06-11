@@ -35,6 +35,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
+import org.apache.abdera.parser.Parser;
+import org.apache.abdera.parser.ParserOptions;
 import org.apache.abdera.writer.Writer;
 import org.apache.cxf.common.logging.LogUtils;
 
@@ -43,7 +45,7 @@ public abstract class AbstractAtomProvider<T extends Element>
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAtomProvider.class);
     private static final Abdera ATOM_ENGINE = new Abdera();
-        
+    private boolean autodetectCharset;
     private boolean formattedOutput;
     
     public long getSize(T element, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -82,7 +84,14 @@ public abstract class AbstractAtomProvider<T extends Element>
     public T readFrom(Class<T> clazz, Type t, Annotation[] a, MediaType mt, 
                          MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
-        Document<T> doc = ATOM_ENGINE.getParser().parse(is);
+        Parser parser = ATOM_ENGINE.getParser();
+        synchronized (parser) {
+            ParserOptions options = parser.getDefaultParserOptions();
+            if (options != null) {
+                options.setAutodetectCharset(autodetectCharset);
+            }
+        }
+        Document<T> doc = parser.parse(is);
         return doc.getRoot();
     }
 
@@ -90,4 +99,7 @@ public abstract class AbstractAtomProvider<T extends Element>
         this.formattedOutput = formattedOutput;
     }
 
+    public void setAutodetectCharset(boolean autodetectCharset) {
+        this.autodetectCharset = autodetectCharset;
+    }
 }
