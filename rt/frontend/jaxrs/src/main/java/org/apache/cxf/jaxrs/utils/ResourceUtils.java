@@ -270,7 +270,8 @@ public final class ResourceUtils {
                     if (enableStatic) {
                         ClassResourceInfo subCri = cri.findResource(subClass, subClass);
                         if (subCri == null) {
-                            subCri = subClass == cri.getServiceClass() ? cri
+                            ClassResourceInfo ancestor = getAncestorWithSameServiceClass(cri, subClass);
+                            subCri = ancestor != null ? ancestor
                                      : createClassResourceInfo(subClass, subClass, cri, false, enableStatic,
                                                                cri.getBus());
                         }
@@ -283,6 +284,16 @@ public final class ResourceUtils {
             }
         }
         cri.setMethodDispatcher(md);
+    }
+    
+    private static ClassResourceInfo getAncestorWithSameServiceClass(ClassResourceInfo parent, Class<?> subClass) {
+        if (parent == null) {
+            return null;
+        }
+        if (parent.getServiceClass() == subClass) {
+            return parent;
+        }
+        return getAncestorWithSameServiceClass(parent.getParent(), subClass);
     }
     
     public static Constructor<?> findResourceConstructor(Class<?> resourceClass, boolean perRequest) {
@@ -552,7 +563,7 @@ public final class ResourceUtils {
         }
         
         for (ClassResourceInfo sub : resource.getSubResources()) {
-            if (sub != resource) {
+            if (resource != sub) {
                 getAllTypesForResource(sub, types, jaxbOnly);
             }
         }
