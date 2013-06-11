@@ -149,10 +149,9 @@ public class ClassResourceInfo extends BeanResourceInfo {
         SubresourceKey key = new SubresourceKey(typedClass, instanceClass);
         ClassResourceInfo cri = subResources.get(key);
         if (cri == null) {
-            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, resolveContexts,
+            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, this, false, resolveContexts,
                                                         getBus());
             if (cri != null) {
-                cri.setParent(this);
                 subResources.putIfAbsent(key, cri);
             }
         }
@@ -183,9 +182,6 @@ public class ClassResourceInfo extends BeanResourceInfo {
         subResources.putIfAbsent(new SubresourceKey(cri.getResourceClass(), 
                                             cri.getServiceClass()),
                                  cri);
-        if (cri != this) {
-            cri.setParent(this);
-        }
     }
     
     public Collection<ClassResourceInfo> getSubResources() {
@@ -287,7 +283,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
         }
     }
 
-    void setParent(ClassResourceInfo parent) {
+    public void setParent(ClassResourceInfo parent) {
         this.parent = parent;
     }
 }
