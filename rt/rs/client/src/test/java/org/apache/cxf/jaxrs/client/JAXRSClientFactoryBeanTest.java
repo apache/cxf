@@ -233,12 +233,12 @@ public class JAXRSClientFactoryBeanTest extends Assert {
     
     public interface IProductResource {
         @Path("/parts")
-        public IPartsResource getParts();
+        IPartsResource getParts();
     }
     
     public interface IPartsResource {
-    @Path("/{i}/")
-    public IProductResource elementAt(@PathParam("i") String i);
+        @Path("/{i}/")
+        IProductResource elementAt(@PathParam("i") String i);
         String get();
     }
     
