@@ -66,6 +66,7 @@ public interface BookSubresource {
     
     @POST
     @Path("/subresource3")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     Book getTheBook3(@FormParam("id") String id,
                      @FormParam("name") List<String> nameParts) throws BookNotFoundFault;
     
