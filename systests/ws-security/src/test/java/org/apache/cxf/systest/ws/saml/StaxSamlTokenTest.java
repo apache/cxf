@@ -886,9 +886,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // See WSS-443
     @org.junit.Test
-    @org.junit.Ignore
     public void testSaml2EndorsingEncryptedOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
