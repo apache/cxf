@@ -138,9 +138,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
                 ClassResourceInfo tmpCri = subResources.putIfAbsent(key, cri);
                 if (tmpCri != null) {
                     cri = tmpCri;
-                    if (cri != this) {
-                        cri.setParent(this);
-                    }
                 }
             }
         }
@@ -151,9 +148,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         subResources.putIfAbsent(new SubresourceKey(cri.getResourceClass(), 
                                             cri.getServiceClass()),
                                  cri);
-        if (cri != this) {
-            cri.setParent(this);
-        }
     }
     
     public Collection<ClassResourceInfo> getSubResources() {
@@ -299,7 +293,7 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         return resourceProvider != null && resourceProvider.isSingleton();
     }
 
-    void setParent(ClassResourceInfo parent) {
+    public void setParent(ClassResourceInfo parent) {
         this.parent = parent;
     }
 }

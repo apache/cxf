@@ -215,7 +215,17 @@ public final class ResourceUtils {
                                                             boolean root, 
                                                             boolean enableStatic,
                                                             Bus bus) {
+        return createClassResourceInfo(rClass, sClass, null, root, enableStatic, bus);
+    }
+    
+    public static ClassResourceInfo createClassResourceInfo(final Class<?> rClass, 
+                                                            final Class<?> sClass,
+                                                            ClassResourceInfo parent,
+                                                            boolean root, 
+                                                            boolean enableStatic,
+                                                            Bus bus) {
         ClassResourceInfo cri = new ClassResourceInfo(rClass, sClass, root, enableStatic, bus);
+        cri.setParent(parent);
 
         if (root) {
             URITemplate t = URITemplate.createTemplate(cri.getPath());
@@ -244,7 +254,7 @@ public final class ResourceUtils {
                         ClassResourceInfo subCri = cri.findResource(subClass, subClass);
                         if (subCri == null) {
                             subCri = subClass == cri.getServiceClass() ? cri
-                                     : createClassResourceInfo(subClass, subClass, false, enableStatic,
+                                     : createClassResourceInfo(subClass, subClass, cri, false, enableStatic,
                                                                cri.getBus());
                         }
                         
