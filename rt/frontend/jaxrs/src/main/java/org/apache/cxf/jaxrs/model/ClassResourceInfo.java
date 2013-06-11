@@ -296,4 +296,8 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     public void setParent(ClassResourceInfo parent) {
         this.parent = parent;
     }
+    
+    public ClassResourceInfo getParent() {
+        return parent;
+    }
 }

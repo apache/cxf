@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Fault;
@@ -179,6 +182,16 @@ public class JAXRSClientFactoryBeanTest extends Assert {
                      WebClient.client(store2).getCurrentURI().toString());
     }
     
+    @Test 
+    public void testComplexProxy() throws Exception {
+        IProductResource productResource = JAXRSClientFactory.create("http://localhost:9000", 
+                                                                     IProductResource.class);
+        assertNotNull(productResource);
+        IPartsResource parts = productResource.getParts();
+        assertNotNull(parts);
+        IProductResource productResourceElement = parts.elementAt("1");
+        assertNotNull(productResourceElement);
+    }
     
     private class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
@@ -216,5 +229,15 @@ public class JAXRSClientFactoryBeanTest extends Assert {
     }
     
 
+    public interface IProductResource {
+        @Path("/parts")
+        IPartsResource getParts();
+    }
     
+    public interface IPartsResource {
+        @Path("/{i}/")
+        IProductResource elementAt(@PathParam("i") String i);
+        String get();
+    }
+
 }
