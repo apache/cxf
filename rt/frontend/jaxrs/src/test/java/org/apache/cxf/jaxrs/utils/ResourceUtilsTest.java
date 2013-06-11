@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
@@ -116,5 +119,41 @@ public class ResourceUtilsTest extends Assert {
         assertEquals(2, types.size());
         assertTrue(types.containsKey(Book.class));
         assertTrue(types.containsKey(Chapter.class));
+    }
+    @Test
+    public void testGetAllJaxbClasses2() {
+        ClassResourceInfo cri1 = 
+            ResourceUtils.createClassResourceInfo(IProductResource.class, IProductResource.class, true, true);
+        Map<Class<?>, Type> types = 
+            ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true)
+                .getAllTypes();
+        assertEquals(2, types.size());
+        assertTrue(types.containsKey(Book.class));
+        assertTrue(types.containsKey(Chapter.class));
+    }
+    
+    public interface IProductResource {
+        @Path("/parts")
+        IPartsResource getParts();
+    }
+    
+    public interface IPartsResource {
+        @Path("/{i}/")
+        IPartsResource2 elementAt(@PathParam("i") String i);
+        @Path("/parts")
+        IPartsResource getParts();
+        @Path("/products")
+        IProductResource getProducts();
+        @Path("chapter")
+        Chapter get();
+    }
+    
+    public interface IPartsResource2 {
+        @Path("/{i}/")
+        IPartsResource elementAt(@PathParam("i") String i);
+        @Path("/products")
+        IProductResource getProducts();
+        @GET
+        Book get();
     }
 }

@@ -275,4 +275,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
     public void setParent(ClassResourceInfo parent) {
         this.parent = parent;
     }
+    
+    public ClassResourceInfo getParent() {
+        return parent;
+    }
 }
