@@ -563,10 +563,20 @@ public final class ResourceUtils {
         }
         
         for (ClassResourceInfo sub : resource.getSubResources()) {
-            if (resource != sub) {
+            if (!isRecursiveSubResource(resource, sub)) {
                 getAllTypesForResource(sub, types, jaxbOnly);
             }
         }
+    }
+    
+    private static boolean isRecursiveSubResource(ClassResourceInfo parent, ClassResourceInfo sub) {
+        if (parent == null) {
+            return false;
+        }
+        if (parent == sub) {
+            return true;
+        }
+        return isRecursiveSubResource(parent.getParent(), sub);
     }
     
     private static void checkJaxbType(Class<?> type, 
