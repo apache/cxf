@@ -152,6 +152,14 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
             
         } 
+        if (uri.getScheme().equals("https") 
+            && tlsClientParameters != null
+            && tlsClientParameters.getSSLSocketFactory() != null) {
+            //if they configured in an SSLSocketFactory, we cannot do anything
+            //with it as the NIO based transport cannot use socket created from
+            //the SSLSocketFactory.
+            o = false;
+        }
         if (!MessageUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
             super.setupConnection(message, uri, csPolicy);
@@ -200,6 +208,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                                               boolean needToCacheRequest, 
                                               boolean isChunking,
                                               int chunkThreshold) throws IOException {
+        
         if (Boolean.TRUE.equals(message.get(USE_ASYNC))) {
             CXFHttpRequest entity = message.get(CXFHttpRequest.class);
             AsyncWrappedOutputStream out = new AsyncWrappedOutputStream(message,
