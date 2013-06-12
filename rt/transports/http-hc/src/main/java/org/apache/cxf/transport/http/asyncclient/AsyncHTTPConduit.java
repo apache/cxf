@@ -809,20 +809,25 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         sslengine.setEnabledCipherSuites(cipherSuites);
     }
 
-    protected static void getKeyManagersWithCertAlias(TLSClientParameters tlsClientParameters,
+    protected static KeyManager[] getKeyManagersWithCertAlias(TLSClientParameters tlsClientParameters,
                                                       KeyManager[] keyManagers) throws GeneralSecurityException {
         if (tlsClientParameters.getCertAlias() != null) {
+            KeyManager ret[] = new KeyManager[keyManagers.length];  
             for (int idx = 0; idx < keyManagers.length; idx++) {
                 if (keyManagers[idx] instanceof X509KeyManager) {
                     try {
-                        keyManagers[idx] = new AliasedX509ExtendedKeyManager(tlsClientParameters.getCertAlias(),
+                        ret[idx] = new AliasedX509ExtendedKeyManager(tlsClientParameters.getCertAlias(),
                                                                              (X509KeyManager)keyManagers[idx]);
                     } catch (Exception e) {
                         throw new GeneralSecurityException(e);
                     }
+                } else {
+                    ret[idx] = keyManagers[idx]; 
                 }
             }
+            return ret;
         }
+        return keyManagers;
     }
 
 
