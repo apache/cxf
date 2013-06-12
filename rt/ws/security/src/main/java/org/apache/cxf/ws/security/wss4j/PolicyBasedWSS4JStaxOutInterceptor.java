@@ -45,6 +45,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxAsymmetricBindingHandler;
+import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxSymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxTransportBindingHandler;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -350,6 +351,11 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (!ais.isEmpty()) {
             new StaxAsymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
+        }
+        
+        ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {
+            new StaxSymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
         }
     }
     

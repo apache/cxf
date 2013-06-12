@@ -452,11 +452,7 @@ public abstract class AbstractStaxBindingHandler {
         */
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         AbstractBinding binding = getBinding(aim);
-        if (binding instanceof SymmetricBinding) {
-            config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKeySHA1");
-        } else {
-            config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
-        }
+        config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
         
         // Find out do we also need to include the token as per the Inclusion requirement
         if (token instanceof X509Token 
