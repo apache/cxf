@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.ws.rm.manager.RetryPolicyType;
+import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -60,11 +60,9 @@ public class RMManagerConfigurationTest extends Assert {
         bus = factory.createBus("org/apache/cxf/ws/rm/exactly-once.xml", false);
         RMManager manager = bus.getExtension(RMManager.class);
         RMConfiguration cfg = manager.getConfiguration();
-        assertNotNull(cfg.getDeliveryAssurance().getAtLeastOnce());
-        assertTrue(cfg.getDeliveryAssurance().isSetAtLeastOnce());
-        assertNotNull(cfg.getDeliveryAssurance().getAtMostOnce());
-        assertTrue(cfg.getDeliveryAssurance().isSetAtMostOnce());
-        assertTrue(cfg.isExactlyOnce());
+        DeliveryAssurance da = cfg.getDeliveryAssurance();
+        assertEquals(da, DeliveryAssurance.EXACTLY_ONCE);
+        assertFalse(cfg.isInOrder());
     }
     
     @Test
@@ -73,11 +71,6 @@ public class RMManagerConfigurationTest extends Assert {
         bus = factory.createBus("org/apache/cxf/ws/rm/feature.xml");
         RMManager manager = bus.getExtension(RMManager.class);
         verifyManager(manager);
-
-        // verify additional properties not verified by verifyManager.
-        RetryPolicyType rmrp = manager.getSourcePolicy().getRetryPolicy();
-        assertNotNull(rmrp);
-        assertEquals(3, rmrp.getMaxRetries());
     }
     
     private void verifyManager(RMManager manager) {
@@ -91,7 +84,7 @@ public class RMManagerConfigurationTest extends Assert {
             manager.getConfiguration().getRM10AddressingNamespace().getUri());
         TestStore store = (TestStore)manager.getStore();
         assertEquals("here", store.getLocation());     
-        assertNotNull(manager.getConfiguration().getDeliveryAssurance().getInOrder());
+        assertTrue(manager.getConfiguration().isInOrder());
     }
 
     static class TestStore implements RMStore {

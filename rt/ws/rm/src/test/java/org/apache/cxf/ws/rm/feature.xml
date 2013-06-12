@@ -41,7 +41,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 </wsrm-mgr:deliveryAssurance>
                 <wsrm-mgr:sourcePolicy>
                     <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="true"/>                    
-                    <wsrm-mgr:retryPolicy maxRetries="3" />                    
                 </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:destinationPolicy>
                     <wsrm-mgr:acksPolicy ImmediaAcksTimeout="2000" intraMessageThreshold="0"/>                    

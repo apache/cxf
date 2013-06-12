@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 
 /**
@@ -27,14 +26,18 @@ import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
  * configuration with default values and WS-ReliableMessagingPolicy overrides.
  */
 public class RMConfiguration {
+    
+    public enum DeliveryAssurance {
+        AT_MOST_ONCE, AT_LEAST_ONCE, EXACTLY_ONCE
+    }
     private Long inactivityTimeout;
     private Long acknowledgementInterval;
     private Long baseRetransmissionInterval;
     private boolean exponentialBackoff;
     private boolean sequenceSTRRequired;
     private boolean sequenceTransportSecurityRequired;
-    private boolean exactlyOnce;
-    private DeliveryAssuranceType deliveryAssurance;
+    private boolean inOrder;
+    private DeliveryAssurance deliveryAssurance;
     private String rmNamespace;
     private RM10AddressingNamespaceType rm10AddressingNamespace;
     
@@ -60,32 +63,31 @@ public class RMConfiguration {
         rmNamespace = base.rmNamespace;
         rm10AddressingNamespace = base.rm10AddressingNamespace;
     }
-    
-    /**
-     *  @return Returns the exactlyOnce.
+
+    /** * @return Returns the inOrder.
      */
-    public boolean isExactlyOnce() {
-        return exactlyOnce;
+    public boolean isInOrder() {
+        return inOrder;
     }
 
     /**
-     * @param exactlyOnce The exactlyOnce to set.
+     * @param inOrder The inOrder to set.
      */
-    public void setExactlyOnce(boolean exactlyOnce) {
-        this.exactlyOnce = exactlyOnce;
+    public void setInOrder(boolean inOrder) {
+        this.inOrder = inOrder;
     }
 
     /**  
      * @return Returns the deliveryAssurance.
      */
-    public DeliveryAssuranceType getDeliveryAssurance() {
+    public DeliveryAssurance getDeliveryAssurance() {
         return deliveryAssurance;
     }
 
     /**
      * @param deliveryAssurance The deliveryAssurance to set.
      */
-    public void setDeliveryAssurance(DeliveryAssuranceType deliveryAssurance) {
+    public void setDeliveryAssurance(DeliveryAssurance deliveryAssurance) {
         this.deliveryAssurance = deliveryAssurance;
     }
 

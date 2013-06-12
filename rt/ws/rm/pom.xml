@@ -168,15 +168,6 @@
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                  </xsdOption>
-                                 <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/schemas/configuration/wsrmp-1.1-schema-200702.xsd</xsd>
-                                    <bindingFile>${basedir}/src/main/resources/schemas/configuration/wsrmp-1.1-schema-200702.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
-                                    <extension>true</extension>
-                                    <extensionArgs>
-                                        <extensionArg>-Xdv</extensionArg>
-                                    </extensionArgs>
-                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>

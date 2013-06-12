@@ -92,7 +92,7 @@ public class RMFeature extends AbstractFeature {
             manager.setRMAssertion(rmAssertion);
         }
         if (null != deliveryAssurance) {
-            manager.getConfiguration().setDeliveryAssurance(deliveryAssurance);
+            manager.setDeliveryAssurance(deliveryAssurance);
         }
         if (null != sourcePolicy) {
             manager.setSourcePolicy(sourcePolicy);

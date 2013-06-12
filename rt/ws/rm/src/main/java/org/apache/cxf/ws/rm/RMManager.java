@@ -59,6 +59,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
+import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
@@ -205,11 +206,19 @@ public class RMManager {
     }
 
     /**
-     * @param deliveryAssurance The deliveryAssurance to set.
+     * @param dat The deliveryAssurance to set.
      */
-    public void setDeliveryAssurance(DeliveryAssuranceType da) {
-        RMConfiguration cfg = forceConfiguration();
-        cfg.setExactlyOnce(da.isSetExactlyOnce());
+    public void setDeliveryAssurance(DeliveryAssuranceType dat) {
+        RMConfiguration cfg = getConfiguration();
+        cfg.setInOrder(dat.isSetInOrder());
+        DeliveryAssurance da = null;
+        if (dat.isSetExactlyOnce() || (dat.isSetAtLeastOnce() && dat.isSetAtMostOnce())) {
+            da = DeliveryAssurance.EXACTLY_ONCE;
+        } else if (dat.isSetAtLeastOnce()) {
+            da = DeliveryAssurance.AT_LEAST_ONCE;
+        } else if (dat.isSetAtMostOnce()) {
+            da = DeliveryAssurance.AT_MOST_ONCE;
+        }
         cfg.setDeliveryAssurance(da);
     }
 
@@ -259,7 +268,7 @@ public class RMManager {
      * @param rma The rmAssertion to set.
      */
     public void setRMAssertion(org.apache.cxf.ws.rmp.v200502.RMAssertion rma) {
-        RMConfiguration cfg = forceConfiguration();
+        RMConfiguration cfg = getConfiguration();
         cfg.setExponentialBackoff(rma.getExponentialBackoff() != null);
         org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout inactTimeout
             = rma.getInactivityTimeout();
@@ -616,18 +625,9 @@ public class RMManager {
         if (configuration == null) {
             forceConfiguration().setExponentialBackoff(true);
         }
-        DeliveryAssuranceType deliveryAssurance = configuration.getDeliveryAssurance();
-        if (deliveryAssurance == null) {
-            DeliveryAssuranceType da = new DeliveryAssuranceType();
-            da.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
-            configuration.setDeliveryAssurance(da);
-        } else if (deliveryAssurance.getExactlyOnce() != null) {
-            if (deliveryAssurance.getAtMostOnce() == null) {
-                deliveryAssurance.setAtMostOnce(new DeliveryAssuranceType.AtMostOnce());
-            }
-            if (deliveryAssurance.getAtLeastOnce() == null) {
-                deliveryAssurance.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
-            }
+        DeliveryAssurance da = configuration.getDeliveryAssurance();
+        if (da == null) {
+            configuration.setDeliveryAssurance(DeliveryAssurance.AT_LEAST_ONCE);
         }
         if (null == sourcePolicy) {
             setSourcePolicy(null);

@@ -29,8 +29,8 @@ import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConfiguration;
+import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.RMUtils;
-import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.policy.RM12Assertion.Order;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
@@ -147,9 +147,7 @@ public final class RMPolicyUtilities {
             }
         } else if (b.getDeliveryAssurance() == null) {
             return false;
-        } else if (a.getDeliveryAssurance().isSetAtLeastOnce() != b.getDeliveryAssurance().isSetAtLeastOnce()
-                || a.getDeliveryAssurance().isSetAtMostOnce() != b.getDeliveryAssurance().isSetAtMostOnce()
-                || a.getDeliveryAssurance().isSetInOrder() != b.getDeliveryAssurance().isSetInOrder()) {
+        } else if (a.getDeliveryAssurance() != b.getDeliveryAssurance()) {
             return false;
         }
         if (a.getRM10AddressingNamespace() == null) {
@@ -165,7 +163,7 @@ public final class RMPolicyUtilities {
         if (!RMUtils.equalStrings(a.getRMNamespace(), b.getRMNamespace())) {
             return false;
         }
-        return a.isExactlyOnce() == b.isExactlyOnce()
+        return a.isInOrder() == b.isInOrder()
                && a.isExponentialBackoff() == b.isExponentialBackoff()
                && a.isSequenceSTRRequired() == b.isSequenceSTRRequired()
                && a.isSequenceTransportSecurityRequired() == b.isSequenceTransportSecurityRequired()
@@ -301,29 +299,25 @@ public final class RMPolicyUtilities {
             compatible.setSequenceTransportSecurityRequired(true);
         }
         if (rma.isAssuranceSet()) {
-            DeliveryAssuranceType assurance = compatible.getDeliveryAssurance();
-            if (assurance == null) {
-                assurance = new DeliveryAssuranceType();
-            }
-            if (rma.isInOrder()) {
-                assurance.setInOrder(new DeliveryAssuranceType.InOrder());
-            }
+            compatible.setInOrder(rma.isInOrder());
+            DeliveryAssurance da = null;
             Order order = rma.getOrder();
             if (order != null) {
                 switch (order) {
                 case AtLeastOnce:
-                    assurance.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
+                    da = DeliveryAssurance.AT_LEAST_ONCE;
                     break;
                 case AtMostOnce:
-                    assurance.setAtMostOnce(new DeliveryAssuranceType.AtMostOnce());
+                    da = DeliveryAssurance.AT_MOST_ONCE;
                     break;
                 case ExactlyOnce:
-                    assurance.setExactlyOnce(new DeliveryAssuranceType.ExactlyOnce());
+                    da = DeliveryAssurance.EXACTLY_ONCE;
                     break;
                 default:
                     // unreachable code, required by checkstyle
                     break;
                 }
+                compatible.setDeliveryAssurance(da);
             }
         }
         return compatible;
@@ -341,19 +335,19 @@ public final class RMPolicyUtilities {
             || (rma.isSequenceTransportSecurity() && !cfg.isSequenceTransportSecurityRequired())) {
             return false;
         }
-        DeliveryAssuranceType assurance = cfg.getDeliveryAssurance();
-        if (rma.isInOrder() && (assurance == null || assurance.getInOrder() == null)) {
+        if (rma.isInOrder() != cfg.isInOrder()) {
             return false;
         }
         Order order = rma.getOrder();
+        DeliveryAssurance da = cfg.getDeliveryAssurance();
         if (order != null) {
             switch (order) {
             case AtLeastOnce:
-                return assurance.isSetAtLeastOnce();
+                return da == DeliveryAssurance.AT_LEAST_ONCE;
             case AtMostOnce:
-                return assurance.isSetAtMostOnce();
+                return da == DeliveryAssurance.AT_MOST_ONCE;
             case ExactlyOnce:
-                return assurance.isSetExactlyOnce();
+                return da == DeliveryAssurance.EXACTLY_ONCE;
             default:
                 // unreachable code, required by checkstyle
                 break;

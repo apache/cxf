@@ -37,8 +37,8 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
-import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
@@ -237,8 +237,9 @@ public class DestinationSequence extends AbstractSequence {
      */
     boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
-        DeliveryAssuranceType da = destination.getManager().getConfiguration().getDeliveryAssurance();
-        boolean canSkip = !da.isSetAtLeastOnce() && !da.isSetExactlyOnce();
+        RMConfiguration config = destination.getManager().getConfiguration();
+        DeliveryAssurance da = config.getDeliveryAssurance();
+        boolean canSkip = da != DeliveryAssurance.AT_LEAST_ONCE && da != DeliveryAssurance.EXACTLY_ONCE;
         boolean robust = false;
         boolean robustDelivering = false;
         if (message != null) {
@@ -253,10 +254,10 @@ public class DestinationSequence extends AbstractSequence {
             removeDeliveringMessageNumber(mn);
             return true;
         }
-        if (cont != null && da.isSetInOrder() && !cont.isNew()) {
+        if (cont != null && config.isInOrder() && !cont.isNew()) {
             return waitInQueue(mn, canSkip, message, cont);
         }
-        if ((da.isSetExactlyOnce() || da.isSetAtMostOnce()) 
+        if ((da == DeliveryAssurance.EXACTLY_ONCE || da == DeliveryAssurance.AT_MOST_ONCE) 
             && (isAcknowledged(mn) 
                 || (robustDelivering && deliveringMessageNumbers.contains(mn)))) {            
             
@@ -271,7 +272,7 @@ public class DestinationSequence extends AbstractSequence {
         if (robustDelivering) {
             deliveringMessageNumbers.add(mn);
         }
-        if (da.isSetInOrder()) {
+        if (config.isInOrder()) {
             return waitInQueue(mn, canSkip, message, cont);
         }
         return true;

@@ -29,8 +29,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
+import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
-import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -467,9 +467,7 @@ public class DestinationSequenceTest extends Assert {
         List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
         AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
         EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
-        DeliveryAssuranceType assure = new DeliveryAssuranceType();
-        assure.setAtMostOnce(new DeliveryAssuranceType.AtMostOnce());
-        config.setDeliveryAssurance(assure);
+        config.setDeliveryAssurance(DeliveryAssurance.AT_MOST_ONCE);
         
         control.replay();        
         DestinationSequence ds = new DestinationSequence(id, ref, 0, ack, ProtocolVariation.RM10WSA200408);
@@ -504,9 +502,7 @@ public class DestinationSequenceTest extends Assert {
             messages[i] = setUpMessage(Integer.toString(i + 1));                                           
         }
         
-        DeliveryAssuranceType assure = new DeliveryAssuranceType();
-        assure.setAtLeastOnce(new DeliveryAssuranceType.AtLeastOnce());
-        config.setDeliveryAssurance(assure);
+        config.setDeliveryAssurance(DeliveryAssurance.AT_LEAST_ONCE);
         
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
         List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
