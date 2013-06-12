@@ -83,6 +83,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     
     private MessageContext mc;   
     private boolean formattedOutput;
+    private boolean autodetectCharset;
     
     @Context
     public void setMessageContext(MessageContext context) {
@@ -467,8 +468,10 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         if (isFeed) {
             return readFromFeed(cls, mt, headers, is);
         } else {
-            Entry entry = new AtomEntryProvider().readFrom(Entry.class, Entry.class, 
-                                                           new Annotation[]{}, mt, headers, is);
+            AtomEntryProvider p = new AtomEntryProvider();
+            p.setAutodetectCharset(autodetectCharset);
+            Entry entry = p.readFrom(Entry.class, Entry.class, 
+                                     new Annotation[]{}, mt, headers, is);
             return readFromEntry(entry, cls, mt, headers, is);
         }
     }
@@ -479,6 +482,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         throws IOException {
         
         AtomFeedProvider p = new AtomFeedProvider();
+        p.setAutodetectCharset(autodetectCharset);
         Feed feed = p.readFrom(Feed.class, Feed.class, new Annotation[]{}, mt, headers, is);
         
         AtomElementReader<?, ?> reader = atomReaders.get(cls.getName());
@@ -522,5 +526,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         return null;
     }
 
-    
+    public void setAutodetectCharset(boolean autodetectCharset) {
+        this.autodetectCharset = autodetectCharset;
+    }
 }
