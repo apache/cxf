@@ -254,6 +254,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             try {
                 GZIPFeature feature = new GZIPFeature();
                 feature.setThreshold(annotation.threshold());
+                feature.setForce(annotation.force());
                 feature.initialize(ep, bus);
             } catch (Exception e) {
                 //ignore - just assume it's an unsupported/unknown annotation
