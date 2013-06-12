@@ -32,8 +32,6 @@
             <outputDirectory>apache-cxf-${cxf.version}-src</outputDirectory>
             <includes>
                 <include>licenses/*.*</include>
-                <include>README</include>
-                <include>BUILDING.txt</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -69,6 +67,7 @@
                 <exclude>**/pmd-eclipse.log</exclude>
                 <exclude>**/.classpath</exclude>
                 <exclude>**/.project</exclude>
+                <exclude>**/.gitignore</exclude>
                 <exclude>**/.wtpmodules</exclude>
                 <exclude>**/surefire*</exclude>
                 <exclude>**/cobertura.ser</exclude>
