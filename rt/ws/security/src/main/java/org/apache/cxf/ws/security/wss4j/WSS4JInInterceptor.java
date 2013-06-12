@@ -226,6 +226,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             int doAction = WSSecurityUtil.decodeAction(action, actions);
 
             String actor = (String)getOption(WSHandlerConstants.ACTOR);
+            if (actor == null) {
+                actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
+            }
 
             reqData.setCallbackHandler(getCallback(reqData, doAction, utWithCallbacks));
             

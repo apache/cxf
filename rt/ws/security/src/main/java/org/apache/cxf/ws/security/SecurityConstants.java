@@ -71,6 +71,12 @@ public final class SecurityConstants {
      */
     public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
     
+    /**
+     * The actor or role name of the wsse:Security header. If this parameter 
+     * is omitted, the actor name is not set.
+     */
+    public static final String ACTOR = "ws-security.actor";
+    
     //
     // Callback class and Crypto properties
     //
@@ -451,7 +457,7 @@ public final class SecurityConstants {
     
     static {
         Set<String> s = new HashSet<String>(Arrays.asList(new String[] {
-            USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME,
+            USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME, ACTOR,
             CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES, 
             SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             VALIDATE_TOKEN, ENABLE_REVOCATION, ALWAYS_ENCRYPT_UT, IS_BSP_COMPLIANT, 

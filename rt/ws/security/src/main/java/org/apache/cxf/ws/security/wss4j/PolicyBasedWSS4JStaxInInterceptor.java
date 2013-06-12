@@ -451,9 +451,10 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             soapAction = "";
         }
         
+        String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         PolicyEnforcer securityEventListener = 
-            new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg)) {
+            new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), actor) {
             
                 @Override
                 public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
