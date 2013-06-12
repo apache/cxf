@@ -58,7 +58,7 @@ public class BookSubresourceImpl implements BookSubresource {
         b.setName(n1 + n2 + n3 + n33 + n4 + n5 + n6);
         return b;
     }
-    
+    @Override
     public Book getTheBook3(String sid, List<String> nameParts) throws BookNotFoundFault {
         if (nameParts.size() != 2) {
             throw new RuntimeException("Wrong number of name parts");
