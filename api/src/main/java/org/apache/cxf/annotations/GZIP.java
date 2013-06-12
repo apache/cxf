@@ -33,5 +33,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface GZIP {
     int threshold() default -1;
+    boolean force() default false;
 }
 
