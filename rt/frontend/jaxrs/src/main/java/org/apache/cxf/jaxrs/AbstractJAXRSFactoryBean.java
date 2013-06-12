@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -71,7 +72,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
-    protected List<?> entityProviders;
+    protected List<Object> entityProviders = new LinkedList<Object>();
     
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
@@ -278,21 +279,21 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
 
     /**
-     * Sets custom JAX-RS providers.
+     * Add custom JAX-RS providers to the list of providers
      * 
      * @param entityProviders the entityProviders
      */
     public void setProviders(List<? extends Object> providers) {
-        this.entityProviders = providers;
+        this.entityProviders.addAll(providers);
     }
     
     /**
-     * Sets a custom JAX-RS provider.
+     * Add custom JAX-RS provider to the list of providers
      * 
      * @param provider the custom provider.
      */
     public void setProvider(Object provider) {
-        setProviders(Collections.singletonList(provider));
+        entityProviders.add(provider);
     }
 
     protected void checkResources(boolean server) {
