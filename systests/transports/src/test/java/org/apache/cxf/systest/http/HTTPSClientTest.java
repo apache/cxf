@@ -128,7 +128,10 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
               BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
               address);
         
+        //provider.getRequestContext().put("use.async.http.conduit", Boolean.TRUE);
+        //for (int x = 0; x < 100000; x++) {
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        //}
         
         
         stopServers();
