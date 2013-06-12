@@ -46,16 +46,9 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 
-//import org.apache.handler_test.PingException;
 
 /**
  * Describe class TestSOAPHandler here.
- *
- *
- * Created: Fri Oct 21 13:24:05 2005
- *
- * @author <a href="mailto:codea@iona.com">codea</a>
- * @version 1.0
  */
 public class  TestSOAPHandler extends TestHandlerBase 
     implements SOAPHandler<SOAPMessageContext> {

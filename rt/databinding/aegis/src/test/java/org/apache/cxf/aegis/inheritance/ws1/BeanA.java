@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class BeanA implements java.io.Serializable {
     private String propA;
 

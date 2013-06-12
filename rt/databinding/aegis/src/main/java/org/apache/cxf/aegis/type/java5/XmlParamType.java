@@ -28,8 +28,6 @@ import org.apache.cxf.aegis.type.AegisType;
 /**
  * Annotates services method parameters to provide information about how they
  * are to be serialized.
- * 
- * @author Dan Diephouse
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

@@ -31,9 +31,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 /**
  * AegisType for the Date class which serializes as an xsd:date (no time
  * and timezone information).
- * 
- * @author Dennis Kieselhorst
- *
  */
 public class TimezoneLessDateType extends DateType {
     private static TimezoneLessXsDateFormat format = new TimezoneLessXsDateFormat();

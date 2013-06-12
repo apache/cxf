@@ -22,11 +22,6 @@ import org.apache.cxf.aegis.inheritance.ws2.common.ParentBean;
 import org.apache.cxf.aegis.inheritance.ws2.common.exception.AlreadyExistsException;
 import org.apache.cxf.aegis.inheritance.ws2.common.exception.NotFoundException;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public interface WS2 {
     void putParentBean(ParentBean parentBean)
         throws AlreadyExistsException;

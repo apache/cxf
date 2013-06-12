@@ -27,10 +27,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
 
 /**
- *
- * @author jtalbut
- * 
- * The LoadDistributorTargetSelector attempts to do the same job as the 
+ * The LoadDistributorTargetSelector attempts to do the same job as the
  * FailoverTargetSelector, but to choose an alternate target on every request
  * rather than just when a fault occurs.
  * The LoadDistributorTargetSelector uses the same FailoverStrategy interface as 

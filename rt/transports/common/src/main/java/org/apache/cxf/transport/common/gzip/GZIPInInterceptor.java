@@ -47,8 +47,6 @@ import org.apache.cxf.phase.Phase;
  * to let the server know you can handle compressed responses. To compress
  * outgoing messages, see {@link GZIPOutInterceptor}. This class was originally
  * based on one of the CXF samples (configuration_interceptor).
- * 
- * @author Ian Roberts (i.roberts@dcs.shef.ac.uk)
  */
 public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
 

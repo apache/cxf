@@ -94,8 +94,6 @@ import org.opensaml.xml.XMLObject;
 
 /**
  * Performs WS-Security inbound actions.
- * 
- * @author <a href="mailto:tsztelak@gmail.com">Tomasz Sztelak</a>
  */
 public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 

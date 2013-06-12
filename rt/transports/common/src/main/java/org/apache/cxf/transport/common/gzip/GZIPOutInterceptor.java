@@ -56,8 +56,6 @@ import org.apache.cxf.phase.Phase;
  * not be compressed. To force compression of all messages, set the threshold to
  * 0. This class was originally based on one of the CXF samples
  * (configuration_interceptor).
- * 
- * @author Ian Roberts (i.roberts@dcs.shef.ac.uk)
  */
 public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
 

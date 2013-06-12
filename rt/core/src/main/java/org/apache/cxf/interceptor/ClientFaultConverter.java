@@ -56,8 +56,6 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 /**
  * Takes a Fault and converts it to a local exception type if possible.
- * 
- * @author Dan Diephouse
  */
 public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
     public static final String DISABLE_FAULT_MAPPING = "disable-fault-mapping";

@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws2.common.exception;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class AlreadyExistsException extends Exception {
     private final String id;
 

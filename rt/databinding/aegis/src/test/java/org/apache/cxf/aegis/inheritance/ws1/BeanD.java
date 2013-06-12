@@ -20,9 +20,6 @@ package org.apache.cxf.aegis.inheritance.ws1;
 
 import java.io.Serializable;
 
-/**
- * @author jdavias
- */
 public class BeanD implements Serializable {
     private String propD;
 

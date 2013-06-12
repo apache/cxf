@@ -27,9 +27,6 @@ import org.apache.cxf.common.util.SOAPConstants;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class XMLBeansServiceTest extends AbstractXmlBeansTest {
 
     @Before

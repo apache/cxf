@@ -26,8 +26,6 @@ import org.apache.cxf.transport.Session;
 
 /**
  * A session implementation bound to HTTP.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class HTTPSession implements Session {
     private HttpServletRequest request;

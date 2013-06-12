@@ -22,8 +22,6 @@ import javax.xml.namespace.QName;
 
 /**
  * Writes messages to an output stream.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public interface MessageWriter {
     void writeValue(Object value);

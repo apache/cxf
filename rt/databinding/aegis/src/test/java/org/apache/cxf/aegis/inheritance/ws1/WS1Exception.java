@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class WS1Exception extends Exception {
     private int errorCode;
     private Object simpleBean;

@@ -59,8 +59,6 @@ import org.apache.cxf.common.util.StringUtils;
 
 /**
  * Few simple utils to read DOM. This is originally from the Jakarta Commons Modeler.
- * 
- * @author Costin Manolache
  */
 public final class DOMUtils {
     private static final String XMLNAMESPACE = "xmlns";

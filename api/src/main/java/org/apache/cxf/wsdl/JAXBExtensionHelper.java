@@ -60,8 +60,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * JAXBExtensionHelper
- * @author dkulp
- *
  */
 public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeserializer {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);

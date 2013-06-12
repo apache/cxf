@@ -30,8 +30,6 @@ import org.junit.Test;
   
 /**
  * Tests that we can handle multiple schemas within the same namespace.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class MultipleSchemaInNSTest extends AbstractXmlBeansTest {
     String ns = "urn:xfire:xmlbeans:nstest";

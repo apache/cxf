@@ -25,12 +25,6 @@ import java.util.List;
 
 import org.apache.cxf.common.i18n.Message;
 
-/**
- * 
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Feb 14, 2004
- */
 public class DatabindingException extends RuntimeException {
     
     private final List<String> extraMessages = new LinkedList<String>();

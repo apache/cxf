@@ -36,8 +36,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * Reads literal encoded messages.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class ElementReader extends AbstractMessageReader implements MessageReader {
     private static final Pattern QNAME_PATTERN = Pattern.compile("([^:]+):([^:]+)");

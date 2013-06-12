@@ -39,7 +39,6 @@ import org.apache.cxf.common.util.Base64Utility;
  * Converts back and forth to byte[] objects.
  * There is a co-routine between this class and the MTOM ByteArrayType. This class can accept either 
  * inline base64 or an MTOM attachment. It passes the problem over the ByteArrayType for the later. 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class Base64Type extends AegisType {
     private AbstractXOPType optimizedType;

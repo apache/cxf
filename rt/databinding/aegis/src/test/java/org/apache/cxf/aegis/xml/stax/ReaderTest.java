@@ -28,10 +28,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Nov 4, 2004
- */
 public class ReaderTest extends AbstractCXFTest {
     @Test
     public void testLiteralReader() throws Exception {
