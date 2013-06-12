@@ -254,6 +254,8 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 AbstractFeature feature = (AbstractFeature)cls.newInstance();
                 cls.getMethod("setThreshold", new Class[] {Integer.TYPE})
                     .invoke(feature, annotation.threshold());
+                cls.getMethod("setForce", new Class[] {Boolean.TYPE})
+                    .invoke(feature, annotation.force());
                 feature.initialize(ep, bus);
             } catch (Exception e) {
                 //ignore - just assume it's an unsupported/unknown annotation
