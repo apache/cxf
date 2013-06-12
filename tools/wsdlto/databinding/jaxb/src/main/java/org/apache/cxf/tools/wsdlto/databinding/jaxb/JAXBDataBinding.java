@@ -663,7 +663,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 is.setPublicId(key);
                 opts.addGrammar(is);
                 try {
-                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele, key));
+                    schemaCompiler.parseSchema(key, createNoCDATAReader(StaxUtils.createXMLStreamReader(ele, key)));
                 } catch (XMLStreamException e) {
                     throw new ToolException(e);
                 }
@@ -688,7 +688,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     }
 
                     XMLStreamReader reader = StaxUtils.createXMLStreamReader(key, in);
-                    reader = new LocationFilterReader(reader, catalog);
+                    reader = createNoCDATAReader(new LocationFilterReader(reader, catalog));
                     InputSource is = new InputSource(key);
                     opts.addGrammar(is);
                     schemaCompiler.parseSchema(key, reader);
@@ -727,12 +727,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 is.setPublicId(key);
                 opts.addGrammar(is);
                 try {
-                    XMLStreamReader reader = new StreamReaderDelegate(StaxUtils.createXMLStreamReader(ele, key)) {
-                        public int next() throws XMLStreamException {
-                            int i = super.next();
-                            return i == XMLStreamReader.CDATA ? XMLStreamReader.CHARACTERS : i;
-                        }
-                    };
+                    XMLStreamReader reader = createNoCDATAReader(StaxUtils.createXMLStreamReader(ele, key));
                     schemaCompiler.parseSchema(key, reader);
                 } catch (XMLStreamException e) {
                     throw new RuntimeException(e);
@@ -740,6 +735,15 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
 
+    }
+    
+    private XMLStreamReader createNoCDATAReader(final XMLStreamReader reader) {
+        return new StreamReaderDelegate(reader) {
+            public int next() throws XMLStreamException {
+                int i = super.next();
+                return i == XMLStreamReader.CDATA ? XMLStreamReader.CHARACTERS : i;
+            }
+        };
     }
     private String getPluginUsageString(Options opts) {
         StringBuilder buf = new StringBuilder();
