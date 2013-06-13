@@ -122,8 +122,8 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             translateProperties(mc);
             Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens = 
                 new HashMap<String, SecurityTokenProvider<OutboundSecurityToken>>();
-            configureProperties(mc, outboundTokens);
             configureCallbackHandler(mc);
+            configureProperties(mc, outboundTokens);
             
             OutboundWSSec outboundWSSec = null;
             WSSSecurityProperties secProps = null;

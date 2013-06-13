@@ -61,14 +61,6 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(StaxServer.class, true)
         );
-        /*
-        assertTrue(
-                "Intermediary failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(Intermediary.class, true)
-        );
-        */
     }
     
     @org.junit.AfterClass
@@ -120,29 +112,6 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
                 "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
-        
-        x509Port.doubleIt(25);
-        
-        ((java.io.Closeable)x509Port).close();
-        bus.shutdown(true);
-    }
-    
-    @org.junit.Test
-    public void testIntermediary() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxX509TokenTest.class.getResource("client/intermediary-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
-        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItIntermediary.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItPort");
-        DoubleItPortType x509Port = 
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, INTERMEDIARY_PORT);
         
         x509Port.doubleIt(25);
         

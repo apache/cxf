@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -39,9 +43,12 @@ import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.stax.ConfigurationConverter;
@@ -114,6 +121,22 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             translateProperties(soapMessage);
             configureProperties(soapMessage);
             configureCallbackHandler(soapMessage);
+            
+            if (getSecurityProperties() != null) {
+                TokenStoreCallbackHandler callbackHandler = 
+                    new TokenStoreCallbackHandler(
+                        getSecurityProperties().getCallbackHandler(), getTokenStore(soapMessage)
+                    );
+                getSecurityProperties().setCallbackHandler(callbackHandler);
+            } else {
+                Map<String, Object> config = getProperties();
+                TokenStoreCallbackHandler callbackHandler = 
+                    new TokenStoreCallbackHandler(
+                        (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
+                        getTokenStore(soapMessage)
+                    );
+                config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+            }
             
             InboundWSSec inboundWSSec = null;
             WSSSecurityProperties secProps = null;
@@ -334,5 +357,32 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public void setActions(List<String> actions) {
         this.actions = actions;
+    }
+    
+    private class TokenStoreCallbackHandler implements CallbackHandler {
+        private CallbackHandler internal;
+        private TokenStore store;
+        public TokenStoreCallbackHandler(CallbackHandler in, TokenStore st) {
+            internal = in;
+            store = st;
+        }
+        
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (int i = 0; i < callbacks.length; i++) {
+                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+                
+                String id = pc.getIdentifier();
+                SecurityToken tok = store.getToken(id);
+                if (tok != null) {
+                    pc.setKey(tok.getSecret());
+                    pc.setCustomToken(tok.getToken());
+                    return;
+                }
+            }
+            if (internal != null) {
+                internal.handle(callbacks);
+            }
+        }
+        
     }
 }

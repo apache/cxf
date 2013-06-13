@@ -37,12 +37,16 @@ import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -168,6 +172,27 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             } else {
                 config.put(ConfigurationConstants.PW_CALLBACK_REF, (CallbackHandler)o);
             }
+        }
+    }
+    
+    protected final TokenStore getTokenStore(Message message) {
+        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+        synchronized (info) {
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
+            if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
+            }
+            if (tokenStore == null) {
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
+                if (info.getName() != null) {
+                    cacheKey += "-" + info.getName().toString().hashCode();
+                }
+                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
+            }
+            return tokenStore;
         }
     }
 
