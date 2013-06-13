@@ -534,6 +534,7 @@
                   </sp:Layout>
                   <sp:IncludeTimestamp/>
                   <sp:OnlySignEntireHeadersAndBody/>
+                  <sp:ProtectTokens/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
                         <sp:Basic128/>
@@ -840,6 +841,7 @@
                   </sp:Layout>
                   <sp:IncludeTimestamp/>
                   <sp:OnlySignEntireHeadersAndBody/>
+                  <sp:ProtectTokens/>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
                         <sp:Basic128/>

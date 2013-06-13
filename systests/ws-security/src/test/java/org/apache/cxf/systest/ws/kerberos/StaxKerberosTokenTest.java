@@ -74,9 +74,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
-    // TODO See WSS-453
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -164,9 +162,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
     }
     */
     
-    // TODO - See WSS-454
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetric() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -199,9 +195,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-453
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverTransportEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -230,9 +224,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-453
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetricEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -310,9 +302,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
     }
     */
     
-    // TODO - See WSS-453 WSS-454
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetricSignedEndorsing() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -345,9 +335,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - See WSS-453 WSS-454
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetricSignedEncrypted() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
