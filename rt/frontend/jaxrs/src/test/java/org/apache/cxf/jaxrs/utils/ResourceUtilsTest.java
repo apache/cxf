@@ -132,6 +132,17 @@ public class ResourceUtilsTest extends Assert {
         assertTrue(types.containsKey(Chapter.class));
     }
     
+    @Test
+    public void testClassResourceInfoWithOverride() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(ExampleImpl.class, ExampleImpl.class, true, true);
+        assertNotNull(cri);
+        Method m = ExampleImpl.class.getMethod("get");
+        OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(m);
+        assertNotNull(ori);
+        assertEquals("GET", ori.getHttpMethod());
+    }
+    
     public interface IProductResource {
         @Path("/parts")
         IPartsResource getParts();
@@ -155,5 +166,20 @@ public class ResourceUtilsTest extends Assert {
         IProductResource getProducts();
         @GET
         Book get();
+    }
+    
+    @Path("example")
+    public interface Example {
+         
+        @GET
+        Book get();
+    }
+
+    public static class ExampleImpl implements Example {
+
+        @Override
+        public Book get() {
+            return null;
+        }
     }
 }
