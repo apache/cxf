@@ -93,11 +93,11 @@ public class ServletController {
             // Using HTTP_PREFIX check is safe for ServletController
             // URI.create(ad).isRelative() can be used - a bit more expensive though
             if (ad != null && !ad.startsWith(HTTP_PREFIX)) {
-                if (disableAddressUpdates) {
-                    request.setAttribute("org.apache.cxf.transport.endpoint.address", 
-                                         base + ad);
-                } else {
-                    BaseUrlHelper.setAddress(d, base + ad);
+                String endpointAddress = base + ad;
+                request.setAttribute("org.apache.cxf.transport.endpoint.address", 
+                                     endpointAddress);
+                if (!disableAddressUpdates) {
+                    BaseUrlHelper.setAddress(d, endpointAddress);
                 }
             }
         }

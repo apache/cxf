@@ -61,6 +61,7 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
      */
     @Test
     public void testBasePathAndPathAndPathParam() throws Exception {
+        checkUriInfo("http://127.0.0.1:" + PORT + "/app/v1", "\"\"", "/");
         checkUriInfo("http://localhost:" + PORT + "/app/v1", "\"\"", "/");
         checkUriInfo("http://localhost:" + PORT + "/app/v1/", "\"\"", "/");
         checkUriInfo("http://localhost:" + PORT + "/app/v1/test", "\"test\"", "test");
