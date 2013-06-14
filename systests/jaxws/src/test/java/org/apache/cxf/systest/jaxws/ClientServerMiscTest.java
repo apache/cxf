@@ -19,7 +19,9 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigInteger;
@@ -71,6 +73,8 @@ import org.apache.cxf.systest.jaxws.DocLitBareCodeFirstService.GMonthTest;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411Result;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411SubClass;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
+import org.apache.cxf.systest.jaxws.cxf5064.HeaderObj;
+import org.apache.cxf.systest.jaxws.cxf5064.SOAPHeaderSEI;
 import org.apache.cxf.tests.inherit.Inherit;
 import org.apache.cxf.tests.inherit.InheritService;
 import org.apache.cxf.tests.inherit.objects.SubTypeA;
@@ -876,5 +880,37 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             //expected
         }
        
+    }
+    
+    
+    @Test
+    public void testCXF5064() throws Exception {
+        URL url = new URL(ServerMisc.CXF_5064_URL + "?wsdl");
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.getResponseCode();
+        String str = IOUtils.readStringFromStream(con.getInputStream());
+        
+        //Check to make sure SESSIONID is a string
+        BufferedReader reader = new BufferedReader(new StringReader(str)); 
+        String s = reader.readLine();
+        while (s != null) {
+            if (s.contains("SESSIONID") && s.contains("element ")) {
+                assertTrue(s.contains("string"));
+                assertFalse(s.contains("headerObj"));
+            }
+            s = reader.readLine();   
+        }
+        //wsdl is correct, now make sure we can actually invoke it 
+        QName name = new QName("http://cxf.apache.org/cxf5064", 
+            "SOAPHeaderServiceImplService");
+        Service service = Service.create(name);
+        service.addPort(name, SOAPBinding.SOAP11HTTP_BINDING, ServerMisc.CXF_5064_URL);
+        SOAPHeaderSEI port = service.getPort(name, SOAPHeaderSEI.class);
+        assertEquals("a-b", port.test(new HeaderObj("a-b")));
+        
+        
+        service = Service.create(url, name);
+        port = service.getPort(SOAPHeaderSEI.class);
+        assertEquals("a-b", port.test(new HeaderObj("a-b")));
     }
 }

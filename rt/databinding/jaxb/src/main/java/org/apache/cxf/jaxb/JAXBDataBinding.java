@@ -21,6 +21,7 @@ package org.apache.cxf.jaxb;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -46,6 +47,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -60,12 +62,15 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.jaxb.JAXBBeanInfo;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.jaxb.JAXBContextProxy;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
@@ -84,6 +89,8 @@ import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
+import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.ObjectFactory;
@@ -339,6 +346,7 @@ public class JAXBDataBinding extends AbstractDataBinding
 
             if (col.getXmlSchemas().length > 1) {
                 // someone has already filled in the types
+                justCheckForJAXBAnnotations(serviceInfo);
                 continue;
             }
 
@@ -407,6 +415,28 @@ public class JAXBDataBinding extends AbstractDataBinding
             if (cachedContextAndSchemas != null && !schemasFromCache) {
                 cachedContextAndSchemas.setSchemas(schemas);
             }
+        }
+    }
+
+    private void justCheckForJAXBAnnotations(ServiceInfo serviceInfo) {
+        for (MessageInfo mi: serviceInfo.getMessages().values()) {
+            for (MessagePartInfo mpi : mi.getMessageParts()) {
+                checkForJAXBAnnotations(mpi);
+            }
+        }
+    }
+    private void checkForJAXBAnnotations(MessagePartInfo mpi) {
+        Annotation[] anns = (Annotation[])mpi.getProperty("parameter.annotations");
+        JAXBContextProxy ctx = ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
+        XmlJavaTypeAdapter jta = JAXBSchemaInitializer.findFromTypeAdapter(ctx, mpi.getTypeClass(), anns);
+        JAXBBeanInfo jtaBeanInfo = null;
+        if (jta != null) {
+            jtaBeanInfo = JAXBSchemaInitializer.findFromTypeAdapter(ctx, jta.value());
+        }
+        JAXBBeanInfo beanInfo = JAXBSchemaInitializer.getBeanInfo(ctx, mpi.getTypeClass());
+        if (jtaBeanInfo != beanInfo && jta != null) {
+            mpi.setProperty("parameter.annotations", anns);
+            mpi.setProperty("honor.jaxb.annotations", Boolean.TRUE);
         }
     }
 
