@@ -149,6 +149,9 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     public static final String METHOD_ANNOTATIONS = "method.return.annotations";
     public static final String PARAM_ANNOTATION = "parameter.annotations";
     private static final Logger LOG = LogUtils.getL7dLogger(ReflectionServiceFactoryBean.class);
+    private static final boolean DO_VALIDATE = SystemPropertyAction.getProperty("cxf.validateServiceSchemas", "false")
+            .equals("true");
+
     private static Class<? extends DataBinding> defaultDatabindingClass;
 
     protected String wsdlURL;
@@ -184,16 +187,15 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
-
-        ignoredClasses.add("java.lang.Object");
-        ignoredClasses.add("java.lang.Throwable");
-        ignoredClasses.add("org.omg.CORBA_2_3.portable.ObjectImpl");
-        ignoredClasses.add("org.omg.CORBA.portable.ObjectImpl");
-        ignoredClasses.add("javax.ejb.EJBObject");
-        ignoredClasses.add("javax.rmi.CORBA.Stub");
+        ignoredClasses.addAll(Arrays.asList(new String[] {
+            "java.lang.Object",
+            "java.lang.Throwable",
+            "org.omg.CORBA_2_3.portable.ObjectImpl",
+            "org.omg.CORBA.portable.ObjectImpl",
+            "javax.ejb.EJBObject",
+            "javax.rmi.CORBA.Stub"
+        }));
     }
-
-
 
     protected DataBinding createDefaultDataBinding() {
         Object obj = null;
@@ -839,6 +841,9 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                     inf.setElementQName(part.getElementQName());
                     inf.setConcreteName(part.getConcreteName());
                     inf.setXmlSchema(part.getXmlSchema());
+                    if (paraAnnos != null) {
+                        part.setProperty(PARAM_ANNOTATION, paraAnnos);
+                    }
                     part = inf;
                     inf.setProperty(HEADER, Boolean.TRUE);
                 }
@@ -2459,7 +2464,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     public void setWsdlURL(URL wsdlURL) {
-        this.wsdlURL = wsdlURL.toString();
+        setWsdlURL(wsdlURL.toString());
     }
 
     public List<AbstractServiceConfiguration> getServiceConfigurations() {
@@ -2583,8 +2588,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     private boolean isValidate() {
-        return validate 
-            || SystemPropertyAction.getProperty("cxf.validateServiceSchemas", "false").equals("true");
+        return validate || DO_VALIDATE;
     }
 
     /**
