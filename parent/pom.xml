@@ -87,6 +87,7 @@
              need the 5.5.0 features.xml. :-(  -->
         <cxf.activemq.version>5.4.2</cxf.activemq.version>
         <cxf.axiom.version>1.2.14</cxf.axiom.version>
+        <cxf.bcprov.version>1.49</cxf.bcprov.version>
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
         <cxf.cglib.osgi.version>[2.1.3,3.0.0)</cxf.cglib.osgi.version>
         <cxf.commons-codec.version>1.6</cxf.commons-codec.version>
@@ -1280,7 +1281,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
-                <version>1.47</version>
+                <version>${cxf.bcprov.version}</version>
             </dependency>
 
             <dependency>
