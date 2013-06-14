@@ -33,12 +33,12 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.ws.eventing.AttributedURIType;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.DeliveryType;
-import org.apache.cxf.ws.eventing.EndpointReferenceType;
 import org.apache.cxf.ws.eventing.ExpirationType;
 import org.apache.cxf.ws.eventing.FilterType;
-import org.apache.cxf.ws.eventing.NotifyTo;
+import org.apache.cxf.ws.eventing.ObjectFactory;
 import org.apache.cxf.ws.eventing.Subscribe;
 import org.apache.cxf.ws.eventing.SubscribeResponse;
 import org.apache.cxf.ws.eventing.eventsource.EventSourceEndpoint;
@@ -104,8 +104,7 @@ public class CreateSubscriptionServlet extends HttpServlet {
         eventSinkAddr.setValue(targetURL);
         eventSink.setAddress(eventSinkAddr);
         sub.setDelivery(new DeliveryType());
-        sub.getDelivery().getContent().add(new NotifyTo());
-        ((NotifyTo)sub.getDelivery().getContent().get(0)).setValue(eventSink);
+        sub.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSink));
 
         // filter
         if (filter != null && filter.length() > 0) {
