@@ -445,7 +445,15 @@ public final class SecurityConstants {
      * c) A CallbackHandler object to use to obtain the token
      */
     public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
-    
+
+    /**
+     * Set this to "false" in order to remove the SOAP mustUnderstand header from security headers generated based on
+     * a WS-SecurityPolicy.
+     *
+     * The default value is "true" which included the SOAP mustUnderstand header.
+     */
+    public static final String MUST_UNDERSTAND = "ws-security.must-understand";
+
     //
     // Internal tags
     //
@@ -472,7 +480,7 @@ public final class SecurityConstants {
             STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
-            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE
+            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

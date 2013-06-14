@@ -106,8 +106,11 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             Collection<AssertionInfo> ais;
             SOAPMessage saaj = message.getContent(SOAPMessage.class);
 
-            boolean mustUnderstand = true;
-            String actor = null;
+            boolean mustUnderstand = 
+                MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.MUST_UNDERSTAND, true
+                );
+            String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
             
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information

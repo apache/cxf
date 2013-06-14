@@ -153,6 +153,21 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                                validateSAMLSubjectConf);
             }
         }
+        
+        String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
+        if (actor != null) {
+            if (securityProperties != null) {
+                securityProperties.setActor(actor);
+            } else {
+                properties.put(ConfigurationConstants.ACTOR, actor);
+            }
+        }
+        
+        boolean mustUnderstand = 
+            MessageUtils.getContextualBoolean(msg, SecurityConstants.MUST_UNDERSTAND, true);
+        if (properties != null) {
+            properties.put(ConfigurationConstants.MUST_UNDERSTAND, Boolean.toString(mustUnderstand));
+        }
     }
     
     protected void configureCallbackHandler(SoapMessage soapMessage) throws WSSecurityException {
