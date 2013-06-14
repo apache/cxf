@@ -35,6 +35,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -96,8 +97,11 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             Collection<AssertionInfo> ais;
             SOAPMessage saaj = message.getContent(SOAPMessage.class);
 
-            boolean mustUnderstand = true;
-            String actor = null;
+            boolean mustUnderstand = 
+                MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.MUST_UNDERSTAND, true
+                );
+            String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
             
 
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);

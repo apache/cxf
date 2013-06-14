@@ -71,6 +71,12 @@ public final class SecurityConstants {
      */
     public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
     
+    /**
+     * The actor or role name of the wsse:Security header. If this parameter 
+     * is omitted, the actor name is not set.
+     */
+    public static final String ACTOR = "ws-security.actor";
+    
     //
     // Callback class and Crypto properties
     //
@@ -432,7 +438,15 @@ public final class SecurityConstants {
      * c) A CallbackHandler object to use to obtain the token
      */
     public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
-    
+
+    /**
+     * Set this to "false" in order to remove the SOAP mustUnderstand header from security headers generated based on
+     * a WS-SecurityPolicy.
+     *
+     * The default value is "true" which included the SOAP mustUnderstand header.
+     */
+    public static final String MUST_UNDERSTAND = "ws-security.must-understand";
+
     //
     // Internal tags
     //
@@ -444,7 +458,7 @@ public final class SecurityConstants {
     
     static {
         Set<String> s = new HashSet<String>(Arrays.asList(new String[] {
-            USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME,
+            USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME, ACTOR,
             CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES, 
             SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             VALIDATE_TOKEN, ENABLE_REVOCATION, ALWAYS_ENCRYPT_UT, IS_BSP_COMPLIANT, 
@@ -459,7 +473,7 @@ public final class SecurityConstants {
             STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
-            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE
+            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
