@@ -74,6 +74,7 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
     }
 
     @Test
+    @Ignore
     public void testIsCertChainValid() throws CertificateException {
         TrustedAuthorityValidator validator = new TrustedAuthorityValidator(certificateRepo);
         Assert.assertTrue("Root should be valid",
