@@ -26,22 +26,16 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
-import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
-import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.apache.cxf.xkms.model.xmldsig.ObjectFactory;
@@ -113,30 +107,6 @@ public final class X509Utils {
         }
     }
 
-    void addResult(LocateResultType response, Collection<X509Certificate> certificates, List<String> reasons) {
-        String result = null;
-        if (0 != certificates.size()) {
-            result = ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SUCCESS.value();
-        } else {
-            if ((null != reasons) && (0 != reasons.size())) {
-                // At least one of the components reported a problem, so we
-                // include the reported error code
-                Iterator<String> reason = reasons.iterator();
-                result = reason.next();
-                String minor = reason.next();
-                if (null != minor) {
-                    response.setResultMinor(minor);
-                }
-            } else {
-                // no error here, we simply did not find any matching
-                // certificates
-                result = ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SUCCESS.value();
-                response.setResultMinor(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_NO_MATCH.value());
-            }
-        }
-        response.setResultMajor(result);
-    }
-
     public static UnverifiedKeyBindingType getUnverifiedKeyBinding(X509Certificate cert)
         throws CertificateEncodingException {
         UnverifiedKeyBindingType unverifiedKeyBinding = new UnverifiedKeyBindingType();
@@ -169,26 +139,5 @@ public final class X509Utils {
             throw new IllegalArgumentException(elementClass.getName() + " must be set");
         }
     }
-
-    public static String getSubjectDN(String application, String id, String serviceDNTemplate) {
-        if (application.equalsIgnoreCase(Applications.SERVICE_SOAP.getUri())) {
-            return String.format(serviceDNTemplate, id);
-        } else {
-            return id;
-        }
-    }
-
-    public static String getDN(String applicationUri, String identifier, String serviceDNTemplate, String rootDN) {
-        String dn = identifier;
-        if (Applications.SERVICE_SOAP.getUri().equals(applicationUri)) {
-            String escapedIdentifier = identifier.replaceAll("\\/", Matcher.quoteReplacement("\\/"));
-            dn = String.format(serviceDNTemplate, escapedIdentifier);
-        }
-        if ((rootDN != null) && !(rootDN.isEmpty())) {
-            dn = dn + "," + rootDN;
-        }
-        return dn;
-    }
-
 
 }

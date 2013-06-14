@@ -24,6 +24,9 @@
         <feature>spring-dm</feature>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-common/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-client/${project.version}</bundle>
+        <configfile finalname="/etc/org.apache.cxf.xkms.client.cfg">
+            mvn:${project.groupId}/cxf-services-xkms-features/${project.version}/cfg/org.apache.cxf.xkms.client
+        </configfile>
     </feature>
 
     <feature name="cxf-xkms-service" version="${project.version}">

@@ -80,6 +80,11 @@
                                     <classifier>org.apache.cxf.xkms</classifier>
                                     <type>cfg</type>
                                 </artifact>
+                                <artifact>
+                                    <file>target/classes/org.apache.cxf.xkms.client.cfg</file>
+                                    <classifier>org.apache.cxf.xkms.client</classifier>
+                                    <type>cfg</type>
+                                </artifact>
                             </artifacts>
                         </configuration>
                     </execution>

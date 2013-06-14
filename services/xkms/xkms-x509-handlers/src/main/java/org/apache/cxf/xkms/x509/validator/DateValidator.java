@@ -33,7 +33,6 @@ import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
 import org.apache.cxf.xkms.model.xkms.ReasonEnum;
 import org.apache.cxf.xkms.model.xkms.StatusType;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
-import org.apache.cxf.xkms.x509.parser.ValidateRequestParser;
 
 public class DateValidator implements Validator {
 

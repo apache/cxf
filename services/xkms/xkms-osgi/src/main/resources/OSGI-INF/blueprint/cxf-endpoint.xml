@@ -24,18 +24,17 @@
         <property name="validators">
             <list>
                 <ref component-id="dateValidator" />
+                <ref component-id="trustedAuthorityValidator" />
             </list>
         </property>
         <property name="locators">
             <list>
-                <ref component-id="x509LdapLocator" />
-                <!-- ref component-id="x509FileLocator" / -->
+                <ref component-id="x509Locator" />
             </list>
         </property>
         <property name="keyRegisterHandlers">
             <list>
-                <ref component-id="ldapRegisterHandler" />
-                <!-- ref component-id="fileRegisterHandler" / -->
+                <ref component-id="registerHandler" />
             </list>
         </property>
     </bean>

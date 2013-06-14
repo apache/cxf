@@ -41,18 +41,17 @@
         <property name="validators">
             <list>
                 <ref bean="dateValidator" />
+                <ref bean="trustedAuthorityValidator" />
             </list>
         </property>
         <property name="locators">
             <list>
-                <!--ref bean="x509LdapLocator" /-->
-                <ref bean="x509FileLocator" />
+                <ref bean="x509Locator" />
             </list>
         </property>
         <property name="keyRegisterHandlers">
             <list>
-                <!--ref bean="ldapRegisterHandler" /-->
-                <ref bean="fileRegisterHandler" />
+                <ref bean="registerHandler" />
             </list>
         </property>
     </bean>

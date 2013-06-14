@@ -53,5 +53,14 @@ public enum Applications {
     public String getUri() {
         return this.uri;
     }
-
+    
+    public static Applications fromUri(String uri) {
+        for (Applications app :  Applications.values()) {
+            if (app.getUri().equals(uri)) {
+                return app;
+            }
+        }
+        return null;
+    }
+    
 }
