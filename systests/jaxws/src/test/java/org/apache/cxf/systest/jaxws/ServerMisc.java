@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl;
@@ -34,6 +37,7 @@ import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.PerRequestFactory;
 import org.apache.cxf.service.invoker.PooledFactory;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.systest.jaxws.cxf5064.SOAPHeaderServiceImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
@@ -51,6 +55,25 @@ public class ServerMisc extends AbstractBusTestServerBase {
         "http://localhost:" + PORT + "/DocLitBareCodeFirstService/";
     public static final String DOCLIT_CODEFIRST_SETTINGS_URL = 
         "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceSettings/";
+    public static final String CXF_5064_URL = 
+        "http://localhost:" + PORT + "/CXF5064/";
+    
+    
+    List<org.apache.cxf.endpoint.Server> servers = new LinkedList<org.apache.cxf.endpoint.Server>();
+    List<Endpoint> endpoints = new LinkedList<Endpoint>();
+    public void tearDown() throws Exception {
+        for (org.apache.cxf.endpoint.Server s : servers) {
+            s.stop();
+            s.destroy();
+        }
+        servers.clear();
+        
+        for (Endpoint ep : endpoints) {
+            ep.stop();
+        }
+        endpoints.clear();
+    }
+    
     
     @SuppressWarnings("deprecation")
     protected void run() {
@@ -65,7 +88,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
         factoryBean.setAddress(DOCLIT_CODEFIRST_URL);
         factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
         factoryBean.setInvoker(invoker);
-        factoryBean.create();
+        servers.add(factoryBean.create());
         
         factoryBean = new JaxWsServerFactoryBean();
         factoryBean.setAddress(DOCLIT_CODEFIRST_SETTINGS_URL);
@@ -80,41 +103,43 @@ public class ServerMisc extends AbstractBusTestServerBase {
                 return Long.valueOf(1L);
             }
         });
-        factoryBean.create();
+        servers.add(factoryBean.create());
          
         //Object implementor4 = new DocLitWrappedCodeFirstServiceImpl();
-        //Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4);
+        //endpoints.add(Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4));
         
         Object implementor7 = new DocLitBareCodeFirstServiceImpl();
         EndpointImpl ep = (EndpointImpl)Endpoint.publish(DOCLITBARE_CODEFIRST_URL, implementor7);
         ep.getServer().getEndpoint().getInInterceptors().add(new SAAJInInterceptor());
         ep.getServer().getEndpoint().getInInterceptors().add(new URIMappingInterceptor());
+        endpoints.add(ep);
 
         
         Object implementor6 = new InterfaceInheritTestImpl();
-        Endpoint.publish(DOCLIT_CODEFIRST_BASE_URL, implementor6);
+        endpoints.add(Endpoint.publish(DOCLIT_CODEFIRST_BASE_URL, implementor6));
         
         Object implementor1 = new AnonymousComplexTypeImpl();
         String address = "http://localhost:" + PORT + "/anonymous_complex_typeSOAP";
-        Endpoint.publish(address, implementor1);
+        endpoints.add(Endpoint.publish(address, implementor1));
 
         Object implementor2 = new JaxbElementTestImpl();
         address = "http://localhost:" + PORT + "/jaxb_element_test";
-        Endpoint.publish(address, implementor2);
+        endpoints.add(Endpoint.publish(address, implementor2));
 
         Object implementor3 = new OrderedParamHolderImpl();
         address = "http://localhost:" + PORT + "/ordered_param_holder/";
-        Endpoint.publish(address, implementor3);
+        endpoints.add(Endpoint.publish(address, implementor3));
         
         //Object implementor4 = new DocLitWrappedCodeFirstServiceImpl();
-        //Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4);
+        //endpoints.add(Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4));
         
         Object implementor5 = new RpcLitCodeFirstServiceImpl();
-        Endpoint.publish(RPCLIT_CODEFIRST_URL, implementor5);
+        endpoints.add(Endpoint.publish(RPCLIT_CODEFIRST_URL, implementor5));
         
-        Endpoint.publish("http://localhost:" + PORT + "/InheritContext/InheritPort",
-                         new InheritImpl());
-
+        endpoints.add(Endpoint.publish("http://localhost:" + PORT + "/InheritContext/InheritPort",
+                         new InheritImpl()));
+        
+        endpoints.add(Endpoint.publish(CXF_5064_URL, new SOAPHeaderServiceImpl()));
     }
 
     public static void main(String[] args) {

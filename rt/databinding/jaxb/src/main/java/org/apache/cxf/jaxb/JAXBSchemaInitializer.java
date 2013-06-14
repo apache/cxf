@@ -170,31 +170,33 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         }
 
+        Annotation[] anns = (Annotation[])part.getProperty("parameter.annotations");
+        XmlJavaTypeAdapter jta = findFromTypeAdapter(context, clazz, anns);
+        JAXBBeanInfo jtaBeanInfo = null;
+        if (jta != null) {
+            jtaBeanInfo = findFromTypeAdapter(context, jta.value());
+        }
         JAXBBeanInfo beanInfo = getBeanInfo(clazz);
-        if (beanInfo == null) {
-            Annotation[] anns = (Annotation[])part.getProperty("parameter.annotations");
-            XmlJavaTypeAdapter jta = findFromTypeAdapter(clazz, anns);
-            if (jta != null) {
-                beanInfo = findFromTypeAdapter(jta.value());
-                if (anns == null) {
-                    anns = new Annotation[] {jta};
-                } else {
-                    boolean found = false;
-                    for (Annotation t : anns) {
-                        if (t == jta) {
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        Annotation tmp[] = new Annotation[anns.length + 1];
-                        System.arraycopy(anns, 0, tmp, 0, anns.length);
-                        tmp[anns.length] = jta;
-                        anns = tmp;
+        if (jtaBeanInfo != beanInfo && jta != null) {
+            beanInfo = jtaBeanInfo;
+            if (anns == null) {
+                anns = new Annotation[] {jta};
+            } else {
+                boolean found = false;
+                for (Annotation t : anns) {
+                    if (t == jta) {
+                        found = true;
                     }
                 }
-                part.setProperty("parameter.annotations", anns);
-                part.setProperty("honor.jaxb.annotations", Boolean.TRUE);
+                if (!found) {
+                    Annotation tmp[] = new Annotation[anns.length + 1];
+                    System.arraycopy(anns, 0, tmp, 0, anns.length);
+                    tmp[anns.length] = jta;
+                    anns = tmp;
+                }
             }
+            part.setProperty("parameter.annotations", anns);
+            part.setProperty("honor.jaxb.annotations", Boolean.TRUE);
         }
         if (beanInfo == null) {
             if (Exception.class.isAssignableFrom(clazz)) {
@@ -249,29 +251,32 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
     }
 
-    private XmlJavaTypeAdapter findFromTypeAdapter(Class<?> clazz, Annotation[] anns) {
+    static XmlJavaTypeAdapter findFromTypeAdapter(JAXBContextProxy context, Class<?> clazz, Annotation[] anns) {
         JAXBBeanInfo ret = null;
         if (anns != null) {
             for (Annotation a : anns) {
                 if (XmlJavaTypeAdapter.class.isAssignableFrom(a.annotationType())) {
-                    ret = findFromTypeAdapter(((XmlJavaTypeAdapter)a).value());
+                    ret = findFromTypeAdapter(context, ((XmlJavaTypeAdapter)a).value());
                     if (ret != null) {
                         return (XmlJavaTypeAdapter)a;
                     }
                 }
             }
         }
-        XmlJavaTypeAdapter xjta = clazz.getAnnotation(XmlJavaTypeAdapter.class);
-        if (xjta != null) {
-            ret = findFromTypeAdapter(xjta.value());
-            if (ret != null) {
-                return xjta;
+        if (clazz != null) {
+            XmlJavaTypeAdapter xjta = clazz.getAnnotation(XmlJavaTypeAdapter.class);
+            if (xjta != null) {
+                ret = findFromTypeAdapter(context, xjta.value());
+                if (ret != null) {
+                    return xjta;
+                }
             }
         }
         return null;
     }
 
-    private JAXBBeanInfo findFromTypeAdapter(@SuppressWarnings("rawtypes") 
+    static JAXBBeanInfo findFromTypeAdapter(JAXBContextProxy context,
+                                            @SuppressWarnings("rawtypes") 
                                              Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
@@ -282,7 +287,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (sp instanceof ParameterizedType) {
             Type tp = ((ParameterizedType)sp).getActualTypeArguments()[0];
             if (tp instanceof Class) {
-                return getBeanInfo((Class<?>)tp);
+                return getBeanInfo(context, (Class<?>)tp);
             }
         }
         return null;
