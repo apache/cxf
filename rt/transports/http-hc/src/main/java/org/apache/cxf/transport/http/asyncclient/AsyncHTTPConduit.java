@@ -796,7 +796,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
         KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
         if (tlsClientParameters.getCertAlias() != null) {
-            getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
+            keyManagers = getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
         }
         ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                  tlsClientParameters.getSecureRandom());
