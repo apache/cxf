@@ -468,10 +468,14 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * @return true if the endorsed supporting token policy is correct
      */
     private boolean checkEndorsed(List<WSSecurityEngineResult> tokenResults) {
+        boolean endorsingSatisfied = false;
         if (isTLSInUse()) {
-            return checkTimestampIsSigned(tokenResults);
+            endorsingSatisfied = checkTimestampIsSigned(tokenResults);
         }
-        return checkSignatureIsSigned(tokenResults);
+        if (!endorsingSatisfied) {
+            endorsingSatisfied = checkSignatureIsSigned(tokenResults);
+        }
+        return endorsingSatisfied;
     }
     
     
