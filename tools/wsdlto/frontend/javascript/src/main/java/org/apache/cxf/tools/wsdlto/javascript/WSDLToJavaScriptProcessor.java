@@ -34,7 +34,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.javascript.BasicNameManager;
-import org.apache.cxf.javascript.JavascriptQueryHandler;
+import org.apache.cxf.javascript.JavascriptGetInterceptor;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
 import org.apache.cxf.javascript.service.ServiceJavascriptBuilder;
 import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
@@ -73,7 +73,7 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
-                JavascriptQueryHandler.writeUtilsToResponseStream(WSDLToJavaScriptProcessor.class, 
+                JavascriptGetInterceptor.writeUtilsToResponseStream(WSDLToJavaScriptProcessor.class, 
                                                                   fileOutputStream);
             }
             

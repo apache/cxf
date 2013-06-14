@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,11 +36,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
 public class ServletController {
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
@@ -179,27 +175,6 @@ public class ServletController {
                         }
                     }
                     updateDestination(request, d);
-                    
-                    if (bus != null) {
-                        QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
-                        if ("GET".equals(request.getMethod()) 
-                            && !StringUtils.isEmpty(request.getQueryString()) 
-                            && queryHandlerRegistry != null) {
-                            
-                            EndpointInfo ei = d.getEndpointInfo();
-                            String ctxUri = request.getPathInfo();
-                            String baseUri = request.getRequestURL().toString()
-                                + "?" + request.getQueryString();
-    
-                            QueryHandler selectedHandler = 
-                                findQueryHandler(queryHandlerRegistry, ei, ctxUri, baseUri);
-                            
-                            if (selectedHandler != null) {
-                                respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
-                                return true;
-                            }
-                        }
-                    }
                     invokeDestination(request, res, d);
                 } finally {
                     if (orig != null) { 
@@ -227,38 +202,6 @@ public class ServletController {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
             }
-        }
-    }
-    
-    protected QueryHandler findQueryHandler(QueryHandlerRegistry queryHandlerRegistry, 
-                                            EndpointInfo ei, 
-                                            String ctxUri,
-                                            String baseUri) {
-        if (queryHandlerRegistry == null) {
-            return null;
-        }
-        Iterable<QueryHandler> handlers = queryHandlerRegistry.getHandlers();
-        for (QueryHandler qh : handlers) {
-            if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
-                return qh;
-            }
-        }
-        return null;
-    }
-
-    protected void respondUsingQueryHandler(QueryHandler selectedHandler, HttpServletResponse res,
-                                          EndpointInfo ei, String ctxUri, String baseUri) throws IOException,
-        ServletException {
-        res.setContentType(selectedHandler.getResponseContentType(baseUri, ctxUri));
-        OutputStream out = res.getOutputStream();
-        try {
-            selectedHandler.writeResponse(baseUri, ctxUri, ei, out);
-            out.flush();
-        } catch (Exception e) {
-            LOG.warning(selectedHandler.getClass().getName()
-                + " Exception caught writing response: "
-                + e.getMessage());
-            throw new ServletException(e);
         }
     }
 

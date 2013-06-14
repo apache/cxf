@@ -33,7 +33,6 @@ import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.headers.HeaderManager;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.junit.Assert;
 import org.junit.Test;
@@ -80,7 +79,6 @@ public class BusExtensionLoadingTest extends Assert {
 
     private static void assertNotNullExtensions(Bus bus) {
         assertNotNull(bus.getExtension(WSDLManager.class));
-        assertNotNull(bus.getExtension(QueryHandlerRegistry.class));
         assertNotNull(bus.getExtension(ServerRegistry.class));
         assertNotNull(bus.getExtension(HeaderManager.class));
     }

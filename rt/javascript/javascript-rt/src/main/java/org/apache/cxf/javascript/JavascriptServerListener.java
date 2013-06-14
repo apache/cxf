@@ -17,26 +17,29 @@
  * under the License.
  */
 
-package org.apache.cxf.transports.http;
+package org.apache.cxf.javascript;
 
-import java.util.List;
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapBinding;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.endpoint.ServerLifeCycleListener;
 
-public interface QueryHandlerRegistry {
-    
-    /**
-     * Register QueryHandler with registry
-     */ 
-    void registerHandler(QueryHandler handler);
+/**
+ * 
+ */
+public class JavascriptServerListener implements ServerLifeCycleListener {
 
-    /**
-    * Register QueryHandler with registry in a specified position in the list
-    */ 
-    void registerHandler(QueryHandler handler, int position);
-    
-    /**
-     * Returns list of QueryHandlers
-     */  
-    List<QueryHandler> getHandlers();
+    public JavascriptServerListener(Bus b) {
+    }
 
+    public void startServer(Server server) {
+        if (server.getEndpoint().getBinding() instanceof SoapBinding) {
+            //found a SOAP binding, add the javascript generation interceptor
+            server.getEndpoint().getBinding().getInInterceptors().add(JavascriptGetInterceptor.INSTANCE);
+        }
+    }
+
+    public void stopServer(Server server) {
+    }
 
 }

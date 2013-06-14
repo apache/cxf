@@ -35,7 +35,6 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -43,9 +42,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPSession;
-import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 
 public class NettyHttpDestination extends AbstractHTTPDestination {
 
@@ -152,50 +148,6 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
             resp.flushBuffer();
             return;
         }
-        QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
-
-        if (null != req.getQueryString() && queryHandlerRegistry != null) {
-            String reqAddr = req.getRequestURL().toString();
-            String requestURL = reqAddr + "?" + req.getQueryString();
-            String pathInfo = req.getPathInfo();
-            for (QueryHandler qh : queryHandlerRegistry.getHandlers()) {
-                boolean recognized =
-                        qh instanceof StemMatchingQueryHandler
-                                ? ((StemMatchingQueryHandler) qh).isRecognizedQuery(requestURL,
-                                    pathInfo,
-                                    endpointInfo,
-                                    contextMatchOnExact())
-                                    : qh.isRecognizedQuery(requestURL, pathInfo, endpointInfo);
-                if (recognized) {
-                    //replace the endpointInfo address with request url only for get wsdl
-                    String errorMsg = null;
-                    CachedOutputStream out = new CachedOutputStream();
-                    try {
-                        synchronized (endpointInfo) {
-                            String oldAddress = updateEndpointAddress(reqAddr);
-                            resp.setContentType(qh.getResponseContentType(requestURL, pathInfo));
-                            try {
-                                qh.writeResponse(requestURL, pathInfo, endpointInfo, out);
-                            } catch (Exception ex) {
-                                LOG.log(Level.WARNING, "writeResponse failed: ", ex);
-                                errorMsg = ex.getMessage();
-                            }
-                            endpointInfo.setAddress(oldAddress);
-                        }
-                        if (errorMsg != null) {
-                            resp.sendError(500, errorMsg);
-                        } else {
-                            out.writeCacheTo(resp.getOutputStream());
-                            resp.getOutputStream().flush();
-                        }
-                    } finally {
-                        out.close();
-                    }
-
-                    return;
-                }
-            }
-        }
 
         // REVISIT: service on executor if associated with endpoint
         ClassLoaderHolder origLoader = null;
@@ -277,36 +229,12 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         // Here we don't support the Continuation
     }
 
-    private synchronized String updateEndpointAddress(String addr) {
-        // only update the EndpointAddress if the base path is equal
-        // make sure we don't broke the get operation?parament query
-        String address = removeTrailingSeparator(endpointInfo.getAddress());
-        if (getBasePathForFullAddress(address)
-                .equals(removeTrailingSeparator(getStem(getBasePathForFullAddress(addr))))) {
-            endpointInfo.setAddress(addr);
-        }
-        return address;
-    }
-
-    private String removeTrailingSeparator(String addr) {
-        if (addr != null && addr.length() > 0
-                && addr.lastIndexOf('/') == addr.length() - 1) {
-            return addr.substring(0, addr.length() - 1);
-        } else {
-            return addr;
-        }
-    }
-
     protected String getBasePathForFullAddress(String addr) {
         try {
             return new URL(addr).getPath();
         } catch (MalformedURLException e) {
             return null;
         }
-    }
-
-    private String getStem(String baseURI) {
-        return baseURI.substring(0, baseURI.lastIndexOf("/"));
     }
 
     public ServletContext getServletContext() {

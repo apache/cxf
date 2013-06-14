@@ -45,7 +45,6 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -56,9 +55,6 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
-import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.eclipse.jetty.http.Generator;
 import org.eclipse.jetty.io.AbstractConnection;
 import org.eclipse.jetty.server.AbstractHttpConnection.Output;
@@ -198,27 +194,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             return null;
         }
     }
-
-    private String removeTrailingSeparator(String addr) {
-        if (addr != null && addr.length() > 0 
-            && addr.lastIndexOf('/') == addr.length() - 1) {
-            return addr.substring(0, addr.length() - 1);
-        } else {
-            return addr;
-        }
-    }
-    
-    private synchronized String updateEndpointAddress(String addr) {
-        // only update the EndpointAddress if the base path is equal
-        // make sure we don't broke the get operation?parament query 
-        String address = removeTrailingSeparator(endpointInfo.getAddress());
-        if (getBasePathForFullAddress(address)
-            .equals(removeTrailingSeparator(getStem(getBasePathForFullAddress(addr))))) {
-            endpointInfo.setAddress(addr);
-        }
-        return address;
-    }
-   
+       
     protected void doService(HttpServletRequest req,
                              HttpServletResponse resp) throws IOException {
         doService(servletContext, req, resp);
@@ -263,50 +239,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             resp.flushBuffer();
             baseRequest.setHandled(true);
             return;
-        }
-        QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
-        
-        if (null != req.getQueryString() && queryHandlerRegistry != null) {   
-            String reqAddr = req.getRequestURL().toString();
-            String requestURL =  reqAddr + "?" + req.getQueryString();
-            String pathInfo = req.getPathInfo();                     
-            for (QueryHandler qh : queryHandlerRegistry.getHandlers()) {
-                boolean recognized =
-                    qh instanceof StemMatchingQueryHandler
-                    ? ((StemMatchingQueryHandler)qh).isRecognizedQuery(requestURL,
-                                                                       pathInfo,
-                                                                       endpointInfo,
-                                                                       contextMatchOnExact())
-                    : qh.isRecognizedQuery(requestURL, pathInfo, endpointInfo);
-                if (recognized) {
-                    //replace the endpointInfo address with request url only for get wsdl
-                    String errorMsg = null;
-                    CachedOutputStream out = new CachedOutputStream();
-                    try {
-                        synchronized (endpointInfo) {
-                            String oldAddress = updateEndpointAddress(reqAddr);   
-                            resp.setContentType(qh.getResponseContentType(requestURL, pathInfo));
-                            try {
-                                qh.writeResponse(requestURL, pathInfo, endpointInfo, out);
-                            } catch (Exception ex) {
-                                LOG.log(Level.WARNING, "writeResponse failed: ", ex);
-                                errorMsg = ex.getMessage();
-                            }
-                            endpointInfo.setAddress(oldAddress);
-                        }
-                        if (errorMsg != null) {
-                            resp.sendError(500, errorMsg);
-                        } else {
-                            out.writeCacheTo(resp.getOutputStream());
-                            resp.getOutputStream().flush();                     
-                        }
-                    } finally {
-                        out.close();
-                    }
-                    baseRequest.setHandled(true);
-                    return;
-                }
-            }
         }
 
         // REVISIT: service on executor if associated with endpoint
@@ -466,10 +398,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         return engine;
     }
    
-    private String getStem(String baseURI) {    
-        return baseURI.substring(0, baseURI.lastIndexOf("/"));
-    }
-    
     protected Message retrieveFromContinuation(HttpServletRequest req) {
         return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
     }

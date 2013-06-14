@@ -28,63 +28,68 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
-import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.interceptor.EndpointSelectionInterceptor;
 import org.apache.cxf.common.i18n.UncheckedException;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerRegistry;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.javascript.service.ServiceJavascriptBuilder;
 import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.transport.DestinationWithEndpoint;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.transports.http.StemMatchingQueryHandler;
+import org.apache.cxf.transport.Conduit;
 
-@NoJSR250Annotations(unlessNull = "bus")
-public class JavascriptQueryHandler implements StemMatchingQueryHandler {
+public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static final Interceptor<? extends Message> INSTANCE = new JavascriptGetInterceptor();
+   
     private static final String JS_UTILS_PATH = "/org/apache/cxf/javascript/cxf-utils.js";
     private static final Charset UTF8 = Charset.forName("utf-8");
     private static final String NO_UTILS_QUERY_KEY = "nojsutils";
     private static final String CODE_QUERY_KEY = "js";
-    private Bus bus;
 
-    public JavascriptQueryHandler(Bus b) {
-        setBus(b);
+    public JavascriptGetInterceptor() {
+        super(Phase.READ);
+        getAfter().add(EndpointSelectionInterceptor.class.getName());
     }
+
     
-    @Resource
-    public final void setBus(Bus b) {
-        if (bus != b) {
-            bus = b;
-            QueryHandlerRegistry reg = b.getExtension(QueryHandlerRegistry.class);
-            if (reg != null) {
-                reg.registerHandler(this);
+    public void handleMessage(Message message) throws Fault {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        String query = (String)message.get(Message.QUERY_STRING);
+        if (!"GET".equals(method) || StringUtils.isEmpty(query)) {
+            return;
+        }
+        String baseUri = (String)message.get(Message.REQUEST_URL);
+        URI uri = URI.create(baseUri);
+        Map<String, String> map = UrlUtils.parseQueryString(query);
+        if (isRecognizedQuery(map, uri, message.getExchange().getEndpoint().getEndpointInfo())) {
+            try {
+                Conduit c = message.getExchange().getDestination().getBackChannel(message);
+                Message mout = new MessageImpl();
+                mout.setExchange(message.getExchange());
+                message.getExchange().setOutMessage(mout);
+                mout.put(Message.CONTENT_TYPE, "application/javascript;charset=UTF-8");
+                c.prepare(mout);
+                OutputStream os = mout.getContent(OutputStream.class);
+                writeResponse(uri, map, os, message.getExchange().getEndpoint());
+            } catch (IOException ioe) {
+                throw new Fault(ioe);
             }
-        }
+        }        
     }
     
-    public String getResponseContentType(String fullQueryString, String ctx) {
-        URI uri = URI.create(fullQueryString);
-        Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
-        if (map.containsKey(CODE_QUERY_KEY)) {
-            return "application/javascript;charset=UTF-8";
-        }
-        return null;
-    }
-
-    public boolean isRecognizedQuery(String baseUri, String ctx, EndpointInfo endpointInfo,
-                                     boolean contextMatchExact) {
-        if (baseUri == null) {
+    private boolean isRecognizedQuery(Map<String, String> map, URI uri, EndpointInfo endpointInfo) {
+        if (uri == null) {
             return false;
         }
-        URI uri = URI.create(baseUri);
-        Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
         if (map.containsKey(CODE_QUERY_KEY)) {
             return endpointInfo.getAddress().contains(UrlUtils.getStem(uri.getSchemeSpecificPart()));
         }
@@ -96,46 +101,22 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
         if (utils == null) {
             throw new RuntimeException("Unable to get stream for " + JS_UTILS_PATH);
         }
-        // it's amazing that this still has to be coded up.
-        byte buffer[] = new byte[1024];
-        int count;
         try {
-            while ((count = utils.read(buffer, 0, 1024)) > 0) {
-                outputStream.write(buffer, 0, count);
-            }
+            IOUtils.copyAndCloseInput(utils, outputStream);
             outputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException("Failed to write javascript utils to HTTP response.", e);
         }
     }
-    
-    private Endpoint findEndpoint(EndpointInfo endpointInfo) {
-        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
-        for (Server server : serverRegistry.getServers()) {
-            // Hypothetically, not all destinations have an endpoint.
-            // There has to be a better way to do this.
-            if (server.getDestination() instanceof DestinationWithEndpoint
-                &&
-                endpointInfo.
-                    equals(((DestinationWithEndpoint)server.getDestination()).getEndpointInfo())) {
-                return server.getEndpoint();
-            }
-        }
-        return null;
-    }
 
-    public void writeResponse(String fullQueryString, String ctx, EndpointInfo endpoint, OutputStream os) {
-        URI uri = URI.create(fullQueryString);
-        String query = uri.getQuery();
-        Map<String, String> map = UrlUtils.parseQueryString(query);
+    private void writeResponse(URI uri, Map<String, String> map, OutputStream os, Endpoint serverEndpoint) {
         OutputStreamWriter writer = new OutputStreamWriter(os, UTF8);
         if (!map.containsKey(NO_UTILS_QUERY_KEY)) {
-            writeUtilsToResponseStream(JavascriptQueryHandler.class, os);
+            writeUtilsToResponseStream(JavascriptGetInterceptor.class, os);
         } 
         if (map.containsKey(CODE_QUERY_KEY)) {
-            ServiceInfo serviceInfo = endpoint.getService();
+            ServiceInfo serviceInfo = serverEndpoint.getService().getServiceInfos().get(0);
             Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
-            Endpoint serverEndpoint = findEndpoint(endpoint);
             // we need to move this to the bus.
             BasicNameManager nameManager = BasicNameManager.newNameManager(serviceInfo, serverEndpoint);
             NamespacePrefixAccumulator prefixManager = new NamespacePrefixAccumulator(serviceInfo
@@ -148,10 +129,11 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
                     writer.append(allThatJavascript);
                 }
 
-                ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
-                                                                                       endpoint.getAddress(),
-                                                                                       prefixManager,
-                                                                                       nameManager);
+                ServiceJavascriptBuilder serviceBuilder 
+                    = new ServiceJavascriptBuilder(serviceInfo,
+                                                   serverEndpoint.getEndpointInfo().getAddress(),
+                                                   prefixManager,
+                                                   nameManager);
                 serviceBuilder.walk();
                 String serviceJavascript = serviceBuilder.getCode();
                 writer.append(serviceJavascript);
@@ -160,11 +142,8 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
                 throw new UncheckedException(e);
             }
         } else {
-            throw new RuntimeException("Invalid query " + fullQueryString);
+            throw new RuntimeException("Invalid query " + uri.toString());
         }
     }
 
-    public boolean isRecognizedQuery(String fullQueryString, String ctx, EndpointInfo endpoint) {
-        return isRecognizedQuery(fullQueryString, ctx, endpoint, false);
-    }
 }

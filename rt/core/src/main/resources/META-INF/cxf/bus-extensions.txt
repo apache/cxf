@@ -2,7 +2,6 @@ org.apache.cxf.bus.managers.PhaseManagerImpl:org.apache.cxf.phase.PhaseManager:t
 org.apache.cxf.bus.managers.WorkQueueManagerImpl:org.apache.cxf.workqueue.WorkQueueManager:true
 org.apache.cxf.bus.managers.CXFBusLifeCycleManager:org.apache.cxf.buslifecycle.BusLifeCycleManager:true   	   
 org.apache.cxf.bus.managers.ServerRegistryImpl:org.apache.cxf.endpoint.ServerRegistry:true
-org.apache.cxf.transports.http.internal.QueryHandlerRegistryImpl:org.apache.cxf.transports.http.QueryHandlerRegistry:true 
 org.apache.cxf.bus.managers.EndpointResolverRegistryImpl:org.apache.cxf.endpoint.EndpointResolverRegistry:true
 org.apache.cxf.bus.managers.HeaderManagerImpl:org.apache.cxf.headers.HeaderManager:true
 org.apache.cxf.service.factory.FactoryBeanListenerManager::true
