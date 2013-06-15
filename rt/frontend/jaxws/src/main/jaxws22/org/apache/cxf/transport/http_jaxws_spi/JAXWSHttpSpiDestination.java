@@ -30,7 +30,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -38,9 +37,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPSession;
-import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 
 public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
 
@@ -67,54 +63,6 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
      */
     protected void doService(HttpServletRequest req, HttpServletResponse resp)
         throws IOException {
-
-        QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
-        
-        if (null != req.getQueryString() && queryHandlerRegistry != null) {   
-            String reqAddr = req.getRequestURL().toString();
-            String requestURL =  reqAddr + "?" + req.getQueryString();
-            String pathInfo = req.getPathInfo();                     
-            for (QueryHandler qh : queryHandlerRegistry.getHandlers()) {
-                boolean recognized =
-                    qh instanceof StemMatchingQueryHandler
-                    ? ((StemMatchingQueryHandler)qh).isRecognizedQuery(requestURL,
-                                                                       pathInfo,
-                                                                       endpointInfo,
-                                                                       contextMatchOnExact())
-                    : qh.isRecognizedQuery(requestURL, pathInfo, endpointInfo);
-                if (recognized) {
-                    //replace the endpointInfo address with request url only for get wsdl
-                    String errorMsg = null;
-                    CachedOutputStream out = new CachedOutputStream();
-                    try {
-                        synchronized (endpointInfo) {
-                            String oldAddress = endpointInfo.getAddress(); 
-                            endpointInfo.setAddress(reqAddr);   
-                            resp.setContentType(qh.getResponseContentType(requestURL, pathInfo));
-                            try {
-                                qh.writeResponse(requestURL, pathInfo, endpointInfo, out);
-                            } catch (Exception ex) {
-                                LOG.log(Level.WARNING, "writeResponse failed: ", ex);
-                                errorMsg = ex.getMessage();
-                            }
-                            endpointInfo.setAddress(oldAddress);
-                        }
-                        if (errorMsg != null) {
-                            resp.sendError(500, errorMsg);
-                        } else {
-                            out.writeCacheTo(resp.getOutputStream());
-                            resp.getOutputStream().flush();                     
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new RuntimeException(e);
-                    } finally {
-                        out.close();
-                    }
-                    return;
-                }
-            }
-        }
         
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus); 
         try {

@@ -32,7 +32,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -87,7 +86,6 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
     
     @Test
     public void testMessage() throws Exception {
-        expect(bus.getExtension(QueryHandlerRegistry.class)).andReturn(null);
         HttpExchange exchange = setUpExchange();
         control.replay();
 
