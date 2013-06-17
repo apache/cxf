@@ -20,6 +20,7 @@
 package org.apache.cxf.frontend;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.logging.Level;
@@ -34,7 +35,9 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.interceptor.EndpointSelectionInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -93,14 +96,48 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         String baseUri = (String)message.get(Message.REQUEST_URL);
         String ctx = (String)message.get(Message.PATH_INFO);
         
-        
-        //cannot have two wsdl's being written for the same endpoint at the same
-        //time as the addresses may get mixed up
-        synchronized (message.getExchange().getEndpoint()) {
-            Map<String, String> map = UrlUtilities.parseQueryString(query);
-            if (isRecognizedQuery(map, baseUri, ctx, 
-                                  message.getExchange().getEndpoint().getEndpointInfo())) {
-                
+        boolean setOutMessageToNull = false;
+        try {
+            CachedOutputStream cos = null;
+
+            //cannot have two wsdl's being written for the same endpoint at the same
+            //time as the addresses may get mixed up
+            synchronized (message.getExchange().getEndpoint()) {
+                Map<String, String> map = UrlUtils.parseQueryString(query);
+                if (isRecognizedQuery(map, baseUri, ctx, 
+                                      message.getExchange().getEndpoint().getEndpointInfo())) {
+
+                    setOutMessageToNull = true;
+                    try {
+                        Document doc = getDocument(message,
+                                      baseUri,
+                                      map,
+                                      ctx,
+                                      message.getExchange().getEndpoint().getEndpointInfo());
+                        String enc = null;
+                        try {
+                            enc = doc.getXmlEncoding();
+                        } catch (Exception ex) {
+                            //ignore - not dom level 3
+                        }
+                        if (enc == null) {
+                            enc = "utf-8";
+                        }
+
+                        cos = new CachedOutputStream();
+                        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(cos,
+                                                                                 enc);
+                        StaxUtils.writeNode(doc, writer, true);
+                        writer.flush();
+                        writer.close();
+
+                    } catch (XMLStreamException e) {
+                        throw new Fault(e);
+                    }
+                }
+            }
+
+            if (cos != null) {
                 try {
                     Conduit c = message.getExchange().getDestination().getBackChannel(message, null, null);
                     Message mout = new MessageImpl();
@@ -109,46 +146,33 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                     mout.put(Message.CONTENT_TYPE, "text/xml");
                     c.prepare(mout);
                     OutputStream os = mout.getContent(OutputStream.class);
-                    Document doc = getDocument(message,
-                                  baseUri,
-                                  map,
-                                  ctx,
-                                  message.getExchange().getEndpoint().getEndpointInfo());
-                    String enc = null;
-                    try {
-                        enc = doc.getXmlEncoding();
-                    } catch (Exception ex) {
-                        //ignore - not dom level 3
-                    }
-                    if (enc == null) {
-                        enc = "utf-8";
-                    }
 
-                    XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os,
-                                                                             enc);
-                    StaxUtils.writeNode(doc, writer, true);
+                    InputStream cis = cos.getInputStream();
+                    IOUtils.copyAndCloseInput(cis, os);
                     message.getInterceptorChain().abort();
+
                     try {
-                        writer.flush();
-                        writer.close();
                         os.flush();
                         os.close();
                     } catch (IOException ex) {
                         LOG.log(Level.FINE, "Failure writing full wsdl to the stream", ex);
                         //we can ignore this.   Likely, whatever has requested the WSDL
-                        //has closed the connection before reading the entire wsdl.  
+                        //has closed the connection before reading the entire wsdl.
                         //WSDL4J has a tendency to not read the closing tags and such
-                        //and thus can sometimes hit this.   In anycase, it's 
+                        //and thus can sometimes hit this.   In any case, it's
                         //pretty much ignorable and nothing we can do about it (cannot
                         //send a fault or anything anyway
                     }
+
+                    cos.close();
                 } catch (IOException e) {
                     throw new Fault(e);
-                } catch (XMLStreamException e) {
-                    throw new Fault(e);
-                } finally {
-                    message.getExchange().setOutMessage(null);
                 }
+            }
+
+        } finally {
+            if (setOutMessageToNull) {
+                message.getExchange().setOutMessage(null);
             }
         }
     }
@@ -171,3 +195,4 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
 }
+
