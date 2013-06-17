@@ -83,6 +83,14 @@ public class SearchContextImplTest extends Assert {
     }
     
     @Test
+    public void testFiqlSearchConditionCustomQueryName() {
+        Message m = new MessageImpl();
+        m.put(SearchContextImpl.CUSTOM_SEARCH_QUERY_PARAM_NAME, "thequery");
+        doTestFiqlSearchCondition(m,
+            "thequery" + "=" + "name==CXF%20Rocks;id=gt=123");
+    }
+    
+    @Test
     public void testFiqlSearchBean() {
         doTestFiqlSearchBean(
             SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
@@ -110,7 +118,10 @@ public class SearchContextImplTest extends Assert {
     }
     
     private void doTestFiqlSearchCondition(String queryString) {
-        Message m = new MessageImpl();
+        doTestFiqlSearchCondition(new MessageImpl(), queryString);
+    }
+    
+    private void doTestFiqlSearchCondition(Message m, String queryString) {
         m.put(Message.QUERY_STRING, queryString);
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<Book> sc = context.getCondition(Book.class);
