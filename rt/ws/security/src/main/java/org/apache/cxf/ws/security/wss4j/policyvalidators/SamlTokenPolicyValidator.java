@@ -163,7 +163,9 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             return false;
         }
         
-        assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
+        if (samlTokenType != null) {
+            assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
+        }
         return true;
     }
     
