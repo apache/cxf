@@ -61,6 +61,7 @@ import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -68,6 +69,8 @@ import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.apache.xml.security.utils.Base64;
@@ -122,6 +125,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             doEncryptBeforeSign();
         } else {
             doSignBeforeEncrypt();
+        }
+        
+        if (!isRequestor()) {
+            config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
         }
     }
     
@@ -337,8 +344,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             config.put(ConfigurationConstants.ENCRYPTION_PARTS, parts);
 
-            config.put(ConfigurationConstants.ENC_KEY_ID, 
+            if (isRequestor()) {
+                config.put(ConfigurationConstants.ENC_KEY_ID, 
                        getKeyIdentifierType(recToken, encrToken));
+            } else {
+                config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
+            }
 
             config.put(ConfigurationConstants.ENC_KEY_TRANSPORT, 
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());
@@ -402,7 +413,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKey");
             } else {
                 config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKeySHA1");
-                // TODO sig.setEncrKeySha1value(tok.getSHA1());
             }
         }
         
@@ -426,46 +436,41 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         tempTok.setKey(symmetricKey);
         tempTok.setSecret(symmetricKey.getEncoded());
         
-        // Set the SHA1 value of the encrypted key, this is used when the encrypted
-        // key is referenced via a key identifier of type EncryptedKeySHA1
-        // tempTok.setSHA1(getSHA1(encrKey.getEncryptedEphemeralKey()));
-        
         getTokenStore().add(tempTok);
         
         return tempTok.getId();
     }
     
-    private String getEncryptedKey() {
-        // findEncryptedKeyToken(message);
-        /*
-        SecurityEvent event = findEncryptedKeyEvent(message);
-        if (event != null) {
-            org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                ((EncryptedKeyTokenSecurityEvent)event).getSecurityToken();
-            if (securityToken != null) {
-                Date created = new Date();
-                Date expires = new Date();
-                expires.setTime(created.getTime() + 300000);
-                
-                String encryptedKeyID = securityToken.getId();
-                System.out.println("ID: " + encryptedKeyID);
-                SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
-                // tempTok.setSecret(securityToken.g);
-                //tempTok.setSHA1(getSHA1((byte[])wser
-                //                        .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
-                getTokenStore().add(tempTok);
-                
-                return encryptedKeyID;
+    private String getEncryptedKey() throws XMLSecurityException {
+        org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+            findEncryptedKeyToken();
+        if (securityToken != null) {
+            Date created = new Date();
+            Date expires = new Date();
+            expires.setTime(created.getTime() + 300000);
+
+            String encryptedKeyID = securityToken.getId();
+            SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
+            // TODO revisit
+            for (String key : securityToken.getSecretKey().keySet()) {
+                if (securityToken.getSecretKey().get(key) != null) {
+                    tempTok.setKey(securityToken.getSecretKey().get(key));
+                    tempTok.setSecret(securityToken.getSecretKey().get(key).getEncoded());
+                    break;
+                }
             }
+            //tempTok.setSHA1(getSHA1((byte[])wser.get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
+            getTokenStore().add(tempTok);
+
+            return encryptedKeyID;
         }
-        System.out.println("EVENT NULL?: " + (event == null));
-        */
         return null;
         
     }
-    /*
-     * TODO
-    private SecurityToken findEncryptedKeyToken(Message message) {
+    
+    // TODO revisit
+    private org.apache.xml.security.stax.securityToken.SecurityToken 
+    findEncryptedKeyToken() throws XMLSecurityException {
         @SuppressWarnings("unchecked")
         final List<SecurityEvent> incomingEventList = 
             (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
@@ -476,15 +481,18 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
-                    if (token != null && token.get) {
-                        
+                    if (token != null && token.getSecretKey() != null) {
+                        for (String key : token.getSecretKey().keySet()) {
+                            if (token.getSecretKey().get(key) != null) {
+                                return token;
+                            }
+                        }
                     }
                 }
             }
         }
         return null;
     }
-    */
     
     private String getSHA1(byte[] input) {
         try {
@@ -563,7 +571,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (pc.getKey() != null) {
                     String id = pc.getIdentifier();
                     SecurityToken token = store.getToken(id);
-                    if (token != null) {
+                    if (token != null && token.getSHA1() == null) {
                         token.setSHA1(getSHA1(pc.getKey()));
                         // Create another cache entry with the SHA1 Identifier as the key 
                         // for easy retrieval
