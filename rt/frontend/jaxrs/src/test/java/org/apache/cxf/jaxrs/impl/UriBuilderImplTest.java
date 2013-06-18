@@ -410,6 +410,13 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testReplacePathHttpString() throws Exception {
+        URI uri = new URI("http://foo/bar/baz;m1=m1value");
+        URI newUri = new UriBuilderImpl(uri).replacePath("httppnewpath").build();
+        assertEquals("URI is not built correctly", "http://foo/httppnewpath", newUri.toString());
+    }
+    
+    @Test
     public void testReplaceNullPath() throws Exception {
         URI uri = new URI("http://foo/bar/baz;m1=m1value");
         URI newUri = new UriBuilderImpl(uri).replacePath(null).build();
