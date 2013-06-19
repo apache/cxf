@@ -37,9 +37,9 @@ import org.apache.cxf.xkms.model.xkms.StatusType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo;
+
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TrustedAuthorityValidatorTest extends BasicValidationTest {
@@ -74,7 +74,6 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
     }
 
     @Test
-    @Ignore
     public void testIsCertChainValid() throws CertificateException {
         TrustedAuthorityValidator validator = new TrustedAuthorityValidator(certificateRepo);
         Assert.assertTrue("Root should be valid",
@@ -84,7 +83,6 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
     }
 
     @Test
-    @Ignore
     public void testRootCertIsValid() throws JAXBException, CertificateException {
         StatusType result = processRequest("validateRequestOKRoot.xml");
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
@@ -94,7 +92,6 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
     }
 
     @Test
-    @Ignore
     public void testAliceSignedByRootIsValid() throws JAXBException, CertificateException {
         StatusType result = processRequest("validateRequestOKAlice.xml");
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
@@ -104,7 +101,6 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
     }
 
     @Test
-    @Ignore
     public void testDaveSignedByAliceSginedByRootIsValid() throws JAXBException, CertificateException {
         StatusType result = processRequest("validateRequestOKDave.xml");
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
@@ -114,7 +110,6 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
     }
 
     @Test
-    @Ignore
     public void testSelfSignedCertOscarIsNotValid() throws JAXBException, CertificateException {
         StatusType result = processRequest("validateRequestInvalidOscar.xml");
         Assert.assertEquals(result.getStatusValue(), KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_INVALID);

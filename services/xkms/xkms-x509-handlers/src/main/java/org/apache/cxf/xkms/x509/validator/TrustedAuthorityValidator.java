@@ -73,6 +73,7 @@ public class TrustedAuthorityValidator implements Validator {
             PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustAnchors, selector);
             pkixParams.addCertStore(CertStore.getInstance("Collection", intermediateParams));
             pkixParams.addCertStore(CertStore.getInstance("Collection", certificateParams));
+            pkixParams.setRevocationEnabled(false);
             CertPathBuilder builder = CertPathBuilder.getInstance("PKIX");
             builder.build(pkixParams);
         } catch (InvalidAlgorithmParameterException e) {
