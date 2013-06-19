@@ -194,6 +194,56 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteCollectionParameterDef() 
+        throws Exception {
+        doTestWriteCollectionParameterDef(false);
+    }
+    
+    @Test
+    public void testWriteCollectionParameterDefAsJaxbElement() 
+        throws Exception {
+        doTestWriteCollectionParameterDef(true);
+    }
+    
+    private void doTestWriteCollectionParameterDef(boolean asJaxbElement) 
+        throws Exception {
+        JSONProvider<List<ReportDefinition>> provider 
+            = new JSONProvider<List<ReportDefinition>>();
+        provider.setMarshallAsJaxbElement(asJaxbElement);
+        provider.setUnmarshallAsJaxbElement(asJaxbElement);
+        ReportDefinition r = new ReportDefinition();
+        r.setReportName("report");
+        r.addParameterDefinition(new ParameterDefinition("param"));
+        List<ReportDefinition> reports = Collections.singletonList(r);
+        
+        Method m = ReportService.class.getMethod("findAllReports", new Class<?>[]{});
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(reports, m.getReturnType(), m.getGenericReturnType(),
+                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        @SuppressWarnings({
+            "unchecked", "rawtypes"
+        })
+        List<ReportDefinition> reports2 = provider.readFrom((Class)m.getReturnType(), m.getGenericReturnType(),
+                          new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                          new MetadataMap<String, String>(), new ByteArrayInputStream(bos.toString().getBytes()));
+        assertNotNull(reports2);
+        assertEquals(1, reports2.size());
+        ReportDefinition rd = reports2.get(0);
+        assertEquals("report", rd.getReportName());
+        
+        List<ParameterDefinition> params = rd.getParameterList();
+        assertNotNull(params);
+        assertEquals(1, params.size());
+        ParameterDefinition pd = params.get(0);
+        assertEquals("param", pd.getName());
+        
+    }
+    
+    
+
+    
+    @Test
     public void testReadFromTags() throws Exception {
         MessageBodyReader<Tags> p = new JSONProvider<Tags>();
         byte[] bytes = 
@@ -989,7 +1039,6 @@ public class JSONProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(many, ManyTags.class, ManyTags.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        System.out.println(bos.toString());
     }
  
     @Test
@@ -1354,5 +1403,66 @@ public class JSONProviderTest extends Assert {
             return attr;
         }
         
+    }
+    
+    interface ReportService {
+
+        List<ReportDefinition> findAllReports();
+
+    } 
+    
+    public static class ParameterDefinition {
+        private String name;
+        public ParameterDefinition() {
+        }
+        public ParameterDefinition(String name) {
+            this.name = name;
+        }
+        public String getName() {
+            return name;
+        }
+    
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+    }
+
+    @XmlRootElement
+    public static class ReportDefinition {
+        private String reportName;
+       
+        private List<ParameterDefinition> parameterList;
+       
+        public ReportDefinition() {
+       
+        }
+       
+        public ReportDefinition(String reportName) {
+            this.reportName = reportName;
+        }
+       
+        public String getReportName() {
+            return reportName;
+        }
+
+        public void setReportName(String reportName) {
+            this.reportName = reportName;
+        }
+       
+        public List<ParameterDefinition> getParameterList() {
+            return parameterList;
+        }
+
+        public void setParameterList(List<ParameterDefinition> parameterList) {
+            this.parameterList = parameterList;
+        }
+       
+        public void addParameterDefinition(ParameterDefinition parameterDefinition) {
+            if (parameterList == null) {
+                parameterList = new ArrayList<ParameterDefinition>();
+            }
+            parameterList.add(parameterDefinition);
+        }
     }
 }

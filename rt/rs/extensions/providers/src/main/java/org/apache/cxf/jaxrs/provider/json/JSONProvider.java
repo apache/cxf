@@ -221,8 +221,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 
-                || unmarshalAsJaxbElement
-                || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
+                || !isCollection && (unmarshalAsJaxbElement
+                || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
                 response = unmarshaller.unmarshal(xsr, theType);
             } else {
                 response = unmarshaller.unmarshal(xsr);
