@@ -81,6 +81,12 @@ public class WebClientTest extends Assert {
     }
     
     @Test
+    public void testAddressNotEncoded() {
+        URI u = WebClient.create("http://localhost/somepath ").getCurrentURI();
+        assertEquals("http://localhost/somepath%20", u.toString());
+    }
+    
+    @Test
     public void testDoubleAsteriscs() {
         URI u = WebClient.create("http://foo").path("**").getCurrentURI();
         assertEquals("http://foo/**", u.toString());

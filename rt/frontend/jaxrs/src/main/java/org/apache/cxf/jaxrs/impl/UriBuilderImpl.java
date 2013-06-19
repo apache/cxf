@@ -878,7 +878,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
 
-    private UriBuilder uriAsTemplate(String uri) {
+    public UriBuilder uriAsTemplate(String uri) {
         // This can be a start of replacing URI class Parser completely
         // but it can be too complicated, the following code is needed for now 
         // to deal with URIs containing template variables. 

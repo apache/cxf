@@ -45,6 +45,11 @@ public class HttpUtilsTest extends Assert {
     }
     
     @Test
+    public void testCommaInQuery() {
+        assertEquals("a+,b", HttpUtils.queryEncode("a ,b"));
+    }
+    
+    @Test
     public void testRelativize() throws Exception {
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6226081
         URI a = new URI("file:/c:/abc/def/myDocument/doc.xml");
