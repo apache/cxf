@@ -844,6 +844,31 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
 
+    public UriBuilder uriAsTemplate(String uri) {
+        // This can be a start of replacing URI class Parser completely
+        // but it can be too complicated, the following code is needed for now 
+        // to deal with URIs containing template variables. 
+        int index = uri.indexOf(":");
+        if (index != -1) {
+            this.scheme = uri.substring(0, index);
+            uri = uri.substring(index + 1);
+            if (uri.indexOf("//") == 0) {
+                uri = uri.substring(2);
+                index = uri.indexOf("/");
+                if (index != -1) {
+                    String[] schemePair = uri.substring(0, index).split(":");
+                    this.host = schemePair[0];
+                    this.port = schemePair.length == 2 ? Integer.valueOf(schemePair[1]) : -1;
+                    
+                }
+                uri = uri.substring(index);
+            }
+            
+        }
+        setPathAndMatrix(uri);
+        return this;
+    }
+    
     //the clarified rules for encoding values of uri templates are:
     //  - encode each value contextually based on the URI component containing the template
     //  - in path templates, by default, encode also slashes (i.e. treat all path templates as 

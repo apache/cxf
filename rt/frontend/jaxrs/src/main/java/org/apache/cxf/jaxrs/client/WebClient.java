@@ -55,6 +55,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
+import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -79,7 +80,7 @@ public class WebClient extends AbstractClient {
     private static final String RESPONSE_TYPE = "response.type";
     
     protected WebClient(String baseAddress) {
-        this(URI.create(baseAddress));
+        this(convertStringToURI(baseAddress));
     }
     
     protected WebClient(URI baseURI) {
@@ -1179,6 +1180,20 @@ public class WebClient extends AbstractClient {
         return clientState;
     }
     
+    static URI convertStringToURI(String baseAddress) {
+        try {
+            return URI.create(baseAddress);
+        } catch (RuntimeException ex) {
+            // no need to check "https" scheme or indeed ':' 
+            // as the relative address will not work as the base address
+            if (baseAddress.startsWith(HTTP_SCHEME)) {
+                return new UriBuilderImpl().uriAsTemplate(baseAddress).build();
+            } else {
+                throw ex;
+            }
+        }
+    }
+
     // Async related code, consider pushing most of it to AbstractClient
     public AsyncInvoker async() {
         return new AsyncInvokerImpl();
