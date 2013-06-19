@@ -54,6 +54,9 @@ final class JDKBugHacks {
     }
     
     private static boolean skipHack(final String key) {
+        return skipHack(key, "false");
+    }
+    private static boolean skipHack(final String key, String def) {
         String cname = null;
         try {
             cname = AccessController.doPrivileged(new PrivilegedAction<String>() {
@@ -82,8 +85,8 @@ final class JDKBugHacks {
         } catch (Throwable t) {
             //ignore
         }
-        if (cname == null) {
-            cname = "false";
+        if (StringUtils.isEmpty(cname)) {
+            cname = def;
         }
         return Boolean.parseBoolean(cname);
     }
@@ -100,7 +103,7 @@ final class JDKBugHacks {
             try {
                 try {
                     //Trigger a call to sun.awt.AppContext.getAppContext()
-                    if (!skipHack("org.apache.cxf.JDKBugHacks.imageIO")) {
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.imageIO", "true")) {
                         ImageIO.getCacheDirectory();
                     }
                 } catch (Throwable t) {
