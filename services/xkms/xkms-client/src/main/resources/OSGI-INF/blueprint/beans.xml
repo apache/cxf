@@ -38,7 +38,7 @@
     <bean id="additionalClasses"
         class="org.apache.cxf.xkms.model.extensions.AdditionalClassesFactory" />
 
-    <jaxws:client id="XKMSConsumer" xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
+    <jaxws:client id="xkmsClient" xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
         serviceClass="org.w3._2002._03.xkms_wsdl.XKMSPortType"
         serviceName="serviceNamespace:XKMSPortType" endpointName="serviceNamespace:XKMSService"
         address="${xkms.endpoint}">
@@ -50,6 +50,13 @@
         </jaxws:properties>
     </jaxws:client>
 
-    <service ref="XKMSConsumer" interface="org.w3._2002._03.xkms_wsdl.XKMSPortType" />
+    <service ref="xkmsClient" interface="org.w3._2002._03.xkms_wsdl.XKMSPortType" />
+
+    <bean id="xkmsCryptoProviderFactory"
+        class="org.apache.cxf.xkms.crypto.XkmsCryptoProviderFactory">
+        <argument ref="xkmsClient" />
+    </bean>        
+
+    <service ref="xkmsCryptoProviderFactory" interface="org.apache.cxf.xkms.crypto.CryptoProviderFactory" />
 
 </blueprint>
