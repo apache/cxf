@@ -19,7 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -46,7 +46,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 @Path("/token")
 public class AccessTokenService extends AbstractTokenService {
-    private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
+    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
     
     /**
      * Sets the list of optional grant handlers
@@ -54,6 +54,14 @@ public class AccessTokenService extends AbstractTokenService {
      */
     public void setGrantHandlers(List<AccessTokenGrantHandler> handlers) {
         grantHandlers = handlers;
+    }
+    
+    /**
+     * Sets a grant handler
+     * @param handler the grant handler
+     */
+    public void setGrantHandler(AccessTokenGrantHandler handler) {
+        grantHandlers.add(handler);
     }
     
     /**
