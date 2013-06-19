@@ -87,8 +87,8 @@ public abstract class AbstractClient implements Client, Retryable {
     protected static final String REQUEST_CONTEXT = "RequestContext";
     protected static final String RESPONSE_CONTEXT = "ResponseContext";
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
-    
-    private static final String HTTP_SCHEME = "http";
+    protected static final String HTTP_SCHEME = "http";
+
     private static final String PROXY_PROPERTY = "jaxrs.proxy";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);

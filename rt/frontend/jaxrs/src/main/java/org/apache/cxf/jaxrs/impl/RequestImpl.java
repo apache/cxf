@@ -40,6 +40,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 /**
  * TODO : deal with InvalidStateExceptions
@@ -67,6 +68,8 @@ public class RequestImpl implements Request {
         List<String> acceptEncs = parseAcceptEnc(
             headers.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING));
         
+        List<Object> varyValues = new LinkedList<Object>();
+        
         List<Variant> matchingVars = new LinkedList<Variant>();
         for (Variant var : vars) {
             MediaType mt = var.getMediaType();
@@ -75,23 +78,63 @@ public class RequestImpl implements Request {
                         
             boolean mtMatched = mt == null || acceptMediaTypes.isEmpty()
                 || JAXRSUtils.intersectMimeTypes(acceptMediaTypes, mt).size() != 0;
-            
-            boolean encMatched = acceptEncs.isEmpty() || enc == null 
-                || acceptEncs.contains(enc);
+            if (mtMatched) {
+                handleVaryValues(varyValues, HttpHeaders.ACCEPT);
+            }
             
             boolean langMatched = lang == null || acceptLangs.isEmpty()
                 || isLanguageMatched(acceptLangs, lang);
+            if (langMatched) {
+                handleVaryValues(varyValues, HttpHeaders.ACCEPT_LANGUAGE);
+            }
+            
+            boolean encMatched = acceptEncs.isEmpty() || enc == null 
+                || acceptEncs.contains(enc);
+            if (encMatched) {
+                handleVaryValues(varyValues, HttpHeaders.ACCEPT_ENCODING);
+            }
             
             if (mtMatched && encMatched && langMatched) {
                 matchingVars.add(var);
             }
         }
-        if (matchingVars.size() > 1) {
-            Collections.sort(matchingVars, new VariantComparator());       
-        }
-        return matchingVars.isEmpty() ? null : matchingVars.get(0);
+        if (matchingVars.size() > 0) {
+            addVaryHeader(varyValues);
+            Collections.sort(matchingVars, new VariantComparator());
+            return matchingVars.get(0);
+        } 
+        return null;
     }
 
+    private static void handleVaryValues(List<Object> varyValues, String ...values) {
+        for (String v : values) {
+            if (v != null && !varyValues.contains(v)) {
+                varyValues.add(v);
+            }
+        }
+    }
+    
+    private static void addVaryHeader(List<Object> varyValues) {
+        // at this point we still have no out-bound message so lets
+        // use HttpServletResponse. If needed we can save the header on the exchange
+        // and then copy it into the out-bound message's headers
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message != null) {
+            Object httpResponse = message.get("HTTP.RESPONSE");
+            if (httpResponse != null) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < varyValues.size(); i++) {
+                    if (i > 0) {
+                        sb.append(',');
+                    }
+                    sb.append(varyValues.get(i).toString());
+                }
+                ((javax.servlet.http.HttpServletResponse)httpResponse)
+                    .setHeader(HttpHeaders.VARY, sb.toString());
+            }
+        }
+    }
+    
     private static boolean isLanguageMatched(List<Locale> locales, Locale l) {
         for (Locale locale : locales) {
             if (locale.getLanguage().equalsIgnoreCase(l.getLanguage())) {
@@ -116,6 +159,9 @@ public class RequestImpl implements Request {
     }
     
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
+        if (eTag == null) {
+            throw new IllegalArgumentException("ETag is null");
+        }
         ResponseBuilder rb = evaluateIfMatch(eTag);
         if (rb == null) {
             rb = evaluateIfNonMatch(eTag);
@@ -177,6 +223,9 @@ public class RequestImpl implements Request {
     }
     
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
+        if (lastModified == null) {
+            throw new IllegalArgumentException("Date is null");
+        }
         List<String> ifModifiedSince = headers.getRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
         
         if (ifModifiedSince == null || ifModifiedSince.size() == 0) {
@@ -231,13 +280,13 @@ public class RequestImpl implements Request {
 
     public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
         final ResponseBuilder rb = evaluatePreconditions(eTag);
-        if (rb != null) {
+        if (rb == null) {
             // the ETag conditions match; so now conditions for last modified must match
             return evaluatePreconditions(lastModified);
         } else {
             // the ETag conditions do not match, so last modified should be ignored
             // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html (section 14.26 for
-            // "If-None-Match", behavior not specified for "If-Match", section 14.24)
+            // "If-None-Match", behaviour not specified for "If-Match", section 14.24)
             return null;
         }
     }

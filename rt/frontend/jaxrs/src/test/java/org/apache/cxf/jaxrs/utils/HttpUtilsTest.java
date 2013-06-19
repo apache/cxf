@@ -45,6 +45,11 @@ public class HttpUtilsTest extends Assert {
     }
     
     @Test
+    public void testCommaInQuery() {
+        assertEquals("a+,b", HttpUtils.queryEncode("a ,b"));
+    }
+    
+    @Test
     public void testIsDateHeader() {
         assertFalse(HttpUtils.isDateRelatedHeader(HttpHeaders.ETAG));
         assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.EXPIRES));
