@@ -46,6 +46,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ReaderInterceptor;
@@ -360,7 +361,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (!ct.endsWith("ISO-8859-1")) {
                 ct += "us-ascii";
             }
-            context.getHeaders().putSingle("Content-Type", ct);
+            context.setMediaType(MediaType.valueOf(ct));
             context.proceed();
         }
         

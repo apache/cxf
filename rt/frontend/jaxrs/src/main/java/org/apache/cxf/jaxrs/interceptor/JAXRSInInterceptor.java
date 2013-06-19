@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -98,15 +99,10 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         try {
             processRequest(message);
+        } catch (Fault ex) {
+            convertExceptionToResponseIfPossible(ex.getCause(), message);
         } catch (RuntimeException ex) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
-            if (excResponse == null) {
-                ProviderFactory.getInstance(message).clearThreadLocalProxies();
-                message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
-                                          JAXRSUtils.propogateException(message));
-                throw ex;
-            }
-            message.getExchange().put(Response.class, excResponse);
+            convertExceptionToResponseIfPossible(ex, message);
         }
         
         
@@ -240,14 +236,20 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             List<Object> params = JAXRSUtils.processParameters(ori, values, message);
             message.setContent(List.class, params);
         } catch (IOException ex) {
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
-            if (excResponse == null) {
-                throw new InternalServerErrorException(ex);
-            } else {
-                message.getExchange().put(Response.class, excResponse);
-            }
+            convertExceptionToResponseIfPossible(ex, message);
         }
         
+    }
+    
+    private void convertExceptionToResponseIfPossible(Throwable ex, Message message) {
+        Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
+        if (excResponse == null) {
+            ProviderFactory.getInstance(message).clearThreadLocalProxies();
+            message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
+                                      JAXRSUtils.propogateException(message));
+            throw ex instanceof RuntimeException ? (RuntimeException)ex : new InternalServerErrorException(ex);
+        }
+        message.getExchange().put(Response.class, excResponse);
     }
     
     private void setExchangeProperties(Message message, OperationResourceInfo ori, 

@@ -100,6 +100,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
@@ -1245,7 +1246,7 @@ public final class JAXRSUtils {
                 } catch (WebApplicationException ex) {
                     throw ex;
                 } catch (Exception ex) {
-                    throw new WebApplicationException(ex);
+                    throw new Fault(ex);
                 }
             } else {
                 String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
@@ -1275,7 +1276,6 @@ public final class JAXRSUtils {
             ReaderInterceptorContext context = new ReaderInterceptorContextImpl(targetTypeClass, 
                                                                             parameterType, 
                                                                             parameterAnnotations, 
-                                                                            mediaType,
                                                                             is,
                                                                             m,
                                                                             readers);
@@ -1308,8 +1308,7 @@ public final class JAXRSUtils {
             WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,
                                                                                 type, 
                                                                             genericType, 
-                                                                            annotations, 
-                                                                            mediaType,
+                                                                            annotations,
                                                                             entityStream,
                                                                             message,
                                                                             writers);
