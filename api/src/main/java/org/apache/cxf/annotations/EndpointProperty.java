@@ -37,12 +37,33 @@ public @interface EndpointProperty {
      * The value(s) of the property
      * @return the value of the property
      */
-    String[] value();
+    String[] value() default { };
     
     /**
      * The key to record the property
      * @return the key for the property
      */
     String key();
+    
+    /**
+     * Reference to a named bean that is looked up from the
+     * configuration associated with the application. 
+     */
+    String ref() default "";
+    
+    /**
+     * The class for the property. If "ref" is specified,
+     * this class is used to cast the looked up reference
+     * to make sure the Object is of the correct type. 
+     * 
+     * If ref is not set and value is not set, this class
+     * is used to create a bean. The class must have either 
+     * a default constructor, a constructor that takes an
+     * org.apache.cxf.endpoint.Endpoint, or a constructor
+     * that takes a org.apache.cxf.endpoint.Endpoint and 
+     * an org.apache.cxf.Bus.
+     */
+    Class<?> beanClass() default Object.class;
+
 }
 

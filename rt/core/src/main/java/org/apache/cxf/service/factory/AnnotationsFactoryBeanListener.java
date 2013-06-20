@@ -37,6 +37,7 @@ import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentation.Placement;
 import org.apache.cxf.annotations.WSDLDocumentationCollection;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.LoggingFeature;
@@ -216,14 +217,38 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (prop == null) {
                 continue;
             }
+            String ref = prop.ref();
+            Class<?> cls = prop.beanClass();
+            Object obj = null;
             String s[] = prop.value();
-            if (s.length == 1) {
-                ep.getEndpointInfo().setProperty(prop.key(), s[0]);
+            if (!StringUtils.isEmpty(ref)) {
+                obj = bus.getExtension(ConfiguredBeanLocator.class).getBeanOfType(ref, cls);
+            } else if (s.length == 0 && cls != Object.class) {
+                obj = createObject(cls, ep, bus);
+            } else if (s.length == 1) {
+                obj = s[0];
             } else {
-                ep.getEndpointInfo().setProperty(prop.key(), s);                
+                obj = s;
             }
+            ep.getEndpointInfo().setProperty(prop.key(), obj);                
         }
         
+    }
+
+    private Object createObject(Class<?> cls, Endpoint ep, Bus bus) {
+        try {
+            try {
+                return cls.getConstructor(Endpoint.class, Bus.class).newInstance(ep, bus);
+            } catch (NoSuchMethodException e) {
+                try {
+                    return cls.getConstructor(Endpoint.class).newInstance(ep);
+                } catch (NoSuchMethodException e2) {
+                    return cls.newInstance();
+                }                
+            }
+        } catch (Exception ex) {
+            throw new ServiceConstructionException(ex);
+        }
     }
 
     private void setDataBinding(AbstractServiceFactoryBean factory,
