@@ -139,7 +139,6 @@ public final class RMContextUtils {
             ? RMMessageConstants.RM_PROPERTIES_OUTBOUND : RMMessageConstants.RM_PROPERTIES_INBOUND;
     }
 
-    //TODO put this key to the constant
     public static ProtocolVariation getProtocolVariation(Message message) {
         return (ProtocolVariation)message.get(RMMessageConstants.RM_PROTOCOL_VARIATION);
     }
