@@ -27,7 +27,7 @@ import org.apache.cxf.xkms.model.xkms.RequestAbstractType;
 import org.apache.cxf.xkms.model.xkms.RevokeRequestType;
 import org.apache.cxf.xkms.model.xkms.RevokeResultType;
 
-public interface KeyRegisterHandler {
+public interface Register {
 
     boolean canProcess(RequestAbstractType request);
 

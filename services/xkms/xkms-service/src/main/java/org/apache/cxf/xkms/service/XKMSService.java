@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.exception.ExceptionMapper;
-import org.apache.cxf.xkms.handlers.KeyRegisterHandler;
 import org.apache.cxf.xkms.handlers.Locator;
+import org.apache.cxf.xkms.handlers.Register;
 import org.apache.cxf.xkms.handlers.Validator;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.model.xkms.CompoundRequestType;
@@ -68,7 +68,7 @@ public class XKMSService implements XKMSPortType {
 
     private List<Validator> validators = new ArrayList<Validator>();
 
-    private List<KeyRegisterHandler> keyRegisterHandlers = new ArrayList<KeyRegisterHandler>();
+    private List<Register> keyRegisterHandlers = new ArrayList<Register>();
 
     @Override
     public ReissueResultType reissue(ReissueRequestType request) {
@@ -76,7 +76,7 @@ public class XKMSService implements XKMSPortType {
             validateRequest(request);
             ReissueResultType response = XKMSResponseFactory.createResponse(request, new ReissueResultType());
             try {
-                for (KeyRegisterHandler handler : keyRegisterHandlers) {
+                for (Register handler : keyRegisterHandlers) {
                     if (handler.canProcess(request)) {
                         return handler.reissue(request, response);
                     }
@@ -105,7 +105,7 @@ public class XKMSService implements XKMSPortType {
             validateRequest(request);
             RegisterResultType response = XKMSResponseFactory.createResponse(request, new RegisterResultType());
             try {
-                for (KeyRegisterHandler handler : keyRegisterHandlers) {
+                for (Register handler : keyRegisterHandlers) {
                     if (handler.canProcess(request)) {
                         return handler.register(request, response);
                     }
@@ -134,7 +134,7 @@ public class XKMSService implements XKMSPortType {
             validateRequest(request);
             RevokeResultType response = XKMSResponseFactory.createResponse(request, new RevokeResultType());
             try {
-                for (KeyRegisterHandler handler : keyRegisterHandlers) {
+                for (Register handler : keyRegisterHandlers) {
                     if (handler.canProcess(request)) {
                         return handler.revoke(request, response);
                     }
@@ -264,7 +264,7 @@ public class XKMSService implements XKMSPortType {
         this.validators = validators;
     }
 
-    public void setKeyRegisterHandlers(List<KeyRegisterHandler> keyRegisterHandlers) {
+    public void setKeyRegisterHandlers(List<Register> keyRegisterHandlers) {
         this.keyRegisterHandlers = keyRegisterHandlers;
     }
 

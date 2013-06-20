@@ -27,7 +27,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
-import org.apache.cxf.xkms.handlers.KeyRegisterHandler;
+import org.apache.cxf.xkms.handlers.Register;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
 import org.apache.cxf.xkms.model.xkms.KeyBindingType;
 import org.apache.cxf.xkms.model.xkms.PrototypeKeyBindingType;
@@ -46,12 +46,12 @@ import org.apache.cxf.xkms.model.xmldsig.X509DataType;
 import org.apache.cxf.xkms.x509.repo.CertificateRepo;
 import org.apache.cxf.xkms.x509.utils.X509Utils;
 
-public class X509RegisterHandler implements KeyRegisterHandler {
+public class X509Register implements Register {
 
     protected final CertificateFactory certFactory;
     private CertificateRepo certRepo;
 
-    public X509RegisterHandler(CertificateRepo certRepo) throws CertificateException {
+    public X509Register(CertificateRepo certRepo) throws CertificateException {
         this.certRepo = certRepo;
         certFactory = CertificateFactory.getInstance("X.509");
     }

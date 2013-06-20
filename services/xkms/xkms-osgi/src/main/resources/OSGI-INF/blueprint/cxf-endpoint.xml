@@ -34,7 +34,7 @@
         </property>
         <property name="keyRegisterHandlers">
             <list>
-                <ref component-id="registerHandler" />
+                <ref component-id="x509Register" />
             </list>
         </property>
     </bean>

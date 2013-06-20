@@ -51,7 +51,7 @@
         </property>
         <property name="keyRegisterHandlers">
             <list>
-                <ref bean="registerHandler" />
+                <ref bean="x509Register" />
             </list>
         </property>
     </bean>

@@ -65,8 +65,8 @@
         <argument ref="certificateRepo" />
     </bean>
 
-    <bean id="registerHandler"
-        class="org.apache.cxf.xkms.x509.handlers.X509RegisterHandler">
+    <bean id="x509Register"
+        class="org.apache.cxf.xkms.x509.handlers.X509Register">
         <argument ref="certificateRepo" />
     </bean>
 
