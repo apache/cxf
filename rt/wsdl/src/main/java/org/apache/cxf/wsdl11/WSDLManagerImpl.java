@@ -19,17 +19,11 @@
 
 package org.apache.cxf.wsdl11;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.wsdl.BindingInput;
@@ -41,7 +35,6 @@ import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.mime.MIMEPart;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
@@ -54,13 +47,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
-import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
@@ -69,11 +59,6 @@ import org.apache.cxf.wsdl.WSDLManager;
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class WSDLManagerImpl implements WSDLManager {
-
-    private static final Logger LOG = LogUtils.getL7dLogger(WSDLManagerImpl.class);
-
-    private static final String EXTENSIONS_RESOURCE = "META-INF/cxf/extensions.xml";
-    private static final String EXTENSIONS_RESOURCE_COMPAT = "META-INF/extensions.xml";
 
     final ExtensionRegistry registry;
     final WSDLFactory factory;
@@ -119,7 +104,6 @@ public class WSDLManagerImpl implements WSDLManager {
         definitionsMap = new CacheMap<Object, Definition>();
         schemaCacheMap = new CacheMap<Object, ServiceSchemaInfo>();
 
-        registerInitialExtensions(b);
         setBus(b);
     }
     
@@ -263,47 +247,6 @@ public class WSDLManagerImpl implements WSDLManager {
             definitionsMap.put(url, def);
         }
         return def;
-    }
-
-    private void registerInitialExtensions(Bus b) throws BusException {
-        registerInitialXmlExtensions(EXTENSIONS_RESOURCE_COMPAT, b);
-        registerInitialXmlExtensions(EXTENSIONS_RESOURCE, b);
-    }
-    private void registerInitialXmlExtensions(String resource, Bus b) throws BusException {
-        Properties initialExtensions = null;
-        try {
-            ClassLoader cl = null;
-            if (b != null) {
-                cl = b.getExtension(ClassLoader.class);
-            }
-            if (cl != null) {
-                initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, cl);
-            }
-            
-            //use TCCL as fallback so that can load resources from other bundles in OSGi
-            if (initialExtensions == null || initialExtensions.size() == 0) {
-                initialExtensions = PropertiesLoaderUtils.loadAllProperties(resource, 
-                    Thread.currentThread().getContextClassLoader());
-            }
-        } catch (IOException ex) {
-            throw new BusException(ex);
-        }
-
-        for (Iterator<?> it = initialExtensions.keySet().iterator(); it.hasNext();) {
-            StringTokenizer st = new StringTokenizer(initialExtensions.getProperty((String) it.next()), "=");
-            String parentType = st.nextToken();
-            String elementType = st.nextToken();
-            try {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Registering extension: " + elementType + " for parent: " + parentType);
-                }
-                JAXBExtensionHelper.addExtensions(registry, parentType, elementType);
-            } catch (ClassNotFoundException ex) {
-                LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
-            } catch (JAXBException ex) {
-                LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);
-            }
-        }
     }
 
     public ServiceSchemaInfo getSchemasForDefinition(Definition wsdl) {
