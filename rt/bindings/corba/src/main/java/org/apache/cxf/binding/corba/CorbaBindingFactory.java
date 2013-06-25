@@ -27,8 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultInInterceptor;
@@ -36,21 +34,17 @@ import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultOutInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamInInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamOutInterceptor;
 import org.apache.cxf.binding.corba.utils.OrbConfig;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
-import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.binding.AbstractWSDLBindingFactory;
 
-@NoJSR250Annotations(unlessNull = { "bus" })
 public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     implements ConduitInitiator, DestinationFactory {
 
@@ -64,40 +58,10 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     protected List<String> transportIds = new ArrayList<String>(DEFAULT_NAMESPACES);
     protected OrbConfig orbConfig = new OrbConfig();
 
-    public CorbaBindingFactory(Bus b) {
-        super(b, DEFAULT_NAMESPACES);
-        registerWithDestinationManager();
-        registerWithConduitManager();
+    public CorbaBindingFactory() {
+        super(DEFAULT_NAMESPACES);
     }
 
-    
-    @PostConstruct
-    final void registerWithDestinationManager() {
-        if (null == bus) {
-            return;
-        }
-
-        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-        if (null != dfm && activationNamespaces != null) {
-            for (String ns : activationNamespaces) {
-                dfm.registerDestinationFactory(ns, this);
-            }
-        }
-    }
-
-    @PostConstruct
-    final void registerWithConduitManager() {
-        if (null == bus) {
-            return;
-        }
-
-        ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
-        if (null != cim && activationNamespaces != null) {
-            for (String ns : activationNamespaces) {
-                cim.registerConduitInitiator(ns, this);
-            }
-        }
-    }
 
     public void setOrbClass(String cls) {
         orbConfig.setOrbClass(cls);
@@ -120,17 +84,17 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
         return binding;
     }
 
-    public Conduit getConduit(EndpointInfo endpointInfo)
+    public Conduit getConduit(EndpointInfo endpointInfo, Bus bus)
         throws IOException {
-        return getConduit(endpointInfo, null);
+        return getConduit(endpointInfo, null, bus);
     }
 
-    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target)
+    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
         throws IOException {
         return new CorbaConduit(endpointInfo, target, orbConfig);
     }
 
-    public Destination getDestination(EndpointInfo endpointInfo)
+    public Destination getDestination(EndpointInfo endpointInfo, Bus bus)
         throws IOException {
         return new CorbaDestination(endpointInfo, orbConfig);
     }

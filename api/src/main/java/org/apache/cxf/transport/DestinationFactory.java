@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 
 /**
@@ -36,7 +37,7 @@ public interface DestinationFactory {
      * @param ei the endpoint info of the destination.
      * @return the created Destination.
      */
-    Destination getDestination(EndpointInfo ei) throws IOException;
+    Destination getDestination(EndpointInfo ei, Bus bus) throws IOException;
     
     Set<String> getUriPrefixes();
     

@@ -36,7 +36,7 @@ public class HTTPTransportFactoryTest extends Assert {
         HTTPTransportFactory factory = bus.getExtension(HTTPTransportFactory.class);
         if (factory != null) {
             try {
-                factory.getDestination(ei);
+                factory.getDestination(ei, bus);
                 fail("Expect exception here.");
             } catch (IOException ex) {
                 assertTrue("We should find some exception related to the HttpDestination"

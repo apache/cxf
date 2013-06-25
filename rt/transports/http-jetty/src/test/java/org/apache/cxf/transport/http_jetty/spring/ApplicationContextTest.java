@@ -108,7 +108,7 @@ public class ApplicationContextTest extends Assert {
         
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         DestinationFactory factory = dfm.getDestinationFactory("http://cxf.apache.org/transports/http");
-        Destination d = factory.getDestination(info);
+        Destination d = factory.getDestination(info, bus);
         assertTrue(d instanceof JettyHTTPDestination);
         JettyHTTPDestination jd = (JettyHTTPDestination) d;        
         assertEquals("foobar", jd.getServer().getContentEncoding());   
@@ -119,16 +119,16 @@ public class ApplicationContextTest extends Assert {
         
         ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiator("http://cxf.apache.org/transports/http");
-        HTTPConduit conduit = (HTTPConduit) ci.getConduit(info);
+        HTTPConduit conduit = (HTTPConduit) ci.getConduit(info, bus);
         assertEquals(97, conduit.getClient().getConnectionTimeout());
         
         info.setName(new QName("urn:test:ns", "Bar"));
-        conduit = (HTTPConduit) ci.getConduit(info);
+        conduit = (HTTPConduit) ci.getConduit(info, bus);
         assertEquals(79, conduit.getClient().getConnectionTimeout());
 
         JettyHTTPDestination jd2 = 
             (JettyHTTPDestination)factory.getDestination(
-                getEndpointInfo("foo", "bar", "http://localhost:9001"));
+                getEndpointInfo("foo", "bar", "http://localhost:9001"), bus);
         
         engine = (JettyHTTPServerEngine)jd2.getEngine();
         assertEquals(40000, engine.getMaxIdleTime());
@@ -143,7 +143,7 @@ public class ApplicationContextTest extends Assert {
         
         JettyHTTPDestination jd3 = 
             (JettyHTTPDestination)factory.getDestination(
-                getEndpointInfo("sna", "foo", "https://localhost:9002"));
+                getEndpointInfo("sna", "foo", "https://localhost:9002"), bus);
         
         engine = (JettyHTTPServerEngine)jd3.getEngine();
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
@@ -153,7 +153,7 @@ public class ApplicationContextTest extends Assert {
         
         JettyHTTPDestination jd4 = 
             (JettyHTTPDestination)factory.getDestination(
-                getEndpointInfo("sna", "foo2", "https://localhost:9003"));
+                getEndpointInfo("sna", "foo2", "https://localhost:9003"), bus);
         
         engine = (JettyHTTPServerEngine)jd4.getEngine();
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
@@ -161,7 +161,7 @@ public class ApplicationContextTest extends Assert {
 
         JettyHTTPDestination jd5 = 
             (JettyHTTPDestination)factory.getDestination(
-                getEndpointInfo("sna", "foo", "http://localhost:9100"));
+                getEndpointInfo("sna", "foo", "http://localhost:9100"), bus);
         
         engine = (JettyHTTPServerEngine)jd5.getEngine();
         String r = "expected fallback thread parameters configured for port 0";

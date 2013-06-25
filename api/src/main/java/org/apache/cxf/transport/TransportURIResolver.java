@@ -106,7 +106,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     // set the endpointInfo name which could be used for configuration
                     info.setName(new QName("http://cxf.apache.org", "TransportURIResolver"));
                     info.setAddress(base.toString());
-                    final Conduit c = ci.getConduit(info);
+                    final Conduit c = ci.getConduit(info, bus);
                     Message message = new MessageImpl();
                     Exchange exch = new ExchangeImpl();
                     message.setExchange(exch);

@@ -990,7 +990,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             ei.setName(new QName(ep.getEndpointInfo().getName().getNamespaceURI(),
                                  ep.getEndpointInfo().getName().getLocalPart() + ".decoupled"));
             ei.setAddress(address);
-            destination = factory.getDestination(ei);
+            destination = factory.getDestination(ei, bus);
             Conduit conduit = ContextUtils.getConduit(null, message);
             if (conduit != null) {
                 MessageObserver ob = ((Observable)conduit).getMessageObserver();

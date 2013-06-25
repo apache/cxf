@@ -70,7 +70,7 @@ public class DispatchTest extends AbstractJaxWsTest {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress(address);
 
-        d = localTransport.getDestination(ei);
+        d = localTransport.getDestination(ei, bus);
     }
 
     @Test

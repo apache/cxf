@@ -271,13 +271,14 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     }
     
     @Override
-    public HTTPConduit createConduit(HTTPTransportFactory f, 
+    public HTTPConduit createConduit(HTTPTransportFactory f,
+                                     Bus bus,
                                      EndpointInfo localInfo,
                                      EndpointReferenceType target) throws IOException {
         if (isShutdown) {
             return null;
         }
-        return new AsyncHTTPConduit(f.getBus(), localInfo, target, this);
+        return new AsyncHTTPConduit(bus, localInfo, target, this);
     }
 
     @Resource 

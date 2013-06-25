@@ -242,6 +242,7 @@ public class TransportFinder<T> {
             = new ConfiguredBeanLocator.BeanLoaderListener<T>() {
                 public boolean beanLoaded(String name, T bean) {
                     loaded.add(name);
+                    registerBean(bean);
                     return map.containsKey(namespace);
                 }
 

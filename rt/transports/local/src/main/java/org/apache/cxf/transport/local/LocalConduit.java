@@ -27,6 +27,7 @@ import java.io.PipedOutputStream;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
@@ -115,12 +116,11 @@ public class LocalConduit extends AbstractConduit {
     private void dispatchViaPipe(final Message message) throws IOException {
         final LocalConduit conduit = this;
         final Exchange exchange = message.getExchange();
-        
+
         if (destination.getMessageObserver() == null) {
             throw new IllegalStateException("Local destination does not have a MessageObserver on address " 
                                             + destination.getAddress().getAddress().getValue());
         }
-        
         
         AbstractWrappedOutputStream cout 
             = new AbstractWrappedOutputStream() {
@@ -138,7 +138,9 @@ public class LocalConduit extends AbstractConduit {
                     final Runnable receiver = new Runnable() {
                         public void run() {                            
                             ExchangeImpl ex = new ExchangeImpl();
+                            ex.put(Bus.class, destination.getBus());
                             ex.setInMessage(inMsg);
+                            inMsg.setExchange(ex);
                             ex.put(IN_EXCHANGE, exchange);
                             destination.getMessageObserver().onMessage(inMsg);
                         }
@@ -146,7 +148,7 @@ public class LocalConduit extends AbstractConduit {
                     Executor ex = message.getExchange() != null
                         ? message.getExchange().get(Executor.class) : null;
                     if (ex == null || SynchronousExecutor.isA(ex)) {
-                        ex = transportFactory.getExecutor();
+                        ex = transportFactory.getExecutor(destination.getBus());
                         if (ex != null) {
                             ex.execute(receiver);
                         } else {

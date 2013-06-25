@@ -619,7 +619,7 @@ public final class ContextUtils {
                     = bus.getExtension(ConduitInitiatorManager.class)
                         .getConduitInitiatorForUri(reference.getAddress().getValue());
                 if (conduitInitiator != null) {
-                    Conduit c = conduitInitiator.getConduit(ei, reference);
+                    Conduit c = conduitInitiator.getConduit(ei, reference, bus);
                     //ensure decoupled back channel input stream is closed
                     c.setMessageObserver(new MessageObserver() {
                         public void onMessage(Message m) {

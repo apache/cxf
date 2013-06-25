@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -38,7 +36,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-@NoJSR250Annotations(unlessNull = { "bus" })
+@NoJSR250Annotations
 public class JMSTransportFactory extends AbstractTransportFactory implements ConduitInitiator,
     DestinationFactory {
 
@@ -58,23 +56,15 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     public JMSTransportFactory() {
         super(DEFAULT_NAMESPACES);
     }
-    public JMSTransportFactory(Bus b) {
-        super(DEFAULT_NAMESPACES, b);
-    }
     
-    @Resource(name = "cxf")
-    public void setBus(Bus bus) {
-        super.setBus(bus);
-    }
-
-    public Conduit getConduit(EndpointInfo endpointInfo) throws IOException {
-        return getConduit(endpointInfo, endpointInfo.getTarget());
+    public Conduit getConduit(EndpointInfo endpointInfo, Bus b) throws IOException {
+        return getConduit(endpointInfo, endpointInfo.getTarget(), b);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target) throws IOException {
+    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus) throws IOException {
         JMSOldConfigHolder old = new JMSOldConfigHolder();
         JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus,
                                                                               endpointInfo,
@@ -86,7 +76,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     /**
      * {@inheritDoc}
      */
-    public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
+    public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
         JMSOldConfigHolder old = new JMSOldConfigHolder();
         JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, false);
         return new JMSDestination(bus, endpointInfo, jmsConf);

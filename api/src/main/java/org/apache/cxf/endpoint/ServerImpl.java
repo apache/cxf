@@ -90,7 +90,7 @@ public class ServerImpl implements Server {
             }
         }
             
-        destination = destinationFactory.getDestination(ei);
+        destination = destinationFactory.getDestination(ei, bus);
         LOG.info("Setting the server's publish address to be " + ei.getAddress());
         serverRegistry = bus.getExtension(ServerRegistry.class);
         

@@ -302,10 +302,11 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         for (Extension ex : all.values()) {
             Class<?> cls = ex.getClassObject(loader);
             if (cls != null 
-                && ex.getLoadedObject() == null 
                 && type.isAssignableFrom(cls)
                 && listener.loadBean(ex.getName(), cls.asSubclass(type))) {
-                loadAndRegister(ex);
+                if (ex.getLoadedObject() == null) {
+                    loadAndRegister(ex);
+                }
                 if (listener.beanLoaded(ex.getName(), type.cast(ex.getLoadedObject()))) {
                     return true;
                 }

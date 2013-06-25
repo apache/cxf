@@ -166,7 +166,7 @@ public class ObjectBindingTest extends AbstractCXFTest {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(string);
 
-        return df.getDestination(ei);
+        return df.getDestination(ei, getBus());
     }
 
     private Conduit getLocalConduit(String string) throws BusException, IOException {
@@ -175,6 +175,6 @@ public class ObjectBindingTest extends AbstractCXFTest {
         ConduitInitiator ci = cim.getConduitInitiator(LocalTransportFactory.TRANSPORT_ID);
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(string);
-        return ci.getConduit(ei);
+        return ci.getConduit(ei, getBus());
     }
 }

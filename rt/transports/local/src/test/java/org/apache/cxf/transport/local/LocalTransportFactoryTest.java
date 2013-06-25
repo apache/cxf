@@ -27,6 +27,8 @@ import java.io.OutputStream;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -50,16 +52,16 @@ public class LocalTransportFactoryTest extends Assert {
     private void testInvocation(boolean isDirectDispatch) throws Exception {
         // Need to create a DefaultBus
         Bus bus = BusFactory.getDefaultBus();
-        LocalTransportFactory factory = new LocalTransportFactory(bus);
+        LocalTransportFactory factory = new LocalTransportFactory();
         
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress("http://localhost/test");
 
-        LocalDestination d = (LocalDestination) factory.getDestination(ei);
+        LocalDestination d = (LocalDestination) factory.getDestination(ei, bus);
         d.setMessageObserver(new EchoObserver());
         
         // Set up a listener for the response
-        Conduit conduit = factory.getConduit(ei);
+        Conduit conduit = factory.getConduit(ei, bus);
         TestMessageObserver obs = new TestMessageObserver();
         conduit.setMessageObserver(obs);
         
@@ -68,6 +70,9 @@ public class LocalTransportFactoryTest extends Assert {
             m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         }    
         m.setDestination(d);
+        Exchange ex = new ExchangeImpl();
+        ex.put(Bus.class, bus);
+        m.setExchange(ex);
         conduit.prepare(m);
         
         OutputStream out = m.getContent(OutputStream.class);

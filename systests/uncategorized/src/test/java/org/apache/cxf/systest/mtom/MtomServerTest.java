@@ -82,7 +82,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
 
         ConduitInitiatorManager conduitMgr = getStaticBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
-        Conduit conduit = conduitInit.getConduit(ei);
+        Conduit conduit = conduitInit.getConduit(ei, getStaticBus());
 
         TestUtilities.TestMessageObserver obs = new TestUtilities.TestMessageObserver();
         conduit.setMessageObserver(obs);
@@ -148,7 +148,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
 
         ConduitInitiatorManager conduitMgr = getStaticBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
-        Conduit conduit = conduitInit.getConduit(ei);
+        Conduit conduit = conduitInit.getConduit(ei, getStaticBus());
 
         TestUtilities.TestMessageObserver obs = new TestUtilities.TestMessageObserver();
         conduit.setMessageObserver(obs);
@@ -209,7 +209,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(add);
 
-        Destination d = df.getDestination(ei);
+        Destination d = df.getDestination(ei, bus);
         d.setMessageObserver(null);
 
     }
@@ -227,7 +227,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(add);
 
-        Destination d = df.getDestination(ei);
+        Destination d = df.getDestination(ei, bus);
         d.setMessageObserver(new MessageObserver() {
 
             public void onMessage(Message message) {

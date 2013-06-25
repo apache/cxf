@@ -27,6 +27,7 @@ import java.io.PipedOutputStream;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
@@ -46,14 +47,19 @@ public class LocalDestination extends AbstractDestination {
 
     private LocalTransportFactory localDestinationFactory;
 
-    public LocalDestination(LocalTransportFactory localDestinationFactory, EndpointReferenceType epr,
-                            EndpointInfo ei) {
-        super(epr, ei);
+    public LocalDestination(LocalTransportFactory localDestinationFactory,
+                            EndpointReferenceType epr,
+                            EndpointInfo ei,
+                            Bus bus) {
+        super(bus, epr, ei);
         this.localDestinationFactory = localDestinationFactory;
     }
 
     public void shutdown() {
         localDestinationFactory.remove(this);
+    }
+    public Bus getBus() {
+        return bus;
     }
 
     protected Logger getLogger() {
@@ -103,7 +109,11 @@ public class LocalDestination extends AbstractDestination {
                                 ? message.getExchange().get(Executor.class) : null;
                             // Need to avoid to get the SynchronousExecutor
                             if (ex == null || SynchronousExecutor.isA(ex)) {
-                                ex = localDestinationFactory.getExecutor();
+                                if (exchange == null) {
+                                    ex = localDestinationFactory.getExecutor(bus);
+                                } else {
+                                    ex = localDestinationFactory.getExecutor(exchange.getBus());
+                                }
                                 if (ex != null) {
                                     ex.execute(receiver);
                                 } else {

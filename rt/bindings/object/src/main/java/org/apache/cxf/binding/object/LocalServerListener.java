@@ -71,7 +71,7 @@ public class LocalServerListener implements ServerLifeCycleListener {
         
         try {
             // Register a new Destination locally for the Server
-            Destination destination = getDestinationFactory().getDestination(ei);
+            Destination destination = getDestinationFactory().getDestination(ei, bus);
             
             destination.setMessageObserver(new OverrideBindingObserver(endpoint, binding, bus));
         } catch (IOException e1) {
@@ -85,7 +85,7 @@ public class LocalServerListener implements ServerLifeCycleListener {
         ei.setAddress(uri);
         
         try {
-            Destination destination = getDestinationFactory().getDestination(ei);
+            Destination destination = getDestinationFactory().getDestination(ei, bus);
             
             destination.shutdown();
         } catch (IOException e) {

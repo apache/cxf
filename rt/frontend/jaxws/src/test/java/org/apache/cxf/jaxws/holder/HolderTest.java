@@ -47,7 +47,7 @@ public class HolderTest extends AbstractJaxWsTest {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress(address);
 
-        Destination d = localTransport.getDestination(ei);
+        Destination d = localTransport.getDestination(ei, bus);
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/holder/echoResponse.xml"));
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();

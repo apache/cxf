@@ -20,10 +20,8 @@
 package org.apache.cxf.transport.http.netty.client;
 
 import java.io.IOException;
-import javax.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
-import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -31,7 +29,7 @@ import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-@NoJSR250Annotations(unlessNull = "bus")
+@NoJSR250Annotations
 public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPConduitFactory {
 
     boolean isShutdown;
@@ -39,24 +37,13 @@ public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPCondui
     public NettyHttpConduitFactory() {
     }
 
-    public NettyHttpConduitFactory(Bus b) {
-        this();
-        addListener(b);
-    }
-
-    @Resource
-    public void setBus(Bus b) {
-        addListener(b);
-    }
-
-    private void addListener(Bus b) {
-        b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
-    }
-
     @Override
-    public HTTPConduit createConduit(HTTPTransportFactory f, EndpointInfo localInfo, EndpointReferenceType target)
+    public HTTPConduit createConduit(HTTPTransportFactory f, 
+                                     Bus bus, 
+                                     EndpointInfo localInfo,
+                                     EndpointReferenceType target)
         throws IOException {
-        return new NettyHttpConduit(f.getBus(), localInfo, target, this);
+        return new NettyHttpConduit(bus, localInfo, target, this);
     }
 
     @Override

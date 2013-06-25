@@ -69,8 +69,8 @@ public class HttpConduitConfigurationTest extends Assert {
     public void testConduitBean() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("org/apache/cxf/transport/http/spring/conduit-bean.xml");
-        HTTPTransportFactory atf = new HTTPTransportFactory(bus);
-        HTTPConduit conduit = (HTTPConduit)atf.getConduit(ei);
+        HTTPTransportFactory atf = new HTTPTransportFactory();
+        HTTPConduit conduit = (HTTPConduit)atf.getConduit(ei, bus);
         
         verifyConduit(conduit);
     }
@@ -79,8 +79,8 @@ public class HttpConduitConfigurationTest extends Assert {
     public void testConduitBeanWithTLSReferences() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("org/apache/cxf/transport/http/spring/conduit-tlsrefs-bean.xml");
-        HTTPTransportFactory atf = new HTTPTransportFactory(bus);
-        HTTPConduit conduit = (HTTPConduit)atf.getConduit(ei);
+        HTTPTransportFactory atf = new HTTPTransportFactory();
+        HTTPConduit conduit = (HTTPConduit)atf.getConduit(ei, bus);
 
         verifyConduit(conduit);
     }

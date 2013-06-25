@@ -63,7 +63,7 @@ public class TestUtils {
                                                      "ExceptionTestCORBAService",
                                                      "ExceptionTestCORBAPort");
         CorbaBindingFactory corbaBF = factory;
-        return (CorbaDestination)corbaBF.getDestination(endpointInfo);        
+        return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);        
     }
     
     public CorbaDestination getComplexTypesTestDestination() throws Exception {
@@ -72,7 +72,7 @@ public class TestUtils {
                                                      "ComplexTypesCORBAService",
                                                      "ComplexTypesCORBAPort");
         CorbaBindingFactory corbaBF = factory;        
-        return (CorbaDestination)corbaBF.getDestination(endpointInfo);
+        return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);
     }
     public CorbaDestination getComplexTypesTestDestinationYoko() throws Exception {
         endpointInfo = setupServiceInfo("http://cxf.apache.org/bindings/corba/ComplexTypes",
@@ -80,7 +80,7 @@ public class TestUtils {
                                                      "ComplexTypesCORBAService",
                                                      "ComplexTypesCORBAPort");
         CorbaBindingFactory corbaBF = factory;        
-        return (CorbaDestination)corbaBF.getDestination(endpointInfo);
+        return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);
     }
 
 }

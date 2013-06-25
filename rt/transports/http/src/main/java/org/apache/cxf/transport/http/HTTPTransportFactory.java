@@ -30,8 +30,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
@@ -52,7 +50,7 @@ import org.apache.cxf.wsdl.http.AddressType;
 /**
  *
  */
-@NoJSR250Annotations(unlessNull = "bus")
+@NoJSR250Annotations
 public class HTTPTransportFactory 
     extends AbstractTransportFactory 
     implements ConduitInitiator, DestinationFactory {
@@ -82,32 +80,13 @@ public class HTTPTransportFactory
     public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
     }
-    public HTTPTransportFactory(Bus b) {
-        this(b, null);
-    }
-    public HTTPTransportFactory(Bus b, DestinationRegistry registry) {
-        super(DEFAULT_NAMESPACES, null);
-        if (registry == null && b != null) {
-            registry = b.getExtension(DestinationRegistry.class);
-        }
+    public HTTPTransportFactory(DestinationRegistry registry) {
+        super(DEFAULT_NAMESPACES);
         if (registry == null) {
             registry = new DestinationRegistryImpl();
         }
         this.registry = registry;
-        bus = b;
-        register();
     }
-
-    public HTTPTransportFactory(DestinationRegistry registry) {
-        super(DEFAULT_NAMESPACES);
-        this.registry = registry;
-    }
-    
-    @Resource 
-    public void setBus(Bus b) {
-        super.setBus(b);
-    }
-
     public DestinationRegistry getRegistry() {
         return registry;
     }
@@ -164,11 +143,11 @@ public class HTTPTransportFactory
      * 
      * @param bean
      */
-    protected void configure(Object bean) {
-        configure(bean, null, null);
+    protected void configure(Bus b, Object bean) {
+        configure(b, bean, null, null);
     }
     
-    protected void configure(Object bean, String name, String extraName) {
+    protected void configure(Bus bus, Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
             configurer.configureBean(name, bean);
@@ -202,8 +181,8 @@ public class HTTPTransportFactory
      * This call creates a new HTTPConduit for the endpoint. It is equivalent
      * to calling getConduit without an EndpointReferenceType.
      */
-    public Conduit getConduit(EndpointInfo endpointInfo) throws IOException {
-        return getConduit(endpointInfo, endpointInfo.getTarget());
+    public Conduit getConduit(EndpointInfo endpointInfo, Bus bus) throws IOException {
+        return getConduit(endpointInfo, endpointInfo.getTarget(), bus);
     }
 
     /**
@@ -214,13 +193,14 @@ public class HTTPTransportFactory
      */
     public Conduit getConduit(
             EndpointInfo endpointInfo,
-            EndpointReferenceType target
+            EndpointReferenceType target,
+            Bus bus
     ) throws IOException {
         
-        HTTPConduitFactory factory = findFactory(endpointInfo);
+        HTTPConduitFactory factory = findFactory(endpointInfo, bus);
         HTTPConduit conduit = null;
         if (factory != null) {
-            conduit = factory.createConduit(this, endpointInfo, target);
+            conduit = factory.createConduit(this, bus, endpointInfo, target);
         }
         if (conduit == null) {
             conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
@@ -235,19 +215,19 @@ public class HTTPTransportFactory
         if (c1 != null) {
             c1.configure(conduit.getBeanName(), address, conduit);
         }
-        configure(conduit, conduit.getBeanName(), address);
+        configure(bus, conduit, conduit.getBeanName(), address);
         conduit.finalizeConfig();
         return conduit;
     }
     
-    protected HTTPConduitFactory findFactory(EndpointInfo endpointInfo) {
+    protected HTTPConduitFactory findFactory(EndpointInfo endpointInfo, Bus bus) {
         HTTPConduitFactory f = endpointInfo.getProperty(HTTPConduitFactory.class.getName(), HTTPConduitFactory.class);
         if (f == null) {
             f = bus.getExtension(HTTPConduitFactory.class);
         }
         return f;
     }
-    public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
+    public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
         if (endpointInfo == null) {
             throw new IllegalArgumentException("EndpointInfo cannot be null");
         }
@@ -270,9 +250,9 @@ public class HTTPTransportFactory
                     factory = new ServletDestinationFactory();
                 }
                 
-                d = factory.createDestination(endpointInfo, getBus(), registry);
+                d = factory.createDestination(endpointInfo, bus, registry);
                 registry.addDestination(d);
-                configure(d);
+                configure(bus, d);
                 d.finalizeConfig();
             }
             return d;

@@ -20,6 +20,7 @@ package org.apache.cxf.transport.http;
 
 import java.io.IOException;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -31,6 +32,7 @@ public interface HTTPConduitFactory {
     
     
     HTTPConduit createConduit(HTTPTransportFactory f,
+                              Bus b,
                               EndpointInfo localInfo,
                               EndpointReferenceType target) throws IOException;
 }

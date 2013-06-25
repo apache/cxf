@@ -100,14 +100,14 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
                         String basePath = (String)message.get(Message.BASE_PATH);
                         if (StringUtils.isEmpty(add)
                             || add.equals(ei.getAddress())) {
-                            c = conduitInitiator.getConduit(ei);
+                            c = conduitInitiator.getConduit(ei, exchange.getBus());
                             replaceEndpointAddressPropertyIfNeeded(message, add, c);
                         } else {
                             EndpointReferenceType epr = new EndpointReferenceType();
                             AttributedURIType ad = new AttributedURIType();
                             ad.setValue(StringUtils.isEmpty(basePath) ? add : basePath);
                             epr.setAddress(ad);
-                            c = conduitInitiator.getConduit(ei, epr);
+                            c = conduitInitiator.getConduit(ei, epr, exchange.getBus());
                         }
                         MessageObserver observer = 
                             exchange.get(MessageObserver.class);

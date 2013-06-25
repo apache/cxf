@@ -30,8 +30,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
@@ -48,7 +46,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.http.AddressType;
 
-@NoJSR250Annotations(unlessNull = { "bus" })
+@NoJSR250Annotations
 public class LocalTransportFactory extends AbstractTransportFactory
     implements DestinationFactory, ConduitInitiator {
    
@@ -80,10 +78,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
     private volatile Executor executor;
 
     public LocalTransportFactory() {
-        this(null);
-    }
-    public LocalTransportFactory(Bus b) {
-        super(DEFAULT_NAMESPACES, null);
+        super(DEFAULT_NAMESPACES);
         
         messageFilterProperties = new HashSet<String>();
         messageIncludeProperties = new HashSet<String>();
@@ -96,22 +91,15 @@ public class LocalTransportFactory extends AbstractTransportFactory
         messageIncludeProperties.add(Message.RESPONSE_CODE);
         messageIncludeProperties.add(Message.REQUEST_URI);
         messageIncludeProperties.add(Message.HTTP_REQUEST_METHOD);
-        
-        bus = b;
-        register();
-    }
-    
-    @Resource(name = "cxf")
-    public void setBus(Bus b) {
-        super.setBus(b);
     }
 
-    public Destination getDestination(EndpointInfo ei) throws IOException {
-        return getDestination(ei, createReference(ei));
+    public Destination getDestination(EndpointInfo ei, Bus bus) throws IOException {
+        return getDestination(ei, createReference(ei), bus);
     }
 
     protected Destination getDestination(EndpointInfo ei,
-                                         EndpointReferenceType reference)
+                                         EndpointReferenceType reference,
+                                         Bus bus)
         throws IOException {
         Destination d = null;
         String addr = reference.getAddress().getValue();
@@ -126,7 +114,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         }
         d = destinations.get(addr);
         if (d == null) {
-            d = createDestination(ei, reference);
+            d = createDestination(ei, reference, bus);
             Destination tmpD = destinations.putIfAbsent(addr, d);
             if (tmpD != null) {
                 d = tmpD;
@@ -135,9 +123,9 @@ public class LocalTransportFactory extends AbstractTransportFactory
         return d;
     }
 
-    private Destination createDestination(EndpointInfo ei, EndpointReferenceType reference) {
+    private Destination createDestination(EndpointInfo ei, EndpointReferenceType reference, Bus bus) {
         LOG.info("Creating destination for address " + reference.getAddress().getValue());
-        return new LocalDestination(this, reference, ei);
+        return new LocalDestination(this, reference, ei, bus);
     }
 
     void remove(LocalDestination destination) {
@@ -148,18 +136,15 @@ public class LocalTransportFactory extends AbstractTransportFactory
         }
     }
     
-    public Executor getExecutor() {
+    public Executor getExecutor(Bus bus) {
         if (executor == null && bus != null) {
-            synchronized (this) {
-                if (executor == null) {
-                    WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
-                    if (manager != null) {
-                        executor =  manager.getNamedWorkQueue("local-transport");
-                        if (executor == null) {
-                            executor = manager.getAutomaticWorkQueue();
-                        }
-                    }
+            WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
+            if (manager != null) {
+                Executor ex =  manager.getNamedWorkQueue("local-transport");
+                if (ex == null) {
+                    ex = manager.getAutomaticWorkQueue();
                 }
+                return ex;
             }
         }
         return executor;
@@ -169,12 +154,12 @@ public class LocalTransportFactory extends AbstractTransportFactory
         this.executor = executor;
     }
 
-    public Conduit getConduit(EndpointInfo ei) throws IOException {
-        return new LocalConduit(this, (LocalDestination)getDestination(ei));
+    public Conduit getConduit(EndpointInfo ei, Bus bus) throws IOException {
+        return new LocalConduit(this, (LocalDestination)getDestination(ei, bus));
     }
 
-    public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException {
-        return new LocalConduit(this, (LocalDestination)getDestination(ei, target));
+    public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target, Bus bus) throws IOException {
+        return new LocalConduit(this, (LocalDestination)getDestination(ei, target, bus));
     }
 
     EndpointReferenceType createReference(EndpointInfo ei) {

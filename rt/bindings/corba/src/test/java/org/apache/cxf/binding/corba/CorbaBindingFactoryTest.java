@@ -104,12 +104,12 @@ public class CorbaBindingFactoryTest extends Assert {
                          "SimpleCORBAService", 
                          "SimpleCORBAPort");
         
-        Conduit conduit = factory.getConduit(endpointInfo);
+        Conduit conduit = factory.getConduit(endpointInfo, bus);
         assertNotNull(conduit);   
-        conduit = factory.getConduit(endpointInfo, null);
+        conduit = factory.getConduit(endpointInfo, null, bus);
         assertNotNull(conduit);
         target = EasyMock.createMock(EndpointReferenceType.class);
-        conduit = factory.getConduit(endpointInfo, target);
+        conduit = factory.getConduit(endpointInfo, target, bus);
         assertNotNull(conduit);
     }
             
@@ -120,7 +120,7 @@ public class CorbaBindingFactoryTest extends Assert {
                          "SimpleCORBAService", 
                          "SimpleCORBAPort");
         
-        Destination destination = factory.getDestination(endpointInfo);
+        Destination destination = factory.getDestination(endpointInfo, bus);
         assertNotNull(destination);
         target = destination.getAddress();
         assertNotNull(target);

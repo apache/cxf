@@ -105,9 +105,9 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
 
     public class CustomDestinationFactory extends AbstractTransportFactory implements DestinationFactory {
         public CustomDestinationFactory(Bus b) {
-            super(Arrays.asList("id"), b);
+            super(Arrays.asList("id"));
         }
-        public Destination getDestination(EndpointInfo ei) throws IOException {
+        public Destination getDestination(EndpointInfo ei, Bus b) throws IOException {
             return new CustomDestination();
         }
 

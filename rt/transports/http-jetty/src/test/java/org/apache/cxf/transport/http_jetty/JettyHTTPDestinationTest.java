@@ -129,7 +129,9 @@ public class JettyHTTPDestinationTest extends Assert {
     }
     @After
     public void tearDown() {
-       
+        if (bus != null) {
+            bus.shutdown(true);
+        }
         bus = null;
         transportFactory = null;
         decoupledBackChannel = null;
@@ -163,14 +165,14 @@ public class JettyHTTPDestinationTest extends Assert {
     
     @Test
     public void testRandomPortAllocation() throws Exception {
+        bus = BusFactory.getDefaultBus(true);
         transportFactory = new HTTPTransportFactory();
-        transportFactory.setBus(BusFactory.getDefaultBus());
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));
         EndpointInfo ei = new EndpointInfo(serviceInfo, "");
         ei.setName(new QName("bla", "Port"));
         
-        Destination d1 = transportFactory.getDestination(ei);
+        Destination d1 = transportFactory.getDestination(ei, bus);
         URL url = new URL(d1.getAddress().getAddress().getValue());
         assertTrue("No random port has been allocated", 
                    url.getPort() > 0);
@@ -215,13 +217,12 @@ public class JettyHTTPDestinationTest extends Assert {
                 return httpEngine;
             }
         };
+        Bus b2 = new ExtensionManagerBus();
         transportFactory = new HTTPTransportFactory();
-        transportFactory.setBus(new ExtensionManagerBus());
-        transportFactory.getBus().setExtension(
-            factory, JettyHTTPServerEngineFactory.class);
+        b2.setExtension(factory, JettyHTTPServerEngineFactory.class);
         
         TestJettyDestination testDestination = 
-            new TestJettyDestination(transportFactory.getBus(), 
+            new TestJettyDestination(b2, 
                                      transportFactory.getRegistry(), 
                                      ei,
                                      factory);
@@ -232,24 +233,24 @@ public class JettyHTTPDestinationTest extends Assert {
     
     @Test
     public void testGetMultiple() throws Exception {
+        bus = BusFactory.getDefaultBus(true);
         transportFactory = new HTTPTransportFactory();
-        transportFactory.setBus(BusFactory.getDefaultBus(true));
         
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));        
         EndpointInfo ei = new EndpointInfo(serviceInfo, "");
         ei.setName(new QName("bla", "Port"));
         ei.setAddress("http://foo");
-        Destination d1 = transportFactory.getDestination(ei);
+        Destination d1 = transportFactory.getDestination(ei, bus);
         
-        Destination d2 = transportFactory.getDestination(ei);
+        Destination d2 = transportFactory.getDestination(ei, bus);
         
         // Second get should not generate a new destination. It should just retrieve the existing one
         assertEquals(d1, d2);
         
         d2.shutdown();
         
-        Destination d3 = transportFactory.getDestination(ei);
+        Destination d3 = transportFactory.getDestination(ei, bus);
         // Now a new destination should have been created
         assertNotSame(d1, d3);
     }
@@ -388,10 +389,9 @@ public class JettyHTTPDestinationTest extends Assert {
         throws Exception {
         policy = new HTTPServerPolicy();
         address = getEPR("bar/foo");
-        bus = new ExtensionManagerBus();
+        bus = BusFactory.getDefaultBus(true);
         
         transportFactory = new HTTPTransportFactory();
-        transportFactory.setBus(bus);
         
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));        
@@ -488,11 +488,11 @@ public class JettyHTTPDestinationTest extends Assert {
         transportFactory = new HTTPTransportFactory();
 
         final ConduitInitiator ci = new ConduitInitiator() {
-            public Conduit getConduit(EndpointInfo targetInfo) throws IOException {
+            public Conduit getConduit(EndpointInfo targetInfo, Bus b) throws IOException {
                 return decoupledBackChannel;
             }
 
-            public Conduit getConduit(EndpointInfo localInfo, EndpointReferenceType target)
+            public Conduit getConduit(EndpointInfo localInfo, EndpointReferenceType target, Bus b)
                 throws IOException {
                 return decoupledBackChannel;
             }

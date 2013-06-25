@@ -42,12 +42,11 @@ public abstract class AbstractSimpleFrontendTest extends AbstractCXFTest {
             .registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bindingFactory);
 
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-        SoapTransportFactory soapTF = new SoapTransportFactory();
-        soapTF.setBus(bus);
+        SoapTransportFactory soapTF = new SoapTransportFactory();        
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/", soapTF);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/", soapTF);
 
-        LocalTransportFactory localTransport = new LocalTransportFactory(bus);
+        LocalTransportFactory localTransport = new LocalTransportFactory();
         localTransport.getUriPrefixes().add("http");
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);

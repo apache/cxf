@@ -125,7 +125,7 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
 
         ConduitInitiatorManager conduitMgr = getStaticBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
-        Conduit conduit = conduitInit.getConduit(ei);
+        Conduit conduit = conduitInit.getConduit(ei, getStaticBus());
 
         TestUtilities.TestMessageObserver obs = new TestUtilities.TestMessageObserver();
         conduit.setMessageObserver(obs);

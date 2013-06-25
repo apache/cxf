@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -36,7 +37,8 @@ public interface ConduitInitiator {
      * @param targetInfo the endpoint info of the target 
      * @return a suitable new or pre-existing Conduit
      */
-    Conduit getConduit(EndpointInfo targetInfo) throws IOException;
+    Conduit getConduit(EndpointInfo targetInfo,
+                       Bus bus) throws IOException;
 
     /**
      * Initiate an outbound Conduit.
@@ -47,7 +49,8 @@ public interface ConduitInitiator {
      * @return a suitable new or pre-existing Conduit
      */
     Conduit getConduit(EndpointInfo localInfo,
-                       EndpointReferenceType target) throws IOException;
+                       EndpointReferenceType target,
+                       Bus bus) throws IOException;
     
     Set<String> getUriPrefixes();
     List<String> getTransportIds();

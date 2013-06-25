@@ -73,12 +73,11 @@ public abstract class AbstractXmlBeansTest extends AbstractCXFTest {
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
 
         SoapTransportFactory soapDF = new SoapTransportFactory();
-        soapDF.setBus(bus);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/", soapDF);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/", soapDF);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", soapDF);
         
-        localTransport = new LocalTransportFactory(bus);
+        localTransport = new LocalTransportFactory();
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
         dfm.registerDestinationFactory("http://cxf.apache.org/bindings/xformat", localTransport);

@@ -60,7 +60,7 @@ public class SoapDestinationFactoryTest extends Assert {
         Destination dest = control.createMock(Destination.class);
 
         EasyMock.expect(dfm.getDestinationFactory(transportURI)).andReturn(fooDF);
-        EasyMock.expect(fooDF.getDestination(ei)).andStubReturn(dest);
+        EasyMock.expect(fooDF.getDestination(ei, null)).andStubReturn(dest);
 
         control.replay();
 

@@ -60,12 +60,12 @@ public class StaxDatabindingTest extends AbstractCXFTest {
         
         ServerFactoryBean sf = new ServerFactoryBean();
         sf.setServiceBean(new CopyService());
+        sf.setBus(getBus());
         sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         sf.setAddress(address);
         sf.setDataBinding(new StaxDataBinding());
         sf.getFeatures().add(new StaxDataBindingFeature());
-
-        sf.create();
+        sf.create().start();
         
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "req.xml");
         

@@ -69,12 +69,9 @@ public class PolicyAnnotationTest extends Assert {
             "http://cxf.apache.org/transports/http/configuration",
             "http://cxf.apache.org/bindings/xformat");
         
-        LocalTransportFactory f = new LocalTransportFactory(bus);
+        LocalTransportFactory f = new LocalTransportFactory();
         f.getUriPrefixes().add("http");
-        f.setTransportIds(tp);
-        f.setBus(bus);
-        f.register();
-        
+        f.setTransportIds(tp);        
         
         Server s = factory.create();
 
@@ -135,11 +132,9 @@ public class PolicyAnnotationTest extends Assert {
             "http://cxf.apache.org/transports/http/configuration",
             "http://cxf.apache.org/bindings/xformat");
         
-        LocalTransportFactory f = new LocalTransportFactory(bus);
+        LocalTransportFactory f = new LocalTransportFactory();
         f.getUriPrefixes().add("http");
         f.setTransportIds(tp);
-        f.setBus(bus);
-        f.register();
         
         
         Server s = factory.create();

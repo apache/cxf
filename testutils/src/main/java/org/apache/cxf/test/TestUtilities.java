@@ -194,7 +194,7 @@ public class TestUtilities {
 
         ConduitInitiatorManager conduitMgr = getBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator(transport);
-        Conduit conduit = conduitInit.getConduit(ei);
+        Conduit conduit = conduitInit.getConduit(ei, getBus());
 
         TestMessageObserver obs = new TestMessageObserver();
         conduit.setMessageObserver(obs);
@@ -226,7 +226,7 @@ public class TestUtilities {
 
         ConduitInitiatorManager conduitMgr = getBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator(transport);
-        Conduit conduit = conduitInit.getConduit(ei);
+        Conduit conduit = conduitInit.getConduit(ei, getBus());
 
         TestMessageObserver obs = new TestMessageObserver();
         conduit.setMessageObserver(obs);

@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
@@ -58,7 +57,7 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
-@NoJSR250Annotations(unlessNull = { "bus" })
+@NoJSR250Annotations
 public class SoapTransportFactory extends AbstractTransportFactory implements DestinationFactory,
     WSDLEndpointFactory, ConduitInitiator {
     
@@ -83,11 +82,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         )));
     
     public SoapTransportFactory() {
-        super(DEFAULT_NAMESPACES, null);
-    }
-
-    public SoapTransportFactory(Bus b) {
-        super(DEFAULT_NAMESPACES, b);
+        super(DEFAULT_NAMESPACES);
     }
     
     public Set<String> getUriPrefixes() {
@@ -114,7 +109,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         return address != null && address.startsWith("jms:") && !"jms://".equals(address);
     }
 
-    public Destination getDestination(EndpointInfo ei) throws IOException {
+    public Destination getDestination(EndpointInfo ei, Bus bus) throws IOException {
         String address = ei.getAddress();
         if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp")) {
             return new SoapTcpDestination(ei.getTarget(), ei);
@@ -139,7 +134,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             } else {
                 destinationFactory = mgr.getDestinationFactoryForUri(address);
             }
-            return destinationFactory.getDestination(ei);
+            return destinationFactory.getDestination(ei, bus);
         } catch (BusException e) {
             IOException ex = new IOException("Could not find destination factory for transport " + transId);
             ex.initCause(e);
@@ -207,7 +202,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
 
 
-    public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target) throws IOException {
+    public Conduit getConduit(EndpointInfo ei, EndpointReferenceType target, Bus bus) throws IOException {
         String address = target == null ? ei.getAddress() : target.getAddress().getValue();
         if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp://")) {
             //TODO - examine policies and stuff to look for the sun tcp policies
@@ -235,19 +230,14 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             if (conduitInit == null) {
                 throw new RuntimeException(String.format(CANNOT_GET_CONDUIT_ERROR, address, transId));
             }
-            return conduitInit.getConduit(ei, target);
+            return conduitInit.getConduit(ei, target, bus);
         } catch (BusException e) {
             throw new RuntimeException(String.format(CANNOT_GET_CONDUIT_ERROR, address, transId));
         }
     }
 
-    public Conduit getConduit(EndpointInfo ei) throws IOException {
-        return getConduit(ei, ei.getTarget());
-    }
-
-    @Resource(name = "cxf")
-    public void setBus(Bus bus) {
-        super.setBus(bus);
+    public Conduit getConduit(EndpointInfo ei, Bus b) throws IOException {
+        return getConduit(ei, ei.getTarget(), b);
     }
     
     public void setActivationNamespaces(Collection<String> ans) {
