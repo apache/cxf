@@ -361,6 +361,9 @@ public abstract class BusFactory {
                 try {
                     Class<?> cls =  ClassLoaderUtils.loadClass(busFactoryClass, BusFactory.class)
                         .asSubclass(BusFactory.class);
+                    if (busFactoryCondition.startsWith("#")) {
+                        busFactoryCondition = busFactoryCondition.substring(1);
+                    }
                     int idx = busFactoryCondition.indexOf(',');
                     while (idx != -1) {
                         cls.getClassLoader().loadClass(busFactoryCondition.substring(0, idx));
