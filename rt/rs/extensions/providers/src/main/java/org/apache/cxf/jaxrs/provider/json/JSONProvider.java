@@ -32,6 +32,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +60,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -99,6 +101,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private String wrapperName;
     private Map<String, String> wrapperMap;
     private boolean dropRootElement;
+    private boolean dropElementsInXmlStream = true;
     private boolean dropCollectionWrapperElement;
     private boolean ignoreMixedContent; 
     private boolean writeXsiType = true;
@@ -107,6 +110,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private String convention = MAPPED_CONVENTION;
     private TypeConverter typeConverter;
     private boolean attributesToElements;
+    private boolean writeNullAsString = true;
+    private boolean readNullAsEmptyString = true;
     
     @Override
     public void setAttributesToElements(boolean value) {
@@ -270,8 +275,12 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             reader = JSONUtils.createBadgerFishReader(is);
         } else {
-            reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap, 
-                                                  primitiveArrayKeys, getDepthProperties());
+            reader = JSONUtils.createStreamReader(is, 
+                                                  readXsiType, 
+                                                  namespaceMap, 
+                                                  primitiveArrayKeys,
+                                                  readNullAsEmptyString,
+                                                  getDepthProperties());
         }
         reader = createTransformReaderIfNeeded(reader, is);
         
@@ -497,7 +506,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         boolean dropRootNeeded = isDropRootNeeded();
         
         QName qname = actualClass == Document.class ? null : getQName(actualClass, genericType, actualObject);
-        if (qname != null && ignoreNamespaces && (isCollection  || dropRootNeeded)) {        
+        if (qname != null && ignoreNamespaces && (isCollection || dropRootNeeded)) {        
             qname = new QName(qname.getLocalPart());
         }
         
@@ -506,13 +515,20 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                                           writeXsiType && !ignoreNamespaces,
                                           attributesToElements,
                                           typeConverter);
-        
+        if (!dropElementsInXmlStream && super.outDropElements != null) {
+            config.setIgnoredElements(outDropElements);
+        }
+        config.setWriteNullAsString(writeNullAsString);
+        config.setDropRootElement(dropRootElement && !dropElementsInXmlStream);
+        if (ignoreNamespaces && serializeAsArray && arrayKeys == null) {
+            arrayKeys = CastUtils.cast((List<?>)Collections.singletonList(qname.getLocalPart()));
+        }
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,
              isCollection || dropRootNeeded);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
-        return createTransformWriterIfNeeded(writer, os);
+        return createTransformWriterIfNeeded(writer, os, dropElementsInXmlStream);
     }
     
     protected boolean isDropRootNeeded() {
@@ -524,7 +540,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 return MessageUtils.isTrue(prop);
             }
         }
-        return dropRootElement;
+        return dropRootElement && dropElementsInXmlStream;
     }
     
     protected void marshal(Object actualObject, Class<?> actualClass, 
@@ -567,6 +583,18 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
     public void setPrimitiveArrayKeys(List<String> primitiveArrayKeys) {
         this.primitiveArrayKeys = primitiveArrayKeys;
+    }
+
+    public void setDropElementsInXmlStream(boolean drop) {
+        this.dropElementsInXmlStream = drop;
+    }
+
+    public void setWriteNullAsString(boolean writeNullAsString) {
+        this.writeNullAsString = writeNullAsString;
+    }
+
+    public void setReadNullAsEmptyString(boolean readNullAsString) {
+        this.readNullAsEmptyString = readNullAsString;
     }
 
 }

@@ -550,7 +550,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         if (writer == null && os == null) {
             writer = getStreamHandlerFromCurrentMessage(XMLStreamWriter.class);
         }
-        return createTransformWriterIfNeeded(writer, os);
+        return createTransformWriterIfNeeded(writer, os, true);
     }
     
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
