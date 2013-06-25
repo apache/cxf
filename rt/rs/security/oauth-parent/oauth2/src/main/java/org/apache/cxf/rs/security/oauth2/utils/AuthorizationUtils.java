@@ -70,6 +70,10 @@ public final class AuthorizationUtils {
     }
     
     public static void throwAuthorizationFailure(Set<String> challenges) {
+        throwAuthorizationFailure(challenges, null);
+    }
+    
+    public static void throwAuthorizationFailure(Set<String> challenges, String realm) {
         ResponseBuilder rb = Response.status(401);
         
         StringBuilder sb = new StringBuilder();
@@ -83,6 +87,9 @@ public final class AuthorizationUtils {
             sb.append(challenge);
         }
         if (sb.length() > 0) {
+            if (realm != null) {
+                sb.append(" realm=\"" + realm + "\"");
+            }
             rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
         }
         Response r = rb.build();
