@@ -21,13 +21,20 @@ package org.apache.cxf.transport.http.netty.server;
 
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+
 import javax.annotation.Resource;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
+
 
 public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
     private static final Logger LOG =
@@ -39,13 +46,21 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
     private Bus bus;
 
     private BusLifeCycleManager lifeCycleManager;
+    
+    private Map<String, TLSServerParameters> tlsServerParametersMap = 
+        new TreeMap<String, TLSServerParameters>();
 
     public NettyHttpServerEngineFactory() {
         // Empty
     }
-
+    
     public NettyHttpServerEngineFactory(Bus b) {
         setBus(b);
+    }
+    
+    public NettyHttpServerEngineFactory(Bus b, Map<String, TLSServerParameters> tls) {
+        setBus(b);
+        tlsServerParametersMap = tls;
     }
 
     public Bus getBus() {
@@ -69,6 +84,24 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
             }
         }
     }
+    
+    public Map<String, TLSServerParameters> getTlsServerParametersMap() {
+        return tlsServerParametersMap;
+    }
+
+    public void setTlsServerParameters(Map<String, TLSServerParameters> tlsParametersMap) {
+        this.tlsServerParametersMap = tlsParametersMap;
+    }
+    
+    public void setEnginesList(List<NettyHttpServerEngine> enginesList) {
+        for (NettyHttpServerEngine engine : enginesList) {
+            /*if (engine.getPort() == FALLBACK_THREADING_PARAMS_KEY) {
+                fallbackThreadingParameters = engine.getThreadingParameters();
+            }*/
+            portMap.putIfAbsent(engine.getPort(), engine);
+        }    
+    }
+    
 
     public void initComplete() {
         // do nothing here
@@ -82,6 +115,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
         for (NettyHttpServerEngine engine : engines) {
             engine.shutdown();
         }
+        tlsServerParametersMap.clear();
     }
 
     public void preShutdown() {
@@ -91,15 +125,18 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
 
     private static NettyHttpServerEngine getOrCreate(NettyHttpServerEngineFactory factory,
                                                      String host,
-                                                     int port
-    ) throws IOException {
+                                                     int port,
+                                                     TLSServerParameters tlsParams
+                                                     ) throws IOException {
 
         NettyHttpServerEngine ref = portMap.get(port);
         if (ref == null) {
             ref = new NettyHttpServerEngine(host, port);
-
+            if (tlsParams != null) {
+                ref.setTlsServerParameters(tlsParams);
+            }
+            ref.finalizeConfig();
             NettyHttpServerEngine tmpRef = portMap.putIfAbsent(port, ref);
-
             if (tmpRef != null) {
                 ref = tmpRef;
             }
@@ -115,8 +152,12 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
 
     public synchronized NettyHttpServerEngine createNettyHttpServerEngine(String host, int port,
                                                                           String protocol) throws IOException {
-        LOG.fine("Creating Jetty HTTP Server Engine for port " + port + ".");
-        NettyHttpServerEngine ref = getOrCreate(this, host, port);
+        LOG.fine("Creating Netty HTTP Server Engine for port " + port + ".");
+        TLSServerParameters tlsServerParameters = null;
+        if (protocol.equals("https") && tlsServerParametersMap != null) {
+            tlsServerParameters = tlsServerParametersMap.get(port);
+        }
+        NettyHttpServerEngine ref = getOrCreate(this, host, port, tlsServerParameters);
         // checking the protocol
         if (!protocol.equals(ref.getProtocol())) {
             throw new IOException("Protocol mismatch for port " + port + ": "
@@ -148,4 +189,6 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
             }
         }
     }
+
+   
 }

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<xs:schema targetNamespace="http://cxf.apache.org/transports/http-netty-server/configuration" 
+           xmlns:tns="http://cxf.apache.org/transports/http-netty-server/configuration" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+           xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" 
+           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+           xmlns:sec="http://cxf.apache.org/configuration/security"
+  		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  		   xmlns:ptp="http://cxf.apache.org/configuration/parameterized-types" 
+  		   xsi:schemaLocation="
+  		     http://www.springframework.org/schema/beans
+  		       http://www.springframework.org/schema/beans/spring-beans.xsd"
+           elementFormDefault="qualified" 
+           attributeFormDefault="unqualified"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           jaxb:version="2.0">
+
+    <xs:import namespace="http://cxf.apache.org/configuration/security"
+               schemaLocation="http://cxf.apache.org/schemas/configuration/security.xsd"/>
+    <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+               schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
+    
+    
+    <xs:complexType name="TLSServerParametersIdentifiedType">
+       <xs:sequence>
+          <xs:element name="tlsServerParameters" type="sec:TLSServerParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies the properties for the parameter set.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+       </xs:sequence>
+          <xs:attribute name="id" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>Specifies a unique identifier by which the property set can be referred.</xs:documentation>
+             </xs:annotation>
+          </xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="ParametersRefType">
+       <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+    
+    <xs:complexType name="NettyHttpServerEngineConfigType">
+       <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="tlsServerParameters" 
+                      type="sec:TLSServerParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies an instance of the security parameters for the Netty Http server instance.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+          <xs:element name="tlsServerParametersRef"
+                      type="tns:ParametersRefType">
+             <xs:annotation>
+                <xs:documentation>Specifies a reference to a reusable set of security parameters.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+         </xs:choice>
+         <xs:element name="sessionSupport" type="ptp:ParameterizedBoolean" minOccurs="0"/>
+         <xs:element name="reuseAddress" type="ptp:ParameterizedBoolean" minOccurs="0" />          
+       </xs:sequence>
+       
+       <xs:attribute name="port" type="ptp:ParameterizedInt" use="required">
+             <xs:annotation>
+                <xs:documentation>Specifies the port used by the Netty Http server instance.
+                You can specify a value of 0 for the port attribute. Any threading 
+                properties specified in an engine element with its port attribute
+                set to 0 are used as the configuration for all Netty listeners that are not explicitly configured.</xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="host" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>
+                  Specifies the listen address used by the Netty Http server instance.
+                  Value can be a hostname or ip address.
+                  If not specified, Netty Http server will listen on all local addresses.
+                </xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="readIdleTime" type="ptp:ParameterizedInt">
+           <xs:annotation>  
+                <xs:documentation>Specifies the maximum read idle time for a Netty connection. The timer is reset whenever there are any read actions on the underlying stream.</xs:documentation> 
+           </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="writeIdleTime" type="ptp:ParameterizedInt">
+           <xs:annotation>  
+                <xs:documentation>Specifies the maximum write idle time for a Netty connection. The timer is reset whenever there are any write actions on the underlying stream.</xs:documentation> 
+           </xs:annotation>
+       </xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="NettyHttpServerEngineFactoryConfigType">
+       <xs:sequence>
+           <xs:element name="identifiedTLSServerParameters" 
+                       type="tns:TLSServerParametersIdentifiedType"
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies a reusable set of properties for securing an HTTP service provider.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="engine" 
+                       type="tns:NettyHttpServerEngineConfigType" 
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies the configuration for a particular Netty Http server runtime instance.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
+       </xs:sequence>
+       <xs:attribute name="bus" type="xs:string" default="cxf"/>
+       <xs:attribute name="id" type="xs:ID" use="optional"/>
+    </xs:complexType>
+    
+    <xs:element name="engine-factory" 
+                type="tns:NettyHttpServerEngineFactoryConfigType">
+       <xs:annotation>
+          <xs:documentation>Contains the configuration for a Netty Http Server instance.</xs:documentation>
+       </xs:annotation>
+    </xs:element>
+ </xs:schema>

@@ -62,6 +62,22 @@
             <artifactId>geronimo-servlet_2.5_spec</artifactId>
             <version>1.1.2</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- testing -->
         <dependency>
@@ -92,19 +108,35 @@
     </dependencies>
 
     <build>
-        <defaultGoal>install</defaultGoal>
-
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>${cxf.xjc-utils.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/configuration/http-netty-server.xsd</xsd>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <deleteDirs>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/configuration/security</deleteDir>
+                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/transports/http/configuration</deleteDir>
+                                    </deleteDirs>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-
         </plugins>
     </build>
 

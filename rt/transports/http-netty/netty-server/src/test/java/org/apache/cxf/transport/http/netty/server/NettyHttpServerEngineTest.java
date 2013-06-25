@@ -89,17 +89,17 @@ public class NettyHttpServerEngineTest extends Assert {
         
         String response = null;
         response = getResponse(urlStr);
-        assertEquals("The jetty http handler did not take effect", response, "string1");
+        assertEquals("The netty http handler did not take effect", response, "string1");
 
         engine.addServant(new URL(urlStr), handler2);
         response = getResponse(urlStr);
-        assertEquals("The jetty http handler did not take effect", response, "string1string2");
+        assertEquals("The netty http handler did not take effect", response, "string1string2");
         engine.addServant(new URL(urlStr2), handler2);
 
         
         engine.removeServant(new URL(urlStr));
         response = getResponse(urlStr2);
-        assertEquals("The jetty http handler did not take effect", response, "string2");
+        assertEquals("The netty http handler did not take effect", response, "string2");
         engine.shutdown();
         // set the get request
         NettyHttpServerEngineFactory.destroyForPort(PORT1);
@@ -125,14 +125,14 @@ public class NettyHttpServerEngineTest extends Assert {
         } catch (Exception ex) {
             fail("Can't get the reponse from the server " + ex);
         }
-        assertEquals("the jetty http handler did not take effect", response, "test");
+        assertEquals("the netty http handler did not take effect", response, "test");
 
         try {
             response = getResponse(urlStr2 + "/test");
         } catch (Exception ex) {
             fail("Can't get the reponse from the server " + ex);
         }
-        assertEquals("the jetty http handler did not take effect", response, "test2");
+        assertEquals("the netty http handler did not take effect", response, "test2");
 
         NettyHttpServerEngineFactory.destroyForPort(PORT3);
     }

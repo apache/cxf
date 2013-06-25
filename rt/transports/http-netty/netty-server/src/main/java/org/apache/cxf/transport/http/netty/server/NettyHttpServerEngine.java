@@ -25,11 +25,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.timeout.IdleStateHandler;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timer;
 
 public class NettyHttpServerEngine implements ServerEngine {
 
@@ -52,6 +57,8 @@ public class NettyHttpServerEngine implements ServerEngine {
     private volatile Channel serverChannel;
 
     private NettyHttpServletPipelineFactory servletPipeline;
+    
+    private Timer timer = new HashedWheelTimer();
 
     private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<String, NettyHttpContextHandler>();
     
@@ -62,6 +69,15 @@ public class NettyHttpServerEngine implements ServerEngine {
      */
     private TLSServerParameters tlsServerParameters;
     
+    private int readIdleTime = 60;
+    
+    private int writeIdleTime = 30;
+    
+    private boolean sessionSupport;
+    
+    public NettyHttpServerEngine() {
+        
+    }
 
     public NettyHttpServerEngine(
             String host,
@@ -78,6 +94,11 @@ public class NettyHttpServerEngine implements ServerEngine {
         this.protocol = protocol;
     }
     
+    @PostConstruct
+    public void finalizeConfig() {
+        // need to check if we need to any other thing other than Setting the TLSServerParameter
+    }
+    
     
     /**
      * This method is used to programmatically set the TLSServerParameters.
@@ -85,9 +106,7 @@ public class NettyHttpServerEngine implements ServerEngine {
      * @throws IOException 
      */
     public void setTlsServerParameters(TLSServerParameters params) {
-        
         tlsServerParameters = params;
-        
     }
     
     /**
@@ -98,17 +117,22 @@ public class NettyHttpServerEngine implements ServerEngine {
      */
     public TLSServerParameters getTlsServerParameters() {
         return tlsServerParameters;
-    } 
-    
-   
+    }
+      
     protected Channel startServer() {
         // TODO Configure the server.
         final ServerBootstrap bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(Executors
                         .newCachedThreadPool(), Executors.newCachedThreadPool()));
-
+        // Set up the idle handler
+        IdleStateHandler idleStateHandler = 
+            new IdleStateHandler(this.timer, getReadIdleTime(), getWriteIdleTime(), 0);
         // Set up the event pipeline factory.
-        servletPipeline = new NettyHttpServletPipelineFactory(tlsServerParameters, handlerMap);
+        servletPipeline = 
+            new NettyHttpServletPipelineFactory(
+                 tlsServerParameters, sessionSupport, port, handlerMap, idleStateHandler);
+        // Start the servletPipeline's timer
+        servletPipeline.start();
         bootstrap.setPipelineFactory(servletPipeline);
         InetSocketAddress address = null;
         if (host == null) {
@@ -163,6 +187,8 @@ public class NettyHttpServerEngine implements ServerEngine {
     }
 
     public void shutdown() {
+        // stop the timer
+        timer.stop();
         // just unbind the channel
         if (serverChannel != null) {
             serverChannel.close();
@@ -170,5 +196,37 @@ public class NettyHttpServerEngine implements ServerEngine {
         if (servletPipeline != null) {
             servletPipeline.shutdown();
         }
+    }
+
+    public int getReadIdleTime() {
+        return readIdleTime;
+    }
+
+    public void setReadIdleTime(int readIdleTime) {
+        this.readIdleTime = readIdleTime;
+    }
+
+    public int getWriteIdleTime() {
+        return writeIdleTime;
+    }
+
+    public void setWriteIdleTime(int writeIdleTime) {
+        this.writeIdleTime = writeIdleTime;
+    }
+
+    public boolean isSessionSupport() {
+        return sessionSupport;
+    }
+
+    public void setSessionSupport(boolean session) {
+        this.sessionSupport = session;
+    }
+    
+    public int getPort() {
+        return port;
+    }
+    
+    public void setPort(int port) {
+        this.port = port;
     }
 }

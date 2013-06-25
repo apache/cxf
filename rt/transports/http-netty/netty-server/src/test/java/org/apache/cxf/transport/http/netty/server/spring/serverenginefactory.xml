@@ -1,0 +1,57 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<hj:engine-factory
+       xmlns:hj="http://cxf.apache.org/transports/http-jetty/configuration"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+   bus="cxf">
+   
+   <hj:identifiedTLSServerParameters id="sample1">
+      <hj:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
+        <sec:clientAuthentication want="false" required="false"/>
+      </hj:tlsServerParameters>
+   </hj:identifiedTLSServerParameters>
+   
+   <hj:identifiedThreadingParameters id="sampleThreading1">
+      <hj:threadingParameters minThreads="11" maxThreads="12"/>
+   </hj:identifiedThreadingParameters>
+   
+   <hj:engine port="9000">
+      <hj:tlsServerParametersRef id="sample1"/>
+      <hj:threadingParameters minThreads="1" maxThreads="2"/>
+   </hj:engine>
+   
+   <hj:engine port="9001">
+      <hj:tlsServerParameters>
+        <sec:clientAuthentication want="true" required="true"/>
+      </hj:tlsServerParameters>
+      <hj:threadingParametersRef id="sampleThreading1"/>
+   </hj:engine>
+   <hj:engine port="9002">
+      <hj:connector>
+         <bean class="jettysocketconnector"/>
+      </hj:connector>
+      <hj:handlers>
+         <bean class="jettyhandler1"/>
+         <bean class="jettyhandler2"/>  
+      </hj:handlers>
+      <hj:useSession> true </hj:useSession>
+   </hj:engine>    
+</hj:engine-factory>
+         

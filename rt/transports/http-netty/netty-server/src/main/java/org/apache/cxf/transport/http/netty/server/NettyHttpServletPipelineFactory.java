@@ -47,8 +47,6 @@ import org.jboss.netty.handler.execution.ExecutionHandler;
 import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.handler.timeout.IdleStateHandler;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
 
 public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
     private static final Logger LOG =
@@ -59,26 +57,25 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
     private final HttpSessionWatchdog watchdog;
 
     private final ChannelHandler idleStateHandler;
-
-    private final Timer timer;
     
     private final TLSServerParameters tlsServerParameters;
-
-    // TODO we may need to configure the thread pool from outside
-    private final ExecutionHandler executionHandler =
-            new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(200, 2048576, 204857600));
+    
+    private final boolean supportSession;
+    
+    private final ExecutionHandler executionHandler;
 
     private final Map<String, NettyHttpContextHandler> handlerMap;
 
-    public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters,
-                                           Map<String, NettyHttpContextHandler> handlerMap) {
-
-        this.timer = new HashedWheelTimer();
-        this.idleStateHandler = new IdleStateHandler(this.timer, 60, 30, 0);
+    public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters, 
+                                           boolean supportSession, int threadPoolSize,
+                                           Map<String, NettyHttpContextHandler> handlerMap,
+                                           IdleStateHandler idleStateHandler) {
+        this.supportSession = supportSession;
+        this.idleStateHandler = idleStateHandler;
         this.watchdog = new HttpSessionWatchdog();
         this.handlerMap = handlerMap;
         this.tlsServerParameters = tlsServerParameters;
-        new Thread(watchdog).start();
+        this.executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(200, 2048576, 204857600));
     }
 
 
@@ -101,9 +98,14 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         return null;
     }
     
+    public void start() {
+        if (supportSession) {
+            new Thread(watchdog).start();
+        }
+    }
+    
     public void shutdown() {
         this.watchdog.stopWatching();
-        this.timer.stop();
         this.allChannels.close().awaitUninterruptibly();
     }
 
@@ -124,7 +126,9 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
 
         NettyHttpServletHandler handler = new NettyHttpServletHandler(this);
         handler.addInterceptor(new ChannelInterceptor());
-        handler.addInterceptor(new HttpSessionInterceptor(getHttpSessionStore()));
+        if (supportSession) {
+            handler.addInterceptor(new HttpSessionInterceptor(getHttpSessionStore()));
+        }
         return handler;
     }
 
