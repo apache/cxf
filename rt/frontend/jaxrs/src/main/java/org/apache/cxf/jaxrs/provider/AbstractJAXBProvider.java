@@ -726,10 +726,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
-                                                            OutputStream os) {
+                                                            OutputStream os,
+                                                            boolean dropAtXmlLevel) {
         return TransformUtils.createTransformWriterIfNeeded(writer, os, 
                                                       outElementsMap,
-                                                      outDropElements,
+                                                      dropAtXmlLevel ? outDropElements : null,
                                                       outAppendMap,
                                                       attributesToElements,
                                                       null);
