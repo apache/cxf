@@ -778,6 +778,27 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
     
     @Test
+    public void testExceptionRefNillable() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception-ref-nillable.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo3Impl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        File wsdlFile = new File(output, "exception-ref-nillable.wsdl");
+        assertTrue(wsdlFile.exists());
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        int refElement = wsdlContent.indexOf("<xs:element ref=\"tns:item\"/>");
+        assertTrue(refElement > -1);
+
+    }
+    
+    
+    @Test
     public void testCXF4877() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/testwsdl.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.cxf4877.HelloImpl");
@@ -791,6 +812,4 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         //if the test works, this won't throw an exception.  CXF-4877 generated bad XML at this point
         StaxUtils.read(new FileInputStream(wsdlFile));
     }
-    
-    
 }

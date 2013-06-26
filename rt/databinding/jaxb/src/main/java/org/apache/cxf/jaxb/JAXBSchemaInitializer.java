@@ -626,6 +626,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             QName ename = new QName(beanInfo.getElementNamespaceURI(null),
                                    beanInfo.getElementLocalName(null));
             XmlSchemaElement el2 = schemas.getElementByQName(ename);
+            el.setNillable(false);
             el.getRef().setTargetQName(el2.getQName());
         } else {
             el.setName(name.getLocalPart());
