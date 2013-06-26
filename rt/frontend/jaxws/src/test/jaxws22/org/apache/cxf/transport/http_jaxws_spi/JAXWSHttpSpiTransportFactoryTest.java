@@ -43,7 +43,7 @@ public class JAXWSHttpSpiTransportFactoryTest extends Assert {
         control = EasyMock.createNiceControl();
         context = control.createMock(HttpContext.class);
         bus = control.createMock(Bus.class);
-        factory = new JAXWSHttpSpiTransportFactory(bus, context);
+        factory = new JAXWSHttpSpiTransportFactory(context);
     }
     
     @After
@@ -70,7 +70,7 @@ public class JAXWSHttpSpiTransportFactoryTest extends Assert {
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(endpointAddress);
         
-        Destination destination = factory.getDestination(endpoint);
+        Destination destination = factory.getDestination(endpoint, bus);
         assertNotNull(destination);
         assertNotNull(destination.getAddress());
         assertNotNull(destination.getAddress().getAddress());
