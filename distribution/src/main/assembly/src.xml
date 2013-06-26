@@ -78,6 +78,8 @@
                 <exclude>**/build.out*</exclude>
                 <exclude>STATUS</exclude>
                 <exclude>KEYS</exclude>
+                <exclude>security/**/*</exclude>
+                <exclude>etc/survey/**/*</exclude>
             </excludes>
         </fileSet>
     </fileSets>
