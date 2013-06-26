@@ -33,15 +33,14 @@ public class JAXWSHttpSpiTransportFactory extends HTTPTransportFactory implement
     private HttpContext context;
     private JAXWSHttpSpiDestination destination;
 
-    public JAXWSHttpSpiTransportFactory(Bus bus, HttpContext context) {
+    public JAXWSHttpSpiTransportFactory(HttpContext context) {
         super();
         this.context = context;
-        this.bus = bus; //directly set the bus to prevent this factory from being registered
     }
 
-    public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
+    public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
         if (destination == null) { 
-            destination = new JAXWSHttpSpiDestination(getBus(), registry, endpointInfo);
+            destination = new JAXWSHttpSpiDestination(bus, registry, endpointInfo);
             // set handler into the provided HttpContext, our Destination hook into the server container
             HttpHandlerImpl handler = new HttpHandlerImpl(destination);
             context.setHandler(handler);

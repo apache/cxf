@@ -108,7 +108,7 @@ public class EndpointImpl extends org.apache.cxf.jaxws.EndpointImpl {
     public void publish(javax.xml.ws.spi.http.HttpContext context) {
         ServerFactoryBean serverFactory = getServerFactory();
         if (serverFactory.getDestinationFactory() == null) {
-            serverFactory.setDestinationFactory(new JAXWSHttpSpiTransportFactory(getBus(), context));
+            serverFactory.setDestinationFactory(new JAXWSHttpSpiTransportFactory(context));
         }
         super.publish(context.getPath());
     }
