@@ -238,6 +238,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         Exchange ex = message.getExchange();
         for (String s : SecurityConstants.ALL_PROPERTIES) {
             Object v = message.getContextualProperty(s + ".sct");
+            if (v == null) {
+                v = message.getContextualProperty(s);
+            }
             if (v != null) {
                 ex.put(s, v);
             }

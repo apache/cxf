@@ -108,6 +108,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
         for (String s : SecurityConstants.ALL_PROPERTIES) {
             Object v = message.getContextualProperty(s + ".sct");
+            if (v == null) {
+                v = message.getContextualProperty(s);
+            }
             if (v != null) {
                 ctx.put(s, v);
             }
