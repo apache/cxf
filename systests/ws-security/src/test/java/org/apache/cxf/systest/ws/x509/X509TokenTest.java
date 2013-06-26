@@ -433,7 +433,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         // DOM
         x509Port.doubleIt(25);
         
-        // TODO Streaming
+        // TODO WSS-456 Streaming
         // SecurityTestUtil.enableStreaming(x509Port);
         // x509Port.doubleIt(25);
         
