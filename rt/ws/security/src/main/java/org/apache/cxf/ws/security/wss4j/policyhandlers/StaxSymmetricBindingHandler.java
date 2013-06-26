@@ -451,7 +451,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             String encryptedKeyID = securityToken.getId();
             SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
-            // TODO revisit
+            tempTok.setSHA1(securityToken.getSha1Identifier());
+            
             for (String key : securityToken.getSecretKey().keySet()) {
                 if (securityToken.getSecretKey().get(key) != null) {
                     tempTok.setKey(securityToken.getSecretKey().get(key));
@@ -459,7 +460,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     break;
                 }
             }
-            //tempTok.setSHA1(getSHA1((byte[])wser.get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
             getTokenStore().add(tempTok);
 
             return encryptedKeyID;
@@ -468,7 +468,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
     }
     
-    // TODO revisit
     private org.apache.xml.security.stax.securityToken.SecurityToken 
     findEncryptedKeyToken() throws XMLSecurityException {
         @SuppressWarnings("unchecked")
@@ -481,12 +480,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
-                    if (token != null && token.getSecretKey() != null) {
-                        for (String key : token.getSecretKey().keySet()) {
-                            if (token.getSecretKey().get(key) != null) {
-                                return token;
-                            }
-                        }
+                    if (token != null && token.getSecretKey() != null 
+                        && token.getSha1Identifier() != null) {
+                        return token;
                     }
                 }
             }
@@ -550,6 +546,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     return encryptedKeySecurityToken.getId();
                 }
             };
+        encryptedKeySecurityToken.setSha1Identifier(tok.getSHA1());
         outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
                            encryptedKeySecurityTokenProvider);
         outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
