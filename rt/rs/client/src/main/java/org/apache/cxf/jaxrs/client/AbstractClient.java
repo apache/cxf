@@ -45,6 +45,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -906,10 +907,10 @@ public abstract class AbstractClient implements Client {
         
         m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         
+        body = checkIfBodyEmpty(body);
+        setEmptyRequestPropertyIfNeeded(m, body);    
+        
         m.setContent(List.class, getContentsList(body));
-        if (body == null) {
-            setEmptyRequestProperty(m, httpMethod);
-        }
         
         m.put(URITemplate.TEMPLATE_PARAMETERS, getState().getTemplates());
         
@@ -928,6 +929,23 @@ public abstract class AbstractClient implements Client {
         prepareConduitSelector(m, currentURI, proxy);
         
         return m;
+    }
+    
+    protected void setEmptyRequestPropertyIfNeeded(Message outMessage, Object body) {
+        if (body == null) {
+            outMessage.put("org.apache.cxf.empty.request", true);
+        }
+    }
+
+    
+    protected Object checkIfBodyEmpty(Object body) {
+        if (body != null 
+            && (body.getClass() == String.class && ((String)body).length() == 0 
+            || body.getClass() == Form.class && ((Form)body).asMap().isEmpty()
+            || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty())) {
+            body = null;
+        }
+        return body;
     }
     
     protected Map<String, Object> getRequestContext(Message outMessage) {
@@ -982,12 +1000,6 @@ public abstract class AbstractClient implements Client {
         message.put(Message.INVOCATION_CONTEXT, context);
         message.putAll(reqContext);
         exchange.putAll(reqContext);
-    }
-    
-    protected void setEmptyRequestProperty(Message outMessage, String httpMethod) {
-        if ("POST".equals(httpMethod)) {
-            outMessage.put("org.apache.cxf.post.empty", true);
-        }
     }
     
     protected void setPlainOperationNameProperty(Message outMessage, String name) {
