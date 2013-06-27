@@ -215,7 +215,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (s.length == 1) {
                 ep.getEndpointInfo().setProperty(prop.key(), s[0]);
             } else {
-                ep.getEndpointInfo().setProperty(prop.key(), s[1]);                
+                ep.getEndpointInfo().setProperty(prop.key(), s);                
             }
         }
         
