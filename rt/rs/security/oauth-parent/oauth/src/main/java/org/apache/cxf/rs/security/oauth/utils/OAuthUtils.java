@@ -109,8 +109,8 @@ public final class OAuthUtils {
         } catch (Exception ex) {
             if (token != null) {
                 provider.removeToken(token);
-                throw ex;
             }
+            throw ex;
         }
         if (token != null && validator instanceof DefaultOAuthValidator) {
             ((DefaultOAuthValidator)validator).validateToken(token, provider);
