@@ -121,7 +121,7 @@
         <cxf.jaxb.xjc.version>${cxf.jaxb21.xjc.version}</cxf.jaxb.xjc.version>
 
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jettison.version>1.3.3</cxf.jettison.version>
+        <cxf.jettison.version>1.3.4</cxf.jettison.version>
         <cxf.jetty.osgi.version>[7.2,8.2)</cxf.jetty.osgi.version>
         <cxf.jetty.version>7.5.4.v20111024</cxf.jetty.version>
         <cxf.jibx.version>1.2.4.5</cxf.jibx.version>
@@ -1801,6 +1801,12 @@
             </build>
         </profile>
     </profiles>
+    <repositories>
+         <repository>
+            <id>jettison</id>
+            <url>https://nexus.codehaus.org/content/repositories/orgcodehausjettison-021/</url>
+         </repository>
+    </repositories>
 </project>
 
 
