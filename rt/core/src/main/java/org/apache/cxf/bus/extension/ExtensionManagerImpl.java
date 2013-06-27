@@ -197,6 +197,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
  
         Object obj = e.load(loader, bus);
+        if (obj == null) {
+            return;
+        }
         
         if (null != activated) {
             Configurer configurer = (Configurer)(activated.get(Configurer.class));

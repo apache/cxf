@@ -230,19 +230,18 @@ public class Extension {
             }
             obj = cls.getConstructor().newInstance();
         } catch (ExtensionException ex) {
-            throw ex;
-        } catch (IllegalAccessException ex) {
-            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
-        } catch (InstantiationException ex) {
-            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
-        } catch (IllegalArgumentException e) {
-            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
-        } catch (SecurityException e) {
-            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
+            notFound = true;
+            if (!optional) {
+                throw ex;
+            }
         } catch (InvocationTargetException ex) {
-            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), 
-                                         ex.getCause());
+            notFound = true;
+            if (!optional) {
+                throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), 
+                                             ex.getCause());
+            }
         } catch (NoSuchMethodException ex) {
+            notFound = true;
             List<Object> a = new ArrayList<Object>();
             if (b != null) {
                 a.add(b);
@@ -250,8 +249,15 @@ public class Extension {
             if (args != null) {
                 a.add(args);
             }
-            throw new ExtensionException(new Message("PROBLEM_FINDING_CONSTRUCTOR", LOG,
-                                                     cls.getName(), a), ex);
+            if (!optional) {
+                throw new ExtensionException(new Message("PROBLEM_FINDING_CONSTRUCTOR", LOG,
+                                                         cls.getName(), a), ex);
+            }
+        } catch (Throwable e) {
+            notFound = true;
+            if (!optional) {
+                throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
+            }
         }
         return obj;
     }
