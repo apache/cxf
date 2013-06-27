@@ -46,6 +46,7 @@ public abstract class AbstractAccessTokenValidator {
     private List<AccessTokenValidator> tokenHandlers = Collections.emptyList();
     private Set<String> supportedSchemes = new HashSet<String>();
     private OAuthDataProvider dataProvider;
+    private String realm;
     
     public void setTokenValidator(AccessTokenValidator validator) {
         setTokenValidators(Collections.singletonList(validator));
@@ -106,7 +107,7 @@ public abstract class AbstractAccessTokenValidator {
                 accessTokenV = handler.validateAccessToken(mc, authScheme, authSchemeData);
             } catch (OAuthServiceException ex) {
                 AuthorizationUtils.throwAuthorizationFailure(
-                    Collections.singleton(authScheme));
+                    Collections.singleton(authScheme), realm);
             }
         }
         // Default processing if no registered providers available
@@ -119,21 +120,25 @@ public abstract class AbstractAccessTokenValidator {
             }
             if (localAccessToken == null) {
                 AuthorizationUtils.throwAuthorizationFailure(
-                    Collections.singleton(authScheme));
+                    Collections.singleton(authScheme), realm);
             }
             accessTokenV = new AccessTokenValidation(localAccessToken);
         }
         if (accessTokenV == null) {
-            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Check if token is still valid
         if (OAuthUtils.isExpired(accessTokenV.getTokenIssuedAt(), accessTokenV.getTokenLifetime())) {
             if (localAccessToken != null) {
                 dataProvider.removeAccessToken(localAccessToken);
             }
-            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         return accessTokenV;
+    }
+
+    public void setRealm(String realm) {
+        this.realm = realm;
     }
     
     

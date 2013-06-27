@@ -169,7 +169,9 @@ public final class OAuthClientUtils {
                 accessTokenService.header("Authorization", sb.toString());
             } else {
                 form.set(OAuthConstants.CLIENT_ID, consumer.getKey());
-                form.set(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
+                if (consumer.getSecret() != null) {
+                    form.set(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
+                } 
             }
         } else {
             // in this case the AccessToken service is expected to find a mapping between
