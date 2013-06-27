@@ -47,7 +47,10 @@ import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http.netty.server.NettyHttpServerEngine;
 import org.apache.cxf.transport.http.netty.server.NettyHttpServerEngineFactory;
+import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
 import org.apache.cxf.transports.http_netty_server.configuration.TLSServerParametersIdentifiedType;
+import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersIdentifiedType;
+import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersType;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -71,20 +74,15 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
         if (hostStr != null && !"".equals(hostStr.trim())) {
             bean.addPropertyValue("host", hostStr);
         }
-
-        String continuationsStr = element.getAttribute("continuationsEnabled");
-        if (continuationsStr != null && continuationsStr.length() > 0) {
-            bean.addPropertyValue("continuationsEnabled", continuationsStr);
+        
+        String readIdleTimeStr = element.getAttribute("readIdleTime");
+        if (readIdleTimeStr != null && !"".equals(readIdleTimeStr.trim())) {
+            bean.addPropertyValue("readIdleTime", readIdleTimeStr);
         }
         
-        String maxIdleTimeStr = element.getAttribute("maxIdleTime");
-        if (maxIdleTimeStr != null && !"".equals(maxIdleTimeStr.trim())) {
-            bean.addPropertyValue("maxIdleTime", maxIdleTimeStr);
-        }
-        
-        String sendServerVersionStr = element.getAttribute("sendServerVersion");
-        if (sendServerVersionStr != null && sendServerVersionStr.length() > 0) {
-            bean.addPropertyValue("sendServerVersion", sendServerVersionStr);
+        String writeIdleTimeStr = element.getAttribute("writeIdleTime");
+        if (writeIdleTimeStr != null && !"".equals(writeIdleTimeStr.trim())) {
+            bean.addPropertyValue("writeIdleTime", writeIdleTimeStr);
         }
         
         ValueHolder busValue = ctx.getContainingBeanDefinition()
@@ -103,6 +101,21 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
                                                     TLSServerParametersIdentifiedType.class,
                                                     NettyHttpServerEngineBeanDefinitionParser.class,
                                                     "createTLSServerParametersConfigRef");
+                } else if ("threadingParameters".equals(name)) {
+                    mapElementToJaxbPropertyFactory(elem,
+                                                    bean,
+                                                    "threadingParameters",
+                                                    ThreadingParametersType.class,
+                                                    NettyHttpServerEngineBeanDefinitionParser.class,
+                                                    "createThreadingParameters");
+                } else if ("threadingParametersRef".equals(name)) {
+                    mapElementToJaxbPropertyFactory(elem,
+                                                    bean,
+                                                    "threadingParametersRef",
+                                                    ThreadingParametersIdentifiedType.class,
+                                                    NettyHttpServerEngineBeanDefinitionParser.class,
+                                                    "createThreadingParametersRef"
+                                                    );
                 } else if ("sessionSupport".equals(name) || "reuseAddress".equals(name)) {
                     String text = elem.getTextContent();                        
                     bean.addPropertyValue(name, text);
@@ -253,6 +266,9 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             if (tlsRef != null) {
                 setTlsServerParameters(factory.getTlsServerParametersMap().get(tlsRef));
             }
+            if (threadingRef != null) {
+                setThreadingParameters(factory.getThreadingParametersMap().get(threadingRef));
+            }
             super.finalizeConfig();
         }
 
@@ -266,8 +282,8 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
                                                                             JAXBContext context) 
         throws GeneralSecurityException, IOException {
         
-        TLSServerParametersType parametersType = unmarshalFactoryString(s, context,
-                                                                        TLSServerParametersType.class);
+        TLSServerParametersType parametersType = 
+            unmarshalFactoryString(s, context, TLSServerParametersType.class);
         
         return new TLSServerParametersConfig(parametersType);
     }
@@ -280,6 +296,27 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             = unmarshalFactoryString(s, context, TLSServerParametersIdentifiedType.class);
         
         return parameterTypeRef.getId(); 
-    } 
+    }
+    
+    private static ThreadingParameters toThreadingParameters(ThreadingParametersType paramtype) {
+        ThreadingParameters params = new ThreadingParameters();
+        if (paramtype.getThreadPoolSize() != null) {
+            params.setThreadPoolSize(paramtype.getThreadPoolSize());
+        }
+
+        return params;
+    }
+    
+    public static ThreadingParameters createThreadingParameters(String s, JAXBContext context) {
+        ThreadingParametersType parametersType = 
+            unmarshalFactoryString(s, context, ThreadingParametersType.class);
+        return toThreadingParameters(parametersType);
+    }
+
+    public static String createThreadingParametersRef(String s, JAXBContext context) {
+        ThreadingParametersIdentifiedType parametersType = 
+            unmarshalFactoryString(s, context, ThreadingParametersIdentifiedType.class);
+        return parametersType.getId();
+    }
    
 }

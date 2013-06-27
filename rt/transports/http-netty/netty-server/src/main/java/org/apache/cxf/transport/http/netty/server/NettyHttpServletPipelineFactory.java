@@ -75,7 +75,9 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         this.watchdog = new HttpSessionWatchdog();
         this.handlerMap = handlerMap;
         this.tlsServerParameters = tlsServerParameters;
-        this.executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(200, 2048576, 204857600));
+        // TODO need to check the if we need pass other setting
+        this.executionHandler = 
+            new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(threadPoolSize, 2048576, 204857600));
     }
 
 

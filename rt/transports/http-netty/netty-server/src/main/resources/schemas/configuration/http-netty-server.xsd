@@ -40,6 +40,28 @@
     <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
                schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
     
+    <xs:complexType name="ThreadingParametersType">
+       <xs:attribute name="threadPoolSize" type="ptp:ParameterizedUShort">
+          <xs:annotation>
+             <xs:documentation>Specifies the number of threads available to the Netty instance for processing requests.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="ThreadingParametersIdentifiedType">
+       <xs:sequence>
+         <xs:element name="threadingParameters" type="tns:ThreadingParametersType">
+            <xs:annotation>
+               <xs:documentation>Specifies the thread pool properties for the parameter set.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+       </xs:sequence>
+         <xs:attribute name="id" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>Specifies a unique identifier by which the property set can be referred.</xs:documentation>
+             </xs:annotation>
+         </xs:attribute>
+    </xs:complexType>
     
     <xs:complexType name="TLSServerParametersIdentifiedType">
        <xs:sequence>
@@ -76,6 +98,20 @@
              </xs:annotation>
           </xs:element>
          </xs:choice>
+         <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="threadingParameters" 
+                      type="tns:ThreadingParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies an instance of the threading configuration use for the Jetty engine.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+          <xs:element name="threadingParametersRef"
+                      type="tns:ParametersRefType">
+             <xs:annotation>
+                <xs:documentation>Specifies a reference to a reusable set of threading parameters.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+         </xs:choice>  
          <xs:element name="sessionSupport" type="ptp:ParameterizedBoolean" minOccurs="0"/>
          <xs:element name="reuseAddress" type="ptp:ParameterizedBoolean" minOccurs="0" />          
        </xs:sequence>
@@ -116,6 +152,13 @@
                        minOccurs="0" maxOccurs="unbounded">
               <xs:annotation>
                  <xs:documentation>Specifies a reusable set of properties for securing an HTTP service provider.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
+            <xs:element name="identifiedThreadingParameters"
+                       type="tns:ThreadingParametersIdentifiedType"
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies a reusable set of properties for controlling a Jetty instance's thread pool.</xs:documentation>
               </xs:annotation>
            </xs:element>
            <xs:element name="engine" 

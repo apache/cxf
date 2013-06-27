@@ -68,7 +68,16 @@
         </hn:tlsServerParameters>
        </hn:identifiedTLSServerParameters>
        
+       <hn:identifiedThreadingParameters id="sampleThreading1">
+	      <hn:threadingParameters threadPoolSize="120"/>
+	   </hn:identifiedThreadingParameters>
+	   
+	   <hn:engine port="${engine.port.nine.zero}">
+	      <hn:threadingParametersRef id="sampleThreading1"/>	      
+	   </hn:engine>
+       
 	   <hn:engine port="$(engine.port.nine.one)" readIdleTime="$(engine.port.nine.one.readIdle)">
+	     <hn:threadingParameters threadPoolSize="$(engine.port.nine.one.threadPoolSize)" />	
          <hn:sessionSupport>true</hn:sessionSupport>
 	  </hn:engine> 
 	  

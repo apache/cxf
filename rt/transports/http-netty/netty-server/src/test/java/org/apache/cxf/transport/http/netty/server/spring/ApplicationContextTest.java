@@ -87,6 +87,7 @@ public class ApplicationContextTest extends Assert {
         ctx.close();
         ctx.destroy();
     }
+    
     @Test
     public void testContextWithProperties() throws Exception {
         String s4 = getClass()
@@ -114,9 +115,9 @@ public class ApplicationContextTest extends Assert {
         assertEquals("foobar", jd.getServer().getContentEncoding());   
         
         NettyHttpServerEngine engine = (NettyHttpServerEngine)jd.getEngine();
-        //assertEquals(111, engine.getThreadingParameters().getMinThreads());
-        //assertEquals(120, engine.getThreadingParameters().getMaxThreads());
+        assertEquals(120, engine.getThreadingParameters().getThreadPoolSize());
         
+       
         ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiator("http://cxf.apache.org/transports/http");
         HTTPConduit conduit = (HTTPConduit) ci.getConduit(info, bus);
@@ -131,8 +132,8 @@ public class ApplicationContextTest extends Assert {
                 getEndpointInfo("foo", "bar", "http://localhost:9001"), bus);
         
         engine = (NettyHttpServerEngine)jd2.getEngine();
-        //assertEquals(40000, engine.getMaxIdleTime());
-        //assertTrue("The engine should support session manager", engine.isSessionSupport());
+        assertEquals(40000, engine.getReadIdleTime());
+        assertTrue("The engine should support session manager", engine.isSessionSupport());
         
         NettyHttpDestination jd3 = 
             (NettyHttpDestination)factory.getDestination(

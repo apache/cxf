@@ -53,16 +53,20 @@
         </hn:tlsServerParameters>
        </hn:identifiedTLSServerParameters>
        
+       <hn:identifiedThreadingParameters id="sampleThreading1">
+	      <hn:threadingParameters threadPoolSize="120"/>
+	   </hn:identifiedThreadingParameters>
+       
 	   <hn:engine port="9000" readIdleTime="30000" writeIdleTime="90000">
-	      <!-- hn:threadingParametersRef id="sampleThreading1"/-->	      
+	      <hn:threadingParametersRef id="sampleThreading1"/>	      
 	   </hn:engine>
 	   
 	   <hn:engine port="0">
-	      <!-- hn:threadingParameters minThreads="21" maxThreads="389"/-->
+	      <hn:threadingParameters threadPoolSize="400"/>
 	   </hn:engine>
 	   
 	   <hn:engine port="9001" readIdleTime="40000">
-	       <!-- hn:threadingParameters minThreads="99" maxThreads="777"/-->	      
+	     <hn:threadingParameters threadPoolSize="99" />	      
 	     <hn:sessionSupport>true</hn:sessionSupport>
 	  </hn:engine> 
 	  

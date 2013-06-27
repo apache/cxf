@@ -34,7 +34,9 @@ import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http.netty.server.NettyHttpServerEngineFactory;
+import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
 import org.apache.cxf.transports.http_netty_server.configuration.TLSServerParametersIdentifiedType;
+import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersIdentifiedType;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -85,6 +87,11 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
                                                         TLSServerParametersIdentifiedType.class,
                                                         NettySpringTypesFactory.class,
                                                         "createTLSServerParametersMap"));
+            
+            bean.addConstructorArgValue(mapElementToJaxbBean(element,
+                                                             ThreadingParametersIdentifiedType.class,
+                                                             NettySpringTypesFactory.class,
+                                                             "createThreadingParametersMap"));
             
             // parser the engine list
             List<Object> list = 
@@ -138,8 +145,9 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
             super();
         }
         public SpringNettyHttpServerEngineFactory(Bus bus,
-                                                  Map<String, TLSServerParameters> tls) {
-            super(bus, tls);
+                                                  Map<String, TLSServerParameters> tls,
+                                                  Map<String, ThreadingParameters> threads) {
+            super(bus, tls, threads);
         }   
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {

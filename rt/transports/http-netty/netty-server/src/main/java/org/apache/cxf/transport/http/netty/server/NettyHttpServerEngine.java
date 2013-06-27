@@ -69,6 +69,8 @@ public class NettyHttpServerEngine implements ServerEngine {
      */
     private TLSServerParameters tlsServerParameters;
     
+    private ThreadingParameters threadingParameters = new ThreadingParameters(); 
+    
     private int readIdleTime = 60;
     
     private int writeIdleTime = 30;
@@ -118,6 +120,14 @@ public class NettyHttpServerEngine implements ServerEngine {
     public TLSServerParameters getTlsServerParameters() {
         return tlsServerParameters;
     }
+    
+    public void setThreadingParameters(ThreadingParameters params) {
+        threadingParameters = params;
+    }
+    
+    public ThreadingParameters getThreadingParameters() {
+        return threadingParameters;
+    }
       
     protected Channel startServer() {
         // TODO Configure the server.
@@ -130,7 +140,9 @@ public class NettyHttpServerEngine implements ServerEngine {
         // Set up the event pipeline factory.
         servletPipeline = 
             new NettyHttpServletPipelineFactory(
-                 tlsServerParameters, sessionSupport, port, handlerMap, idleStateHandler);
+                 tlsServerParameters, sessionSupport, 
+                 threadingParameters.getThreadPoolSize(), 
+                 handlerMap, idleStateHandler);
         // Start the servletPipeline's timer
         servletPipeline.start();
         bootstrap.setPipelineFactory(servletPipeline);

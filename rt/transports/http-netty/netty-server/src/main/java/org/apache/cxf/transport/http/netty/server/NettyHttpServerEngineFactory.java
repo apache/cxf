@@ -47,6 +47,13 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
 
     private BusLifeCycleManager lifeCycleManager;
     
+    /**
+     * This map holds the threading parameters that are to be applied
+     * to new Engines when bound to the reference id.
+     */
+    private Map<String, ThreadingParameters> threadingParametersMap =
+        new TreeMap<String, ThreadingParameters>();
+    
     private Map<String, TLSServerParameters> tlsServerParametersMap = 
         new TreeMap<String, TLSServerParameters>();
 
@@ -58,9 +65,12 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
         setBus(b);
     }
     
-    public NettyHttpServerEngineFactory(Bus b, Map<String, TLSServerParameters> tls) {
+    public NettyHttpServerEngineFactory(Bus b, 
+                                        Map<String, TLSServerParameters> tls, 
+                                        Map<String, ThreadingParameters> threads) {
         setBus(b);
         tlsServerParametersMap = tls;
+        threadingParametersMap = threads;
     }
 
     public Bus getBus() {
@@ -93,11 +103,16 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
         this.tlsServerParametersMap = tlsParametersMap;
     }
     
+    public Map<String, ThreadingParameters> getThreadingParametersMap() {
+        return threadingParametersMap;
+    }
+    
+    public void setThreadingParametersMap(Map<String, ThreadingParameters> parameterMap) {
+        this.threadingParametersMap = parameterMap;
+    }
+    
     public void setEnginesList(List<NettyHttpServerEngine> enginesList) {
         for (NettyHttpServerEngine engine : enginesList) {
-            /*if (engine.getPort() == FALLBACK_THREADING_PARAMS_KEY) {
-                fallbackThreadingParameters = engine.getThreadingParameters();
-            }*/
             portMap.putIfAbsent(engine.getPort(), engine);
         }    
     }

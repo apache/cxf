@@ -38,13 +38,33 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
 import org.apache.cxf.transports.http_netty_server.configuration.TLSServerParametersIdentifiedType;
+import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersIdentifiedType;
+import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersType;
 
 
 @NoJSR250Annotations
 public final class NettySpringTypesFactory {
     public NettySpringTypesFactory() {
         
+    }
+    
+    private static Map<String, ThreadingParameters> toThreadingParameters(
+        List<ThreadingParametersIdentifiedType> list) {
+        
+        Map<String, ThreadingParameters> map = new TreeMap<String, ThreadingParameters>();
+        for (ThreadingParametersIdentifiedType t : list) {
+            ThreadingParameters parameter = toThreadingParameters(t.getThreadingParameters());
+            map.put(t.getId(), parameter);
+        }
+        return map;
+    }
+
+    private static ThreadingParameters toThreadingParameters(ThreadingParametersType paramtype) {
+        ThreadingParameters params = new ThreadingParameters();
+        params.setThreadPoolSize(paramtype.getThreadPoolSize());
+        return params;
     }
         
     private static Map<String, TLSServerParameters> toTLSServerParamenters(
@@ -78,6 +98,21 @@ public final class NettySpringTypesFactory {
         Map<String, TLSServerParameters> tlsServerParametersMap =
             toTLSServerParamenters(tlsServerParameters);
         return tlsServerParametersMap;
+    }
+    
+    public Map<String, ThreadingParameters> createThreadingParametersMap(String s,
+                                                                         JAXBContext ctx) 
+        throws Exception {
+        Document doc = DOMUtils.readXml(new StringReader(s));
+        List <ThreadingParametersIdentifiedType> threadingParametersIdentifiedTypes = 
+            NettySpringTypesFactory
+                .parseListElement(doc.getDocumentElement(), 
+                                  new QName(NettyHttpServerEngineFactoryBeanDefinitionParser.HTTP_NETTY_SERVER_NS,
+                                            "identifiedThreadingParameters"), 
+                                  ThreadingParametersIdentifiedType.class, ctx);
+        Map<String, ThreadingParameters> threadingParametersMap =
+            toThreadingParameters(threadingParametersIdentifiedTypes);
+        return threadingParametersMap;
     }
     
     @SuppressWarnings("unchecked")
