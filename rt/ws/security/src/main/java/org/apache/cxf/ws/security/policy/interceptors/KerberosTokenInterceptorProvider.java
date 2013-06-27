@@ -48,10 +48,13 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -127,6 +130,11 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         message.getExchange().put(SecurityConstants.TOKEN_ID, 
                                                   tok.getId());
                         getTokenStore(message).add(tok);
+                        
+                        // Create another cache entry with the SHA1 Identifier as the key for easy retrieval
+                        if (tok.getSHA1() != null) {
+                            getTokenStore(message).add(tok.getSHA1(), tok);
+                        }
                     }
                 } else {
                     //server side should be checked on the way in
@@ -213,6 +221,12 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         SecurityToken token = new SecurityToken(binarySecurityToken.getID());
         token.setToken(binarySecurityToken.getElement());
         token.setTokenType(binarySecurityToken.getValueType());
+        byte[] tokenBytes = binarySecurityToken.getToken();
+        try {
+            token.setSHA1(Base64.encode(WSSecurityUtil.generateDigest(tokenBytes)));
+        } catch (WSSecurityException e) {
+            // Just consume this for now as it isn't critical...
+        }
         return token;
     }
         
