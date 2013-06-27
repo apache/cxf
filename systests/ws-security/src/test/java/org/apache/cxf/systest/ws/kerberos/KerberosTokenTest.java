@@ -303,9 +303,9 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         kerberosPort.doubleIt(25);
         
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);

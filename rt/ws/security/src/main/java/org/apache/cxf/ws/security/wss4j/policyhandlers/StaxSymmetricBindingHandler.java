@@ -141,8 +141,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             //SecureConversationToken
             String tokenId = null;
             SecurityToken tok = null;
-            if (encryptionToken instanceof IssuedToken 
-                || encryptionToken instanceof KerberosToken
+            if (encryptionToken instanceof KerberosToken) {
+                tok = getSecurityToken();
+                addKerberosToken((KerberosToken)encryptionToken, false, false);
+            } else if (encryptionToken instanceof IssuedToken 
                 || encryptionToken instanceof SecureConversationToken
                 || encryptionToken instanceof SecurityContextToken
                 || encryptionToken instanceof SpnegoContextToken) {
@@ -232,10 +234,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         try {
             SecurityToken sigTok = null;
             if (sigToken != null) {
-                if (sigToken instanceof SecureConversationToken
+                if (sigToken instanceof KerberosToken) {
+                    sigTok = getSecurityToken();
+                    addKerberosToken((KerberosToken)sigToken, false, false);
+                } else if (sigToken instanceof SecureConversationToken
                     || sigToken instanceof SecurityContextToken
                     || sigToken instanceof IssuedToken 
-                    || sigToken instanceof KerberosToken
                     || sigToken instanceof SpnegoContextToken) {
                     sigTok = getSecurityToken();
                 } else if (sigToken instanceof X509Token) {
@@ -359,6 +363,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             String encUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
             if (encUser != null) {
                 config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
+            }
+            
+            if (encrToken instanceof KerberosToken) {
+                config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
             }
         }
     }

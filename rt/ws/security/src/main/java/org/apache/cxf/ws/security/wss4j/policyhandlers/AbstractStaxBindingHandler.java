@@ -460,6 +460,8 @@ public abstract class AbstractStaxBindingHandler {
             && ("IssuerSerial".equals(config.get(ConfigurationConstants.SIG_KEY_ID))
                 || "Thumbprint".equals(config.get(ConfigurationConstants.SIG_KEY_ID)))) {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
+        } else {
+            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
         }
 
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
