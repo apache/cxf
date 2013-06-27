@@ -421,10 +421,17 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 // attached use key identifier as defined in WSS1.1 section
                 // 7.7 Encrypted Key reference
                 SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
-                tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
                 String tokenType = encrTok.getTokenType();
-                if (tokenType == null) {
-                    tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                if (encrToken instanceof KerberosToken) {
+                    tokenRef.setKeyIdentifier(WSConstants.WSS_KRB_KI_VALUE_TYPE, encrTok.getSHA1(), true);
+                    if (tokenType == null) {
+                        tokenType = WSConstants.WSS_GSS_KRB_V5_AP_REQ;
+                    }
+                } else {
+                    tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
+                    if (tokenType == null) {
+                        tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                    }
                 }
                 tokenRef.addTokenType(tokenType);
                 dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
@@ -569,6 +576,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         }
                     } else if (encrToken instanceof UsernameToken) {
                         encr.setCustomReferenceValue(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+                    } else if (encrToken instanceof KerberosToken && !isRequestor()) {
+                        encr.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
+                        encr.setEncKeyId(encrTok.getSHA1());
                     } else if (!isRequestor()) {
                         if (encrTok.getSHA1() != null) {
                             encr.setCustomReferenceValue(encrTok.getSHA1());
@@ -633,10 +643,17 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             // 7.7 Encrypted Key reference
             SecurityTokenReference tokenRef = new SecurityTokenReference(doc);
             if (tok.getSHA1() != null) {
-                tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
                 String tokenType = tok.getTokenType();
-                if (tokenType == null) {
-                    tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                if (policyToken instanceof KerberosToken) {
+                    tokenRef.setKeyIdentifier(WSConstants.WSS_KRB_KI_VALUE_TYPE, tok.getSHA1(), true);
+                    if (tokenType == null) {
+                        tokenType = WSConstants.WSS_GSS_KRB_V5_AP_REQ;
+                    }
+                } else {
+                    tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
+                    if (tokenType == null) {
+                        tokenType = WSConstants.WSS_ENC_KEY_VALUE_TYPE;
+                    }
                 }
                 tokenRef.addTokenType(tokenType);
             }
@@ -729,6 +746,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 
                 : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
+            String sigTokId = tok.getId();
             if (policyToken instanceof X509Token) {
                 if (isRequestor()) {
                     sig.setCustomTokenValueType(
@@ -743,6 +761,15 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else if (policyToken instanceof UsernameToken) {
                 sig.setCustomTokenValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
                 sig.setKeyIdentifierType(type);
+            } else if (policyToken instanceof KerberosToken) {
+                if (isRequestor()) {
+                    sig.setCustomTokenValueType(tok.getTokenType());
+                    sig.setKeyIdentifierType(type);
+                } else {
+                    sig.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
+                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                    sigTokId = tok.getSHA1();
+                }
             } else {
                 //Setting the AttachedReference or the UnattachedReference according to the flag
                 Element ref;
@@ -774,7 +801,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }
             
-            String sigTokId;
             if (included) {
                 sigTokId = tok.getWsuId();
                 if (sigTokId == null) {
@@ -787,8 +813,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 if (sigTokId.startsWith("#")) {
                     sigTokId = sigTokId.substring(1);
                 }
-            } else {
-                sigTokId = tok.getId();
             }
                       
             if (included && sbinding.isTokenProtection()) {
