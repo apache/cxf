@@ -358,11 +358,15 @@ public class WrappedMessageContext implements MessageContext {
             return null;
         }
         Collection<Attachment> attachments = CastUtils.cast((Collection<?>)mc.get(Message.ATTACHMENTS));
-        Map<String, DataHandler> dataHandlers = 
-            AttachmentUtil.getDHMap(attachments);
-        mc.put(propertyName, 
-               dataHandlers);
-        scopes.put(propertyName, Scope.APPLICATION);
+        Map<String, DataHandler> dataHandlers;
+        if (attachments instanceof WrappedAttachments) {
+            dataHandlers = ((WrappedAttachments) attachments).getAttachments();
+        } else {
+            dataHandlers = AttachmentUtil.getDHMap(attachments);
+            mc.put(propertyName, 
+                   dataHandlers);
+            scopes.put(propertyName, Scope.APPLICATION);
+        }
         return dataHandlers;
     }    
         
@@ -416,7 +420,6 @@ public class WrappedMessageContext implements MessageContext {
         Object ret = null;
         if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
             || MessageContext.HTTP_RESPONSE_CODE.equals(key)
-            || MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)
             || MessageContext.HTTP_RESPONSE_CODE.equals(key))
             && !isResponse() && !isRequestor()) { 
             Message tmp = createResponseMessage();
@@ -447,6 +450,9 @@ public class WrappedMessageContext implements MessageContext {
             authPolicy.setPassword((String)value);
         } else if (MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
             ret = message.put(Message.PROTOCOL_HEADERS, value);
+        } else if (MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
+            Map<String, DataHandler> attachments = CastUtils.cast((Map<?, ?>)value);
+            ret = message.put(Message.ATTACHMENTS, new WrappedAttachments(attachments));
         } else if (SoapBindingConstants.SOAP_ACTION.equals(mappedKey)
             && !isRequestor() && exchange != null) {
             Message tmp = createResponseMessage();
