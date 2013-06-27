@@ -976,9 +976,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     
     // In this test-case, the WSP is configured with a XACML PEP interceptor, which in this
     // case just mocks the call to the PDP + enforces the decision
-    // TODO
     @org.junit.Test
-    @org.junit.Ignore
     public void testSaml2PEP() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -994,6 +992,56 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType saml2Port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
+       
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected as Assertion doesn't contain Role information");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+        
+        SamlRoleCallbackHandler roleCallbackHandler = 
+            new SamlRoleCallbackHandler();
+        roleCallbackHandler.setRoleName("manager");
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", roleCallbackHandler
+        );
+        
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        // Expected failure on incorrect role
+        roleCallbackHandler.setRoleName("boss");
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected as Assertion doesn't contain correct role");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    // In this test-case, the WSP is configured with a XACML PEP interceptor, which in this
+    // case just mocks the call to the PDP + enforces the decision
+    @org.junit.Test
+    public void testSaml2PEPStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2PEPPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT);
+        SecurityTestUtil.enableStreaming(saml2Port);
        
         try {
             saml2Port.doubleIt(25);

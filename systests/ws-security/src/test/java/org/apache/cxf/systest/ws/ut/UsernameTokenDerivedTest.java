@@ -35,7 +35,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for keys derived from Username Tokens.
+ * A set of tests for keys derived from Username Tokens. Endorsing UsernameTokens are not
+ * supported in the streaming code, only in the DOM code.
  */
 public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerDerived.class);
