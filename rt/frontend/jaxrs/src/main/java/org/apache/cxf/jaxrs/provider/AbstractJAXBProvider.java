@@ -91,8 +91,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
 
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
-    protected static final String NS_MAPPER_PROPERTY = "com.sun.xml.bind.namespacePrefixMapper";
-    protected static final String NS_MAPPER_PROPERTY_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
+    protected static final String NS_MAPPER_PROPERTY_RI = "com.sun.xml.bind.namespacePrefixMapper";
+    protected static final String NS_MAPPER_PROPERTY_RI_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     
@@ -137,10 +137,16 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private DocumentDepthProperties depthProperties;
+    private String namespaceMapperPropertyName;
     
-    protected static void setNamespaceMapper(Marshaller ms, Map<String, String> map) throws Exception {
+    protected void setNamespaceMapper(Marshaller ms, 
+                                      Map<String, String> map) throws Exception {
         NamespaceMapper nsMapper = new NamespaceMapper(map);
-        setMarshallerProp(ms, nsMapper, NS_MAPPER_PROPERTY, NS_MAPPER_PROPERTY_INT);
+        if (namespaceMapperPropertyName != null) {
+            setMarshallerProp(ms, nsMapper, namespaceMapperPropertyName, null);
+        } else {
+            setMarshallerProp(ms, nsMapper, NS_MAPPER_PROPERTY_RI, NS_MAPPER_PROPERTY_RI_INT);
+        }
     }
     
     protected static void setMarshallerProp(Marshaller ms, Object value, 
@@ -148,7 +154,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         try {
             ms.setProperty(name1, value);
         } catch (PropertyException ex) {
-            ms.setProperty(name2, value);
+            if (name2 != null) {
+                ms.setProperty(name2, value);
+            } else {
+                throw ex;
+            }
         }
         
     }
@@ -798,6 +808,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
     public void setMarshallerListener(Marshaller.Listener marshallerListener) {
         this.marshallerListener = marshallerListener;
+    }
+
+    public void setNamespaceMapperPropertyName(String namespaceMapperProperty) {
+        this.namespaceMapperPropertyName = namespaceMapperProperty;
     }
 
     @XmlRootElement
