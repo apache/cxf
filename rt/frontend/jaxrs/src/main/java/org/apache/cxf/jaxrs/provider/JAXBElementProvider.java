@@ -76,8 +76,8 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Provider
 public class JAXBElementProvider extends AbstractJAXBProvider  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
-    private static final String XML_PI_PROPERTY = "com.sun.xml.bind.xmlHeaders";
-    private static final String XML_PI_PROPERTY_INT = "com.sun.xml.internal.bind.xmlHeaders";
+    private static final String XML_PI_PROPERTY_RI = "com.sun.xml.bind.xmlHeaders";
+    private static final String XML_PI_PROPERTY_RI_INT = "com.sun.xml.internal.bind.xmlHeaders";
     
     private static final List<String> MARSHALLER_PROPERTIES =
         Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
@@ -85,14 +85,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                     Marshaller.JAXB_FRAGMENT,
                                     Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
                                     Marshaller.JAXB_SCHEMA_LOCATION,
-                                    NS_MAPPER_PROPERTY,
-                                    NS_MAPPER_PROPERTY_INT,
-                                    XML_PI_PROPERTY,
-                                    XML_PI_PROPERTY_INT});
+                                    NS_MAPPER_PROPERTY_RI,
+                                    NS_MAPPER_PROPERTY_RI_INT,
+                                    XML_PI_PROPERTY_RI,
+                                    XML_PI_PROPERTY_RI_INT});
     
     private Map<String, Object> mProperties = Collections.emptyMap();
     private Map<String, String> nsPrefixes = Collections.emptyMap();
     private String xmlResourceOffset = "";
+    private String xmlPiPropertyName;
     
     public JAXBElementProvider() {
         
@@ -104,6 +105,14 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     public void setNamespacePrefixes(Map<String, String> prefixes) {
         nsPrefixes = prefixes;
+    }
+    
+    protected void setXmlPiProperty(Marshaller ms, String value) throws Exception {
+        if (xmlPiPropertyName != null) {
+            setMarshallerProp(ms, value, xmlPiPropertyName, null);
+        } else {
+            setMarshallerProp(ms, value, XML_PI_PROPERTY_RI, XML_PI_PROPERTY_RI_INT);
+        }
     }
     
     @Override
@@ -418,7 +427,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 String absRef = buildAbsoluteXMLResourceURI(relRef);
                 value = value.substring(0, ind + 6) + absRef + "'?>";
             }
-            setMarshallerProp(ms, value, XML_PI_PROPERTY, XML_PI_PROPERTY_INT);
+            setXmlPiProperty(ms, value);
         }
     }
     
@@ -552,6 +561,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, MediaType mt) 
         throws Exception {
         ms.marshal(obj, writer);
+    }
+
+    public void setXmlPiPropertyName(String xmlPiPropertyName) {
+        this.xmlPiPropertyName = xmlPiPropertyName;
     }
     
 }
