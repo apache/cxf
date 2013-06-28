@@ -42,6 +42,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
@@ -138,7 +139,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSend() throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
         finalVerify();
@@ -148,12 +149,18 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSendWithHeaders() throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
-        Message message = new MessageImpl();
-        message.put("Content-Type", "text/xml;charset=utf8");
+        Message message = createMessage();
         setUpHeaders(message);
         conduit.prepare(message);
         verifySentMessage(conduit, message, true, "POST", false);
         finalVerify();
+    }
+    
+    private Message createMessage() {
+        Message message = new MessageImpl();
+        message.put("Content-Type", "text/xml;charset=utf8");
+        message.setContent(List.class, new MessageContentsList("<body/>"));
+        return message;
     }
     
     public void testSendWithHeadersCheckErrorStream() throws Exception {
@@ -171,7 +178,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSendHttpConnection() throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
         finalVerify();
@@ -181,7 +188,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSendHttpConnectionAutoRedirect() throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, true);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
         finalVerify();
@@ -216,7 +223,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         conduit.prepare(message);
         message.put(Message.PROCESS_ONEWAY_RESPONSE, Boolean.TRUE);
         verifySentMessage(conduit, 
@@ -233,7 +240,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, 
                           message, 
@@ -249,7 +256,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, 
                           message, 

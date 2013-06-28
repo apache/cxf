@@ -166,7 +166,8 @@ public abstract class HTTPConduit
 
     private static final String HTTP_POST_METHOD = "POST"; 
     private static final String HTTP_PUT_METHOD = "PUT";
-    
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT = 
+        new HashSet<String>(Arrays.asList(new String[]{"GET", "DELETE", "HEAD", "OPTIONS", "TRACE"}));
     /**
      * This constant is the Message(Map) key for a list of visited URLs that
      * is used in redirect loop protection.
@@ -1264,21 +1265,16 @@ public abstract class HTTPConduit
             
             // Trust is okay, set up for writing the request.
             
-            // If this is a GET method we must not touch the output
-            // stream as this automatically turns the request into a POST.
-            // Nor it should be done in case of DELETE/HEAD/OPTIONS 
-            // - strangely, empty PUTs work ok
             String method = getMethod();
-            if (!"POST".equals(method)
-                && !"PUT".equals(method)) {
+            if (KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(method)) {
                 handleNoOutput();
                 return;
             }
-            if (outMessage.get("org.apache.cxf.post.empty") != null) {
+
+            if (outMessage.get("org.apache.cxf.empty.request") != null) {
                 handleNoOutput();
                 return;
             }
-            
             setupWrappedStream();
         }
         

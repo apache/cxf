@@ -70,6 +70,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.jaxrs.client.spec.ClientRequestFilterInterceptor;
 import org.apache.cxf.jaxrs.client.spec.ClientResponseFilterInterceptor;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -897,11 +898,11 @@ public abstract class AbstractClient implements Client, Retryable {
         }
         
         m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
+        body = checkIfBodyEmpty(body);
+        setEmptyRequestPropertyIfNeeded(m, body);
         
         m.setContent(List.class, getContentsList(body));
-        if (body == null) {
-            setEmptyRequestProperty(m, httpMethod);
-        }
+        
         
         m.put(URITemplate.TEMPLATE_PARAMETERS, getState().getTemplates());
         
@@ -976,10 +977,20 @@ public abstract class AbstractClient implements Client, Retryable {
         exchange.putAll(reqContext);
     }
     
-    protected void setEmptyRequestProperty(Message outMessage, String httpMethod) {
-        if ("POST".equals(httpMethod)) {
-            outMessage.put("org.apache.cxf.post.empty", true);
+    protected void setEmptyRequestPropertyIfNeeded(Message outMessage, Object body) {
+        if (body == null) {
+            outMessage.put("org.apache.cxf.empty.request", true);
         }
+    }
+
+    protected Object checkIfBodyEmpty(Object body) {
+        if (body != null 
+            && (body.getClass() == String.class && ((String)body).length() == 0 
+            || body.getClass() == Form.class && ((Form)body).getData().isEmpty()
+            || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty())) {
+            body = null;
+        }
+        return body;
     }
     
     protected void setPlainOperationNameProperty(Message outMessage, String name) {
