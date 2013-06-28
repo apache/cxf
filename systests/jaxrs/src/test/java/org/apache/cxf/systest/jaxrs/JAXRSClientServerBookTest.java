@@ -38,6 +38,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -91,7 +92,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         createStaticBus();
     }
     
-
+    @Test
+    public void testPostEmptyForm() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/emptyform";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.form(new Form());
+        assertEquals("empty form", r.readEntity(String.class));
+    }
 
     @Test
     public void testGetCustomBookResponse() {
