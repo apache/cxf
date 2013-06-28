@@ -163,12 +163,11 @@ public final class JAXRSUtils {
     public static final String ROOT_PROVIDER = "service.root.provider";
     public static final String EXCEPTION_FROM_MAPPER = "exception.from.mapper";
     public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
-        "media.subtype.partial.check";
+        "media.subtype.partial.check"; 
     public static final String DOC_LOCATION = "wadl.location";
     public static final String MEDIA_TYPE_Q_PARAM = "q";
     public static final String MEDIA_TYPE_QS_PARAM = "qs";
     private static final String MEDIA_TYPE_DISTANCE_PARAM = "d";
-    private static final String DEFAULT_CONTENT_TYPE = "default.content.type";
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
@@ -828,8 +827,7 @@ public final class JAXRSUtils {
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
             if (contentType == null) {
-                String defaultCt = (String)message.getContextualProperty(DEFAULT_CONTENT_TYPE);
-                contentType = defaultCt == null ? MediaType.APPLICATION_OCTET_STREAM : defaultCt;
+                contentType = MediaType.APPLICATION_OCTET_STREAM;
             }
 
             return readFromMessageBody(parameterClass,
@@ -1306,15 +1304,17 @@ public final class JAXRSUtils {
                 } catch (Exception ex) {
                     throw new Fault(ex);
                 }
-            }
-        }
-
-        String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
+            } else {
+                String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
                                                        BUNDLE,
                                                        targetTypeClass.getSimpleName(),
                                                        mediaTypeToString(contentType)).toString();
-        LOG.warning(errorMessage);
-        throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
+                LOG.warning(errorMessage);
+                throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
+            }
+        }
+
+        return null;
     }
     
     @SuppressWarnings("unchecked")
