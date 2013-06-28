@@ -48,9 +48,10 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
-                String rvalStr = statement.getValue().toString();
                 String name = getRealPropertyName(statement.getProperty());
-               
+                String rvalStr = getPropertyValue(name, statement.getValue());
+                validatePropertyValue(name, rvalStr);
+                
                 sb.append("(");
                 if (sc.getConditionType() == ConditionType.NOT_EQUALS) {
                     sb.append("!");
