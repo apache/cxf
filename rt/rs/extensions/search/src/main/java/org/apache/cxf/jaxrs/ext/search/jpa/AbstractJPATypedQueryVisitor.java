@@ -164,12 +164,15 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     
     private Predicate buildPredicate(PrimitiveStatement ps) {
         String name = ps.getProperty();
+        Object propertyValue = ps.getValue();
+        validatePropertyValue(name, propertyValue);
+        
         name = super.getRealPropertyName(name);
         ClassValue cv = getPrimitiveFieldClass(ps,
                                                name, 
                                                ps.getValue().getClass(), 
                                                ps.getValueType(), 
-                                               ps.getValue()); 
+                                               propertyValue); 
         CollectionCheckInfo collInfo = cv.getCollectionCheckInfo();
         Path<?> path = getPath(root, name, cv, collInfo);
         

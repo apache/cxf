@@ -36,6 +36,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     
     private Map<String, String> fieldMap;
     private Map<String, Class<?>> primitiveFieldTypeMap;
+    private PropertyValidator<Object> validator;
     
     protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
         this.fieldMap = fieldMap;
@@ -157,5 +158,15 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
         public boolean isCollection(String name) {
             return collectionProps != null && collectionProps.contains(name);
         }
+    }
+    
+    protected void validatePropertyValue(String name, Object value) {
+        if (validator != null) {
+            validator.validate(name, value);
+        }
+    }
+    
+    public void setValidator(PropertyValidator<Object> validator) {
+        this.validator = validator;
     }
 }

@@ -35,6 +35,10 @@ public abstract class AbstractUntypedSearchConditionVisitor<T, E> extends Abstra
     public VisitorState<StringBuilder> getVisitorState() {
         return this.state;
     }
+
+    protected String getPropertyValue(String name, Object value) {
+        return value.toString();
+    }
     
     protected StringBuilder getStringBuilder() {
         return getVisitorState().get();
@@ -52,5 +56,4 @@ public abstract class AbstractUntypedSearchConditionVisitor<T, E> extends Abstra
         StringBuilder sb = removeStringBuilder();
         return sb == null ? null : sb.toString();
     }
-    
 }

@@ -102,6 +102,8 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     
     private Query buildSimpleQuery(ConditionType ct, String name, Object value) {
         name = super.getRealPropertyName(name);
+        validatePropertyValue(name, value);
+        
         Class<?> clazz = getPrimitiveFieldClass(name, value.getClass());
         
         

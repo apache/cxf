@@ -67,9 +67,12 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
-                String rvalStr = statement.getValue().toString().replaceAll("\\*", "%");
                 String name = getRealPropertyName(statement.getProperty());
-               
+                String value = getPropertyValue(name, statement.getValue());
+                validatePropertyValue(name, value);
+                String rvalStr = value.replaceAll("\\*", "%");
+                
+                                
                 if (tableAlias != null) {
                     name = tableAlias + "." + name;
                 }
