@@ -20,47 +20,25 @@ package org.apache.cxf.transport.http.netty.server;
 
 /**
  * This class holds a structure that contains parameters
- * pertaining to the threading of a Jetty HTTP Server Engine.
+ * pertaining to the threading of a Netty HTTP Server Engine.
  */
 public class ThreadingParameters {
 
-    private int threadPoolSize;
-    private int minThreads;
-    private int maxThreads;
-    private boolean minThreadsSet;
-    private boolean maxThreadsSet;
+    private int threadPoolSize = 200;
+    private boolean threadPoolSizeSet;
     
-    public void setMinThreads(int number) {
-        minThreadsSet = true;
-        minThreads = number;
+    
+    public void setThreadPoolSize(int number) {
+        threadPoolSizeSet = true;
+        threadPoolSize = number;
     }
     
-    public void setMaxThreads(int number) {
-        maxThreadsSet = true;
-        maxThreads = number;
-    }
-    
-    public int getMinThreads() {
-        return minThreads;
-    }
-    
-    public int getMaxThreads() {
-        return maxThreads;
-    }
-    
-    public boolean isSetMaxThreads() {
-        return maxThreadsSet;
-    }
-    
-    public boolean isSetMinThreads() {
-        return minThreadsSet;
-    }
-
     public int getThreadPoolSize() {
         return threadPoolSize;
     }
-
-    public void setThreadPoolSize(int threadPoolSize) {
-        this.threadPoolSize = threadPoolSize;
+    
+    public boolean isSeThreadPoolSize() {
+        return threadPoolSizeSet;
     }
+    
 }
