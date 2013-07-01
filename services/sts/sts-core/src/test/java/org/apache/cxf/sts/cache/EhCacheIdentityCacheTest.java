@@ -22,7 +22,7 @@ package org.apache.cxf.sts.cache;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.sts.IdentityMapper;
-import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.ws.security.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 

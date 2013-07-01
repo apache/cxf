@@ -41,9 +41,9 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.IdentityMapper;
+import org.apache.cxf.ws.security.cache.EHCacheManagerHolder;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
-import org.apache.wss4j.common.cache.EHCacheManagerHolder;
-import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.ws.security.CustomTokenPrincipal;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
@@ -81,9 +81,9 @@ public class EHCacheIdentityCache
         }
 
         if (configFileURL != null) {
-            cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
+            cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
         } else {
-            cacheManager = EHCacheManagerHolder.getCacheManager(getDefaultConfigFileURL());
+            cacheManager = EHCacheManagerHolder.getCacheManager(bus, getDefaultConfigFileURL());
         }
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         
@@ -92,6 +92,7 @@ public class EHCacheIdentityCache
     }
     
     public MemoryIdentityCacheStatistics getStatistics() {
+        
         if (statistics == null) {
             this.statistics = new MemoryIdentityCacheStatistics();
         }
