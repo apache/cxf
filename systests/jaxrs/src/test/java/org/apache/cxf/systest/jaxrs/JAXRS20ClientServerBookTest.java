@@ -48,7 +48,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -91,35 +90,19 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testGetBook() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
-        doTestGetBook(address);
+        doTestGetBook(address, false);
+    }
+    
+    @Test
+    public void testGetBookSyncWithAsync() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        doTestGetBook(address, true);
     }
     
     @Test
     public void testGetBookAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBookAsync(address, false);
-    }
-    
-    @Test
-    @Ignore
-    public void testGetBookAsync404() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
-        WebClient wc = createWebClient(address);
-        Future<Book> future = wc.async().get(Book.class);
-        Book book = future.get();
-        assertEquals(124L, book.getId());
-    }
-    
-    @Test
-    @Ignore
-    public void testGetBookAsync404Callback() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
-        WebClient wc = createWebClient(address);
-        final Holder<Book> holder = new Holder<Book>();
-        InvocationCallback<Book> callback = createCallback(holder);
-        Future<Book> future = wc.async().get(callback);
-        Book book = future.get();
-        assertEquals(124L, book.getId());
     }
     
     @Test
@@ -180,7 +163,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testGetBookWrongPath() {
         String address = "http://localhost:" + PORT + "/wrongpath";
-        doTestGetBook(address);
+        doTestGetBook(address, false);
     }
     @Test
     public void testGetBookWrongPathAsync() throws Exception {
@@ -341,8 +324,11 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         
     }
     
-    private void doTestGetBook(String address) {
+    private void doTestGetBook(String address, boolean useAsync) {
         WebClient wc = createWebClient(address);
+        if (useAsync) {
+            WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
+        }
         Book book = wc.get(Book.class);
         assertEquals(124L, book.getId());
         validateResponse(wc);

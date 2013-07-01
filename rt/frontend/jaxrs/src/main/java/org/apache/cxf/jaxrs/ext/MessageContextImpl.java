@@ -92,6 +92,9 @@ public class MessageContextImpl implements MessageContext {
                 if (inMessage != null && inMessage != m) {
                     value = inMessage.get(key);
                 }
+                if (value == null) {
+                    value = m.getExchange().get(key);
+                }
             }
         } 
         return value;

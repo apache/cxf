@@ -151,6 +151,14 @@ public class BookStore {
         return doGetBook("123");
     }
     
+    @RETRIEVE
+    @Path("/retrieve")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book retrieveBook(Book book) {
+        return book;
+    }
+    
     @POST
     @Path("/emptyform")
     @Produces("text/plain")
