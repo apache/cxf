@@ -59,7 +59,6 @@ import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -82,6 +81,7 @@ import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.search.QueryContext;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
@@ -150,12 +150,20 @@ public class BookStore {
         return doGetBook("123");
     }
     
+    @RETRIEVE
+    @Path("/retrieve")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book retrieveBook(Book book) {
+        return book;
+    }
+    
     @POST
     @Path("/emptyform")
     @Produces("text/plain")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String postEmptyForm(Form form) {
-        if (!form.asMap().isEmpty()) {
+        if (!form.getData().isEmpty()) {
             throw new WebApplicationException(400);
         }
         return "empty form";

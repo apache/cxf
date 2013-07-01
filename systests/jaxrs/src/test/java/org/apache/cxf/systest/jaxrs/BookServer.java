@@ -31,6 +31,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
@@ -54,7 +55,7 @@ public class BookServer extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
-        
+        sf.getInInterceptors().add(new LoggingInInterceptor());
         List<Object> providers = new ArrayList<Object>();
         
         //default lifecycle is per-request, change it to singleton
@@ -88,6 +89,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.getProperties(true).put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", true);
         sf.getProperties().put("search.visitor", new SQLPrinterVisitor<SearchBean>("books"));
         sf.getProperties().put("org.apache.cxf.http.header.split", true);
+        sf.getProperties().put("default.content.type", "*/*");
         server = sf.create();
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
