@@ -41,7 +41,7 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/blueprint/jaxrs-client.xsd");
+        return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs-client.xsd");
     }
 
 

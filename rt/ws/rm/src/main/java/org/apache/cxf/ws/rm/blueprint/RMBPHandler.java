@@ -35,13 +35,13 @@ public class RMBPHandler implements NamespaceHandler {
     public URL getSchemaLocation(String s) {
         if ("http://cxf.apache.org/ws/rm/manager".equals(s)) {
             return getClass().getClassLoader().
-                getResource("/schemas/configuration/wsrm-manager.xsd");
+                getResource("schemas/configuration/wsrm-manager.xsd");
         } else if ("http://schemas.xmlsoap.org/ws/2005/02/rm/policy".equals(s)) {
             return getClass().getClassLoader().
-                getResource("/schemas/configuration/wsrm-policy.xsd");
+                getResource("schemas/configuration/wsrm-policy.xsd");
         } else if ("http://docs.oasis-open.org/ws-rx/wsrmp/200702".equals(s)) {
             return getClass().getClassLoader().
-                getResource("/schemas/configuration/wsrmp-1.1-schema-200702.xsd");
+                getResource("schemas/configuration/wsrmp-1.1-schema-200702.xsd");
         }
         return null;
     }

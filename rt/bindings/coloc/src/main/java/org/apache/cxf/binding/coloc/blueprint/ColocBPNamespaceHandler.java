@@ -33,7 +33,7 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class ColocBPNamespaceHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("/schemas/coloc-feature.xsd");
+        return getClass().getClassLoader().getResource("schemas/coloc-feature.xsd");
     }
 
     @SuppressWarnings("rawtypes")

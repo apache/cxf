@@ -42,7 +42,7 @@ public class CXFCoreNamespaceHandler implements NamespaceHandler {
     
     public URL getSchemaLocation(String namespace) {
         if ("http://cxf.apache.org/blueprint/core".equals(namespace)) {
-            return getClass().getClassLoader().getResource("/schemas/blueprint/core.xsd");
+            return getClass().getClassLoader().getResource("schemas/blueprint/core.xsd");
         }
         return null;
     }
