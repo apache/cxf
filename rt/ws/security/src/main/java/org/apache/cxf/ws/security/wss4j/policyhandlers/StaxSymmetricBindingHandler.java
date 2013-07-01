@@ -72,6 +72,7 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.apache.xml.security.utils.Base64;
 
@@ -351,6 +352,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, 
                        getKeyIdentifierType(recToken, encrToken));
+            } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
+                config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
             } else {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
             }
@@ -422,6 +425,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else {
                 config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKeySHA1");
             }
+        } else if (policyToken instanceof KerberosToken && !isRequestor()) {
+            config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
         }
         
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
@@ -538,8 +543,14 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     }
     
     private void storeSecurityToken(SecurityToken tok) {
+        TokenType tokenType = WSSecurityTokenConstants.EncryptedKeyToken;
+        if (tok.getTokenType() != null 
+            && tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
+            tokenType = WSSecurityTokenConstants.KerberosToken;
+        }
+        
         final GenericOutboundSecurityToken encryptedKeySecurityToken = 
-            new GenericOutboundSecurityToken(tok.getId(), WSSecurityTokenConstants.EncryptedKeyToken, tok.getKey());
+            new GenericOutboundSecurityToken(tok.getId(), tokenType, tok.getKey());
         
         final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
             new SecurityTokenProvider<OutboundSecurityToken>() {

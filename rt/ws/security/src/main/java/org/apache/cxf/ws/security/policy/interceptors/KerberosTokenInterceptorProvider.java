@@ -278,13 +278,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         KerberosServiceSecurityToken kerberosToken = 
                             ((KerberosTokenSecurityEvent)event).getSecurityToken();
                         if (kerberosToken != null) {
-                            SecurityToken token = new SecurityToken(kerberosToken.getId());
-                            token.setTokenType(kerberosToken.getKerberosTokenValueType());
-
-                            byte[] secret = getSecretKeyFromToken(kerberosToken);
-                            token.setSecret(secret);
-                            getTokenStore(message).add(token);
-                            message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
+                            storeKerberosToken(message, kerberosToken);
                         }
                     }
                 } else {
@@ -297,6 +291,27 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
                 NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
+        }
+        
+        private void storeKerberosToken(Message message, KerberosServiceSecurityToken kerberosToken) {
+            SecurityToken token = new SecurityToken(kerberosToken.getId());
+            token.setTokenType(kerberosToken.getKerberosTokenValueType());
+
+            SecretKey secretKey = getSecretKeyFromToken(kerberosToken);
+            token.setKey(secretKey);
+            if (secretKey != null) {
+                token.setSecret(secretKey.getEncoded());
+            }
+            
+            byte[] ticket = kerberosToken.getBinaryContent();
+            try {
+                token.setSHA1(Base64.encode(WSSecurityUtil.generateDigest(ticket)));
+            } catch (WSSecurityException e) {
+                // Just consume this for now as it isn't critical...
+            }
+            
+            getTokenStore(message).add(token);
+            message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
         }
         
         private SecurityEvent findKerberosEvent(Message message) {
@@ -314,13 +329,13 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             return null;
         }
         
-        private byte[] getSecretKeyFromToken(KerberosServiceSecurityToken kerberosToken) {
+        private SecretKey getSecretKeyFromToken(KerberosServiceSecurityToken kerberosToken) {
             try {
                 Map<String, Key> secretKeys = kerberosToken.getSecretKey();
                 if (secretKeys != null) {
                     for (String key : kerberosToken.getSecretKey().keySet()) {
                         if (secretKeys.get(key) instanceof SecretKey) {
-                            return ((SecretKey)secretKeys.get(key)).getEncoded();
+                            return (SecretKey)secretKeys.get(key);
                         }
                     }
                 }

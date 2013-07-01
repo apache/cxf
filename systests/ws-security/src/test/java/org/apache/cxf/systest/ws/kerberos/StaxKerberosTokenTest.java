@@ -102,7 +102,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    /*
+    
     @org.junit.Test
     public void testKerberosOverSymmetric() throws Exception {
         
@@ -125,8 +125,12 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(kerberosPort, PORT);
         
-        int result = kerberosPort.doubleIt(25);
-        assertTrue(result == 50);
+        // DOM
+        kerberosPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -154,13 +158,16 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(kerberosPort, PORT);
         
-        int result = kerberosPort.doubleIt(25);
-        assertTrue(result == 50);
+        // DOM
+        kerberosPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    */
     
     @org.junit.Test
     public void testKerberosOverAsymmetric() throws Exception {
@@ -252,7 +259,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    /*
+    
     @org.junit.Test
     public void testKerberosOverSymmetricProtection() throws Exception {
 
@@ -270,13 +277,18 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         
         updateAddressPort(kerberosPort, PORT);
-        int result = kerberosPort.doubleIt(25);
-        assertTrue(result == 50);
+        
+        // DOM
+        kerberosPort.doubleIt(25);
+        
+        // TODO Streaming
+        // SecurityTestUtil.enableStreaming(kerberosPort);
+        // kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    
+    /*
     @org.junit.Test
     public void testKerberosOverSymmetricDerivedProtection() throws Exception {
 
