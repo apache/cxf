@@ -62,7 +62,6 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -95,7 +94,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testPostEmptyForm() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/emptyform";
         WebClient wc = WebClient.create(address);
-        Response r = wc.form(new Form());
+        Response r = wc.form(new org.apache.cxf.jaxrs.ext.form.Form());
         assertEquals("empty form", r.readEntity(String.class));
     }
 
