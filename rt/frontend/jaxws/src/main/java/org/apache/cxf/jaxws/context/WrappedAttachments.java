@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxws.context;
 
-import java.util.Arrays;
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,7 +81,9 @@ class WrappedAttachments implements Set<Attachment> {
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
         Object[] obj = toArray();
-        return (T[])Arrays.copyOf(obj, obj.length, a.getClass());
+        T[] copy = (T[])Array.newInstance(a.getClass(), obj.length);
+        System.arraycopy(obj, 0, copy, 0, obj.length);
+        return copy;
     }
 
     public boolean add(Attachment e) {
