@@ -150,7 +150,7 @@ public class RMEndpointTest extends Assert {
         Conduit c = control.createMock(Conduit.class);
         EndpointReferenceType epr = control.createMock(EndpointReferenceType.class);
         control.replay();
-        rme.initialise(c, epr, null);
+        rme.initialise(new RMConfiguration(), c, epr, null);
         assertSame(c, rme.getConduit());
         assertSame(epr, rme.getReplyTo());
     }

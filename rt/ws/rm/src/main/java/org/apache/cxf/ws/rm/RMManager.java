@@ -67,6 +67,7 @@ import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
+import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 import org.apache.cxf.ws.rm.soap.RetransmissionQueueImpl;
 import org.apache.cxf.ws.rm.soap.SoapFaultFactory;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
@@ -148,7 +149,7 @@ public class RMManager {
 
     public void setRM10AddressingNamespace(RM10AddressingNamespaceType addrns) {
         RMConfiguration cfg = forceConfiguration();
-        cfg.setRM10AddressingNamespace(addrns);
+        cfg.setRM10AddressingNamespace(addrns.getUri());
     }
     
     public Bus getBus() {
@@ -237,6 +238,8 @@ public class RMManager {
     }
 
     /**
+     * Get base configuration for manager. This needs to be modified by endpoint policies to get the effective
+     * configuration.
      * @return configuration (non-<code>null</code>)
      */
     public RMConfiguration getConfiguration() {
@@ -268,23 +271,7 @@ public class RMManager {
      * @param rma The rmAssertion to set.
      */
     public void setRMAssertion(org.apache.cxf.ws.rmp.v200502.RMAssertion rma) {
-        RMConfiguration cfg = getConfiguration();
-        cfg.setExponentialBackoff(rma.getExponentialBackoff() != null);
-        org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout inactTimeout
-            = rma.getInactivityTimeout();
-        if (inactTimeout != null) {
-            cfg.setInactivityTimeout(inactTimeout.getMilliseconds());
-        }
-        org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval bri
-            = rma.getBaseRetransmissionInterval();
-        if (bri != null) {
-            cfg.setBaseRetransmissionInterval(bri.getMilliseconds());
-        }
-        org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval ackInterval
-            = rma.getAcknowledgementInterval();
-        if (ackInterval != null) {
-            cfg.setAcknowledgementInterval(ackInterval.getMilliseconds());
-        }
+        setConfiguration(RMPolicyUtilities.intersect(rma, getConfiguration()));
     }
 
     /** 
@@ -320,8 +307,9 @@ public class RMManager {
             WrappedEndpoint wrappedEndpoint = (WrappedEndpoint)endpoint;
             endpoint = wrappedEndpoint.getWrappedEndpoint();
         }
-        String rmUri = getRMNamespace(message);
-        String addrUri = getAddressingNamespace(message);
+        RMConfiguration dflt = getConfiguration();
+        String rmUri = getRMNamespace(dflt, message);
+        String addrUri = getAddressingNamespace(dflt, message);
         ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
         if (protocol == null) {
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
@@ -343,7 +331,8 @@ public class RMManager {
                 = ei == null ? null : ei.getEndpointInfo()
                     .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
                              org.apache.cxf.transport.Destination.class);
-            rme.initialise(message.getExchange().getConduit(message), replyTo, dest);
+            RMConfiguration config = RMPolicyUtilities.getRMConfiguration(getConfiguration(), message);
+            rme.initialise(config, message.getExchange().getConduit(message), replyTo, dest);
             reliableEndpoints.put(endpoint, rme);
             LOG.fine("Created new RMEndpoint.");
         }
@@ -352,12 +341,13 @@ public class RMManager {
 
     /**
      * Get the WS-Addressing namespace being used for a message. If the WS-Addressing namespace has not been
-     * set, this returns the default configured for this manager.
+     * set, this returns the default from the supplied configuration.
      * 
+     * @param config
      * @param message
      * @return namespace URI
      */
-    public String getAddressingNamespace(Message message) {
+    String getAddressingNamespace(RMConfiguration config, Message message) {
         String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
         if (addrUri == null) {
             AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
@@ -365,20 +355,40 @@ public class RMManager {
                 addrUri = maps.getNamespaceURI();
             }
             if (addrUri == null) {
-                addrUri = forceConfiguration().getConfiguredProtocol().getWSANamespace();
+                addrUri = ProtocolVariation.findVariant(config.getRMNamespace(), config.getRM10AddressingNamespace())
+                    .getWSANamespace();
             }
         }
         return addrUri;
     }
 
     /**
-     * Get the WS-RM namespace being used for a message. If the WS-RM namespace has not been set, this returns
-     * the default configured for this manager.
+     * Get the WS-Addressing namespace being used for a message. If the WS-Addressing namespace has not been set, this
+     * returns the best default.
      * 
      * @param message
      * @return namespace URI
      */
-    String getRMNamespace(Message message) {
+    public String getAddressingNamespace(Message message) {
+        RMConfiguration config = null;
+        try {
+            config = getReliableEndpoint(message).getConfiguration();
+        } catch (RMException e) {
+            // only happens with invalid namespace combination, just fall back to manager default
+            config = getConfiguration();
+        }
+        return getAddressingNamespace(config, message);
+    }
+
+    /**
+     * Get the WS-RM namespace being used for a message. If the WS-RM namespace has not been set, this returns the
+     * default from the supplied configuration.
+     * 
+     * @param config
+     * @param message
+     * @return namespace URI
+     */
+    String getRMNamespace(RMConfiguration config, Message message) {
         String rmUri = (String)message.getContextualProperty(WSRM_VERSION_PROPERTY);
         if (rmUri == null) {
             RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
@@ -386,10 +396,29 @@ public class RMManager {
                 rmUri = rmps.getNamespaceURI();
             }
             if (rmUri == null) {
-                rmUri = getConfiguration().getRMNamespace();
+                rmUri = ProtocolVariation.findVariant(config.getRMNamespace(), config.getRM10AddressingNamespace())
+                    .getWSRMNamespace();
             }
         }
         return rmUri;
+    }
+
+    /**
+     * Get the WS-RM namespace being used for a message. If the WS-RM namespace has not been set, this returns the best
+     * default.
+     * 
+     * @param message
+     * @return namespace URI
+     */
+    String getRMNamespace(Message message) {
+        RMConfiguration config = null;
+        try {
+            config = getReliableEndpoint(message).getConfiguration();
+        } catch (RMException e) {
+            // only happens with invalid namespace combination, just fall back to manager default
+            config = getConfiguration();
+        }
+        return getRMNamespace(config, message);
     }
 
     public Destination getDestination(Message message) throws RMException {
@@ -422,7 +451,7 @@ public class RMManager {
             RelatesToType relatesTo = null;
             if (isServer) {
                 AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);
-                inMaps.exposeAs(getConfiguration().getConfiguredProtocol().getWSANamespace());
+                inMaps.exposeAs(getAddressingNamespace(message));
                 acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();
                 source.getReliableEndpoint().getServant().setUnattachedIdentifier(inSeqId);
@@ -532,7 +561,7 @@ public class RMManager {
         LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                 new Object[] {null == conduit ? "client" : "server", id});
         RMEndpoint rme = createReliableEndpoint(endpoint);
-        rme.initialise(conduit, null, null);
+        rme.initialise(getConfiguration(), conduit, null, null);
         reliableEndpoints.put(endpoint, rme);
         for (SourceSequence ss : sss) {            
             recoverSourceSequence(endpoint, conduit, rme.getSource(), ss);

@@ -103,6 +103,7 @@ public class RMEndpoint {
     private AtomicInteger controlMessageCount;
     private InstrumentationManager instrumentationManager;
     private ManagedRMEndpoint managedEndpoint;
+    private RMConfiguration configuration;
     
     /**
      * Constructor.
@@ -252,6 +253,15 @@ public class RMEndpoint {
     public Conduit getConduit() {
         return conduit;
     }
+    
+    /**
+     * Get the RM configuration applied to this endpoint.
+     * 
+     * @return configuration
+     */
+    public RMConfiguration getConfiguration() {
+        return configuration;
+    }
 
     /**
      * Returns the replyTo address of the first application request, i.e. the
@@ -264,9 +274,9 @@ public class RMEndpoint {
         return replyTo;
     }
 
-    void initialise(Conduit c, 
-                    EndpointReferenceType r,
-                    org.apache.cxf.transport.Destination d) {
+    void initialise(RMConfiguration config, Conduit c, EndpointReferenceType r,
+        org.apache.cxf.transport.Destination d) {
+        configuration = config;
         conduit = c;
         replyTo = r;
         createServices();

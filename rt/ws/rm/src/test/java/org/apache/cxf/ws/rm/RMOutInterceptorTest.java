@@ -134,10 +134,6 @@ public class RMOutInterceptorTest extends Assert {
             andReturn(rmpsOut).anyTimes();
         InterceptorChain chain = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(chain).anyTimes();
-        EasyMock.expect(manager.getRMNamespace(EasyMock.same(message)))
-            .andReturn(RM10Constants.NAMESPACE_URI);
-        EasyMock.expect(manager.getAddressingNamespace(EasyMock.same(message)))
-            .andReturn(Names200408.WSA_NAMESPACE_NAME);
         chain.add(EasyMock.isA(RetransmissionInterceptor.class));
         EasyMock.expectLastCall();
         RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
@@ -146,6 +142,12 @@ public class RMOutInterceptorTest extends Assert {
         EasyMock.expectLastCall();
                 
         RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMConfiguration config = new RMConfiguration();
+        config.setRMNamespace(RM10Constants.NAMESPACE_URI);
+        config.setRM10AddressingNamespace(Names200408.WSA_NAMESPACE_NAME);
+        EasyMock.expect(rme.getConfiguration()).andReturn(config).anyTimes();
+        EasyMock.expect(manager.getRMNamespace(message)).andReturn(RM10Constants.NAMESPACE_URI).anyTimes();
+        EasyMock.expect(manager.getAddressingNamespace(message)).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
         Source source = control.createMock(Source.class);
         EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
         EasyMock.expect(manager.getSource(message)).andReturn(source).anyTimes();

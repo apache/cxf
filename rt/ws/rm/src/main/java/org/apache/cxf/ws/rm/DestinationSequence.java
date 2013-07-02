@@ -41,7 +41,6 @@ import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
@@ -174,11 +173,10 @@ public class DestinationSequence extends AbstractSequence {
             store.persistIncoming(this, msg);
         }
         
-        RMConfiguration cfg = destination.getManager().getConfiguration();
-        cfg = RMPolicyUtilities.getRMConfiguration(cfg, message);
+        RMEndpoint reliableEndpoint = destination.getReliableEndpoint();
+        RMConfiguration cfg = reliableEndpoint.getConfiguration();
         
-        long acknowledgementInterval = cfg.getAcknowledgementIntervalTime();
-        scheduleAcknowledgement(acknowledgementInterval);
+        scheduleAcknowledgement(cfg.getAcknowledgementIntervalTime());
        
         long inactivityTimeout = cfg.getInactivityTimeoutTime();
         scheduleSequenceTermination(inactivityTimeout);
@@ -237,7 +235,7 @@ public class DestinationSequence extends AbstractSequence {
      */
     boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
-        RMConfiguration config = destination.getManager().getConfiguration();
+        RMConfiguration config = destination.getReliableEndpoint().getConfiguration();
         DeliveryAssurance da = config.getDeliveryAssurance();
         boolean canSkip = da != DeliveryAssurance.AT_LEAST_ONCE && da != DeliveryAssurance.EXACTLY_ONCE;
         boolean robust = false;

@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
+import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.apache.neethi.Assertion;
@@ -39,10 +40,10 @@ import org.apache.neethi.PolicyComponent;
  */
 public class RM10AssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
     public static final List<QName> KNOWN_ELEMENTS 
-        = Collections.singletonList(RM11Constants.WSRMP_RMASSERTION_QNAME);
+        = Collections.singletonList(RM10Constants.WSRMP_RMASSERTION_QNAME);
 
     public RM10AssertionBuilder() throws JAXBException {
-        super(RMAssertion.class, RM11Constants.WSRMP_RMASSERTION_QNAME);     
+        super(RMAssertion.class, RM10Constants.WSRMP_RMASSERTION_QNAME);     
     }
 
     @Override

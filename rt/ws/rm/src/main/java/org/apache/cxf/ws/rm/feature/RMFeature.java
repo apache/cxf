@@ -107,7 +107,7 @@ public class RMFeature extends AbstractFeature {
             manager.getConfiguration().setRMNamespace(rmNamespace);
         }
         if (null != rm10AddressingNamespace) {
-            manager.getConfiguration().setRM10AddressingNamespace(rm10AddressingNamespace);
+            manager.getConfiguration().setRM10AddressingNamespace(rm10AddressingNamespace.getUri());
         }
 
         rmLogicalIn.setBus(bus);

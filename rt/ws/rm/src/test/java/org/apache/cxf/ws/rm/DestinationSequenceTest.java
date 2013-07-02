@@ -54,6 +54,7 @@ public class DestinationSequenceTest extends Assert {
     private EndpointReferenceType ref;
     private Destination destination;
     private RMManager manager;
+    private RMEndpoint endpoint;
     private RMConfiguration config;
     private AcksPolicyType ap;
     private DestinationPolicyType dp;
@@ -477,8 +478,8 @@ public class DestinationSequenceTest extends Assert {
         
         control.reset();
         ranges.add(r);
-        EasyMock.expect(destination.getManager()).andReturn(manager);
-        EasyMock.expect(manager.getConfiguration()).andReturn(config);
+        EasyMock.expect(destination.getReliableEndpoint()).andReturn(endpoint);
+        EasyMock.expect(endpoint.getConfiguration()).andReturn(config).anyTimes();
         EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
         EasyMock.expect(r.getLower()).andReturn(new Long(5));
         EasyMock.expect(r.getUpper()).andReturn(new Long(15));
@@ -709,7 +710,7 @@ public class DestinationSequenceTest extends Assert {
         setUpDestination(null, null);
     }
     
-    private void setUpDestination(Timer timer, RMEndpoint endpoint) {
+    private void setUpDestination(Timer timer, RMEndpoint rme) {
         
         manager = control.createMock(RMManager.class);
 
@@ -722,15 +723,17 @@ public class DestinationSequenceTest extends Assert {
         config = new RMConfiguration();
         config.setBaseRetransmissionInterval(new Long(3000));
         EasyMock.expect(manager.getConfiguration()).andReturn(config).anyTimes();
+        endpoint = rme;
+        if (endpoint == null) {
+            endpoint = control.createMock(RMEndpoint.class);
+        }
+        EasyMock.expect(endpoint.getConfiguration()).andReturn(config).anyTimes();
 
         EasyMock.expect(manager.getDestinationPolicy()).andReturn(dp).anyTimes();
         EasyMock.expect(manager.getStore()).andReturn(null).anyTimes();
         
         destination = control.createMock(Destination.class);
         EasyMock.expect(destination.getManager()).andReturn(manager).anyTimes();
-        if (endpoint == null) {
-            endpoint = EasyMock.createMock(RMEndpoint.class);
-        }
         EasyMock.expect(destination.getReliableEndpoint()).andReturn(endpoint).anyTimes();
         
         if (null != timer) {

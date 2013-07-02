@@ -19,87 +19,117 @@
 
 package org.apache.cxf.ws.rm.policy;
 
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.rm.RM11Constants;
-import org.apache.cxf.ws.rm.policy.RM12Assertion.Order;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
-import org.apache.neethi.Constants;
+import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
+import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
- * Builds a WS-RMP 1.2 assertion from the raw XML. Unlike WS-RMP 1.0, in WS-RMP 1.2 the actual assertions are
- * nested within layers of <wsp:Policy> operators so need to be handled directly (not by JAXB).
+ * Builds a WS-RMP 1.2 assertion and nested assertions from the raw XML.
  */
 public class RM12AssertionBuilder implements AssertionBuilder<Element> {
+
+    public static final String SEQUENCESTR_NAME = "SequenceSTR";
+    public static final String SEQUENCETRANSEC_NAME = "SequenceTransportSecurity";
+    public static final String DELIVERYASSURANCE_NAME = "DeliveryAssurance";
+    public static final String EXACTLYONCE_NAME = "ExactlyOnce";
+    public static final String ATLEASTONCE_NAME = "AtLeastOnce";
+    public static final String ATMOSTONCE_NAME = "AtMostOnce";
+    public static final String INORDER_NAME = "InOrder";
+    
+    private static final QName SEQSTR_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCESTR_NAME);
+    private static final QName SEQTRANSSEC_QNAME =
+        new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCETRANSEC_NAME);
+    private static final QName DELIVERYASSURANCE_QNAME =
+        new QName(RM11Constants.WSRMP_NAMESPACE_URI, DELIVERYASSURANCE_NAME);
+    private static final QName EXACTLYONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, EXACTLYONCE_NAME);
+    private static final QName ATLEASTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATLEASTONCE_NAME);
+    private static final QName ATMOSTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATMOSTONCE_NAME);
+    private static final QName INORDER_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, INORDER_NAME);
+    
+    private static final QName[] KNOWN_ELEMENTS = {
+        RM11Constants.WSRMP_RMASSERTION_QNAME,
+        SEQSTR_QNAME,
+        SEQTRANSSEC_QNAME,
+        DELIVERYASSURANCE_QNAME,
+        EXACTLYONCE_QNAME,
+        ATLEASTONCE_QNAME,
+        ATMOSTONCE_QNAME,
+        INORDER_QNAME
+    };
     
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#getKnownElements()
      */
     public QName[] getKnownElements() {
-        return new QName[] {RM11Constants.WSRMP_RMASSERTION_QNAME};
+        return KNOWN_ELEMENTS;
     }
     
     /**
-     * @see org.apache.neethi.builders.AssertionBuilder#build(java.lang.Object,
+     * @see org.apache.neethi.builders.AssertionBuilder#build(org.w3c.dom.Element,
      *  org.apache.neethi.AssertionBuilderFactory)
      */
-    public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
-        
-        RM12Assertion assertion = new RM12Assertion();
-        assertion.setOptional(PolicyConstants.isOptional(element));
-        assertion.setIgnorable(PolicyConstants.isIgnorable(element));
-        
-        // dig into the nested structure to set property values
-        Element elem = DOMUtils.getFirstElement(element);
-        while (elem != null) {
-            if (DOMUtils.getFirstChildWithName(elem, 
-                RM11Constants.WSRMP_NAMESPACE_URI, RM12Assertion.DELIVERYASSURANCE_NAME) != null) {
+    public Assertion build(Element elem, AssertionBuilderFactory factory) throws IllegalArgumentException {
+        Assertion assertion = null;
+        if (RM11Constants.WSRMP_NAMESPACE_URI.equals(elem.getNamespaceURI())) {
+            boolean optional = XMLPrimitiveAssertionBuilder.isOptional(elem);
+            String lname = elem.getLocalName();
+            if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
                 
-                // find nested policy and definitions within (note this won't handle nested policy operators)
-                Element childEl = DOMUtils.getFirstElement(elem);
-                while (childEl != null) {
-                    if (Constants.isPolicyElement(childEl.getNamespaceURI(), childEl.getLocalName())) {
-                        handlePolicy(childEl, assertion);
+                // top-level RMAssertion, with nested policy
+                XMLPrimitiveAssertionBuilder nesting = new XMLPrimitiveAssertionBuilder() {
+                    public Assertion newPrimitiveAssertion(Element element, Map<QName, String> mp) {
+                        return new PrimitiveAssertion(RM11Constants.WSRMP_RMASSERTION_QNAME, isOptional(element),
+                            isIgnorable(element), mp);        
                     }
-                }
-
-            } else if (DOMUtils.getFirstChildWithName(elem, 
-                RM11Constants.WSRMP_NAMESPACE_URI, RM12Assertion.SEQUENCESTR_NAME) != null) {
-                assertion.setSequenceSTR(true);
-            } else if (DOMUtils.getFirstChildWithName(elem, 
-                RM11Constants.WSRMP_NAMESPACE_URI, RM12Assertion.SEQUENCETRANSEC_NAME) != null) {
-                assertion.setSequenceTransportSecurity(true);              
+                    public Assertion newPolicyContainingAssertion(Element element, Map<QName, String> mp,
+                        Policy policy) {
+                        return new PolicyContainingPrimitiveAssertion(RM11Constants.WSRMP_RMASSERTION_QNAME,
+                            isOptional(element), isIgnorable(element), mp, policy);
+                    }
+                }; 
+                assertion = nesting.build(elem, factory);
+                
+            } else if (SEQUENCESTR_NAME.equals(lname)) {
+                assertion = new PrimitiveAssertion(SEQSTR_QNAME,  optional);
+            } else if (SEQUENCETRANSEC_NAME.equals(lname)) {
+                assertion = new PrimitiveAssertion(SEQTRANSSEC_QNAME,  optional);
+            } else if (DELIVERYASSURANCE_NAME.equals(lname)) {
+                
+                // DeliveryAssurance, with nested policy
+                XMLPrimitiveAssertionBuilder nesting = new XMLPrimitiveAssertionBuilder() {
+                    public Assertion newPrimitiveAssertion(Element element, Map<QName, String> mp) {
+                        return new PrimitiveAssertion(DELIVERYASSURANCE_QNAME, isOptional(element),
+                            isIgnorable(element), mp);        
+                    }
+                    public Assertion newPolicyContainingAssertion(Element element, Map<QName, String> mp,
+                        Policy policy) {
+                        return new PolicyContainingPrimitiveAssertion(DELIVERYASSURANCE_QNAME,
+                            isOptional(element), isIgnorable(element), mp, policy);
+                    }
+                }; 
+                assertion = nesting.build(elem, factory);
+                
+            } else if (EXACTLYONCE_NAME.equals(lname)) {
+                assertion = new PrimitiveAssertion(EXACTLYONCE_QNAME,  optional);
+            } else if (ATLEASTONCE_NAME.equals(lname)) {
+                assertion = new PrimitiveAssertion(ATLEASTONCE_QNAME,  optional);
+            } else if (ATMOSTONCE_NAME.equals(lname)) {
+                assertion = new PrimitiveAssertion(ATMOSTONCE_QNAME,  optional);
+            } else if (INORDER_NAME.equals(lname)) {
+                assertion = new PrimitiveAssertion(INORDER_QNAME,  optional);
             }
-            elem = DOMUtils.getNextElement(elem);
         }
-
         return assertion;
-    }
-
-    /**
-     * @param childEl
-     * @param assertion
-     */
-    private void handlePolicy(Element childEl, RM12Assertion assertion) {
-        
-        // don't check for conflicts or repeats, just use the last values supplied
-        Element innerEl = DOMUtils.getFirstElement(childEl);
-        if (RM11Constants.WSRMP_NAMESPACE_URI.equals(innerEl.getNamespaceURI())) {
-            String lname = innerEl.getLocalName();
-            if (RM12Assertion.INORDER_NAME.equals(lname)) {
-                assertion.setInOrder(true);
-            } else {
-                Order order = RM12Assertion.Order.valueOf(lname);
-                if (order != null) {
-                    assertion.setOrder(order);
-                }
-            }
-        }
     }
 }
