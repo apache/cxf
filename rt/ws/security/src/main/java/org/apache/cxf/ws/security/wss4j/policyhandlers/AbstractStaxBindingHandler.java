@@ -90,6 +90,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 public abstract class AbstractStaxBindingHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractStaxBindingHandler.class);
     protected boolean timestampAdded;
+    protected boolean signatureConfirmationAdded;
     protected Set<SecurePart> encryptedTokensList = new HashSet<SecurePart>();
     
     protected Map<AbstractToken, SecurePart> endEncSuppTokMap;
@@ -848,6 +849,7 @@ public abstract class AbstractStaxBindingHandler {
                 new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
             sigParts.add(securePart);
         }
+        signatureConfirmationAdded = true;
     }
     
     /**

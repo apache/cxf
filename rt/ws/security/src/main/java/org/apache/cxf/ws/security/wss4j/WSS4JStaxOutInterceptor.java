@@ -227,6 +227,11 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             if (sigCrypto != null) {
                 config.put(ConfigurationConstants.SIG_PROP_REF_ID, "RefId-" + sigCrypto.hashCode());
                 config.put("RefId-" + sigCrypto.hashCode(), sigCrypto);
+                if (sigUser == null && sigCrypto.getDefaultX509Identifier() != null) {
+                    // Fall back to default identifier
+                    config.put(ConfigurationConstants.SIGNATURE_USER, 
+                               sigCrypto.getDefaultX509Identifier());
+                }
             }
             
             Crypto encCrypto = 
@@ -238,6 +243,11 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             if (encCrypto != null) {
                 config.put(ConfigurationConstants.ENC_PROP_REF_ID, "RefId-" + encCrypto.hashCode());
                 config.put("RefId-" + encCrypto.hashCode(), encCrypto);
+                if (encUser == null && encCrypto.getDefaultX509Identifier() != null) {
+                    // Fall back to default identifier
+                    config.put(ConfigurationConstants.ENCRYPTION_USER, 
+                               encCrypto.getDefaultX509Identifier());
+                }
             }
         }
     }

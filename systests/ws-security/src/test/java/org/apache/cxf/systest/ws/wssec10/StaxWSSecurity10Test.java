@@ -32,7 +32,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.wssec10.server.Server;
+import org.apache.cxf.systest.ws.wssec10.server.StaxServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -45,11 +45,11 @@ import wssec.wssec10.PingService;
 
 
 /**
- * It tests both DOM + StAX clients against the DOM server
+ * It tests both DOM + StAX clients against the StAX server
  */
-public class WSSecurity10Test extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String SSL_PORT = allocatePort(Server.class, 1);
+public class StaxWSSecurity10Test extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxServer.class);
+    static final String SSL_PORT = allocatePort(StaxServer.class, 1);
 
     private static final String INPUT = "foo";
     private static boolean unrestrictedPoliciesInstalled;
@@ -65,7 +65,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
     }
     
