@@ -273,16 +273,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                     if (future.isSuccess()) {
                         setChannel(future.getChannel());
                         SslHandler sslHandler = channel.getPipeline().get(SslHandler.class);
-                        if (!handshakeDone.getAndSet(true) && (sslHandler != null)) {
-                            sslHandler.handshake().addListener(this);
-                            return;
-                        } else {
-                            if (sslHandler != null) {
-                                // setup the session for use
-                                session = sslHandler.getEngine().getSession();
-                            }
+                        if (sslHandler != null) {
+                            session = sslHandler.getEngine().getSession();
                         }
-
                     } else {
                         setException((Exception) future.getCause());
                     }
