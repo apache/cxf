@@ -47,17 +47,17 @@ public class RM12AssertionBuilder implements AssertionBuilder<Element> {
     public static final String ATMOSTONCE_NAME = "AtMostOnce";
     public static final String INORDER_NAME = "InOrder";
     
-    private static final QName SEQSTR_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCESTR_NAME);
-    private static final QName SEQTRANSSEC_QNAME =
+    public static final QName SEQSTR_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCESTR_NAME);
+    public static final QName SEQTRANSSEC_QNAME =
         new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCETRANSEC_NAME);
-    private static final QName DELIVERYASSURANCE_QNAME =
+    public static final QName DELIVERYASSURANCE_QNAME =
         new QName(RM11Constants.WSRMP_NAMESPACE_URI, DELIVERYASSURANCE_NAME);
-    private static final QName EXACTLYONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, EXACTLYONCE_NAME);
-    private static final QName ATLEASTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATLEASTONCE_NAME);
-    private static final QName ATMOSTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATMOSTONCE_NAME);
-    private static final QName INORDER_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, INORDER_NAME);
+    public static final QName EXACTLYONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, EXACTLYONCE_NAME);
+    public static final QName ATLEASTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATLEASTONCE_NAME);
+    public static final QName ATMOSTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATMOSTONCE_NAME);
+    public static final QName INORDER_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, INORDER_NAME);
     
-    private static final QName[] KNOWN_ELEMENTS = {
+    public static final QName[] KNOWN_ELEMENTS = {
         RM11Constants.WSRMP_RMASSERTION_QNAME,
         SEQSTR_QNAME,
         SEQTRANSSEC_QNAME,

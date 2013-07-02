@@ -327,6 +327,40 @@
         </wsdl:port>
         
     </wsdl:service>
+    
+    <wsdl:service name="Reliable12GreeterService">
+        <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort">
+            <soap:address location="http://localhost:9020/SoapContext/GreeterPort"/>
+            <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
+              <wsp:ExactlyOne>
+                <wsp:All>
+                  <wsrmp:RMAssertion xmlns:wsrmp="http://docs.oasis-open.org/ws-rx/wsrmp/200702">
+                    <wsp:Policy>
+                      <wsrmp:DeliveryAssurance>
+                        <wsp:Policy>
+                          <wsrmp:ExactlyOnce/>
+                          <wsrmp:InOrder/>
+                        </wsp:Policy>
+                      </wsrmp:DeliveryAssurance>
+                    </wsp:Policy>
+                  </wsrmp:RMAssertion>
+                  <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
+                      <wsp:Policy/>
+                  </wsam:Addressing>
+                </wsp:All>
+              </wsp:ExactlyOne>
+            </wsp:Policy>
+        </wsdl:port> 
+        <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort2">
+            <soap:address location="http://localhost:9020/SoapContext/GreeterPort2"/>
+            <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
+                <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
+                    <wsp:Policy/>
+                </wsam:Addressing>
+            </wsp:Policy>
+        </wsdl:port>
+        
+    </wsdl:service>
    
     <wsdl:service name="BasicGreeterService">
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort">

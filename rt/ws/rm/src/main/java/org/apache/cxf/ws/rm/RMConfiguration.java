@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm;
 
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
+
 
 /**
  * Configuration parameters for reliable messaging. These may be defined by a combination of Spring/Blueprint
@@ -207,5 +209,24 @@ public class RMConfiguration {
 
     public void setRM10AddressingNamespace(String addrns) {
         rm10AddressingNamespace = addrns;
+    }
+    
+    public String getAddressingNamespace() {
+        
+        // determine based on RM namespace and RM 1.0 addressing namespace values
+        if (RM10Constants.NAMESPACE_URI.equals(rmNamespace)) {
+            return rm10AddressingNamespace == null
+                ? EncoderDecoder10Impl.INSTANCE.getWSANamespace() : rm10AddressingNamespace;
+        }
+        if (RM11Constants.NAMESPACE_URI.equals(rmNamespace)) {
+            return EncoderDecoder11Impl.INSTANCE.getWSANamespace();
+        }
+        
+        // should not happen, but in case RM namespace is not set
+        return Names200408.WSA_NAMESPACE_NAME;
+    }
+    
+    public ProtocolVariation getProtocolVariation() {
+        return ProtocolVariation.findVariant(getRMNamespace(), getRM10AddressingNamespace());
     }
 }

@@ -22,7 +22,6 @@ package org.apache.cxf.ws.rm;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -37,7 +36,6 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -266,52 +264,6 @@ public class RMEndpointTest extends Assert {
         PolicyEngine pe = control.createMock(PolicyEngine.class);
         EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(pe);
         EasyMock.expect(pe.isEnabled()).andReturn(false);
-        control.replay();
-        rme.setPolicies();
-    }
-
-    @Test
-    public void testSetPolicies() throws NoSuchMethodException {
-        Method m = RMEndpoint.class.getDeclaredMethod("getEndpoint", new Class[] {ProtocolVariation.class});
-        rme = EasyMock.createMockBuilder(RMEndpoint.class)
-            .addMockedMethod(m).createMock(control);
-        rme.setAplicationEndpoint(ae);
-        rme.setManager(manager);
-        Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(e);
-        EndpointInfo ei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(e.getEndpointInfo()).andReturn(ei);
-        Bus bus = control.createMock(Bus.class);
-        EasyMock.expect(manager.getBus()).andReturn(bus).times(2);
-        PolicyEngine pe = control.createMock(PolicyEngine.class);
-        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(pe);
-        EasyMock.expect(pe.isEnabled()).andReturn(true);
-        PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
-        EasyMock.expect(bus.getExtension(PolicyInterceptorProviderRegistry.class)).andReturn(reg);
-        EndpointInfo aei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(ae.getEndpointInfo()).andReturn(aei);
-        EndpointPolicy epi = control.createMock(EndpointPolicy.class);
-        EasyMock.expect(pe.getServerEndpointPolicy(aei, null)).andReturn(epi);
-        EasyMock.expect(epi.getChosenAlternative()).andReturn(new ArrayList<Assertion>());
-
-        pe.setServerEndpointPolicy(ei, epi);
-        EasyMock.expectLastCall();
-        BindingInfo bi = control.createMock(BindingInfo.class);
-        EasyMock.expect(ei.getBinding()).andReturn(bi);
-        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
-        EasyMock.expect(bi.getOperations()).andReturn(Collections.singletonList(boi));
-        pe.setEffectiveServerRequestPolicy(EasyMock.eq(ei), EasyMock.eq(boi), EasyMock
-            .isA(EffectivePolicy.class));
-        EasyMock.expectLastCall();
-        pe.setEffectiveServerResponsePolicy(EasyMock.eq(ei), EasyMock.eq(boi), EasyMock
-            .isA(EffectivePolicy.class));
-        EasyMock.expectLastCall();
-        pe.setEffectiveClientRequestPolicy(EasyMock.eq(ei), EasyMock.eq(boi), EasyMock
-            .isA(EffectivePolicy.class));
-        EasyMock.expectLastCall();
-        pe.setEffectiveClientResponsePolicy(EasyMock.eq(ei), EasyMock.eq(boi), EasyMock
-            .isA(EffectivePolicy.class));
-        EasyMock.expectLastCall();
         control.replay();
         rme.setPolicies();
     }

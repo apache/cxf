@@ -51,7 +51,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
@@ -294,14 +293,13 @@ public class RMManagerTest extends Assert {
     public void testGetReliableEndpointExisting() throws NoSuchMethodException, RMException {
         Method m1 = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
             new Class[] {Endpoint.class});
-        Method m2 = RMManager.class.getDeclaredMethod("getRMNamespace",  new Class[] {Message.class});
-        Method m3 = RMManager.class.getDeclaredMethod("getAddressingNamespace",  new Class[] {Message.class});
-        manager = control.createMock(RMManager.class, new Method[] {m1, m2, m3});
+        manager = control.createMock(RMManager.class, new Method[] {m1});
         manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
-        EasyMock.expect(manager.getRMNamespace(message)).andReturn(RM10Constants.NAMESPACE_URI).anyTimes();
-        EasyMock.expect(manager.getAddressingNamespace(message)).andReturn(Names200408.WSA_NAMESPACE_NAME)
-            .anyTimes();
+        RMConfiguration config = new RMConfiguration();
+        config.setRMNamespace(RM10Constants.NAMESPACE_URI);
+        config.setRM10AddressingNamespace(RM10Constants.NAMESPACE_URI);
+        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         Endpoint endpoint = control.createMock(Endpoint.class);
@@ -384,8 +382,6 @@ public class RMManagerTest extends Assert {
         Method m = RMManager.class.getDeclaredMethod("getSource", new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
         Message message = control.createMock(Message.class);
-        EasyMock.expect(RMContextUtils.getProtocolVariation(message))
-            .andReturn(ProtocolVariation.RM10WSA200408);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();

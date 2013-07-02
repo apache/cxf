@@ -143,13 +143,11 @@ public class RMManager {
     // Configuration
 
     public void setRMNamespace(String uri) {
-        RMConfiguration cfg = forceConfiguration();
-        cfg.setRMNamespace(uri);
+        getConfiguration().setRMNamespace(uri);
     }
 
     public void setRM10AddressingNamespace(RM10AddressingNamespaceType addrns) {
-        RMConfiguration cfg = forceConfiguration();
-        cfg.setRM10AddressingNamespace(addrns.getUri());
+        getConfiguration().setRM10AddressingNamespace(addrns.getUri());
     }
     
     public Bus getBus() {
@@ -243,7 +241,10 @@ public class RMManager {
      * @return configuration (non-<code>null</code>)
      */
     public RMConfiguration getConfiguration() {
-        return forceConfiguration();
+        if (configuration == null) {
+            setConfiguration(new RMConfiguration());
+        }
+        return configuration;
     }
 
     /**
@@ -260,11 +261,14 @@ public class RMManager {
         this.configuration = configuration;
     }
     
-    RMConfiguration forceConfiguration() {
-        if (configuration == null) {
-            setConfiguration(new RMConfiguration());
-        }
-        return configuration;
+    /**
+     * Get configuration after applying policies.
+     * 
+     * @param msg
+     * @return configuration (non-<code>null</code>)
+     */
+    public RMConfiguration getEffectiveConfiguration(Message msg) {
+        return RMPolicyUtilities.getRMConfiguration(getConfiguration(), msg);
     }
 
     /**
@@ -307,15 +311,33 @@ public class RMManager {
             WrappedEndpoint wrappedEndpoint = (WrappedEndpoint)endpoint;
             endpoint = wrappedEndpoint.getWrappedEndpoint();
         }
-        RMConfiguration dflt = getConfiguration();
-        String rmUri = getRMNamespace(dflt, message);
-        String addrUri = getAddressingNamespace(dflt, message);
-        ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
-        if (protocol == null) {
-            org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
-                "UNSUPPORTED_NAMESPACE", LOG, addrUri, rmUri);
-            LOG.log(Level.INFO, msg.toString());
-            throw new RMException(msg);
+        String rmUri = (String)message.getContextualProperty(WSRM_VERSION_PROPERTY);
+        if (rmUri == null) {
+            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+            if (rmps != null) {
+                rmUri = rmps.getNamespaceURI();
+            }
+        }
+        String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
+        if (addrUri == null) {
+            AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
+            if (maps != null) {
+                addrUri = maps.getNamespaceURI();
+            }
+        }
+        RMConfiguration config = getConfiguration();
+        if (rmUri != null) {
+            config.setRMNamespace(rmUri);
+            ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
+            if (protocol == null) {
+                org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
+                    "UNSUPPORTED_NAMESPACE", LOG, addrUri, rmUri);
+                LOG.log(Level.INFO, msg.toString());
+                throw new RMException(msg);
+            }
+        }
+        if (addrUri != null) {
+            config.setRM10AddressingNamespace(addrUri);
         }
         RMEndpoint rme = reliableEndpoints.get(endpoint);
         if (null == rme) {
@@ -331,94 +353,12 @@ public class RMManager {
                 = ei == null ? null : ei.getEndpointInfo()
                     .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
                              org.apache.cxf.transport.Destination.class);
-            RMConfiguration config = RMPolicyUtilities.getRMConfiguration(getConfiguration(), message);
+            config = RMPolicyUtilities.getRMConfiguration(config, message);
             rme.initialise(config, message.getExchange().getConduit(message), replyTo, dest);
             reliableEndpoints.put(endpoint, rme);
             LOG.fine("Created new RMEndpoint.");
         }
         return rme;
-    }
-
-    /**
-     * Get the WS-Addressing namespace being used for a message. If the WS-Addressing namespace has not been
-     * set, this returns the default from the supplied configuration.
-     * 
-     * @param config
-     * @param message
-     * @return namespace URI
-     */
-    String getAddressingNamespace(RMConfiguration config, Message message) {
-        String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
-        if (addrUri == null) {
-            AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
-            if (maps != null) {
-                addrUri = maps.getNamespaceURI();
-            }
-            if (addrUri == null) {
-                addrUri = ProtocolVariation.findVariant(config.getRMNamespace(), config.getRM10AddressingNamespace())
-                    .getWSANamespace();
-            }
-        }
-        return addrUri;
-    }
-
-    /**
-     * Get the WS-Addressing namespace being used for a message. If the WS-Addressing namespace has not been set, this
-     * returns the best default.
-     * 
-     * @param message
-     * @return namespace URI
-     */
-    public String getAddressingNamespace(Message message) {
-        RMConfiguration config = null;
-        try {
-            config = getReliableEndpoint(message).getConfiguration();
-        } catch (RMException e) {
-            // only happens with invalid namespace combination, just fall back to manager default
-            config = getConfiguration();
-        }
-        return getAddressingNamespace(config, message);
-    }
-
-    /**
-     * Get the WS-RM namespace being used for a message. If the WS-RM namespace has not been set, this returns the
-     * default from the supplied configuration.
-     * 
-     * @param config
-     * @param message
-     * @return namespace URI
-     */
-    String getRMNamespace(RMConfiguration config, Message message) {
-        String rmUri = (String)message.getContextualProperty(WSRM_VERSION_PROPERTY);
-        if (rmUri == null) {
-            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-            if (rmps != null) {
-                rmUri = rmps.getNamespaceURI();
-            }
-            if (rmUri == null) {
-                rmUri = ProtocolVariation.findVariant(config.getRMNamespace(), config.getRM10AddressingNamespace())
-                    .getWSRMNamespace();
-            }
-        }
-        return rmUri;
-    }
-
-    /**
-     * Get the WS-RM namespace being used for a message. If the WS-RM namespace has not been set, this returns the best
-     * default.
-     * 
-     * @param message
-     * @return namespace URI
-     */
-    String getRMNamespace(Message message) {
-        RMConfiguration config = null;
-        try {
-            config = getReliableEndpoint(message).getConfiguration();
-        } catch (RMException e) {
-            // only happens with invalid namespace combination, just fall back to manager default
-            config = getConfiguration();
-        }
-        return getRMNamespace(config, message);
     }
 
     public Destination getDestination(Message message) throws RMException {
@@ -442,7 +382,7 @@ public class RMManager {
 
         Source source = getSource(message);
         SourceSequence seq = source.getCurrent(inSeqId);
-        ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
+        RMConfiguration config = getEffectiveConfiguration(message);
         if (null == seq || seq.isExpired()) {
             // TODO: better error handling
             EndpointReferenceType to = null;
@@ -451,7 +391,7 @@ public class RMManager {
             RelatesToType relatesTo = null;
             if (isServer) {
                 AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);
-                inMaps.exposeAs(getAddressingNamespace(message));
+                inMaps.exposeAs(config.getAddressingNamespace());
                 acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();
                 source.getReliableEndpoint().getServant().setUnattachedIdentifier(inSeqId);
@@ -486,6 +426,7 @@ public class RMManager {
                 throw new RMException(msg);
             }
             Proxy proxy = source.getReliableEndpoint().getProxy();
+            ProtocolVariation protocol = config.getProtocolVariation();
             CreateSequenceResponseType createResponse = 
                 proxy.createSequence(acksTo, relatesTo, isServer, protocol);
             if (!isServer) {
@@ -652,7 +593,7 @@ public class RMManager {
     @PostConstruct
     void initialise() {
         if (configuration == null) {
-            forceConfiguration().setExponentialBackoff(true);
+            getConfiguration().setExponentialBackoff(true);
         }
         DeliveryAssurance da = configuration.getDeliveryAssurance();
         if (da == null) {

@@ -394,32 +394,33 @@ public class RMEndpoint {
             return;
         }
 
-        EndpointInfo ei = getEndpoint(ProtocolVariation.RM10WSA200408).getEndpointInfo();
-
-        PolicyInterceptorProviderRegistry reg = manager.getBus()
-            .getExtension(PolicyInterceptorProviderRegistry.class);
-        EndpointPolicy ep = null == conduit ? engine.getServerEndpointPolicy(applicationEndpoint
-            .getEndpointInfo(), null) : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(),
-                                                                       conduit);
-
-        if (conduit != null) {
-            engine.setClientEndpointPolicy(ei, ep);
-        } else {
-            engine.setServerEndpointPolicy(ei, ep);
-        }
-
-        EffectivePolicy effectiveOutbound = new EffectivePolicyImpl(ep, reg, true, false);
-        EffectivePolicy effectiveInbound = new EffectivePolicyImpl(ep, reg, false, false);
-
-        BindingInfo bi = ei.getBinding();
-        Collection<BindingOperationInfo> bois = bi.getOperations();
-
-        for (BindingOperationInfo boi : bois) {
-            engine.setEffectiveServerRequestPolicy(ei, boi, effectiveInbound);
-            engine.setEffectiveServerResponsePolicy(ei, boi, effectiveOutbound);
-
-            engine.setEffectiveClientRequestPolicy(ei, boi, effectiveOutbound);
-            engine.setEffectiveClientResponsePolicy(ei, boi, effectiveInbound);
+        for (Endpoint endpoint : endpoints.values()) {
+            EndpointInfo ei = endpoint.getEndpointInfo();
+            PolicyInterceptorProviderRegistry reg = manager.getBus()
+                .getExtension(PolicyInterceptorProviderRegistry.class);
+            EndpointPolicy ep = null == conduit ? engine.getServerEndpointPolicy(applicationEndpoint
+                .getEndpointInfo(), null) : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(),
+                    conduit);
+            
+            if (conduit != null) {
+                engine.setClientEndpointPolicy(ei, ep);
+            } else {
+                engine.setServerEndpointPolicy(ei, ep);
+            }
+            
+            EffectivePolicy effectiveOutbound = new EffectivePolicyImpl(ep, reg, true, false);
+            EffectivePolicy effectiveInbound = new EffectivePolicyImpl(ep, reg, false, false);
+            
+            BindingInfo bi = ei.getBinding();
+            Collection<BindingOperationInfo> bois = bi.getOperations();
+            
+            for (BindingOperationInfo boi : bois) {
+                engine.setEffectiveServerRequestPolicy(ei, boi, effectiveInbound);
+                engine.setEffectiveServerResponsePolicy(ei, boi, effectiveOutbound);
+                
+                engine.setEffectiveClientRequestPolicy(ei, boi, effectiveOutbound);
+                engine.setEffectiveClientResponsePolicy(ei, boi, effectiveInbound);
+            }
         }
 
         // TODO: FaultPolicy (SequenceFault)

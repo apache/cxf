@@ -69,6 +69,7 @@ import org.apache.cxf.ws.rm.EncoderDecoder;
 import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMEndpoint;
@@ -285,7 +286,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                             String wsauri = null;
                             AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
                             if (maps == null) {
-                                wsauri = getManager(message).getAddressingNamespace(message);
+                                RMConfiguration config = getManager(message).getEffectiveConfiguration(message);
+                                wsauri = config.getAddressingNamespace();
                             } else {
                                 wsauri = maps.getNamespaceURI();
                             }

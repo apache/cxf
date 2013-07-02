@@ -465,10 +465,10 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(exchange.getDestination()).andReturn(td);
         
         manager = control.createMock(RMManager.class);
-        EasyMock.expect(manager.getRMNamespace(EasyMock.same(message)))
-            .andReturn(RM10Constants.NAMESPACE_URI).anyTimes();
-        EasyMock.expect(manager.getAddressingNamespace(EasyMock.same(message)))
-            .andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
+        RMConfiguration config = new RMConfiguration();
+        config.setRMNamespace(RM10Constants.NAMESPACE_URI);
+        config.setRM10AddressingNamespace(RM10Constants.NAMESPACE_URI);
+        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
         interceptor.setManager(manager);
         rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(manager.getReliableEndpoint(message)).andReturn(rme);

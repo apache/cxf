@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.apache.cxf.message.Message;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
@@ -365,9 +364,8 @@ public class RetransmissionQueueImplTest extends Assert {
     }
     
     private void setupMessagePolicies(Message message) {
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
         RMConfiguration cfg = new RMConfiguration();
-        EasyMock.expect(manager.getConfiguration()).andReturn(cfg);
+        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(cfg);
         cfg.setBaseRetransmissionInterval(new Long(5000));
         cfg.setExponentialBackoff(true);
     }

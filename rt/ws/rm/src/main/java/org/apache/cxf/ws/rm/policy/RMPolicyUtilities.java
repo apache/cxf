@@ -21,12 +21,14 @@ package org.apache.cxf.ws.rm.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
-import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
@@ -38,6 +40,15 @@ import org.apache.neethi.builders.PrimitiveAssertion;
  * Utilities for working with policies and configurations.
  */
 public final class RMPolicyUtilities {
+    
+    private static final List<QName> ASSERTION_NAMES;
+    static {
+        ASSERTION_NAMES = new ArrayList<QName>();
+        ASSERTION_NAMES.addAll(RM10AssertionBuilder.KNOWN_ELEMENTS);
+        for (QName qn : RM12AssertionBuilder.KNOWN_ELEMENTS) {
+            ASSERTION_NAMES.add(qn);
+        }
+    }
     
     private RMPolicyUtilities() {
     }
@@ -76,13 +87,11 @@ public final class RMPolicyUtilities {
     public static Collection<AssertionInfo> collectRMAssertions(AssertionInfoMap aim) {
         Collection<AssertionInfo> mergedAsserts = new ArrayList<AssertionInfo>();
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(RM10Constants.WSRMP_RMASSERTION_QNAME);
-            if (ais != null) {
-                mergedAsserts.addAll(ais);
-            }
-            ais = aim.get(RM11Constants.WSRMP_RMASSERTION_QNAME);
-            if (ais != null) {
-                mergedAsserts.addAll(ais);
+            for (QName qn : ASSERTION_NAMES) {
+                Collection<AssertionInfo> ais = aim.get(qn);
+                if (ais != null) {
+                    mergedAsserts.addAll(ais);
+                }
             }
         }
         return mergedAsserts;

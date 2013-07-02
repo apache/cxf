@@ -146,8 +146,7 @@ public class RMOutInterceptorTest extends Assert {
         config.setRMNamespace(RM10Constants.NAMESPACE_URI);
         config.setRM10AddressingNamespace(Names200408.WSA_NAMESPACE_NAME);
         EasyMock.expect(rme.getConfiguration()).andReturn(config).anyTimes();
-        EasyMock.expect(manager.getRMNamespace(message)).andReturn(RM10Constants.NAMESPACE_URI).anyTimes();
-        EasyMock.expect(manager.getAddressingNamespace(message)).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
+        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
         Source source = control.createMock(Source.class);
         EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
         EasyMock.expect(manager.getSource(message)).andReturn(source).anyTimes();

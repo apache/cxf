@@ -69,7 +69,6 @@ import org.apache.cxf.ws.rm.RetryStatus;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
@@ -505,7 +504,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             message = m;
             retries = 0;
             out = m.getContent(OutputStream.class);
-            RMConfiguration cfg = RMPolicyUtilities.getRMConfiguration(manager.getConfiguration(), message);
+            RMConfiguration cfg = manager.getEffectiveConfiguration(message);
             long baseRetransmissionInterval = 
                 cfg.getBaseRetransmissionInterval().longValue();
             backoff = cfg.isExponentialBackoff()  ? RetransmissionQueue.DEFAULT_EXPONENTIAL_BACKOFF : 1;
