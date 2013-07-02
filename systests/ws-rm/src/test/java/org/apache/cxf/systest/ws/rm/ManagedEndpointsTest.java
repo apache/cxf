@@ -296,7 +296,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         LOG.info("resumed the source queue: " + sseqId);
         
         LOG.info("waiting for 15 secs for the retry (resumed)...");
-        Thread.sleep(10000);
+        Thread.sleep(15000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
                        new Object[]{true}, new String[]{"boolean"});
