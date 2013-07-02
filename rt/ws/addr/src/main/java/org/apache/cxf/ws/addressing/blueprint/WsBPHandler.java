@@ -33,7 +33,7 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class WsBPHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("/schemas/ws-addr-conf.xsd");
+        return getClass().getClassLoader().getResource("schemas/ws-addr-conf.xsd");
     }
 
     @SuppressWarnings("rawtypes")

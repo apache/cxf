@@ -35,13 +35,13 @@ public class PolicyBPHandler implements NamespaceHandler {
         //Say yes to various schemas.
 
         if ("http://cxf.apache.org/policy".equals(s)) {
-            return getClass().getClassLoader().getResource("/schemas/blueprint/policy.xsd");
+            return getClass().getClassLoader().getResource("schemas/blueprint/policy.xsd");
         } else if ("http://www.w3.org/ns/ws-policy".equals(s)) {
-            return getClass().getClassLoader().getResource("/schemas/ws-policy-200702.xsd");
+            return getClass().getClassLoader().getResource("schemas/ws-policy-200702.xsd");
         } else if ("http://www.w3.org/2006/07/ws-policy".equals(s)) {
-            return getClass().getClassLoader().getResource("/schemas/ws-policy-200607.xsd");
+            return getClass().getClassLoader().getResource("schemas/ws-policy-200607.xsd");
         } else if ("http://schemas.xmlsoap.org/ws/2004/09/policy".equals(s)) {
-            return getClass().getClassLoader().getResource("/schemas/ws-policy-200409.xsd");
+            return getClass().getClassLoader().getResource("schemas/ws-policy-200409.xsd");
         }
 
         return null;

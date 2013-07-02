@@ -45,7 +45,7 @@ public class JAXWSBPNamespaceHandler implements NamespaceHandler {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/blueprint/jaxws.xsd");
+        return getClass().getClassLoader().getResource("schemas/blueprint/jaxws.xsd");
     }
 
 

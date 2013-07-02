@@ -53,7 +53,7 @@ public class ClusteringBPNamespaceHandler implements NamespaceHandler {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/clustering.xsd");
+        return getClass().getClassLoader().getResource("schemas/clustering.xsd");
     }
 
 }

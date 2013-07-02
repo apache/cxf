@@ -45,7 +45,7 @@ public class HttpBPHandler implements NamespaceHandler {
     public URL getSchemaLocation(String s) {
         if ("http://cxf.apache.org/transports/http/configuration".equals(s)) {
             return getClass().getClassLoader().
-                getResource("/schemas/configuration/http-conf.xsd");
+                getResource("schemas/configuration/http-conf.xsd");
         }
         return null;
     }

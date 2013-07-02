@@ -37,13 +37,13 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
     
     public URL getSchemaLocation(String namespace) {
         if ("http://cxf.apache.org/configuration/beans".equals(namespace)) {
-            return getClass().getClassLoader().getResource("/schemas/configuration/cxf-beans.xsd");           
+            return getClass().getClassLoader().getResource("schemas/configuration/cxf-beans.xsd");           
         } else if ("http://cxf.apache.org/configuration/parameterized-types".equals(namespace)) {
-            return getClass().getClassLoader().getResource("/schemas/configuration/parameterized-types.xsd");
+            return getClass().getClassLoader().getResource("schemas/configuration/parameterized-types.xsd");
         } else if ("http://cxf.apache.org/configuration/security".equals(namespace)) {
-            return getClass().getClassLoader().getResource("/schemas/configuration/security.xsd");
+            return getClass().getClassLoader().getResource("schemas/configuration/security.xsd");
         } else if ("http://schemas.xmlsoap.org/wsdl/".equals(namespace)) {
-            return getClass().getClassLoader().getResource("/schemas/wsdl/wsdl.xsd");
+            return getClass().getClassLoader().getResource("schemas/wsdl/wsdl.xsd");
         }
         return null;
     }
