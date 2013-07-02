@@ -50,6 +50,7 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.EffectivePolicy;
@@ -422,7 +423,11 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             if (MessageUtils.isRequestor(msg)) {
                 policy = 
                     (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-client-response");
-                localName = bindingOperationInfo.getOutput().getMessageInfo().getName().getLocalPart();
+                MessageInfo messageInfo = bindingOperationInfo.getOutput().getMessageInfo();
+                localName = messageInfo.getName().getLocalPart();
+                if (!messageInfo.getMessageParts().isEmpty()) {
+                    localName = messageInfo.getMessagePart(0).getConcreteName().getLocalPart();
+                }
             }
             SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
 
