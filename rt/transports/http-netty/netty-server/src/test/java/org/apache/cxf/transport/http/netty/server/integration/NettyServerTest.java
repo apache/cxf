@@ -67,7 +67,7 @@ public class NettyServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testInvocation() throws Exception {
-        System.out.println("http://localhost:" + PORT + "/SoapContext/SoapPort");
+        
         updateAddressPort(g, PORT);
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
