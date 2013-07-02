@@ -34,7 +34,6 @@ import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -266,8 +265,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
                 
-                private final AtomicBoolean handshakeDone = new AtomicBoolean(false);
-
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
