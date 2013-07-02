@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxws.context;
 
-import java.util.Arrays;
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,7 +65,13 @@ class WrappedAttachments implements Set<Attachment> {
     }
 
     public Object[] toArray() {
-        Object[] obj = new Object[attachments.size()];
+        return toArray(new Object[attachments.size()]);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        T[] copy = a.length == attachments.size() 
+            ? a : (T[])Array.newInstance(a.getClass(), attachments.size());
         int i = 0;
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
             Attachment o = cache.get(entry.getKey());
@@ -73,15 +79,9 @@ class WrappedAttachments implements Set<Attachment> {
                 o = new AttachmentImpl(entry.getKey(), entry.getValue());
                 cache.put(entry.getKey(), o);
             }
-            obj[i++] = o;
+            copy[i++] = (T)o;
         }
-        return obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] a) {
-        Object[] obj = toArray();
-        return (T[])Arrays.copyOf(obj, obj.length, a.getClass());
+        return copy;        
     }
 
     public boolean add(Attachment e) {
