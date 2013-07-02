@@ -25,6 +25,8 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.SamlTokenInterceptor;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -46,6 +48,11 @@ public class SamlTokenInterceptorProvider extends AbstractPolicyInterceptorProvi
         super(ASSERTION_TYPES);
         this.getOutInterceptors().add(new SamlTokenInterceptor());
         this.getInInterceptors().add(new SamlTokenInterceptor());
+        
+        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
+        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
+        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
     }
     
 }

@@ -190,6 +190,39 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml1Supporting() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SupportingPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        
+        // DOM
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        // TODO - See WSS-458 Streaming
+        // SecurityTestUtil.enableStreaming(saml1Port);
+        // saml1Port.doubleIt(25);
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml1ElementOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

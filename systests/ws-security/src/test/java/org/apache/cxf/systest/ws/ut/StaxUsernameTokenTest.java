@@ -119,6 +119,34 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testPlaintextSupporting() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextSupportingPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        // DOM
+        utPort.doubleIt(25);
+        
+        //  TODO - See WSS-458 Streaming
+        // SecurityTestUtil.enableStreaming(utPort);
+        // utPort.doubleIt(25);
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testPasswordHashed() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

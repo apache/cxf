@@ -342,21 +342,17 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         
         super.configureProperties(msg, outboundTokens);
         
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (!ais.isEmpty()) {
+        if (!getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING).isEmpty()) {
+            new StaxTransportBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
+        } else if (!getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING).isEmpty()) {
+            new StaxAsymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
+        } else if (!getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING).isEmpty()) {
+            new StaxSymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
+        } else {
+            // Fall back to Transport Binding
             new StaxTransportBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
         }
         
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (!ais.isEmpty()) {
-            new StaxAsymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (!ais.isEmpty()) {
-            new StaxSymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
-        }
     }
     
 }

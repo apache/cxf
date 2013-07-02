@@ -34,6 +34,7 @@ import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.StaxServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -184,6 +185,41 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
             // String error = "SamlToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml1Supporting() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = StaxSamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SupportingPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false);
+        samlCallbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", samlCallbackHandler
+        );
+        
+        // DOM
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        // TODO - See WSS-458 Streaming
+        // SecurityTestUtil.enableStreaming(saml1Port);
+        // saml1Port.doubleIt(25);
         
         ((java.io.Closeable)saml1Port).close();
         bus.shutdown(true);

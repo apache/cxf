@@ -65,6 +65,15 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItPlaintextSupportingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.username" value="Alice"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItHashedPort" 
                   createdFromAPI="true">
        <jaxws:properties>

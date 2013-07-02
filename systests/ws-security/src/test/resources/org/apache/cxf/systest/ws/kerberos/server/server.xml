@@ -138,7 +138,7 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
-       id="Kerberosupporting"
+       id="KerberosSupporting"
        address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSupporting" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleItKerberosSupportingPort"

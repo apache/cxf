@@ -105,6 +105,21 @@
      
     </jaxws:endpoint> 
     
+     <jaxws:endpoint 
+       id="Saml1SupportingToken"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1Supporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml1SupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
     <jaxws:endpoint 
        id="Saml2TokenOverSymmetric"
        address="http://localhost:${testutil.ports.Server}/DoubleItSaml2Symmetric" 

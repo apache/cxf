@@ -75,9 +75,11 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         
         if (this.isRequestor()) {
             tbinding = (TransportBinding)getBinding(aim);
-            TransportToken token = tbinding.getTransportToken();
-            if (token.getToken() instanceof IssuedToken) {
-                // TODO
+            if (tbinding != null) {
+                TransportToken token = tbinding.getTransportToken();
+                if (token.getToken() instanceof IssuedToken) {
+                    // TODO
+                }
             }
             
             try {

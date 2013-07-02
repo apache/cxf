@@ -131,6 +131,25 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="KerberosSupporting"
+       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSupporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKerberosSupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.enable.streaming" value="true"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="KerberosOverAsymmetric"
        address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetric" 
        serviceName="s:DoubleItService"

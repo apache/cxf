@@ -106,6 +106,24 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint 
+       id="PlaintextSupporting"
+       address="https://localhost:${testutil.ports.StaxServer}/DoubleItUTPlaintextSupporting" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItPlaintextSupportingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+           <entry key="ws-security.enable.streaming" value="true"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
        id="Hashed"
        address="https://localhost:${testutil.ports.StaxServer}/DoubleItUTHashed" 
        serviceName="s:DoubleItService"

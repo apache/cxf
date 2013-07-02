@@ -37,6 +37,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -131,6 +132,12 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 secProps = getSecurityProperties();
             } else {
                 secProps = ConfigurationConverter.convert(getProperties());
+            }
+            
+            if ((secProps.getOutAction() == null || secProps.getOutAction().length == 0)
+                && mc.get(AssertionInfoMap.class) != null) {
+                // If no actions configured (with SecurityPolicy) then return
+                return;
             }
             
             SecurityEventListener securityEventListener = 
