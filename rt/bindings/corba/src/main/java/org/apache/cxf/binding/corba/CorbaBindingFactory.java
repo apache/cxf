@@ -20,7 +20,6 @@
 package org.apache.cxf.binding.corba;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,8 +33,6 @@ import org.apache.cxf.binding.corba.interceptors.CorbaStreamFaultOutInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamInInterceptor;
 import org.apache.cxf.binding.corba.interceptors.CorbaStreamOutInterceptor;
 import org.apache.cxf.binding.corba.utils.OrbConfig;
-import org.apache.cxf.interceptor.BareInInterceptor;
-import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
@@ -44,6 +41,8 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.binding.AbstractWSDLBindingFactory;
+import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
+import org.apache.cxf.wsdl.interceptors.BareOutInterceptor;
 
 public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     implements ConduitInitiator, DestinationFactory {

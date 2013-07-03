@@ -20,7 +20,6 @@
 package org.apache.cxf.binding.soap;
 
 import java.util.ArrayList;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -81,13 +80,10 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
-import org.apache.cxf.interceptor.BareOutInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -108,6 +104,9 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl.binding.AbstractWSDLBindingFactory;
+import org.apache.cxf.wsdl.interceptors.BareOutInterceptor;
+import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
+import org.apache.cxf.wsdl.interceptors.WrappedOutInterceptor;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 import static org.apache.cxf.helpers.CastUtils.cast;

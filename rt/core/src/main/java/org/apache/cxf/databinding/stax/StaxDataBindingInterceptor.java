@@ -28,8 +28,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
@@ -39,11 +37,10 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor {
-    private static final Logger LOG = LogUtils.getL7dLogger(DocLiteralInInterceptor.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(StaxDataBindingInterceptor.class);
 
     public StaxDataBindingInterceptor() {
         super(Phase.UNMARSHAL);
-        addAfter(URIMappingInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) {

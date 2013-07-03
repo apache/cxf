@@ -24,9 +24,9 @@ import java.util.List;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.headers.HeaderTesterImpl;
 import org.apache.hello_world_xml_http.bare.GreeterImpl;
 import org.apache.hello_world_xml_http.wrapped.GreeterFaultImpl;

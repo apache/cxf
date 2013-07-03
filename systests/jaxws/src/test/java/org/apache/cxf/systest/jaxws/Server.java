@@ -29,10 +29,10 @@ import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.annotations.UseAsyncMethod;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.GreeterImpl;

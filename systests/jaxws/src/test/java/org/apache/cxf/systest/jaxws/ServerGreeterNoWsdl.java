@@ -26,9 +26,9 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.frontend.WSDLGetUtils;
 import org.apache.cxf.greeter_control.GreeterImplNoWsdl;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 public class ServerGreeterNoWsdl extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(ServerGreeterNoWsdl.class);

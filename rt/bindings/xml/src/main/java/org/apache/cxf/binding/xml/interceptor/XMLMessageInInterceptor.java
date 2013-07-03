@@ -31,7 +31,6 @@ import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -43,6 +42,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 
 public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLMessageInInterceptor.class);

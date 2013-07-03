@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.interceptor;
+package org.apache.cxf.wsdl.interceptors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +33,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;

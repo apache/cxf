@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.interceptor;
+package org.apache.cxf.wsdl.interceptors;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +42,8 @@ import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;

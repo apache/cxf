@@ -26,11 +26,11 @@ import java.net.URLConnection;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

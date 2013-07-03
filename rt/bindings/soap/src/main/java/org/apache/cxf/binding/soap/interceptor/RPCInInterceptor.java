@@ -34,9 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
-import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
@@ -51,6 +49,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     private static final QName SOAP12_RESULT = new QName("http://www.w3.org/2003/05/soap-rpc",

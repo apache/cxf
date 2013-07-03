@@ -35,6 +35,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
+
 import org.junit.Test;
 
 public class XMLFaultInterceptorsTest extends TestBase {

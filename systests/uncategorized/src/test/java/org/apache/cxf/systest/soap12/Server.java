@@ -21,9 +21,9 @@ package org.apache.cxf.systest.soap12;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);

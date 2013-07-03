@@ -30,7 +30,6 @@ import org.apache.cxf.calculator.CalculatorImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -41,6 +40,7 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.junit.Before;

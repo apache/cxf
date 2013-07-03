@@ -29,15 +29,15 @@ import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
-import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl.interceptors.BareOutInterceptor;
+import org.apache.cxf.wsdl.interceptors.WrappedOutInterceptor;
 
 public class XMLMessageOutInterceptor extends AbstractOutDatabindingInterceptor {
 

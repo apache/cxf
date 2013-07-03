@@ -17,9 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.interceptor;
+package org.apache.cxf.wsdl.interceptors;
 import java.util.List;
 
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;

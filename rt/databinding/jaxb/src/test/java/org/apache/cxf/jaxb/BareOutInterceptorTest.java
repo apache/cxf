@@ -28,16 +28,17 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl.interceptors.BareOutInterceptor;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

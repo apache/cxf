@@ -24,11 +24,11 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.AbstractEndpointSelectionInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.wsdl.interceptors.AbstractEndpointSelectionInterceptor;
 
 /**
  * Selects the most appropriate endpoint based on the SOAP version used.

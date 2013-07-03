@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.interceptor;
+package org.apache.cxf.wsdl.interceptors;
 
 import java.util.ResourceBundle;
 
@@ -27,6 +27,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;

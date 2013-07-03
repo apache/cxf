@@ -25,11 +25,12 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
 import org.apache.hello_world_xml_http.wrapped.types.GreetMe;
+
 import org.junit.Before;
 import org.junit.Test;
 

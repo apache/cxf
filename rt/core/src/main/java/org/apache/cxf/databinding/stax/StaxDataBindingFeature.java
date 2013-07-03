@@ -18,17 +18,16 @@
  */
 package org.apache.cxf.databinding.stax;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.interceptor.BareInInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
+import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptor;
 
 public class StaxDataBindingFeature extends AbstractFeature {
 
@@ -44,25 +43,13 @@ public class StaxDataBindingFeature extends AbstractFeature {
     }
 
     private void removeDatabindingInterceptor(List<Interceptor<? extends Message>> inInterceptors) {
-        removeInterceptor(inInterceptors, DocLiteralInInterceptor.class.getName());
-        removeInterceptor(inInterceptors, BareInInterceptor.class.getName());
-        
-
-        inInterceptors.add(new StaxDataBindingInterceptor());
-    }
-
-    private void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
-
+        List<Interceptor<? extends Message>> remove = new LinkedList<Interceptor<? extends Message>>();
         for (Interceptor<? extends Message> i : inInterceptors) {
-            if (i instanceof PhaseInterceptor) {
-                PhaseInterceptor<? extends Message> p = (PhaseInterceptor<? extends Message>)i;
-
-                if (p.getId().equals(name)) {
-                    inInterceptors.remove(p);
-                    return;
-                }
+            if (i instanceof AbstractInDatabindingInterceptor) {
+                remove.add(i);
             }
         }
+        inInterceptors.removeAll(remove);
+        inInterceptors.add(new StaxDataBindingInterceptor());
     }
-
 }

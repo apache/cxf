@@ -25,18 +25,19 @@ import java.util.Set;
 
 
 
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.AbstractEndpointSelectionInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.wsdl.interceptors.AbstractEndpointSelectionInterceptor;
 
 
 public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor {

@@ -26,7 +26,6 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxb_element_test.JaxbElementTestImpl;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
@@ -38,6 +37,7 @@ import org.apache.cxf.service.invoker.PooledFactory;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.systest.jaxws.cxf5064.SOAPHeaderServiceImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 
 

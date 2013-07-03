@@ -34,12 +34,12 @@ import org.apache.cxf.aegis.services.Echo;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.test.XPathAssert;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.interceptor;
+package org.apache.cxf.wsdl.interceptors;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -52,6 +52,7 @@ import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

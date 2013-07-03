@@ -44,8 +44,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
-import org.apache.cxf.interceptor.BareInInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -58,6 +56,8 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
+import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 
 /**
  * Perform databinding of the SOAP headers.

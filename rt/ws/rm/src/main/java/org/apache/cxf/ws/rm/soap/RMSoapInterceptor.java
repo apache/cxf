@@ -47,7 +47,6 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.headers.Header;
-import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
@@ -80,6 +79,7 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.SequenceFault;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
 
 /**
  * Protocol Handler responsible for {en|de}coding the RM 

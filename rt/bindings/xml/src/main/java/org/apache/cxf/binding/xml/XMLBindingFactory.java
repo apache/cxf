@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
@@ -34,16 +33,16 @@ import org.apache.cxf.binding.xml.interceptor.XMLMessageOutInterceptor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
-import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
+import org.apache.cxf.wsdl.interceptors.WrappedOutInterceptor;
 
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class XMLBindingFactory extends AbstractBindingFactory {
