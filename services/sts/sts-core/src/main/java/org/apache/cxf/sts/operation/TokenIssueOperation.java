@@ -19,14 +19,18 @@
 
 package org.apache.cxf.sts.operation;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.event.STSIssueFailureEvent;
@@ -55,7 +59,12 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
+import org.apache.ws.security.SAMLTokenPrincipal;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -112,6 +121,29 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
     
             TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
             String tokenType = tokenRequirements.getTokenType();
+            
+            
+            if (stsProperties.getSamlRealmCodec() != null) {
+                AssertionWrapper assertion = fetchSAMLAssertionFromWSSecuritySAMLToken(context);
+                
+                if (assertion != null) {
+                    String wssecRealm = stsProperties.getSamlRealmCodec().getRealmFromToken(assertion);
+                    SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.fine("SAML token realm of user '" + samlPrincipal.getName() + "' is " + wssecRealm);
+                    }
+                    
+                    ReceivedToken wssecToken = new ReceivedToken(assertion.getElement());
+                    wssecToken.setState(STATE.VALID);
+                    TokenValidatorResponse tokenResponse = new TokenValidatorResponse();
+                    tokenResponse.setPrincipal(samlPrincipal);
+                    tokenResponse.setToken(wssecToken);
+                    tokenResponse.setTokenRealm(wssecRealm);
+                    tokenResponse.setAdditionalProperties(new HashMap<String, Object>());
+                    processValidToken(providerParameters, wssecToken, tokenResponse);
+                    providerParameters.setPrincipal(wssecToken.getPrincipal());
+                }
+            }
     
     
             // Validate OnBehalfOf token if present
@@ -344,6 +376,38 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         JAXBElement<BinarySecretType> binarySecret = 
                 QNameConstants.WS_TRUST_FACTORY.createBinarySecret(binarySecretType);
         return binarySecret;
+    }
+    
+    /**
+     * Method to fetch SAML assertion from the WS-Security header
+     */
+    
+    private static AssertionWrapper fetchSAMLAssertionFromWSSecuritySAMLToken(
+        WebServiceContext wsContext
+    ) {
+        
+        MessageContext messageContext = wsContext.getMessageContext();
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
+        
+        if (handlerResults != null && handlerResults.size() > 0) {
+            WSHandlerResult handlerResult = handlerResults.get(0);
+            List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
+            
+            for (WSSecurityEngineResult engineResult : engineResults) {
+                /*
+                Integer actInt = (Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION);
+                String id = (String)engineResult.get(WSSecurityEngineResult.TAG_ID);
+                Element tokenElement = 
+                    (Element)engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                */
+                Object token = engineResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                if (token instanceof AssertionWrapper) {
+                    return (AssertionWrapper)token;
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -35,6 +35,7 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.realm.RelationshipResolver;
+import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -63,6 +64,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private IdentityMapper identityMapper;
     private List<Relationship> relationships;
     private RelationshipResolver relationshipResolver;
+    private SAMLRealmCodec samlRealmCodec;
+
+
 
     /**
      * Load the CallbackHandler, Crypto objects, if necessary.
@@ -386,6 +390,14 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     
     public RelationshipResolver getRelationshipResolver() {
         return relationshipResolver;      
+    }
+    
+    public SAMLRealmCodec getSamlRealmCodec() {
+        return samlRealmCodec;
+    }
+
+    public void setSamlRealmCodec(SAMLRealmCodec samlRealmCodec) {
+        this.samlRealmCodec = samlRealmCodec;
     }
     
 }

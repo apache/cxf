@@ -904,12 +904,26 @@ public abstract class AbstractBindingBuilder {
                 }
             }
         }
-        
+                
         //
         // Get the SAML CallbackHandler
         //
         Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
-    
+        
+        if (o == null && message.getContextualProperty(SecurityConstants.TOKEN) != null) {
+            SecurityToken securityToken = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+            Element tokenElement = (Element)securityToken.getToken();
+            String namespace = tokenElement.getNamespaceURI();
+            String localname = tokenElement.getLocalName();
+            if ((token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11())
+                    && WSConstants.SAML_NS.equals(namespace) && "Assertion".equals(localname)) {
+                return new AssertionWrapper(tokenElement);
+            } else if (token.isUseSamlVersion20Profile11()
+                    && WSConstants.SAML2_NS.equals(namespace) && "Assertion".equals(localname)) {
+                return new AssertionWrapper(tokenElement);
+            }
+        }
+        
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {
             handler = (CallbackHandler)o;
