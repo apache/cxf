@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.aegis;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -28,13 +27,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
-
-import org.xml.sax.SAXException;
 
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.AegisType;
@@ -301,11 +298,7 @@ public class AegisContext {
     private Document getSchemaDocument(String resourcePath) { 
         try {
             return XMLUtils.parse(getClass().getResourceAsStream(resourcePath));
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
     }

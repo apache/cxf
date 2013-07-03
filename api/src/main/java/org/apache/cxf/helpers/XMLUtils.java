@@ -20,11 +20,12 @@
 package org.apache.cxf.helpers;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
@@ -32,7 +33,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
@@ -45,43 +45,34 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSSerializer;
+
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public final class XMLUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XMLUtils.class);
     
-    private static final Map<ClassLoader, DocumentBuilderFactory> DOCUMENT_BUILDER_FACTORIES
-        = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilderFactory>());
+    private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS
+        = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
     
-    private static final Map<ClassLoader, TransformerFactory> TRANSFORMER_FACTORIES
-        = Collections.synchronizedMap(new WeakHashMap<ClassLoader, TransformerFactory>());
-
     private static final Pattern XML_ESCAPE_CHARS = Pattern.compile("[\"'&<>]");
     private static final Map<String, String> XML_ENCODING_TABLE;
     static {
@@ -96,113 +87,87 @@ public final class XMLUtils {
     private XMLUtils() {
     }
 
-    private static TransformerFactory getTransformerFactory() {
+    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         if (loader == null) {
             loader = XMLUtils.class.getClassLoader();
         }
         if (loader == null) {
-            return TransformerFactory.newInstance();
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder();
         }
-        TransformerFactory factory = TRANSFORMER_FACTORIES.get(loader);
+        DocumentBuilder factory = DOCUMENT_BUILDERS.get(loader);
         if (factory == null) {
-            factory = TransformerFactory.newInstance();
-            TRANSFORMER_FACTORIES.put(loader, factory);
+            DocumentBuilderFactory f2 = DocumentBuilderFactory.newInstance();
+            f2.setNamespaceAware(true);
+            factory = f2.newDocumentBuilder();
+            DOCUMENT_BUILDERS.put(loader, factory);
         }
         return factory;
     }
-    private static DocumentBuilderFactory getDocumentBuilderFactory() {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        if (loader == null) {
-            loader = XMLUtils.class.getClassLoader();
-        }
-        if (loader == null) {
-            return DocumentBuilderFactory.newInstance();
-        }
-        DocumentBuilderFactory factory = DOCUMENT_BUILDER_FACTORIES.get(loader);
-        if (factory == null) {
-            factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DOCUMENT_BUILDER_FACTORIES.put(loader, factory);
-        }
-        return factory;
-    }
-    public static Transformer newTransformer() throws TransformerConfigurationException {
-        return getTransformerFactory().newTransformer();
-    }
-    public static Transformer newTransformer(int indent) throws TransformerConfigurationException {
-        if (indent > 0) {
-            TransformerFactory f = TransformerFactory.newInstance();
-            try {
-                //sun way of setting indent
-                f.setAttribute("indent-number", Integer.toString(indent));
-            } catch (Throwable t) {
-                //ignore
-            }
-            return f.newTransformer();
-        }
-        return getTransformerFactory().newTransformer();
+
+
+    public static Document parse(InputSource is) throws XMLStreamException {
+        return StaxUtils.read(is);
     }
 
-    public static DocumentBuilder getParser() throws ParserConfigurationException {
-        return getDocumentBuilderFactory().newDocumentBuilder();
+    public static Document parse(File is) throws XMLStreamException, IOException {
+        InputStream fin = new FileInputStream(is);
+        try {
+            return StaxUtils.read(fin);
+        } finally {
+            fin.close();
+        }
     }
 
-    public static Document parse(InputSource is) throws ParserConfigurationException, SAXException,
-        IOException {
-        return getParser().parse(is);
-    }
-
-    public static Document parse(File is) throws ParserConfigurationException, SAXException,
-        IOException {
-        return getParser().parse(is);
-    }
-
-    public static Document parse(InputStream in) throws ParserConfigurationException, SAXException,
-        IOException {
+    public static Document parse(InputStream in) throws XMLStreamException {
         if (in == null && LOG.isLoggable(Level.FINE)) {
             LOG.fine("XMLUtils trying to parse a null inputstream");
         }
-        return getParser().parse(in);
+        return StaxUtils.read(in);
     }
 
-    public static Document parse(String in) throws ParserConfigurationException, SAXException, IOException {
-        return parse(in.getBytes());
+    public static Document parse(String in) throws XMLStreamException {
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(in));
+        try {
+            return StaxUtils.read(reader);
+        } finally {
+            reader.close();
+        }
     }
 
-    public static Document parse(byte[] in) throws ParserConfigurationException, SAXException, IOException {
+    public static Document parse(byte[] in) throws XMLStreamException {
         if (in == null) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("XMLUtils trying to parse a null bytes");
             }
             return null;
         }
-        return getParser().parse(new ByteArrayInputStream(in));
+        return StaxUtils.read(new ByteArrayInputStream(in));
     }
 
     public static Document newDocument() throws ParserConfigurationException {
-        return getParser().newDocument();
+        return getDocumentBuilder().newDocument();
     }
 
-    public static void writeTo(Node node, OutputStream os) {
+    public static void writeTo(Node node, OutputStream os) throws XMLStreamException {
         writeTo(new DOMSource(node), os);
     }
-    public static void writeTo(Node node, OutputStream os, int indent) {
+    public static void writeTo(Node node, OutputStream os, int indent) throws XMLStreamException {
         writeTo(new DOMSource(node), os, indent);
     }
-    public static void writeTo(Source src, OutputStream os) {
+    public static void writeTo(Source src, OutputStream os) throws XMLStreamException {
         writeTo(src, os, -1);
     }
-    public static void writeTo(Node node, Writer os) {
+    public static void writeTo(Node node, Writer os) throws XMLStreamException {
         writeTo(new DOMSource(node), os);
     }
-    public static void writeTo(Node node, Writer os, int indent) {
+    public static void writeTo(Node node, Writer os, int indent) throws XMLStreamException {
         writeTo(new DOMSource(node), os, indent);
     }
-    public static void writeTo(Source src, Writer os) {
+    public static void writeTo(Source src, Writer os) throws XMLStreamException {
         writeTo(src, os, -1);
     }
-    public static void writeTo(Source src, OutputStream os, int indent) {
+    public static void writeTo(Source src, OutputStream os, int indent) throws XMLStreamException {
         String enc = null;
         if (src instanceof DOMSource
             && ((DOMSource)src).getNode() instanceof Document) {
@@ -212,9 +177,9 @@ public final class XMLUtils {
                 //ignore - not DOM level 3
             }
         }
-        writeTo(src, os, indent, enc, "no");
+        writeTo(src, os, indent, enc, false);
     }
-    public static void writeTo(Source src, Writer os, int indent) {
+    public static void writeTo(Source src, Writer os, int indent) throws XMLStreamException {
         String enc = null;
         if (src instanceof DOMSource
             && ((DOMSource)src).getNode() instanceof Document) {
@@ -224,84 +189,79 @@ public final class XMLUtils {
                 //ignore - not DOM level 3
             }
         }
-        writeTo(src, os, indent, enc, "no");
+        writeTo(src, os, indent, enc, false);
     }
     public static void writeTo(Source src,
                                OutputStream os,
                                int indent,
                                String charset,
-                               String omitXmlDecl) {
-        Transformer it;
-        try {
-            if (StringUtils.isEmpty(charset)) {
-                charset = "utf-8"; 
-            }
-
-            it = newTransformer(indent);
-            it.setOutputProperty(OutputKeys.METHOD, "xml");
-            if (indent > -1) {
-                it.setOutputProperty(OutputKeys.INDENT, "yes");
-                it.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
-                                     Integer.toString(indent));
-            }
-            it.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXmlDecl);
-            it.setOutputProperty(OutputKeys.ENCODING, charset);
-            it.transform(src, new StreamResult(os));
-        } catch (TransformerException e) {
-            throw new RuntimeException("Failed to configure TRaX", e);
+                               boolean omitXmlDecl) throws XMLStreamException {
+        
+        if (StringUtils.isEmpty(charset)) {
+            charset = "utf-8"; 
         }
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, charset);
+        if (indent > 0) {
+            writer = new PrettyPrintXMLStreamWriter(writer, 0, indent);
+        }
+        if (!omitXmlDecl) {
+            writer.writeStartDocument(charset, "1.0");
+        }
+        StaxUtils.copy(src, writer);
+        if (!omitXmlDecl) {
+            writer.writeEndDocument();
+        }
+        writer.close();
     }
     public static void writeTo(Source src,
                                Writer os,
                                int indent,
                                String charset,
-                               String omitXmlDecl) {
-        Transformer it;
-        try {
-            if (StringUtils.isEmpty(charset)) {
-                charset = "utf-8"; 
-            }
-
-            it = newTransformer(indent);
-            it.setOutputProperty(OutputKeys.METHOD, "xml");
-            if (indent > -1) {
-                it.setOutputProperty(OutputKeys.INDENT, "yes");
-                it.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
-                                     Integer.toString(indent));
-            }
-            it.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXmlDecl);
-            it.setOutputProperty(OutputKeys.ENCODING, charset);
-            it.transform(src, new StreamResult(os));
-        } catch (TransformerException e) {
-            throw new RuntimeException("Failed to configure TRaX", e);
+                               boolean omitXmlDecl) throws XMLStreamException {
+        if (StringUtils.isEmpty(charset)) {
+            charset = "utf-8"; 
         }
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os);
+        if (indent > 0) {
+            writer = new PrettyPrintXMLStreamWriter(writer, 0, indent);
+        }
+        if (!omitXmlDecl) {
+            writer.writeStartDocument(charset, "1.0");
+        }
+        StaxUtils.copy(src, writer);
+        if (!omitXmlDecl) {
+            writer.writeEndDocument();
+        }
+        writer.close();
     }
+    
+    
     public static String toString(Source source) throws TransformerException, IOException {
-        return toString(source, null);
-    }
-
-    public static String toString(Source source, Properties props) throws TransformerException, IOException {
-        StringWriter bos = new StringWriter();
-        StreamResult sr = new StreamResult(bos);
-        Transformer trans = newTransformer();
-        if (props == null) {
-            props = new Properties();
-            props.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter out = new StringWriter();
+        try {
+            writeTo(source, out, 0, "utf-8", true);
+        } catch (XMLStreamException ex) {
+            throw new RuntimeException(ex);
         }
-        trans.setOutputProperties(props);
-        trans.transform(source, sr);
-        bos.close();
-        return bos.toString();
+        return out.toString();
     }
 
     public static String toString(Node node, int indent) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeTo(node, out, indent);
+        StringWriter out = new StringWriter();
+        try {
+            writeTo(node, out, indent);
+        } catch (XMLStreamException ex) {
+            throw new RuntimeException(ex);
+        }
         return out.toString();
     }
     public static String toString(Node node) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeTo(node, out);
+        StringWriter out = new StringWriter();
+        try {
+            writeTo(node, out);
+        } catch (XMLStreamException ex) {
+            throw new RuntimeException(ex);
+        }
         return out.toString();
     }
 
@@ -364,18 +324,8 @@ public final class XMLUtils {
         return new QName(namespceURI, localName);
     }
 
-    public static void generateXMLFile(Element element, Writer writer) {
-        try {
-            Transformer it = newTransformer();
-
-            it.setOutputProperty(OutputKeys.METHOD, "xml");
-            it.setOutputProperty(OutputKeys.INDENT, "yes");
-            it.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            it.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            it.transform(new DOMSource(element), new StreamResult(writer));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void generateXMLFile(Element element, Writer writer) throws XMLStreamException {
+        writeTo(new DOMSource(element), writer, 2, "UTF-8", false);
     }
 
     public static Element createElementNS(Node node, QName name) {
@@ -407,29 +357,11 @@ public final class XMLUtils {
     }
 
     public static InputStream getInputStream(Document doc) throws Exception {
-        DOMImplementationLS impl = null;
-        DOMImplementation docImpl = doc.getImplementation();
-        // Try to get the DOMImplementation from doc first before
-        // defaulting to the sun implementation.
-        if (docImpl != null && docImpl.hasFeature("LS", "3.0")) {
-            impl = (DOMImplementationLS)docImpl.getFeature("LS", "3.0");
-        } else {
-            DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
-            impl = (DOMImplementationLS)registry.getDOMImplementation("LS");
-            if (impl == null) {
-                System.setProperty(DOMImplementationRegistry.PROPERTY,
-                                   "com.sun.org.apache.xerces.internal.dom.DOMImplementationSourceImpl");
-                registry = DOMImplementationRegistry.newInstance();
-                impl = (DOMImplementationLS)registry.getDOMImplementation("LS");
-            }
-        }
-        LSOutput output = impl.createLSOutput();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        output.setByteStream(byteArrayOutputStream);
-        LSSerializer writer = impl.createLSSerializer();
-        writer.write(doc, output);
-        byte[] buf = byteArrayOutputStream.toByteArray();
-        return new ByteArrayInputStream(buf);
+        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out, "UTF-8");
+        StaxUtils.writeDocument(doc, writer, true);
+        writer.close();
+        return out.createInputStream();
     }
 
     public static Element fetchElementByNameAttribute(Element parent, String targetName, String nameValue) {
@@ -465,12 +397,8 @@ public final class XMLUtils {
         return new QName(ns, localName, prefix);
     }
 
-    public static Node  fromSource(Source src) throws Exception {
-
-        Transformer trans = TransformerFactory.newInstance().newTransformer();
-        DOMResult res = new DOMResult();
-        trans.transform(src, res);
-        return res.getNode();
+    public static Node fromSource(Source src) throws Exception {
+        return StaxUtils.read(src);
     }
     
     public static QName convertStringToQName(String expandedQName) {

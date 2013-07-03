@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
-import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
@@ -94,7 +93,7 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         try {
             XMLUtils.generateXMLFile(hChains, writer);
             writer.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new ToolException(ex);
         }
     }

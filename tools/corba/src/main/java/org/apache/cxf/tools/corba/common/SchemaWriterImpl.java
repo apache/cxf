@@ -29,6 +29,7 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.xml.WSDLWriter;
+import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,9 +83,17 @@ public class SchemaWriterImpl implements WSDLWriter {
     }
 
     public void writeWSDL(Definition wsdlDef, Writer sink) throws WSDLException {
-        XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+        try {
+            XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
     }    
     public void writeWSDL(Definition wsdlDef, OutputStream sink) throws WSDLException {
-        XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+        try {
+            XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
     }   
 }

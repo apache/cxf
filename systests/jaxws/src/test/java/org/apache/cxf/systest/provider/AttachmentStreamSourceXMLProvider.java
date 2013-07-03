@@ -32,8 +32,6 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.annotation.Resource;
 import javax.mail.util.ByteArrayDataSource;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
@@ -47,8 +45,8 @@ import org.w3c.dom.Document;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @WebServiceProvider(serviceName = "AttachmentStreamSourceXMLProvider")
 @ServiceMode(value = Service.Mode.PAYLOAD)
@@ -67,12 +65,9 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             
             int count = 0;
             // we really want to verify that a root part is a proper XML as expected
-            DOMResult result = new DOMResult();
             try {
-                Transformer transformer = XMLUtils.newTransformer();
-                transformer.transform(source, result);
-                count = 
-                    Integer.parseInt(((Document)result.getNode()).getDocumentElement().getAttribute("count"));
+                Document doc = StaxUtils.read(source);
+                count = Integer.parseInt(doc.getDocumentElement().getAttribute("count"));
             } catch (Exception ex) {
                 // ignore
             }

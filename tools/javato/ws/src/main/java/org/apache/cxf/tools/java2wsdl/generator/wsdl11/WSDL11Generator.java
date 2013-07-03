@@ -30,11 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLWriter;
+import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
 
@@ -121,6 +123,8 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
         } catch (FileNotFoundException fnfe) {
             throw new ToolException("Output file " + file + " not found", fnfe);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (XMLStreamException e) {
             e.printStackTrace();
         }
         return def;

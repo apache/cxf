@@ -28,15 +28,14 @@ import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.ExtensionSerializer;
 import javax.wsdl.extensions.schema.Schema;
 import javax.xml.namespace.QName;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * A custom Schema serializer because WSDL4J's is buggy.
@@ -48,15 +47,15 @@ public class SchemaSerializer implements ExtensionSerializer {
                          Definition def, ExtensionRegistry extReg) throws WSDLException {
         try {
             writeXml(((Schema)extension).getElement(), pw);
-        } catch (TransformerException e) {
+        } catch (XMLStreamException e) {
             throw new WSDLException("", "Could not write schema.", e);
         }
     }
 
-    private void writeXml(Node n, PrintWriter pw) throws TransformerException {
-        Transformer t = XMLUtils.newTransformer(2);
-        t.setOutputProperty(OutputKeys.INDENT, "yes");
-        t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        t.transform(new DOMSource(n), new StreamResult(pw));
+    private void writeXml(Node n, PrintWriter pw) throws XMLStreamException {
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(pw);
+        writer = new PrettyPrintXMLStreamWriter(writer, 0, 2);
+        StaxUtils.copy(new DOMSource(n), writer);
+        writer.close();
     }
 }

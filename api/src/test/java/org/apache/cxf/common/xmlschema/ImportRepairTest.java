@@ -27,11 +27,8 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
@@ -41,7 +38,8 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexContent;
@@ -51,7 +49,6 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
-import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
@@ -156,8 +153,7 @@ public class ImportRepairTest extends Assert {
         tryToParseSchemas();
     }
 
-    private void tryToParseSchemas() throws ClassNotFoundException, InstantiationException,
-        IllegalAccessException, XmlSchemaSerializerException, TransformerException {
+    private void tryToParseSchemas() throws Exception {
         // Get DOM Implementation using DOM Registry
         final List<DOMLSInput> inputs = new ArrayList<DOMLSInput>();
         final Map<String, LSInput> resolverMap = new HashMap<String, LSInput>();
@@ -203,18 +199,15 @@ public class ImportRepairTest extends Assert {
         schemaLoader.loadInputList(new ListLSInput(inputs));
     }
 
-    private void dumpSchema(Document document) {
+    private void dumpSchema(Document document) throws Exception {
         if (!dumpSchemas) {
             return;
         }
-        try {
-            Transformer t = XMLUtils.newTransformer(2);
-            t.setOutputProperty(OutputKeys.INDENT, "yes");
-            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            t.transform(new DOMSource(document), new StreamResult(System.err));
-        } catch (Exception e) {
-            //
-        }
+        
+        XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(System.err);
+        xwriter = new PrettyPrintXMLStreamWriter(xwriter, 0, 2);
+        StaxUtils.copy(new DOMSource(document), xwriter);
+        xwriter.close();
     }
 
     private void createTypeImportedByElement(XmlSchema elementTypeSchema) {

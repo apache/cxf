@@ -21,13 +21,24 @@ package org.apache.cxf.wsdl;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.wsdl.Binding;
+import javax.wsdl.BindingFault;
+import javax.wsdl.BindingInput;
+import javax.wsdl.BindingOperation;
+import javax.wsdl.BindingOutput;
 import javax.wsdl.Definition;
+import javax.wsdl.Message;
+import javax.wsdl.Operation;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionDeserializer;
@@ -63,6 +74,7 @@ import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 
 
@@ -70,7 +82,9 @@ import org.apache.cxf.staxutils.StaxUtils;
  * JAXBExtensionHelper
  */
 public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeserializer {
+    static final Map<Class<?>, Integer> WSDL_INDENT_MAP = new HashMap<Class<?>, Integer>();
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
+    private static final int DEFAULT_INDENT_LEVEL = 2;
 
     final Class<?> typeClass;
     final String namespace;
@@ -95,6 +109,29 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     void setExtensionClass(Class<?> cls) {
         extensionClass = cls;
     }
+    
+    private int getIndentLevel(Class<?> parent) {
+        Integer result = WSDL_INDENT_MAP.get(parent);
+        if (result == null) {
+            return DEFAULT_INDENT_LEVEL;
+        }
+        return result.intValue();
+    }
+
+    static {
+        WSDL_INDENT_MAP.put(Definition.class, Integer.valueOf(DEFAULT_INDENT_LEVEL));
+        WSDL_INDENT_MAP.put(Binding.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(BindingFault.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(BindingInput.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(BindingOutput.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(BindingOperation.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(Message.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(Operation.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(Port.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(Service.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(Types.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
+    }
+    
     
     public static void addExtensions(ExtensionRegistry registry, String parentType, String elementType)
         throws JAXBException, ClassNotFoundException {
@@ -261,7 +298,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             
             javax.xml.stream.XMLOutputFactory fact = javax.xml.stream.XMLOutputFactory.newInstance();
             XMLStreamWriter writer =
-                new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), parent);
+                new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), getIndentLevel(parent));
             writer.setNamespaceContext(new javax.xml.namespace.NamespaceContext() {
                 
                 public String getNamespaceURI(String arg) {

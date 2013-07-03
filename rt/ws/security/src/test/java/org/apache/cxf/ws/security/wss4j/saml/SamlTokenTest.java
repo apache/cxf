@@ -595,7 +595,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
     }
 
     // FOR DEBUGGING ONLY
-    /*private*/ static String serialize(Document doc) {
+    /*private*/ static String serialize(Document doc) throws Exception {
         return XMLUtils.toString(doc);
     }
 }

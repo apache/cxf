@@ -18,9 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.xml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.util.Collections;
@@ -43,13 +41,13 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -331,11 +329,9 @@ public class XMLSource {
     private <T> Object readPrimitiveValue(Node node, Class<T> cls) {
         if (String.class == cls) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                XMLUtils.writeTo(new DOMSource(node), bos, 0, "", "yes");
                 try {
-                    return cls.cast(bos.toString("UTF-8"));
-                } catch (UnsupportedEncodingException ex) {
+                    return StaxUtils.toString((Element)node);
+                } catch (XMLStreamException e) {
                     // won't happen
                 }
             } else {

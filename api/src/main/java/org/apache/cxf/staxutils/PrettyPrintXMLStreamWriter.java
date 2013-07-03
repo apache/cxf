@@ -17,23 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.wsdl;
+package org.apache.cxf.staxutils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
-import javax.wsdl.Binding;
-import javax.wsdl.BindingFault;
-import javax.wsdl.BindingInput;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.BindingOutput;
-import javax.wsdl.Definition;
-import javax.wsdl.Message;
-import javax.wsdl.Operation;
-import javax.wsdl.Port;
-import javax.wsdl.Service;
-import javax.wsdl.Types;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -41,24 +28,31 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
 
-    static final Map<Class<?>, Integer> WSDL_INDENT_MAP = new HashMap<Class<?>, Integer>();
     static final int DEFAULT_INDENT_LEVEL = 2;
 
     XMLStreamWriter baseWriter;
 
-    int indent;
+    int curIndent;
+    int indentAmount = DEFAULT_INDENT_LEVEL;
     Stack<CurrentElement> elems = new Stack<CurrentElement>();
     QName currElem;
     boolean nestedStartElement;   
 
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
-                                      Class<?> parent) {
+                                      int initialLevel) {
         baseWriter = writer;
-        indent = getIndentLevel(parent);
+        curIndent = initialLevel;
+    }
+    public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
+                                      int initialLevel,
+                                      int indentAmount) {
+        baseWriter = writer;
+        curIndent = initialLevel;
+        this.indentAmount = indentAmount;
     }
 
     public void writeSpaces() throws XMLStreamException {
-        for (int i = 0; i < indent; i++) {
+        for (int i = 0; i < curIndent; i++) {
             baseWriter.writeCharacters(" ");
         }
     }
@@ -69,11 +63,11 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
 
     public void indent() {
-        indent += DEFAULT_INDENT_LEVEL;
+        curIndent += indentAmount;
     }
     
     public void unindent() {
-        indent -= DEFAULT_INDENT_LEVEL;
+        curIndent -= indentAmount;
     }
 
     public void close() throws XMLStreamException {
@@ -248,27 +242,6 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
         elems.push(new CurrentElement(currElemName));
     }
 
-    private int getIndentLevel(Class<?> parent) {
-        Integer result = WSDL_INDENT_MAP.get(parent);
-        if (result == null) {
-            return DEFAULT_INDENT_LEVEL;
-        }
-        return result.intValue();
-    }
-
-    static {
-        WSDL_INDENT_MAP.put(Definition.class, Integer.valueOf(DEFAULT_INDENT_LEVEL));
-        WSDL_INDENT_MAP.put(Binding.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-        WSDL_INDENT_MAP.put(BindingFault.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(BindingInput.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(BindingOutput.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(BindingOperation.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(Message.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-        WSDL_INDENT_MAP.put(Operation.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(Port.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(Service.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-        WSDL_INDENT_MAP.put(Types.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-    }
 
     class CurrentElement {
         private QName name;

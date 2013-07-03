@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
@@ -36,6 +37,7 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,7 +137,7 @@ public class AegisTest extends ToolTestBase {
         return namespaces;
     }
     
-    private void assertValid(String xpathExpression, Document doc) {
+    private void assertValid(String xpathExpression, Document doc) throws XMLStreamException {
         XPathUtils xpu = new XPathUtils(getNSMap());
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
             throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
