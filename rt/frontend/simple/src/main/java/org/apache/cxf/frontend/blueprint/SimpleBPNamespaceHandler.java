@@ -41,7 +41,7 @@ public class SimpleBPNamespaceHandler implements NamespaceHandler {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/blueprint/simple.xsd");
+        return getClass().getClassLoader().getResource("schemas/blueprint/simple.xsd");
     }
 
 

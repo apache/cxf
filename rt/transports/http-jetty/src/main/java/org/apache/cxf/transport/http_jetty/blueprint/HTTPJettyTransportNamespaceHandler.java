@@ -44,7 +44,7 @@ public class HTTPJettyTransportNamespaceHandler implements NamespaceHandler {
     public URL getSchemaLocation(String s) {
         if (JETTY_TRANSPORT.equals(s)) {
             return getClass().getClassLoader().
-                getResource("/schemas/configuration/http-jetty.xsd");
+                getResource("schemas/configuration/http-jetty.xsd");
         } else {
             return null;
         }

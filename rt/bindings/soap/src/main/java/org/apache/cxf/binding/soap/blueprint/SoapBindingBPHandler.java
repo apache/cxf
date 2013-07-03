@@ -32,7 +32,7 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class SoapBindingBPHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("/schemas/configuration/blueprint/soap.xsd");
+        return getClass().getClassLoader().getResource("schemas/configuration/blueprint/soap.xsd");
     }
 
     @SuppressWarnings("rawtypes")

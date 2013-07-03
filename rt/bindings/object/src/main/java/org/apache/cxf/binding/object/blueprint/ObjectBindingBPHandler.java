@@ -33,7 +33,7 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class ObjectBindingBPHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("/schemas/bindings/blueprint/object.xsd");
+        return getClass().getClassLoader().getResource("schemas/bindings/blueprint/object.xsd");
     }
 
     @SuppressWarnings("rawtypes")
