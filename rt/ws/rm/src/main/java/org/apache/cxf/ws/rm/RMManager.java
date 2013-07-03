@@ -80,21 +80,26 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
  */
 public class RMManager {
     
-    /**
-     * Message contextual property giving WS-ReliableMessaging namespace.
-     */
+    /** Message contextual property giving WS-ReliableMessaging namespace. */
     public static final String WSRM_VERSION_PROPERTY = "org.apache.cxf.ws.rm.namespace";
     
-    /**
-     * Message contextual property giving addressing namespace to be used by WS-RM implementation.
-     */
+    /** Message contextual property giving addressing namespace to be used by WS-RM implementation. */
     public static final String WSRM_WSA_VERSION_PROPERTY = "org.apache.cxf.ws.rm.wsa-namespace";
 
-    /**
-     * Message contextual property giving the last message.
-     */
-    public static final String WSRM_LAST_MESSAGE_PROPERTY = 
-        "org.apache.cxf.ws.rm.last-message";
+    /** Message contextual property giving the last message flag (Boolean). */
+    public static final String WSRM_LAST_MESSAGE_PROPERTY = "org.apache.cxf.ws.rm.last-message";
+    
+    /** Message contextual property giving WS-ReliableMessaging inactivity timeout (Long). */
+    public static final String WSRM_INACTIVITY_TIMEOUT_PROPERTY = "org.apache.cxf.ws.rm.inactivity-timeout";
+    
+    /** Message contextual property giving WS-ReliableMessaging base retransmission interval (Long). */
+    public static final String WSRM_RETRANSMISSION_INTERVAL_PROPERTY = "org.apache.cxf.ws.rm.retransmission-interval";
+    
+    /** Message contextual property giving WS-ReliableMessaging exponential backoff flag (Boolean). */
+    public static final String WSRM_EXPONENTIAL_BACKOFF_PROPERTY = "org.apache.cxf.ws.rm.exponential-backoff";
+    
+    /** Message contextual property giving WS-ReliableMessaging acknowledgement interval (Long). */
+    public static final String WSRM_ACKNOWLEDGEMENT_INTERVAL_PROPERTY = "org.apache.cxf.ws.rm.acknowledgement-interval";
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMManager.class);
 
@@ -338,6 +343,22 @@ public class RMManager {
         }
         if (addrUri != null) {
             config.setRM10AddressingNamespace(addrUri);
+        }
+        Long timeout = (Long)message.getContextualProperty(WSRM_INACTIVITY_TIMEOUT_PROPERTY);
+        if (timeout != null) {
+            config.setInactivityTimeout(timeout);
+        }
+        Long interval = (Long)message.getContextualProperty(WSRM_RETRANSMISSION_INTERVAL_PROPERTY);
+        if (interval != null) {
+            config.setBaseRetransmissionInterval(interval);
+        }
+        Boolean exponential = (Boolean)message.getContextualProperty(WSRM_EXPONENTIAL_BACKOFF_PROPERTY);
+        if (exponential != null) {
+            config.setExponentialBackoff(exponential);
+        }
+        interval = (Long)message.getContextualProperty(WSRM_ACKNOWLEDGEMENT_INTERVAL_PROPERTY);
+        if (interval != null) {
+            config.setAcknowledgementInterval(interval);
         }
         RMEndpoint rme = reliableEndpoints.get(endpoint);
         if (null == rme) {

@@ -48,6 +48,7 @@ public final class RMPolicyUtilities {
         for (QName qn : RM12AssertionBuilder.KNOWN_ELEMENTS) {
             ASSERTION_NAMES.add(qn);
         }
+        ASSERTION_NAMES.add(RSPAssertionBuilder.CONFORMANT_QNAME);
     }
     
     private RMPolicyUtilities() {
@@ -79,7 +80,8 @@ public final class RMPolicyUtilities {
     }
 
     /**
-     * Collect RMAssertions from map. This checks both namespaces defined for WS-RM policy assertions.
+     * Collect RMAssertions from map. This checks both namespaces defined for WS-RM policy assertions, along with the
+     * WS-I RSP namespace.
      * 
      * @param aim map, may be <code>null</code>
      * @return merged collection, never <code>null</code>

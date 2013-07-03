@@ -43,6 +43,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         Collection<QName> types = new ArrayList<QName>();
         types.add(new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"));
         types.add(new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"));
+        types.add(new QName("http://ws-i.org/profiles/rsp/1.0/", "Conformant"));
         ASSERTION_TYPES = types;
     }
 
