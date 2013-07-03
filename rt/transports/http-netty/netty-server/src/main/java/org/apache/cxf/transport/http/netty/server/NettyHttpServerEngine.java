@@ -241,4 +241,12 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setPort(int port) {
         this.port = port;
     }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+    
+    public String getHost() {
+        return host;
+    }
 }

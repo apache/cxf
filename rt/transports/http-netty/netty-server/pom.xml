@@ -38,6 +38,8 @@
         <cxf.osgi.import>
 	    org.jboss.netty.*;version="${cxf.netty.version.range}",
 	    javax.annotation;version="${cxf.osgi.javax.annotation.version}",
+	    org.apache.aries*;version="${cxf.aries.version.range}",
+        org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
         <cxf.osgi.export>
             org.apache.cxf.*,
@@ -61,6 +63,23 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.5_spec</artifactId>
             <version>1.1.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint.core</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
         
         <dependency>
