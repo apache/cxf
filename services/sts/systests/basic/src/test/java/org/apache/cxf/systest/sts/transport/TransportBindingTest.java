@@ -95,7 +95,17 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
         }
+
+        // DOM
+        doubleIt(transportSaml1Port, 25);
         
+        // Streaming
+        transportSaml1Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml1Port);
         doubleIt(transportSaml1Port, 25);
         
         ((java.io.Closeable)transportSaml1Port).close();
@@ -122,7 +132,18 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
         }
         
+        // DOM
         doubleIt(transportSaml2Port, 30);
+        
+        // Streaming
+        transportSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml2Port);
+        doubleIt(transportSaml2Port, 25);
         
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
@@ -154,6 +175,22 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
         }
         
+        // DOM
+        try {
+            doubleIt(transportSaml1Port, 35);
+            fail("Expected failure on an unknown client");
+        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+            // expected
+        }
+        
+        // Streaming
+        transportSaml1Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml1Port);
         try {
             doubleIt(transportSaml1Port, 35);
             fail("Expected failure on an unknown client");
@@ -164,7 +201,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-
+    
     @org.junit.Test
     public void testSAML1Endorsing() throws Exception {
 
@@ -185,7 +222,18 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
         }
         
+        // DOM
         doubleIt(transportSaml1Port, 40);
+        
+        // Streaming
+        transportSaml1Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml1Port);
+        // TODO doubleIt(transportSaml1Port, 25);
         
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
@@ -226,7 +274,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);

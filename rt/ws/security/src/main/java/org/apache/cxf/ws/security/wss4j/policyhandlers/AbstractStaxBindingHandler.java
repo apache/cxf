@@ -37,6 +37,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -55,6 +57,7 @@ import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -66,6 +69,7 @@ import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.EncryptedParts;
 import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.model.Layout;
@@ -305,6 +309,40 @@ public abstract class AbstractStaxBindingHandler {
         return new SecurePart(qname, Modifier.Element);
     }
     
+    protected void addIssuedToken(IssuedToken token, SecurityToken secToken, 
+                                  boolean signed, boolean endorsing) {
+        if (isTokenRequired(token.getIncludeTokenType())) {
+            final Element el = secToken.getToken();
+            
+            String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
+            if (signed || endorsing) {
+                samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
+            }
+            Map<String, Object> config = getProperties();
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, action + " " + samlAction);
+            } else {
+                config.put(ConfigurationConstants.ACTION, samlAction);
+            }
+            
+            CallbackHandler callbackHandler = new CallbackHandler() {
+
+                @Override
+                public void handle(Callback[] callbacks) {
+                    for (Callback callback : callbacks) {
+                        if (callback instanceof SAMLCallback) {
+                            SAMLCallback samlCallback = (SAMLCallback)callback;
+                            samlCallback.setAssertionElement(el);
+                        }
+                    }
+                }
+                
+            };
+            config.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
+        } 
+    }
+    
     protected void policyNotAsserted(Assertion assertion, String reason) {
         if (assertion == null) {
             return;
@@ -428,60 +466,11 @@ public abstract class AbstractStaxBindingHandler {
             }
         }
         
-        // boolean alsoIncludeToken = false;
-        /* TODO if (token instanceof IssuedToken || token instanceof SamlToken) {
-            SecurityToken securityToken = getSecurityToken();
-            String tokenType = securityToken.getTokenType();
-
-            Element ref;
-            if (attached) {
-                ref = securityToken.getAttachedReference();
-            } else {
-                ref = securityToken.getUnattachedReference();
-            }
-
-            if (ref != null) {
-                SecurityTokenReference secRef = 
-                    new SecurityTokenReference(cloneElement(ref), new BSPEnforcer());
-                sig.setSecurityTokenReference(secRef);
-                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-            } else {
-                int type = attached ? WSConstants.CUSTOM_SYMM_SIGNING 
-                    : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML_NS.equals(tokenType)) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML2_NS.equals(tokenType)) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                } else {
-                    sig.setCustomTokenValueType(tokenType);
-                    sig.setKeyIdentifierType(type);
-                }
-            }
-
-            String sigTokId;
-            if (attached) {
-                sigTokId = securityToken.getWsuId();
-                if (sigTokId == null) {
-                    sigTokId = securityToken.getId();                    
-                }
-                if (sigTokId.startsWith("#")) {
-                    sigTokId = sigTokId.substring(1);
-                }
-            } else {
-                sigTokId = securityToken.getId();
-            }
-
-            sig.setCustomTokenId(sigTokId);
-        } else {
-        */
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         AbstractBinding binding = getBinding(aim);
-        config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
         
+        config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
+
         // Find out do we also need to include the token as per the Inclusion requirement
         if (token instanceof X509Token 
             && token.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER
@@ -510,9 +499,6 @@ public abstract class AbstractStaxBindingHandler {
         config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
         // sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
-        //if (alsoIncludeToken) {
-        //    includeToken(user, crypto, sig);
-        //}
     }
     
     protected final TokenStore getTokenStore() {

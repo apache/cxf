@@ -49,6 +49,8 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -89,6 +91,11 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
         this.getInInterceptors().add(new IssuedTokenInInterceptor());
         this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
+        
+        this.getOutInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
+        this.getOutFaultInterceptors().add(PolicyBasedWSS4JStaxOutInterceptor.INSTANCE);
+        this.getInInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
+        this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
     }
     
     static final TokenStore createTokenStore(Message message) {

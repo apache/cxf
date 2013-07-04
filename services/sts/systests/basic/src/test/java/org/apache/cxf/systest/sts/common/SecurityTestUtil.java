@@ -20,6 +20,11 @@ package org.apache.cxf.systest.sts.common;
 
 import java.io.File;
 
+import javax.xml.ws.BindingProvider;
+
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.example.contract.doubleit.DoubleItPortType;
+
 /**
  * A utility class for security tests
  */
@@ -44,6 +49,15 @@ public final class SecurityTestUtil {
                 }
             }
         }
+    }
+    
+    public static void enableStreaming(DoubleItPortType port) {
+        ((BindingProvider)port).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)port).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
     }
     
 }

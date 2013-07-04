@@ -109,6 +109,17 @@ public class BearerTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
         }
         
+        // DOM
+        doubleIt(transportSaml2Port, 45);
+        
+        // Streaming
+        transportSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml2Port);
         doubleIt(transportSaml2Port, 45);
         
         ((java.io.Closeable)transportSaml2Port).close();
@@ -185,7 +196,18 @@ public class BearerTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
         }
         
+        // DOM
         doubleIt(transportSaml2Port, 45);
+        
+        // Streaming
+        transportSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml2Port);
+        // TODO See WSS-358 doubleIt(transportSaml2Port, 45);
         
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
