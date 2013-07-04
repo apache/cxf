@@ -461,7 +461,7 @@
                                 <sp:X509Token
                                   sp:IncludeToken='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient'>
                                     <wsp:Policy>
-                                        <sp:WssX509V3Token10 />
+                                        <sp:WssX509V1Token11 />
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
@@ -471,7 +471,7 @@
                                 <sp:X509Token
                                   sp:IncludeToken='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always'>
                                     <wsp:Policy>
-                                        <sp:WssX509V3Token10 />
+                                        <sp:WssX509V1Token11 />
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
@@ -565,7 +565,7 @@
                                 <sp:X509Token
                                   sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                                     <wsp:Policy>
-                                        <sp:WssX509V3Token10 />
+                                        <sp:WssX509V1Token11 />
                                         <sp:RequireThumbprintReference/> <!-- needed for V1 certs -->
                                     </wsp:Policy>
                                 </sp:X509Token>
@@ -575,7 +575,7 @@
                             <wsp:Policy>
                                 <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always">
                                     <wsp:Policy>
-                                        <sp:WssX509V3Token10 />
+                                        <sp:WssX509V1Token11 />
                                         <sp:RequireThumbprintReference/>
                                     </wsp:Policy>
                                 </sp:X509Token>

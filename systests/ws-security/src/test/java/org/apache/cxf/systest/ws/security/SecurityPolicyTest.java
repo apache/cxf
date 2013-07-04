@@ -247,7 +247,14 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("alice.properties"));
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
+        
+        // DOM
         pt.doubleIt(5);
+        
+        // TODO EncryptBeforeSigning + EncryptSignature not working
+        // SecurityTestUtil.enableStreaming(pt);
+        // pt.doubleIt(5);
+        
         ((java.io.Closeable)pt).close();
 
         portQName = new QName(NAMESPACE, "DoubleItPortSign");
@@ -260,6 +267,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(5);
+        
         ((java.io.Closeable)pt).close();
 
         portQName = new QName(NAMESPACE, "DoubleItPortSignThenEncrypt");
@@ -271,12 +279,14 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("alice.properties"));
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
+        
+        // DOM
         pt.doubleIt(5);
         
-        //((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-        //                                              POLICY_SIGNENC_PROVIDER_ADDRESS);
-        //int x = pt.doubleIt(5);
-        //assertEquals(10, x);
+        // Streaming
+        SecurityTestUtil.enableStreaming(pt);
+        // pt.doubleIt(5);
+        
         ((java.io.Closeable)pt).close();
         
         portQName = new QName(NAMESPACE, "DoubleItPortHttps");
@@ -293,7 +303,14 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.USERNAME, "bob");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "bob");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.PASSWORD, "pwd");
+        
+        // DOM
         pt.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(pt);
+        pt.doubleIt(25);
+        
         ((java.io.Closeable)pt).close();
         
         try {
@@ -329,7 +346,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
         QName portQName = new QName(NAMESPACE, "DoubleItPortSignedOnly");
         pt = service.getPort(portQName, DoubleItPortType.class);
-
         updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
@@ -338,7 +354,14 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         //This should work as it should be properly signed.
+        
+        // DOM
         assertEquals(10, pt.doubleIt(5));
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(pt);
+        assertEquals(10, pt.doubleIt(5));
+        
         ((java.io.Closeable)pt).close();
         
         //Try sending a message with the "TimestampOnly" policy into affect to the 
@@ -348,11 +371,21 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         pt = service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                                       POLICY_SIGNONLY_ADDRESS);
+        // DOM
         try {
             pt.doubleIt(5);
             fail("should have had a security/policy exception as the body wasn't signed");
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("policy alternatives"));
+        }
+        
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(pt);
+            pt.doubleIt(5);
+            fail("should have had a security/policy exception as the body wasn't signed");
+        } catch (Exception ex) {
+            // expected
         }
         
         ((java.io.Closeable)pt).close();
@@ -431,7 +464,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
     }
     
-    
     @Test
     public void testCXF3041() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -455,8 +487,13 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("alice.properties"));
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
+        
+        // DOM
         assertEquals(10, pt.doubleIt(5));
         
+        // Streaming
+        SecurityTestUtil.enableStreaming(pt);
+        assertEquals(10, pt.doubleIt(5));
         
         ((java.io.Closeable)pt).close();
         bus.shutdown(true);
@@ -485,7 +522,13 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("alice.properties"));
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("alice.properties"));
+
+        // DOM
         assertEquals(10, pt.doubleIt(5));
+        
+        // TODO See WSS-458 Streaming
+        // SecurityTestUtil.enableStreaming(pt);
+        // assertEquals(10, pt.doubleIt(5));
         
         ((java.io.Closeable)pt).close();
         bus.shutdown(true);
@@ -589,11 +632,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory.setThreadDefaultBus(bus);
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
-        DoubleItPortType pt;
-
-        QName
-        portQName = new QName(NAMESPACE, "DoubleItPortCXF4122");
-        pt = service.getPort(portQName, DoubleItPortType.class);
+        QName portQName = new QName(NAMESPACE, "DoubleItPortCXF4122");
+        DoubleItPortType pt = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
                                                       new KeystorePasswordCallback());
@@ -601,6 +641,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("revocation.properties"));
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
                                                       getClass().getResource("bob.properties"));
+        // DOM
         try {
             pt.doubleIt(5);
             fail("should fail on server side when do signature validation due the revoked certificates");
@@ -612,6 +653,18 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Error during certificate path validation"));
         }
         
+        // TODO EncryptBeforeSigning + EncryptSignature not working
+        /*
+        SecurityTestUtil.enableStreaming(pt);
+        try {
+            pt.doubleIt(5);
+            fail("should fail on server side when do signature validation due the revoked certificates");
+        } catch (Exception ex) {
+            String errorMessage = ex.getMessage();
+            // Different errors using different JDKs...
+            System.out.println("ERR1: " + errorMessage);
+        }
+        */
         ((java.io.Closeable)pt).close();
         ep.stop();
         epBus.shutdown(true);

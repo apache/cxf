@@ -30,7 +30,9 @@ import org.junit.Test;
 
 /**
  * This class runs the first half of the tests, as having all in 
- * the one class causes an out of memory problem in eclipse
+ * the one class causes an out of memory problem in eclipse.
+ * 
+ * It tests both DOM + StAX clients against the DOM server.
  */
 public class WSSecurity111Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
@@ -89,6 +91,28 @@ public class WSSecurity111Test extends WSSecurity11Common {
             "UXD-SEES", 
         };
         runClientServer(argv, unrestrictedPoliciesInstalled, false);
+    }
+    
+    @Test
+    public void testClientServerStreaming() throws IOException {
+        if ((!unrestrictedPoliciesInstalled)
+                && (WSSecurity11Common.isIBMJDK16())) {
+            System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
+            return;
+        }
+        String[] argv = new String[] {
+            "A",
+            "A-NoTimestamp",
+            // TODO Derived "AD",
+            // TODO EncryptBeforeSigning not working "A-ES",
+            // TODO Derived "AD-ES",
+            "UX",
+            "UX-NoTimestamp",
+            // TODO Derived "UXD",
+            "UX-SEES",
+            // TODO Derived "UXD-SEES",
+        };
+        runClientServerStreaming(argv, unrestrictedPoliciesInstalled, false);
     }
     
  

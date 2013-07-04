@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -32,6 +33,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssec11.server.Server11;
 import org.apache.cxf.systest.ws.wssec11.server.Server12;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 
 import wssec.wssec11.IPingService;
 import wssec.wssec11.PingService11;
@@ -88,8 +90,59 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
- 
-    
+    public void runClientServerStreaming(
+        String[] argv, boolean unrestrictedPoliciesInstalled, boolean wssecurity12
+    ) throws IOException {
+
+        Bus bus = null;
+        if (unrestrictedPoliciesInstalled) {
+            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client/client.xml");
+        } else {
+            bus = new SpringBusFactory().createBus(
+                      "org/apache/cxf/systest/ws/wssec11/client/client_restricted.xml");
+        }
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        String portNumber = null;
+        if (wssecurity12) {
+            portNumber = Server12.PORT;
+        } else {
+            portNumber = Server11.PORT;
+        }
+
+        URL wsdlLocation = null;
+        for (String portPrefix : argv) {
+            PingService11 svc = null; 
+            wsdlLocation = getWsdlLocation(portPrefix, portNumber); 
+            svc = new PingService11(wsdlLocation);
+            final IPingService port = 
+                svc.getPort(
+                    new QName(
+                        "http://WSSec/wssec11",
+                        portPrefix + "_IPingService"
+                    ),
+                    IPingService.class
+                );
+
+            ((BindingProvider)port).getRequestContext().put(
+                SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+            );
+            ((BindingProvider)port).getResponseContext().put(
+                SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+            );
+            
+            final String output = port.echo(INPUT);
+            assertEquals(INPUT, output);
+
+            ((java.io.Closeable)port).close();
+        }
+
+        bus.shutdown(true);
+    }
+
+
+
     private static URL getWsdlLocation(String portPrefix, String portNumber) {
         try {
             return new URL("http://localhost:" + portNumber + "/" + portPrefix + "PingService?wsdl");
@@ -98,7 +151,7 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         }
     }
 
-    
+
     public static boolean isIBMJDK16() {
         String fullVersion = System.getProperty("java.fullversion");
         if (fullVersion == null) {

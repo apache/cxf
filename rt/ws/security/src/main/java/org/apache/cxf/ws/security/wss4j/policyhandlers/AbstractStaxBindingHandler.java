@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +31,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
@@ -50,6 +53,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
@@ -148,7 +152,42 @@ public abstract class AbstractStaxBindingHandler {
             config.put(ConfigurationConstants.ADD_USERNAMETOKEN_CREATED, "true");
         }
         
+        // Check if a CallbackHandler was specified
+        if (config.get(ConfigurationConstants.PW_CALLBACK_REF) == null) {
+            String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
+            if (password != null) {
+                String username = 
+                    (String)message.getContextualProperty(SecurityConstants.USERNAME);
+                UTCallbackHandler callbackHandler = new UTCallbackHandler(username, password);
+                config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+            }
+        }
+        
         return new SecurePart(WSSConstants.TAG_wsse_UsernameToken, Modifier.Element);
+    }
+    
+    private static class UTCallbackHandler implements CallbackHandler {
+        
+        private final String username;
+        private final String password;
+        
+        public UTCallbackHandler(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        @Override
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (Callback callback : callbacks) {
+                if (callback instanceof WSPasswordCallback) {
+                    WSPasswordCallback pwcb = (WSPasswordCallback)callback;
+                    if (pwcb.getIdentifier().equals(username)) {
+                        pwcb.setPassword(password);
+                    }
+                }
+            }
+        }
+        
     }
     
     protected SecurePart addKerberosToken(
@@ -286,20 +325,8 @@ public abstract class AbstractStaxBindingHandler {
     }
     
     protected void configureTimestamp(AssertionInfoMap aim) {
-        Map<String, Object> config = getProperties();
-        
         AbstractBinding binding = getBinding(aim);
         if (binding != null && binding.isIncludeTimestamp()) {
-            // Action
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, 
-                           action + " " + ConfigurationConstants.TIMESTAMP);
-            } else {
-                config.put(ConfigurationConstants.ACTION, 
-                           ConfigurationConstants.TIMESTAMP);
-            }
-            
             timestampAdded = true;
         }
     }
@@ -887,6 +914,7 @@ public abstract class AbstractStaxBindingHandler {
             for (Header head : parts.getHeaders()) {
                 QName qname = new QName(head.getNamespace(), head.getName());
                 SecurePart securePart = new SecurePart(qname, Modifier.Element);
+                securePart.setRequired(false);
                 signedParts.add(securePart);
             }
         }
@@ -939,6 +967,7 @@ public abstract class AbstractStaxBindingHandler {
             for (Header head : parts.getHeaders()) {
                 QName qname = new QName(head.getNamespace(), head.getName());
                 SecurePart securePart = new SecurePart(qname, Modifier.Content);
+                securePart.setRequired(false);
                 encryptedParts.add(securePart);
             }
         }

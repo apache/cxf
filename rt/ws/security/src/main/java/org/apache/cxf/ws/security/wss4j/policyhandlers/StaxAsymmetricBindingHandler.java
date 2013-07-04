@@ -80,6 +80,19 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         } else {
             doSignBeforeEncrypt();
         }
+        
+        if (timestampAdded) {
+            Map<String, Object> config = getProperties();
+            // Action
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, 
+                           action + " " + ConfigurationConstants.TIMESTAMP);
+            } else {
+                config.put(ConfigurationConstants.ACTION, 
+                           ConfigurationConstants.TIMESTAMP);
+            }
+        }
     }
 
     private void doSignBeforeEncrypt() {
@@ -125,6 +138,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
                 sigs.add(part);
             }
+            sigs.addAll(this.getSignedParts());
             addSupportingTokens();
             
             if (isRequestor() && initiatorWrapper != null) {
@@ -379,11 +393,21 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
-        sigParts.addAll(this.getSignedParts());
+        String optionalParts = "";
+        if (config.containsKey(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS)) {
+            optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
+            if (!optionalParts.endsWith(";")) {
+                optionalParts += ";";
+            }
+        }
         
         for (SecurePart part : sigParts) {
             QName name = part.getName();
-            parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            if (part.isRequired()) {
+                parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            } else {
+                optionalParts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            }
         }
         
         AbstractToken sigToken = wrapper.getToken();
@@ -393,6 +417,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
+        config.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
         
         configureSignature(wrapper, sigToken, false);
         

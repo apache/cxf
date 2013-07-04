@@ -92,6 +92,19 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         } else {
             addSignatureConfirmation(null);
         }
+        
+        if (timestampAdded) {
+            Map<String, Object> config = getProperties();
+            // Action
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, 
+                           action + " " + ConfigurationConstants.TIMESTAMP);
+            } else {
+                config.put(ConfigurationConstants.ACTION, 
+                           ConfigurationConstants.TIMESTAMP);
+            }
+        }
     }
     
     /**
@@ -312,6 +325,14 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
+        String optionalParts = "";
+        if (properties.containsKey(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS)) {
+            optionalParts = (String)properties.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
+            if (!optionalParts.endsWith(";")) {
+                optionalParts += ";";
+            }
+        }
+        
         // Add timestamp
         if (timestampAdded) {
             parts += "{Element}{" + WSSConstants.NS_WSU10 + "}Timestamp;";
@@ -324,7 +345,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             }
             
             for (Header head : signedParts.getHeaders()) {
-                parts += "{Element}{" +  head.getNamespace() + "}" + head.getName() + ";";
+                optionalParts += "{Element}{" +  head.getNamespace() + "}" + head.getName() + ";";
             }
         }
         /*
@@ -345,6 +366,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         */
         
         properties.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
+        properties.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
     }
 
 

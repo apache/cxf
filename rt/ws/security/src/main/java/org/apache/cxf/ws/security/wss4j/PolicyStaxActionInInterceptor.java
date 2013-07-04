@@ -182,6 +182,7 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL);
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
+        assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
 
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
@@ -191,6 +192,11 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         
         assertAllAssertionsByLocalname(aim, SPConstants.WSS10);
         assertAllAssertionsByLocalname(aim, SPConstants.WSS11);
+        
+        assertAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+        assertAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+        assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
+        assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
     }
     
     private void assertAllAssertionsByLocalname(AssertionInfoMap aim, String localname) {

@@ -131,6 +131,18 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         if (!isRequestor()) {
             config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
         }
+        
+        if (timestampAdded) {
+            // Action
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, 
+                           action + " " + ConfigurationConstants.TIMESTAMP);
+            } else {
+                config.put(ConfigurationConstants.ACTION, 
+                           ConfigurationConstants.TIMESTAMP);
+            }
+        }
     }
     
     private void doEncryptBeforeSign() {
@@ -204,6 +216,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
                     sigParts.add(part);
                 }
+                sigParts.addAll(this.getSignedParts());
                 
                 AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
                 AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
@@ -276,6 +289,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
                 sigs.add(part);
             }
+            sigs.addAll(this.getSignedParts());
 
             if (isRequestor()) {
                 addSupportingTokens();
@@ -402,11 +416,21 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
         }
         
-        sigParts.addAll(this.getSignedParts());
+        String optionalParts = "";
+        if (config.containsKey(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS)) {
+            optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
+            if (!optionalParts.endsWith(";")) {
+                optionalParts += ";";
+            }
+        }
         
         for (SecurePart part : sigParts) {
             QName name = part.getName();
-            parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            if (part.isRequired()) {
+                parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            } else {
+                optionalParts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            }
         }
         
         AbstractToken sigToken = wrapper.getToken();
@@ -415,6 +439,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
+        config.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
         
         configureSignature(wrapper, sigToken, false);
         
