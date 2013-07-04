@@ -131,7 +131,7 @@ public final class JAXBUtils {
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
             fout = new FileOutputStream(tmpFile);
-            DOMUtils.writeXml(rootElement, fout);
+            XMLUtils.writeTo(rootElement, fout);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

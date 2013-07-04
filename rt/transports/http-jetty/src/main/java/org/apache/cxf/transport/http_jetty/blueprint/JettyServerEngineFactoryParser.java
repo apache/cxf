@@ -18,20 +18,16 @@
  */
 package org.apache.cxf.transport.http_jetty.blueprint;
 
-import java.io.StringWriter;
 import java.util.StringTokenizer;
 import java.util.UUID;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
+import org.apache.cxf.helpers.XMLUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -68,19 +64,9 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         ef.setRuntimeClass(JettyHTTPServerEngineFactoryHolder.class);
 
         try {
-
-            TransformerFactory transfac = TransformerFactory.newInstance();
-            Transformer trans = transfac.newTransformer();
-            trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "YES");
-            //trans.setOutputProperty(OutputKeys.INDENT, "yes");
-
             // Print the DOM node
 
-            StringWriter sw = new StringWriter();
-            StreamResult result = new StreamResult(sw);
-            DOMSource source = new DOMSource(element);
-            trans.transform(source, result);
-            String xmlString = sw.toString();
+            String xmlString = XMLUtils.toString(element);
             ef.addProperty("parsedElement", createValue(context, xmlString));
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);

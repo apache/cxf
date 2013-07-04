@@ -19,13 +19,11 @@
 
 package org.apache.cxf.test;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
@@ -36,6 +34,7 @@ import org.w3c.dom.NodeList;
 import junit.framework.AssertionFailedError;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
 
 import org.junit.Assert;
 
@@ -92,13 +91,7 @@ public final class XPathAssert {
     }
 
     private static String writeNodeToString(Node node) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            DOMUtils.writeXml(node, bos);
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
-        }
-        return bos.toString();
+        return XMLUtils.toString(node);
     }
 
     /**

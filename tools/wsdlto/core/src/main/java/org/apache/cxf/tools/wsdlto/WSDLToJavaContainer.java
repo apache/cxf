@@ -827,7 +827,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 updateImports(xsdEle, sourceMap);
             }
             updateWSDLImports(defEle, importWSDLMap);
-            DOMUtils.writeXml(defEle, wsdloutput);
+            XMLUtils.writeTo(defEle, wsdloutput);
             wsdloutput.close();
             
                     
@@ -844,7 +844,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     updateImports(xsdEle, sourceMap);
                 }
                 updateWSDLImports(importEle, importWSDLMap);
-                DOMUtils.writeXml(importEle, wsdlOs);
+                XMLUtils.writeTo(importEle, wsdlOs);
                 wsdlOs.close();
 
             }               

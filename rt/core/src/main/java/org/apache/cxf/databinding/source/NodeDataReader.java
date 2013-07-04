@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
@@ -57,15 +57,15 @@ public class NodeDataReader implements DataReader<Node> {
             return new StaxSource(reader);
         } else if (StreamSource.class.isAssignableFrom(type)) {
             try {
-                CachedOutputStream out = new CachedOutputStream();                
-                DOMUtils.writeXml(input, out);
+                CachedOutputStream out = new CachedOutputStream();
+                XMLUtils.writeTo(input, out);
                 InputStream is = out.getInputStream();
                 out.close();
                 
                 return new StreamSource(is);
             } catch (IOException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
-            } catch (TransformerException e) {
+            } catch (XMLStreamException e) {
                 throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
                                 e.getClass().getCanonicalName(), e.getMessage());
             } 

@@ -100,7 +100,7 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
             // TODO: this is not critical now - but figure out if we can avoid copying
             // DOMs
             CachedOutputStream bos = new CachedOutputStream();
-            DOMUtils.writeXml(newDoc, bos);
+            XMLUtils.writeTo(newDoc, bos);
             return DOMUtils.readXml(bos.getInputStream());
         } else {
             return newDoc;
