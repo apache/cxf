@@ -148,7 +148,6 @@ public class BookStore {
         return new String[]{"Good book"};
     }
     
-    @SuppressWarnings("unchecked")
     @GET
     @Path("/booklist")
     public List<String> getBookListArray() {
@@ -1511,7 +1510,6 @@ public class BookStore {
             return String[].class.isAssignableFrom(arg0);
         }
 
-        @Override
         public void writeTo(String[] arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
                             MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
             WebApplicationException {
@@ -1542,7 +1540,6 @@ public class BookStore {
                 && String.class == InjectionUtils.getActualType(arg1);
         }
 
-        @Override
         public void writeTo(List<String> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
                             MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
             WebApplicationException {
