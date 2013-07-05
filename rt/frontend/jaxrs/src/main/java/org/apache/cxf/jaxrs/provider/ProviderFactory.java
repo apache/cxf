@@ -325,6 +325,9 @@ public final class ProviderFactory {
                     if (actualClass == null) {
                         continue;
                     }
+                    if (expectedType.isArray()) {
+                        expectedType = expectedType.getComponentType();
+                    }
                     if (actualClass.isAssignableFrom(expectedType)) {
                         if (injectContext) {
                             injectContextValues(em, m);
