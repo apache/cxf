@@ -23,8 +23,10 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -33,6 +35,20 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxws.context.WebServiceContextImpl;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
+import org.apache.cxf.sts.token.provider.TokenProviderParameters;
+import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.apache.cxf.sts.token.realm.SAMLRealm;
+import org.apache.cxf.systest.sts.common.CommonCallbackHandler;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -42,9 +58,12 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -240,7 +259,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Get a token
         SecurityToken token = 
             requestSecurityToken(
-                SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bst.getElement(), bus, DEFAULT_ADDRESS, null
+                SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bst.getElement(), bus, DEFAULT_ADDRESS, null, null, null, null
             );
         assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
         assertTrue(token.getToken() != null);
@@ -361,13 +380,83 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+  //CHECKSTYLE:OFF
+    @org.junit.Test
+    public void testSAMLinWSSecToOtherRealm() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new CommonCallbackHandler();
+        
+        //Create SAML token
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+                    callbackHandler, null, "alice", "a-issuer");
+        
+        String id = null;
+        QName elName = DOMUtils.getElementQName(samlToken);
+        if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+            && samlToken.hasAttributeNS(null, "AssertionID")) {
+            id = samlToken.getAttributeNS(null, "AssertionID");
+        } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))
+            && samlToken.hasAttributeNS(null, "ID")) {
+            id = samlToken.getAttributeNS(null, "ID");
+        }
+        if (id == null) {
+            id = samlToken.getAttributeNS(WSConstants.WSU_NS, "Id");
+        }
+                
+        SecurityToken wstoken = new SecurityToken(id, samlToken, null, null);
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(SecurityConstants.TOKEN, wstoken);
+        properties.put(SecurityConstants.TOKEN_ID, wstoken.getId());
+        
+        // Get a token
+        
+        SecurityToken token = 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, null,
+                    bus, DEFAULT_ADDRESS, null, properties, "b-issuer", "Transport_SAML_Port");
+        
+        /*
+        SecurityToken token = 
+                requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, null,
+                        bus, DEFAULT_ADDRESS, null, properties, "b-issuer", null);
+                        */
+        assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        assertTrue(token.getToken() != null);
+        
+        List<WSSecurityEngineResult> results = processToken(token);
+        assertTrue(results != null && results.size() == 1);
+        SamlAssertionWrapper assertion = 
+            (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(assertion != null);
+        assertTrue(assertion.isSigned());
+        
+        List<String> methods = assertion.getConfirmationMethods();
+        String confirmMethod = null;
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        assertTrue(confirmMethod.contains("bearer"));
+        
+        assertTrue("b-issuer".equals(assertion.getIssuerString()));
+        String subjectName = assertion.getSaml2().getSubject().getNameID().getValue();
+        assertTrue("Subject must be ALICE instead of " + subjectName, "ALICE".equals(subjectName));
+        
+    }
+    
     private SecurityToken requestSecurityToken(
         String tokenType, 
         String keyType, 
         Bus bus,
         String endpointAddress
     ) throws Exception {
-        return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, null);
+        return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, null, null, null, null);
     }
     
     private SecurityToken requestSecurityToken(
@@ -377,7 +466,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         String endpointAddress,
         String context
     ) throws Exception {
-        return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, context);
+        return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, context, null, null, null);
     }
     
     private SecurityToken requestSecurityToken(
@@ -386,23 +475,38 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         Element supportingToken,
         Bus bus,
         String endpointAddress,
-        String context
+        String context,
+        Map<String, Object> msgProperties,
+        String realmUri,
+        String wsdlPort
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
         String port = "8443";
         if (standalone) {
             port = STSPORT;
         }
-        stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/Transport?wsdl");
+        if (realmUri != null) {
+            stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/" + realmUri
+                                      + "/Transport?wsdl");
+        } else {
+            stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/Transport?wsdl");
+        }
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
-        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(SecurityConstants.USERNAME, "alice");
-        properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
-            "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
-        );
+        if (wsdlPort != null) {
+            stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}" + wsdlPort);
+        } else {
+            stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
+        }
+
+        Map<String, Object> properties = msgProperties;
+        if (properties == null) {
+            properties = new HashMap<String, Object>();
+            properties.put(SecurityConstants.USERNAME, "alice");
+            properties.put(
+                SecurityConstants.CALLBACK_HANDLER, 
+                "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
+            );
+        }
         properties.put(SecurityConstants.IS_BSP_COMPLIANT, "false");
         
         if (PUBLIC_KEY_KEYTYPE.equals(keyType)) {
@@ -424,6 +528,79 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         return stsClient.requestSecurityToken(endpointAddress);
     }
     
+    private Properties getEncryptionProperties() {
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+        );
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+
+        return properties;
+    }
+            
+    /*
+     * Mock up an SAML assertion element
+     */
+    private Element createSAMLAssertion(
+        String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler,
+        Map<String, SAMLRealm> realms, String user, String issuer
+    ) throws WSSecurityException {
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        samlTokenProvider.setRealmMap(realms);
+
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername,
+                callbackHandler, user, issuer
+            );
+        if (realms != null) {
+            providerParameters.setRealm("A");
+        }
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        return providerResponse.getToken();
+    }
+            
+    private TokenProviderParameters createProviderParameters(
+        String tokenType, String keyType, Crypto crypto, 
+        String signatureUsername, CallbackHandler callbackHandler,
+        String username, String issuer
+    ) throws WSSecurityException {
+        TokenProviderParameters parameters = new TokenProviderParameters();
+
+        TokenRequirements tokenRequirements = new TokenRequirements();
+        tokenRequirements.setTokenType(tokenType);
+        parameters.setTokenRequirements(tokenRequirements);
+
+        KeyRequirements keyRequirements = new KeyRequirements();
+        keyRequirements.setKeyType(keyType);
+        parameters.setKeyRequirements(keyRequirements);
+
+        parameters.setPrincipal(new CustomTokenPrincipal(username));
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        parameters.setWebServiceContext(webServiceContext);
+
+        parameters.setAppliesToAddress("http://dummy-service.com/dummy");
+
+        // Add STSProperties object
+        StaticSTSProperties stsProperties = new StaticSTSProperties();
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setSignatureUsername(signatureUsername);
+        stsProperties.setCallbackHandler(callbackHandler);
+        stsProperties.setIssuer(issuer);
+        parameters.setStsProperties(stsProperties);
+
+        parameters.setEncryptionProperties(new EncryptionProperties());
+
+        return parameters;
+    }
+
     private SecurityToken requestSecurityTokenTTL(
             String tokenType, 
             String keyType,

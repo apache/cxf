@@ -47,66 +47,166 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="transportSTSProviderBean"
-	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
-	    <property name="services" ref="transportService" />
-		<property name="stsProperties" ref="transportSTSProperties" />
+    <bean id="transportSTSProviderBean2"
+        class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+        <property name="issueOperation" ref="transportIssueDelegate" />
+        <property name="validateOperation" ref="transportValidateDelegate" />
     </bean>
 
-	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
-		<property name="endpoints" ref="transportEndpoints" />
-	</bean>
+    <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+        <property name="tokenProviders" ref="transportTokenProviders" />
+        <property name="tokenValidators" ref="transportTokenValidators" />
+        <property name="services" ref="transportService" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+    </bean>
 
-	<util:list id="transportEndpoints">
-		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
-		</value>
-	</util:list>
+    <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+        <property name="tokenValidators" ref="transportTokenValidators" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+    </bean>
 
-	<bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
-		<property name="signatureUsername" value="mystskey" />
-		<property name="callbackHandlerClass"
-			value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
-		<property name="issuer" value="DoubleItSTSIssuer" />
-		<property name="encryptionUsername" value="myservicekey" />
-	</bean>
+    <util:list id="transportTokenValidators">
+        <ref bean="transportSamlTokenValidator" />
+    </util:list>
 
-	<jaxws:endpoint id="transportSTS" implementor="#transportSTSProviderBean"
-		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport"
-		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
-		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-		serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port"
+    <util:list id="transportTokenProviders">
+        <ref bean="transportSamlTokenProvider" />
+    </util:list>
+
+
+    <bean id="transportSTSProviderBean"
+        class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
+        <property name="services" ref="transportService" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+    </bean>
+
+ 
+    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints" ref="transportEndpoints" />
+    </bean>
+
+    <util:list id="transportEndpoints">
+        <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
+        </value>
+    </util:list>
+    
+    <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+        <property name="samlRealmCodec" ref="samlRealmCodec" />
+    </bean>
+    
+    <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+        <property name="realmMap" ref="realms"/>
+    </bean>
+    
+    <bean id="realmA"
+        class="org.apache.cxf.sts.token.realm.SAMLRealm">
+        <property name="issuer" value="a-issuer"/>
+    </bean>
+    
+    <bean id="realmB"
+        class="org.apache.cxf.sts.token.realm.SAMLRealm">
+        <property name="issuer" value="b-issuer"/>
+    </bean>
+    
+    <util:map id="realms">
+        <entry key="a-issuer" value-ref="realmA"/>
+        <entry key="b-issuer" value-ref="realmB"/>
+    </util:map>
+    
+    
+    <bean id="samlRealmCodec" class="org.apache.cxf.systest.sts.common.SAMLRealmCNCodec" />
+    
+    <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser" />
+    
+    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper" />
+    
+    <util:list id="relationships">
+        <bean class="org.apache.cxf.sts.token.realm.Relationship">
+            <property name="sourceRealm" value="a-issuer" />
+            <property name="targetRealm" value="b-issuer"/>
+            <property name="identityMapper" ref="identityMapper" />
+            <property name="type" value="FederatedIdentity" />
+        </bean>
+    </util:list>
+
+    <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+        <property name="signaturePropertiesFile" value="stsKeystore.properties" />
+        <property name="signatureUsername" value="mystskey" />
+        <property name="callbackHandlerClass"
+            value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+        <property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+        <property name="issuer" value="DoubleItSTSIssuer" />
+        <property name="encryptionUsername" value="myservicekey" />
+
+        <property name="realmParser" ref="customRealmParser"/>
+
+        <property name="relationships" ref="relationships" />
+        <property name="samlRealmCodec" ref="samlRealmCodec" />
+    </bean>
+
+    <jaxws:endpoint id="transportSTS" implementor="#transportSTSProviderBean"
+        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport"
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port"
                 depends-on="ClientAuthHttpsSettings">
-		<jaxws:properties>
-			<entry key="ws-security.callback-handler"
-				value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
-		</jaxws:properties>
-	</jaxws:endpoint>
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
+    
+    <jaxws:endpoint id="transportSTS-realmB" implementor="#transportSTSProviderBean2"
+        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/b-issuer/Transport"
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_SAML_Port"
+                depends-on="ClientAuthHttpsSettings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <!--
+    <jaxws:endpoint id="transportSTS-realmB" implementor="#transportSTSProviderBean2"
+        address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/b-issuer/Transport"
+        wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
+        xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port"
+                depends-on="ClientAuthHttpsSettings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler" />
+            <entry key="ws-security.signature.properties" value="stsKeystore.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    --> 
 
-	<httpj:engine-factory id="ClientAuthHttpsSettings"
-		bus="cxf">
-		<httpj:engine port="${testutil.ports.STSServer}">
-			<httpj:tlsServerParameters>
-				<sec:keyManagers keyPassword="skpass">
-					<sec:keyStore type="jks" password="sspass" resource="servicestore.jks" />
-				</sec:keyManagers>
-				<sec:trustManagers>
-					<sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />
-				</sec:trustManagers>
-				<sec:cipherSuitesFilter>
-					<sec:include>.*_EXPORT_.*</sec:include>
-					<sec:include>.*_EXPORT1024_.*</sec:include>
-					<sec:include>.*_WITH_DES_.*</sec:include>
-					<sec:include>.*_WITH_AES_.*</sec:include>
-					<sec:include>.*_WITH_NULL_.*</sec:include>
-					<sec:exclude>.*_DH_anon_.*</sec:exclude>
-				</sec:cipherSuitesFilter>
-				<sec:clientAuthentication want="false"
-					required="false" />
-			</httpj:tlsServerParameters>
-		</httpj:engine>
-	</httpj:engine-factory>
+    <httpj:engine-factory id="ClientAuthHttpsSettings"
+        bus="cxf">
+        <httpj:engine port="${testutil.ports.STSServer}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="skpass">
+                    <sec:keyStore type="jks" password="sspass" resource="servicestore.jks" />
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />
+                </sec:trustManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="false"
+                    required="false" />
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
         
 </beans>
 

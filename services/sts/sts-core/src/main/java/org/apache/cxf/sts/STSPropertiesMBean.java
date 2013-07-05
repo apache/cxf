@@ -26,6 +26,7 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.realm.RelationshipResolver;
+import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.crypto.Crypto;
 
@@ -181,4 +182,16 @@ public interface STSPropertiesMBean {
      */    
     RelationshipResolver getRelationshipResolver();
     
+    /**
+     * Get the SAML Realm Codec object to use.
+     * @return the SAMLRealmCodec object to use.
+     */
+    SAMLRealmCodec getSamlRealmCodec();
+
+    /**
+     * Set the SAML Realm Codec object to use.
+     * @param samlRealmCodec the SAMLRealmCodec object to use.
+     */
+    void setSamlRealmCodec(SAMLRealmCodec samlRealmCodec);
+
 }
