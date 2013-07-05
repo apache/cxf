@@ -26,10 +26,12 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +73,8 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -79,6 +83,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.common.util.ProxyHelper;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
@@ -88,6 +93,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
 import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAddedAsync;
@@ -136,6 +142,19 @@ public class BookStore {
         //System.out.println("PreDestroy called");
     }
 
+    @GET
+    @Path("/bookarray")
+    public String[] getBookStringArray() {
+        return new String[]{"Good book"};
+    }
+    
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("/booklist")
+    public List<String> getBookListArray() {
+        return Collections.singletonList("Good book");
+    }
+    
     @GET
     @Path("/customtext")
     @Produces("text/custom")
@@ -1471,6 +1490,66 @@ public class BookStore {
             throw new RuntimeException(ex);
         }
     }
+    
+    public static class StringArrayBodyReaderWriter 
+        implements MessageBodyReader<String[]>, MessageBodyWriter<String[]> {
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return String[].class.isAssignableFrom(arg0);
+        }
+
+        public String[] readFrom(Class<String[]> arg0, Type arg1,
+            Annotation[] arg2, MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
+            throws IOException, WebApplicationException {
+            return new String[] {IOUtils.readStringFromStream(arg5)};
+        }
+
+        public long getSize(String[] arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
+            return -1;
+        }
+
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return String[].class.isAssignableFrom(arg0);
+        }
+
+        @Override
+        public void writeTo(String[] arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
+                            MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
+            WebApplicationException {
+            arg6.write(arg0[0].getBytes());
+        }
+
+    }
+        
+    public static class StringListBodyReaderWriter 
+        implements MessageBodyReader<List<String>>, MessageBodyWriter<List<String>> {
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return List.class.isAssignableFrom(arg0) 
+                && String.class == InjectionUtils.getActualType(arg1);
+        }
+
+        public List<String> readFrom(Class<List<String>> arg0, Type arg1,
+            Annotation[] arg2, MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
+            throws IOException, WebApplicationException {
+            return Collections.singletonList(IOUtils.readStringFromStream(arg5));
+        }
+
+        public long getSize(List<String> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
+            return -1;
+        }
+
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return List.class.isAssignableFrom(arg0) 
+                && String.class == InjectionUtils.getActualType(arg1);
+        }
+
+        @Override
+        public void writeTo(List<String> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
+                            MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
+            WebApplicationException {
+            arg6.write(arg0.get(0).getBytes());
+        }
+
+    }    
 }
 
 

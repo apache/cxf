@@ -23,6 +23,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -218,6 +219,8 @@ public final class InjectionUtils {
                     bounds = wildcardType.getUpperBounds();
                 }
                 genericType = getType(bounds, pos);
+            } else if (genericType instanceof GenericArrayType) {
+                genericType = ((GenericArrayType)genericType).getGenericComponentType();
             }
 
             Class<?> cls = (Class<?>)genericType;
@@ -237,9 +240,7 @@ public final class InjectionUtils {
     
     public static Class<?> getRawType(Type genericType) {
         
-        if (genericType == null) {
-            return null;
-        } else if (genericType instanceof Class) {
+        if (genericType instanceof Class) {
             return (Class<?>) genericType;
         } else if (genericType instanceof ParameterizedType) {
             ParameterizedType paramType = (ParameterizedType)genericType;
@@ -247,8 +248,9 @@ public final class InjectionUtils {
             if (t instanceof Class) {
                 return (Class<?>)t;
             }
+        } else if (genericType instanceof GenericArrayType) {
+            return getRawType(((GenericArrayType)genericType).getGenericComponentType());
         }
-        // it might be a TypeVariable, or a GenericArray.
         return null;
     }
     
