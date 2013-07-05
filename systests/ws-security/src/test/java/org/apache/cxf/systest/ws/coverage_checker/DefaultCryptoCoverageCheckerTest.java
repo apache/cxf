@@ -36,7 +36,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for the DefaultCryptoCoverageChecker.
+ * A set of tests for the DefaultCryptoCoverageChecker. It tests both DOM + StAX 
+ * clients against the DOM server.
  */
 public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);

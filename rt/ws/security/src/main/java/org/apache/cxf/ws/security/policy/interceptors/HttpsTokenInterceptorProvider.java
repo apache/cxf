@@ -283,7 +283,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             new HttpsSecurityTokenImpl((X509Certificate)tlsInfo.getPeerCertificates()[0]);
                         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
-                    } else {
+                    } else if (httpsTokenSecurityEvent.getAuthenticationType() == null) {
                         httpsTokenSecurityEvent.setAuthenticationType(
                             HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
                         );

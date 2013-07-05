@@ -36,7 +36,8 @@ import org.junit.BeforeClass;
 
 /**
  * This is a test for AlgorithmSuites. Essentially it checks that a service endpoint will
- * reject a client request that uses a different AlgorithmSuite.
+ * reject a client request that uses a different AlgorithmSuite. It tests both DOM + StAX 
+ * clients against the DOM server.
  */
 public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -79,6 +80,11 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         
         // This should succeed as the client + server policies match
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port2");
@@ -87,11 +93,22 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         
         // This should fail as the client uses Basic128Rsa15 + the server uses Basic128
         try {
+            // DOM
             port.doubleIt(25);
             fail("Failure expected on Rsa15 AlgorithmSuite");
         } catch (Exception ex) {
             // expected
         }
+        
+        try {
+            // Streaming
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on Rsa15 AlgorithmSuite");
+        } catch (Exception ex) {
+            // expected
+        }
+        
         
         // This should fail as the client uses Basic256 + the server uses Basic128
         if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
@@ -101,6 +118,16 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
             
             // This should fail as the client uses Basic128Rsa15 + the server uses Basic128
             try {
+                // DOM
+                port.doubleIt(25);
+                fail("Failure expected on Basic256 AlgorithmSuite");
+            } catch (Exception ex) {
+                // expected
+            }
+            
+            try {
+                // Streaming
+                SecurityTestUtil.enableStreaming(port);
                 port.doubleIt(25);
                 fail("Failure expected on Basic256 AlgorithmSuite");
             } catch (Exception ex) {
@@ -134,6 +161,11 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
 
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         bus.shutdown(true);

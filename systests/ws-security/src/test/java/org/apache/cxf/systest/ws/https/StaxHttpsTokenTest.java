@@ -27,17 +27,17 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.https.server.Server;
+import org.apache.cxf.systest.ws.https.server.StaxServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
  * A set of tests for the HttpsToken policy. It tests both DOM + StAX clients against the 
- * DOM server.
+ * StAX server.
  */
-public class HttpsTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+public class StaxHttpsTokenTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -48,7 +48,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
     }
     
@@ -62,13 +62,13 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
     public void testRequireClientCert() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HttpsTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxHttpsTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = HttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
+        URL wsdl = StaxHttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItRequireClientCertPort");
         DoubleItPortType port = 
@@ -92,8 +92,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not using a client cert");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "HttpsToken";
-            assertTrue(ex.getMessage().contains(error));
+            // expected
         }
         
         try {
@@ -113,13 +112,13 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
     public void testBasicAuth() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HttpsTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxHttpsTokenTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = HttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
+        URL wsdl = StaxHttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBasicAuthPort");
         DoubleItPortType port = 
@@ -143,8 +142,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernamePassword");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "HttpsToken";
-            assertTrue(ex.getMessage().contains(error));
+            // expected
         }
         
         try {
