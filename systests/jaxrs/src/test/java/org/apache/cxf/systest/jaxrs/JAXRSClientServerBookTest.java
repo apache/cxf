@@ -939,6 +939,30 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetStringArray() throws Exception {
+        String address = "http://localhost:" + PORT;
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 
+        bean.setProvider(new BookStore.StringArrayBodyReaderWriter());
+        bean.setAddress(address);
+        bean.setResourceClass(BookStore.class);
+        BookStore store = bean.create(BookStore.class);
+        String[] str = store.getBookStringArray();
+        assertEquals("Good book", str[0]);
+    }
+    
+    @Test
+    public void testGetStringList() throws Exception {
+        String address = "http://localhost:" + PORT;
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 
+        bean.setProvider(new BookStore.StringListBodyReaderWriter());
+        bean.setAddress(address);
+        bean.setResourceClass(BookStore.class);
+        BookStore store = bean.create(BookStore.class);
+        List<String> str = store.getBookListArray();
+        assertEquals("Good book", str.get(0));
+    }
+    
+    @Test
     public void testEmptyPostProxy2() throws Exception {
         String address = "http://localhost:" + PORT;
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
