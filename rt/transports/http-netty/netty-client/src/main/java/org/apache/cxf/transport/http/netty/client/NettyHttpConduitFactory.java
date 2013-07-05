@@ -45,6 +45,14 @@ public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPCondui
         throws IOException {
         return new NettyHttpConduit(bus, localInfo, target, this);
     }
+    
+    
+    public HTTPConduit createConduit(Bus bus, 
+                                     EndpointInfo localInfo,
+                                     EndpointReferenceType target)
+        throws IOException {
+        return new NettyHttpConduit(bus, localInfo, target, this);
+    }
 
     @Override
     public void initComplete() {

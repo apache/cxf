@@ -90,6 +90,15 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
     // Using Netty API directly
     protected void setupConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
 
+        // need to do some clean up work on the URI address
+        String uriString = uri.toString();
+        if (uriString.startsWith("netty://")) {
+            try {
+                uri = new URI(uriString.substring(8));
+            } catch (URISyntaxException ex) {
+                throw new MalformedURLException("unsupport uri: "  + uriString);
+            }
+        }
         String s = uri.getScheme();
         if (!"http".equals(s) && !"https".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);

@@ -25,6 +25,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -76,6 +77,29 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
     public void testInvocation() throws Exception {
         updateAddressPort(g, PORT);
         String response = g.greetMe("test");
+        assertEquals("Get a wrong response", "Hello test", response);
+    }
+    
+    @Test
+    public void testInovationWithNettyAddress() throws Exception {
+        String address =  "netty://http://localhost:" + PORT + "/SoapContext/SoapPort";
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress(address);
+        //factory.setTransportId("http://cxf.apache.org/transports/http/netty/client");
+        Greeter greeter = factory.create(Greeter.class);
+        String response = greeter.greetMe("test");
+        assertEquals("Get a wrong response", "Hello test", response);
+    }
+    
+    public void testInvocationWithTransportId() throws Exception {
+        String address =  "//http://localhost:" + PORT + "/SoapContext/SoapPort";
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress(address);
+        factory.setTransportId("http://cxf.apache.org/transports/http/netty/client");
+        Greeter greeter = factory.create(Greeter.class);
+        String response = greeter.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
 

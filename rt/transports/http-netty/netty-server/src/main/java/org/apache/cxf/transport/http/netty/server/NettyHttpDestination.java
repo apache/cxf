@@ -33,6 +33,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
@@ -71,7 +72,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         super(b, registry, ei, getAddressValue(ei, true).getAddress(), true);
         loader = bus.getExtension(ClassLoader.class);
         this.serverEngineFactory = serverEngineFactory;
-        nurl = new URL(endpointInfo.getAddress());
+        nurl = new URL(getAddress(endpointInfo));
     }
 
 
@@ -102,6 +103,21 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         }
         configFinalized = true;
     }
+    
+    protected String getAddress(EndpointInfo endpointInfo) {
+        String address = endpointInfo.getAddress();
+        if (address.startsWith("netty://")) {
+            address = address.substring(8);
+        }
+        return address;
+    }
+    
+    protected String getBasePath(String contextPath) throws IOException {
+        if (StringUtils.isEmpty(endpointInfo.getAddress())) {
+            return "";
+        }
+        return new URL(getAddress(endpointInfo)).getPath();
+    }
 
     /**
      * Activate receipt of incoming messages.
@@ -110,8 +126,9 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         super.activate();
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
         URL url = null;
+        
         try {
-            url = new URL(endpointInfo.getAddress());
+            url = new URL(getAddress(endpointInfo));
         } catch (Exception e) {
             throw new Fault(e);
         }
