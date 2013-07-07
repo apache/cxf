@@ -111,4 +111,8 @@ public class BookSubresourceImpl implements BookSubresource {
         return new Book(name, bookid);
     }
 
+    public Book getTheBookQueryBean(Book book) throws BookNotFoundFault {
+        return book;
+    }
+
 }

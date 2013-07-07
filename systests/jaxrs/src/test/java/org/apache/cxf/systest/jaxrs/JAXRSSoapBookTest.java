@@ -532,9 +532,24 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                               BookStoreJaxrsJaxws.class);
+        WebClient.getConfig(proxy).getOutInterceptors().add(new LoggingOutInterceptor());
         BookSubresource bs = proxy.getBookSubresource("139");
         Book bean = new Book("CXF Rocks", 139L);
         Book b = bs.getTheBook4(bean, bean, bean, bean);
+        assertEquals(139, b.getId());
+        assertEquals("CXF Rocks", b.getName());
+    }
+    
+    @Test
+    public void testGetBookSubresourceParamExtensions2() throws Exception {
+        
+        String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                              BookStoreJaxrsJaxws.class);
+        WebClient.getConfig(proxy).getOutInterceptors().add(new LoggingOutInterceptor());
+        BookSubresource bs = proxy.getBookSubresource("139");
+        Book bean = new Book("CXF Rocks", 139L);
+        Book b = bs.getTheBookQueryBean(bean);
         assertEquals(139, b.getId());
         assertEquals("CXF Rocks", b.getName());
     }

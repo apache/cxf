@@ -91,5 +91,10 @@ public interface BookSubresource {
     @Produces("application/xml")
     OrderBean addOrder(@FormParam("") OrderBean order);
     
+    @GET
+    @Path("/thebook5")
+    @Produces("application/xml")
+    Book getTheBookQueryBean(@QueryParam("") Book book) throws BookNotFoundFault;
+    
 }
 
