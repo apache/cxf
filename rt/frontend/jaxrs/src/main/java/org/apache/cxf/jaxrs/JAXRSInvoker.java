@@ -148,32 +148,30 @@ public class JAXRSInvoker extends AbstractInvoker {
         boolean wasSuspended = exchange.remove(REQUEST_WAS_SUSPENDED) != null;
         
         if (!wasSuspended) {
-            
             pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), inMessage);
+        }
             
-            final boolean contextsAvailable = cri.contextsAvailable();
-            final boolean paramsAvailable = cri.paramsAvailable();
-            if (contextsAvailable || paramsAvailable) {
-                Object realResourceObject = ClassHelper.getRealObject(resourceObject);
-                if (paramsAvailable) {
-                    JAXRSUtils.injectParameters(ori, realResourceObject, inMessage);
-                }
-                if (contextsAvailable) {
-                    InjectionUtils.injectContexts(realResourceObject, cri, inMessage);
-                }
+        final boolean contextsAvailable = cri.contextsAvailable();
+        final boolean paramsAvailable = cri.paramsAvailable();
+        if (contextsAvailable || paramsAvailable) {
+            Object realResourceObject = ClassHelper.getRealObject(resourceObject);
+            if (paramsAvailable) {
+                JAXRSUtils.injectParameters(ori, realResourceObject, inMessage);
             }
-            if (cri.isRoot()) {
-                ProviderInfo<?> appProvider = 
-                    (ProviderInfo<?>)exchange.getEndpoint().get(Application.class.getName());
-                if (appProvider != null) {
-                    InjectionUtils.injectContexts(appProvider.getProvider(),
-                                                  appProvider,
-                                                  inMessage);
-                }
+            if (contextsAvailable) {
+                InjectionUtils.injectContexts(realResourceObject, cri, inMessage);
+            }
+        }
+        if (cri.isRoot()) {
+            ProviderInfo<?> appProvider = 
+                (ProviderInfo<?>)exchange.getEndpoint().get(Application.class.getName());
+            if (appProvider != null) {
+                InjectionUtils.injectContexts(appProvider.getProvider(),
+                                              appProvider,
+                                              inMessage);
             }
         }
         
-
         Method methodToInvoke = InjectionUtils.checkProxy(
             cri.getMethodDispatcher().getMethod(ori), resourceObject);
         
