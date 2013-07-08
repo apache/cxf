@@ -25,7 +25,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.ws.wssc.client.KeystorePasswordCallback;
+import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 

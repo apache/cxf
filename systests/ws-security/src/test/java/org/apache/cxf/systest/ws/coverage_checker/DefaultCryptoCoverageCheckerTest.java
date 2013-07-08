@@ -84,7 +84,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
@@ -127,7 +127,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         
@@ -180,7 +180,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
@@ -234,7 +234,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://www.w3.org/2003/05/soap-envelope}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
@@ -277,7 +277,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://www.w3.org/2003/05/soap-envelope}Body;");
         
@@ -330,7 +330,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
@@ -387,7 +387,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         outProps.put("encryptionParts",
@@ -433,7 +433,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         outProps.put("encryptionParts",
@@ -489,7 +489,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"

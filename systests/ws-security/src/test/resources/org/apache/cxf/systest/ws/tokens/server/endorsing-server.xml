@@ -53,7 +53,7 @@
 
 		<jaxws:properties>
 			<entry key="ws-security.callback-handler"
-				value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
 			<entry key="ws-security.signature.properties"
 				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
 			<entry key="ws-security.encryption.username" value="useReqSigCert" />
@@ -77,7 +77,7 @@
 
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />
@@ -101,7 +101,7 @@
 
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />
@@ -125,7 +125,7 @@
 
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />
@@ -149,7 +149,7 @@
 
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />
@@ -173,7 +173,7 @@
 
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />

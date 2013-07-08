@@ -54,7 +54,7 @@
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
        </jaxws:properties> 
@@ -77,7 +77,7 @@
                <entry key="action" value="Signature Timestamp"/>
                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                <entry key="passwordCallbackClass" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
            </constructor-arg>
         </bean>

@@ -45,7 +45,7 @@ public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
         // add roles this user is in
         String roleName = "Alice".equals(name) ? "developers" : "pms";
         String expectedPassword = "Alice".equals(name) ? "ecilA" 
-            : UsernameToken.doPasswordDigest(nonce, created, "knarF");
+            : UsernameToken.doPasswordDigest(nonce, created, "invalid-password");
         if (!password.equals(expectedPassword)) {
             throw new SecurityException("Wrong Password");
         }

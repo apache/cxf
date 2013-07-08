@@ -61,7 +61,7 @@
                 <entry key="encryptionPropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
                 <entry key="encryptionUser" value="Bob"/>
                 <entry key="signatureKeyIdentifier" value="DirectReference"/>
-                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/>
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                 <entry key="signatureParts" value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
                 <!--    
                      Recommendation: signatures should be encrypted    
@@ -85,7 +85,7 @@
                 <entry key="action" value="Timestamp Signature Encrypt"/>
                 <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/bob.properties"/>
                 <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/security/alice.properties"/>
-                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.KeystorePasswordCallback"/>
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
         </constructor-arg>
     </bean>

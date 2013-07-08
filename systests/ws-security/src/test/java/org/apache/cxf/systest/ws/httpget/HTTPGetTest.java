@@ -145,7 +145,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
                      "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
-                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"

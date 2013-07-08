@@ -54,6 +54,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.systest.ws.common.DoubleItImpl;
+import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyEngine;

@@ -46,7 +46,7 @@
 		<jaxws:properties>
 			<entry key="ws-security.username" value="Alice" />
 			<entry key="ws-security.callback-handler"
-				value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
 			<entry key="ws-security.encryption.properties"
 				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
 			<entry key="ws-security.encryption.username" value="bob" />
@@ -65,7 +65,7 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.encryption.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
@@ -84,7 +84,7 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.encryption.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
@@ -103,7 +103,7 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
             <entry key="ws-security.encryption.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
@@ -127,7 +127,7 @@
                         <entry key="user" value="Alice" />
                         <entry key="encryptionUser" value="bob" />
                         <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                               value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="encryptionPropFile"
                                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
                         <entry key="encryptionKeyTransportAlgorithm"
@@ -149,7 +149,7 @@
                         <entry key="user" value="Alice" />
                         <entry key="encryptionUser" value="bob" />
                         <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                               value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="encryptionPropFile"
                                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
                         <entry key="encryptionKeyTransportAlgorithm"
@@ -171,7 +171,7 @@
                         <entry key="user" value="Alice" />
                         <entry key="encryptionUser" value="bob" />
                         <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                               value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="encryptionPropFile"
                                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
                         <entry key="encryptionKeyTransportAlgorithm"
@@ -194,7 +194,7 @@
                         <entry key="action" value="Signature"/> 
                         <entry key="user" value="alice" />
                         <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                               value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="signaturePropFile"
                                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
                         <entry key="signatureAlgorithm"
@@ -215,7 +215,7 @@
                         <entry key="action" value="Signature"/> 
                         <entry key="user" value="alice" />
                         <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                               value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="signaturePropFile"
                                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
                         <entry key="signatureAlgorithm"

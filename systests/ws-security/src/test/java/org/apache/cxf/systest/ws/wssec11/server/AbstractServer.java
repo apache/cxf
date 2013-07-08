@@ -21,6 +21,7 @@ package org.apache.cxf.systest.ws.wssec11.server;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 

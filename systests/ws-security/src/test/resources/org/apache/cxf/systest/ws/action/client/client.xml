@@ -73,7 +73,7 @@
                <constructor-arg>
                    <map>
                         <entry key="action" value="UsernameToken"/> 
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
                         <entry key="user" value="Alice"/>
                    </map>
                </constructor-arg>

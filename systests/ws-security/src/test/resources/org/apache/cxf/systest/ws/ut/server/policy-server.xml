@@ -81,7 +81,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -103,7 +103,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -125,7 +125,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -147,7 +147,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -169,7 +169,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -191,7 +191,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -213,7 +213,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -235,7 +235,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -257,7 +257,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -279,7 +279,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -301,7 +301,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -323,7 +323,7 @@
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>

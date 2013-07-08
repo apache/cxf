@@ -84,7 +84,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
@@ -98,7 +98,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
@@ -119,7 +119,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
@@ -131,7 +131,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
@@ -143,7 +143,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
@@ -155,7 +155,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
@@ -167,7 +167,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
@@ -191,7 +191,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
@@ -205,7 +205,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
@@ -219,7 +219,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
@@ -231,7 +231,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 

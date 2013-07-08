@@ -67,7 +67,7 @@
                <entry key="action" value="Signature"/>
                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                <entry key="passwordCallbackClass" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
            </constructor-arg>
         </bean>
@@ -86,7 +86,7 @@
                <entry key="action" value="Signature"/>
                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                <entry key="passwordCallbackClass" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
            </constructor-arg>
         </bean>
@@ -99,7 +99,7 @@
                <entry key="action" value="Signature"/>
                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                <entry key="passwordCallbackClass" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
            </constructor-arg>
         </bean>

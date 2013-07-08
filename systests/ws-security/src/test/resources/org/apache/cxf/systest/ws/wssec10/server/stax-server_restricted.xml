@@ -88,7 +88,7 @@
         
        <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties> 
      
@@ -102,7 +102,7 @@
         
        <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties> 
      
@@ -125,7 +125,7 @@
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties> 
 
@@ -148,7 +148,7 @@
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties> 
 

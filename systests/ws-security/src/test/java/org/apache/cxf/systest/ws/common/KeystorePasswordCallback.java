@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.wssc.client;
+
+package org.apache.cxf.systest.ws.common;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,38 +30,39 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 /**
+ * A CallbackHandler implementation for keystores.
  */
-
-public class UTPasswordCallback implements CallbackHandler {
+public class KeystorePasswordCallback implements CallbackHandler {
     
     private Map<String, String> passwords = 
         new HashMap<String, String>();
     
-    public UTPasswordCallback() {
-        passwords.put("Alice", "ecilA");
-        passwords.put("Frank", "invalid-password");
+    public KeystorePasswordCallback() {
+        passwords.put("Alice", "abcd!1234");
+        passwords.put("alice", "password");
+        passwords.put("Bob", "abcd!1234");
+        passwords.put("bob", "password");
+        passwords.put("abcd", "dcba");
+        passwords.put("6e0e88f36ebb8744d470f62f604d03ea4ebe5094", "password");
+        passwords.put("wss40rev", "security");
     }
 
     /**
-     * Here, we attempt to get the password from the private 
+     * It attempts to get the password from the private 
      * alias/passwords map.
      */
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-
             String pass = passwords.get(pc.getIdentifier());
             if (pass != null) {
                 pc.setPassword(pass);
                 return;
+            } else {
+                pc.setPassword("password");
             }
         }
     }
     
-    /**
-     * Add an alias/password pair to the callback mechanism.
-     */
-    public void setAliasPassword(String alias, String password) {
-        passwords.put(alias, password);
-    }
+
 }
