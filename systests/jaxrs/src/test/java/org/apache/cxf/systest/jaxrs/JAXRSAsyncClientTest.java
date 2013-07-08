@@ -143,7 +143,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             fail("Exception expected");
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof NotFoundException);
-            assertTrue(ex.getCause() == holder.value);
+            assertTrue(ex.getCause() == ((ClientException)holder.value).getCause());
         }
     }
     
