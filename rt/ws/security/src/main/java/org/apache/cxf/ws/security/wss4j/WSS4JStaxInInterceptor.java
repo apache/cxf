@@ -122,22 +122,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             configureProperties(soapMessage);
             configureCallbackHandler(soapMessage);
             
-            if (getSecurityProperties() != null) {
-                TokenStoreCallbackHandler callbackHandler = 
-                    new TokenStoreCallbackHandler(
-                        getSecurityProperties().getCallbackHandler(), getTokenStore(soapMessage)
-                    );
-                getSecurityProperties().setCallbackHandler(callbackHandler);
-            } else {
-                Map<String, Object> config = getProperties();
-                TokenStoreCallbackHandler callbackHandler = 
-                    new TokenStoreCallbackHandler(
-                        (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
-                        getTokenStore(soapMessage)
-                    );
-                config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
-            }
-            
             InboundWSSec inboundWSSec = null;
             WSSSecurityProperties secProps = null;
             if (getSecurityProperties() != null) {
@@ -146,6 +130,12 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 secProps = ConfigurationConverter.convert(getProperties());
             }
             
+            TokenStoreCallbackHandler callbackHandler = 
+                new TokenStoreCallbackHandler(
+                    secProps.getCallbackHandler(), getTokenStore(soapMessage)
+                );
+            secProps.setCallbackHandler(callbackHandler);
+
             setTokenValidators(secProps, soapMessage);
             
             SecurityEventListener securityEventListener = 
@@ -253,6 +243,15 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                     ConfigurationConstants.SIG_VER_PROP_FILE,
                     ConfigurationConstants.SIG_VER_PROP_REF_ID
                 );
+            if (sigVerCrypto == null) {
+                // Fall back to using the Signature properties for verification
+                sigVerCrypto = 
+                    loadCrypto(
+                        msg,
+                        ConfigurationConstants.SIG_PROP_FILE,
+                        ConfigurationConstants.SIG_PROP_REF_ID
+                    );
+            }
             if (sigVerCrypto != null) {
                 config.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, "RefId-" + sigVerCrypto.hashCode());
                 config.put("RefId-" + sigVerCrypto.hashCode(), sigVerCrypto);
