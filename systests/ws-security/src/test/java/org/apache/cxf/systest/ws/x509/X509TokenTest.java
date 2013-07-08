@@ -35,8 +35,6 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
-import org.apache.cxf.systest.ws.x509.server.Intermediary;
-import org.apache.cxf.systest.ws.x509.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;

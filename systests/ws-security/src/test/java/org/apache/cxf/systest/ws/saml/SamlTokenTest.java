@@ -31,7 +31,6 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlElementCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
-import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;

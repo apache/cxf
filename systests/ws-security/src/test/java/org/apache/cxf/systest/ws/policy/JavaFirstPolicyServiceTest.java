@@ -41,7 +41,6 @@ import org.apache.cxf.systest.ws.common.UTPasswordCallback;
 import org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService;
 import org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService;
 import org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService;
-import org.apache.cxf.systest.ws.policy.server.JavaFirstPolicyServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;

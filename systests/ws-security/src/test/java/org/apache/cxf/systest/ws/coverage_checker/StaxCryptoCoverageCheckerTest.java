@@ -29,7 +29,6 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.coverage_checker.server.StaxServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
