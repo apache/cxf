@@ -136,13 +136,14 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public void testGetBookAsync404Callback() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
-        final Holder<Book> holder = new Holder<Book>();
-        InvocationCallback<Book> callback = createCallback(holder);
+        final Holder<Object> holder = new Holder<Object>();
+        InvocationCallback<Object> callback = createCallback(holder);
         try {
             wc.async().get(callback).get();
             fail("Exception expected");
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof NotFoundException);
+            assertTrue(ex.getCause() == holder.value);
         }
     }
     
@@ -154,13 +155,13 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         return wc;
     }
     
-    private InvocationCallback<Book> createCallback(final Holder<Book> holder) {
-        return new InvocationCallback<Book>() {
-            public void completed(Book response) {
+    private InvocationCallback<Object> createCallback(final Holder<Object> holder) {
+        return new InvocationCallback<Object>() {
+            public void completed(Object response) {
                 holder.value = response;
             }
             public void failed(ClientException error) {
-                error.printStackTrace();
+                holder.value = error;
             }
         };
     }
