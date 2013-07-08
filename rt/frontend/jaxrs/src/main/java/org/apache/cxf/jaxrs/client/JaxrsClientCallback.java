@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +52,15 @@ class JaxrsClientCallback<T> extends ClientCallback {
         return responseClass;
     }
     
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        boolean result = super.cancel(mayInterruptIfRunning);
+        if (result && handler != null) {
+            handler.failed(new ClientException(new CancellationException()));
+        }
+        return result;
+    }
+    
     public Future<T> createFuture() {
         return new JaxrsResponseCallback<T>(this);
     }
@@ -70,15 +80,34 @@ class JaxrsClientCallback<T> extends ClientCallback {
         public boolean cancel(boolean mayInterruptIfRunning) {
             return callback.cancel(mayInterruptIfRunning);
         }
-        @SuppressWarnings("unchecked")
+        
         public T get() throws InterruptedException, ExecutionException {
-            return (T)callback.get()[0];
+            try {
+                return getObject(callback.get()[0]);
+            } catch (InterruptedException ex) {
+                if (callback.handler != null) {
+                    callback.handler.failed(new ClientException((InterruptedException)ex));
+                }
+                throw ex;
+            }
         }
-        @SuppressWarnings("unchecked")
         public T get(long timeout, TimeUnit unit) throws InterruptedException,
             ExecutionException, TimeoutException {
-            return (T)callback.get(timeout, unit)[0];
+            try {
+                return getObject(callback.get(timeout, unit)[0]);
+            } catch (InterruptedException ex) {
+                if (callback.handler != null) {
+                    callback.handler.failed(new ClientException((InterruptedException)ex));
+                }
+                throw ex;
+            }
         }
+        
+        @SuppressWarnings("unchecked")
+        private T getObject(Object object) {
+            return (T)object;
+        }
+        
         public boolean isCancelled() {
             return callback.isCancelled();
         }
@@ -104,13 +133,9 @@ class JaxrsClientCallback<T> extends ClientCallback {
     @Override
     public void handleException(Map<String, Object> ctx, final Throwable ex) {
         context = ctx;
-        if (ex instanceof ClientException) {
-            exception = ex;
-        } else {
-            exception = new ClientException(ex);
-        }
+        exception = ex;
         if (handler != null) {
-            handler.failed((ClientException)exception);
+            handler.failed(new ClientException(exception));
         }
         done = true;
         synchronized (this) {

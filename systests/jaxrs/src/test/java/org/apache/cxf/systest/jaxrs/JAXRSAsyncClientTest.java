@@ -19,13 +19,26 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -33,7 +46,6 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
@@ -68,26 +80,72 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
+    public void testGetBookAsyncResponse404() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
+        WebClient wc = createWebClient(address);
+        Future<Response> future = wc.async().get(Response.class);
+        assertEquals(404, future.get().getStatus());
+    }
+    
+    @Test
     public void testGetBookAsync404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
         Future<Book> future = wc.async().get(Book.class);
-        Book book = future.get();
-        assertEquals(124L, book.getId());
+        try {
+            future.get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof NotFoundException);
+        }
     }
     
     @Test
-    @Ignore
+    public void testPostBookProcessingException() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/";
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new FaultyBookWriter());
+        WebClient wc = WebClient.create(address, providers);
+        
+        Future<Book> future = wc.async().post(Entity.xml(new Book()), Book.class);
+        try {
+            future.get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof ClientException);
+        }
+    }
+    
+    @Test
+    public void testGetBookResponseProcessingException() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/123";
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new FaultyBookReader());
+        WebClient wc = WebClient.create(address, providers);
+        
+        Future<Book> future = wc.async().get(Book.class);
+        try {
+            future.get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof ClientException);
+        }
+    }
+    
+    @Test
     public void testGetBookAsync404Callback() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
         final Holder<Book> holder = new Holder<Book>();
         InvocationCallback<Book> callback = createCallback(holder);
-        Future<Book> future = wc.async().get(callback);
-        Book book = future.get();
-        assertEquals(124L, book.getId());
+        try {
+            wc.async().get(callback).get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof NotFoundException);
+        }
     }
+    
     
     private WebClient createWebClient(String address) {
         List<Object> providers = new ArrayList<Object>();
@@ -107,4 +165,43 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         };
     }
     
+    private static class FaultyBookWriter implements MessageBodyWriter<Book> {
+
+        @Override
+        public long getSize(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
+                            MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
+            WebApplicationException {
+            throw new RuntimeException();
+            
+        }
+        
+    }
+    
+    private static class FaultyBookReader implements MessageBodyReader<Book> {
+
+        @Override
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                             MultivaluedMap<String, String> arg4, InputStream arg5) throws IOException,
+            WebApplicationException {
+            throw new RuntimeException();
+        }
+
+                
+    }
 }
