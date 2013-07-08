@@ -104,7 +104,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         configFinalized = true;
     }
     
-    protected String getAddress(EndpointInfo endpointInfo) {
+    private String getAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("netty://")) {
             address = address.substring(8);
