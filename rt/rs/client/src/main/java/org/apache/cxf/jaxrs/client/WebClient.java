@@ -931,7 +931,15 @@ public class WebClient extends AbstractClient {
         
         doRunInterceptorChain(m);
         
-        return cb.createFuture();
+        Future<T> future = cb.createFuture();
+        if (m.getExchange().get(Exception.class) != null) {
+            Throwable ex = m.getExchange().get(Exception.class);
+            if (ex instanceof Fault) {
+                ex = ex.getCause();
+            }
+            cb.handleException(m, ex);
+        }
+        return future;
     }
 
     
@@ -963,22 +971,31 @@ public class WebClient extends AbstractClient {
                 r = (Response)results[0];
             }
         } catch (Exception ex) {
-            throw ex instanceof WebApplicationException 
+            Throwable t = ex instanceof WebApplicationException 
                 ? (WebApplicationException)ex 
                 : ex instanceof ProcessingException 
-                ? (ProcessingException)ex : new ProcessingException(ex); 
+                ? (ProcessingException)ex : new ProcessingException(ex);
+            cb.handleException(message, t);
+            return;
         }
         if (r == null) {
-            r = handleResponse(message.getExchange().getOutMessage(),
-                                        cb.getResponseClass(),
-                                        cb.getOutGenericType());
+            try {
+                r = handleResponse(message.getExchange().getOutMessage(),
+                                            cb.getResponseClass(),
+                                            cb.getOutGenericType());
+            } catch (Throwable t) {
+                cb.handleException(message, t);
+                return;
+            }
         }
-        
         if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
             cb.handleResponse(message, new Object[] {r});
+        } else if (r.getStatus() >= 300) {
+            cb.handleException(message, convertToWebApplicationException(r));
         } else {
             cb.handleResponse(message, new Object[] {r.getEntity()});
         }
+        
     }
     private void handleAsyncFault(Message message) {
     }
