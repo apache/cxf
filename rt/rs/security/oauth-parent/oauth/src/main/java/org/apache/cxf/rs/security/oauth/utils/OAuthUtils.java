@@ -31,7 +31,6 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -182,7 +181,7 @@ public final class OAuthUtils {
                 builder.entity(e.getMessage());    
             }
         }
-        throw new NotAuthorizedException(builder.build());
+        return builder.build();
     }
 
     public static List<String> parseParamValue(String paramValue, String defaultValue) 
