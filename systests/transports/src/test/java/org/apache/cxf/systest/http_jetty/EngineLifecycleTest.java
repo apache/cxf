@@ -123,7 +123,7 @@ public class EngineLifecycleTest extends Assert {
                 break;
             } catch (Exception ex) {
                 response = null;
-                Thread.sleep(1000);
+                Thread.sleep(2 * 1000);
             }
         }
         assertNotNull("Test doc can not be read", response);
@@ -207,14 +207,14 @@ public class EngineLifecycleTest extends Assert {
         invokeService8801();
         shutdownService();
         System.gc(); //make sure the port is cleaned up a bit
-        Thread.sleep(100);
+        Thread.sleep(2 * 100);
         System.gc(); 
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
         
         
         setUpBus(true);
-        Thread.sleep(100);       
+        Thread.sleep(2 * 100);       
         invokeService();            
         invokeService8801();
         getTestHtml();
