@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -27,14 +27,19 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
 public class BookContinuationStore {
@@ -45,7 +50,7 @@ public class BookContinuationStore {
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
     
-    @Resource
+    @Context
     private MessageContext context;
     
     public BookContinuationStore() {
@@ -55,7 +60,10 @@ public class BookContinuationStore {
     @GET
     @Path("/books/{id}")
     public String getBookDescription(@PathParam("id") String id) {
-        
+        URI uri = context.getUriInfo().getAbsolutePath();
+        if (!uri.toString().contains("/books/")) {
+            throw new WebApplicationException(500);
+        }
         return handleContinuationRequest(id);
         
     }
@@ -128,8 +136,21 @@ public class BookContinuationStore {
     }
     
     private Continuation getContinuation(String name) {
-        
-        //System.out.println("Getting continuation for " + name);
+        ContinuationProvider provider = 
+            (ContinuationProvider)context.get(ContinuationProvider.class.getName());
+        if (provider == null) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            UriInfo uriInfo = new UriInfoImpl(m);
+            if (uriInfo.getAbsolutePath().toString().contains("/books/subresources/")) {
+                // when we suspend a CXF continuation from a sub-resource, the invocation will
+                // return directly to that object - and sub-resources do not have contexts supported
+                // by default - so we just need to depend on PhaseInterceptorChain
+                provider = (ContinuationProvider)m.get(ContinuationProvider.class.getName());
+            } 
+        }
+        if (provider == null) {
+            throw new WebApplicationException(500);
+        }
         
         synchronized (suspended) {
             Continuation suspendedCont = suspended.remove(name);
@@ -138,8 +159,6 @@ public class BookContinuationStore {
             }
         }
         
-        ContinuationProvider provider = 
-            (ContinuationProvider)context.get(ContinuationProvider.class.getName());
         return provider.getContinuation();
     }
     

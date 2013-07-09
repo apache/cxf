@@ -94,19 +94,17 @@ public class JAXRSInvoker extends AbstractInvoker {
             return invoke(exchange, request, serviceObject);
         } finally {
             boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
+            if (exchange.isOneWay() || suspended) {
+                ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
+            }
             if (!suspended) {
-                if (exchange.isOneWay()) {
-                    ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
-                }
                 if (!isServiceObjectRequestScope(exchange.getInMessage())) {
                     provider.releaseInstance(exchange.getInMessage(), rootInstance);
-                } else {
-                    persistRoots(exchange, rootInstance, provider);
                 }
             } else {
-                persistRoots(exchange, rootInstance, provider);
                 exchange.put(REQUEST_WAS_SUSPENDED, true);
             }
+            persistRoots(exchange, rootInstance, provider);
         }
     }
 
@@ -125,24 +123,22 @@ public class JAXRSInvoker extends AbstractInvoker {
         
         if (!wasSuspended) {
             pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
-                    
-            if (cri.isRoot()) {
-                Object realResourceObject = ClassHelper.getRealObject(resourceObject);
-                JAXRSUtils.injectParameters(ori, realResourceObject,
-                                         exchange.getInMessage());
+        }            
+        if (cri.isRoot()) {
+            Object realResourceObject = ClassHelper.getRealObject(resourceObject);
+            JAXRSUtils.injectParameters(ori, realResourceObject,
+                                        exchange.getInMessage());
     
-                InjectionUtils.injectContexts(realResourceObject,
-                                              ori.getClassResourceInfo(),
+            InjectionUtils.injectContexts(realResourceObject,
+                                          ori.getClassResourceInfo(),
+                                          exchange.getInMessage());
+                
+            ProviderInfo<?> appProvider = 
+                (ProviderInfo)exchange.getEndpoint().get(Application.class.getName());
+            if (appProvider != null) {
+                InjectionUtils.injectContexts(appProvider.getProvider(),
+                                              appProvider,
                                               exchange.getInMessage());
-                
-                ProviderInfo<?> appProvider = 
-                    (ProviderInfo)exchange.getEndpoint().get(Application.class.getName());
-                if (appProvider != null) {
-                    InjectionUtils.injectContexts(appProvider.getProvider(),
-                                                  appProvider,
-                                                  exchange.getInMessage());
-                }
-                
             }
         }
         
