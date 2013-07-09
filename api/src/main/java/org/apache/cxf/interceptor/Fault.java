@@ -42,7 +42,7 @@ public class Fault extends UncheckedException {
     private static final long serialVersionUID = -1583932965031558864L;
 
     private Element detail;
-    private String message;
+    private String messageString;
     private QName code;
     private String lang;
     /**
@@ -52,13 +52,13 @@ public class Fault extends UncheckedException {
 
     public Fault(Message message, Throwable throwable) {
         super(message, throwable);
-        this.message = message.toString();
+        this.messageString = message.toString();
         code = FAULT_CODE_SERVER;
     }
     
     public Fault(Message message) {
         super(message);
-        this.message = message.toString();
+        this.messageString = message.toString();
         code = FAULT_CODE_SERVER;
     }
 
@@ -83,42 +83,42 @@ public class Fault extends UncheckedException {
     
     public Fault(Throwable t) {
         super(t);
-        if (super.getMessage() != null) {
-            message = super.getMessage();
+        if (message != null) {
+            messageString = message.toString();
         } else {
-            message = t == null ? null : t.getMessage();
+            messageString = t == null ? null : t.getMessage();
         }
         code = FAULT_CODE_SERVER;
     }
     
     public Fault(Message message, Throwable throwable, QName fc) {
         super(message, throwable);
-        this.message = message.toString();
+        this.messageString = message.toString();
         code = fc;
     }
     
     public Fault(Message message, QName fc) {
         super(message);
-        this.message = message.toString();
+        this.messageString = message.toString();
         code = fc;
     }
 
     public Fault(Throwable t, QName fc) {
         super(t);
-        if (super.getMessage() != null) {
-            message = super.getMessage();
+        if (message != null) {
+            messageString = message.toString();
         } else {
-            message = t == null ? null : t.getMessage();
+            messageString = t == null ? null : t.getMessage();
         }
         code = fc;
     }    
 
     public String getMessage() {
-        return message;
+        return messageString;
     }
 
     public void setMessage(String message) {
-        this.message = message;
+        this.messageString = message;
     }
     
     public QName getFaultCode() {

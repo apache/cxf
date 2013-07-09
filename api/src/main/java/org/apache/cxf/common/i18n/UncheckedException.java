@@ -28,7 +28,7 @@ public class UncheckedException extends java.lang.RuntimeException {
     
     private static final long serialVersionUID = 1L;
     
-    private final Message message;
+    protected final Message message;
     
     public UncheckedException(Message msg) {
         message = msg;
