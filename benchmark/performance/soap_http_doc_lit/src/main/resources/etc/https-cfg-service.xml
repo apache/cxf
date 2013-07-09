@@ -23,7 +23,6 @@
     xmlns:http="http://cxf.apache.org/transports/http/configuration"
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
     xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:security="http://schemas.iona.com/soa/security-config"
     xmlns:interop="http://InteropBaseAddress/interop"
     xmlns:cxf="http://cxf.apache.org/core"
     xmlns:p="http://cxf.apache.org/policy"
@@ -35,7 +34,6 @@
         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-        http://schemas.iona.com/soa/security-config                     http://schemas.iona.com/soa/security-config.xsd
     ">
 
     <httpj:engine-factory id="tls-settings">
