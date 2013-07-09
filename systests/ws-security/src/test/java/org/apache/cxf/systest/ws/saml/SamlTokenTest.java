@@ -68,7 +68,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1OverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -129,7 +129,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1OverTransportStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -192,7 +192,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1Supporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -225,7 +225,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1ElementOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -259,7 +259,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1ElementOverTransportStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -294,7 +294,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetric() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -351,7 +351,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetricStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -412,7 +412,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetricSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -444,7 +444,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetric() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -505,7 +505,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -568,7 +568,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SelfSignedOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -595,7 +595,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SelfSignedOverTransportStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -623,7 +623,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SelfSignedOverTransportSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -650,7 +650,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SelfSignedOverTransportSP11Streaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -678,7 +678,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSamlInitiator() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -707,7 +707,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetricSignedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -734,7 +734,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -764,7 +764,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingOverTransportStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -795,7 +795,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingPKOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -826,7 +826,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingPKOverTransportStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -858,7 +858,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingOverTransportSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -888,7 +888,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingOverTransportSP11Streaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -919,7 +919,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricSignedEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -946,7 +946,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricSignedEncryptedStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -974,7 +974,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -1003,7 +1003,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricEncryptedStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -1033,7 +1033,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingEncryptedOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -1063,7 +1063,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingEncryptedOverTransportStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -1094,7 +1094,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testNoSamlToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -1123,7 +1123,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testNoSamlTokenStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -1155,7 +1155,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2PEP() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

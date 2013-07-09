@@ -64,7 +64,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     public void testSecurityPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = AlgorithmSuiteTest.class.getResource("client/client.xml");
+        URL busFile = AlgorithmSuiteTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -145,7 +145,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = AlgorithmSuiteTest.class.getResource("client/client.xml");
+        URL busFile = AlgorithmSuiteTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -174,7 +174,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     public void testManualConfigurationEncryption() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = AlgorithmSuiteTest.class.getResource("client/client.xml");
+        URL busFile = AlgorithmSuiteTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -224,7 +224,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     public void testManualConfigurationSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = AlgorithmSuiteTest.class.getResource("client/client.xml");
+        URL busFile = AlgorithmSuiteTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

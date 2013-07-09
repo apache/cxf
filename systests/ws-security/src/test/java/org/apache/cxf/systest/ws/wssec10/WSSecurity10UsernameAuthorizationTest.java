@@ -69,7 +69,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     @Test
     public void testClientServerUTOnlyAuthorized() throws IOException {
 
-        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
+        String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getUTOnlyPort(bus, false);
         
@@ -83,7 +83,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     @Test
     public void testClientServerUTOnlyUnauthorized() throws IOException {
 
-        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
+        String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted_unauthorized.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getUTOnlyPort(bus, true);
         
@@ -101,7 +101,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     @Test
     public void testClientServerComplexPolicyAuthorized() throws IOException {
 
-        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
+        String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getComplexPolicyPort(bus);
         
@@ -115,7 +115,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     @Test
     public void testClientServerComplexPolicyUnauthorized() throws IOException {
 
-        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
+        String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted_unauthorized.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getComplexPolicyPort(bus);
         

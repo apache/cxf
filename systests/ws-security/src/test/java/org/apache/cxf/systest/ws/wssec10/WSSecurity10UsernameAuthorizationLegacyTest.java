@@ -68,7 +68,7 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
     @Test
     public void testClientServerComplexPolicyAuthorized() {
 
-        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
+        String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getComplexPolicyPort(bus);
         
@@ -81,7 +81,7 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
     @Test
     public void testClientServerComplexPolicyUnauthorized() {
 
-        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
+        String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted_unauthorized.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getComplexPolicyPort(bus);
         

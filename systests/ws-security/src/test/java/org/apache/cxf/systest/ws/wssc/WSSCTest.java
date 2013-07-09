@@ -52,7 +52,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class, true)
         );
         
-        bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/client/client.xml");
+        bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/client.xml");
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
         

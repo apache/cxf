@@ -60,7 +60,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void test3DESEncryptionGivenKey() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -82,7 +82,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client/client.xml");
+        URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

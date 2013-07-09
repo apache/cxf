@@ -52,10 +52,10 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
-            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client/client.xml");
+            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client.xml");
         } else {
             bus = new SpringBusFactory().createBus(
-                    "org/apache/cxf/systest/ws/wssec11/client/client_restricted.xml");
+                    "org/apache/cxf/systest/ws/wssec11/client_restricted.xml");
         }
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
@@ -96,10 +96,10 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
 
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
-            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client/client.xml");
+            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client.xml");
         } else {
             bus = new SpringBusFactory().createBus(
-                      "org/apache/cxf/systest/ws/wssec11/client/client_restricted.xml");
+                      "org/apache/cxf/systest/ws/wssec11/client_restricted.xml");
         }
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);

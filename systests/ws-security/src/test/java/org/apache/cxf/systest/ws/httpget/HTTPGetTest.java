@@ -73,7 +73,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HTTPGetTest.class.getResource("client/client.xml");
+        URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -98,7 +98,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HTTPGetTest.class.getResource("client/client.xml");
+        URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -125,7 +125,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HTTPGetTest.class.getResource("client/client.xml");
+        URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -164,7 +164,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         }
         
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HTTPGetTest.class.getResource("client/client.xml");
+        URL busFile = HTTPGetTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

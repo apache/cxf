@@ -65,7 +65,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintext() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -93,7 +93,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintextCreated() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -121,7 +121,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintextSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -149,7 +149,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPasswordHashed() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -177,7 +177,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testNoPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -205,7 +205,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -233,7 +233,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -261,7 +261,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -289,7 +289,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testNoUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -331,7 +331,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPasswordHashedReplay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -368,7 +368,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintextPrincipal() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxUsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

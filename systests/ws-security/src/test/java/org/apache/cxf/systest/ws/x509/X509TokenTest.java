@@ -79,7 +79,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifier() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -107,7 +107,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifierJaxwsClient() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/jaxws-client.xml");
+        URL busFile = X509TokenTest.class.getResource("jaxws-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -139,7 +139,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testIntermediary() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/intermediary-client.xml");
+        URL busFile = X509TokenTest.class.getResource("intermediary-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -167,7 +167,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testIssuerSerial() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -195,7 +195,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testThumbprint() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -223,7 +223,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testContentEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -247,7 +247,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricIssuerSerial() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -275,7 +275,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricThumbprint() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -303,7 +303,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryptBeforeSigning() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -331,7 +331,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryptSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -359,7 +359,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -387,7 +387,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -415,7 +415,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -443,7 +443,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -471,7 +471,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsingSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -499,7 +499,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSignedEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -527,7 +527,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -555,7 +555,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSignedEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -583,7 +583,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -611,7 +611,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignatureSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -639,7 +639,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryption() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -667,7 +667,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignatureReplay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -703,7 +703,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSupportingSigned() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -731,7 +731,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSupportingSignedCertConstraints() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -769,7 +769,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportKVT() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -797,7 +797,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifier2() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -830,7 +830,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSupportingToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -879,7 +879,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testNegativeEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+        URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

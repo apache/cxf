@@ -61,7 +61,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
     public void testRequireClientCert() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HttpsTokenTest.class.getResource("client/client.xml");
+        URL busFile = HttpsTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -112,7 +112,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
     public void testBasicAuth() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HttpsTokenTest.class.getResource("client/client.xml");
+        URL busFile = HttpsTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

@@ -60,7 +60,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testSupportingToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("client/policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -96,7 +96,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testPlaintextPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("client/policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -144,7 +144,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testHashPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("client/policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -192,7 +192,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testCreated() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("client/policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -228,7 +228,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testNonce() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("client/policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

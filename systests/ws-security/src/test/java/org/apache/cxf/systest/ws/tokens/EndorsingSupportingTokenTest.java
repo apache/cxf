@@ -63,7 +63,7 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
     public void testEndorsingSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = EndorsingSupportingTokenTest.class.getResource("client/endorsing-client.xml");
+        URL busFile = EndorsingSupportingTokenTest.class.getResource("endorsing-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -114,7 +114,7 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
     public void testSignedEndorsingSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = EndorsingSupportingTokenTest.class.getResource("client/endorsing-client.xml");
+        URL busFile = EndorsingSupportingTokenTest.class.getResource("endorsing-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

@@ -68,7 +68,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testSymmetricProtectionSignatureToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -95,7 +95,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testSymmetricProtectionSignatureDKToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -122,7 +122,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testSymmetricProtectionEncryptionToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -149,7 +149,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -176,7 +176,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testSymmetricSignedEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -203,7 +203,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testSymmetricEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -230,7 +230,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     public void testSymmetricSignedEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenDerivedTest.class.getResource("client/client-derived.xml");
+        URL busFile = UsernameTokenDerivedTest.class.getResource("client-derived.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

@@ -62,7 +62,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testRequiredParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -98,7 +98,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testRequiredElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -134,7 +134,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testSignedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -183,7 +183,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testSignedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -219,7 +219,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testEncryptedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -268,7 +268,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -304,7 +304,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testContentEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client/client.xml");
+        URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

@@ -87,7 +87,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         //argv = new String[] {argv[1]};
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
-            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec10/client/client.xml");
+            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec10/client.xml");
         } else {
             bus = new SpringBusFactory().createBus(
                     "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");
@@ -138,7 +138,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         //argv = new String[] {argv[1]};
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
-            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec10/client/client.xml");
+            bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec10/client.xml");
         } else {
             bus = new SpringBusFactory().createBus(
                     "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");

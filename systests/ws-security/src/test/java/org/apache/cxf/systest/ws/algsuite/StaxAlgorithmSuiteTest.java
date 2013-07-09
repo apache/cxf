@@ -64,7 +64,7 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     public void testSecurityPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxAlgorithmSuiteTest.class.getResource("client/client.xml");
+        URL busFile = StaxAlgorithmSuiteTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

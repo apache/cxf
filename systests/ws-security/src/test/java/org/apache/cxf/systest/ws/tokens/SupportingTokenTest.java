@@ -63,7 +63,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client/client.xml");
+        URL busFile = SupportingTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -112,7 +112,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testEncryptedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client/client.xml");
+        URL busFile = SupportingTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -161,7 +161,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedEncryptedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client/client.xml");
+        URL busFile = SupportingTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

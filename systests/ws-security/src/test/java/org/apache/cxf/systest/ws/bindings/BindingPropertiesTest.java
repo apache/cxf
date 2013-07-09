@@ -63,7 +63,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testOnlySignEntireHeadersAndBody() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -99,7 +99,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testEncryptSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -135,7 +135,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testIncludeTimestamp() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -171,7 +171,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testEncryptBeforeSigning() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -207,7 +207,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testSignBeforeEncrypting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -245,7 +245,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testTimestampFirst() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -281,7 +281,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testTimestampLast() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -317,7 +317,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testStrict() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -355,7 +355,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testTokenProtection() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -393,7 +393,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
     public void testSignatureConfirmation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

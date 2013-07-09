@@ -75,7 +75,7 @@ public class StaxGCMTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxGCMTest.class.getResource("client/client.xml");
+        URL busFile = StaxGCMTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -118,7 +118,7 @@ public class StaxGCMTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxGCMTest.class.getResource("client/client.xml");
+        URL busFile = StaxGCMTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -161,7 +161,7 @@ public class StaxGCMTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxGCMTest.class.getResource("client/client.xml");
+        URL busFile = StaxGCMTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

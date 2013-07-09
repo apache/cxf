@@ -79,7 +79,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer", PORT);
 
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-            "org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+            "org/apache/cxf/systest/ws/policy/javafirstclient.xml");
 
         JavaFirstAttachmentPolicyService svc = ctx.getBean("JavaFirstAttachmentPolicyServiceClient",
                                                            JavaFirstAttachmentPolicyService.class);
@@ -113,7 +113,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer.2", PORT2);
 
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-            "org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+            "org/apache/cxf/systest/ws/policy/javafirstclient.xml");
 
         SslUsernamePasswordAttachmentService svc = ctx.getBean("SslUsernamePasswordAttachmentServiceClient",
                                                                SslUsernamePasswordAttachmentService.class);
@@ -147,7 +147,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer", PORT);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
-            "org/apache/cxf/systest/ws/policy/client/sslnocertclient.xml"
+            "org/apache/cxf/systest/ws/policy/sslnocertclient.xml"
         });
 
         BindingSimpleService simpleService = clientContext.getBean("BindingSimpleServiceClient",
@@ -179,7 +179,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
-            "org/apache/cxf/systest/ws/policy/client/sslcertclient.xml"
+            "org/apache/cxf/systest/ws/policy/sslcertclient.xml"
         });
 
         BindingSimpleService simpleService = clientContext.getBean("BindingSimpleServiceClient",
@@ -208,7 +208,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
-            "org/apache/cxf/systest/ws/policy/client/sslnocertclient.xml"
+            "org/apache/cxf/systest/ws/policy/sslnocertclient.xml"
         });
 
         NoAlternativesOperationSimpleService simpleService = clientContext
@@ -257,7 +257,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
-            "org/apache/cxf/systest/ws/policy/client/sslcertclient.xml"
+            "org/apache/cxf/systest/ws/policy/sslcertclient.xml"
         });
 
         NoAlternativesOperationSimpleService simpleService = clientContext
@@ -301,7 +301,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
-            "org/apache/cxf/systest/ws/policy/client/sslnocertclient.xml"
+            "org/apache/cxf/systest/ws/policy/sslnocertclient.xml"
         });
 
         OperationSimpleService simpleService = clientContext
@@ -337,7 +337,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
-            "org/apache/cxf/systest/ws/policy/client/sslcertclient.xml"
+            "org/apache/cxf/systest/ws/policy/sslcertclient.xml"
         });
 
         OperationSimpleService simpleService = clientContext

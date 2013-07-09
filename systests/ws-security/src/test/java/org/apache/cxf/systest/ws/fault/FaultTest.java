@@ -72,7 +72,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testSoap11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client/client.xml");
+        URL busFile = FaultTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -105,7 +105,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client/client.xml");
+        URL busFile = FaultTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

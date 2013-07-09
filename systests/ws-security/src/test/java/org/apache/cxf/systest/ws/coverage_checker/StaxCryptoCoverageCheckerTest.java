@@ -64,7 +64,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedBodyTimestamp() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -106,7 +106,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedBodyOnly() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -158,7 +158,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedTimestampOnly() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -211,7 +211,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedBodyTimestampSoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -253,7 +253,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedBodyOnlySoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -305,7 +305,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedTimestampOnlySoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -358,7 +358,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedEncryptedBody() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -402,7 +402,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testSignedNotEncryptedBody() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -459,7 +459,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     @org.junit.Test
     public void testWSAddressing() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
