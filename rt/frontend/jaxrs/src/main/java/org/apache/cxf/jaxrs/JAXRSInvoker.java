@@ -65,7 +65,6 @@ public class JAXRSInvoker extends AbstractInvoker {
     private static final String SERVICE_OBJECT_SCOPE = "org.apache.cxf.service.scope";
     private static final String REQUEST_SCOPE = "request";    
     private static final String LAST_SERVICE_OBJECT = "org.apache.cxf.service.object.last";
-    private static final String REQUEST_WAS_SUSPENDED = "org.apache.cxf.service.request.suspended";
     private static final String PROXY_INVOCATION_ERROR_FRAGMENT 
         = "object is not an instance of declaring class"; 
     
@@ -104,19 +103,13 @@ public class JAXRSInvoker extends AbstractInvoker {
             return handleFault(ex, exchange.getInMessage());
         } finally {
             boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
-            if (!suspended) {
-                if (exchange.isOneWay()) {
-                    ServerProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
-                }
-                if (!isServiceObjectRequestScope(exchange.getInMessage())) {
-                    provider.releaseInstance(exchange.getInMessage(), rootInstance);
-                } else {
-                    persistRoots(exchange, rootInstance, provider);
-                }
-            } else {
-                persistRoots(exchange, rootInstance, provider);
-                exchange.put(REQUEST_WAS_SUSPENDED, true);
+            if (exchange.isOneWay() || suspended) {
+                ServerProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
             }
+            if (!suspended && !isServiceObjectRequestScope(exchange.getInMessage())) {
+                provider.releaseInstance(exchange.getInMessage(), rootInstance);
+            }
+            persistRoots(exchange, rootInstance, provider);
         }
     }
 
