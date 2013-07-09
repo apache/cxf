@@ -140,8 +140,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");

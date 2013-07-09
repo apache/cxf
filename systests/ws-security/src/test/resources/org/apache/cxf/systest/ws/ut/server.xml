@@ -167,8 +167,7 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/> 
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
@@ -187,8 +186,7 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/> 
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      

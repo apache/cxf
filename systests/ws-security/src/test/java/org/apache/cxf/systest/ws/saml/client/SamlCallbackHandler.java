@@ -116,7 +116,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
                 
                 try {
-                    String file = "org/apache/cxf/systest/ws/wssec10/client/alice.properties";
+                    String file = "alice.properties";
                     Crypto crypto = CryptoFactory.getInstance(file);
                     callback.setIssuerCrypto(crypto);
                     callback.setIssuerKeyName("alice");
@@ -131,7 +131,7 @@ public class SamlCallbackHandler implements CallbackHandler {
     
     protected KeyInfoBean createKeyInfo() throws Exception {
         Crypto crypto = 
-            CryptoFactory.getInstance("org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+            CryptoFactory.getInstance("alice.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("alice");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);

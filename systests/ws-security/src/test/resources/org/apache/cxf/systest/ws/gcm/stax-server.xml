@@ -55,8 +55,7 @@
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-          <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.signature.properties" value="bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
           <entry key="ws-security.enable.streaming" value="true"/>
@@ -76,8 +75,7 @@
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-          <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.signature.properties" value="bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
           <entry key="ws-security.is-bsp-compliant" value="false"/>
@@ -98,8 +96,7 @@
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-          <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.signature.properties" value="bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
           <entry key="ws-security.enable.streaming" value="true"/>

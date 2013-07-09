@@ -42,8 +42,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
        </jaxws:properties>
     </jaxws:client>

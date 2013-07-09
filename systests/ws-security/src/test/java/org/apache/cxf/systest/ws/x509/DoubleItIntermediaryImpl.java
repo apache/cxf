@@ -59,7 +59,7 @@ public class DoubleItIntermediaryImpl extends AbstractBusClientServerTestBase im
         }
         
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
-                "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+                "bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
         
         return x509Port.doubleIt(numberToDouble);

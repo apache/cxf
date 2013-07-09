@@ -68,8 +68,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -84,8 +83,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricSupportingPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -100,8 +98,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSupportingPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -118,11 +115,9 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/>
            <entry key="ws-security.signature.username" value="alice"/> 
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -144,8 +139,7 @@
                    <property name="serviceName" value="bob@service.ws.apache.org"/>
                </bean>            
            </entry> 
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/>
            <entry key="ws-security.signature.username" value="alice"/> 
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -157,11 +151,9 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/>
            <entry key="ws-security.signature.username" value="alice"/> 
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -176,8 +168,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricProtectionPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -192,8 +183,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricDerivedProtectionPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -210,11 +200,9 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/>
            <entry key="ws-security.signature.username" value="alice"/> 
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -231,11 +219,9 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+           <entry key="ws-security.signature.properties" value="alice.properties"/>
            <entry key="ws-security.signature.username" value="alice"/> 
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -250,8 +236,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricEndorsingEncryptedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">
@@ -266,8 +251,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricSignedEndorsingEncryptedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="bob"/>
            <entry key="ws-security.kerberos.client">
                <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient">

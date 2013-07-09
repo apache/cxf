@@ -114,7 +114,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
-                "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+                "bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
         
         // DOM
@@ -686,7 +686,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-                "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+                "bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "bob");
         
         try {
@@ -697,7 +697,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
-            "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+            "alice.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
     
         x509Port.doubleIt(25);

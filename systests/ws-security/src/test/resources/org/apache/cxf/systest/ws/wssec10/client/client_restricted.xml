@@ -58,10 +58,10 @@
     <http:conduit name="https://.*/UserNameOverTransport.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/alice.jks"/>
+                <sec:keyStore type="jks" password="password" resource="certs/restricted/alice.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/bob.jks"/>
+                <sec:keyStore type="jks" password="password" resource="certs/restricted/bob.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>    
@@ -73,8 +73,8 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
-            <entry key="ws-security.encryption.properties" value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
 
@@ -86,8 +86,8 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
-            <entry key="ws-security.encryption.properties" value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:client>
 

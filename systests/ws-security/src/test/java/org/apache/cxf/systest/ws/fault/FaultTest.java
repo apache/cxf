@@ -166,7 +166,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         );
         client.getRequestContext().put(
             "ws-security.encryption.properties", 
-            "org/apache/cxf/systest/ws/wssec10/client/bob.properties"
+            "bob.properties"
         );
         client.getRequestContext().put("ws-security.encryption.username", "bob");
 

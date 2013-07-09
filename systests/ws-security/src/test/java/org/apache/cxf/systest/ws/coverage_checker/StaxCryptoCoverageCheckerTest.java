@@ -79,8 +79,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
@@ -122,8 +121,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
@@ -175,8 +173,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
@@ -229,8 +226,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
@@ -272,8 +268,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
@@ -325,8 +320,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
@@ -379,10 +373,8 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature Encrypt");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
-        outProps.put("encryptionPropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+        outProps.put("signaturePropFile", "alice.properties");
+        outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
         outProps.put("passwordCallbackClass", 
@@ -425,10 +417,8 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature Encrypt");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
-        outProps.put("encryptionPropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+        outProps.put("signaturePropFile", "alice.properties");
+        outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
         outProps.put("passwordCallbackClass", 
@@ -484,8 +474,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
         
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
-        outProps.put("signaturePropFile", 
-                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
         outProps.put("passwordCallbackClass", 
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");

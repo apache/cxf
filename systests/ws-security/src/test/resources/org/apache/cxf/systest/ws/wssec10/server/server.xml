@@ -54,10 +54,10 @@
         <httpj:engine port="${testutil.ports.Server.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/bob.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="certs/bob.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/alice.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="certs/alice.jks"/>
                 </sec:trustManagers> 
 
                 <sec:cipherSuitesFilter>
@@ -119,7 +119,7 @@
         
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -141,7 +141,7 @@
         
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
-            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
             <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>

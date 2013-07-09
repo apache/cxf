@@ -47,11 +47,9 @@
 			<entry key="ws-security.username" value="Alice" />
 			<entry key="ws-security.callback-handler"
 				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-			<entry key="ws-security.encryption.properties"
-				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+			<entry key="ws-security.encryption.properties" value="bob.properties" />
 			<entry key="ws-security.encryption.username" value="bob" />
-			<entry key="ws-security.signature.properties"
-				value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+			<entry key="ws-security.signature.properties" value="alice.properties" />
 			<entry key="ws-security.signature.username" value="alice" />
 		</jaxws:properties>
 		<jaxws:features>
@@ -68,11 +66,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
     </jaxws:client>
@@ -84,11 +80,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -101,7 +95,7 @@
     <jaxws:client
         name="{http://www.example.org/contract/DoubleIt}DoubleItClientCertPort" createdFromAPI="true">
         
-                <jaxws:properties>
+        <jaxws:properties>
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
@@ -117,8 +111,7 @@
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
@@ -135,8 +128,7 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.username" value="alice"/>
-           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.signature.properties" value="alice.properties"/> 
            <entry key="ws-security.signature.username" value="alice"/>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>

@@ -54,7 +54,7 @@ abstract class AbstractServer extends AbstractBusTestServerBase {
         Endpoint ep = Endpoint.create(obj);
         ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                "org/apache/cxf/systest/ws/wssec11/server/bob.properties");
+                "bob.properties");
         ep.publish(url);
     }
     

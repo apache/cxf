@@ -128,7 +128,7 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
     
     protected KeyInfoBean createKeyInfo() throws Exception {
         Crypto crypto = 
-            CryptoFactory.getInstance("org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+            CryptoFactory.getInstance("alice.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("alice");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);

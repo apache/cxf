@@ -47,11 +47,9 @@
 			<entry key="ws-security.username" value="Alice" />
 			<entry key="ws-security.callback-handler"
 				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-			<entry key="ws-security.encryption.properties"
-				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+			<entry key="ws-security.encryption.properties" value="bob.properties" />
 			<entry key="ws-security.encryption.username" value="bob" />
-			<entry key="ws-security.signature.properties"
-				value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+			<entry key="ws-security.signature.properties" value="alice.properties" />
 			<entry key="ws-security.signature.username" value="alice" />
 		</jaxws:properties>
 		<jaxws:features>
@@ -69,11 +67,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -91,11 +87,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -113,11 +107,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -135,11 +127,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -157,11 +147,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -179,11 +167,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -201,11 +187,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -223,11 +207,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -245,11 +227,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -267,11 +247,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -289,11 +267,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -311,11 +287,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -333,11 +307,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -355,11 +327,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -377,11 +347,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -399,11 +367,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -421,11 +387,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -443,11 +407,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>
@@ -465,11 +427,9 @@
             <entry key="ws-security.username" value="Alice" />
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.properties" value="bob.properties" />
             <entry key="ws-security.encryption.username" value="bob" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
+            <entry key="ws-security.signature.properties" value="alice.properties" />
             <entry key="ws-security.signature.username" value="alice" />
         </jaxws:properties>
         <jaxws:features>

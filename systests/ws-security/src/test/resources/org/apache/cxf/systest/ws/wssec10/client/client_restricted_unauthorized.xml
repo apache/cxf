@@ -57,10 +57,10 @@
     <http:conduit name="https://.*/UserNameOverTransport.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/alice.jks"/>
+                <sec:keyStore type="jks" password="password" resource="certs/restricted/alice.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/bob.jks"/>
+                <sec:keyStore type="jks" password="password" resource="certs/restricted/bob.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

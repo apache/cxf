@@ -54,8 +54,7 @@
 		<jaxws:properties>
 			<entry key="ws-security.callback-handler"
 				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-			<entry key="ws-security.signature.properties"
-				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+			<entry key="ws-security.signature.properties" value="bob.properties" />
 			<entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
 		</jaxws:properties>
 		<jaxws:features>
@@ -77,8 +76,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.signature.properties" value="bob.properties" />
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
@@ -100,8 +98,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.signature.properties" value="bob.properties" />
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
@@ -123,8 +120,7 @@
         <jaxws:properties>
             <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.signature.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.signature.properties" value="bob.properties" />
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
@@ -150,8 +146,7 @@
                         <entry key="action" value="Encrypt"/> 
                         <entry key="passwordCallbackClass" 
                                value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                        <entry key="decryptionPropFile"
-                               value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" /> 
+                        <entry key="decryptionPropFile" value="bob.properties" /> 
                         <entry key="encryptionKeyTransportAlgorithm"
                                value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p" /> 
                         <entry key="encryptionSymAlgorithm"
@@ -177,8 +172,7 @@
                         <entry key="action" value="Encrypt"/> 
                         <entry key="passwordCallbackClass" 
                                value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                        <entry key="decryptionPropFile"
-                               value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" /> 
+                        <entry key="decryptionPropFile" value="bob.properties" /> 
                         <entry key="encryptionKeyTransportAlgorithm"
                                value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p" /> 
                         <entry key="encryptionSymAlgorithm"
@@ -204,8 +198,7 @@
                         <entry key="action" value="Encrypt"/> 
                         <entry key="passwordCallbackClass" 
                                value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                        <entry key="decryptionPropFile"
-                               value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" /> 
+                        <entry key="decryptionPropFile" value="bob.properties" /> 
                         <entry key="encryptionKeyTransportAlgorithm"
                                value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p" /> 
                         <entry key="encryptionSymAlgorithm"
@@ -231,8 +224,7 @@
                         <entry key="action" value="Signature"/> 
                         <entry key="passwordCallbackClass" 
                                value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                        <entry key="signaturePropFile"
-                               value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" /> 
+                        <entry key="signaturePropFile" value="alice.properties" /> 
                         <entry key="signatureAlgorithm"
                                value="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /> 
                     </map>
@@ -256,8 +248,7 @@
                         <entry key="action" value="Signature"/> 
                         <entry key="passwordCallbackClass" 
                                value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                        <entry key="signaturePropFile"
-                               value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" /> 
+                        <entry key="signaturePropFile" value="alice.properties" /> 
                         <entry key="signatureAlgorithm"
                                value="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /> 
                     </map>

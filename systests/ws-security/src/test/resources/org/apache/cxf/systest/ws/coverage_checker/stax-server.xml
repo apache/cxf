@@ -57,7 +57,7 @@
            <constructor-arg>
             <map>
                <entry key="action" value="Signature Timestamp"/>
-               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+               <entry key="signaturePropFile" value="alice.properties"/>
                <entry key="passwordCallbackClass" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
@@ -81,7 +81,7 @@
            <constructor-arg>
             <map>
                <entry key="action" value="Signature Timestamp"/>
-               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+               <entry key="signaturePropFile" value="alice.properties"/>
                <entry key="passwordCallbackClass" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
@@ -108,8 +108,8 @@
            <constructor-arg>
             <map>
                <entry key="action" value="Encrypt Signature Timestamp"/>
-               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
-               <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+               <entry key="signaturePropFile" value="alice.properties"/>
+               <entry key="decryptionPropFile" value="bob.properties"/>
                <entry key="passwordCallbackClass" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
@@ -137,7 +137,7 @@
            <constructor-arg>
             <map>
                <entry key="action" value="Signature Timestamp"/>
-               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+               <entry key="signaturePropFile" value="alice.properties"/>
                <entry key="passwordCallbackClass" 
                   value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
