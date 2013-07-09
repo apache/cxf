@@ -720,6 +720,38 @@ public class JAXRSUtilsTest extends Assert {
         assertNull(params.get(3));
     }
     
+    @Test
+    public void testQueryParametersIntegerArray() throws Exception {
+        Class<?>[] argType = {Integer[].class};
+        Method m = Customer.class.getMethod("testQueryIntegerArray", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        
+        messageImpl.put(Message.QUERY_STRING, "query=1&query=2");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        Integer[] intValues = (Integer[])params.get(0);
+        assertEquals(1, (int)intValues[0]);
+        assertEquals(2, (int)intValues[1]);
+    }
+    
+    @Test
+    public void testQueryParametersIntArray() throws Exception {
+        Class<?>[] argType = {int[].class};
+        Method m = Customer.class.getMethod("testQueryIntArray", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        
+        messageImpl.put(Message.QUERY_STRING, "query=1&query=2");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        int[] intValues = (int[])params.get(0);
+        assertEquals(1, intValues[0]);
+        assertEquals(2, intValues[1]);
+    }
+    
     @SuppressWarnings("unchecked")
     @Test
     public void testQueryParamAsListWithDefaultValue() throws Exception {

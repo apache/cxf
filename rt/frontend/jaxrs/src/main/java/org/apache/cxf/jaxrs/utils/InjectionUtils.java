@@ -789,6 +789,8 @@ public final class InjectionUtils {
         if (o != null) {
             if (theValues instanceof Collection) {
                 Collection.class.cast(theValues).add(o);
+            } else if (theValues.getClass().getComponentType().isPrimitive()) {
+                Array.set(theValues, index, o);
             } else {
                 ((Object[]) theValues)[index] = o;
             }
