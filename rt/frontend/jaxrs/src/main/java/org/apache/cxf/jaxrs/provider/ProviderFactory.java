@@ -307,7 +307,7 @@ public abstract class ProviderFactory {
                     if (actualClass == null) {
                         continue;
                     }
-                    if (expectedType.isArray()) {
+                    if (expectedType.isArray() && !actualClass.isArray()) {
                         expectedType = expectedType.getComponentType();
                     }
                     if (actualClass.isAssignableFrom(expectedType)) {
