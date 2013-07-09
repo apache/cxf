@@ -952,7 +952,7 @@ public abstract class AbstractStaxBindingHandler {
             }
             for (Header head : parts.getHeaders()) {
                 QName qname = new QName(head.getNamespace(), head.getName());
-                SecurePart securePart = new SecurePart(qname, Modifier.Content);
+                SecurePart securePart = new SecurePart(qname, Modifier.Element);
                 securePart.setRequired(false);
                 encryptedParts.add(securePart);
             }
