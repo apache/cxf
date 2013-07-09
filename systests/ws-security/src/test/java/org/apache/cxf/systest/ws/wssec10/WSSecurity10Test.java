@@ -130,7 +130,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     public void testClientServerStreaming() {
 
         String[] argv = new String[] {
-            // TODO - See WSS-458 "UserName",
+            "UserName",
             "UserNameOverTransport",
             "MutualCertificate10SignEncrypt",
             "MutualCertificate10SignEncryptRsa15TripleDes"

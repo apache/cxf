@@ -527,9 +527,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         // DOM
         assertEquals(10, pt.doubleIt(5));
         
-        // TODO See WSS-458 Streaming
-        // SecurityTestUtil.enableStreaming(pt);
-        // assertEquals(10, pt.doubleIt(5));
+        // Streaming
+        SecurityTestUtil.enableStreaming(pt);
+        assertEquals(10, pt.doubleIt(5));
         
         ((java.io.Closeable)pt).close();
         bus.shutdown(true);

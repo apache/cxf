@@ -216,9 +216,9 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
         
-        // TODO - See WSS-458 Streaming
-        // SecurityTestUtil.enableStreaming(saml1Port);
-        // saml1Port.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(saml1Port);
+        saml1Port.doubleIt(25);
         
         ((java.io.Closeable)saml1Port).close();
         bus.shutdown(true);

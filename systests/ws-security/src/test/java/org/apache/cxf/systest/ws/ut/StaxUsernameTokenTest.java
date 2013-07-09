@@ -137,9 +137,9 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         utPort.doubleIt(25);
         
-        //  TODO - See WSS-458 Streaming
-        // SecurityTestUtil.enableStreaming(utPort);
-        // utPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(utPort);
+        utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
