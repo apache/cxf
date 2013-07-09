@@ -25,6 +25,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,8 +77,7 @@ public class XKMSInvoker {
     }
     
     public X509Certificate getCertificateForId(Applications application, String id) {
-        List<X509AppId> ids = new ArrayList<X509AppId>();
-        ids.add(new X509AppId(application, id));
+        List<X509AppId> ids = Collections.singletonList(new X509AppId(application, id));
         return getCertificate(ids);
     }
     

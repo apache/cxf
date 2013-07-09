@@ -291,11 +291,11 @@ public class XKMSService implements XKMSPortType {
     }
 
     /**
-     * Sets encryption, signature and exchang as key usage for provided keyBinding.
+     * Sets encryption, signature and exchange as key usage for provided keyBinding.
      *
      * @param keyBinding KeyBinding to set KeyUsage within
      */
-    protected void setKeyUssageAll(KeyBindingAbstractType keyBinding) {
+    protected void setKeyUsageAll(KeyBindingAbstractType keyBinding) {
         keyBinding.getKeyUsage().add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_ENCRYPTION);
         keyBinding.getKeyUsage().add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SIGNATURE);
         keyBinding.getKeyUsage().add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_EXCHANGE);
