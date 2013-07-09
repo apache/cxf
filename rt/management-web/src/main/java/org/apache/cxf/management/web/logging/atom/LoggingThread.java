@@ -28,24 +28,24 @@ package org.apache.cxf.management.web.logging.atom;
  */
 final class LoggingThread {
 
-    private static ThreadLocal<LoggingThread> threadLocal = new ThreadLocal<LoggingThread>() {
-        @Override
-        protected LoggingThread initialValue() {
-            return new LoggingThread();
-        }
-    };
-
-    private boolean isSilent;
+    private static ThreadLocal<Boolean> threadLocal = new ThreadLocal<Boolean>();
 
     private LoggingThread() {
     }
 
     public static void markSilent(boolean silent) {
-        LoggingThread lt = threadLocal.get();
-        lt.isSilent = silent;
+        if (silent) {
+            threadLocal.set(Boolean.TRUE);
+        } else {
+            threadLocal.remove();
+        }
     }
 
     public static boolean isSilent() {
-        return threadLocal.get().isSilent;
+        Boolean b = threadLocal.get();
+        if (b != null) {
+            return b;
+        }
+        return false;
     }
 }
