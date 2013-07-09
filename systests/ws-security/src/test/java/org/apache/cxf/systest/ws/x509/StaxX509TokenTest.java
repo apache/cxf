@@ -796,8 +796,8 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending an X.509 Supporting Token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "X509Token not satisfied";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         // This should fail, as the client is not sending a PKI Token
@@ -809,8 +809,8 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a PKI token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "WssX509PkiPathV1Token11";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();
@@ -852,8 +852,8 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not endorsing the token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "X509Token not satisfied";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         try {
@@ -862,8 +862,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not endorsing the token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
-            // assertTrue(ex.getMessage().contains(error));
+            // expected
         }
         
         ((java.io.Closeable)port).close();

@@ -149,8 +149,8 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "SignedParts";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "Body must be signed";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         // Streaming
@@ -173,8 +173,8 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "SignedParts";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "To must be signed";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         // Streaming

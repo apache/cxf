@@ -324,7 +324,8 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // assertTrue(ex.getMessage().contains("Wrong SAML Version"));
+            String error = "Policy enforces SamlVersion20Profile11 but we got 1.1";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -410,7 +411,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // assertTrue(ex.getMessage().contains("SamlToken not satisfied"));
+            assertTrue(ex.getMessage().contains("SamlToken not satisfied"));
         }
         
         ((java.io.Closeable)saml2Port).close();
@@ -448,7 +449,8 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // assertTrue(ex.getMessage().contains("Wrong SAML Version"));
+            String error = "Policy enforces SamlVersion20Profile11 but we got 1.1";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -470,8 +472,8 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Failure expected on no token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "SamlToken not satisfied";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "SamlToken not satisfied";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)saml2Port).close();
