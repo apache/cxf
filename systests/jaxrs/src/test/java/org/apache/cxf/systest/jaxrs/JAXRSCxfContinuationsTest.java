@@ -51,6 +51,12 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
         
         doTestContinuation("books");
     }
+
+    @Test
+    public void testContinuationSubresource() throws Exception {
+        
+        doTestContinuation("books/subresources");
+    }
     
     private void doTestContinuation(String pathSegment) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS,
