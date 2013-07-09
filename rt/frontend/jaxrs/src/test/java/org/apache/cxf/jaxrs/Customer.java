@@ -362,6 +362,16 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     @Produces("text/xml")   
+    public void testQueryIntegerArray(@QueryParam("query") Integer[] query) {
+        // complete
+    }
+    
+    @Produces("text/xml")   
+    public void testQueryIntArray(@QueryParam("query") int[] query) {
+        // complete
+    }
+    
+    @Produces("text/xml")   
     public void testQueryAsList(
         @DefaultValue("default") @QueryParam("query") List<String> queryString,
         @QueryParam("query2") List<String> queryString2,
