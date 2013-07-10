@@ -195,6 +195,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             if (asyncResponse != null) {
                 if (!asyncResponse.isSuspended() && !asyncResponse.isResumedByApplication()) {
                     asyncResponse.suspendContinuation();
+                    providerFactory.clearThreadLocalProxies();
                 } else {
                     result = handleAsyncResponse(exchange, asyncResponse.getResponseObject());
                 }
