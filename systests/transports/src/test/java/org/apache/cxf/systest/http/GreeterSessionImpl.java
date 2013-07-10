@@ -67,6 +67,7 @@ public class GreeterSessionImpl implements Greeter {
             }
         }
         
+        
         HttpSession session = req.getSession();
         // Get a session property "counter" from context
         if (session == null) {
@@ -106,9 +107,24 @@ public class GreeterSessionImpl implements Greeter {
     }
 
 
-    public void greetMeOneWay(String requestType) {
-        // TODO Auto-generated method stub
+    public void greetMeOneWay(String me) {
+        LOG.info("Executing operation greetMeOneWay");        
+        LOG.info("Message received: " + me);
+        MessageContext mc = context.getMessageContext();
+        HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
         
+        HttpSession session = req.getSession();
+        if (session == null) {
+            throw new WebServiceException("No session in WebServiceContext");
+        }
+        String name = (String)session.getAttribute("name");
+        if (name == null) {
+            name = me;
+            LOG.info("Starting the Session");
+        } 
+        
+        session.setAttribute("name", me);
+                        
     }
 
 
