@@ -33,10 +33,10 @@ import org.junit.BeforeClass;
 
 /**
  * A set of (negative) tests for Username Tokens policies over the Transport Binding.
- * It tests both DOM + StAX clients against the DOM server
+ * It tests both DOM + StAX clients against the StAX server
  */
-public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(PolicyServer.class);
+public class StaxUsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxPolicyServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -47,7 +47,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(PolicyServer.class, true)
+            launchServer(StaxPolicyServer.class, true)
         );
     }
     
@@ -61,13 +61,13 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testSupportingToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = StaxUsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        URL wsdl = StaxUsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSupportingTokenPort");
         DoubleItPortType port = 
@@ -91,7 +91,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken Supporting Token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "These policy alternatives can not be satisfied";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -101,7 +101,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken Supporting Token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -113,13 +113,13 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testPlaintextPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = StaxUsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        URL wsdl = StaxUsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
         DoubleItPortType port = 
@@ -143,7 +143,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a hashed password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "These policy alternatives can not be satisfied";
+            String error = "UsernameToken password must not be hashed";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -153,7 +153,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a hashed password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -187,13 +187,13 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testHashPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = StaxUsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        URL wsdl = StaxUsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItHashPort");
         DoubleItPortType port = 
@@ -217,7 +217,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a plaintext password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "These policy alternatives can not be satisfied";
+            String error = "UsernameToken does not contain a hashed password";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -227,7 +227,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a plaintext password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -261,13 +261,13 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testCreated() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = StaxUsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        URL wsdl = StaxUsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCreatedPort");
         DoubleItPortType port = 
@@ -291,7 +291,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Created element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "These policy alternatives can not be satisfied";
+            String error = "UsernameToken does not contain a created timestamp";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -301,7 +301,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Created element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -313,13 +313,13 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testNonce() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = StaxUsernameTokenPolicyTest.class.getResource("policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        URL wsdl = StaxUsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItNoncePort");
         DoubleItPortType port = 
@@ -343,7 +343,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Nonce element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "These policy alternatives can not be satisfied";
+            String error = "UsernameToken does not contain a nonce";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -352,7 +352,7 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Nonce element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "These policy alternatives can not be satisfied";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
