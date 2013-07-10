@@ -33,6 +33,7 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -84,7 +85,8 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello Bonjour", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
-
+            
+            
             greeting = greeter.greetMe("Hello");
             cookie = "";
             if (greeting.indexOf(';') != -1) {
@@ -211,6 +213,31 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
         String result = greeter.greetMe("World");
         assertEquals("Hello World", result);
         assertEquals("Bonjour World", greeter.sayHi());
+    }
+    
+    @Test    
+    public void testOnewayInvocationWithSession() throws Exception {
+
+        GreeterService service = new GreeterService();
+        assertNotNull(service);
+
+        try {
+            Greeter greeter = service.getGreeterPort();
+            
+            BindingProvider bp = (BindingProvider)greeter;
+            updateAddressPort(bp, PORT);
+            bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+                                             
+            greeter.greetMeOneWay("Bonjour");
+            
+            String greeting = greeter.greetMe("Hello");
+            
+            assertNotNull("no response received from service", greeting);
+            assertEquals("Hello Bonjour", greeting);
+            
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        }
     }
     
     private void doSessionsTest(String url) {
