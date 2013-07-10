@@ -548,8 +548,10 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                                               BookStoreJaxrsJaxws.class);
         WebClient.getConfig(proxy).getOutInterceptors().add(new LoggingOutInterceptor());
         BookSubresource bs = proxy.getBookSubresource("139");
-        Book bean = new Book("CXF Rocks", 139L);
-        Book b = bs.getTheBookQueryBean(bean);
+        BookBean bean = new BookBean("CXF Rocks", 139L);
+        bean.getComments().put(1L, "Good");
+        bean.getComments().put(2L, "Good");
+        BookBean b = bs.getTheBookQueryBean(bean);
         assertEquals(139, b.getId());
         assertEquals("CXF Rocks", b.getName());
     }

@@ -94,7 +94,7 @@ public interface BookSubresource {
     @GET
     @Path("/thebook5")
     @Produces("application/xml")
-    Book getTheBookQueryBean(@QueryParam("") Book book) throws BookNotFoundFault;
+    BookBean getTheBookQueryBean(@QueryParam("") BookBean book) throws BookNotFoundFault;
     
 }
 
