@@ -274,12 +274,12 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         if (inMessage == null) {
             
             inMessage = new MessageImpl();
+            ExchangeImpl exchange = new ExchangeImpl();
+            exchange.setInMessage(inMessage);
             setupMessage(inMessage, context, req, resp);
             
             ((MessageImpl)inMessage).setDestination(this);
     
-            ExchangeImpl exchange = new ExchangeImpl();
-            exchange.setInMessage(inMessage);
             exchange.setSession(new HTTPSession(req));
         }
         
