@@ -189,8 +189,12 @@ public class JAXRSInvoker extends AbstractInvoker {
                 asyncResponse = (AsyncResponseImpl)inMessage.get(AsyncResponse.class);
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
-            if (asyncResponse != null && !asyncResponse.suspendContinuationIfNeeded()) {
-                result = handleAsyncResponse(exchange, asyncResponse);
+            if (asyncResponse != null) {
+                if (!asyncResponse.suspendContinuationIfNeeded()) {
+                    result = handleAsyncResponse(exchange, asyncResponse);
+                } else {
+                    providerFactory.clearThreadLocalProxies();
+                }
             }
         } catch (Fault ex) {
             Object faultResponse;
