@@ -67,7 +67,7 @@ public final class DOMUtils {
     private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         if (loader == null) {
-            loader = XMLUtils.class.getClassLoader();
+            loader = DOMUtils.class.getClassLoader();
         }
         if (loader == null) {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -271,18 +271,18 @@ public final class DOMUtils {
      * @param attName attribute we're looking for
      * @param attVal attribute value or null if we just want any
      */
-    public static Node findChildWithAtt(Node parent, String elemName, String attName, String attVal) {
+    public static Element findChildWithAtt(Node parent, String elemName, String attName, String attVal) {
 
-        Node child = DOMUtils.getChild(parent, Node.ELEMENT_NODE);
+        Element child = (Element)getChild(parent, Node.ELEMENT_NODE);
         if (attVal == null) {
             while (child != null && (elemName == null || elemName.equals(child.getNodeName()))
                    && DOMUtils.getAttribute(child, attName) != null) {
-                child = getNext(child, elemName, Node.ELEMENT_NODE);
+                child = (Element)getNext(child, elemName, Node.ELEMENT_NODE);
             }
         } else {
             while (child != null && (elemName == null || elemName.equals(child.getNodeName()))
                    && !attVal.equals(DOMUtils.getAttribute(child, attName))) {
-                child = getNext(child, elemName, Node.ELEMENT_NODE);
+                child = (Element)getNext(child, elemName, Node.ELEMENT_NODE);
             }
         }
         return child;

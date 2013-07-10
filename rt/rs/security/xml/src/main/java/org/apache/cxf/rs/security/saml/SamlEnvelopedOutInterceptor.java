@@ -24,12 +24,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 
@@ -100,7 +100,7 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
             // TODO: this is not critical now - but figure out if we can avoid copying
             // DOMs
             CachedOutputStream bos = new CachedOutputStream();
-            XMLUtils.writeTo(newDoc, bos);
+            StaxUtils.writeTo(newDoc, bos);
             return DOMUtils.readXml(bos.getInputStream());
         } else {
             return newDoc;

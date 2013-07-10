@@ -43,8 +43,8 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.SchemaInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
 import org.apache.cxf.tools.util.FileWriterUtil;
@@ -113,7 +113,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                 updateImports(el, imports);
                 os = new FileWriterUtil(impfile.getParent(),
                                         getToolContext().get(OutputStreamCreator.class)).getWriter(impfile, "UTF-8");
-                XMLUtils.writeTo(el, os, 2);
+                StaxUtils.writeTo(el, os, 2);
                 os.close();
             }
 

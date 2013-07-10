@@ -34,8 +34,8 @@ import org.w3c.dom.Document;
 import junit.framework.AssertionFailedError;
 
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
 
 import org.junit.After;
@@ -141,7 +141,7 @@ public class AegisTest extends ToolTestBase {
         XPathUtils xpu = new XPathUtils(getNSMap());
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
             throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
-                                           + " from document:\n" + XMLUtils.toString(doc));
+                                           + " from document:\n" + StaxUtils.toString(doc));
         }
     }    
 }

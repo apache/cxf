@@ -335,8 +335,6 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         }
         try {
             return StaxUtils.toString(document);
-        } catch (XMLStreamException e) {
-            return super.toString();
         } catch (Throwable t) {
             t.printStackTrace();
             return super.toString();

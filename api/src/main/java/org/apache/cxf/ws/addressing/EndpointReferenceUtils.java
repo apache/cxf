@@ -72,7 +72,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -634,7 +633,7 @@ public final class EndpointReferenceUtils {
                 // Something not right with the schema from the wsdl.
                 LOG.log(Level.WARNING, "SAXException for newSchema()", ex);
                 for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
-                    String s = XMLUtils.toString(schemaInfo.getElement(), 4);
+                    String s = StaxUtils.toString(schemaInfo.getElement(), 4);
                     LOG.log(Level.INFO, "Schema for: " + schemaInfo.getNamespaceURI() + "\n" + s);
                 }
             } finally { 

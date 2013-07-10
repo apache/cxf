@@ -49,7 +49,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -62,6 +61,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
@@ -475,7 +475,7 @@ public class WSDLServiceBuilderTest extends Assert {
                 file.delete();
             }
             FileOutputStream fout = new FileOutputStream(file);
-            XMLUtils.writeTo(doc, fout);
+            StaxUtils.writeTo(doc, fout);
             fout.flush();
             fout.close();
         }

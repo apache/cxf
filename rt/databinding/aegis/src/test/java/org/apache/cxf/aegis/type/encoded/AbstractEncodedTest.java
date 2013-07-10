@@ -40,7 +40,7 @@ import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.helpers.MapNamespaceContext;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Before;
 
@@ -101,7 +101,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
     }
 
     public Object readRef(Element element) throws XMLStreamException {
-        String xml = XMLUtils.toString(element);
+        String xml = StaxUtils.toString(element);
         ElementReader root;
         try {
             root = new ElementReader(new ByteArrayInputStream(xml.getBytes("utf-8")));

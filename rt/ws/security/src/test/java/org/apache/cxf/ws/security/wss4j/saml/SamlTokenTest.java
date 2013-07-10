@@ -40,7 +40,6 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -596,6 +595,6 @@ public class SamlTokenTest extends AbstractSecurityTest {
 
     // FOR DEBUGGING ONLY
     /*private*/ static String serialize(Document doc) throws Exception {
-        return XMLUtils.toString(doc);
+        return StaxUtils.toString(doc);
     }
 }

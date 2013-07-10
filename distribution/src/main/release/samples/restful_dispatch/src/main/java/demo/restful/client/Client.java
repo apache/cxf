@@ -40,7 +40,7 @@ import javax.xml.ws.http.HTTPBinding;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public final class Client {
 
@@ -76,7 +76,7 @@ public final class Client {
 
         Client client = new Client();
         InputStream is = client.getClass().getResourceAsStream("/CustomerJohnReq.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource reqMsg = new DOMSource(doc);
 
         requestContext.put(MessageContext.HTTP_REQUEST_METHOD, "POST");

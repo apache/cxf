@@ -61,7 +61,6 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -650,7 +649,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SAXSource saxSourceResp = disp.invoke(saxSourceReq);
         assertNotNull(saxSourceResp);
         String expected = "Hello TestSOAPInputMessage";
-        assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp).contains(expected));
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp).contains(expected));
 
         // Test oneway
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq1.xml");
@@ -669,7 +668,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SAXSource saxSourceResp2 = response.get();
         assertNotNull(saxSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp2).contains(expected2));
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp2).contains(expected2));
 
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
@@ -684,7 +683,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         String expected3 = "Hello TestSOAPInputMessage3";
         SAXSource saxSourceResp3 = tssh.getSAXSource();
         assertNotNull(saxSourceResp3);
-        assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp3).contains(expected3));
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp3).contains(expected3));
     }
 
     @Test
@@ -713,7 +712,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SAXSource saxSourceResp = disp.invoke(saxSourceReq);
         assertNotNull(saxSourceResp);
         String expected = "Hello TestSOAPInputMessage";
-        assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp).contains(expected));
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp).contains(expected));
 
         // Test oneway
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq1.xml");
@@ -737,7 +736,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SAXSource saxSourceResp2 = response.get();
         assertNotNull(saxSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp2).contains(expected2));
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp2).contains(expected2));
 
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq3.xml");
@@ -756,7 +755,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         String expected3 = "Hello TestSOAPInputMessage3";
         SAXSource saxSourceResp3 = tssh.getSAXSource();
         assertNotNull(saxSourceResp3);
-        assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp3).contains(expected3));
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp3).contains(expected3));
     }
 
     @Test
@@ -779,7 +778,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource streamSourceResp = disp.invoke(streamSourceReq);
         assertNotNull(streamSourceResp);
         String expected = "Hello TestSOAPInputMessage";
-        assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp).contains(expected));
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp).contains(expected));
 
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq1.xml");
         StreamSource streamSourceReq1 = new StreamSource(is1);
@@ -793,7 +792,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource streamSourceResp2 = response.get();
         assertNotNull(streamSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp2).contains(expected2));
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp2).contains(expected2));
 
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
         StreamSource streamSourceReq3 = new StreamSource(is3);
@@ -806,7 +805,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         String expected3 = "Hello TestSOAPInputMessage3";
         StreamSource streamSourceResp3 = tssh.getStreamSource();
         assertNotNull(streamSourceResp3);
-        assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp3).contains(expected3));
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp3).contains(expected3));
     }
 
     @Test
@@ -830,7 +829,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource streamSourceResp = disp.invoke(streamSourceReq);
         assertNotNull(streamSourceResp);
         String expected = "Hello TestSOAPInputMessage";
-        assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp).contains(expected));
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp).contains(expected));
 
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq1.xml");
         StreamSource streamSourceReq1 = new StreamSource(is1);
@@ -845,7 +844,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource streamSourceResp2 = response.get();
         assertNotNull(streamSourceResp2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp2).contains(expected2));
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp2).contains(expected2));
 
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq3.xml");
@@ -860,7 +859,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         String expected3 = "Hello TestSOAPInputMessage3";
         StreamSource streamSourceResp3 = tssh.getStreamSource();
         assertNotNull(streamSourceResp3);
-        assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp3).contains(expected3));
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp3).contains(expected3));
     }
     
     @Test

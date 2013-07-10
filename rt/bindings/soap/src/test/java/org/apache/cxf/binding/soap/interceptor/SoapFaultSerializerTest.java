@@ -47,7 +47,6 @@ import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12F
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor.SAAJPreInInterceptor;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
@@ -71,7 +70,7 @@ public class SoapFaultSerializerTest extends Assert {
         XPathUtils xpu = new XPathUtils(namespaces);
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
             throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
-                                           + " from document:\n" + XMLUtils.toString(doc));
+                                           + " from document:\n" + StaxUtils.toString(doc));
         }
     }
     

@@ -27,7 +27,7 @@ import javax.jws.HandlerChain;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -91,7 +91,7 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         throws ToolException {
         
         try {
-            XMLUtils.generateXMLFile(hChains, writer);
+            StaxUtils.writeTo(hChains, writer, 2);
             writer.close();
         } catch (Exception ex) {
             throw new ToolException(ex);

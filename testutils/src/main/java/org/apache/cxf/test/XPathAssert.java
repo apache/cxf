@@ -34,7 +34,7 @@ import org.w3c.dom.NodeList;
 import junit.framework.AssertionFailedError;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Assert;
 
@@ -91,7 +91,7 @@ public final class XPathAssert {
     }
 
     private static String writeNodeToString(Node node) {
-        return XMLUtils.toString(node);
+        return StaxUtils.toString(node);
     }
 
     /**

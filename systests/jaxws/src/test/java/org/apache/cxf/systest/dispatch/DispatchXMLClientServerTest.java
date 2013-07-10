@@ -36,7 +36,6 @@ import javax.xml.ws.WebServiceException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -109,7 +108,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
         Source source = disp.invoke(reqMsg);
         assertNotNull(source);
                 
-        String streamString = XMLUtils.toString(source); 
+        String streamString = StaxUtils.toString(source); 
         Document doc = StaxUtils.read(new StringReader(streamString));
         assertEquals("greetMeResponse", doc.getFirstChild().getLocalName());
         assertEquals("Hello tli", doc.getFirstChild().getTextContent());

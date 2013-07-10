@@ -44,7 +44,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -132,7 +131,7 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
                 //for the preferred type. However, older xalans don't know about it
                 //we'll manually do it
                 XMLStreamReader r = (XMLStreamReader)s.getClass().getMethod("getXMLStreamReader").invoke(s);
-                return XMLUtils.toString(StaxUtils.read(r).getDocumentElement());
+                return StaxUtils.toString(StaxUtils.read(r).getDocumentElement());
             }
             throw te;
         }

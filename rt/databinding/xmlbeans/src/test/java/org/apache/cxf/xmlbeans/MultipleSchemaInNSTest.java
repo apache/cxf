@@ -20,11 +20,12 @@ package org.apache.cxf.xmlbeans;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Node;
+import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Before;
 import org.junit.Test;
   
@@ -46,11 +47,11 @@ public class MultipleSchemaInNSTest extends AbstractXmlBeansTest {
 
     @Test
     public void testWSDL() throws Exception {
-        Node wsdl = getWSDLDocument("MultipleSchemaService");
+        Document wsdl = getWSDLDocument("MultipleSchemaService");
 
         addNamespace("xsd", SOAPConstants.XSD);
         NodeList list = assertValid("//xsd:schema[@targetNamespace='" + ns + "']", wsdl);
-        assertEquals(XMLUtils.toString(wsdl), 3, list.getLength());
+        assertEquals(StaxUtils.toString(wsdl), 3, list.getLength());
         assertValid("//xsd:import[@namespace='" + ns + "']",
                     list.item(0));
         assertValid("//xsd:import[@namespace='" + ns + "']", list.item(0));

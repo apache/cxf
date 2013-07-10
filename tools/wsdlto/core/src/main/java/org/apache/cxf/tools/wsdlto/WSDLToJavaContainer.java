@@ -67,7 +67,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -810,7 +809,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     updateImports(el, sourceMap);
                     os = new FileWriterUtil(impfile.getParent(), context.get(OutputStreamCreator.class))
                         .getWriter(impfile, "UTF-8");
-                    XMLUtils.writeTo(el, os, 2);
+                    StaxUtils.writeTo(el, os, 2);
                     os.close();
                 }
             }
@@ -828,7 +827,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 updateImports(xsdEle, sourceMap);
             }
             updateWSDLImports(defEle, importWSDLMap);
-            XMLUtils.writeTo(defEle, wsdloutput);
+            StaxUtils.writeTo(defEle, wsdloutput);
             wsdloutput.close();
             
                     
@@ -845,7 +844,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     updateImports(xsdEle, sourceMap);
                 }
                 updateWSDLImports(importEle, importWSDLMap);
-                XMLUtils.writeTo(importEle, wsdlOs);
+                StaxUtils.writeTo(importEle, wsdlOs);
                 wsdlOs.close();
 
             }               

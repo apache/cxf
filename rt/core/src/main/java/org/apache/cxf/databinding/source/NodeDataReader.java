@@ -36,7 +36,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataReader;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
@@ -58,7 +57,7 @@ public class NodeDataReader implements DataReader<Node> {
         } else if (StreamSource.class.isAssignableFrom(type)) {
             try {
                 CachedOutputStream out = new CachedOutputStream();
-                XMLUtils.writeTo(input, out);
+                StaxUtils.writeTo(input, out);
                 InputStream is = out.getInputStream();
                 out.close();
                 

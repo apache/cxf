@@ -42,7 +42,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -239,7 +238,7 @@ public class StaxUtilsTest extends Assert {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document doc = dbf.newDocumentBuilder().parse(new InputSource(reader));
-        String orig = XMLUtils.toString(doc.getDocumentElement());
+        String orig = StaxUtils.toString(doc.getDocumentElement());
         
         StringWriter sw = new StringWriter();
         XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
@@ -253,7 +252,7 @@ public class StaxUtilsTest extends Assert {
         
         W3CDOMStreamWriter domwriter = new W3CDOMStreamWriter();
         StaxUtils.writeDocument(doc, domwriter, false, true);
-        output = XMLUtils.toString(domwriter.getDocument().getDocumentElement());
+        output = StaxUtils.toString(domwriter.getDocument().getDocumentElement());
         assertEquals(orig, output);
     }
     

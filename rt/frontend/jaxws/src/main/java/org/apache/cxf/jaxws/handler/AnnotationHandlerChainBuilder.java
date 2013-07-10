@@ -46,7 +46,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -96,7 +95,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                 if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI()) 
                     || !"handler-chains".equals(el.getLocalName())) {
                         
-                    String xml = XMLUtils.toString(el);
+                    String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
                                                        "NOT_VALID_ROOT_ELEMENT",
@@ -113,7 +112,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                         if (!el.getNamespaceURI().equals("http://java.sun.com/xml/ns/javaee") 
                             || !el.getLocalName().equals("handler-chain")) {
                                 
-                            String xml = XMLUtils.toString(el);
+                            String xml = StaxUtils.toString(el);
                             throw new WebServiceException(
                                 BundleUtils.getFormattedString(BUNDLE,
                                                                "NOT_VALID_ELEMENT_IN_HANDLER",
@@ -146,7 +145,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             if (cur instanceof Element) {
                 el = (Element)cur;
                 if (!el.getNamespaceURI().equals("http://java.sun.com/xml/ns/javaee")) {
-                    String xml = XMLUtils.toString(el);
+                    String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
                                                        "NOT_VALID_ELEMENT_IN_HANDLER",
@@ -210,7 +209,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             return true;
         }
         if (!namePattern.contains(":")) {
-            String xml = XMLUtils.toString(el);
+            String xml = StaxUtils.toString(el);
             throw new WebServiceException(
                 BundleUtils.getFormattedString(BUNDLE,
                                                "NOT_A_QNAME_PATTER",

@@ -47,7 +47,6 @@ import org.apache.cxf.binding.corba.wsdl.RaisesType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -61,6 +60,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ServerRequest;
@@ -302,7 +302,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         }
         
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Exception DOM: " + XMLUtils.toString(faultElement));
+            LOG.fine("Exception DOM: " + StaxUtils.toString(faultElement));
         }
         return faultDoc;
     }

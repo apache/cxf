@@ -108,7 +108,6 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -600,7 +599,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         InputSource result = null;
         ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        XMLUtils.writeTo(ele, new FileOutputStream(tmpFile));
+        StaxUtils.writeTo(ele, new FileOutputStream(tmpFile));
         result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
         return result;

@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -68,7 +67,7 @@ public class W3CDOMStreamReaderTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new DOMSource(doc));
 
         StaxUtils.copy(reader, writer);
-        assertTrue(XMLUtils.toString(writer.getDocument()).endsWith(RESULT));
+        assertTrue(StaxUtils.toString(writer.getDocument()).endsWith(RESULT));
 
     }
     

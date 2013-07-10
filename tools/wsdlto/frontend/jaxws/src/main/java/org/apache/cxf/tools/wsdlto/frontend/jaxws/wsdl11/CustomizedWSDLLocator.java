@@ -30,8 +30,8 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
     private String wsdlUrl;
@@ -76,7 +76,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
     public InputSource getBaseInputSource() {
         if (elementMap.get(baseUri) != null) {
             Element ele = elementMap.get(baseUri);
-            String content = XMLUtils.toString(ele);
+            String content = StaxUtils.toString(ele);
             InputSource ins = new InputSource(new StringReader(content));
             ins.setSystemId(baseUri);
             return ins;
@@ -108,7 +108,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
             
             if (elementMap.get(importURI.toString()) != null) {
                 Element ele = elementMap.get(importURI.toString());
-                String content = XMLUtils.toString(ele);
+                String content = StaxUtils.toString(ele);
 
                 InputSource ins = new InputSource(new StringReader(content));
                 ins.setSystemId(importURI.toString());

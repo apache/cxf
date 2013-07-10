@@ -33,7 +33,8 @@ import org.w3c.dom.Element;
 
 import org.apache.callback.SOAPService;
 import org.apache.callback.ServerPortType;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 
@@ -71,10 +72,10 @@ public final class Client {
         ServerPortType port = ss.getSOAPPort();
         
         InputStream is = demo.callback.client.Client.class.getResourceAsStream("/callback_infoset.xml");
-        Document doc = XMLUtils.parse(is);
-        Element referenceParameters = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                           "wsa:ReferenceParameters",
-                                                                           "");
+        Document doc = StaxUtils.read(is);
+        Element referenceParameters = DOMUtils.findChildWithAtt(doc.getDocumentElement(),
+                                                                "wsa:ReferenceParameters",
+                                                                "name", "");
         W3CEndpointReference ref = (W3CEndpointReference)endpoint.getEndpointReference(referenceParameters);
         
 

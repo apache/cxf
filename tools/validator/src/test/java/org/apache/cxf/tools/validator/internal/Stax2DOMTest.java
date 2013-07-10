@@ -28,7 +28,8 @@ import java.net.URISyntaxException;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class Stax2DOMTest extends Assert {
     }
 
     public void assertDocumentContent(Document doc) {
-        String content = XMLUtils.toString(doc);
+        String content = StaxUtils.toString(doc);
         assertTrue(
                 content,
                 content.indexOf("xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"") != -1);

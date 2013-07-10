@@ -25,7 +25,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 
@@ -65,7 +64,7 @@ public class CustomizationParserTest extends ProcessorTestBase {
         parser.copyAllJaxbDeclarations(schemaNode, (Element)jaxwsBindingNode);
 
         File file = new File(output, "custom_test.xsd");
-        XMLUtils.writeTo(schemaNode, new FileOutputStream(file));
+        StaxUtils.writeTo(schemaNode, new FileOutputStream(file));
         Document testNode = StaxUtils.read(file);
 
         Node result = selector.queryNode(testNode, checkingPoint);
@@ -81,7 +80,7 @@ public class CustomizationParserTest extends ProcessorTestBase {
         parser.internalizeBinding(jaxwsBinding, wsdlDoc, "");
 
         File file = new File(output, "custom_test.wsdl");
-        XMLUtils.writeTo(wsdlDoc, new FileOutputStream(file));
+        StaxUtils.writeTo(wsdlDoc, new FileOutputStream(file));
         Document testNode = StaxUtils.read(file);
 
         String[] checkingPoints =
@@ -103,7 +102,7 @@ public class CustomizationParserTest extends ProcessorTestBase {
             new String[]{base + "jaxb:schemaBindings/jaxb:package"};
 
         File file = new File(output, "custom_test.wsdl");
-        XMLUtils.writeTo(wsdlDoc, new FileOutputStream(file));
+        StaxUtils.writeTo(wsdlDoc, new FileOutputStream(file));
         Document testNode = StaxUtils.read(file);
 
         checking(testNode, checkingPoints);
@@ -121,7 +120,7 @@ public class CustomizationParserTest extends ProcessorTestBase {
             new String[]{base + "jaxb:globalBindings/jaxb:javaType"};
 
         File file = new File(output, "custom_test.wsdl");
-        XMLUtils.writeTo(wsdlDoc, new FileOutputStream(file));
+        StaxUtils.writeTo(wsdlDoc, new FileOutputStream(file));
         Document testNode = StaxUtils.read(file);
 
         checking(testNode, checkingPoints);
@@ -143,7 +142,7 @@ public class CustomizationParserTest extends ProcessorTestBase {
             new String[]{checkingPoint};
 
         File file = new File(output, "custom_test4.wsdl");
-        XMLUtils.writeTo(wsdlDoc, new FileOutputStream(file));
+        StaxUtils.writeTo(wsdlDoc, new FileOutputStream(file));
         Document testNode = StaxUtils.read(file);
 
         checking(testNode, checkingPoints);

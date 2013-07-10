@@ -41,7 +41,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -144,7 +143,7 @@ public final class CustomizationParser {
         InputSource result = null;
         ele.setAttribute("schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        XMLUtils.writeTo(ele, new FileOutputStream(tmpFile));
+        StaxUtils.writeTo(ele, new FileOutputStream(tmpFile));
         result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
         return result;

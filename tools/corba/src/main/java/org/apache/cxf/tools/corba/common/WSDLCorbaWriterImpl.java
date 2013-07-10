@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
  /*
   * This class is extending the wsdl4j RI class to print out the 
@@ -143,14 +143,14 @@ public class WSDLCorbaWriterImpl implements WSDLWriter {
 
     public void writeWSDL(Definition wsdlDef, Writer sink) throws WSDLException {
         try {
-            XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+            StaxUtils.writeTo(getDocument(wsdlDef), sink, 2);
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
     }    
     public void writeWSDL(Definition wsdlDef, OutputStream sink) throws WSDLException {
         try {
-            XMLUtils.writeTo(getDocument(wsdlDef), sink, 2);
+            StaxUtils.writeTo(getDocument(wsdlDef), sink, 2);
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }

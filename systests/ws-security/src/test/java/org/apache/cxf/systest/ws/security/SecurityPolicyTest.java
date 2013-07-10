@@ -47,7 +47,6 @@ import org.w3c.dom.Node;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -428,7 +427,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ns.put("ns2", "http://www.example.org/schema/DoubleIt");
         XPathUtils xp = new XPathUtils(ns);
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
-        assertEquals(XMLUtils.toString(nd), "50", o);
+        assertEquals(StaxUtils.toString(nd), "50", o);
         
         bus.shutdown(true);
     }

@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 
 public final class JAXBUtils {
@@ -131,7 +131,7 @@ public final class JAXBUtils {
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
             fout = new FileOutputStream(tmpFile);
-            XMLUtils.writeTo(rootElement, fout);
+            StaxUtils.writeTo(rootElement, fout);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

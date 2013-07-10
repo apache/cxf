@@ -27,7 +27,7 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -61,7 +61,7 @@ public class NettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
 
         try {
             // Print the DOM node
-            String xmlString = XMLUtils.toString(element);
+            String xmlString = StaxUtils.toString(element);
             ef.addProperty("parsedElement", createValue(context, xmlString));
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);

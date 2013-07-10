@@ -329,11 +329,7 @@ public class XMLSource {
     private <T> Object readPrimitiveValue(Node node, Class<T> cls) {
         if (String.class == cls) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                try {
-                    return StaxUtils.toString((Element)node);
-                } catch (XMLStreamException e) {
-                    // won't happen
-                }
+                return StaxUtils.toString((Element)node);
             } else {
                 return cls.cast(node.getNodeValue());
             }

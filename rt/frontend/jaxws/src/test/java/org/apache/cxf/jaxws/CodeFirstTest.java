@@ -381,7 +381,6 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         factory.setAddress("local://localhost/test"); 
         Server server = factory.create();
         Document doc = getWSDLDocument(server);
-        //XMLUtils.printDOM(doc);
         assertValid("//xsd:schema/xsd:complexType[@name='entity']", doc);
     }
     
@@ -399,7 +398,6 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         Server server = null;
         server = factory.create();
         Document doc = getWSDLDocument(server);
-        //org.apache.cxf.helpers.XMLUtils.printDOM(doc);
         assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/xsd:element[@type='xs:int']",
                     doc);
         
@@ -416,7 +414,6 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         factory.setAddress("local://localhost/test2"); 
         server = factory.create();
         Document doc2 = getWSDLDocument(server);
-        //org.apache.cxf.helpers.XMLUtils.printDOM(doc2);
         assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/"
                     + "xsd:element[@type='xs:float']",
                     doc2);

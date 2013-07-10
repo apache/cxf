@@ -87,7 +87,6 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -381,7 +380,39 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     private String xmlEncodeIfNeeded(String value) {
-        return XMLUtils.xmlEncode(value);
+        
+        StringBuilder builder = new StringBuilder(value.length());
+        boolean change = false;
+        for (int x = 0; x < value.length(); x++) {
+            char ch = value.charAt(x);
+            String ap = null;
+            switch (ch) {
+            case '\"':
+                ap = "&quot;";
+                break;
+            case '\'':
+                ap = "&apos;";
+                break;
+            case '<':
+                ap = "&lt;";
+                break;
+            case '>':
+                ap = "&gt;";
+                break;
+            case '&':
+                ap = "&amp;";
+                break;
+            default:
+                ap = null;
+            }
+            if (ap != null) {
+                change = true;
+                builder.append(ap);
+            } else {
+                builder.append(ch);
+            }
+        }
+        return change ? builder.toString() : value;
     }
     
     private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
