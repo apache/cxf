@@ -54,7 +54,6 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
@@ -218,7 +217,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         
         

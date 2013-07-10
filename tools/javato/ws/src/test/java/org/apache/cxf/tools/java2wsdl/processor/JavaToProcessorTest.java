@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -353,8 +352,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File xsd2 = new File(output, "xml-bare_schema2.xsd");
         assertTrue("Generate xsd1 Fail", xsd1.exists());
         assertTrue("Generate xsd2 Fail", xsd2.exists());
-        Document doc1 = XMLUtils.parse(xsd1);
-        Document doc2 = XMLUtils.parse(xsd2);
+        Document doc1 = StaxUtils.read(xsd1);
+        Document doc2 = StaxUtils.read(xsd2);
         String imp = findImport(doc2);
         if (StringUtils.isEmpty(imp)) {
             imp = findImport(doc1);

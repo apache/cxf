@@ -34,7 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 
 public class OutTransformWriter extends DelegatingXMLStreamWriter {
@@ -78,7 +78,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         TransformUtils.convertToQNamesMap(outAMap, attributesMap, null);
 
         TransformUtils.convertToMapOfElementProperties(append, appendMap);
-        dropElements = XMLUtils.convertStringsToQNames(dropEls);
+        dropElements = DOMUtils.convertStringsToQNames(dropEls);
         this.attributesToElements = attributesToElements;
         namespaceContext = new DelegatingNamespaceContext(
             writer.getNamespaceContext(), nsMap);

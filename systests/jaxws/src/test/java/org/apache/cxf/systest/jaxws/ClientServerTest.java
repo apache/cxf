@@ -59,9 +59,9 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
@@ -75,6 +75,7 @@ import org.apache.hello_world_soap_http.SOAPServiceMultiPortTypeTest;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -774,7 +775,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);        
        
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         
         Map<String, String> ns = new HashMap<String, String>();
@@ -804,7 +805,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         
         Map<String, String> ns = new HashMap<String, String>();
@@ -833,7 +834,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
        
                 
@@ -855,7 +856,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         
         Map<String, String> ns = new HashMap<String, String>();

@@ -28,9 +28,7 @@ import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.EndpointReference;
-
 import javax.xml.ws.WebServiceException;
-
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
@@ -38,9 +36,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
-
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 
@@ -130,7 +128,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
             .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
 
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource erXML = new DOMSource(doc);
         EndpointReference endpointReference = EndpointReference.readFrom(erXML);
 
@@ -151,7 +149,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         endpoint.publish("http://localhost:8080/test");
         
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource erXML = new DOMSource(doc);
         EndpointReference endpointReference = EndpointReference.readFrom(erXML);
 
@@ -170,10 +168,10 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         endpoint.publish("http://localhost:8080/test");
 
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
-        Element referenceParameters = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                           "wsa:ReferenceParameters",
-                                                                           "");
+        Document doc = StaxUtils.read(is);
+        Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                  "wsa:ReferenceParameters",
+                                                                  "");
         EndpointReference endpointReference = endpoint.getEndpointReference(referenceParameters);
         assertNotNull(endpointReference);
         assertTrue(endpointReference instanceof W3CEndpointReference);
@@ -195,10 +193,10 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
 
         try {
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-            Document doc = XMLUtils.parse(is);
-            Element referenceParameters = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                               "wsa:ReferenceParameters",
-                                                                               "");
+            Document doc = StaxUtils.read(is);
+            Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                      "wsa:ReferenceParameters",
+                                                                      "");
             endpoint.getEndpointReference(referenceParameters);
 
             fail("Did not get expected UnsupportedOperationException");
@@ -217,10 +215,10 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         endpoint.publish("http://localhost:8080/test");
 
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
-        Element referenceParameters = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                           "wsa:ReferenceParameters",
-                                                                           "");
+        Document doc = StaxUtils.read(is);
+        Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                  "wsa:ReferenceParameters",
+                                                                  "");
         EndpointReference endpointReference = endpoint.getEndpointReference(W3CEndpointReference.class,
                                                                             referenceParameters);
         assertNotNull(endpointReference);
@@ -243,10 +241,10 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
 
         try {
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-            Document doc = XMLUtils.parse(is);
-            Element referenceParameters = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                               "wsa:ReferenceParameters",
-                                                                               "");
+            Document doc = StaxUtils.read(is);
+            Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                      "wsa:ReferenceParameters",
+                                                                      "");
             endpoint.getEndpointReference(MyEndpointReference.class, referenceParameters);
 
             fail("Did not get expected WebServiceException");
@@ -262,7 +260,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         ProviderImpl provider = new ProviderImpl();
 
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource erXML = new DOMSource(doc);
         EndpointReference endpointReference = provider.readEndpointReference(erXML);
         assertNotNull(endpointReference);
@@ -275,16 +273,16 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         ProviderImpl provider = new ProviderImpl();
 
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
-        Element referenceParameter = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
-                                                                          "wsa:ReferenceParameters",
-                                                                          "");
+        Document doc = StaxUtils.read(is);
+        Element referenceParameter = fetchElementByNameAttribute(doc.getDocumentElement(),
+                                                                 "wsa:ReferenceParameters",
+                                                                 "");
         List<Element> referenceParameters = new ArrayList<Element>();
         if (referenceParameter != null) {
             referenceParameters.add(referenceParameter);
         }
 
-        Element metadata = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(), "wsa:metadata", "");
+        Element metadata = fetchElementByNameAttribute(doc.getDocumentElement(), "wsa:metadata", "");
         List<Element> metadataList = new ArrayList<Element>();
         if (metadata != null) {
             metadataList.add(metadata);
@@ -306,7 +304,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         ProviderImpl provider = new ProviderImpl();
         
         InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource erXML = new DOMSource(doc);
         EndpointReference endpointReference = EndpointReference.readFrom(erXML);        
 
@@ -327,4 +325,21 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         }
     }
 
+    
+
+    public static Element fetchElementByNameAttribute(Element parent, String elementName, String nameValue) {
+        if (elementName.equals(parent.getTagName())
+            && parent.getAttribute("name").equals(nameValue)) {
+            return parent;
+        }
+        Element elem = DOMUtils.getFirstElement(parent);
+        while (elem != null) {
+            Element el = fetchElementByNameAttribute(elem, elementName, nameValue);
+            if (el != null) {
+                return el;
+            }
+            elem = DOMUtils.getNextElement(elem);
+        }
+        return null;
+    }      
 }

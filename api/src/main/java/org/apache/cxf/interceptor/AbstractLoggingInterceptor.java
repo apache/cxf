@@ -153,7 +153,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
             StringWriter swriter = new StringWriter();
             XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
-            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 0, 2);
+            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
             InputStream in = cos.getInputStream();
             StaxUtils.copy(new StreamSource(in), xwriter);
             xwriter.close();
@@ -187,7 +187,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
             StringWriter swriter = new StringWriter();
             XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
-            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 0, 2);
+            xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
             StaxUtils.copy(new StreamSource(new StringReader(stringWriter.getBuffer().toString())), xwriter);
             xwriter.close();
             

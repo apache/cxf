@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -30,8 +31,9 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -73,7 +75,7 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
         root = root.substring(idx).trim();
         
 
-        Document result = XMLUtils.parse(root);
+        Document result = StaxUtils.read(new StringReader(root));
         
         List<Element> resList = DOMUtils.findAllElementsByTagName(result.getDocumentElement(), "att");
         assertEquals("Two attachments must've been encoded", 2, resList.size());

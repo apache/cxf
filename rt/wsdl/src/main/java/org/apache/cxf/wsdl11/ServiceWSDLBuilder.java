@@ -55,7 +55,6 @@ import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.extensions.schema.SchemaReference;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,7 +63,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -247,11 +245,7 @@ public class ServiceWSDLBuilder {
             return;
         }
         if (docDoc == null) {
-            try {
-                docDoc = XMLUtils.newDocument();
-            } catch (ParserConfigurationException e) {
-                //ignore
-            }
+            docDoc = DOMUtils.newDocument();
         }
         Element el = docDoc.createElementNS(WSDLConstants.NS_WSDL11, "wsdl:documentation");
         el.setTextContent(text);
@@ -422,8 +416,8 @@ public class ServiceWSDLBuilder {
             }
         }
         
-        Document doc = createDocument();
-        Element nd = XMLUtils.createElementNS(doc, new QName(WSDLConstants.NS_SCHEMA_XSD, "schema"));
+        Document doc = DOMUtils.createDocument();
+        Element nd = doc.createElementNS(WSDLConstants.NS_SCHEMA_XSD, "schema");
         nd.setAttribute("xmlns", WSDLConstants.NS_SCHEMA_XSD);
         doc.appendChild(nd);
         
@@ -438,8 +432,7 @@ public class ServiceWSDLBuilder {
             
             // this ensures only the schemas directly referenced by the wsdl are included.
             if (defNamespaces.contains(schemaInfo.getNamespaceURI())) {
-                Element impElement = XMLUtils.createElementNS(doc, new QName(WSDLConstants.NS_SCHEMA_XSD,
-                                                                             "import"));
+                Element impElement = doc.createElementNS(WSDLConstants.NS_SCHEMA_XSD, "import");
                 
                 impElement.setAttribute("schemaLocation", referencedSchema.getDocumentBaseURI());
                 impElement.setAttribute("namespace", schemaInfo.getNamespaceURI());
@@ -453,16 +446,6 @@ public class ServiceWSDLBuilder {
         types.addExtensibilityElement(schema);
 
         def.setTypes(types);
-    }
-
-    private Document createDocument() {
-        Document doc = null;
-        try {
-            doc = XMLUtils.newDocument();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("DOM configuration problem", e);
-        }
-        return doc;
     }
 
     private void addSchemaImport(Schema schema, SchemaInfo schemaInfo, Schema referencedSchema) {

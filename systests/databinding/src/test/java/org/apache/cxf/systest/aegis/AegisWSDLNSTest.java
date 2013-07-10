@@ -26,8 +26,8 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
 
@@ -82,7 +82,7 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
     @Test
     public void testGeneratedWsdlNs() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/aegisJaxWsWSDLNS?wsdl");
-        Document dom = XMLUtils.parse(url.openStream());
+        Document dom = StaxUtils.read(url.openStream());
         TestUtilities util = new TestUtilities(this.getClass());
         util.addDefaultNamespaces();
         util.assertValid(

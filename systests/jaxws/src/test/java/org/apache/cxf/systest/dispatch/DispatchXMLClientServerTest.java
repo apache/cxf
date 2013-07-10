@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.dispatch;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 
 import javax.xml.bind.JAXBContext;
@@ -36,12 +37,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
 import org.apache.hello_world_xml_http.wrapped.types.GreetMe;
 import org.apache.hello_world_xml_http.wrapped.types.GreetMeResponse;
 import org.apache.hello_world_xml_http.wrapped.types.ObjectFactory;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -107,7 +110,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
         assertNotNull(source);
                 
         String streamString = XMLUtils.toString(source); 
-        Document doc = XMLUtils.parse(streamString);
+        Document doc = StaxUtils.read(new StringReader(streamString));
         assertEquals("greetMeResponse", doc.getFirstChild().getLocalName());
         assertEquals("Hello tli", doc.getFirstChild().getTextContent());
     }
@@ -121,7 +124,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
         assertNotNull(service);
 
         InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource reqMsg = new DOMSource(doc);
         assertNotNull(reqMsg);
 

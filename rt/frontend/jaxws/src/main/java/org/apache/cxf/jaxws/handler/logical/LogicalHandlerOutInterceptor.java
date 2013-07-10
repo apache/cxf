@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxws.handler.logical;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -34,7 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
@@ -69,33 +68,28 @@ public class LogicalHandlerOutInterceptor
             return;
         }
         
-        try {
-            
-            XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
-            
-            Node nd = message.getContent(Node.class);
-            SOAPMessage m = message.getContent(SOAPMessage.class);
-            Document document = null;
-            
-            if (m != null) {
-                document = m.getSOAPPart();
-            } else if (nd != null) {
-                document = nd.getOwnerDocument();
-            } else {
-                document = XMLUtils.newDocument();
-                message.setContent(Node.class, document);
-            }
-            
-            W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document.createDocumentFragment());
+        XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
         
-            // Replace stax writer with DomStreamWriter
-            message.setContent(XMLStreamWriter.class, writer);        
-            message.put(ORIGINAL_WRITER, origWriter);
-            
-            message.getInterceptorChain().add(ending);
-        } catch (ParserConfigurationException e) {
-            throw new Fault(e);
+        Node nd = message.getContent(Node.class);
+        SOAPMessage m = message.getContent(SOAPMessage.class);
+        Document document = null;
+        
+        if (m != null) {
+            document = m.getSOAPPart();
+        } else if (nd != null) {
+            document = nd.getOwnerDocument();
+        } else {
+            document = DOMUtils.newDocument();
+            message.setContent(Node.class, document);
         }
+        
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document.createDocumentFragment());
+    
+        // Replace stax writer with DomStreamWriter
+        message.setContent(XMLStreamWriter.class, writer);        
+        message.put(ORIGINAL_WRITER, origWriter);
+        
+        message.getInterceptorChain().add(ending);
     }
     @Override
     public void handleFault(Message message) {

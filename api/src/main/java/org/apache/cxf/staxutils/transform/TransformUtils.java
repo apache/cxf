@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public final class TransformUtils {
@@ -94,8 +94,8 @@ public final class TransformUtils {
                                              Map<String, String> nsMap) {
         if (map != null) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                QName lname = XMLUtils.convertStringToQName(entry.getKey());
-                QName rname = XMLUtils.convertStringToQName(entry.getValue());
+                QName lname = DOMUtils.convertStringToQName(entry.getKey());
+                QName rname = DOMUtils.convertStringToQName(entry.getValue());
                 elementsMap.put(lname, rname);
                 if (nsMap != null && !isEmptyQName(rname)
                     && ("*".equals(lname.getLocalPart()) && "*".equals(rname.getLocalPart()))) {
@@ -112,8 +112,8 @@ public final class TransformUtils {
                                                Map<QName, QName> elementsMap) {
         if (map != null) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                QName lname = XMLUtils.convertStringToQName(entry.getKey());
-                QName rname = XMLUtils.convertStringToQName(entry.getValue());
+                QName lname = DOMUtils.convertStringToQName(entry.getKey());
+                QName rname = DOMUtils.convertStringToQName(entry.getValue());
                 elementsMap.put(lname, rname);
             }
         }
@@ -141,8 +141,8 @@ public final class TransformUtils {
                     key = key.substring(0, key.length() - 1);
                     child = true;
                 }
-                QName lname = XMLUtils.convertStringToQName(key);
-                QName rname = XMLUtils.convertStringToQName(value);
+                QName lname = DOMUtils.convertStringToQName(key);
+                QName rname = DOMUtils.convertStringToQName(value);
                 
                 ElementProperty desc = new ElementProperty(rname, text, child); 
                 elementsMap.put(lname, desc);
@@ -154,7 +154,7 @@ public final class TransformUtils {
                                                Set<QName> elementsSet) {
         if (set != null) {
             for (String entry : set) {
-                QName name = XMLUtils.convertStringToQName(entry);
+                QName name = DOMUtils.convertStringToQName(entry);
                 elementsSet.add(name);
             }
         }

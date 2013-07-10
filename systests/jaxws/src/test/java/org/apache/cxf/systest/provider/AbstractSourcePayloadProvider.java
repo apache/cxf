@@ -96,7 +96,7 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
         InputStream greetMeInputStream = getClass()
             .getResourceAsStream("resources/GreetMeRpcLiteralRespBody.xml");
         if (DOMSource.class.equals(class1)) {
-            return new DOMSource(XMLUtils.parse(greetMeInputStream));
+            return new DOMSource(StaxUtils.read(greetMeInputStream));
         } else if (StaxSource.class.equals(class1)) {
             if (doneStax) {
                 XMLReader reader = XMLReaderFactory.createXMLReader();

@@ -40,10 +40,10 @@ import org.w3c.dom.Node;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 @WebService(serviceName = "ControlService", 
@@ -97,7 +97,7 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
 
             Node el;
             try {
-                el = XMLUtils.fromSource(obj);
+                el = StaxUtils.read(obj);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

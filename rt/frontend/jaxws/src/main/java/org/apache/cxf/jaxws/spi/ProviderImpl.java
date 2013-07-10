@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
@@ -50,7 +49,7 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.ServiceImpl;
@@ -182,7 +181,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             
             
             try {
-                Document doc = XMLUtils.newDocument();
+                Document doc = DOMUtils.newDocument();
                 DOMResult result = new DOMResult(doc);
                 external.writeTo(result);
                 W3CDOMStreamReader reader = new W3CDOMStreamReader(doc.getDocumentElement());
@@ -197,9 +196,6 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                     .getValue();
                 return internal;
             } catch (JAXBException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (ParserConfigurationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

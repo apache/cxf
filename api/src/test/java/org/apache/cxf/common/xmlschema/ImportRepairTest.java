@@ -205,7 +205,7 @@ public class ImportRepairTest extends Assert {
         }
         
         XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(System.err);
-        xwriter = new PrettyPrintXMLStreamWriter(xwriter, 0, 2);
+        xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
         StaxUtils.copy(new DOMSource(document), xwriter);
         xwriter.close();
     }

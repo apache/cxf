@@ -35,9 +35,9 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.headers.HeaderTester;
 import org.apache.headers.XMLHeaderService;
@@ -55,6 +55,7 @@ import org.apache.hello_world_xml_http.mixed.types.SayHi;
 import org.apache.hello_world_xml_http.mixed.types.SayHiResponse;
 import org.apache.hello_world_xml_http.wrapped.GreeterFaultImpl;
 import org.apache.hello_world_xml_http.wrapped.PingMeFault;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -140,7 +141,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
 
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
 
         Map<String, String> ns = new HashMap<String, String>();

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.source;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -27,7 +26,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.hello_world_soap_http_source.source.GreetMeFault;
 import org.apache.hello_world_soap_http_source.source.Greeter;
 import org.apache.hello_world_soap_http_source.source.PingMeFault;
@@ -43,17 +41,13 @@ public class GreeterImpl implements Greeter {
     }
 
     public DOMSource sayHi(DOMSource in) {
-        try {
-            Document doc = XMLUtils.newDocument();
-            Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
-                "ns1:sayHiResponse");
-            el.appendChild(doc.createTextNode("Bonjour"));
-            doc.appendChild(el);
-            
-            return new DOMSource(doc);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
+        Document doc = DOMUtils.newDocument();
+        Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
+            "ns1:sayHiResponse");
+        el.appendChild(doc.createTextNode("Bonjour"));
+        doc.appendChild(el);
+        
+        return new DOMSource(doc);
     }
     private Element getElement(Node nd) {
         if (nd instanceof Document) {
@@ -66,32 +60,28 @@ public class GreeterImpl implements Greeter {
         Element eval = getElement(in.getNode());
         eval = DOMUtils.getFirstElement(eval);
         String val = DOMUtils.getContent(eval);
-        try {
-            if ("fault".equals(val)) {
-                Document doc = XMLUtils.newDocument();
-                Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/"
-                                                 + "source/types",
-                        "ns1:greetMeFaultDetail");
-                el.appendChild(doc.createTextNode("Some fault detail"));
-                doc.appendChild(el);
-                
-                throw new GreetMeFault("Fault String", new DOMSource(doc));
-            }
-            
-            Document doc = XMLUtils.newDocument();
-            Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
-                "ns1:greetMeResponse");
-            Element el2 = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
-                "ns1:responseType");
-            el2.appendChild(doc.createTextNode("Hello " + val));
-            el.appendChild(el2);
-            
+        if ("fault".equals(val)) {
+            Document doc = DOMUtils.newDocument();
+            Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/"
+                                             + "source/types",
+                    "ns1:greetMeFaultDetail");
+            el.appendChild(doc.createTextNode("Some fault detail"));
             doc.appendChild(el);
             
-            return new DOMSource(doc);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
+            throw new GreetMeFault("Fault String", new DOMSource(doc));
         }
+        
+        Document doc = DOMUtils.newDocument();
+        Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
+            "ns1:greetMeResponse");
+        Element el2 = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
+            "ns1:responseType");
+        el2.appendChild(doc.createTextNode("Hello " + val));
+        el.appendChild(el2);
+        
+        doc.appendChild(el);
+        
+        return new DOMSource(doc);
     }
 
     public void pingMe() throws PingMeFault {

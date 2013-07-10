@@ -37,13 +37,14 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.aegis.SportsService.Pair;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -125,7 +126,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testWSDL() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/jaxwsAndAegis?wsdl");
-        Document dom = XMLUtils.parse(url.openStream());
+        Document dom = StaxUtils.read(url.openStream());
         TestUtilities util = new TestUtilities(this.getClass());
         util.addDefaultNamespaces();
         util.assertInvalid("//wsdl:definitions/wsdl:types/xsd:schema/"
@@ -138,7 +139,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
                            dom);
         
         url = new URL("http://localhost:" + PORT + "/serviceWithCustomNS?wsdl");
-        dom = XMLUtils.parse(url.openStream());
+        dom = StaxUtils.read(url.openStream());
         util.assertValid("//wsdl:definitions[@targetNamespace='http://foo.bar.com']",
                          dom);
     }

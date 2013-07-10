@@ -43,7 +43,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -352,7 +352,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
                         configdoc = loader.parse(new File(uri), null, options);                        
                     } else {
                         InputSource source = new InputSource(configFiles[i]);
-                        Document doc = XMLUtils.parse(source);
+                        Document doc = StaxUtils.read(source);
                         configdoc = loader.parse(doc, null, options);                        
                     }
                     

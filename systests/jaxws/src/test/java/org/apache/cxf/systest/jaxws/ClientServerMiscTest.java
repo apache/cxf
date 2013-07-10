@@ -62,7 +62,6 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest_Service;
@@ -70,6 +69,7 @@ import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.ordered_param_holder.ComplexStruct;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder_Service;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.jaxws.DocLitBareCodeFirstService.GMonthTest;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411Result;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411SubClass;
@@ -82,6 +82,7 @@ import org.apache.cxf.tests.inherit.objects.SubTypeA;
 import org.apache.cxf.tests.inherit.objects.SubTypeB;
 import org.apache.cxf.tests.inherit.types.ObjectInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -106,7 +107,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("wsdl", WSDLConstants.NS_WSDL11);
         XPathUtils xpu = new XPathUtils(ns);
-        Document wsdl = XMLUtils.parse(this.getHttpConnection(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl")
+        Document wsdl = StaxUtils.read(this.getHttpConnection(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl")
                                           .getInputStream());
         //XMLUtils.printDOM(wsdl.getDocumentElement());
         assertEquals("DocLitWrappedCodeFirstService impl",
@@ -834,7 +835,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         
         

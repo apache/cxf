@@ -41,6 +41,7 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 
 import org.junit.Assert;
@@ -131,7 +132,7 @@ public class StaxUtilsTest extends Assert {
     
     @Test
     public void testCXF2468() throws Exception {
-        Document doc = XMLUtils.newDocument();
+        Document doc = DOMUtils.newDocument();
         doc.appendChild(doc.createElementNS("http://blah.org/", "blah"));
         Element foo = doc.createElementNS("http://blah.org/", "foo");
         Attr attr = doc.createAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:nil");

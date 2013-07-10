@@ -40,7 +40,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.ClientFaultConverter;
 import org.apache.cxf.interceptor.Fault;
@@ -103,7 +103,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                                       fault, 
                                       XPathConstants.NODE);
             if (el != null) {
-                faultCode = XMLUtils.getQName(el.getTextContent(), el);
+                faultCode = DOMUtils.createQName(el.getTextContent(), el);
             }
             
             el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode", 
@@ -114,7 +114,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                 NodeList vlist = el.getElementsByTagNameNS(Soap12.SOAP_NAMESPACE, "Value");
                 for (int i = 0; i < vlist.getLength(); i++) {
                     Node v = vlist.item(i);
-                    subCodes.add(XMLUtils.getQName(v.getTextContent(), v));
+                    subCodes.add(DOMUtils.createQName(v.getTextContent(), v));
                 }
             }
             

@@ -39,13 +39,12 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     boolean nestedStartElement;   
 
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
-                                      int initialLevel) {
-        baseWriter = writer;
-        curIndent = initialLevel;
+                                      int indentAmount) {
+        this(writer, indentAmount, 0);
     }
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
-                                      int initialLevel,
-                                      int indentAmount) {
+                                      int indentAmount,
+                                      int initialLevel) {
         baseWriter = writer;
         curIndent = initialLevel;
         this.indentAmount = indentAmount;

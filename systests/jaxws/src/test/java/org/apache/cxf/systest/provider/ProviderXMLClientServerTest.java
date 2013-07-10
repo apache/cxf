@@ -31,9 +31,10 @@ import javax.xml.ws.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -72,7 +73,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
 
         InputStream is = getClass().getResourceAsStream(
                 "/messages/XML_GreetMeDocLiteralReq.xml");
-        Document doc = XMLUtils.parse(is);
+        Document doc = StaxUtils.read(is);
         DOMSource reqMsg = new DOMSource(doc);
         assertNotNull(reqMsg);
 
@@ -89,7 +90,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
         
         is = getClass().getResourceAsStream(
             "/messages/XML_GreetMeDocLiteralReq_invalid.xml");
-        doc = XMLUtils.parse(is);
+        doc = StaxUtils.read(is);
         reqMsg = new DOMSource(doc);
         assertNotNull(reqMsg);
 

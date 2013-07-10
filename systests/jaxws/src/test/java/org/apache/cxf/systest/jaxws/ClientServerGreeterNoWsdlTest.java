@@ -35,7 +35,6 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -97,7 +96,7 @@ public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBa
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         
         Map<String, String> ns = new HashMap<String, String>();

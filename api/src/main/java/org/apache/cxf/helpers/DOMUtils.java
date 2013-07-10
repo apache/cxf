@@ -24,8 +24,13 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -52,11 +57,48 @@ import org.apache.cxf.common.util.StringUtils;
  * Few simple utils to read DOM. This is originally from the Jakarta Commons Modeler.
  */
 public final class DOMUtils {
+    private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS
+        = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
     private static final String XMLNAMESPACE = "xmlns";
 
     private DOMUtils() {
     }
 
+    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader == null) {
+            loader = XMLUtils.class.getClassLoader();
+        }
+        if (loader == null) {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        }
+        DocumentBuilder factory = DOCUMENT_BUILDERS.get(loader);
+        if (factory == null) {
+            DocumentBuilderFactory f2 = DocumentBuilderFactory.newInstance();
+            f2.setNamespaceAware(true);
+            factory = f2.newDocumentBuilder();
+            DOCUMENT_BUILDERS.put(loader, factory);
+        }
+        return factory;
+    }
+    
+    /**
+     * Creates a new Docuement object
+     * @return
+     * @throws ParserConfigurationException
+     */
+    public static Document newDocument() {
+        return createDocument();
+    }
+    public static Document createDocument() {
+        try {
+            return getDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    
     /**
      * This function is much like getAttribute, but returns null, not "", for a nonexistent attribute.
      * 
@@ -162,6 +204,17 @@ public final class DOMUtils {
         return null;
     }
 
+    
+    public static boolean hasAttribute(Element element, String value) {
+        NamedNodeMap attributes = element.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node node = attributes.item(i);
+            if (value.equals(node.getNodeValue())) {
+                return true;
+            }
+        }
+        return false;
+    }    
     public static String getAttribute(Node element, String attName) {
         NamedNodeMap attrs = element.getAttributes();
         if (attrs == null) {
@@ -256,6 +309,66 @@ public final class DOMUtils {
     public static QName getElementQName(Element el) {
         return new QName(el.getNamespaceURI(), el.getLocalName());
     }
+    
+    /**
+     * Creates a QName object based on the qualified name
+     * and using the Node as a base to lookup the namespace
+     * for the prefix
+     * @param qualifiedName
+     * @param node
+     * @return
+     */
+    public static QName createQName(String qualifiedName, Node node) {
+        if (qualifiedName == null) {
+            return null;
+        }
+
+        int index = qualifiedName.indexOf(":");
+
+        if (index == -1) {
+            return new QName(qualifiedName);
+        }
+
+        String prefix = qualifiedName.substring(0, index);
+        String localName = qualifiedName.substring(index + 1);
+        String ns = node.lookupNamespaceURI(prefix);
+
+        if (ns == null || localName == null) {
+            throw new RuntimeException("Invalid QName in mapping: " + qualifiedName);
+        }
+
+        return new QName(ns, localName, prefix);
+    }
+    
+    public static QName convertStringToQName(String expandedQName) {
+        return convertStringToQName(expandedQName, "");
+    }
+    
+    public static QName convertStringToQName(String expandedQName, String prefix) {
+        int ind1 = expandedQName.indexOf('{');
+        if (ind1 != 0) {
+            return new QName(expandedQName);
+        }
+        
+        int ind2 = expandedQName.indexOf('}');
+        if (ind2 <= ind1 + 1 || ind2 >= expandedQName.length() - 1) {
+            return null;
+        }
+        String ns = expandedQName.substring(ind1 + 1, ind2);
+        String localName = expandedQName.substring(ind2 + 1);
+        return new QName(ns, localName, prefix);
+    }
+    public static Set<QName> convertStringsToQNames(List<String> expandedQNames) {
+        Set<QName> dropElements = Collections.emptySet();
+        if (expandedQNames != null) {
+            dropElements = new LinkedHashSet<QName>(expandedQNames.size());
+            for (String val : expandedQNames) {
+                dropElements.add(convertStringToQName(val));
+            }
+        }
+        return dropElements;
+    }    
+    
 
     /**
      * Get the first direct child with a given type
@@ -480,14 +593,6 @@ public final class DOMUtils {
         return db.parse(is2);
     }
 
-    public static Document createDocument() {
-        try {
-            return XMLUtils.newDocument();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("Couldn't find a DOM parser.", e);
-        }
-    }
-
     public static String getPrefixRecursive(Element el, String ns) {
         String prefix = getPrefix(el, ns);
         if (prefix == null && el.getParentNode() instanceof Element) {
@@ -590,7 +695,7 @@ public final class DOMUtils {
 
         return null;
     }
-
+  
     public static List<Element> findAllElementsByTagNameNS(Element elem, String nameSpaceURI,
                                                            String localName) {
         List<Element> ret = new LinkedList<Element>();

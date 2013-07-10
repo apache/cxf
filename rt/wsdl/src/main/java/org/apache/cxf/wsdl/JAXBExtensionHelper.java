@@ -298,7 +298,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             
             javax.xml.stream.XMLOutputFactory fact = javax.xml.stream.XMLOutputFactory.newInstance();
             XMLStreamWriter writer =
-                new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), getIndentLevel(parent));
+                new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), 2, getIndentLevel(parent));
             writer.setNamespaceContext(new javax.xml.namespace.NamespaceContext() {
                 
                 public String getNamespaceURI(String arg) {

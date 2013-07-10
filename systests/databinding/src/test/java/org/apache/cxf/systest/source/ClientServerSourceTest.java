@@ -33,7 +33,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -82,7 +81,7 @@ public class ClientServerSourceTest extends AbstractBusClientServerTestBase {
         ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor());
         
-        Document doc = XMLUtils.newDocument();
+        Document doc = DOMUtils.newDocument();
         doc.appendChild(doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
                                             "ns1:sayHi"));
         DOMSource ds = new DOMSource(doc);
@@ -90,7 +89,7 @@ public class ClientServerSourceTest extends AbstractBusClientServerTestBase {
         assertEquals("We should get the right response", "Bonjour", 
                      DOMUtils.getContent(getElement(resp.getNode())));
         
-        doc = XMLUtils.newDocument();
+        doc = DOMUtils.newDocument();
         Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
             "ns1:greetMe");
         Element el2 = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
@@ -104,7 +103,7 @@ public class ClientServerSourceTest extends AbstractBusClientServerTestBase {
                      DOMUtils.getContent(DOMUtils.getFirstElement(getElement(resp.getNode()))));
 
         try {
-            doc = XMLUtils.newDocument();
+            doc = DOMUtils.newDocument();
             el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
                 "ns1:greetMe");
             el2 = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",

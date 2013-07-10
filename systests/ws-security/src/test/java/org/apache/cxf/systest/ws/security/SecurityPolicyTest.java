@@ -53,6 +53,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.DoubleItImpl;
 import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
@@ -60,7 +61,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItPortTypeHeader;
 import org.example.schema.doubleit.DoubleIt;
@@ -420,7 +420,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         Source source = new StreamSource(new StringReader(req));
         source = disp.invoke(source);
         
-        Node nd = XMLUtils.fromSource(source);
+        Node nd = StaxUtils.read(source);
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
         }
@@ -445,7 +445,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             
             Node el;
             try {
-                el = XMLUtils.fromSource(obj);
+                el = StaxUtils.read(obj);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

@@ -54,7 +54,7 @@ public class SchemaSerializer implements ExtensionSerializer {
 
     private void writeXml(Node n, PrintWriter pw) throws XMLStreamException {
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(pw);
-        writer = new PrettyPrintXMLStreamWriter(writer, 0, 2);
+        writer = new PrettyPrintXMLStreamWriter(writer, 2);
         StaxUtils.copy(new DOMSource(n), writer);
         writer.close();
     }

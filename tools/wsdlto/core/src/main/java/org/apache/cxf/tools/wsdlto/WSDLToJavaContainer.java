@@ -22,7 +22,6 @@ package org.apache.cxf.tools.wsdlto;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -67,9 +66,11 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
 import org.apache.cxf.tools.common.ClassNameProcessor;
 import org.apache.cxf.tools.common.ClassUtils;
@@ -817,9 +818,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             //change the import location in wsdl file
             OutputStream wsdloutput = new BufferedOutputStream(new FileOutputStream(wsdlFile));
             WSDLWriter wsdlWriter = WSDLFactory.newInstance().newWSDLWriter();
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
             wsdlWriter.writeWSDL(def, bout);
-            Element defEle = XMLUtils.parse(bout.toByteArray()).getDocumentElement();
+            Element defEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();
             List<Element> xsdElements = DOMUtils.findAllElementsByTagNameNS(defEle,
                                                                             WSDLConstants.NS_SCHEMA_XSD,
                                                                             "schema");
@@ -834,9 +835,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             for (Definition importDef : defs) {
                 File importWsdlFile = new File(outputdir, importWSDLMap.get(importDef.getTargetNamespace()));
                 OutputStream wsdlOs = new BufferedOutputStream(new FileOutputStream(importWsdlFile));
-                bout = new ByteArrayOutputStream();
+                bout = new LoadingByteArrayOutputStream();
                 wsdlWriter.writeWSDL(importDef, bout);
-                Element importEle = XMLUtils.parse(bout.toByteArray()).getDocumentElement();
+                Element importEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();
 
                 xsdElements = DOMUtils.findAllElementsByTagNameNS(importEle, WSDLConstants.NS_SCHEMA_XSD,
                                                                   "schema");

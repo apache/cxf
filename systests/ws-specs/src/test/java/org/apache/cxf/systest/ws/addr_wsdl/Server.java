@@ -42,9 +42,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
@@ -107,7 +107,7 @@ public class Server extends AbstractBusTestServerBase {
             //CHECK the incoming
             Element el;
             try {
-                el = ((Document)XMLUtils.fromSource(obj)).getDocumentElement();
+                el = ((Document)StaxUtils.read(obj)).getDocumentElement();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -140,7 +140,7 @@ public class Server extends AbstractBusTestServerBase {
             
             Element el;
             try {
-                el = ((Document)XMLUtils.fromSource(obj)).getDocumentElement();
+                el = ((Document)StaxUtils.read(obj)).getDocumentElement();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

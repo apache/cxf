@@ -46,7 +46,7 @@ import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
@@ -297,7 +297,7 @@ public class AegisContext {
     
     private Document getSchemaDocument(String resourcePath) { 
         try {
-            return XMLUtils.parse(getClass().getResourceAsStream(resourcePath));
+            return StaxUtils.read(getClass().getResourceAsStream(resourcePath));
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }

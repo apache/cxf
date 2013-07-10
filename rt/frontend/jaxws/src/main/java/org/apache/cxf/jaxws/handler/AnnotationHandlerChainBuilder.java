@@ -48,6 +48,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.javaee.PortComponentHandlerType;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @SuppressWarnings("rawtypes")
 public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
@@ -90,7 +91,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                         .getFileName()).toString());
                 }
                 
-                Document doc = XMLUtils.parse(handlerFileURL.openStream());
+                Document doc = StaxUtils.read(handlerFileURL.openStream());
                 Element el = doc.getDocumentElement();
                 if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI()) 
                     || !"handler-chains".equals(el.getLocalName())) {

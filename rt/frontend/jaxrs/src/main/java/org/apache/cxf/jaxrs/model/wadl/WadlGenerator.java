@@ -1547,7 +1547,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 name = type.getAnnotation(XMLName.class);
             }
             if (name != null) {
-                QName qname = XMLUtils.convertStringToQName(name.value(), name.prefix());
+                QName qname = DOMUtils.convertStringToQName(name.value(), name.prefix());
                 if (qname.getPrefix().length() > 0) {
                     return qname;
                 } else {

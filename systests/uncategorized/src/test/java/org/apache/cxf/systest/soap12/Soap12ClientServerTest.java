@@ -38,13 +38,14 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap12_http.Greeter;
 import org.apache.hello_world_soap12_http.PingMeFault;
 import org.apache.hello_world_soap12_http.SOAPService;
 import org.apache.hello_world_soap12_http.types.FaultDetail;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -94,7 +95,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(in);
         assertEquals("application/soap+xml; charset=utf-8", httpConnection.getContentType().toLowerCase());
        
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("soap12", Soap12.SOAP_NAMESPACE);
@@ -122,7 +123,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(in);     
         assertEquals("application/soap+xml; charset=utf-8", httpConnection.getContentType().toLowerCase());
         
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);        
 
         Map<String, String> ns = new HashMap<String, String>();
@@ -164,7 +165,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         InputStream in = httpConnection.getErrorStream();                  
         assertNotNull(in);        
             
-        Document doc = XMLUtils.parse(in);
+        Document doc = StaxUtils.read(in);
         assertNotNull(doc);
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
@@ -204,7 +205,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         // we expect a soap 1.1 fault from the soap 1.1 test service that does not support soap 1.2
         assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
        
-        Document doc = XMLUtils.parse(respin);
+        Document doc = StaxUtils.read(respin);
         assertNotNull(doc);
 
         Map<String, String> ns = new HashMap<String, String>();

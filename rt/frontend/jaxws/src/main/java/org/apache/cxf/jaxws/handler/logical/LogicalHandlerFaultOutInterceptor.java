@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxws.handler.logical;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -32,7 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
@@ -67,26 +66,21 @@ public class LogicalHandlerFaultOutInterceptor
             return;
         }
         
+        XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
+        Document doc = DOMUtils.newDocument();
+        message.setContent(Node.class, doc);
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc);
+        // set up the namespace context
         try {
+            writer.setNamespaceContext(origWriter.getNamespaceContext());
+        } catch (XMLStreamException ex) {
+            // don't set the namespaceContext
+        }
+        // Replace stax writer with DomStreamWriter
+        message.setContent(XMLStreamWriter.class, writer);
+        message.put(ORIGINAL_WRITER, origWriter);
             
-            XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
-            Document doc = XMLUtils.newDocument();
-            message.setContent(Node.class, doc);
-            W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc);
-            // set up the namespace context
-            try {
-                writer.setNamespaceContext(origWriter.getNamespaceContext());
-            } catch (XMLStreamException ex) {
-                // don't set the namespaceContext
-            }
-            // Replace stax writer with DomStreamWriter
-            message.setContent(XMLStreamWriter.class, writer);
-            message.put(ORIGINAL_WRITER, origWriter);
-                
-            message.getInterceptorChain().add(ending);
-        } catch (ParserConfigurationException e) {
-            throw new Fault(e);
-        } 
+        message.getInterceptorChain().add(ending);
     }
     
     

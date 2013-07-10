@@ -19,6 +19,9 @@
 
 package org.apache.cxf.staxutils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -75,6 +78,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.w3c.dom.UserDataHandler;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -84,7 +88,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 
 public final class StaxUtils {
     // System properies for defaults, but also contextual properties usable
@@ -1041,6 +1044,26 @@ public final class StaxUtils {
             }
         }
     }
+    public static Document read(Reader s) throws XMLStreamException {
+        XMLStreamReader reader = createXMLStreamReader(s);
+        try {
+            return read(reader);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
+    public static Document read(File is) throws XMLStreamException, IOException {
+        InputStream fin = new FileInputStream(is);
+        try {
+            return read(fin);
+        } finally {
+            fin.close();
+        }
+    }
     public static Document read(InputSource s) throws XMLStreamException {
         XMLStreamReader reader = createXMLStreamReader(s);
         try {
@@ -1537,7 +1560,16 @@ public final class StaxUtils {
 
     public static void printXmlFragment(XMLStreamReader reader) {
         try {
-            LOG.info(XMLUtils.toString(StaxUtils.read(reader), 4));
+            StringWriter sw = new StringWriter(1024);
+            XMLStreamWriter writer = null;
+            try {
+                writer = new PrettyPrintXMLStreamWriter(createXMLStreamWriter(sw), 4);
+                copy(reader, writer);
+                writer.flush();
+            } finally {
+                StaxUtils.close(writer);
+            }        
+            LOG.info(sw.toString());
         } catch (XMLStreamException e) {
             LOG.severe(e.getMessage());
         }
@@ -1668,18 +1700,23 @@ public final class StaxUtils {
         return sw.toString();
     }
     public static String toString(Element el) throws XMLStreamException {
+        return toString(el, 0);
+    }
+    public static String toString(Element el, int indent) throws XMLStreamException {
         StringWriter sw = new StringWriter(1024);
         XMLStreamWriter writer = null;
         try {
             writer = createXMLStreamWriter(sw);
+            if (indent > 0) {
+                writer = new PrettyPrintXMLStreamWriter(writer, indent);
+            }
             copy(el, writer);
             writer.flush();
         } finally {
             StaxUtils.close(writer);
         }        
-        return sw.toString();
+        return sw.toString();        
     }
-
     public static void close(XMLStreamReader reader) {
         if (reader != null) {
             try {

@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -93,7 +93,7 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             Element detail = fault.getDetail();
             String soapNamespace = message.getVersion().getNamespace();
             if (detail == null) {
-                Document doc = XMLUtils.newDocument();
+                Document doc = DOMUtils.newDocument();
                 Element stackTrace = doc.createElementNS(
                     Fault.STACKTRACE_NAMESPACE, Fault.STACKTRACE);
                 stackTrace.setTextContent(sb.toString());

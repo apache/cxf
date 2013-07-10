@@ -102,7 +102,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
@@ -1689,7 +1689,7 @@ public final class JAXRSUtils {
     }
 
     public static QName convertStringToQName(String name) {
-        return XMLUtils.convertStringToQName(name, "");
+        return DOMUtils.convertStringToQName(name, "");
     }
     
     public static boolean runContainerRequestFilters(ServerProviderFactory pf, 

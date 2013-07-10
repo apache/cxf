@@ -127,7 +127,7 @@ public class WSDLCorbaWriterImpl implements WSDLWriter {
 
 
     private void fixSchema(Schema sc, String pfx) throws ParserConfigurationException {
-        Document doc = XMLUtils.newDocument();
+        Document doc = DOMUtils.newDocument();
         Element el = doc.createElementNS(sc.getElementType().getNamespaceURI(),
                             pfx + ":" + sc.getElementType().getLocalPart());
         sc.setElement(el);

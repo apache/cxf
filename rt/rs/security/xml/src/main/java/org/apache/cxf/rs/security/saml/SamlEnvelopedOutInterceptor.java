@@ -109,7 +109,7 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
 
 
     public void setEnvelopeName(String expandedName) {
-        setEnvelopeQName(XMLUtils.convertStringToQName(expandedName, DEFAULT_ENV_PREFIX));
+        setEnvelopeQName(DOMUtils.convertStringToQName(expandedName, DEFAULT_ENV_PREFIX));
     }
     
     public void setEnvelopeQName(QName name) {

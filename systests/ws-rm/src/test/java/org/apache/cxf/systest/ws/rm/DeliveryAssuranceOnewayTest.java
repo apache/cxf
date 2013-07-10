@@ -47,8 +47,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.rm.RMManager;
@@ -429,7 +429,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
             Node el;
             try {
-                el = XMLUtils.fromSource(obj);
+                el = StaxUtils.read(obj);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

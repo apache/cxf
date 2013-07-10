@@ -34,8 +34,8 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
-import org.apache.cxf.helpers.XMLUtils;
 
 public class W3CDOMStreamWriter implements XMLStreamWriter {
     static final String XML_NS = "http://www.w3.org/2000/xmlns/";
@@ -47,7 +47,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     private Map<String, Object> properties = Collections.emptyMap();
 
     public W3CDOMStreamWriter() throws ParserConfigurationException {
-        document = XMLUtils.newDocument();
+        document = DOMUtils.newDocument();
     }
 
     public W3CDOMStreamWriter(DocumentBuilder builder) {

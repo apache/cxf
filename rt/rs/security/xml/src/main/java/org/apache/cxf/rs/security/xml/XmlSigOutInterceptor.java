@@ -34,7 +34,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
@@ -227,7 +226,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     }
     
     public void setEnvelopeName(String expandedName) {
-        setEnvelopeQName(XMLUtils.convertStringToQName(expandedName, DEFAULT_ENV_PREFIX));
+        setEnvelopeQName(DOMUtils.convertStringToQName(expandedName, DEFAULT_ENV_PREFIX));
     }
     
     public void setEnvelopeQName(QName name) {
