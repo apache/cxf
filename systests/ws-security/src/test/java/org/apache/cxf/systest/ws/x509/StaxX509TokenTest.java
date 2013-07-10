@@ -352,9 +352,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - See WSS-457
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

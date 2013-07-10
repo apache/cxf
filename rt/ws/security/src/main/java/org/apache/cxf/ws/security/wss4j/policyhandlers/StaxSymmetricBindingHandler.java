@@ -434,7 +434,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         AbstractToken sigToken = wrapper.getToken();
-        if (sbinding.isProtectTokens() && (sigToken instanceof X509Token)) {
+        if (sbinding.isProtectTokens() && (sigToken instanceof X509Token) && isRequestor()) {
             parts += "{Element}{" + WSSConstants.NS_XMLENC + "}EncryptedKey;";
         }
         
