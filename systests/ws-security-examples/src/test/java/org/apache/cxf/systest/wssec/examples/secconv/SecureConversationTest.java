@@ -27,7 +27,6 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
-import org.apache.cxf.systest.wssec.examples.secconv.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.example.contract.doubleit.DoubleItPortType;
@@ -68,7 +67,7 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
     public void testSecureConversation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SecureConversationTest.class.getResource("client/client.xml");
+        URL busFile = SecureConversationTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

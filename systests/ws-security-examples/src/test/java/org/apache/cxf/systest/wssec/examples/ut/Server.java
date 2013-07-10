@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.wssec.examples.saml.server;
+package org.apache.cxf.systest.wssec.examples.ut;
 
 import java.net.URL;
 

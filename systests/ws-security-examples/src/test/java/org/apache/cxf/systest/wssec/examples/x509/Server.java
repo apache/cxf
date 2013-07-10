@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.wssec.examples.ut.server;
+package org.apache.cxf.systest.wssec.examples.x509;
 
 import java.net.URL;
 

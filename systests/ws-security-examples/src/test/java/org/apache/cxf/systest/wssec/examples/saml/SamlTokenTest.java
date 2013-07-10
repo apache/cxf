@@ -28,7 +28,6 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
-import org.apache.cxf.systest.wssec.examples.saml.server.Server;
 import org.apache.cxf.systest.wssec.examples.sts.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -79,7 +78,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testBearer() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -105,7 +104,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSSenderVouches() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -131,7 +130,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSHOKSignedEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -157,7 +156,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSigned() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -183,7 +182,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricInitiator() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -210,7 +209,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSaml2Bearer() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -236,7 +235,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSSenderVouchesSaml2() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -262,7 +261,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSHOKSignedEndorsingSaml2() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -288,7 +287,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricSV() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -314,7 +313,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricIssuedToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

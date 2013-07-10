@@ -27,7 +27,6 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
-import org.apache.cxf.systest.wssec.examples.ut.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.example.contract.doubleit.DoubleItPortType;
@@ -68,7 +67,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintext() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -94,7 +93,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintextNoPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -120,7 +119,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testDigest() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -146,7 +145,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -172,7 +171,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSESupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -198,7 +197,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncrSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -224,7 +223,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricSESupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+        URL busFile = UsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
