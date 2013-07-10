@@ -110,7 +110,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     public void handleBinding() {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
-        configureLayout(aim);
         sbinding = (SymmetricBinding)getBinding(aim);
         
         // Set up CallbackHandler which wraps the configured Handler
@@ -132,17 +131,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
         }
         
-        if (timestampAdded) {
-            // Action
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, 
-                           action + " " + ConfigurationConstants.TIMESTAMP);
-            } else {
-                config.put(ConfigurationConstants.ACTION, 
-                           ConfigurationConstants.TIMESTAMP);
-            }
-        }
+        configureLayout(aim);
     }
     
     private void doEncryptBeforeSign() {

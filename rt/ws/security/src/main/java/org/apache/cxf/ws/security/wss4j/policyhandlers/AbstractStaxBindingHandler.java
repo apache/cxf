@@ -38,7 +38,6 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -371,14 +370,32 @@ public abstract class AbstractStaxBindingHandler {
     
     protected void configureLayout(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.LAYOUT);
+        Layout layout = null;
         for (AssertionInfo ai : ais) {
-            Layout layout = (Layout)ai.getAssertion();
+            layout = (Layout)ai.getAssertion();
             ai.setAsserted(true);
-            if (layout.getLayoutType() == LayoutType.LaxTsLast) {
-                // TODO re-order action list
-            } else if (layout.getLayoutType() == LayoutType.LaxTsFirst) {
-                // TODO re-order action list
+        }
+        
+        if (!timestampAdded) {
+            return;
+        }
+        
+        Map<String, Object> config = getProperties();
+        boolean timestampLast = 
+            layout != null && layout.getLayoutType() == LayoutType.LaxTsLast;
+        
+        if (config.containsKey(ConfigurationConstants.ACTION)) {
+            String action = (String)config.get(ConfigurationConstants.ACTION);
+            if (timestampLast) {
+                config.put(ConfigurationConstants.ACTION, 
+                       ConfigurationConstants.TIMESTAMP + " " + action);
+            } else {
+                config.put(ConfigurationConstants.ACTION, 
+                       action + " " + ConfigurationConstants.TIMESTAMP);
             }
+        } else {
+            config.put(ConfigurationConstants.ACTION, 
+                       ConfigurationConstants.TIMESTAMP);
         }
     }
 

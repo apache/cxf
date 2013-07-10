@@ -72,7 +72,6 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     public void handleBinding() {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
-        configureLayout(aim);
         
         if (this.isRequestor()) {
             tbinding = (TransportBinding)getBinding(aim);
@@ -99,18 +98,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             addSignatureConfirmation(null);
         }
         
-        if (timestampAdded) {
-            Map<String, Object> config = getProperties();
-            // Action
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, 
-                           action + " " + ConfigurationConstants.TIMESTAMP);
-            } else {
-                config.put(ConfigurationConstants.ACTION, 
-                           ConfigurationConstants.TIMESTAMP);
-            }
-        }
+        configureLayout(aim);
     }
     
     /**
