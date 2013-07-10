@@ -35,7 +35,7 @@ public class Server11 extends AbstractServer {
     
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(
-            "org/apache/cxf/systest/ws/wssec11/server/server.xml");
+            "org/apache/cxf/systest/ws/wssec11/server.xml");
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
         super.run();

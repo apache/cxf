@@ -34,9 +34,9 @@ public class Server extends AbstractBusTestServerBase {
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
         if (unrestrictedPoliciesInstalled) {
-            configFileName = "org/apache/cxf/systest/ws/wssec10/server/server.xml";
+            configFileName = "org/apache/cxf/systest/ws/wssec10/server.xml";
         } else {
-            configFileName = "org/apache/cxf/systest/ws/wssec10/server/server_restricted.xml";
+            configFileName = "org/apache/cxf/systest/ws/wssec10/server_restricted.xml";
         }
     };    
 

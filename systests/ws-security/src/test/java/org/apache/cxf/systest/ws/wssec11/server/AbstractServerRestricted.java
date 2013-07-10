@@ -33,7 +33,7 @@ abstract class AbstractServerRestricted extends AbstractBusTestServerBase {
     
     protected AbstractServerRestricted(String baseUrl) throws Exception {
         
-        Bus bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server/server.xml");
+        Bus bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server.xml");
         new RestrictedAlgorithmSuiteLoader(bus);
         BusFactory.setDefaultBus(bus);
         setBus(bus);
@@ -60,8 +60,7 @@ abstract class AbstractServerRestricted extends AbstractBusTestServerBase {
     private void doPublish(String url, Object obj) {
         Endpoint ep = Endpoint.create(obj);
         ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
-        ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES, 
-                "org/apache/cxf/systest/ws/wssec11/server/restricted/bob.properties");
+        ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES, "restricted/bob.properties");
         ep.publish(url);
     }
     

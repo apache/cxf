@@ -45,6 +45,12 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    private static boolean unrestrictedPoliciesInstalled;
+    
+    static {
+        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+    };    
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -357,6 +363,11 @@ public class StaxCryptoCoverageCheckerTest extends AbstractBusClientServerTestBa
     
     @org.junit.Test
     public void testSignedEncryptedBody() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = StaxCryptoCoverageCheckerTest.class.getResource("client.xml");
 

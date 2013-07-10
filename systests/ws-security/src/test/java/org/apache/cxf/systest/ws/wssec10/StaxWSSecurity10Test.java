@@ -90,7 +90,7 @@ public class StaxWSSecurity10Test extends AbstractBusClientServerTestBase {
             bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec10/client.xml");
         } else {
             bus = new SpringBusFactory().createBus(
-                    "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");
+                    "org/apache/cxf/systest/ws/wssec10/client_restricted.xml");
         }
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
@@ -141,7 +141,7 @@ public class StaxWSSecurity10Test extends AbstractBusClientServerTestBase {
             bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec10/client.xml");
         } else {
             bus = new SpringBusFactory().createBus(
-                    "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");
+                    "org/apache/cxf/systest/ws/wssec10/client_restricted.xml");
         }
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);

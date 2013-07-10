@@ -34,9 +34,9 @@ public class StaxServer extends AbstractBusTestServerBase {
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
         if (unrestrictedPoliciesInstalled) {
-            configFileName = "org/apache/cxf/systest/ws/wssec10/server/stax-server.xml";
+            configFileName = "org/apache/cxf/systest/ws/wssec10/stax-server.xml";
         } else {
-            configFileName = "org/apache/cxf/systest/ws/wssec10/server/stax-server_restricted.xml";
+            configFileName = "org/apache/cxf/systest/ws/wssec10/stax-server_restricted.xml";
         }
     };    
 
