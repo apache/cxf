@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -111,8 +112,15 @@ public class BookSubresourceImpl implements BookSubresource {
         return new Book(name, bookid);
     }
 
-    public Book getTheBookQueryBean(Book book) throws BookNotFoundFault {
-        return book;
+    public BookBean getTheBookQueryBean(BookBean book) throws BookNotFoundFault {
+        Map<Long, String> comments = book.getComments();
+        String comment1 = comments.get(1L);
+        String comment2 = comments.get(2L);
+        if ("Good".equals(comment1) && "Good".equals(comment2)) {
+            return book;
+        } else {
+            return null;
+        }
     }
 
 }

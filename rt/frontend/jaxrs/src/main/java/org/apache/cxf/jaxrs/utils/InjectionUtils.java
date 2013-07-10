@@ -613,23 +613,41 @@ public final class InjectionUtils {
                                         ParameterType pathParam, Message message) {
     // CHECKSTYLE:ON
         ParameterizedType paramType = (ParameterizedType) genericType;
-        ParameterizedType valueParamType = (ParameterizedType) InjectionUtils
-                                   .getType(paramType.getActualTypeArguments(), 1);
-        Class<?> valueType = (Class<?>) InjectionUtils.getType(valueParamType
-                           .getActualTypeArguments(), 0);
-
-        MultivaluedMap<String, Object> theValues = new MetadataMap<String, Object>();
-           
-        Set<Map.Entry<String, List<String>>> processedValuesEntrySet = processedValues.entrySet();
-        for (Map.Entry<String, List<String>> processedValuesEntry : processedValuesEntrySet) {
-            List<String> valuesList = processedValuesEntry.getValue();
-            for (String value : valuesList) {
-                Object o = InjectionUtils.handleParameter(value,
-                                   decoded, valueType, paramAnns, pathParam, message);
-                theValues.add(processedValuesEntry.getKey(), o);
+        Class<?> keyType = (Class<?>)paramType.getActualTypeArguments()[0];
+        Type secondType = InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
+        
+        if (secondType instanceof ParameterizedType) {
+            MultivaluedMap<Object, Object> theValues = new MetadataMap<Object, Object>();
+            ParameterizedType valueParamType = (ParameterizedType) secondType;
+            Class<?> valueType = (Class<?>) InjectionUtils.getType(valueParamType
+                               .getActualTypeArguments(), 0);
+    
+            for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
+                List<String> valuesList = processedValuesEntry.getValue();
+                for (String value : valuesList) {
+                    Object o = InjectionUtils.handleParameter(value,
+                                       decoded, valueType, paramAnns, pathParam, message);
+                    theValues.add(convertStringToPrimitive(processedValuesEntry.getKey(), keyType), o);
+                }
             }
+            return theValues;
+        } else {
+            Map<Object, Object> theValues = new HashMap<Object, Object>();
+            Class<?> valueType = 
+                (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
+            for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
+                List<String> valuesList = processedValuesEntry.getValue();
+                for (String value : valuesList) {
+                    Object o = InjectionUtils.handleParameter(value,
+                                       decoded, valueType, paramAnns, pathParam, message);
+                    theValues.put(
+                        convertStringToPrimitive(processedValuesEntry.getKey(), keyType), 
+                        o);
+                }
+            }
+            return theValues;
         }
-        return theValues;
+        
     }    
 
     
@@ -640,15 +658,21 @@ public final class InjectionUtils {
             if (paramType.getActualTypeArguments().length == 2) {
                 Class<?> firstType = getRawType(getType(paramType.getActualTypeArguments(), 0));
                 Type secondType = getType(paramType.getActualTypeArguments(), 1);
-                if (secondType instanceof ParameterizedType) {
-                    Class<?> secondRawType = getRawType(secondType);
-                    if (String.class == firstType && List.class.isAssignableFrom(secondRawType)) {
-                        Class<?> listtype = getRawType(
-                            getType(((ParameterizedType)secondType).getActualTypeArguments(), 0));
-                        return InjectionUtils.isPrimitive(listtype);
-                    }
-                }
+                Class<?> secondRawType = getRawType(secondType);
+                
+                return InjectionUtils.isPrimitive(firstType) 
+                    && (InjectionUtils.isPrimitive(secondRawType)
+                        || allowedMapListValue(secondRawType, secondType));
             } 
+        }
+        return false;
+    }
+    
+    private static boolean allowedMapListValue(Class<?> cls, Type type) {
+        if (List.class.isAssignableFrom(cls)) {
+            Class<?> listtype = getRawType(
+                getType(((ParameterizedType)type).getActualTypeArguments(), 0));
+            return InjectionUtils.isPrimitive(listtype);
         }
         return false;
     }
@@ -1074,6 +1098,14 @@ public final class InjectionUtils {
                         theValues = CastUtils.cast((List<?>)value);
                     }
                     values.put(propertyName, theValues);
+                } else if (Map.class.isAssignableFrom(value.getClass())) {
+                    if (isSupportedMap(m.getGenericReturnType())) {
+                        Map<Object, Object> map = CastUtils.cast((Map<?, ?>)value);
+                        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+                            values.add(propertyName + "." + entry.getKey().toString(), 
+                                       entry.getValue().toString());
+                        }
+                    }
                 } else {
                     fillInValuesFromBean(value, propertyName, values);
                 }
