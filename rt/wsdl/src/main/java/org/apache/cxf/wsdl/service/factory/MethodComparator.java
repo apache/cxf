@@ -17,32 +17,29 @@
  * under the License.
  */
 
-package org.apache.cxf.helpers;
+package org.apache.cxf.wsdl.service.factory;
 
-import org.w3c.dom.Node;
+import java.lang.reflect.Method;
+import java.util.Comparator;
 
-public final class NodeUtils {
+class MethodComparator implements Comparator<Method> {
+    public int compare(Method m1, Method m2) {
 
-    private NodeUtils() {
-        //Complete
-    }
+        int val = m1.getName().compareTo(m2.getName());
+        if (val == 0) {
+            val = m1.getParameterTypes().length - m2.getParameterTypes().length;
+            if (val == 0) {
+                Class<?>[] types1 = m1.getParameterTypes();
+                Class<?>[] types2 = m2.getParameterTypes();
+                for (int i = 0; i < types1.length; i++) {
+                    val = types1[i].getName().compareTo(types2[i].getName());
 
-    /**
-     * Returns a first child DOM Node of type ELEMENT_NODE
-     * for the specified Node.
-     */
-    public static Node getChildElementNode(Node xmlNode) {
-        if (xmlNode == null || !xmlNode.hasChildNodes()) {
-            return null;
+                    if (val != 0) {
+                        break;
+                    }
+                }
+            }
         }
-        
-        xmlNode = xmlNode.getFirstChild();
-        while (xmlNode != null 
-               && xmlNode.getNodeType() != Node.ELEMENT_NODE) {
-            xmlNode = xmlNode.getNextSibling();
-        }
-
-        return xmlNode;
+        return val;
     }
 }
-

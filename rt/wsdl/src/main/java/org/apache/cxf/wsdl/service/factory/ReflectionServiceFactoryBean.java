@@ -82,7 +82,6 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.MethodComparator;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.message.Exchange;
