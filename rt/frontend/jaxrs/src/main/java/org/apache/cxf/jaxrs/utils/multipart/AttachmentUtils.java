@@ -56,20 +56,44 @@ public final class AttachmentUtils {
         return (MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
     }
     
+    public static Map<String, Attachment> getChildAttachmentsMap(MessageContext mc,
+                                                                 boolean preferContentDisposition) {
+        return fromListToMap(getChildAttachments(mc), preferContentDisposition);
+    }
+    
     public static Map<String, Attachment> getChildAttachmentsMap(MessageContext mc) {
-        return fromListToMap(getChildAttachments(mc));
+        return fromListToMap(getChildAttachments(mc), false);
     }
     
     public static List<Attachment> getChildAttachments(MessageContext mc) {
-        return ((MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS)).getChildAttachments();
+        return getMultipartBody(mc).getChildAttachments();
+    }
+    
+    public static Map<String, Attachment> getAttachmentsMap(MessageContext mc, 
+                                                            boolean preferContentDisposition) {
+        return fromListToMap(getAttachments(mc), preferContentDisposition);
     }
     
     public static Map<String, Attachment> getAttachmentsMap(MessageContext mc) {
-        return fromListToMap(getAttachments(mc));
+        return fromListToMap(getAttachments(mc), false);
     }
     
     public static List<Attachment> getAttachments(MessageContext mc) {
-        return ((MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS)).getAllAttachments();
+        return getMultipartBody(mc).getAllAttachments();
+    }
+    
+    public static Attachment getFirstMatchingPart(MessageContext mc, Multipart id) {
+        return getFirstMatchingPart(mc, id.value());
+    }
+    
+    public static Attachment getFirstMatchingPart(MessageContext mc, String id) {
+        return getFirstMatchingPart(mc, id, null);
+    }
+    
+    public static Attachment getFirstMatchingPart(MessageContext mc, String id, String mediaType) {
+        List<Attachment> all = getAttachments(mc);
+        List<Attachment> matching = getMatchingAttachments(id, mediaType, all);
+        return matching.isEmpty() ? null : matching.get(0);
     }
     
     public static MultipartBody getMultipartBody(MessageContext mc,
@@ -105,7 +129,7 @@ public final class AttachmentUtils {
         
         if (id != null) {
             for (Attachment a : infos) {
-                if (matchAttachmentId(a, id, mt)) {
+                if (matchAttachmentId(a, id)) {
                     checkMediaTypes(a.getContentType(), id.type());
                     return a;    
                 }
@@ -127,26 +151,45 @@ public final class AttachmentUtils {
         return infos.size() > 0 ? infos.get(0) : null; 
     }
     
-    public static List<Attachment> getAllMultiparts(Multipart id, 
-                                              MediaType mt, 
-                                              List<Attachment> infos) throws IOException {
+    public static List<Attachment> getMatchingAttachments(Multipart id,
+                                                    List<Attachment> infos) {
+        return getMatchingAttachments(id.value(), id.type(), infos);
+    }
+    
+    public static List<Attachment> getMatchingAttachments(String id,
+                                                    List<Attachment> infos) {
+        return getMatchingAttachments(id, null, infos);
+    }
+    
+    public static List<Attachment> getMatchingAttachments(String id,
+                                                         String mediaType,
+                                                         List<Attachment> infos) {
     
         List<Attachment> all = new LinkedList<Attachment>();
         for (Attachment a : infos) {
-            if (matchAttachmentId(a, id, mt)) {
-                checkMediaTypes(a.getContentType(), id.type());
+            if (matchAttachmentId(a, id)) {
+                if (mediaType != null) {
+                    checkMediaTypes(a.getContentType(), mediaType);
+                }
                 all.add(a);    
             }
         }
         return all;
     }
     
-    private static boolean matchAttachmentId(Attachment at, Multipart mid, MediaType multipartType) {
-        if (at.getContentId().equals(mid.value())) {
+    public static boolean matchAttachmentId(Attachment at, Multipart mid) {
+        return matchAttachmentId(at, mid.value());
+    }
+    
+    public static boolean matchAttachmentId(Attachment at, String value) {
+        if (value.isEmpty()) {
+            return true;
+        }
+        if (at.getContentId().equals(value)) {
             return true;
         }
         ContentDisposition cd = at.getContentDisposition();
-        if (cd != null && mid.value().equals(cd.getParameter("name"))) {
+        if (cd != null && value.equals(cd.getParameter("name"))) {
             return true;
         }
         return false;
@@ -166,10 +209,21 @@ public final class AttachmentUtils {
         return populateFormMap(mc, true);
     }
     
-    private static Map<String, Attachment> fromListToMap(List<Attachment> atts) {
+    private static Map<String, Attachment> fromListToMap(List<Attachment> atts,
+                                                         boolean preferContentDisposition) {
         Map<String, Attachment> map = new LinkedHashMap<String, Attachment>();
         for (Attachment a : atts) {
-            map.put(a.getContentId(), a);    
+            String contentId = null;
+            if (preferContentDisposition) {
+                ContentDisposition cd = a.getContentDisposition();
+                if (cd != null) {
+                    contentId = cd.getParameter("name");
+                }
+            } 
+            if (contentId == null) {
+                contentId = a.getContentId();
+            }
+            map.put(contentId, a);    
         }
         return map;
     }
