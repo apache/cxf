@@ -60,13 +60,7 @@ public class StringUtilsTest extends Assert {
         assertFalse(StringUtils.isEmpty(StringUtils.getFound("velocity-1.4.jar", regex)));
         assertTrue(StringUtils.isEmpty(StringUtils.getFound(null, regex)));
     }
-    
-    @Test
-    public void testFormatVersionNumber() throws Exception {
-        assertEquals("2.0", StringUtils.formatVersionNumber("2.0-M1-SNAPSHOT"));
-        assertEquals("2.0.12", StringUtils.formatVersionNumber("2.0.12-M1-SNAPSHOT"));
-    }
-    
+
     @Test
     public void testAddPortIfMissing() throws Exception {
         assertEquals("http://localhost:80", StringUtils.addDefaultPortIfMissing("http://localhost"));

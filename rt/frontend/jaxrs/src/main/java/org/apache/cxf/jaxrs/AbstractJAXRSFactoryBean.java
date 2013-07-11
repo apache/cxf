@@ -18,14 +18,11 @@
  */
 package org.apache.cxf.jaxrs;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -40,7 +37,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
-import org.apache.cxf.databinding.PropertiesAwareDataBinding;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -349,18 +345,10 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (db == null) {
             return;
         }
-        if (db instanceof PropertiesAwareDataBinding) {
-            Map<Class<?>, Type> allClasses = 
-                ResourceUtils.getAllRequestResponseTypes(cris, false).getAllTypes();
-            Map<String, Object> props = new HashMap<String, Object>();
-            props.put(PropertiesAwareDataBinding.TYPES_PROPERTY, allClasses);
-            ((PropertiesAwareDataBinding)db).initialize(props);
-        } else { 
-            if (s instanceof JAXRSServiceImpl) {
-                ((JAXRSServiceImpl)s).setCreateServiceModel(true);
-            }
-            db.initialize(s);
+        if (s instanceof JAXRSServiceImpl) {
+            ((JAXRSServiceImpl)s).setCreateServiceModel(true);
         }
+        db.initialize(s);
         factory.setUserProviders(Collections.singletonList(new DataBindingProvider<Object>(db)));
     }
     

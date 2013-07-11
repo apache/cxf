@@ -57,39 +57,8 @@ public final class StringUtils {
         return s.split(regex, limit);
     }
 
-    public static String extract(String string, String startToken, String endToken) {
-        int start = string.indexOf(startToken) + startToken.length();
-        int end = string.lastIndexOf(endToken);
-
-        if (start == -1 || end == -1) {
-            return null;
-        }
-
-        return string.substring(start, end);
-    }
-
-    public static String wrapper(String string, String startToken, String endToken) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(startToken);
-        sb.append(string);
-        sb.append(endToken);
-        return sb.toString();
-    }
-
     public static boolean isFileExist(String file) {
         return new File(file).exists() && new File(file).isFile();
-    }
-
-    public static boolean isFileAbsolute(String file) {
-        return isFileExist(file) && new File(file).isAbsolute();
-    }
-
-    public static URL getURL(String spec) throws MalformedURLException {
-        try {
-            return new URL(spec);
-        } catch (MalformedURLException e) {
-            return new File(spec).toURI().toURL();
-        }
     }
 
     public static boolean isEmpty(String str) {
@@ -113,19 +82,7 @@ public final class StringUtils {
         }
         return false;
     }
-
-    public static boolean isEqualUri(String uri1, String uri2) {
-
-        if (uri1.substring(uri1.length() - 1).equals("/") && !uri2.substring(uri2.length() - 1).equals("/")) {
-            return uri1.substring(0, uri1.length() - 1).equals(uri2);
-        } else if (uri2.substring(uri2.length() - 1).equals("/")
-                   && !uri1.substring(uri1.length() - 1).equals("/")) {
-            return uri2.substring(0, uri2.length() - 1).equals(uri1);
-        } else {
-            return uri1.equals(uri2);
-        }
-    }
-    
+   
     public static String diff(String str1, String str2) {
         int index = str1.lastIndexOf(str2);
         if (index > -1) {
@@ -191,14 +148,6 @@ public final class StringUtils {
             return null;
         }
         return founds.get(0);
-    }
-    
-    public static String formatVersionNumber(String target) {
-        List<String> found = StringUtils.getFound(target, "\\d+\\.\\d+\\.?\\d*");
-        if (isEmpty(found)) {
-            return target;
-        }
-        return getFirstNotEmpty(found);
     }
     
     public static String addDefaultPortIfMissing(String urlString) {
