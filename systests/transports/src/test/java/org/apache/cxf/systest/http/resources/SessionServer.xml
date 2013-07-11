@@ -45,7 +45,11 @@
    
    <jaxws:endpoint 
        address="http://localhost:${testutil.ports.SessionServer}/SoapContext/GreeterPort"
-       implementor="org.apache.cxf.systest.http.GreeterSessionImpl"/> 
+       implementor="org.apache.cxf.systest.http.GreeterSessionImpl">
+       <jaxws:properties>
+           <entry key="org.apache.cxf.oneway.robust" value="true"/>
+       </jaxws:properties> 
+   </jaxws:endpoint>
         
         
    <jaxws:endpoint address="http://localhost:${testutil.ports.SessionServer}/Stateful1"
