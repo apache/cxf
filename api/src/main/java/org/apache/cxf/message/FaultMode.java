@@ -24,14 +24,9 @@ package org.apache.cxf.message;
  */
 public enum FaultMode {
     
-    RUNTIME_FAULT ("org.apache.cxf.runtime.fault"),
-    LOGICAL_RUNTIME_FAULT ("org.apache.cxf.runtime.fault.logical"),
-    CHECKED_APPLICATION_FAULT ("org.apache.cxf.application.fault.checked"),
-    UNCHECKED_APPLICATION_FAULT ("org.apache.cxf.application.fault.unchecked");
+    RUNTIME_FAULT,
+    LOGICAL_RUNTIME_FAULT,
+    CHECKED_APPLICATION_FAULT,
+    UNCHECKED_APPLICATION_FAULT,
     
-    String mode;
-    
-    FaultMode(String m) {
-        mode = m;
-    }
 }

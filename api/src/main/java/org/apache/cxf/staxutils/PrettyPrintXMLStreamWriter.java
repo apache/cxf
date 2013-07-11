@@ -35,8 +35,6 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     int curIndent;
     int indentAmount = DEFAULT_INDENT_LEVEL;
     Stack<CurrentElement> elems = new Stack<CurrentElement>();
-    QName currElem;
-    boolean nestedStartElement;   
 
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
                                       int indentAmount) {
