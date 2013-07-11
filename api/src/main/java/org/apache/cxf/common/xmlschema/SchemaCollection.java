@@ -300,13 +300,13 @@ public class SchemaCollection {
             // could it be a choice or something else?
             
             if (complexType.getParticle() instanceof XmlSchemaChoice) {
-                XmlSchemaChoice choice = XmlSchemaUtils.getChoice(complexType);
+                XmlSchemaChoice choice = (XmlSchemaChoice)complexType.getParticle();
                 addCrossImports(schema, choice);
             } else if (complexType.getParticle() instanceof XmlSchemaAll) {
-                XmlSchemaAll all = XmlSchemaUtils.getAll(complexType);
+                XmlSchemaAll all = (XmlSchemaAll)complexType.getParticle();
                 addCrossImports(schema, all);
-            } else {
-                XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(complexType);
+            } else if (complexType.getParticle() instanceof XmlSchemaSequence) {
+                XmlSchemaSequence sequence = (XmlSchemaSequence)complexType.getParticle();
                 addCrossImports(schema, sequence);
             }
         }

@@ -174,7 +174,7 @@ public class SchemaJavascriptBuilder {
     public void complexTypeConstructorAndAccessors(QName name, XmlSchemaComplexType type) {
         accessors = new StringBuilder();
         utils = new JavascriptUtils(code);
-        List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
+        List<XmlSchemaObject> items = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
         List<XmlSchemaAnnotated> attrs = XmlSchemaUtils.getContentAttributes(type, xmlSchemaCollection);
 
         final String elementPrefix = "this._";
@@ -336,7 +336,7 @@ public class SchemaJavascriptBuilder {
      */
     protected void complexTypeSerializerBody(XmlSchemaComplexType type, String elementPrefix,
                                              JavascriptUtils bodyUtils) {
-        List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
+        List<XmlSchemaObject> items = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
         for (XmlSchemaObject sequenceItem : items) {
             ParticleInfo itemInfo = ParticleInfo.forLocalItem(sequenceItem, xmlSchema, xmlSchemaCollection,
                                                               prefixAccumulator, type.getQName());
@@ -366,7 +366,7 @@ public class SchemaJavascriptBuilder {
     public void domDeserializerFunction(QName name, XmlSchemaComplexType type) {
         utils = new JavascriptUtils(code);
 
-        List<XmlSchemaObject> contentElements = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
+        List<XmlSchemaObject> contentElements = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
         String typeObjectName = nameManager.getJavascriptName(name);
         code.append("function " + typeObjectName + "_deserialize (cxfjsutils, element) {\n");
         // create the object we are deserializing into.

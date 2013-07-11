@@ -19,23 +19,40 @@
 
 package org.apache.cxf.javascript;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.ws.commons.schema.XmlSchemaAll;
+import org.apache.ws.commons.schema.XmlSchemaAnnotated;
+import org.apache.ws.commons.schema.XmlSchemaAny;
+import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
+import org.apache.ws.commons.schema.XmlSchemaAttribute;
+import org.apache.ws.commons.schema.XmlSchemaChoice;
+import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
+import org.apache.ws.commons.schema.XmlSchemaContent;
+import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaParticle;
+import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContent;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
@@ -48,6 +65,13 @@ import org.apache.ws.commons.schema.constants.Constants;
  * type utilities.
  */
 public class JavascriptUtils {
+    private static final XmlSchemaSequence EMPTY_SEQUENCE = new XmlSchemaSequence();
+    private static final XmlSchemaChoice EMPTY_CHOICE = new XmlSchemaChoice();
+    private static final XmlSchemaAll EMPTY_ALL = new XmlSchemaAll();
+    
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(JavascriptUtils.class);
+
     private static final String NL = "\n";
     private static int anyTypePrefixCounter;
     private StringBuilder code;
@@ -503,4 +527,185 @@ public class JavascriptUtils {
         endBlock(); // for raw
     }
 
+    /**
+     * If the object is an attribute or an anyAttribute,
+     * return the 'Annotated'. If it's not one of those, or it's a group,
+     * throw. We're not ready for groups yet.
+     * @param object
+     */
+    public static XmlSchemaAnnotated getObjectAnnotated(XmlSchemaObject object, QName contextName) {
+
+        if (!(object instanceof XmlSchemaAnnotated)) {
+            unsupportedConstruct("NON_ANNOTATED_ATTRIBUTE",
+                                                object.getClass().getSimpleName(),
+                                                contextName, object);
+        }
+        if (!(object instanceof XmlSchemaAttribute)
+            && !(object instanceof XmlSchemaAnyAttribute)) {
+            unsupportedConstruct("EXOTIC_ATTRIBUTE",
+                                                object.getClass().getSimpleName(), contextName,
+                                                object);
+        }
+
+        return (XmlSchemaAnnotated) object;
+    }
+    
+    /**
+     * If the object is an element or an any, return the particle. If it's not a particle, or it's a group,
+     * throw. We're not ready for groups yet.
+     * @param object
+     */
+    public static XmlSchemaParticle getObjectParticle(XmlSchemaObject object, QName contextName) {
+
+        if (!(object instanceof XmlSchemaParticle)) {
+            unsupportedConstruct("NON_PARTICLE_CHILD",
+                                                object.getClass().getSimpleName(),
+                                                contextName, object);
+        }
+        if (!(object instanceof XmlSchemaElement)
+            && !(object instanceof XmlSchemaAny)) {
+            unsupportedConstruct("GROUP_CHILD",
+                                                object.getClass().getSimpleName(), contextName,
+                                                object);
+        }
+
+        return (XmlSchemaParticle) object;
+    }
+
+    public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {
+        XmlSchemaParticle particle = type.getParticle();
+        XmlSchemaSequence sequence = null;
+
+        if (particle == null) {
+            // the code that uses this wants to iterate. An empty one is more useful than
+            // a null pointer, and certainly an exception.
+            return EMPTY_SEQUENCE;
+        }
+
+        try {
+            sequence = (XmlSchemaSequence) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
+        }
+
+        return sequence;
+    }
+    public static XmlSchemaChoice getChoice(XmlSchemaComplexType type) {
+        XmlSchemaParticle particle = type.getParticle();
+        XmlSchemaChoice choice = null;
+
+        if (particle == null) {
+            // the code that uses this wants to iterate. An empty one is more useful than
+            // a null pointer, and certainly an exception.
+            return EMPTY_CHOICE;
+        }
+
+        try {
+            choice = (XmlSchemaChoice) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_CHOICE_PARTICLE", type);
+        }
+
+        return choice;
+    }
+    public static XmlSchemaAll getAll(XmlSchemaComplexType type) {
+        XmlSchemaParticle particle = type.getParticle();
+        XmlSchemaAll all = null;
+
+        if (particle == null) {
+            // the code that uses this wants to iterate. An empty one is more useful than
+            // a null pointer, and certainly an exception.
+            return EMPTY_ALL;
+        }
+
+        try {
+            all = (XmlSchemaAll) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_CHOICE_PARTICLE", type);
+        }
+
+        return all;
+    }
+    
+    
+    public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type,
+                                                           SchemaCollection collection) {
+        List<XmlSchemaObject> results = new ArrayList<XmlSchemaObject>();
+        QName baseTypeName = XmlSchemaUtils.getBaseType(type);
+        if (baseTypeName != null) {
+            XmlSchemaComplexType baseType = (XmlSchemaComplexType)collection.getTypeByQName(baseTypeName);
+            // recurse onto the base type ...
+            results.addAll(getContentElements(baseType, collection));
+            // and now process our sequence.
+            XmlSchemaSequence extSequence = getContentSequence(type);
+            if (extSequence != null) {
+                for (XmlSchemaSequenceMember item : extSequence.getItems()) {
+                    /*
+                     * For now, leave the return type alone. Fix some day.
+                     */
+                    results.add((XmlSchemaObject)item);
+                }
+            }
+            return results;
+        } else {
+            // no base type, the simple case.
+            XmlSchemaSequence sequence = getSequence(type);
+            for (XmlSchemaSequenceMember item : sequence.getItems()) {
+                results.add((XmlSchemaObject)item);
+            }
+            return results;
+        }
+    }
+
+    public static XmlSchemaSequence getContentSequence(XmlSchemaComplexType type) {
+        XmlSchemaContentModel model = type.getContentModel();
+        if (model == null) {
+            return null;
+        }
+        XmlSchemaContent content = model.getContent();
+        if (content == null) {
+            return null;
+        }
+        if (!(content instanceof XmlSchemaComplexContentExtension)) {
+            return null;
+        }
+
+        XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
+        XmlSchemaParticle particle = ext.getParticle();
+        if (particle == null) {
+            return null;
+        }
+        XmlSchemaSequence sequence = null;
+        try {
+            sequence = (XmlSchemaSequence) particle;
+        } catch (ClassCastException cce) {
+            unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
+        }
+        return sequence;
+    }
+    
+    static void unsupportedConstruct(String messageKey,
+                                             String what,
+                                             QName subjectName,
+                                             XmlSchemaObject subject) {
+        Message message = new Message(messageKey, LOG, what,
+                                      subjectName == null ? "anonymous" : subjectName,
+                                      cleanedUpSchemaSource(subject));
+        throw new UnsupportedConstruct(message);
+    }
+
+    
+    static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
+        Message message = new Message(messageKey, LOG, subject.getQName(),
+                                      cleanedUpSchemaSource(subject));
+        throw new UnsupportedConstruct(message);
+    }
+    
+    static String cleanedUpSchemaSource(XmlSchemaObject subject) {
+        if (subject == null || subject.getSourceURI() == null) {
+            return "";
+        } else {
+            return subject.getSourceURI() + ":" + subject.getLineNumber();
+        }
+    }    
 }

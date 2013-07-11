@@ -304,7 +304,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             if (contextQName == null) {
                 contextQName = inputWrapperElement.getQName();
             }
-            XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(inputWrapperComplexType);
+            XmlSchemaSequence sequence = JavascriptUtils.getSequence(inputWrapperComplexType);
             XmlSchema wrapperSchema =
                 xmlSchemaCollection.getSchemaByTargetNamespace(contextQName.getNamespaceURI());
 
@@ -701,10 +701,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 diagnosticName = element.getQName();
                 type = element.getSchemaType();
                 if (type == null) {
-                    type = XmlSchemaUtils.getElementType(xmlSchemaCollection,
-                                                         null,
-                                                         element,
-                                                         null);
+                    type = getElementType(xmlSchemaCollection,
+                                          null,
+                                          element,
+                                          null);
                 }
             } else {
                 // RPC (!isElement)
@@ -760,10 +760,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             // the null name is probably something awful in RFSB.
             if (inputWrapperComplexType == null) {
                 inputWrapperComplexType = (XmlSchemaComplexType)
-                    XmlSchemaUtils.getElementType(xmlSchemaCollection,
-                                                  serviceInfo.getTargetNamespace(),
-                                                  inputWrapperElement,
-                                                  null);
+                    getElementType(xmlSchemaCollection,
+                                   serviceInfo.getTargetNamespace(),
+                                   inputWrapperElement,
+                                   null);
             }
             if (inputWrapperComplexType == null) {
                 unsupportedConstruct("MISSING_WRAPPER_TYPE",
@@ -802,10 +802,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             outputWrapperComplexType = (XmlSchemaComplexType)outputWrapperElement.getSchemaType();
             if (outputWrapperComplexType == null) {
                 outputWrapperComplexType = (XmlSchemaComplexType)
-                    XmlSchemaUtils.getElementType(xmlSchemaCollection,
-                                                  serviceInfo.getTargetNamespace(),
-                                                  outputWrapperElement,
-                                                  null);
+                    getElementType(xmlSchemaCollection,
+                                   serviceInfo.getTargetNamespace(),
+                                   outputWrapperElement,
+                                   null);
             }
         }
     }
@@ -933,5 +933,81 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         code.append(portClassName + ".prototype = new " + currentInterfaceClassName + ";\n");
     }
 
+    
+    /**
+     * Follow a chain of references from element to element until we can obtain
+     * a type.
+     *
+     * @param element
+     */
+    public static XmlSchemaType getElementType(SchemaCollection xmlSchemaCollection,
+                                               String referencingURI,
+                                               XmlSchemaElement element,
+                                               XmlSchemaType containingType) {
+        assert element != null;
+        if (element.getSchemaTypeName() != null) {
+            XmlSchemaType type = xmlSchemaCollection.getTypeByQName(element.getSchemaTypeName());
+            if (type == null) {
+                Message message = new Message("ELEMENT_TYPE_MISSING", LOG, element.getQName(),
+                                              element.getSchemaTypeName().toString());
+                throw new UnsupportedConstruct(message);
+            }
+            return type;
+        }
+        // The referencing URI only helps if there is a schema that points to
+        // it.
+        // It might be the URI for the wsdl TNS, which might have no schema.
+        if (xmlSchemaCollection.getSchemaByTargetNamespace(referencingURI) == null) {
+            referencingURI = null;
+        }
+
+        if (referencingURI == null && containingType != null) {
+            referencingURI = containingType.getQName().getNamespaceURI();
+        }
+
+        XmlSchemaElement originalElement = element;
+        while (element.getSchemaType() == null && element.isRef()) {
+            /*
+             * This code assumes that all schemas are in the collection.
+             */
+            XmlSchemaElement nextElement = element.getRef().getTarget();
+            assert nextElement != null;
+            element = nextElement;
+        }
+        if (element.getSchemaType() == null) {
+            unsupportedConstruct("ELEMENT_HAS_NO_TYPE",
+                                                originalElement.getName(),
+                                                containingType.getQName(),
+                                                containingType);
+        }
+        return element.getSchemaType();
+    }
+    
+    public static void unsupportedConstruct(String messageKey,
+                                            String what,
+                                            QName subjectName,
+                                            XmlSchemaObject subject) {
+        Message message = new Message(messageKey, LOG, what,
+                                      subjectName == null ? "anonymous" : subjectName,
+                                      cleanedUpSchemaSource(subject));
+        LOG.severe(message.toString());
+        throw new UnsupportedConstruct(message);
+
+    }
+
+    public static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
+        Message message = new Message(messageKey, LOG, subject.getQName(),
+                                      cleanedUpSchemaSource(subject));
+        LOG.severe(message.toString());
+        throw new UnsupportedConstruct(message);
+    }
+
+    public static String cleanedUpSchemaSource(XmlSchemaObject subject) {
+        if (subject == null || subject.getSourceURI() == null) {
+            return "";
+        } else {
+            return subject.getSourceURI() + ":" + subject.getLineNumber();
+        }
+    }    
 
 }

@@ -131,7 +131,7 @@ public final class ParticleInfo implements ItemInfo {
                                             SchemaCollection schemaCollection,
                                             NamespacePrefixAccumulator prefixAccumulator, QName contextName) {
         XmlSchemaParticle sequenceParticle =
-            XmlSchemaUtils.getObjectParticle(sequenceObject, contextName);
+            JavascriptUtils.getObjectParticle(sequenceObject, contextName);
         ParticleInfo elementInfo = new ParticleInfo();
         XmlSchemaParticle realParticle = sequenceParticle;
 
@@ -255,7 +255,7 @@ public final class ParticleInfo implements ItemInfo {
                 if (elementInfo.type == null
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(Constants.URI_2001_SCHEMA_XSD)) {
-                    XmlSchemaUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
+                    JavascriptUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
                             .toString(), element.getQName(), element);
                 }
             }
@@ -284,8 +284,7 @@ public final class ParticleInfo implements ItemInfo {
                 return element.getQName();
             }
         }
-        Message message = new Message("IMPOSSIBLE_GLOBAL_ITEM", LOG, XmlSchemaUtils
-            .cleanedUpSchemaSource(particle));
+        Message message = new Message("IMPOSSIBLE_GLOBAL_ITEM", LOG, JavascriptUtils.cleanedUpSchemaSource(particle));
         LOG.severe(message.toString());
         throw new UnsupportedConstruct(message);
     }

@@ -90,7 +90,7 @@ public final class AttributeInfo implements ItemInfo {
                                              XmlSchema currentSchema,
                                             SchemaCollection schemaCollection,
                                             NamespacePrefixAccumulator prefixAccumulator, QName contextName) {
-        XmlSchemaAnnotated annotated = XmlSchemaUtils.getObjectAnnotated(sequenceObject, contextName);
+        XmlSchemaAnnotated annotated = JavascriptUtils.getObjectAnnotated(sequenceObject, contextName);
         AttributeInfo attributeInfo = new AttributeInfo();
         XmlSchemaAnnotated realAnnotated = annotated;
 
@@ -169,7 +169,7 @@ public final class AttributeInfo implements ItemInfo {
                 if (attributeInfo.type == null
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(Constants.URI_2001_SCHEMA_XSD)) {
-                    XmlSchemaUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
+                    JavascriptUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
                             .toString(), element.getQName(), element);
                 }
             }
