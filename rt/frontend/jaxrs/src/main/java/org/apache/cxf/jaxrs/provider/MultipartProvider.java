@@ -173,7 +173,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         Attachment multipart = AttachmentUtils.getMultipart(id, mt, infos);
         if (multipart != null) {
             if (collectionExpected && !mediaTypeSupported(multipart.getContentType())) {
-                List<Attachment> allMultiparts = AttachmentUtils.getAllMultiparts(id, mt, infos);
+                List<Attachment> allMultiparts = AttachmentUtils.getMatchingAttachments(id, infos);
                 return getAttachmentCollection(t, allMultiparts, anns);
             } else {
                 return fromAttachment(multipart, c, t, anns);
