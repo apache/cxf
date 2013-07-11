@@ -41,8 +41,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
+import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.classloader.JAXBClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -164,7 +165,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 && clazz.getAnnotation(XmlRootElement.class) == null
                 && clazz.getAnnotation(XmlType.class) != null
                 && StringUtils.isEmpty(clazz.getAnnotation(XmlType.class).name())) {
-                Object ref = JAXBClassLoaderUtils.createTypeReference(part.getName(), clazz);
+                Object ref = createTypeReference(part.getName(), clazz);
                 if (ref != null) {
                     typeReferences.add(ref);
                 }
@@ -446,4 +447,38 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         return false;
     }
+    
+    /**
+     * The TypeReference class is a sun specific class that is found in two different
+     * locations depending on environment. In IBM JDK the class is not available at all.
+     * So we have to load it at runtime.
+     * 
+     * @param n
+     * @param cls
+     * @return initiated TypeReference
+     */
+    private static Object createTypeReference(QName n, Class<?> cls) {
+        Class<?> refClass = null;
+        try {
+            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference", 
+                                                  JAXBContextInitializer.class);
+        } catch (Throwable ex) {
+            try {
+                refClass = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.api.TypeReference",
+                                                      JAXBContextInitializer.class);
+            } catch (Throwable ex2) {
+                //ignore
+            }
+        }
+        if (refClass != null) {
+            try {
+                return refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass())
+                    .newInstance(n, cls, new Annotation[0]);
+            } catch (Throwable e) {
+                //ignore
+            }
+        }
+        return null;
+    }
+    
 }
