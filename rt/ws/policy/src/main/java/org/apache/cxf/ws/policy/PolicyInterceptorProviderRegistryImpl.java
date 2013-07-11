@@ -33,7 +33,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
 import org.apache.cxf.interceptor.Interceptor;
@@ -61,16 +60,6 @@ public class PolicyInterceptorProviderRegistryImpl
 
     public PolicyInterceptorProviderRegistryImpl(Map<QName, Set<PolicyInterceptorProvider>> interceptors) {
         super(interceptors);
-    }    
-    public PolicyInterceptorProviderRegistryImpl(MapProvider<QName, 
-                                                 Set<PolicyInterceptorProvider>> interceptors) {
-        super(interceptors.createMap());
-    }    
-    public PolicyInterceptorProviderRegistryImpl(Bus b, 
-        MapProvider<QName, Set<PolicyInterceptorProvider>> interceptors) {
-        
-        super(interceptors.createMap());
-        setBus(b);
     }    
 
     @Resource

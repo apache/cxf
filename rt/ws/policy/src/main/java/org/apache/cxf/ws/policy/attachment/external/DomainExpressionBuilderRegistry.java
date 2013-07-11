@@ -32,7 +32,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
@@ -59,9 +58,6 @@ public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainE
 
     public DomainExpressionBuilderRegistry(Map<QName, DomainExpressionBuilder> builders) {
         super(builders);
-    }
-    public DomainExpressionBuilderRegistry(MapProvider<QName, DomainExpressionBuilder> builders) {
-        super(builders.createMap());
     }
     @Resource
     public final void setBus(Bus b) {

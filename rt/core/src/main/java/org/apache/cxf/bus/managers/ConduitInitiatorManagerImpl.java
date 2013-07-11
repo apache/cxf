@@ -34,7 +34,6 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.TransportFinder;
@@ -56,33 +55,6 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
     public ConduitInitiatorManagerImpl(Bus b) {
         conduitInitiators = new ConcurrentHashMap<String, ConduitInitiator>(8, 0.75f, 4);
         setBus(b);
-    }
-    
-
-    public ConduitInitiatorManagerImpl(MapProvider<String, ConduitInitiator> conduitInitiators) {
-        this.conduitInitiators = conduitInitiators.createMap();
-    }
-    public ConduitInitiatorManagerImpl(MapProvider<String, ConduitInitiator> conduitInitiators,
-                                       Bus b) {
-        this.conduitInitiators = conduitInitiators.createMap();
-        setBus(b);
-    }
-
-    public ConduitInitiatorManagerImpl(Map<String, ConduitInitiator> conduitInitiators) {
-        this.conduitInitiators = conduitInitiators;
-    }
-    public ConduitInitiatorManagerImpl(Map<String, ConduitInitiator> conduitInitiators, Bus b) {
-        this.conduitInitiators = conduitInitiators;
-        setBus(b);
-    }
-    
-    /**
-     * Spring is slow to resolve constructors. This accessor allows
-     * for initialization via a property.
-     * @param mapProvider
-     */
-    public void setMapProvider(MapProvider<String, ConduitInitiator> mapProvider) {
-        this.conduitInitiators = mapProvider.createMap();
     }
     
     @Resource

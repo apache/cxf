@@ -33,7 +33,6 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.TransportFinder;
@@ -67,14 +66,7 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
         this.destinationFactories = destinationFactories;
         setBus(b);
     }
-    public DestinationFactoryManagerImpl(MapProvider<String, DestinationFactory> destinationFactories) {
-        this.destinationFactories = destinationFactories.createMap();
-    }
-
-    public void setMapProvider(MapProvider<String, DestinationFactory> mapProvider) {
-        this.destinationFactories = mapProvider.createMap();
-    }
-
+    
     @Resource
     public void setBus(Bus b) {
         bus = b;

@@ -39,7 +39,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.helpers.CastUtils;
 
 @NoJSR250Annotations(unlessNull = "bus")
@@ -60,35 +59,6 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
         setBus(b);
     }
     
-    public BindingFactoryManagerImpl(Map<String, BindingFactory> bindingFactories) {
-        super();
-        if (!(bindingFactories instanceof ConcurrentHashMap)) {
-            bindingFactories = new ConcurrentHashMap<String, BindingFactory>(bindingFactories);
-        }
-        this.bindingFactories = bindingFactories;
-    }
-    public BindingFactoryManagerImpl(Map<String, BindingFactory> bindingFactories, Bus b) {
-        super();
-        if (!(bindingFactories instanceof ConcurrentHashMap)) {
-            bindingFactories = new ConcurrentHashMap<String, BindingFactory>(bindingFactories);
-        }
-        this.bindingFactories = bindingFactories;
-        setBus(b);
-    }
-    public BindingFactoryManagerImpl(MapProvider<String, BindingFactory> bindingFactories) {
-        super();
-        this.bindingFactories = bindingFactories.createMap();
-    }
-
-    /**
-     * Spring configuration via constructor is slow.
-     * This accessor allows initialization via a property.
-     * @param bindingFactoriesMapProvider
-     */
-    public void setMapProvider(MapProvider<String, BindingFactory> bindingFactoriesMapProvider) {
-        this.bindingFactories = bindingFactoriesMapProvider.createMap();
-    }
-
     @Resource
     public void setBus(Bus b) {
         bus = b;
