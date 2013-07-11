@@ -370,7 +370,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             MessagePartInfo mpi = mInfo.addMessagePart("parameters");
                             mpi.setElement(true);
                             mpi.setTypeClass(c);
-                            mpi.setTypeQName(Constants.XSD_ANY);
+                            mpi.setTypeQName(Constants.XSD_ANYTYPE);
 
                             mInfo = op.createMessage(new QName(catchAll.getNamespaceURI(),
                                                                name + "Response"),
@@ -379,7 +379,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             mpi = mInfo.addMessagePart("parameters");
                             mpi.setElement(true);
                             mpi.setTypeClass(c);
-                            mpi.setTypeQName(Constants.XSD_ANY);
+                            mpi.setTypeQName(Constants.XSD_ANYTYPE);
 
                             BindingOperationInfo bo = new BindingOperationInfo(bind, op);
                             op.setProperty("operation.is.synthetic", Boolean.TRUE);
@@ -693,7 +693,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     protected void initializeParameter(MessagePartInfo part, Class<?> rawClass, Type type) {
         if (implInfo.isWebServiceProvider()) {
-            part.setTypeQName(Constants.XSD_ANY);
+            part.setTypeQName(Constants.XSD_ANYTYPE);
             part.setTypeClass(rawClass);
             return;
         }

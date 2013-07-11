@@ -282,7 +282,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     protected AegisType createObjectType() {
         ObjectType type = new ObjectType();
-        type.setSchemaType(Constants.XSD_ANY);
+        type.setSchemaType(Constants.XSD_ANYTYPE);
         type.setTypeClass(Object.class);
         type.setTypeMapping(getTypeMapping());
         return type;

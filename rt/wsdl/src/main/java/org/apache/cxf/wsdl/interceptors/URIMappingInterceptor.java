@@ -119,7 +119,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         for (BindingOperationInfo b : service.getOperations()) {
             if (b.getInput() != null && !b.getInput().getMessageInfo().getMessageParts().isEmpty()) {
                 MessagePartInfo inf = b.getInput().getMessageInfo().getMessagePart(0);
-                if (Constants.XSD_ANY.equals(inf.getTypeQName())) {
+                if (Constants.XSD_ANYTYPE.equals(inf.getTypeQName())) {
                     return b;
                 }
             }

@@ -50,12 +50,11 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String NO_VALIDATE_PARTS = AbstractInDatabindingInterceptor.class.getName() 
                                                     + ".novalidate-parts";
-    private static final QName XSD_ANY = new QName("http://www.w3.org/2001/XMLSchema", "anyType", "xsd");
-
     private static final ResourceBundle BUNDLE = BundleUtils
         .getBundle(AbstractInDatabindingInterceptor.class);
 
@@ -214,7 +213,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
                 return p;
             }
 
-            if (XSD_ANY.equals(p.getTypeQName())) {
+            if (Constants.XSD_ANYTYPE.equals(p.getTypeQName())) {
                 lastChoice = p;
                 lastBoi = boi;
                 lastMsgInfo = msgInfo;

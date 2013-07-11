@@ -230,16 +230,16 @@ public class DefaultTypeMapping implements TypeMapping {
         defaultRegister(tm, defaultNillable, Double.class, Constants.XSD_DOUBLE, new DoubleType());
         defaultRegister(tm, defaultNillable, Integer.class, Constants.XSD_INT, new IntType());
         defaultRegister(tm, defaultNillable, Long.class, Constants.XSD_LONG, new LongType());
-        defaultRegister(tm, defaultNillable, Object.class, Constants.XSD_ANY, new ObjectType());
+        defaultRegister(tm, defaultNillable, Object.class, Constants.XSD_ANYTYPE, new ObjectType());
         defaultRegister(tm, defaultNillable, Byte.class, Constants.XSD_BYTE, new ByteType());
         defaultRegister(tm, defaultNillable, Short.class, Constants.XSD_SHORT, new ShortType());
-        defaultRegister(tm, defaultNillable, Source.class, Constants.XSD_ANY, new SourceType());
+        defaultRegister(tm, defaultNillable, Source.class, Constants.XSD_ANYTYPE, new SourceType());
         defaultRegister(tm, defaultNillable, String.class, Constants.XSD_STRING, new StringType());
         defaultRegister(tm, defaultNillable, Time.class, Constants.XSD_TIME, new TimeType());
         defaultRegister(tm, defaultNillable, Timestamp.class, Constants.XSD_DATETIME,
                         new TimestampType());
         defaultRegister(tm, defaultNillable, URI.class, Constants.XSD_ANYURI, new URIType());
-        defaultRegister(tm, defaultNillable, XMLStreamReader.class, Constants.XSD_ANY,
+        defaultRegister(tm, defaultNillable, XMLStreamReader.class, Constants.XSD_ANYTYPE,
                         new XMLStreamReaderType());
         
         defaultRegister(tm, defaultNillable, boolean.class, Constants.XSD_BOOLEAN,
@@ -270,7 +270,7 @@ public class DefaultTypeMapping implements TypeMapping {
                         new DataHandlerType(enableMtomXmime, null));
         
 
-        defaultRegister(tm, defaultNillable, Document.class, Constants.XSD_ANY, new DocumentType());
+        defaultRegister(tm, defaultNillable, Document.class, Constants.XSD_ANYTYPE, new DocumentType());
         if (enableJDOM) {
             registerJDOMTypes(tm, defaultNillable);
         }
@@ -280,7 +280,7 @@ public class DefaultTypeMapping implements TypeMapping {
     private static void registerJDOMTypes(TypeMapping tm, boolean defaultNillable) {
         try {
             Class<?> jdomDocClass = ClassLoaderUtils.loadClass("org.jdom.Document", DefaultTypeMapping.class);
-            defaultRegister(tm, defaultNillable, jdomDocClass, Constants.XSD_ANY,
+            defaultRegister(tm, defaultNillable, jdomDocClass, Constants.XSD_ANYTYPE,
                             new JDOMDocumentType());
 
         } catch (ClassNotFoundException e) {
@@ -290,7 +290,7 @@ public class DefaultTypeMapping implements TypeMapping {
         try {
             Class<?> jdomElementClass = 
                 ClassLoaderUtils.loadClass("org.jdom.Element", DefaultTypeMapping.class);
-            defaultRegister(tm, defaultNillable, jdomElementClass, Constants.XSD_ANY,
+            defaultRegister(tm, defaultNillable, jdomElementClass, Constants.XSD_ANYTYPE,
                                 new JDOMElementType());
         } catch (ClassNotFoundException e) {
             // not available.

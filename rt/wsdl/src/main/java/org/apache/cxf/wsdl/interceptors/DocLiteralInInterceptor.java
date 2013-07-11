@@ -220,7 +220,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             List<MessagePartInfo> bparts = bmsg.getMessageParts();
             if (bparts.size() == 0
                 || (bparts.size() == 1 
-                    && Constants.XSD_ANY.equals(bparts.get(0).getTypeQName()))) {
+                    && Constants.XSD_ANYTYPE.equals(bparts.get(0).getTypeQName()))) {
                 BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
                 exchange.put(BindingOperationInfo.class, boi);
                 exchange.put(OperationInfo.class, op);
