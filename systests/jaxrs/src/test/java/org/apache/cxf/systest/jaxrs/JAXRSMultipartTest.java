@@ -170,6 +170,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookJSONFormTwoFiles2() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/filesform2";
+        doAddFormBook(address, "attachmentFormJsonFiles", 200);               
+    }
+    
+    @Test
     public void testBookJSONFormTwoFilesNotRecursive() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/filesform";
         doAddFormBook(address, "attachmentFormJsonFiles2", 200);               

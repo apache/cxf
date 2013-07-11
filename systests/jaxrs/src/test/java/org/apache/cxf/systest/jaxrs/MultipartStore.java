@@ -480,6 +480,16 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/filesform2")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookFilesFormNoOwnerParam(@Multipart("files") List<Book> books) 
+        throws Exception {
+        Attachment attOwner = AttachmentUtils.getFirstMatchingPart(context, "owner");
+        return addBookFilesForm(attOwner.getObject(String.class), books);
+    }
+    
+    @POST
     @Path("/books/filesform/singlefile")
     @Produces("text/xml")
     @Consumes("multipart/form-data")
