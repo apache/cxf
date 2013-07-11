@@ -30,7 +30,6 @@ import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.util.ParamReader;
 import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.factory.ServiceConstructionException;

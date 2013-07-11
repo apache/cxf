@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.common.util;
+package org.apache.cxf.wsdl.service.factory;
 
 // import org.apache.axis.utils.Messages;
 
@@ -42,7 +42,7 @@ import java.util.Map;
  * don't get tricky, it's the bare minimum. Instances of this class are not
  * threadsafe -- don't share them.
  */
-public class ParamReader extends ClassReader {
+class ParamReader extends ClassReader {
     private String methodName;
     private Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
     private Class<?>[] paramTypes;

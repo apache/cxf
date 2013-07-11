@@ -40,7 +40,6 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
-import org.apache.cxf.common.util.SystemUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.interceptor.Fault;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -290,7 +289,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         }
         reader.setNamespaceHandlerResolver(nsHandlerResolver);
         
-        String mode = SystemUtils.getSpringValidationMode();
+        String mode = getSpringValidationMode();
         if (null != mode) {
             reader.setValidationModeName(mode);
         }
@@ -298,6 +297,19 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         
         setEntityResolvers(reader);        
     }
+    
+    static String getSpringValidationMode() {
+        return AccessController.doPrivileged(new PrivilegedAction<String>() {
+            public String run() {
+                String mode = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.spring.validation.mode");
+                if (mode == null) {
+                    mode = SystemPropertyAction.getPropertyOrNull("spring.validation.mode");
+                }
+                return mode;
+            }
+        });
+    }
+        
     
     void setEntityResolvers(XmlBeanDefinitionReader reader) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();

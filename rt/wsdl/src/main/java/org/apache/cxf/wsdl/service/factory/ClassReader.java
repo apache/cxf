@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.common.util;
+package org.apache.cxf.wsdl.service.factory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,7 +45,7 @@ import java.util.Map;
  * threadsafe -- don't share them.
  * <p>
  */
-public class ClassReader extends ByteArrayInputStream {
+class ClassReader extends ByteArrayInputStream {
     // constants values that appear in java class files,
     // from jvm spec 2nd ed, section 4.4, pp 103
     private static final int CONSTANT_CLASS = 7;
