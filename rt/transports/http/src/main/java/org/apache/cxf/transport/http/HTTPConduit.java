@@ -1528,7 +1528,13 @@ public abstract class HTTPConduit
 
             InputStream in = null;
             // oneway or decoupled twoway calls may expect HTTP 202 with no content
-            if (isOneway(exchange) 
+
+            Message inMessage = new MessageImpl();
+            inMessage.setExchange(exchange);
+            updateResponseHeaders(inMessage);
+            inMessage.put(Message.RESPONSE_CODE, responseCode);
+
+            if (isOneway(exchange)
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
                 in = getPartialResponse();
                 if ((in == null) || !doProcessResponse(outMessage)) {
@@ -1561,11 +1567,7 @@ public abstract class HTTPConduit
                 }
                 cachedStream = null;
             }
-            
-            Message inMessage = new MessageImpl();
-            inMessage.setExchange(exchange);
-            updateResponseHeaders(inMessage);
-            inMessage.put(Message.RESPONSE_CODE, responseCode);
+
             String charset = HttpHeaderHelper.findCharset((String)inMessage.get(Message.CONTENT_TYPE));
             String normalizedEncoding = HttpHeaderHelper.mapCharset(charset);
             if (normalizedEncoding == null) {
