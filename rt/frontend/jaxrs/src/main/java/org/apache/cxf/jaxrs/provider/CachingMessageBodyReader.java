@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.WebApplicationException;
@@ -35,16 +37,24 @@ import javax.ws.rs.ext.Provider;
 public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<T>
     implements MessageBodyReader<T> {
     
-    private MessageBodyReader<T> delegatingReader;
+    private List<MessageBodyReader<T>> delegatingReaders;
     
     public boolean isReadable(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
-        if (delegatingReader != null) {
-            return delegatingReader.isReadable(type, gType, anns, mt);
+        if (delegatingReaders != null) {
+            return getDelegatingReader(type, gType, anns, mt) != null;
         } else {
             return isProviderKeyNotSet();
         }
     }
 
+    private MessageBodyReader<T> getDelegatingReader(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
+        for (MessageBodyReader<T> reader: delegatingReaders) {
+            if (reader.isReadable(type, gType, anns, mt)) {
+                return reader;
+            }
+        }
+        return null;
+    }
     
     public T readFrom(Class<T> type, Type gType, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, String> theheaders, InputStream is) 
@@ -56,8 +66,8 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
     
     
     protected MessageBodyReader<T> getReader(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
-        if (delegatingReader != null) {
-            return delegatingReader;
+        if (delegatingReaders != null) {
+            return getDelegatingReader(type, gType, anns, mt);
         }
         MessageBodyReader<T> r = null;
         
@@ -77,6 +87,14 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
             throw new NotAcceptableException();
         }
         return r;
+    }
+
+    public void setDelegatingReader(MessageBodyReader<T> reader) {
+        this.delegatingReaders = Collections.singletonList(reader);
+    }
+    
+    public void setDelegatingReaders(List<MessageBodyReader<T>> readers) {
+        this.delegatingReaders = readers;
     }
 
 }

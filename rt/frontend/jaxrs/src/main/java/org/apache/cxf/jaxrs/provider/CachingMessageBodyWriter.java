@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
@@ -35,20 +37,28 @@ import javax.ws.rs.ext.Provider;
 public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<T>
     implements MessageBodyWriter<T> {
     
-    private MessageBodyWriter<T> delegatingWriter;
+    private List<MessageBodyWriter<T>> delegatingWriters;
     
     public long getSize(T t, Class<?> type, Type gType, Annotation[] anns, MediaType mediaType) {
         return -1;
     }
 
     public boolean isWriteable(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
-        if (delegatingWriter != null) {
-            return delegatingWriter.isWriteable(type, gType, anns, mt);
+        if (delegatingWriters != null) {
+            return getDelegatingWriter(type, gType, anns, mt) != null;
         } else {
             return isProviderKeyNotSet();
         }
     }
 
+    private MessageBodyWriter<T> getDelegatingWriter(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
+        for (MessageBodyWriter<T> writer: delegatingWriters) {
+            if (writer.isWriteable(type, gType, anns, mt)) {
+                return writer;
+            }
+        }
+        return null;
+    }
     
     public void writeTo(T obj, Class<?> type, Type gType, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> theheaders, OutputStream os) 
@@ -59,8 +69,8 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
     
     
     protected MessageBodyWriter<T> getWriter(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
-        if (delegatingWriter != null) {
-            return delegatingWriter;
+        if (delegatingWriters != null) {
+            return getDelegatingWriter(type, gType, anns, mt);
         }
         MessageBodyWriter<T> w = null;
         
@@ -80,5 +90,13 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
             throw new InternalServerErrorException();
         }
         return w;
+    }
+    
+    public void setDelegatingWriter(MessageBodyWriter<T> writer) {
+        this.delegatingWriters = Collections.singletonList(writer);
+    }
+    
+    public void setDelegatingWriters(List<MessageBodyWriter<T>> writers) {
+        this.delegatingWriters = writers;
     }
 }
