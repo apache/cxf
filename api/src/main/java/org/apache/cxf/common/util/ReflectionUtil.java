@@ -21,15 +21,12 @@ package org.apache.cxf.common.util;
 
 import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -137,56 +134,6 @@ public final class ReflectionUtil {
             }
         });
     }
-    public static List<String> getPackagesFromJar(File jarFile) throws IOException {
-        List<String> packageNames = new ArrayList<String>();
-        if (jarFile.isDirectory()) {
-            getPackageNamesFromDir(jarFile, jarFile, packageNames);
-        } else {
-            JarResource resource = new JarResource();
-            for (String item : resource.getJarContents(jarFile)) {
-                if (!item.endsWith(".class")) {
-                    continue;
-                }
-                String packageName = getPackageName(item);
-                if (!StringUtils.isEmpty(packageName)
-                    && !packageNames.contains(packageName)) {
-                    packageNames.add(packageName);
-                }
-            }
-        }
-        return packageNames;
-    }
-    
-    private static void getPackageNamesFromDir(File base, File dir, List<String> pkgs) {
-        boolean foundClass = false;
-        for (File file : dir.listFiles()) {
-            if (file.isDirectory()) {
-                getPackageNamesFromDir(base, file, pkgs);
-            } else if (!foundClass && file.getName().endsWith(".class")) {
-                foundClass = true;
-                String pkg = "";
-                file = dir;
-                while (!file.equals(base)) {
-                    if (!"".equals(pkg)) {
-                        pkg = "." + pkg;
-                    }
-                    pkg = file.getName() + pkg;
-                    file = file.getParentFile();
-                }
-                if (!pkgs.contains(pkg)) {
-                    pkgs.add(pkg);
-                }
-            }
-        }
-    }
-
-    private static String getPackageName(String clzName) {
-        if (clzName.indexOf("/") == -1) {
-            return null;
-        }
-        String packageName = clzName.substring(0, clzName.lastIndexOf("/"));
-        return packageName.replace("/", ".");
-    }
     
     /**
      *  create own array of property descriptors to:
@@ -245,45 +192,6 @@ public final class ReflectionUtil {
             return beanInfo.getPropertyDescriptors();
         }
     }
-
-    /**
-     * Try to find a method we can use.   If the object implements a public  
-     * interface that has the public version of that method, we'll use the interface
-     * defined method in case the actual instance class is not public 
-     */
-    public static Method findMethod(Class<?> cls,
-                                    String name,
-                                    Class<?> ... params) {
-        if (cls == null) {
-            return null;
-        }
-        for (Class<?> cs : cls.getInterfaces()) {
-            if (Modifier.isPublic(cs.getModifiers())) {
-                Method m = findMethod(cs, name, params);
-                if (m != null && Modifier.isPublic(m.getModifiers())) {
-                    return m;
-                }
-            }
-        }
-        try {
-            Method m = cls.getDeclaredMethod(name, params);
-            if (m != null && Modifier.isPublic(m.getModifiers())) {
-                return m;
-            }
-        } catch (Exception e) {
-            //ignore
-        }
-        Method m = findMethod(cls.getSuperclass(), name, params);
-        if (m == null) {
-            try {
-                m = cls.getMethod(name, params);
-            } catch (Exception e) {
-                //ignore
-            }
-        }
-        return m;
-    }
-    
 
     /**
      * Look for a specified annotation on a method. If there, return it. If not, search it's containing class.

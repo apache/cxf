@@ -26,14 +26,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-public class StreamPrinter extends Thread {
-    InputStream is;
-    String msg;
-    OutputStream os;
-
-    StreamPrinter(InputStream stream, String type) {
-        this(stream, type, null);
-    }
+class StreamPrinter extends Thread {
+    private InputStream is;
+    private String msg;
+    private OutputStream os;
 
     StreamPrinter(InputStream stream, String type, OutputStream redirect) {
         is = stream;

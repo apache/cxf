@@ -178,7 +178,7 @@ public abstract class AbstractBeanDefinitionParser
         // REVISIT: use getAttributeNS instead
         
         String id = getIdOrName(elem);
-        String createdFromAPI = elem.getAttribute(BeanConstants.CREATED_FROM_API_ATTR);
+        String createdFromAPI = elem.getAttribute("createdFromAPI");
         
         if (null == id || "".equals(id)) {
             return super.resolveId(elem, definition, ctx);
@@ -502,7 +502,7 @@ public abstract class AbstractBeanDefinitionParser
         String id = elem.getAttribute(BeanDefinitionParserDelegate.ID_ATTRIBUTE);
         
         if (null == id || "".equals(id)) {
-            String names = elem.getAttribute(BeanConstants.NAME_ATTR);
+            String names = elem.getAttribute("name");
             if (null != names) {
                 StringTokenizer st = 
                     new StringTokenizer(names, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);

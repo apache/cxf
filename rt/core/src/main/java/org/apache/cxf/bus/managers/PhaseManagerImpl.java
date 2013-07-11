@@ -67,6 +67,7 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
         inPhases.add(new Phase(Phase.PRE_PROTOCOL, ++i * 1000));
         inPhases.add(new Phase(Phase.PRE_PROTOCOL_FRONTEND, ++i * 1000));
         inPhases.add(new Phase(Phase.USER_PROTOCOL, ++i * 1000));
+        inPhases.add(new Phase(Phase.PROTOCOL, ++i * 1000));
         inPhases.add(new Phase(Phase.POST_PROTOCOL, ++i * 1000));
         inPhases.add(new Phase(Phase.UNMARSHAL, ++i * 1000));
         inPhases.add(new Phase(Phase.PRE_LOGICAL, ++i * 1000));
@@ -97,8 +98,8 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
         outPhases.add(new Phase(Phase.PRE_MARSHAL, ++i * 1000));
         outPhases.add(new Phase(Phase.MARSHAL, ++i * 1000));
         outPhases.add(new Phase(Phase.POST_MARSHAL, ++i * 1000));
-
         outPhases.add(new Phase(Phase.USER_PROTOCOL, ++i * 1000));
+        outPhases.add(new Phase(Phase.PROTOCOL, ++i * 1000));
         outPhases.add(new Phase(Phase.POST_PROTOCOL, ++i * 1000));
 
         outPhases.add(new Phase(Phase.USER_STREAM, ++i * 1000));
