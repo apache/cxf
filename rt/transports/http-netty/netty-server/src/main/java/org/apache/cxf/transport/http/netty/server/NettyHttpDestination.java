@@ -196,13 +196,13 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
 
         if (inMessage == null) {
 
+            ExchangeImpl exchange = new ExchangeImpl();
             inMessage = new MessageImpl();
+            exchange.setInMessage(inMessage);
             setupMessage(inMessage, context, req, resp);
 
             ((MessageImpl) inMessage).setDestination(this);
 
-            ExchangeImpl exchange = new ExchangeImpl();
-            exchange.setInMessage(inMessage);
             exchange.setSession(new HTTPSession(req));
         }
 
