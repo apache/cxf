@@ -21,13 +21,15 @@ package org.apache.cxf.tools.validator.internal;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.wsdl.Definition;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.tools.validator.internal.model.XNode;
-import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
+import org.apache.cxf.wsdl.WSDLManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,8 +37,7 @@ public class WSDLRefValidatorTest extends Assert {
 
     private Definition getWSDL(String wsdl) throws Exception {
         Bus b = BusFactory.getDefaultBus();
-        WSDLDefinitionBuilder wsdlBuilder = new WSDLDefinitionBuilder(b);
-        return wsdlBuilder.build(wsdl);
+        return b.getExtension(WSDLManager.class).getDefinition(wsdl);
     }
     
     @Test

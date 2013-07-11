@@ -462,7 +462,7 @@ public class WSDLServiceBuilder {
         }
         if (factory instanceof WSDLEndpointFactory) {
             WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
-            ei = wFactory.createEndpointInfo(service, bi, 
+            ei = wFactory.createEndpointInfo(bus, service, bi, 
                                              port.getExtensibilityElements());
         }
 

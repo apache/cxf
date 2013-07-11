@@ -31,7 +31,6 @@ import java.util.Set;
 
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
-import javax.wsdl.factory.WSDLFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -40,7 +39,6 @@ import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.tcp.SoapTcpDestination;
 import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
-import org.apache.cxf.binding.soap.wsdl11.SoapAddressPlugin;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.Service;
@@ -55,6 +53,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 @NoJSR250Annotations
@@ -142,36 +141,35 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         }
     }
 
-    public void createPortExtensors(EndpointInfo ei, Service service) {
+    public void createPortExtensors(Bus b, EndpointInfo ei, Service service) {
         if (ei.getBinding() instanceof SoapBindingInfo) {
             SoapBindingInfo bi = (SoapBindingInfo)ei.getBinding();
-            createSoapExtensors(ei, bi, bi.getSoapVersion() instanceof Soap12);
+            createSoapExtensors(b, ei, bi, bi.getSoapVersion() instanceof Soap12);
         }
     }
 
-    private void createSoapExtensors(EndpointInfo ei, SoapBindingInfo bi, boolean isSoap12) {
+    private void createSoapExtensors(Bus bus, EndpointInfo ei, SoapBindingInfo bi, boolean isSoap12) {
         try {
-            // We need to populate the soap extensibilityelement proxy for soap11 and soap12
-            ExtensionRegistry extensionRegistry = WSDLFactory.newInstance().newPopulatedExtensionRegistry();
-            SoapAddressPlugin addresser = new SoapAddressPlugin();
-            addresser.setExtensionRegistry(extensionRegistry);
-                //SoapAddress soapAddress = SOAPBindingUtil.createSoapAddress(extensionRegistry, isSoap12);
+            
             String address = ei.getAddress();
             if (address == null) {
                 address = "http://localhost:9090";
             }
 
-            //soapAddress.setLocationURI(address);
-            ei.addExtensor(addresser.createExtension(isSoap12, address));
-
-            //createSoapBinding(isSoap12, extensionRegistry, bi);
+            ExtensionRegistry registry = bus.getExtension(WSDLManager.class).getExtensionRegistry();
+            SoapAddress soapAddress = SOAPBindingUtil.createSoapAddress(registry, isSoap12);
+            soapAddress.setLocationURI(address);
+            
+            ei.addExtensor(soapAddress);
             
         } catch (WSDLException e) {
             e.printStackTrace();
         }
     }
 
-    public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, 
+    public EndpointInfo createEndpointInfo(Bus bus,
+                                           ServiceInfo serviceInfo,
+                                           BindingInfo b, 
                                            List<?> ees) {
         String transportURI = "http://schemas.xmlsoap.org/wsdl/soap/";
         if (b instanceof SoapBindingInfo) {

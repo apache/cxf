@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.wsdl11;
+package org.apache.cxf.tools.wsdlto.core;
 
 import java.util.Map;
 
@@ -31,6 +31,7 @@ import javax.wsdl.Service;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

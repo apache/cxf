@@ -49,8 +49,8 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
 import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.util.OutputStreamCreator;
+import org.apache.cxf.tools.wsdlto.core.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
-import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
 public class WSDL11Generator extends AbstractGenerator<Definition> {
 

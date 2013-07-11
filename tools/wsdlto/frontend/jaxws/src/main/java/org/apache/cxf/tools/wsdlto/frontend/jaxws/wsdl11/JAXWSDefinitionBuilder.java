@@ -37,6 +37,7 @@ import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.xml.WSDLReader;
 
 import org.w3c.dom.Element;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -49,12 +50,12 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.validator.internal.WSDL11Validator;
 import org.apache.cxf.tools.wsdlto.core.AbstractWSDLBuilder;
+import org.apache.cxf.tools.wsdlto.core.WSDLDefinitionBuilder;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.CustomizationParser;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
 import org.apache.cxf.wsdl.WSDLManager;
-import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
 public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
 

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.wsdl11;
+package org.apache.cxf.tools.wsdlto.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.extensions.ExtensionRegistry;
@@ -44,6 +45,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.wsdl.WSDLBuilder;
 import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl11.WSDLRuntimeException;
 
 public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
     protected static final Logger LOG = LogUtils.getL7dLogger(WSDLDefinitionBuilder.class);

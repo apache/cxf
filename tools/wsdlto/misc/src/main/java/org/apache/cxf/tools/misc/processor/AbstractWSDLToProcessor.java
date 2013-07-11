@@ -24,6 +24,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.wsdl.Definition;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
@@ -42,9 +43,9 @@ import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.validator.internal.WSDL11Validator;
+import org.apache.cxf.tools.wsdlto.core.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
 import org.apache.cxf.wsdl.WSDLManager;
-import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
 public class AbstractWSDLToProcessor implements Processor {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractWSDLToProcessor.class);

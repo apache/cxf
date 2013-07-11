@@ -21,6 +21,9 @@ package org.apache.cxf.aegis;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
@@ -53,6 +56,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -66,7 +70,6 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
-import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
@@ -239,11 +242,23 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         }
         docs.add(writer.getDocument(definition));
 
-        for (Import wsdlImport : WSDLDefinitionBuilder.getImports(definition)) {
+        for (Import wsdlImport : getImports(definition)) {
             docs.add(writer.getDocument(wsdlImport.getDefinition()));
         }
         return docs;
     }
+    
+    private Collection<Import> getImports(final Definition wsdlDef) {
+        Collection<Import> importList = new ArrayList<Import>();
+        Map<?, ?> imports = wsdlDef.getImports();
+        for (Iterator<?> iter = imports.keySet().iterator(); iter.hasNext();) {
+            String uri = (String)iter.next();
+            List<Import> lst = CastUtils.cast((List<?>)imports.get(uri));
+            importList.addAll(lst);
+        }
+        return importList;
+    }
+    
 
     protected Definition getWSDLDefinition(String string) throws WSDLException {
         ServerRegistry svrMan = getBus().getExtension(ServerRegistry.class);

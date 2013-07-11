@@ -284,7 +284,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         WSDLEndpointFactory wsdlEndpointFactory = getWSDLEndpointFactory();
         EndpointInfo ei;
         if (wsdlEndpointFactory != null) {
-            ei = wsdlEndpointFactory.createEndpointInfo(service.getServiceInfos().get(0), bindingInfo, null);
+            ei = wsdlEndpointFactory.createEndpointInfo(bus, service.getServiceInfos().get(0), bindingInfo, null);
             ei.setTransportId(transportId);
         } else {
             ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
@@ -300,7 +300,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         ei.setBinding(bindingInfo);
         
         if (wsdlEndpointFactory != null) {
-            wsdlEndpointFactory.createPortExtensors(ei, service);
+            wsdlEndpointFactory.createPortExtensors(bus, ei, service);
         }
         service.getServiceInfos().get(0).addEndpoint(ei);
         
