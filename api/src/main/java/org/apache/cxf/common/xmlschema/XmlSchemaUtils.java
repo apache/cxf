@@ -63,33 +63,13 @@ public final class XmlSchemaUtils {
     public static final String XSI_NIL = "xsi:nil='true'";
     public static final String XSI_NS_ATTR = WSDLConstants.NP_XMLNS + ":"
         + WSDLConstants.NP_SCHEMA_XSI + "='" + WSDLConstants.NS_SCHEMA_XSI + "'";
-    public static final String XSI_NIL_WITH_PREFIX = XSI_NS_ATTR + " xsi:nil='true'";
-
+    
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSchemaUtils.class);
     private static final XmlSchemaSequence EMPTY_SEQUENCE = new XmlSchemaSequence();
     private static final XmlSchemaChoice EMPTY_CHOICE = new XmlSchemaChoice();
     private static final XmlSchemaAll EMPTY_ALL = new XmlSchemaAll();
 
     private XmlSchemaUtils() {
-    }
-
-    /**
-     * Wrapper around XmlSchemaElement.setName that checks for inconsistency with
-     * refName.
-     * @param element
-     * @param name
-     */
-    public static void setElementName(XmlSchemaElement element, String name) {
-        if (name != null
-            && element.isRef()
-            && !element.getRef().getTargetQName().getLocalPart().equals(name)
-            && (element.getQName() == null || element.getQName().getLocalPart().equals(name))) {
-            LOG.severe("Attempt to set the name of an element with a reference name.");
-            throw new
-                XmlSchemaInvalidOperation("Attempt to set the name of an element "
-                                          + "with a reference name.");
-        }
-        element.setName(name);
     }
 
     /**
@@ -461,21 +441,6 @@ public final class XmlSchemaUtils {
         return (XmlSchemaParticle) object;
     }
 
-    public static XmlSchemaElement getReferredElement(XmlSchemaElement element,
-                                                      SchemaCollection xmlSchemaCollection) {
-        if (element.isRef()) {
-            /*
-             * Calling getTarget works if everything is in the collection already.
-             */
-            XmlSchemaElement refElement = element.getRef().getTarget();
-            if (refElement == null) {
-                throw new RuntimeException("Dangling reference");
-            }
-            return refElement;
-        }
-        return null;
-    }
-
     public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {
         XmlSchemaParticle particle = type.getParticle();
         XmlSchemaSequence sequence = null;
@@ -580,10 +545,6 @@ public final class XmlSchemaUtils {
         } else {
             return isAttributeNameQualified(attribute, attributeSchema);
         }
-    }
-
-    public static boolean isComplexType(XmlSchemaType type) {
-        return type instanceof XmlSchemaComplexType;
     }
 
     public static boolean isElementNameQualified(XmlSchemaElement element, XmlSchema schema) {
