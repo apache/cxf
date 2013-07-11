@@ -1598,6 +1598,11 @@ public class HTTPConduit
             }
 
             InputStream in = null;
+            Message inMessage = new MessageImpl();
+            inMessage.setExchange(exchange);
+            new Headers(inMessage).readFromConnection(connection);
+            inMessage.put(Message.RESPONSE_CODE, responseCode);
+            cookies.readFromConnection(connection);
             // oneway or decoupled twoway calls may expect HTTP 202 with no content
             if (isOneway(exchange) 
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
@@ -1633,10 +1638,6 @@ public class HTTPConduit
                 cachedStream = null;
             }
             
-            Message inMessage = new MessageImpl();
-            inMessage.setExchange(exchange);
-            new Headers(inMessage).readFromConnection(connection);
-            inMessage.put(Message.RESPONSE_CODE, responseCode);
             String ct = connection.getContentType();
             inMessage.put(Message.CONTENT_TYPE, ct);
             String charset = HttpHeaderHelper.findCharset(ct);
@@ -1648,7 +1649,6 @@ public class HTTPConduit
                 throw new IOException(m);   
             } 
             inMessage.put(Message.ENCODING, normalizedEncoding);
-            cookies.readFromConnection(connection);
             if (in == null) {
                 if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                     in = connection.getErrorStream();

@@ -227,11 +227,15 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             BindingProvider bp = (BindingProvider)greeter;
             updateAddressPort(bp, PORT);
             bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+            
+            
                                              
             greeter.greetMeOneWay("Bonjour");
             
             String greeting = greeter.greetMe("Hello");
-            
+            if (greeting.indexOf(';') != -1) {
+                greeting = greeting.substring(0, greeting.indexOf(';'));
+            }
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Bonjour", greeting);
             

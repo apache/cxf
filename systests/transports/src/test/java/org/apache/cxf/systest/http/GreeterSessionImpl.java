@@ -66,7 +66,7 @@ public class GreeterSessionImpl implements Greeter {
                 val += ";" + cookie.getName() + "=" + cookie.getValue();
             }
         }
-        
+       
         
         HttpSession session = req.getSession();
         // Get a session property "counter" from context
