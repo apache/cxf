@@ -20,7 +20,7 @@ package org.apache.cxf.aegis.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Basic type conversion functionality for writing messages.
@@ -53,11 +53,11 @@ public abstract class AbstractMessageWriter implements MessageWriter {
         } else {
             value = type.getLocalPart();
         }
-        getAttributeWriter("type", SOAPConstants.XSI_NS).writeValue(value);
+        getAttributeWriter("type", Constants.URI_2001_SCHEMA_XSI).writeValue(value);
     }
 
     public void writeXsiNil() {
-        MessageWriter attWriter = getAttributeWriter("nil", SOAPConstants.XSI_NS);
+        MessageWriter attWriter = getAttributeWriter("nil", Constants.URI_2001_SCHEMA_XSI);
         attWriter.writeValue("true");
         attWriter.close();
     }

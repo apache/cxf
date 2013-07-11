@@ -22,8 +22,9 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,7 +64,7 @@ public class XMLBeansServiceTest extends AbstractXmlBeansTest {
         // printNode(wsdl);
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);
         addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
 
         assertValid("//wsdl:types/xsd:schema[@targetNamespace='http://www.webservicex.net']", wsdl);
         assertValid("//xsd:schema[@targetNamespace='http://www.webservicex.net']"
@@ -81,7 +82,7 @@ public class XMLBeansServiceTest extends AbstractXmlBeansTest {
 
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);
         addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
 
         assertValid("//wsdl:types/xsd:schema[@targetNamespace='http://cxf.apache.org/xmlbeans']"
                     + "/xsd:element[@name='request']", wsdl);
@@ -95,8 +96,8 @@ public class XMLBeansServiceTest extends AbstractXmlBeansTest {
 
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);
         addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
-        addNamespace("xsd", SOAPConstants.XSD);
-        addNamespace("s", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
+        addNamespace("s", Constants.URI_2001_SCHEMA_XSD);
 
         assertEquals(1, assertValid(xpathString, wsdl).getLength());
     }

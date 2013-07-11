@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;
 import javax.wsdl.BindingInput;
@@ -55,9 +56,9 @@ import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapFault;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.ExtensionInvocationHandler;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 
 public final class SOAPBindingUtil {

@@ -41,7 +41,6 @@ import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -65,7 +64,7 @@ public class BeanTest extends AbstractAegisTest {
         addNamespace("b", "urn:Bean");
         addNamespace("bz", "urn:beanz");
         addNamespace("a", "urn:anotherns");
-        addNamespace("xsi", SOAPConstants.XSI_NS);
+        addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
 
     }
 
@@ -577,7 +576,7 @@ public class BeanTest extends AbstractAegisTest {
         // just
         // shouldn't be there.
 
-        addNamespace("xsi", SOAPConstants.XSI_NS);
+        addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
         assertValid("/b:root/b:data[@xsi:nil='true']", element);
 
         XMLStreamReader sreader = StaxUtils.createXMLStreamReader(element);

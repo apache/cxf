@@ -37,7 +37,7 @@ import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.type.java5.dto.CollectionDTO;
 import org.apache.cxf.aegis.type.java5.dto.DTOService;
 import org.apache.cxf.aegis.type.java5.dto.ObjectDTO;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        tm = new DefaultTypeMapping(SOAPConstants.XSD);
+        tm = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD);
         creator = new Java5TypeCreator();
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
@@ -120,7 +120,7 @@ public class CollectionTest extends AbstractAegisTest {
 
     @Test
     public void testCollectionDTO() {
-        tm = new DefaultTypeMapping(SOAPConstants.XSD);
+        tm = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD);
         creator = new Java5TypeCreator();
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
@@ -143,7 +143,7 @@ public class CollectionTest extends AbstractAegisTest {
 
     @Test
     public void testObjectDTO() {
-        tm = new DefaultTypeMapping(SOAPConstants.XSD);
+        tm = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD);
         creator = new Java5TypeCreator();
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.validator.internal.model;
 
-import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 public final class XMessage extends XWsdl {
     public XMessage() {

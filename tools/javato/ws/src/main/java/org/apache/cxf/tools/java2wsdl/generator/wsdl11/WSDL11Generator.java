@@ -40,7 +40,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -50,6 +49,7 @@ import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
 import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.core.WSDLDefinitionBuilder;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
 public class WSDL11Generator extends AbstractGenerator<Definition> {

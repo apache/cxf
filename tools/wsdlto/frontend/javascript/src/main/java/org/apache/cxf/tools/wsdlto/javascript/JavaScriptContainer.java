@@ -34,7 +34,6 @@ import java.util.logging.Level;
 import javax.wsdl.Definition;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -55,6 +54,7 @@ import org.apache.cxf.tools.wsdlto.WSDLToJavaContainer;
 import org.apache.cxf.tools.wsdlto.core.AbstractWSDLBuilder;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 public class JavaScriptContainer extends WSDLToJavaContainer {

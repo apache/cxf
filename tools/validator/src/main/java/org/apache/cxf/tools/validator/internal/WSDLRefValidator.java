@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
 import javax.wsdl.Definition;
@@ -52,7 +53,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -74,6 +74,7 @@ import org.apache.cxf.tools.validator.internal.model.XOutput;
 import org.apache.cxf.tools.validator.internal.model.XPort;
 import org.apache.cxf.tools.validator.internal.model.XPortType;
 import org.apache.cxf.tools.validator.internal.model.XService;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.SchemaUtil;
 import org.apache.ws.commons.schema.XmlSchemaElement;

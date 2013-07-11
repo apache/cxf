@@ -70,11 +70,11 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -87,6 +87,7 @@ import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Utility functions for JAXB.
@@ -114,14 +115,14 @@ public final class JAXBEncoderDecoder {
 
         public QName getAttributeName(int index) {
             if (first && index == 0) {
-                return new QName(SOAPConstants.XSI_NS, "type");
+                return new QName(Constants.URI_2001_SCHEMA_XSI, "type");
             }
             return super.getAttributeName(index - 1);
         }
 
         public String getAttributeNamespace(int index) {
             if (first && index == 0) {
-                return SOAPConstants.XSI_NS;
+                return Constants.URI_2001_SCHEMA_XSI;
             }
             return super.getAttributeNamespace(index - 1);
         }
@@ -159,7 +160,7 @@ public final class JAXBEncoderDecoder {
         public String getAttributeValue(String namespaceUri,
                                         String localName) {
             if (first
-                && SOAPConstants.XSI_NS.equals(namespaceUri)
+                && Constants.URI_2001_SCHEMA_XSI.equals(namespaceUri)
                 && "type".equals(localName)) {
                 String pfx = this.getNamespaceContext().getPrefix(typeQName.getNamespaceURI());
                 if (StringUtils.isEmpty(pfx)) {
@@ -639,7 +640,7 @@ public final class JAXBEncoderDecoder {
         if (source instanceof XMLStreamReader 
             && typeQName != null) {
             XMLStreamReader reader = (XMLStreamReader)source;
-            String type = reader.getAttributeValue(SOAPConstants.XSI_NS, "type");
+            String type = reader.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
             if (StringUtils.isEmpty(type)) {
                 source = new AddXSITypeStreamReader(reader, typeQName);
             }

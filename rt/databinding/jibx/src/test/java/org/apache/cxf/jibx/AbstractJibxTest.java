@@ -25,7 +25,6 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -34,8 +33,10 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
+
 import org.junit.Before;
 
 public abstract class AbstractJibxTest extends AbstractCXFTest {
@@ -73,9 +74,9 @@ public abstract class AbstractJibxTest extends AbstractCXFTest {
 
         bus.setExtension(new WSDLManagerImpl(), WSDLManager.class);
 
-        addNamespace("wsdl", SOAPConstants.WSDL11_NS);
-        addNamespace("wsdlsoap", SOAPConstants.WSDL11_SOAP_NS);
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("wsdl", WSDLConstants.NS_WSDL11);
+        addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
+        addNamespace("xsd", WSDLConstants.NS_SCHEMA_XSD);
     }
 
     public Server createService(Class<?> serviceClass, Object serviceBean, String address, QName name) {

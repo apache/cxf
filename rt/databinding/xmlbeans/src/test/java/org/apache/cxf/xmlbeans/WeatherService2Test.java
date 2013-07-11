@@ -21,8 +21,9 @@ package org.apache.cxf.xmlbeans;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,7 +57,7 @@ public class WeatherService2Test extends AbstractXmlBeansTest {
     public void testWSDL() throws Exception {
         Node wsdl = getWSDLDocument("WeatherService");
 
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         addNamespace("w", WSDLConstants.NS_WSDL11);
 
         assertValid("//w:message[@name='GetForecastsResponse']/w:part[@element='tns:GetForecastsResponse']",

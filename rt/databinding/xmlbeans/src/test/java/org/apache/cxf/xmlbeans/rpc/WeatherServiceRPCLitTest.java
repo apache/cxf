@@ -28,9 +28,10 @@ import org.w3c.dom.Node;
 
 import net.webservicex.WeatherData;
 
-import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.xmlbeans.AbstractXmlBeansTest;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,7 +65,7 @@ public class WeatherServiceRPCLitTest extends AbstractXmlBeansTest {
         Node wsdl = getWSDLDocument("WeatherService");
 
         addNamespace("w", WSDLConstants.NS_WSDL11);
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
 
         assertValid("//w:message[@name='getWeatherDataResponse']/w:part[@type='tns:WeatherData']", wsdl);
     }

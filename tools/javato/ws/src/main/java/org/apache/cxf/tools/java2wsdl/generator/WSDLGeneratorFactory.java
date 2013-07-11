@@ -19,9 +19,9 @@
 
 package org.apache.cxf.tools.java2wsdl.generator;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.tools.common.ToolException;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 public final class WSDLGeneratorFactory {
     private WSDLConstants.WSDLVersion wsdlVersion;

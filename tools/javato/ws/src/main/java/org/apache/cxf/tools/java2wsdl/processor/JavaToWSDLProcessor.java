@@ -31,7 +31,6 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -48,6 +47,7 @@ import org.apache.cxf.tools.java2wsdl.generator.wsdl11.FaultBeanGenerator;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WrapperBeanGenerator;
 import org.apache.cxf.tools.java2wsdl.processor.internal.ServiceBuilderFactory;
 import org.apache.cxf.tools.util.AnnotationUtil;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 
 public class JavaToWSDLProcessor implements Processor {

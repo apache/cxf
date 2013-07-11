@@ -24,6 +24,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
@@ -39,13 +40,13 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.processor.address.Address;
 import org.apache.cxf.tools.misc.processor.address.AddressFactory;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
 
 public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {

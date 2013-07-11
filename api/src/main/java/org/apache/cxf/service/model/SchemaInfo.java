@@ -27,7 +27,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
@@ -118,12 +117,12 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         // set to the same value as the targetNamespace attribute.
         // The aegis databinding tests demonstrate this particularly.
         if (element.getPrefix() == null
-            && !WSDLConstants.NS_SCHEMA_XSD.equals(element.getAttributeNS(WSDLConstants.NS_XMLNS,
-                                                                    WSDLConstants.NP_XMLNS))) {
+            && !Constants.URI_2001_SCHEMA_XSD.equals(element.getAttributeNS(Constants.XMLNS_ATTRIBUTE_NS_URI,
+                                                                            Constants.XMLNS_ATTRIBUTE))) {
 
             Attr attr = element.getOwnerDocument()
-                .createAttributeNS(WSDLConstants.NS_XMLNS, WSDLConstants.NP_XMLNS);
-            attr.setValue(WSDLConstants.NS_SCHEMA_XSD);
+                .createAttributeNS(Constants.XMLNS_ATTRIBUTE_NS_URI, Constants.XMLNS_ATTRIBUTE);
+            attr.setValue(Constants.URI_2001_SCHEMA_XSD);
             element.setAttributeNodeNS(attr);
         }
         return element;

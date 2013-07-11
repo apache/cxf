@@ -24,10 +24,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,7 +83,7 @@ public class WrappedStyleTest extends AbstractXmlBeansTest {
     public void testWSDL() throws Exception {
         Node wsdl = getWSDLDocument("TestService");
 
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         addNamespace("ns0", "http://cxf.apache.org/xmlbeans");
         assertValid("//xsd:schema[@targetNamespace='urn:TestService']" 
                     + "/xsd:complexType[@name='mixedRequest']"

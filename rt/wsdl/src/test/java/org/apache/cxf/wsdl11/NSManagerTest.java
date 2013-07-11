@@ -17,11 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf;
+package org.apache.cxf.wsdl11;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.NSManager;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 import org.junit.Assert;
 import org.junit.Test;

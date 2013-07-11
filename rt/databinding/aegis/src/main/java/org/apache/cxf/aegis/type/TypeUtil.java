@@ -26,12 +26,13 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.constants.Constants;
 
 
 /**
@@ -54,7 +55,7 @@ public final class TypeUtil {
             return baseType;
         }
         
-        String overrideType = xsr.getAttributeValue(SOAPConstants.XSI_NS, "type");
+        String overrideType = xsr.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
         if (overrideType != null) {
             QName overrideName = NamespaceHelper.createQName(xsr.getNamespaceContext(), overrideType);
 
@@ -113,7 +114,7 @@ public final class TypeUtil {
             return null;
         }
         
-        String typeNameString = xsr.getAttributeValue(SOAPConstants.XSI_NS, "type");
+        String typeNameString = xsr.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
         if (typeNameString != null) {
             QName schemaTypeName = NamespaceHelper.createQName(xsr.getNamespaceContext(), 
                                                                typeNameString);

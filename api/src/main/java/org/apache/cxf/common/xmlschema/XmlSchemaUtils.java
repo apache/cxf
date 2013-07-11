@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -61,8 +60,6 @@ import org.apache.ws.commons.schema.constants.Constants;
  */
 public final class XmlSchemaUtils {
     public static final String XSI_NIL = "xsi:nil='true'";
-    public static final String XSI_NS_ATTR = WSDLConstants.NP_XMLNS + ":"
-        + WSDLConstants.NP_SCHEMA_XSI + "='" + WSDLConstants.NS_SCHEMA_XSI + "'";
     
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSchemaUtils.class);
     private static final XmlSchemaSequence EMPTY_SEQUENCE = new XmlSchemaSequence();

@@ -34,9 +34,9 @@ import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import static org.apache.cxf.aegis.type.encoded.SoapEncodingUtil.readAttributeValue;
 
@@ -64,7 +64,7 @@ public class ArrayTypeInfo {
         // if type is xsd:ur-type replace it with xsd:anyType
         String namespace = reader.getNamespaceForPrefix(typeName.getPrefix());
         if (!StringUtils.isEmpty(namespace)) {
-            if (SOAPConstants.XSD.equals(namespace) && "ur-type".equals(typeName.getLocalPart())) {
+            if (Constants.URI_2001_SCHEMA_XSD.equals(namespace) && "ur-type".equals(typeName.getLocalPart())) {
                 typeName = new QName(namespace, "anyType", typeName.getPrefix());
             } else {
                 typeName = new QName(namespace, typeName.getLocalPart(), typeName.getPrefix());

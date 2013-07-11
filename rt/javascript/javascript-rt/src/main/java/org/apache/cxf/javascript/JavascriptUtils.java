@@ -29,10 +29,10 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;

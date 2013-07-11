@@ -32,9 +32,10 @@ import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.XMLTypeCreator;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.StringType;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.Service;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -152,7 +153,7 @@ public class XFireTypeTest extends AbstractAegisTest {
     public void testWSDL() throws Exception {
         Document wsdl = getWSDLDocument("XFireService");
 
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         assertValid(
                     "//xsd:complexType[@name='XFireBean1']/xsd:sequence/xsd:"
                     + "element[@name='elementProperty']",

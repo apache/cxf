@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.addressing;
+package org.apache.cxf.wsdl11;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 /***
  * Only public/static/final fields can be resolved
@@ -38,7 +39,7 @@ import org.apache.cxf.common.WSDLConstants;
     public static final String NS_WSAW = "http://www.w3.org/2006/05/addressing/wsdl"; 
 ***/
 
-public final class NSManager {
+final class NSManager {
     private final Map<String, String> cache = new HashMap<String, String>();
 
 

@@ -22,13 +22,13 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Basic type conversions for reading messages.
  */
 public abstract class AbstractMessageReader implements MessageReader {
-    private static final QName XSI_NIL = new QName(SOAPConstants.XSI_NS, "nil", SOAPConstants.XSI_PREFIX);
+    private static final QName XSI_NIL = new QName(Constants.URI_2001_SCHEMA_XSI, "nil", "xsi");
 
     public AbstractMessageReader() {
     }

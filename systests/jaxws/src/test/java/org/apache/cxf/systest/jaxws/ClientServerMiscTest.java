@@ -56,7 +56,6 @@ import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;
@@ -82,6 +81,7 @@ import org.apache.cxf.tests.inherit.objects.SubTypeA;
 import org.apache.cxf.tests.inherit.objects.SubTypeB;
 import org.apache.cxf.tests.inherit.types.ObjectInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

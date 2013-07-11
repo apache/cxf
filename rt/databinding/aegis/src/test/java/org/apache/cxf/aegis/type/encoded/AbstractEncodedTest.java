@@ -38,9 +38,9 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 
@@ -54,13 +54,13 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
 
         addNamespace("b", "urn:Bean");
         addNamespace("a", "urn:anotherns");
-        addNamespace("xsi", SOAPConstants.XSI_NS);
+        addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
         addNamespace("soapenc", Soap11.getInstance().getSoapEncodingStyle());
 
         AegisContext context = new AegisContext();
         // create a different mapping than the context creates.
         TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
-        mapping = new DefaultTypeMapping(SOAPConstants.XSD, baseMapping);
+        mapping = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD, baseMapping);
         mapping.setTypeCreator(context.createTypeCreator());
         context.setTypeMapping(mapping);
         context.initialize();

@@ -34,7 +34,6 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.IOUtils;
@@ -44,6 +43,7 @@ import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl;
 import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -165,7 +165,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         Assert.assertEquals("base64Binary", pieces[1]);
         Node elementNode = typeAttr.getOwnerElement();
         String url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
-        Assert.assertEquals(SOAPConstants.XSD, url);
+        Assert.assertEquals(Constants.URI_2001_SCHEMA_XSD, url);
 
         s = testUtilities.getServerForAddress("http://localhost:" + PORT + "/mtomXmime");
         wsdl = testUtilities.getWSDLDocument(s);

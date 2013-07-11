@@ -30,9 +30,9 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.xml.AbstractMessageReader;
 import org.apache.cxf.aegis.xml.MessageReader;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Reads literal encoded messages.
@@ -95,7 +95,7 @@ public class ElementReader extends AbstractMessageReader {
         /*
          * We're making a conscious choice here -- garbage in == garbage out.
          */
-        String xsiTypeQname = root.getAttributeValue(SOAPConstants.XSI_NS, "type");
+        String xsiTypeQname = root.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
         if (xsiTypeQname != null) {
             Matcher m = QNAME_PATTERN.matcher(xsiTypeQname);
             if (m.matches()) {

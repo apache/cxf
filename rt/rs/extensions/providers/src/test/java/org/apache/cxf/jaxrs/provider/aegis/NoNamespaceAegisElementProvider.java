@@ -31,7 +31,7 @@ import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.XMLTypeCreator;
 import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Class that sets options to disable xml namespaces.
@@ -76,7 +76,7 @@ class NoNamespaceAegisElementProvider<T> extends AegisElementProvider<T> {
         context.setTypeCreationOptions(tco);
         context.setRootClasses(rootClasses);
         TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
-        DefaultTypeMapping mapping = new DefaultTypeMapping(SOAPConstants.XSD, baseMapping);
+        DefaultTypeMapping mapping = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD, baseMapping);
         TypeCreator stockTypeCreator = createTypeCreator(tco);
 
         mapping.setTypeCreator(stockTypeCreator);

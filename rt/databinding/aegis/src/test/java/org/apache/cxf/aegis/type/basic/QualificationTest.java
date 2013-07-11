@@ -30,7 +30,7 @@ import org.apache.cxf.aegis.services.XmlMappedAttributeBean;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class QualificationTest extends AbstractAegisTest {
         addNamespace("b", "urn:Bean");
         addNamespace("xyzzy", "urn:xyzzy");
         addNamespace("pkg", "http://services.aegis.cxf.apache.org");
-        addNamespace("xsi", SOAPConstants.XSI_NS);
+        addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
     }
     
     @Test

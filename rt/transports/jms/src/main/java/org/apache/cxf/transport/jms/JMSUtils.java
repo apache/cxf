@@ -46,7 +46,6 @@ import javax.jms.StreamMessage;
 import javax.jms.Topic;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -630,7 +629,7 @@ public final class JMSUtils {
             String soapAction = null;
             
             if (headers != null) {
-                List<String> action = headers.remove(SOAPConstants.SOAP_ACTION);
+                List<String> action = headers.remove("SOAPAction");
                 if (action != null && action.size() > 0) {
                     soapAction = action.get(0);
                 }

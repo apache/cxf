@@ -23,8 +23,8 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class DocumentStyleTest extends AbstractXmlBeansTest {
     public void testWSDL() throws Exception {
         Document wsdl = getWSDLDocument("TestService");
 
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         assertValid("//xsd:schema[@targetNamespace='urn:TestService']"
                     + "/xsd:complexType[@name='mixedRequest']"
                     + "/xsd:sequence/xsd:element[@name='string'][@type='xsd:string']",

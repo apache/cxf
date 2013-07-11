@@ -50,8 +50,6 @@ import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
-import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
@@ -68,6 +66,7 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
@@ -115,9 +114,9 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         
         
 
-        addNamespace("wsdl", SOAPConstants.WSDL11_NS);
-        addNamespace("wsdlsoap", SOAPConstants.WSDL11_SOAP_NS);
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("wsdl", WSDLConstants.NS_WSDL11);
+        addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
+        addNamespace("xsd", WSDLConstants.NS_SCHEMA_XSD);
 
     }
 

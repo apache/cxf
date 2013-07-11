@@ -31,7 +31,8 @@ import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.xml.XMLStreamReaderType;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,12 +45,12 @@ public class XMLStreamReaderMappingTest extends AbstractAegisTest {
         super.setUp();
 
         addNamespace("b", "urn:beanz");
-        addNamespace("xsi", SOAPConstants.XSI_NS);
+        addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
 
         context = new AegisContext();
         // create a different mapping than the context creates.
         TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
-        mapping = new DefaultTypeMapping(SOAPConstants.XSD, baseMapping);
+        mapping = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD, baseMapping);
         mapping.register(XMLStreamReader.class, 
                          new QName("urn:Bean", "SimpleBean"), new XMLStreamReaderType());
         mapping.setTypeCreator(context.createTypeCreator());

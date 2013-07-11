@@ -34,11 +34,9 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.xml.namespace.QName;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.management.InstrumentationManager;
@@ -51,6 +49,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 

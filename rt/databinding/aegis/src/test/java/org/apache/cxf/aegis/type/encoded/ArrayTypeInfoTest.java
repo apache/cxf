@@ -19,6 +19,7 @@
 package org.apache.cxf.aegis.type.encoded;
 
 import java.io.ByteArrayInputStream;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
@@ -26,7 +27,8 @@ import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
-import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Test;
 
 public class ArrayTypeInfoTest extends AbstractAegisTest {
@@ -38,7 +40,7 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
 
         addNamespace("b", "urn:Bean");
         addNamespace("a", "urn:anotherns");
-        addNamespace("xsi", SOAPConstants.XSI_NS);
+        addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
 
         AegisContext context = new AegisContext();
         context.initialize();

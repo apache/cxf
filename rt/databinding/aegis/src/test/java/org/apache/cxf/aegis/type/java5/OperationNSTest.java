@@ -21,6 +21,7 @@ package org.apache.cxf.aegis.type.java5;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -32,9 +33,10 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +59,7 @@ public class OperationNSTest extends AbstractAegisTest {
     public void testWSDL() throws Exception {
         Collection<Document> wsdls = getWSDLDocuments("NotificationService");
 
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         //assertValid("//xsd:element[@name='Notify']", wsdl);
         assertTrue(isExist(wsdls, "//xsd:element[@name='Notify']", getNamespaces()));
     }

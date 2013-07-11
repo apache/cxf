@@ -23,8 +23,8 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class MultipleSchemaInNSTest extends AbstractXmlBeansTest {
     public void testWSDL() throws Exception {
         Document wsdl = getWSDLDocument("MultipleSchemaService");
 
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
         NodeList list = assertValid("//xsd:schema[@targetNamespace='" + ns + "']", wsdl);
         assertEquals(StaxUtils.toString(wsdl), 3, list.getLength());
         assertValid("//xsd:import[@namespace='" + ns + "']",

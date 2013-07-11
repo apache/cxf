@@ -39,7 +39,6 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
@@ -51,9 +50,11 @@ import org.apache.cxf.tools.wsdlto.core.WSDLDefinitionBuilder;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 
@@ -93,9 +94,10 @@ public abstract class AbstractXmlBeansTest extends AbstractCXFTest {
         bus.setExtension(new WSDLManagerImpl(), WSDLManager.class);
         
 
-        addNamespace("wsdl", SOAPConstants.WSDL11_NS);
-        addNamespace("wsdlsoap", SOAPConstants.WSDL11_SOAP_NS);
-        addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("wsdl", WSDLConstants.NS_WSDL11);
+        addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
+        addNamespace("xsd", WSDLConstants.NS_SCHEMA_XSD);
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
 
 
     }

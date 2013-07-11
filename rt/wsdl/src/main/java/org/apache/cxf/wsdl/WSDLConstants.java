@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.common;
+package org.apache.cxf.wsdl;
 
 import javax.xml.namespace.QName;
 

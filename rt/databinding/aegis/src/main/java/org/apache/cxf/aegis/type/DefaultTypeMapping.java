@@ -70,7 +70,6 @@ import org.apache.cxf.aegis.type.xml.XMLStreamReaderType;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.ws.commons.schema.constants.Constants;
 
 /**
@@ -359,7 +358,7 @@ public class DefaultTypeMapping implements TypeMapping {
                                                               boolean enableMtomXmime, 
                                                               boolean enableJDOM) {
         // by convention, the default mapping is against the XML schema URI.
-        DefaultTypeMapping tm = new DefaultTypeMapping(SOAPConstants.XSD);
+        DefaultTypeMapping tm = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD);
         fillStandardMappings(tm, defaultNillable, enableMtomXmime, enableJDOM);
         defaultRegister(tm, defaultNillable, Character.class, 
                         CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,

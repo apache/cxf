@@ -40,10 +40,10 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 public class SchemaHandler {
 

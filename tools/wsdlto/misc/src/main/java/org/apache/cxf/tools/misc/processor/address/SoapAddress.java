@@ -22,9 +22,9 @@ package org.apache.cxf.tools.misc.processor.address;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.wsdl.WSDLConstants;
 
 public class SoapAddress extends XmlAddress {
     public Map<String, String> getNamespaces(final ToolContext context) {
