@@ -82,7 +82,6 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XmlSchemaPrimitiveUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -110,6 +109,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class WadlGenerator implements ContainerRequestFilter {
 
@@ -212,7 +212,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         sbMain.append("<application");
         if (!isJson) {
             sbMain.append(" xmlns=\"").append(getNamespace()).append("\" xmlns:xs=\"")
-                .append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\"");
+                .append(Constants.URI_2001_SCHEMA_XSD).append("\"");
         }
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
@@ -947,11 +947,11 @@ public class WadlGenerator implements ContainerRequestFilter {
                         }
                     } else {
                         handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
-                                                                           XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                           Constants.URI_2001_SCHEMA_XSD,
                                                                            "import"), "schemaLocation", loc,
                                               href, m, ui);
                         handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
-                                                                           XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                           Constants.URI_2001_SCHEMA_XSD,
                                                                            "include"), "schemaLocation", loc,
                                               href, m, ui);
                     }
@@ -1051,15 +1051,15 @@ public class WadlGenerator implements ContainerRequestFilter {
                                                                  Collections.<Class<?>, QName> emptyMap());
                             if (typeName != null) {
                                 Element newElement = doc
-                                    .createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, "xs:element");
+                                    .createElementNS(Constants.URI_2001_SCHEMA_XSD, "xs:element");
                                 newElement.setAttribute("name", entry.getValue().getLocalPart());
-                                Element ctElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                Element ctElement = doc.createElementNS(Constants.URI_2001_SCHEMA_XSD,
                                                                         "xs:complexType");
                                 newElement.appendChild(ctElement);
                                 Element seqElement = doc
-                                    .createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, "xs:sequence");
+                                    .createElementNS(Constants.URI_2001_SCHEMA_XSD, "xs:sequence");
                                 ctElement.appendChild(seqElement);
-                                Element xsElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                Element xsElement = doc.createElementNS(Constants.URI_2001_SCHEMA_XSD,
                                                                         "xs:element");
                                 seqElement.appendChild(xsElement);
                                 xsElement.setAttribute("ref", "tns:" + typeName.getLocalPart());
@@ -1367,7 +1367,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         source.setBuffering();
         String targetNs = source.getValue("/*/@targetNamespace");
 
-        Map<String, String> nsMap = Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+        Map<String, String> nsMap = Collections.singletonMap("xs", Constants.URI_2001_SCHEMA_XSD);
         String[] elementNames = source.getValues("/*/xs:element/@name", nsMap);
         externalQnamesMap.put(targetNs, Arrays.asList(elementNames));
         String schemaValue = source.getNode("/xs:schema", nsMap, String.class);
@@ -1456,7 +1456,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         private Map<String, String> getLocationsMap(XMLSource source, String elementName, List<URI> links,
                                                     UriInfo ui) {
-            Map<String, String> nsMap = Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+            Map<String, String> nsMap = Collections.singletonMap("xs", Constants.URI_2001_SCHEMA_XSD);
             String[] locations = source.getValues("/*/xs:" + elementName + "/@schemaLocation", nsMap);
             if (locations == null) {
                 return Collections.emptyMap();

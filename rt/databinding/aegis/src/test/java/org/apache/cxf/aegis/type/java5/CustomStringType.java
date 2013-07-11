@@ -21,11 +21,11 @@ package org.apache.cxf.aegis.type.java5;
 import javax.xml.XMLConstants;
 
 import org.apache.cxf.aegis.type.basic.StringType;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class CustomStringType extends StringType {
 
@@ -38,9 +38,9 @@ public class CustomStringType extends StringType {
         XmlSchemaSimpleType type = new XmlSchemaSimpleType(root, true);
         type.setName(getSchemaType().getLocalPart());
         XmlSchemaSimpleContentExtension ext = new XmlSchemaSimpleContentExtension();
-        ext.setBaseTypeName(XmlSchemaConstants.STRING_QNAME);
+        ext.setBaseTypeName(Constants.XSD_STRING);
         XmlSchemaSimpleTypeRestriction content = new XmlSchemaSimpleTypeRestriction();
-        content.setBaseTypeName(XmlSchemaConstants.STRING_QNAME);
+        content.setBaseTypeName(Constants.XSD_STRING);
         type.setContent(content);
     }
 

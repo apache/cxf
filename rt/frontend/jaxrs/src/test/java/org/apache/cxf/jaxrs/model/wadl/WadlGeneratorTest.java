@@ -39,7 +39,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.DOMUtils;
@@ -55,6 +54,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
+import org.apache.ws.commons.schema.constants.Constants;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -111,21 +111,21 @@ public class WadlGeneratorTest extends Assert {
             WadlGenerator.WADL_NS, "grammars");
         assertEquals(1, grammarEls.size());
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
-            XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+                                                                Constants.URI_2001_SCHEMA_XSD, "schema");
         assertEquals(1, schemasEls.size());
         assertEquals("http://books", schemasEls.get(0).getAttribute("targetNamespace"));
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-            XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+                                                                Constants.URI_2001_SCHEMA_XSD, "element");
         assertEquals(1, elementEls.size());
         assertTrue(checkElement(elementEls, "books", "books"));
 
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-            XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
+                                                                     Constants.URI_2001_SCHEMA_XSD, "complexType");
         assertEquals(1, complexTypesEls.size());
         assertTrue(checkComplexType(complexTypesEls, "books"));
         
         List<Element> importEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-            XmlSchemaConstants.XSD_NAMESPACE_URI, "import");
+                                                               Constants.URI_2001_SCHEMA_XSD, "import");
         assertEquals(1, importEls.size());
         assertEquals("http://localhost:8080/baz/book1.xsd",
                      importEls.get(0).getAttribute("schemaLocation"));
@@ -237,7 +237,8 @@ public class WadlGeneratorTest extends Assert {
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
-              XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+                                                                Constants.URI_2001_SCHEMA_XSD,
+                                                                "schema");
         assertEquals(2, schemasEls.size());
         assertEquals("http://example.com/test", schemasEls.get(0).getAttribute("targetNamespace"));
         assertEquals("http://example.com/test", schemasEls.get(1).getAttribute("targetNamespace"));
@@ -330,11 +331,13 @@ public class WadlGeneratorTest extends Assert {
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
-                                                          XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+                                                                Constants.URI_2001_SCHEMA_XSD,
+                                                                "schema");
         assertEquals(1, schemasEls.size());
         assertEquals("http://superbooks", schemasEls.get(0).getAttribute("targetNamespace"));
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-                            XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+                                                                Constants.URI_2001_SCHEMA_XSD,
+                                                                "element");
         
         int size = book2El == null ? 2 : 3;
         int elementSize = size;
@@ -354,7 +357,8 @@ public class WadlGeneratorTest extends Assert {
         }
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-                                        XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
+                                                                     Constants.URI_2001_SCHEMA_XSD,
+                                                                     "complexType");
         assertEquals(size, complexTypesEls.size());
         
         assertTrue(checkComplexType(complexTypesEls, "book"));
@@ -370,7 +374,8 @@ public class WadlGeneratorTest extends Assert {
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
-                                                          XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+                                                                Constants.URI_2001_SCHEMA_XSD,
+                                                                "schema");
         assertEquals(0, schemasEls.size());
         
         List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), WadlGenerator.WADL_NS,
@@ -402,13 +407,13 @@ public class WadlGeneratorTest extends Assert {
                     }
                 } else if ("books".equals(name)) {
                     Element ctElement = 
-                        (Element)e.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                        (Element)e.getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD, 
                                                           "complexType").item(0);
                     Element seqElement = 
-                        (Element)ctElement.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                        (Element)ctElement.getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD, 
                                                           "sequence").item(0);
                     Element xsElement = 
-                        (Element)seqElement.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                        (Element)seqElement.getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD, 
                                                           "element").item(0);
                     String ref = xsElement.getAttribute("ref");
                     String expectedRef = "tns:thebook";

@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
@@ -51,6 +50,7 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
     public static final String KEEP_PARAMETERS_WRAPPER = DocLiteralInInterceptor.class.getName() 
@@ -220,7 +220,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             List<MessagePartInfo> bparts = bmsg.getMessageParts();
             if (bparts.size() == 0
                 || (bparts.size() == 1 
-                    && XMLSchemaQNames.XSD_ANY.equals(bparts.get(0).getTypeQName()))) {
+                    && Constants.XSD_ANY.equals(bparts.get(0).getTypeQName()))) {
                 BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
                 exchange.put(BindingOperationInfo.class, boi);
                 exchange.put(OperationInfo.class, op);

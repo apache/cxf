@@ -34,7 +34,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -46,6 +45,7 @@ import org.apache.tuscany.sdo.generate.XSD2JavaGenerator;
 import org.apache.tuscany.sdo.helper.HelperContextImpl;
 import org.apache.tuscany.sdo.helper.XSDHelperImpl;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.constants.Constants;
 import org.eclipse.emf.codegen.ecore.genmodel.GenClass;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.codegen.ecore.genmodel.GenPackage;
@@ -126,7 +126,7 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
 
         ((XSDHelperImpl)xsdHelper).setRedefineBuiltIn(generateBuiltIn);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
+            if (schema.getTargetNamespace().equals(Constants.URI_2001_SCHEMA_XSD)) {
                 continue;
             }
             StringWriter writer = new StringWriter();

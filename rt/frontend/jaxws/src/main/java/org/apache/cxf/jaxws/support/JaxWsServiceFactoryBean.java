@@ -57,7 +57,6 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
@@ -87,6 +86,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Constructs a service model from JAX-WS service endpoint classes. Works
@@ -370,7 +370,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             MessagePartInfo mpi = mInfo.addMessagePart("parameters");
                             mpi.setElement(true);
                             mpi.setTypeClass(c);
-                            mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
+                            mpi.setTypeQName(Constants.XSD_ANY);
 
                             mInfo = op.createMessage(new QName(catchAll.getNamespaceURI(),
                                                                name + "Response"),
@@ -379,7 +379,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             mpi = mInfo.addMessagePart("parameters");
                             mpi.setElement(true);
                             mpi.setTypeClass(c);
-                            mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
+                            mpi.setTypeQName(Constants.XSD_ANY);
 
                             BindingOperationInfo bo = new BindingOperationInfo(bind, op);
                             op.setProperty("operation.is.synthetic", Boolean.TRUE);
@@ -693,7 +693,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     protected void initializeParameter(MessagePartInfo part, Class<?> rawClass, Type type) {
         if (implInfo.isWebServiceProvider()) {
-            part.setTypeQName(XMLSchemaQNames.XSD_ANY);
+            part.setTypeQName(Constants.XSD_ANY);
             part.setTypeClass(rawClass);
             return;
         }

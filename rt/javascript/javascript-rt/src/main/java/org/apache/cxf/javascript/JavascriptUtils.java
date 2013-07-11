@@ -31,7 +31,6 @@ import org.w3c.dom.Attr;
 
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -282,7 +281,7 @@ public class JavascriptUtils {
         if (type == null) {
             return false;
         }
-        if (XmlSchemaConstants.BASE64BINARY_QNAME.equals(type.getQName())) {
+        if (Constants.XSD_BASE64.equals(type.getQName())) {
             return true;
         }
         // there could be some disagreement whether the following is a good enough test.
@@ -295,7 +294,7 @@ public class JavascriptUtils {
                 if (content.getContent() instanceof XmlSchemaSimpleContentExtension) {
                     XmlSchemaSimpleContentExtension extension = 
                         (XmlSchemaSimpleContentExtension)content.getContent();
-                    if (XmlSchemaConstants.BASE64BINARY_QNAME.equals(extension.getBaseTypeName())) {
+                    if (Constants.XSD_BASE64.equals(extension.getBaseTypeName())) {
                         return true;
                     }
                 }

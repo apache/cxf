@@ -34,7 +34,7 @@ import javax.xml.transform.Source;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class XMLSourceTest extends Assert {
         XMLSource xp = new XMLSource(is);
         xp.setBuffering();
         Map<String, String> nsMap = 
-            Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+            Collections.singletonMap("xs", Constants.URI_2001_SCHEMA_XSD);
         String value = xp.getNode("/xs:schema", nsMap, String.class);
         assertFalse(value.contains("<?xml"));
         assertTrue(value, value.startsWith("<xs:schema"));

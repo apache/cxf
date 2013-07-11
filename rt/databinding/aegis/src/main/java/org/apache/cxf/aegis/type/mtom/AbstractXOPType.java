@@ -36,7 +36,6 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.ws.commons.schema.XmlSchemaElement;
@@ -75,7 +74,7 @@ public abstract class AbstractXOPType extends AegisType {
         //      we use the XMIME type instead of the XSD type to allow for our content type attribute.
             setSchemaType(XML_MIME_BASE64);
         } else {
-            setSchemaType(XmlSchemaConstants.BASE64BINARY_QNAME);
+            setSchemaType(Constants.XSD_BASE64);
         }
     }
     

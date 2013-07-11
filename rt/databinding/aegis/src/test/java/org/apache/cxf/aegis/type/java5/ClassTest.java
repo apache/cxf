@@ -33,12 +33,12 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.StringType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.After;
 import org.junit.Before;
@@ -122,7 +122,7 @@ public class ClassTest extends AbstractAegisTest {
             xst.setName("class");
             
             XmlSchemaSimpleTypeRestriction content = new XmlSchemaSimpleTypeRestriction();
-            content.setBaseTypeName(XMLSchemaQNames.XSD_STRING);
+            content.setBaseTypeName(Constants.XSD_STRING);
             xst.setContent(content);
         }
                  

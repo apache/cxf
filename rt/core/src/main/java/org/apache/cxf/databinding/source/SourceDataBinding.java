@@ -26,13 +26,13 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * A simple databinding implementation which reads and writes Source objects.
@@ -64,7 +64,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
                     if (part.getTypeQName() != null || part.getElementQName() != null) {
                         return;
                     }
-                    part.setTypeQName(XmlSchemaConstants.ANY_TYPE_QNAME);
+                    part.setTypeQName(Constants.XSD_ANYTYPE);
                 }
             } .walk();
         }

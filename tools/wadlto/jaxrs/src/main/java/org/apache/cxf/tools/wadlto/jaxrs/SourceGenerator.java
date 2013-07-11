@@ -87,7 +87,6 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.JavaUtils;
@@ -98,6 +97,7 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class SourceGenerator {
     public static final String CODE_TYPE_GRAMMAR = "grammar";
@@ -396,7 +396,7 @@ public class SourceGenerator {
     private void populateElementTypeMap(Application app, Element schemaEl, 
             String systemId, Map<String, String> elementTypeMap) {
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemaEl, 
-                XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+                                                                Constants.URI_2001_SCHEMA_XSD, "element");
         for (Element el : elementEls) {
             String type = el.getAttribute("type");
             if (type.length() > 0) {
@@ -404,7 +404,7 @@ public class SourceGenerator {
             }
         }
         Element includeEl = DOMUtils.getFirstChildWithName(schemaEl, 
-                XmlSchemaConstants.XSD_NAMESPACE_URI, "include");
+                                                           Constants.URI_2001_SCHEMA_XSD, "include");
         if (includeEl != null) {
             int ind = systemId.lastIndexOf("/");
             if (ind != -1) {
@@ -1131,7 +1131,7 @@ public class SourceGenerator {
         String[] pair = type.split(":");
         if (pair.length == 2) {
             if (XSD_SPECIFIC_TYPE_MAP.containsKey(pair[1])) {
-                String expandedName = "{" + XmlSchemaConstants.XSD_NAMESPACE_URI + "}" + pair[1];
+                String expandedName = "{" + Constants.URI_2001_SCHEMA_XSD + "}" + pair[1];
                 if (schemaTypeMap.containsKey(expandedName)) {
                     return schemaTypeMap.get(expandedName);
                 }
@@ -1350,7 +1350,7 @@ public class SourceGenerator {
         
         List<SchemaInfo> schemas = new ArrayList<SchemaInfo>();
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
-             XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+                                                                Constants.URI_2001_SCHEMA_XSD, "schema");
         for (int i = 0; i < schemasEls.size(); i++) {
             String systemId = app.getWadlPath();
             if (schemasEls.size() > 1) {

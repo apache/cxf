@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
@@ -45,6 +44,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.tuscany.sdo.api.SDOUtil;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import commonj.sdo.DataObject;
 import commonj.sdo.Type;
@@ -151,7 +151,7 @@ public class SDODataBinding extends AbstractDataBinding
         }
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
             for (XmlSchema schema : serviceInfo.getXmlSchemaCollection().getXmlSchemas()) {
-                if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
+                if (schema.getTargetNamespace().equals(Constants.URI_2001_SCHEMA_XSD)) {
                     continue;
                 }
                 StringWriter writer = new StringWriter();

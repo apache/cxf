@@ -54,6 +54,7 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeContent;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.XmlSchemaType;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Some functions that avoid problems with Commons XML Schema.
@@ -175,7 +176,7 @@ public final class XmlSchemaUtils {
     public static void addImportIfNeeded(XmlSchema schema, String namespaceUri) {
         // no need to import nothing or the XSD schema, or the schema we are fixing.
         if ("".equals(namespaceUri)
-            || XmlSchemaConstants.XSD_NAMESPACE_URI.equals(namespaceUri)
+            || Constants.URI_2001_SCHEMA_XSD.equals(namespaceUri)
             || schema.getTargetNamespace().equals(namespaceUri)) {
             return;
         }

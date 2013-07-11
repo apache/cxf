@@ -49,7 +49,6 @@ import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.frontend.AbstractWSDLBasedEndpointFactory;
@@ -70,7 +69,9 @@ import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+
 import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {
@@ -282,7 +283,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         xmlsNamespaceMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, targetNamespace);
         
         // ditto for xsd: instead of just namespace= for the schema schema.
-        xmlsNamespaceMap.add("xsd", XmlSchemaConstants.XSD_NAMESPACE_URI);
+        xmlsNamespaceMap.add("xsd", Constants.URI_2001_SCHEMA_XSD);
         return s;
     }
     

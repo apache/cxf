@@ -44,7 +44,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -56,6 +55,7 @@ import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -165,11 +165,12 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
-        assertEquals(XmlSchemaConstants.XSD_NAMESPACE_URI, root.getNamespaceURI());
+        assertEquals(Constants.URI_2001_SCHEMA_XSD, root.getNamespaceURI());
         assertEquals("schema", root.getLocalName());
         if (includedSchema != null) {
             List<Element> includeEls = DOMUtils.getChildrenWithName(root, 
-                         XmlSchemaConstants.XSD_NAMESPACE_URI, refAttrName);
+                                                                    Constants.URI_2001_SCHEMA_XSD,
+                                                                    refAttrName);
             assertEquals(1, includeEls.size());
             String href = includeEls.get(0).getAttribute("schemaLocation");
             assertEquals(address + includedSchema, href);

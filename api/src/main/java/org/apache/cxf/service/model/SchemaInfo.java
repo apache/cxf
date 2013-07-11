@@ -28,11 +28,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
+import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
 public final class SchemaInfo extends AbstractPropertiesHolder {
@@ -100,7 +100,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
             // Some unit tests really want to see 'tns:'.
             if (schAgain.getNamespaceContext() == null) {
                 NamespaceMap nsMap = new NamespaceMap();
-                nsMap.add("xsd", XmlSchemaConstants.XSD_NAMESPACE_URI);
+                nsMap.add("xsd", Constants.URI_2001_SCHEMA_XSD);
                 nsMap.add("tns", schAgain.getTargetNamespace());
                 schAgain.setNamespaceContext(nsMap);
             }

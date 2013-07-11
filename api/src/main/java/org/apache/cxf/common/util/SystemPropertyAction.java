@@ -31,8 +31,8 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public final class SystemPropertyAction implements PrivilegedAction<String> {
     private static final Logger LOG = LogUtils.getL7dLogger(SystemPropertyAction.class);
-    final String property;
-    final String def;
+    private final String property;
+    private final String def;
     private SystemPropertyAction(String name) {
         property = name;
         def = null;

@@ -26,12 +26,12 @@ import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
 import org.apache.ws.commons.schema.XmlSchemaFacet;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class EnumType extends AegisType {
     @SuppressWarnings("unchecked")
@@ -69,7 +69,7 @@ public class EnumType extends AegisType {
         XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root, true);
         simple.setName(getSchemaType().getLocalPart());
         XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
-        restriction.setBaseTypeName(XmlSchemaConstants.STRING_QNAME);
+        restriction.setBaseTypeName(Constants.XSD_STRING);
         simple.setContent(restriction);
 
         Object[] constants = getTypeClass().getEnumConstants();

@@ -42,7 +42,6 @@ import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -52,6 +51,7 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
+import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Test;
 
@@ -478,11 +478,11 @@ public class BeanTest extends AbstractAegisTest {
                 if ("littleByte".equals(oe.getName())) {
                     littleByteOk = true;
                     assertNotNull(oe.getSchemaTypeName());
-                    assertEquals(XmlSchemaConstants.BYTE_QNAME, oe.getSchemaTypeName());
+                    assertEquals(Constants.XSD_BYTE, oe.getSchemaTypeName());
                 } else if ("bigByte".equals(oe.getName())) {
                     bigByteOk = true;
                     assertNotNull(oe.getSchemaTypeName());
-                    assertEquals(XmlSchemaConstants.BYTE_QNAME, oe.getSchemaTypeName());
+                    assertEquals(Constants.XSD_BYTE, oe.getSchemaTypeName());
                 }
             }
         }

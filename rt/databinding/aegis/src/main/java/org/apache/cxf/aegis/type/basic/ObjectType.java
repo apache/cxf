@@ -35,10 +35,10 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * AegisType for runtime inspection of types. Looks as the class to be written, and
@@ -271,7 +271,7 @@ public class ObjectType extends AegisType {
             simple.setName("serializedJavaObject");
             XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
             simple.setContent(restriction);
-            restriction.setBaseTypeName(XmlSchemaConstants.BASE64BINARY_QNAME);
+            restriction.setBaseTypeName(Constants.XSD_BASE64);
         }
     }
 }

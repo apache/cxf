@@ -36,11 +36,11 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * An ArrayType.
@@ -232,7 +232,7 @@ public class ArrayType extends AegisType {
         if (type == null) {
             throw new DatabindingException("Couldn't find type for array.");
         }
-        if (XmlSchemaConstants.ANY_TYPE_QNAME.equals(type.getSchemaType())) {
+        if (Constants.XSD_ANYTYPE.equals(type.getSchemaType())) {
             forceXsiWrite = true;
         }
 

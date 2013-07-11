@@ -40,7 +40,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -56,6 +55,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
     public static final String URIMAPPING_SKIP = URIMappingInterceptor.class.getName() + ".skip";
@@ -119,7 +119,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         for (BindingOperationInfo b : service.getOperations()) {
             if (b.getInput() != null && !b.getInput().getMessageInfo().getMessageParts().isEmpty()) {
                 MessagePartInfo inf = b.getInput().getMessageInfo().getMessagePart(0);
-                if (XMLSchemaQNames.XSD_ANY.equals(inf.getTypeQName())) {
+                if (Constants.XSD_ANY.equals(inf.getTypeQName())) {
                     return b;
                 }
             }

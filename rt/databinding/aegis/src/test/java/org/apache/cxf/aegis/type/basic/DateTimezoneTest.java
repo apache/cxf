@@ -28,7 +28,8 @@ import org.w3c.dom.Element;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.type.TypeMapping;
-import org.apache.cxf.common.util.XMLSchemaQNames;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Test;
 
 
@@ -50,8 +51,8 @@ public class DateTimezoneTest extends AbstractAegisTest {
     @Test
     public void testTimezoneLessCalendar() throws Exception {
         BeanTypeInfo info = new BeanTypeInfo(CalendarBean.class, "urn:Bean");
-        mapping.register(Calendar.class, XMLSchemaQNames.XSD_DATETIME, new TimezoneLessDateType());
-        mapping.register(Calendar.class, XMLSchemaQNames.XSD_DATE, new TimezoneLessDateType());        
+        mapping.register(Calendar.class, Constants.XSD_DATETIME, new TimezoneLessDateType());
+        mapping.register(Calendar.class, Constants.XSD_DATE, new TimezoneLessDateType());        
         info.setTypeMapping(mapping);
   
         BeanType type = new BeanType(info);
@@ -70,8 +71,8 @@ public class DateTimezoneTest extends AbstractAegisTest {
     @Test
     public void testTimezoneLessDate() throws Exception {
         BeanTypeInfo info = new BeanTypeInfo(DateBean.class, "urn:Bean");
-        mapping.register(Date.class, XMLSchemaQNames.XSD_DATETIME, new TimezoneLessDateType());
-        mapping.register(Date.class, XMLSchemaQNames.XSD_DATE, new TimezoneLessDateType());        
+        mapping.register(Date.class, Constants.XSD_DATETIME, new TimezoneLessDateType());
+        mapping.register(Date.class, Constants.XSD_DATE, new TimezoneLessDateType());        
         info.setTypeMapping(mapping);
   
         BeanType type = new BeanType(info);
