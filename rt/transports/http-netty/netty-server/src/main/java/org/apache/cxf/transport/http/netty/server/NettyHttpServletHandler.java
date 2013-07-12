@@ -121,7 +121,7 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
 
         NettyServletResponse nettyServletResponse = buildHttpServletResponse(response);
         NettyHttpServletRequest nettyServletRequest = 
-            buildHttpServletRequest(request, nettyHttpContextHandler.getContextPath());
+            buildHttpServletRequest(request, nettyHttpContextHandler.getContextPath(), ctx);
 
         nettyHttpContextHandler.handle(request.getUri(), nettyServletRequest, nettyServletResponse);
         interceptOnRequestSuccessed(ctx, e, response);
@@ -223,8 +223,8 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
     }
 
     protected NettyHttpServletRequest buildHttpServletRequest(
-            HttpRequest request, String contextPath) {
-        return new NettyHttpServletRequest(request, contextPath);
+            HttpRequest request, String contextPath, ChannelHandlerContext ctx) {
+        return new NettyHttpServletRequest(request, contextPath, ctx);
     }
     
 }

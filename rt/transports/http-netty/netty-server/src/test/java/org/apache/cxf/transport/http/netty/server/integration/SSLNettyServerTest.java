@@ -37,6 +37,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world_soap_http.Greeter;
@@ -63,7 +69,11 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void start() throws Exception {
         Bus b = createStaticBus("/org/apache/cxf/transport/http/netty/server/integration/ServerConfig.xml");
+        // setup the ssl interceptor
+        MySSLInterceptor myInterceptor = new MySSLInterceptor();
+        b.getInInterceptors().add(myInterceptor);
         BusFactory.setThreadDefaultBus(b);
+        
         address = "https://localhost:" + PORT + "/SoapContext/SoapPort";
         ep = Endpoint.publish(address ,
                 new org.apache.hello_world_soap_http.GreeterImpl());
@@ -136,6 +146,23 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         KeyManagerFactory fac = KeyManagerFactory.getInstance(alg);
         fac.init(keyStore, keyPass);
         return fac.getKeyManagers();
+    }
+    
+    public static class MySSLInterceptor extends AbstractPhaseInterceptor<Message> {
+
+        public MySSLInterceptor() {
+            super(Phase.READ);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            if (!MessageUtils.isRequestor(message)) {
+                // just check the request message
+                TLSSessionInfo info = message.get(TLSSessionInfo.class);
+                assertNotNull(info);
+            }
+        }
+        
     }
     
 

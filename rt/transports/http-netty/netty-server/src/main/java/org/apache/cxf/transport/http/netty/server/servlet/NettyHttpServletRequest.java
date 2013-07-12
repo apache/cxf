@@ -28,12 +28,14 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -41,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cxf.transport.http.netty.server.util.Utils;
+import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.http.CookieDecoder;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
@@ -51,6 +54,9 @@ import org.jboss.netty.handler.ssl.SslHandler;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 
 public class NettyHttpServletRequest implements HttpServletRequest {
+    
+    private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
+    private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
     private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
@@ -64,22 +70,37 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     private QueryStringDecoder queryStringDecoder;
 
-    private Map<String, Object> attributes;
+    private Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 
     private CookieDecoder cookieDecoder = new CookieDecoder();
 
     private String characterEncoding;
 
     private String contextPath;
+    
+    private ChannelHandlerContext channelHandlerContext;
 
-    public NettyHttpServletRequest(HttpRequest request, String contextPath) {
+    public NettyHttpServletRequest(HttpRequest request, String contextPath, ChannelHandlerContext ctx) {
         this.originalRequest = request;
         this.contextPath = contextPath;
         this.uriParser = new URIParser(contextPath);
         this.inputStream = new NettyServletInputStream(request);
         this.reader = new BufferedReader(new InputStreamReader(inputStream));
         this.queryStringDecoder = new QueryStringDecoder(request.getUri());
-        
+        // setup the SSL security attributes
+        this.channelHandlerContext = ctx;
+        SslHandler sslHandler = channelHandlerContext.getPipeline().get(SslHandler.class);
+        if (sslHandler != null) {
+            SSLSession session = sslHandler.getEngine().getSession();
+            if (session != null) {
+                attributes.put(SSL_CIPHER_SUITE_ATTRIBUTE, session.getCipherSuite());
+                try {
+                    attributes.put(SSL_PEER_CERT_CHAIN_ATTRIBUTE, session.getPeerCertificates());
+                } catch (SSLPeerUnverifiedException ex) {
+                    // do nothing here
+                }
+            }
+        }
     }
 
     public HttpRequest getOriginalRequest() {
@@ -266,9 +287,6 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public void setAttribute(String name, Object o) {
-        if (this.attributes == null) {
-            this.attributes = new HashMap<String, Object>();
-        }
         this.attributes.put(name, o);
     }
 
