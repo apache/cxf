@@ -109,8 +109,6 @@ public final class Names {
         "/fault";
     public static final String WSA_DEFAULT_FAULT_ACTION =
         WSA_NAMESPACE_NAME + WSA_FAULT_DELIMITER;
-    // REVISIT delimiter should be ":" if target namespace is a URN
-    public static final String WSA_ACTION_DELIMITER = "/";
         
     public static final String WSAW_ACTION_NAME = "Action";
     public static final QName WSAW_ACTION_QNAME = 
@@ -172,13 +170,6 @@ public final class Names {
     public static final String INVALID_CARDINALITY_NAME = "InvalidCardinality";
     public static final QName INVALID_CARDINALITY_QNAME = new QName(WSA_NAMESPACE_NAME,
                                                                     INVALID_CARDINALITY_NAME);
-           
-    public static final String SOAP11HTTP_ADDRESSING_BINDING = 
-        "http://schemas.xmlsoap.org/soap/envelope/?addressing=ms";
-    public static final String SOAP12HTTP_ADDRESSING_BINDING = 
-        "http://www.w3.org/2003/05/soap-envelope?addressing=ms";
-    
-    public static final String SOAP_ACTION_HEADER = "SOAPAction";
     
     /**
      * The set of headers understood by the protocol binding.

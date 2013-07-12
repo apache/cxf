@@ -741,8 +741,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
             Map<String, List<String>> mimeHeaders = CastUtils.cast((Map<?, ?>)
                 message.get(Message.MIME_HEADERS));
             if (mimeHeaders != null) {
-                List<String> soapActionHeaders =
-                    mimeHeaders.get(Names.SOAP_ACTION_HEADER);
+                List<String> soapActionHeaders = mimeHeaders.get("SOAPAction");
                 // only propogate to SOAPAction header if currently non-empty
                 if (!(soapActionHeaders == null
                       || soapActionHeaders.size() == 0

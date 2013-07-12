@@ -21,7 +21,6 @@ package org.apache.cxf.ws.addressing;
 
 
 import org.apache.cxf.message.Message;
-import org.apache.cxf.transport.Conduit;
 
 
 /**
@@ -31,8 +30,6 @@ public final class WSAContextUtils {
     public static final String REPLYTO_PROPERTY =
         "org.apache.cxf.ws.addressing.replyto";
 
-    private static final String TO_PROPERTY =
-        "org.apache.cxf.ws.addressing.to";
     private static final String USING_PROPERTY =
         "org.apache.cxf.ws.addressing.using";    
 
@@ -42,16 +39,6 @@ public final class WSAContextUtils {
     private WSAContextUtils() {
     }
 
-    /**
-     * Store UsingAddressing override flag in the context
-     *
-     * @param override true if UsingAddressing should be overridden
-     * @param message the current message
-     */   
-    public static void storeUsingAddressing(boolean override, Message message) {
-        message.put(USING_PROPERTY, Boolean.valueOf(override));
-    }
-    
     /**
      * Retrieve UsingAddressing override flag from the context
      *
@@ -63,33 +50,6 @@ public final class WSAContextUtils {
         return override == null || override.booleanValue();
     }
 
-    /**
-     * Store To EPR in the context
-     *
-     * @param to the To EPR
-     * @param message the current message
-     */   
-    public static void storeTo(EndpointReferenceType to,
-                               Message message) {
-        message.put(TO_PROPERTY, to);
-    }
-    
-    /**
-     * Retrieve To EPR from the context.
-     *
-     * @param conduit the Conduit if available
-     * @param message the current message
-     * @return the retrieved EPR
-     */
-    public static EndpointReferenceType retrieveTo(Conduit conduit,
-                                                   Message message) {
-        EndpointReferenceType to = null;
-        if (conduit != null) {
-            to = conduit.getTarget();
-        } else {
-            to = (EndpointReferenceType)message.get(TO_PROPERTY);
-        }
-        return to;
-    }
+
 
 }
