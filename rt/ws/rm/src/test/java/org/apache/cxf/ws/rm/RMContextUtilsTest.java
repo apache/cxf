@@ -23,7 +23,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -133,7 +132,7 @@ public class RMContextUtilsTest extends Assert {
     public void testRetrieveMAPs() {
         Message msg = control.createMock(Message.class);
         EasyMock.expect(msg.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE);
-        AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
+        AddressingProperties maps = control.createMock(AddressingProperties.class);
         EasyMock.expect(msg.get(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND)).andReturn(maps);
         control.replay();
         assertSame(maps, RMContextUtils.retrieveMAPs(msg, false, true));     

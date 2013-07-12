@@ -22,8 +22,6 @@ package org.apache.cxf.ws.addressing;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.ws.addressing.impl.AddressingConstantsImpl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +32,7 @@ public class AddressingConstantsImplTest extends Assert {
 
     @Before
     public void setUp() {
-        constants = new AddressingConstantsImpl();
+        constants = new AddressingConstants();
     }
 
     @Test

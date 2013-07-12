@@ -59,7 +59,6 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.discovery.wsdl.AppSequenceType;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
@@ -230,7 +229,7 @@ public class WSDiscoveryClient implements Closeable {
         return dispatch;
     }
     private void addAddressing(BindingProvider p, boolean addSeq, String action) {
-        AddressingProperties addrProperties = new AddressingPropertiesImpl();
+        AddressingProperties addrProperties = new AddressingProperties();
         if (action != null) {
             AttributedURIType act = new AttributedURIType();
             act.setValue(action);

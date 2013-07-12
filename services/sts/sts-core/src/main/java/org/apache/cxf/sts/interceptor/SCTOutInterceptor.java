@@ -29,7 +29,6 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 
 public class SCTOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SCTOutInterceptor.class);
@@ -46,7 +45,7 @@ public class SCTOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
             .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_OUTBOUND);
         if (inProps != null) {
             if (outProps == null) {
-                outProps = new AddressingPropertiesImpl(inProps.getNamespaceURI());
+                outProps = new AddressingProperties(inProps.getNamespaceURI());
             }
             AttributedURIType action = new AttributedURIType();
             action.setValue(inProps.getAction().getValue().replace("/RST/", "/RSTR/"));

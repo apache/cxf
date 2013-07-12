@@ -34,17 +34,18 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -313,7 +314,7 @@ public class RMInInterceptorTest extends Assert {
         
         control.reset();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
+        AddressingProperties maps = control.createMock(AddressingProperties.class);
         EasyMock.expect(maps.getNamespaceURI()).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
         EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         AttributedURIType actionURI = control.createMock(AttributedURIType.class);
@@ -374,7 +375,7 @@ public class RMInInterceptorTest extends Assert {
         manager = control.createMock(RMManager.class);
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
-        AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
+        AddressingProperties maps = control.createMock(AddressingProperties.class);
         
         interceptor.setManager(manager);
         
@@ -449,7 +450,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
         
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(!serverSide);
-        AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
+        AddressingProperties maps = control.createMock(AddressingProperties.class);
         EasyMock.expect(maps.getNamespaceURI()).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
         EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         

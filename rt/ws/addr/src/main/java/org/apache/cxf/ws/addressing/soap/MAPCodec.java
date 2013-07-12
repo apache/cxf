@@ -68,7 +68,6 @@ import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 
 
 /**
@@ -466,7 +465,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
     public AddressingProperties unmarshalMAPs(SoapMessage message) {
         // REVISIT generate MessageAddressingHeaderRequired fault if an
         // expected header is missing 
-        AddressingPropertiesImpl maps = null;
+        AddressingProperties maps = null;
         try {
             List<Header> header = message.getHeaders();
             if (header != null) {
@@ -491,7 +490,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     jaxbContext.createUnmarshaller();
                             }
                             if (maps == null) {
-                                maps = new AddressingPropertiesImpl();
+                                maps = new AddressingProperties();
                                 maps.exposeAs(headerURI);
                             }
                             String localName = headerElement.getLocalName();
@@ -597,7 +596,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
     }
         
     private void decodeReferenceParameters(Set<Element> referenceParameterHeaders, 
-                                           AddressingPropertiesImpl maps, 
+                                           AddressingProperties maps, 
                                            Unmarshaller unmarshaller) 
         throws JAXBException {
         EndpointReferenceType toEpr = maps.getToEndpointReference();

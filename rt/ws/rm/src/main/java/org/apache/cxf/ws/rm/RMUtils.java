@@ -32,7 +32,6 @@ import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingConstantsImpl;
 
 public final class RMUtils {
    
@@ -46,7 +45,7 @@ public final class RMUtils {
         WSRM_FACTORY = new org.apache.cxf.ws.rm.v200702.ObjectFactory();        
         WSRM200502_FACTORY = new org.apache.cxf.ws.rm.v200502.ObjectFactory();
         WSRM200502_WSA200508_FACTORY = new org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory();
-        WSA_CONSTANTS = new AddressingConstantsImpl();
+        WSA_CONSTANTS = new AddressingConstants();
     }
     
     private RMUtils() {        

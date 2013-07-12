@@ -83,7 +83,7 @@ public class MAPAggregatorTest extends Assert {
 
     private MAPAggregatorImpl aggregator;
     private IMocksControl control;
-    private AddressingPropertiesImpl expectedMAPs;
+    private AddressingProperties expectedMAPs;
     private String expectedTo;
     private String expectedReplyTo;
     private String expectedRelatesTo;
@@ -396,7 +396,7 @@ public class MAPAggregatorTest extends Assert {
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.FALSE);
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         EndpointReferenceType replyTo = new EndpointReferenceType();
         replyTo.setAddress(ContextUtils.getAttributedURI(Names.WSA_NONE_ADDRESS));
         maps.setReplyTo(replyTo);
@@ -423,7 +423,7 @@ public class MAPAggregatorTest extends Assert {
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.TRUE);
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         EndpointReferenceType replyTo = new EndpointReferenceType();
         replyTo.setAddress(ContextUtils.getAttributedURI(Names.WSA_ANONYMOUS_ADDRESS));
         maps.setReplyTo(replyTo);
@@ -640,8 +640,8 @@ public class MAPAggregatorTest extends Assert {
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.valueOf(Boolean.TRUE));
-        AddressingPropertiesImpl maps = mapsInContext 
-                                        ? new AddressingPropertiesImpl()
+        AddressingProperties maps = mapsInContext 
+                                        ? new AddressingProperties()
                                         : null;
         if (zeroLengthAction) {
             maps.setAction(ContextUtils.getAttributedURI(""));
@@ -683,7 +683,7 @@ public class MAPAggregatorTest extends Assert {
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.FALSE);
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         EndpointReferenceType replyTo = new EndpointReferenceType();
         replyTo.setAddress(
             ContextUtils.getAttributedURI(args.decoupled
@@ -912,14 +912,14 @@ public class MAPAggregatorTest extends Assert {
     }
 
     private boolean verifyMAPs(Object obj) {
-        if (obj instanceof AddressingPropertiesImpl) {
-            AddressingPropertiesImpl other = (AddressingPropertiesImpl)obj;
+        if (obj instanceof AddressingProperties) {
+            AddressingProperties other = (AddressingProperties)obj;
             return compareExpected(other);
         }
         return false;
     }    
 
-    private boolean compareExpected(AddressingPropertiesImpl other) {
+    private boolean compareExpected(AddressingProperties other) {
         boolean ret = false;
         if (expectedMAPs == null || expectedMAPs == other) {
             boolean toOK = 

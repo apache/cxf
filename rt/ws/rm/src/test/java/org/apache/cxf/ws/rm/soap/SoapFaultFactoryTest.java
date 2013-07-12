@@ -30,7 +30,6 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -188,7 +187,7 @@ public class SoapFaultFactoryTest extends Assert {
         RMProperties rmps = new RMProperties();
         rmps.exposeAs(RM10Constants.NAMESPACE_URI);
         RMContextUtils.storeRMProperties(message, rmps, false);
-        AddressingProperties maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         RMContextUtils.storeMAPs(maps, message, false, false);
         return message;
     }

@@ -31,12 +31,12 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -105,7 +105,7 @@ public class RMOutInterceptorTest extends Assert {
     
     @Test
     public void testHandleApplicationMessage() throws NoSuchMethodException, SequenceFault, RMException {
-        AddressingPropertiesImpl maps = createMAPs("greetMe", "localhost:9000/GreeterPort", 
+        AddressingProperties maps = createMAPs("greetMe", "localhost:9000/GreeterPort", 
             org.apache.cxf.ws.addressing.Names.WSA_NONE_ADDRESS);
         Method[] mocked = new Method[] {
             AbstractRMInterceptor.class.getDeclaredMethod("getManager", new Class[]{}),
@@ -193,8 +193,8 @@ public class RMOutInterceptorTest extends Assert {
         control.verify();
     }
     
-    private AddressingPropertiesImpl createMAPs(String action, String to, String replyTo) {
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+    private AddressingProperties createMAPs(String action, String to, String replyTo) {
+        AddressingProperties maps = new AddressingProperties();
         maps.setTo(RMUtils.createReference(to));
         EndpointReferenceType epr = RMUtils.createReference(replyTo);
         maps.setReplyTo(epr);

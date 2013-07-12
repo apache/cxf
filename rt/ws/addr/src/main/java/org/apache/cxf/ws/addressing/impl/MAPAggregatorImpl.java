@@ -1077,7 +1077,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         LOG.log(Level.FINE, "MAPs retrieved from message {0}", maps);
 
         if (maps == null && isProviderContext) {
-            maps = new AddressingPropertiesImpl();
+            maps = new AddressingProperties();
             setupNamespace(maps, message);
         }
         return maps;

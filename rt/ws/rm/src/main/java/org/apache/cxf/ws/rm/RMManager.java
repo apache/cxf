@@ -58,7 +58,6 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
@@ -583,7 +582,7 @@ public class RMManager {
             RMContextUtils.storeRMProperties(message, rmps, true);                
             if (null == conduit) {
                 String to = m.getTo();
-                AddressingProperties maps = new AddressingPropertiesImpl();
+                AddressingProperties maps = new AddressingProperties();
                 maps.setTo(RMUtils.createReference(to));
                 RMContextUtils.storeMAPs(maps, message, true, false);
             }

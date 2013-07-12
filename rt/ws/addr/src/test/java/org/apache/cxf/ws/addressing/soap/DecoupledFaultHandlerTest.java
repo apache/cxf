@@ -30,7 +30,6 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,7 +48,7 @@ public class DecoupledFaultHandlerTest extends Assert {
         SoapMessage message = new SoapMessage(new MessageImpl());
         QName qname = new QName("http://cxf.apache.org/mustunderstand", "TestMU");
         message.getHeaders().add(new Header(qname, new Object()));
-        AddressingProperties maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         
         EndpointReferenceType faultTo = new EndpointReferenceType();
         faultTo.setAddress(new AttributedURIType());

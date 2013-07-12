@@ -66,7 +66,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.discovery.WSDVersion;
 import org.apache.cxf.ws.discovery.WSDiscoveryClient;
 import org.apache.cxf.ws.discovery.WSDiscoveryService;
@@ -437,7 +436,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         private void updateOutputAction(String append) {
             AddressingProperties p = ContextUtils.retrieveMAPs(PhaseInterceptorChain.getCurrentMessage(),
                                                                false, false);
-            AddressingProperties pout = new AddressingPropertiesImpl();
+            AddressingProperties pout = new AddressingProperties();
             AttributedURIType action = new AttributedURIType();
             action.setValue(p.getAction().getValue() + append);
             pout.exposeAs(p.getNamespaceURI());

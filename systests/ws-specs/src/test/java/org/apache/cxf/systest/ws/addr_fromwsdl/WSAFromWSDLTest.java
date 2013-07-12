@@ -21,6 +21,7 @@ package org.apache.cxf.systest.ws.addr_fromwsdl;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
@@ -30,9 +31,9 @@ import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersFault_Exception;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -173,7 +174,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                  "http://localhost:" + PORT + "/jaxws/addAnon");
         
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         EndpointReferenceType ref = new EndpointReferenceType();
         AttributedURIType add = new AttributedURIType();
         add.setValue("http://localhost:" + INVALID_PORT + "/not/a/real/url");

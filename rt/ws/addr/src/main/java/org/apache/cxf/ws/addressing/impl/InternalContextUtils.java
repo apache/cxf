@@ -340,7 +340,7 @@ final class InternalContextUtils {
         // ensure there is a MAPs instance available for the outbound
         // partial response that contains appropriate To and ReplyTo
         // properties (i.e. anonymous & none respectively)
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         maps.setTo(EndpointReferenceUtils.getAnonymousEndpointReference());
         maps.setReplyTo(ContextUtils.WSA_OBJECT_FACTORY.createEndpointReferenceType());
         maps.getReplyTo().setAddress(ContextUtils.getAttributedURI(Names.WSA_NONE_ADDRESS));

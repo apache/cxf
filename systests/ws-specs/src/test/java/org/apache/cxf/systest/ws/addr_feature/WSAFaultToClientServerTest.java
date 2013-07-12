@@ -35,7 +35,6 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 
@@ -62,7 +61,7 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
 
         Greeter greeter = new SOAPService(wsdl, serviceName).getPort(Greeter.class, new AddressingFeature());
         EndpointReferenceType faultTo = new EndpointReferenceType();
-        AddressingProperties addrProperties = new AddressingPropertiesImpl();
+        AddressingProperties addrProperties = new AddressingProperties();
         AttributedURIType epr = new AttributedURIType();
         String faultToAddress = "http://localhost:" + FaultToEndpointServer.FAULT_PORT  + "/faultTo";
         epr.setValue(faultToAddress);
@@ -96,7 +95,7 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
         c.getClient().setDecoupledEndpoint("http://localhost:" + FaultToEndpointServer.FAULT_PORT2 + "/sendFaultHere");
         
         EndpointReferenceType faultTo = new EndpointReferenceType();
-        AddressingProperties addrProperties = new AddressingPropertiesImpl();
+        AddressingProperties addrProperties = new AddressingProperties();
         AttributedURIType epr = new AttributedURIType();
         epr.setValue("http://localhost:" + FaultToEndpointServer.FAULT_PORT2 + "/sendFaultHere");
         faultTo.setAddress(epr);

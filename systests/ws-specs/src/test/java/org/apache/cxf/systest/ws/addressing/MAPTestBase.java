@@ -47,7 +47,6 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.soap.VersionTransformer;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
@@ -202,7 +201,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             String msgId = "urn:uuid:12345-" + Math.random();
             Map<String, Object> requestContext = 
                 ((BindingProvider)greeter).getRequestContext();
-            AddressingProperties maps = new AddressingPropertiesImpl();
+            AddressingProperties maps = new AddressingProperties();
             AttributedURIType id = 
                 ContextUtils.getAttributedURI(msgId);
             maps.setMessageID(id);

@@ -41,17 +41,18 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.Relationship;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -299,7 +300,7 @@ public class MAPCodecTest extends Assert {
             : (requestor && !outbound) || (!requestor && outbound);
         message.put(REQUESTOR_ROLE, Boolean.valueOf(requestor));
         String mapProperty = getMAPProperty(requestor, outbound);
-        AddressingPropertiesImpl maps = getMAPs(requestor, outbound, exposeAs);
+        AddressingProperties maps = getMAPs(requestor, outbound, exposeAs);
         final Element header = control.createMock(Element.class);
         codec.setHeaderFactory(new MAPCodec.HeaderFactory() {
             public Element getHeader(SoapVersion version) {
@@ -321,7 +322,7 @@ public class MAPCodecTest extends Assert {
     }
 
     private void setUpEncode(boolean requestor, SoapMessage message, Element header,
-                             AddressingPropertiesImpl maps, String mapProperty, boolean invalidMAP,
+                             AddressingProperties maps, String mapProperty, boolean invalidMAP,
                              boolean preExistingSOAPAction) throws Exception {
         message.put(mapProperty, maps);
 
@@ -340,7 +341,7 @@ public class MAPCodecTest extends Assert {
         }
     }
 
-    private void setUpDecode(SoapMessage message, List<Header> headers, AddressingPropertiesImpl maps,
+    private void setUpDecode(SoapMessage message, List<Header> headers, AddressingProperties maps,
                              String mapProperty, boolean requestor) throws Exception {
         Unmarshaller unmarshaller = control.createMock(Unmarshaller.class);
         ContextUtils.getJAXBContext().createUnmarshaller();
@@ -402,8 +403,8 @@ public class MAPCodecTest extends Assert {
             ? SERVER_ADDRESSING_PROPERTIES_OUTBOUND : SERVER_ADDRESSING_PROPERTIES_INBOUND;
     }
 
-    private AddressingPropertiesImpl getMAPs(boolean requestor, boolean outbound, String uri) {
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+    private AddressingProperties getMAPs(boolean requestor, boolean outbound, String uri) {
+        AddressingProperties maps = new AddressingProperties();
         boolean exposeAsNative = Names.WSA_NAMESPACE_NAME.equals(uri);
         boolean exposeAs200408 = VersionTransformer.Names200408.WSA_NAMESPACE_NAME.equals(uri);
         boolean exposeAs200403 = VersionTransformer.Names200403.WSA_NAMESPACE_NAME.equals(uri);
@@ -501,14 +502,14 @@ public class MAPCodecTest extends Assert {
     }
 
     private boolean verifyMAPs(Object obj) {
-        if (obj instanceof AddressingPropertiesImpl) {
-            AddressingPropertiesImpl other = (AddressingPropertiesImpl)obj;
+        if (obj instanceof AddressingProperties) {
+            AddressingProperties other = (AddressingProperties)obj;
             return compareExpected(other);
         }
         return false;
     }
 
-    private boolean compareExpected(AddressingPropertiesImpl other) {
+    private boolean compareExpected(AddressingProperties other) {
         boolean ret = false;
         String uri = other.getNamespaceURI();
         boolean exposedAsNative = Names.WSA_NAMESPACE_NAME.equals(uri);

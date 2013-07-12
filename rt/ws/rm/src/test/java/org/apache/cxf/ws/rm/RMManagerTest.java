@@ -51,7 +51,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
@@ -224,7 +223,7 @@ public class RMManagerTest extends Assert {
         org.apache.cxf.transport.Destination destination = control
             .createMock(org.apache.cxf.transport.Destination.class);
         EasyMock.expect(exchange.getDestination()).andReturn(destination).anyTimes();
-        AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
+        AddressingProperties maps = control.createMock(AddressingProperties.class);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(null);
         EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND))
             .andReturn(maps).anyTimes();

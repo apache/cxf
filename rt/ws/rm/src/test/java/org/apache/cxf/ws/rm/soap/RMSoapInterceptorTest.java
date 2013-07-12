@@ -47,7 +47,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.Names;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
@@ -380,7 +379,7 @@ public class RMSoapInterceptorTest extends Assert {
         RMProperties rmps = new RMProperties();
         rmps.exposeAs(RM10Constants.NAMESPACE_URI);
         RMContextUtils.storeRMProperties(soapMessage, rmps, true);
-        AddressingProperties maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         RMContextUtils.storeMAPs(maps, soapMessage, true, false);
         ex.setOutMessage(soapMessage);
         soapMessage.setExchange(ex);        
@@ -393,7 +392,7 @@ public class RMSoapInterceptorTest extends Assert {
         RMProperties rmps = new RMProperties();
         rmps.exposeAs(RM10Constants.NAMESPACE_URI);
         RMContextUtils.storeRMProperties(message, rmps, false);
-        AddressingProperties maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         RMContextUtils.storeMAPs(maps, message, false, false);
         ex.setInMessage(message);
         message = new MessageImpl();
@@ -460,7 +459,7 @@ public class RMSoapInterceptorTest extends Assert {
         RMProperties rmps = new RMProperties();
         rmps.exposeAs(RM10Constants.NAMESPACE_URI);
         RMContextUtils.storeRMProperties(soapMessage, rmps, false);
-        AddressingProperties maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         RMContextUtils.storeMAPs(maps, soapMessage, false, false);
         message.put(Message.SCHEMA_VALIDATION_ENABLED, false);
         InputStream is = RMSoapInterceptorTest.class.getResourceAsStream(resource);

@@ -29,10 +29,10 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType;
@@ -189,7 +189,7 @@ public class ServantTest extends Assert {
 
         message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
         
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         String msgId = "urn:uuid:12345-" + Math.random();
         AttributedURIType id = ContextUtils.getAttributedURI(msgId);
         maps.setMessageID(id);
@@ -250,7 +250,7 @@ public class ServantTest extends Assert {
 
         message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
         
-        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        AddressingProperties maps = new AddressingProperties();
         String msgId = "urn:uuid:12345-" + Math.random();
         AttributedURIType id = ContextUtils.getAttributedURI(msgId);
         maps.setMessageID(id);
