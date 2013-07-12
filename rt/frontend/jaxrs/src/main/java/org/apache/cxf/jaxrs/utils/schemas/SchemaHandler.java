@@ -43,7 +43,7 @@ import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
-import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.ws.commons.schema.constants.Constants;
 
 public class SchemaHandler {
 
@@ -83,7 +83,7 @@ public class SchemaHandler {
     
     public static Schema createSchema(List<String> locations, String catalogLocation, final Bus bus) {
         
-        SchemaFactory factory = SchemaFactory.newInstance(WSDLConstants.NS_SCHEMA_XSD);
+        SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
         Schema s = null;
         try {
             List<Source> sources = new ArrayList<Source>();

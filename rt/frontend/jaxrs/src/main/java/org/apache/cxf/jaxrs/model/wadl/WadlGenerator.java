@@ -107,7 +107,6 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -1522,7 +1521,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         public void write(StringBuilder sb) {
             for (XmlSchema xs : coll.getXmlSchemas()) {
-                if (xs.getItems().isEmpty() || WSDLConstants.NS_SCHEMA_XSD.equals(xs.getTargetNamespace())) {
+                if (xs.getItems().isEmpty() || Constants.URI_2001_SCHEMA_XSD.equals(xs.getTargetNamespace())) {
                     continue;
                 }
                 StringWriter writer = new StringWriter();
