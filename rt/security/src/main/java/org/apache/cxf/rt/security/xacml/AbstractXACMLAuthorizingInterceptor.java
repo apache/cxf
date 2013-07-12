@@ -40,10 +40,11 @@ import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.opensaml.xacml.ctx.DecisionType;
+import org.opensaml.xacml.ctx.DecisionType.DECISION;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResponseType;
 import org.opensaml.xacml.ctx.ResultType;
+import org.opensaml.xacml.ctx.StatusType;
 
 
 /**
@@ -129,31 +130,20 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         // Handle any Obligations returned by the PDP
         handleObligations(request, principal, message, result);
         
-        List<String> resources = requestBuilder.getResources(message);
-        if (result != null 
-            && (result.getDecision().getDecision() == DecisionType.DECISION.Permit)) {
-            if (result.getResourceId() == null) {
-                LOG.fine("XACML authorization permitted");
-                return true;
-            }
-            for (String resource : resources) {
-                if (resource.equals(result.getResourceId())) {
-                    LOG.fine("XACML authorization permitted");
-                    return true;
-                }
-            }
+        if (result == null) {
+            return false;
         }
-        LOG.fine("XACML authorization not permitted:");
-        if (result != null && result.getStatus() != null) {
-            if (result.getStatus().getStatusCode() != null) {
-                LOG.fine("XACML Status Code: " + result.getStatus().getStatusCode().getValue());
-            }
-            if (result.getStatus().getStatusMessage() != null) {
-                LOG.fine("XACML Status Message: " + result.getStatus().getStatusMessage().getValue());
-            }
+
+        DECISION decision = result.getDecision() != null ? result.getDecision().getDecision() : DECISION.Deny; 
+        String code = "";
+        String statusMessage = "";
+        if (result.getStatus() != null) {
+            StatusType status = result.getStatus();
+            code = status.getStatusCode() != null ? status.getStatusCode().getValue() : "";
+            statusMessage = status.getStatusMessage() != null ? status.getStatusMessage().getValue() : "";
         }
-        
-        return false;
+        LOG.fine("XACML authorization result: " + decision + ", code: " + code + ", message: " + statusMessage);
+        return decision == DECISION.Permit;
     }
     
     public abstract ResponseType performRequest(RequestType request, Message message) throws Exception;

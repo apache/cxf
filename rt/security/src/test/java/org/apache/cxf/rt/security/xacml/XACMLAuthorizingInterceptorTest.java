@@ -50,8 +50,8 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, operation);
         msg.put(SecurityContext.class, sc);
         
-        XACMLAuthorizingInterceptor authorizingInterceptor = 
-            new XACMLAuthorizingInterceptor();
+        AbstractXACMLAuthorizingInterceptor authorizingInterceptor = 
+            new DummyXACMLAuthorizingInterceptor();
         authorizingInterceptor.handleMessage(msg);
     }
     
@@ -65,8 +65,8 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, operation);
         msg.put(SecurityContext.class, sc);
         
-        XACMLAuthorizingInterceptor authorizingInterceptor = 
-            new XACMLAuthorizingInterceptor();
+        AbstractXACMLAuthorizingInterceptor authorizingInterceptor = 
+            new DummyXACMLAuthorizingInterceptor();
         
         try {
             authorizingInterceptor.handleMessage(msg);

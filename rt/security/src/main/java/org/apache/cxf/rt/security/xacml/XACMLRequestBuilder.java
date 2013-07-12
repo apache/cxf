@@ -40,9 +40,7 @@ public interface XACMLRequestBuilder {
      * @return An OpenSAML RequestType object
      * @throws Exception
      */
-    RequestType createRequest(
-        Principal principal, List<String> roles, Message message
-    ) throws Exception;
+    RequestType createRequest(Principal principal, List<String> roles, Message message) throws Exception;
     
     /**
      * Return the list of Resources that have been inserted into the Request.
@@ -50,6 +48,7 @@ public interface XACMLRequestBuilder {
      * @param message The Message from which to retrieve the resource
      * @return the list of Resources that have been inserted into the Request
      */
+    @Deprecated
     List<String> getResources(Message message);
     
     /**

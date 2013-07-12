@@ -26,6 +26,7 @@ import org.opensaml.Configuration;
 import org.opensaml.xacml.XACMLObjectBuilder;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.DecisionType;
+import org.opensaml.xacml.ctx.DecisionType.DECISION;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResponseType;
 import org.opensaml.xacml.ctx.ResultType;
@@ -40,10 +41,15 @@ import org.opensaml.xml.XMLObjectBuilderFactory;
  * object based on the role of the Subject. If the role is "manager" then it permits the
  * request, otherwise it denies it.
  */
-public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
-    
+public class DummyXACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
+
     public ResponseType performRequest(RequestType request, Message message) throws Exception {
-        
+        String role = getSubjectRole(request);
+        DECISION decision = "manager".equals(role) ? DecisionType.DECISION.Permit : DecisionType.DECISION.Deny;        
+        return createResponse(decision);
+    }
+
+    private ResponseType createResponse(DECISION decision) {
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
         
         @SuppressWarnings("unchecked")
@@ -71,16 +77,10 @@ public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterce
             (XACMLObjectBuilder<StatusCodeType>)
             builderFactory.getBuilder(StatusCodeType.DEFAULT_ELEMENT_NAME);
             
-        DecisionType decisionType = decisionTypeBuilder.buildObject();
-        
-        String role = getSubjectRole(request);
-        if ("manager".equals(role)) {
-            decisionType.setDecision(DecisionType.DECISION.Permit); 
-        } else {
-            decisionType.setDecision(DecisionType.DECISION.Deny);
-        }
-        
         ResultType result = resultTypeBuilder.buildObject();
+
+        DecisionType decisionType = decisionTypeBuilder.buildObject();
+        decisionType.setDecision(decision);
         result.setDecision(decisionType);
         
         StatusType status = statusTypeBuilder.buildObject();
@@ -91,7 +91,6 @@ public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterce
         
         ResponseType response = responseTypeBuilder.buildObject();
         response.setResult(result);
-        
         return response;
     }
 
@@ -111,6 +110,5 @@ public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterce
         }
         return null;
     }
-
     
 }

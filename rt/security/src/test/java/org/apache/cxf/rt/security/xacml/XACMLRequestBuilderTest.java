@@ -54,46 +54,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
             builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
     }
-    
-    @org.junit.Test
-    public void testResource() throws Exception {
-        // Mock up a request
-        Principal principal = new Principal() {
-            public String getName() {
-                return "alice";
-            }
-        };
-        
-        String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
-        MessageImpl msg = new MessageImpl();
-        msg.put(Message.WSDL_OPERATION, operation);
-        
-        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
-        RequestType request = 
-            builder.createRequest(principal, Collections.singletonList("manager"), msg);
-        assertNotNull(request); 
-        
-        assertTrue(builder.getResources(msg).contains(operation));
-        
-        operation = "user/list.json";
-        msg = new MessageImpl();
-        msg.put(Message.REQUEST_URI, operation);
-        
-        request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
-        assertNotNull(request); 
-        
-        assertTrue(builder.getResources(msg).contains(operation));
-        
-        operation = "https://localhost:8080/user/list.json";
-        msg = new MessageImpl();
-        msg.put(Message.REQUEST_URL, operation);
-        
-        ((DefaultXACMLRequestBuilder)builder).setSendFullRequestURL(true);
-        request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
-        assertNotNull(request); 
-        
-        assertTrue(builder.getResources(msg).contains(operation));
-    }
+
     
     @org.junit.Test
     public void testAction() throws Exception {
@@ -108,22 +69,22 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         MessageImpl msg = new MessageImpl();
         msg.put(Message.WSDL_OPERATION, operation);
         
-        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
+        DefaultXACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
             builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
         String action = 
             request.getAction().getAttributes().get(0).getAttributeValues().get(0).getValue();
-        assertEquals(action, "execute");
+        assertEquals("execute", action);
         
-        ((DefaultXACMLRequestBuilder)builder).setAction("write");
+        builder.setAction("write");
         request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request); 
         
         action = 
             request.getAction().getAttributes().get(0).getAttributeValues().get(0).getValue();
-        assertEquals(action, "write");
+        assertEquals("write", action);
     }
     
     @org.junit.Test
