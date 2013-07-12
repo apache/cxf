@@ -60,15 +60,15 @@ import org.junit.Test;
 /**
  *
  */
-public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String DEC_PORT = allocatePort(WSSecurityClientTest.class);
+public class StaxWSSecurityClientTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(StaxServer.class);
+    public static final String DEC_PORT = allocatePort(StaxWSSecurityClientTest.class);
 
     private static final java.net.URL WSDL_LOC;
     static {
         java.net.URL tmp = null;
         try {
-            tmp = WSSecurityClientTest.class.getClassLoader().getResource(
+            tmp = StaxWSSecurityClientTest.class.getClassLoader().getResource(
                 "org/apache/cxf/systest/ws/security/hello_world.wsdl"
             );
         } catch (final Exception e) {
@@ -101,7 +101,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
         createStaticBus();
     }

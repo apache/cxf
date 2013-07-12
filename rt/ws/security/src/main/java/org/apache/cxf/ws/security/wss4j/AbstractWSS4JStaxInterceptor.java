@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -29,7 +30,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -50,6 +53,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -179,6 +183,24 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
         }            
+        
+        // If we have a "password" but no CallbackHandler then construct one
+        if (o == null && getPassword(soapMessage) != null) {
+            final String password = getPassword(soapMessage);
+            o = new CallbackHandler() {
+
+                @Override
+                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                    for (Callback callback : callbacks) {
+                        if (callback instanceof WSPasswordCallback) {
+                            WSPasswordCallback wsPasswordCallback = (WSPasswordCallback)callback;
+                            wsPasswordCallback.setPassword(password);
+                        }
+                    }
+                }
+            };
+        }
+        
         if (o instanceof CallbackHandler) {
             Map<String, Object> config = getProperties();
             

@@ -51,7 +51,7 @@
     <jaxws:endpoint
         id="UsernameTokenEndpoint"
         implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
-        address="http://localhost:${testutil.ports.Server}/GreeterService/UsernameTokenPort"
+        address="http://localhost:${testutil.ports.StaxServer}/GreeterService/UsernameTokenPort"
         serviceName="test:GreeterService"
         endpointName="test:UsernameTokenPort"
         >
@@ -64,11 +64,11 @@
     </jaxws:endpoint>
 
     <!--    
-         WSS4JInInterceptor for UsernameTokenEndpoint above    
+         WSS4JStaxInInterceptor for UsernameTokenEndpoint above    
     -->
     <bean 
         id="UsernameToken_Request"
-        class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
+        class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor"
         >
         <constructor-arg>
             <map>
@@ -87,7 +87,7 @@
     <jaxws:endpoint 
         id="TimestampSignEncryptEndpoint"
         implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
-        address="http://localhost:${testutil.ports.Server}/GreeterService/TimestampSignEncryptPort"
+        address="http://localhost:${testutil.ports.StaxServer}/GreeterService/TimestampSignEncryptPort"
         serviceName="test:GreeterService"
         endpointName="test:TimestampSignEncryptPort"
         >
@@ -100,12 +100,12 @@
     </jaxws:endpoint>
 
     <!--    
-         WSS4JInInterceptor for decrypting and validating the signature of the
+         WSS4JStaxInInterceptor for decrypting and validating the signature of the
          SOAP request.
     -->
     <bean 
         id="TimestampSignEncrypt_Request"
-        class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
+        class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor"
         >
         <constructor-arg>
             <map>
@@ -122,11 +122,11 @@
     </bean>
     
     <!--    
-         WSS4JOutInterceptor for encoding and signing the SOAP response.    
+         WSS4JStaxOutInterceptor for encoding and signing the SOAP response.    
     -->
     <bean 
         id="TimestampSignEncrypt_Response"
-        class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor"
+        class="org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor"
         >
         <constructor-arg>
             <map>

@@ -35,12 +35,10 @@
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
         </jaxws:features>
         <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
             <ref bean="TimestampSignEncrypt_Request"/>
         </jaxws:outInterceptors>
         <jaxws:inInterceptors>
             <ref bean="TimestampSignEncrypt_Response"/>
-            <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:client>
 
