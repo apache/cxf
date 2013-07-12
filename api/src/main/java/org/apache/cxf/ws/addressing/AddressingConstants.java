@@ -20,163 +20,235 @@
 package org.apache.cxf.ws.addressing;
 
 
+import java.util.ResourceBundle;
+
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.i18n.BundleUtils;
 
 /**
  * Encapsulation of version-specific WS-Addressing constants.
  */
-public interface AddressingConstants {
+public class AddressingConstants {
+    private static final ResourceBundle BUNDLE = 
+        BundleUtils.getBundle(AddressingConstants.class);
+    
+    
+    public AddressingConstants() {
+    }
+
     /**
      * @return namespace defined by the normative WS-Addressing Core schema
      */
-    String getNamespaceURI();
-    
+    public String getNamespaceURI() {
+        return Names.WSA_NAMESPACE_NAME;
+    }
+
+
     /**
      * @return namespace defined by the normative WS-Addressing WSDL bindings
      * schema
      */
-    String getWSDLNamespaceURI();
-    
+    public String getWSDLNamespaceURI() {
+        return Names.WSA_NAMESPACE_WSDL_NAME;
+    }
+
     /**
      * @return QName of the WSDL extensiblity element
      */
-    QName getWSDLExtensibilityQName();
-    
+    public QName getWSDLExtensibilityQName() {
+        return Names.WSAW_USING_ADDRESSING_QNAME;
+    }
+
     /**
      * @return QName of the wsaw:Action element
      */
-    QName getWSDLActionQName();
-    
+    public QName getWSDLActionQName() {
+        return Names.WSAW_ACTION_QNAME;
+    }
+
     /**
      * @return Anonymous address URI
      */
-    String getAnonymousURI();
+    public String getAnonymousURI() {
+        return Names.WSA_ANONYMOUS_ADDRESS;
+    }
     
     /**
      * @return None address URI
      */
-    String getNoneURI();
-    
+    public String getNoneURI() {
+        return Names.WSA_NONE_ADDRESS;
+    }
+
     /**
      * @return QName of the From addressing header
      */
-    QName getFromQName();
+    public QName getFromQName() {
+        return Names.WSA_FROM_QNAME;
+    }
     
     /**
      * @return QName of the To addressing header
-     */
-    QName getToQName();
+     */    
+    public QName getToQName() {
+        return Names.WSA_TO_QNAME;
+    }
     
     /**
      * @return QName of the ReplyTo addressing header
      */
-    QName getReplyToQName();
+    public QName getReplyToQName() {
+        return Names.WSA_REPLYTO_QNAME;
+    }
     
     /**
      * @return QName of the FaultTo addressing header
      */
-    QName getFaultToQName();
-    
+    public QName getFaultToQName() {
+        return Names.WSA_FAULTTO_QNAME;
+    }
+
     /**
      * @return QName of the Action addressing header
      */
-    QName getActionQName();
+    public QName getActionQName() {
+        return Names.WSA_ACTION_QNAME;
+    }
     
     /**
      * @return QName of the MessageID addressing header
      */
-    QName getMessageIDQName();
+    public QName getMessageIDQName() {
+        return Names.WSA_MESSAGEID_QNAME;
+    }
     
     /**
-     * @return Default value for RelationshipType indicating a reply 
+     * @return Default value for RelationshipType indicating a reply
      * to the related message
      */
-    String getRelationshipReply();
+    public String getRelationshipReply() {
+        return Names.WSA_RELATIONSHIP_REPLY;
+    }
     
     /**
      * @return QName of the RelatesTo addressing header
      */
-    QName getRelatesToQName();
+    public QName getRelatesToQName() {
+        return Names.WSA_RELATESTO_QNAME;
+    }
     
     /**
      * @return QName of the Relationship addressing header
      */
-    QName getRelationshipTypeQName();
-
+    public QName getRelationshipTypeQName() {
+        return Names.WSA_RELATIONSHIPTYPE_QNAME;
+    }
+    
     /**
      * @return QName of the Metadata
      */
-    QName getMetadataQName();
+    public QName getMetadataQName() {
+        return Names.WSA_METADATA_QNAME;
+    }
     
     /**
      * @return QName of the Address
      */
-    QName getAddressQName();
+    public QName getAddressQName() {
+        return Names.WSA_ADDRESS_QNAME;
+    }
     
+   
     /**
      * @return QName of the reference parameter marker
      */
-    QName getIsReferenceParameterQName();
+    public QName getIsReferenceParameterQName() {
+        return Names.WSA_IS_REFERENCE_PARAMETER_QNAME;
+    }
     
     /**
      * @return QName of the Invalid Message Addressing Property fault subcode
      */
-    QName getInvalidMapQName();
+    public QName getInvalidMapQName() {
+        return Names.INVALID_MAP_QNAME;
+    }
     
     /**
      * @return QName of the Message Addressing Property Required fault subcode
      */
-    QName getMapRequiredQName();
+    public QName getMapRequiredQName() {
+        return Names.MAP_REQUIRED_QNAME;
+    }
     
     /**
      * @return QName of the Destination Unreachable fault subcode
      */
-    QName getDestinationUnreachableQName();
+    public QName getDestinationUnreachableQName() {
+        return Names.DESTINATION_UNREACHABLE_QNAME;
+    }
     
     /**
      * @return QName of the Action Not Supported fault subcode
      */
-    QName getActionNotSupportedQName();
+    public QName getActionNotSupportedQName() {
+        return Names.ACTION_NOT_SUPPORTED_QNAME;
+    }
     
     /**
      * @return QName of the Endpoint Unavailable fault subcode
      */
-    QName getEndpointUnavailableQName();
+    public QName getEndpointUnavailableQName() {
+        return Names.ENDPOINT_UNAVAILABLE_QNAME;
+    }
     
     /**
      * @return Default Fault Action
      */
-    String getDefaultFaultAction();
+    public String getDefaultFaultAction() {
+        return Names.WSA_DEFAULT_FAULT_ACTION;
+    }
     
     /**
      * @return Action Not Supported text
      */
-    String getActionNotSupportedText();
+    public String getActionNotSupportedText() {
+        return BUNDLE.getString("ACTION_NOT_SUPPORTED_MSG");
+    }
 
     /**
      * @return Destination Unreachable text
      */
-    String getDestinationUnreachableText();
-
+    public String getDestinationUnreachableText() {
+        return BUNDLE.getString("DESTINATION_UNREACHABLE_MSG");
+    }
+    
     /**
      * @return Endpoint Unavailable text
      */
-    String getEndpointUnavailableText();
-
+    public String getEndpointUnavailableText() {
+        return BUNDLE.getString("ENDPOINT_UNAVAILABLE_MSG");
+    }
+    
     /**
      * @return Invalid Message Addressing Property text
-     */
-    String getInvalidMapText();
-
+     */    
+    public String getInvalidMapText() {
+        return BUNDLE.getString("INVALID_MAP_MSG");
+    }
+    
     /**
      * @return Message Addressing Property Required text
-     */
-    String getMapRequiredText();
+     */    
+    public String getMapRequiredText() {
+        return BUNDLE.getString("MAP_REQUIRED_MSG");
+    }
 
     /**
      * @return Duplicate Message ID text
      */
-    String getDuplicateMessageIDText();
+    public String getDuplicateMessageIDText() {
+        return BUNDLE.getString("DUPLICATE_MESSAGE_ID_MSG");
+    }
 }
 
