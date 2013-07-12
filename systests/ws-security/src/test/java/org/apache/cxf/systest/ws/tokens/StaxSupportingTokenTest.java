@@ -37,10 +37,10 @@ import org.junit.BeforeClass;
  * This is a test for various properties associated with SupportingTokens, i.e.
  * Signed, Encrypted etc.
  * 
- * It tests both DOM + StAX clients against the DOM server
+ * It tests both DOM + StAX clients against the StAX server
  */
-public class SupportingTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+public class StaxSupportingTokenTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -51,7 +51,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
     }
     
@@ -65,13 +65,13 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSupportingTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
+        URL wsdl = StaxSupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
        
         // Successful invocation
@@ -96,7 +96,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the signed supporting token requirement";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -106,7 +106,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the signed supporting token requirement";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -121,7 +121,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the signed supporting token requirement";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -131,7 +131,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the signed supporting token requirement";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -143,13 +143,13 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testEncryptedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSupportingTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
+        URL wsdl = StaxSupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
        
         // Successful invocation
@@ -174,7 +174,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the encrypted supporting token requirement";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -184,7 +184,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the encrypted supporting token requirement";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -198,7 +198,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the encrypted supporting token requirement";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -208,7 +208,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the encrypted supporting token requirement";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -220,13 +220,13 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedEncryptedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSupportingTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
+        URL wsdl = StaxSupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
        
         // Successful invocation
@@ -251,8 +251,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = 
-                "The received token does not match the signed encrypted supporting token requirement";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -262,8 +261,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = 
-            //    "The received token does not match the signed encrypted supporting token requirement";
+            // String error = "UsernameToken not satisfied";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -277,8 +275,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = 
-                "The received token does not match the signed encrypted supporting token requirement";
+            String error = "UsernameToken not satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -288,9 +285,8 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            //String error = 
-            //    "The received token does not match the signed encrypted supporting token requirement";
-            //assertTrue(ex.getMessage().contains(error));
+            // String error = "UsernameToken not satisfied";
+            // assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();
