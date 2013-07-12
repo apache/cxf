@@ -19,6 +19,9 @@
 
 package org.apache.cxf.staxutils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -75,6 +78,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.w3c.dom.UserDataHandler;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -84,7 +88,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.XMLUtils;
 
 public final class StaxUtils {
     // System properies for defaults, but also contextual properties usable
@@ -637,6 +640,36 @@ public final class StaxUtils {
         xsw.close();
     }
     
+    public static void writeTo(Node node, OutputStream os) throws XMLStreamException {
+        copy(new DOMSource(node), os);
+    }
+    public static void writeTo(Node node, OutputStream os, int indent) throws XMLStreamException {
+        if (indent > 0) {
+            XMLStreamWriter writer = new PrettyPrintXMLStreamWriter(createXMLStreamWriter(os), indent);
+            try {
+                copy(new DOMSource(node), writer);
+            } finally {
+                writer.close();
+            }
+        } else {
+            copy(new DOMSource(node), os);
+        }
+    }
+    public static void writeTo(Node node, Writer os) throws XMLStreamException {
+        writeTo(node, os, 0);
+    }
+    public static void writeTo(Node node, Writer os, int indent) throws XMLStreamException {
+        XMLStreamWriter writer = createXMLStreamWriter(os);
+        if (indent > 0) {
+            writer = new PrettyPrintXMLStreamWriter(writer, indent);
+        }
+        try {
+            copy(new DOMSource(node), writer);
+        } finally {
+            writer.close();
+        }
+    }    
+    
     
     /**
      * Copies the reader to the writer. The start and end document methods must
@@ -1039,6 +1072,26 @@ public final class StaxUtils {
             } catch (Exception ex) {
                 //ignore
             }
+        }
+    }
+    public static Document read(Reader s) throws XMLStreamException {
+        XMLStreamReader reader = createXMLStreamReader(s);
+        try {
+            return read(reader);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
+    public static Document read(File is) throws XMLStreamException, IOException {
+        InputStream fin = new FileInputStream(is);
+        try {
+            return read(fin);
+        } finally {
+            fin.close();
         }
     }
     public static Document read(InputSource s) throws XMLStreamException {
@@ -1537,7 +1590,16 @@ public final class StaxUtils {
 
     public static void printXmlFragment(XMLStreamReader reader) {
         try {
-            LOG.info(XMLUtils.toString(StaxUtils.read(reader), 4));
+            StringWriter sw = new StringWriter(1024);
+            XMLStreamWriter writer = null;
+            try {
+                writer = new PrettyPrintXMLStreamWriter(createXMLStreamWriter(sw), 4);
+                copy(reader, writer);
+                writer.flush();
+            } finally {
+                StaxUtils.close(writer);
+            }        
+            LOG.info(sw.toString());
         } catch (XMLStreamException e) {
             LOG.severe(e.getMessage());
         }
@@ -1655,6 +1717,21 @@ public final class StaxUtils {
         }
     }
 
+    public static String toString(Source src) throws XMLStreamException {
+        StringWriter sw = new StringWriter(1024);
+        XMLStreamWriter writer = null;
+        try {
+            writer = createXMLStreamWriter(sw);
+            copy(src, writer);
+            writer.flush();
+        } finally {
+            StaxUtils.close(writer);
+        }
+        return sw.toString();
+    }
+    public static String toString(Node src) throws XMLStreamException {
+        return toString(new DOMSource(src));
+    }
     public static String toString(Document doc) throws XMLStreamException {
         StringWriter sw = new StringWriter(1024);
         XMLStreamWriter writer = null;
@@ -1662,24 +1739,33 @@ public final class StaxUtils {
             writer = createXMLStreamWriter(sw);
             copy(doc, writer);
             writer.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
         } finally {
             StaxUtils.close(writer);
         }
         return sw.toString();
     }
     public static String toString(Element el) throws XMLStreamException {
+        return toString(el, 0);
+    }
+    public static String toString(Element el, int indent) {
         StringWriter sw = new StringWriter(1024);
         XMLStreamWriter writer = null;
         try {
             writer = createXMLStreamWriter(sw);
+            if (indent > 0) {
+                writer = new PrettyPrintXMLStreamWriter(writer, indent);
+            }
             copy(el, writer);
             writer.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
         } finally {
             StaxUtils.close(writer);
         }        
-        return sw.toString();
+        return sw.toString();        
     }
-
     public static void close(XMLStreamReader reader) {
         if (reader != null) {
             try {
