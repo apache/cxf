@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -563,8 +565,23 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             tokenType = WSSecurityTokenConstants.KerberosToken;
         }
         
+        final Key key = tok.getKey();
+        final byte[] secret = tok.getSecret();
         final GenericOutboundSecurityToken encryptedKeySecurityToken = 
-            new GenericOutboundSecurityToken(tok.getId(), tokenType, tok.getKey());
+            new GenericOutboundSecurityToken(tok.getId(), tokenType, key) {
+          
+                @Override
+                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    if (key != null) {
+                        return key;
+                    }
+                    if (secret != null) {
+                        return new SecretKeySpec(secret, algorithmURI);
+                    }
+                
+                    return super.getSecretKey(algorithmURI);
+                }
+            };
         
         final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
             new SecurityTokenProvider<OutboundSecurityToken>() {
@@ -578,6 +595,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 public String getId() {
                     return encryptedKeySecurityToken.getId();
                 }
+                
             };
         encryptedKeySecurityToken.setSha1Identifier(tok.getSHA1());
         outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
