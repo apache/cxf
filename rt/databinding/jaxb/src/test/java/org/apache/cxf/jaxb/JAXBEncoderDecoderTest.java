@@ -84,7 +84,6 @@ public class JAXBEncoderDecoderTest extends Assert {
     
     @Before
     public void setUp() throws Exception {
-        
         context = JAXBContext.newInstance(new Class[] {
             GreetMe.class,
             GreetMeResponse.class,
@@ -218,7 +217,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         String xmlResult = stringWriter.toString();
         // the following is a bit of a crock, but, to tell the truth, this test case most exists
         // so that it could be examined inside the debugger to see how JAXB works.
-        assertTrue(xmlResult.contains("ns3:string2"));
+        assertTrue(xmlResult.contains(":string2>cord</ns"));
     }
     
     @Test
