@@ -71,6 +71,8 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Test;
 
 
@@ -398,8 +400,10 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         Server server = null;
         server = factory.create();
         Document doc = getWSDLDocument(server);
-        assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/xsd:element[@type='xs:int']",
-                    doc);
+        
+        assertXPathEquals("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/xsd:element/@type",
+                          Constants.XSD_INT,
+                          doc);
         
         factory = new JaxWsServerFactoryBean(); 
         factory.setServiceBean(new GenericsService2<Float, Double>() {
@@ -414,8 +418,9 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         factory.setAddress("local://localhost/test2"); 
         server = factory.create();
         Document doc2 = getWSDLDocument(server);
-        assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/"
-                    + "xsd:element[@type='xs:float']",
+        assertXPathEquals("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/"
+                    + "xsd:element/@type",
+                    Constants.XSD_FLOAT,
                     doc2);
         
         QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "Generics2");
