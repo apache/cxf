@@ -74,7 +74,6 @@ import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
 import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.OutTransformWriter;
@@ -301,34 +300,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             javax.xml.stream.XMLOutputFactory fact = javax.xml.stream.XMLOutputFactory.newInstance();
             XMLStreamWriter writer =
                 new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), 2, getIndentLevel(parent));
-            writer.setNamespaceContext(new javax.xml.namespace.NamespaceContext() {
-                
-                public String getNamespaceURI(String arg) {
-                    return wsdl.getNamespace(arg);
-                }
-                                
-                public String getPrefix(String arg) {
-                    if (arg.equals(jaxbNamespace)) {
-                        arg = namespace;
-                    }
-                    
-                    for (Object ent : wsdl.getNamespaces().entrySet()) {
-                        Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
-                        if (arg.equals(entry.getValue())) {
-                            return (String)entry.getKey();
-                        }
-                    }
-                    return null;
-                }
-                
-                public Iterator<String> getPrefixes(String arg) {
-                    if (arg.equals(jaxbNamespace)) {
-                        arg = namespace;
-                    }
-                    Iterator<String> ret = CastUtils.cast(wsdl.getNamespaces().keySet().iterator());
-                    return ret;
-                }
-            });
+            
             if (namespace != null && !namespace.equals(jaxbNamespace)) {
                 Map<String, String> outMap = new HashMap<String, String>();
                 outMap.put("{" + jaxbNamespace + "}*", "{" + namespace + "}*");
