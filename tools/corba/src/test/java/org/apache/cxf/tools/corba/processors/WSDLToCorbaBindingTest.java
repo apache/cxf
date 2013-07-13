@@ -49,6 +49,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.WSDLCorbaFactory;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToCorbaBinding;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -506,7 +507,6 @@ public class WSDLToCorbaBindingTest extends Assert {
 
         Definition model = generator.generateCORBABinding();
         Document document = writer.getDocument(model);        
-
         Element typemap = getElementNode(document, "corba:typeMapping"); 
         assertNotNull(typemap);        
         assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());        

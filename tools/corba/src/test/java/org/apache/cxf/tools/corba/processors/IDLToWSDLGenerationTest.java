@@ -34,11 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.corba.common.ProcessorEnvironment;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.cxf.tools.corba.processors.idl.IDLToWSDLProcessor;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +54,28 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
 
     @Before
     public void setUp() {
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonarray"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "struct"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "member"), "idltype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "object"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "object"), "binding");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "enum"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "union"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "unionbranch"), "idltype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonstring"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonwstring"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "exception"), "idltype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "exception"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "fixed"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "const"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "const"), "idltype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "array"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "array"), "elemtype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "alias"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "alias"), "basetype");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonsequence"), "type");
+        addQNameAttribute(new QName(CorbaConstants.NU_WSDL_CORBA, "anonsequence"), "elemtype");
+
     }
 
     @After
@@ -74,6 +99,7 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         InputStream origStream = getClass().getResourceAsStream(expectedWsdlFilename);  
         InputStream actualStream = new ByteArrayInputStream(out.toString().getBytes());
 
+        System.out.println(out.toString());
         assertWsdlEquals(origStream, actualStream, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
     }
     

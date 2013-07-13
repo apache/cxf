@@ -26,7 +26,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
@@ -101,9 +104,17 @@ public final class ToolsStaxUtils {
 
     public static Tag getTagTree(final File source, final List<String> ignoreAttr) throws Exception {
         InputStream is = new BufferedInputStream(new FileInputStream(source));
-        return getTagTree(is, ignoreAttr);
+        return getTagTree(is, ignoreAttr, null);
     }
-    public static Tag getTagTree(final InputStream is, final List<String> ignoreAttr) throws Exception {
+    public static Tag getTagTree(final File source,
+                                 final List<String> ignoreAttr,
+                                 Map<QName, Set<String>> types) throws Exception {
+        InputStream is = new BufferedInputStream(new FileInputStream(source));
+        return getTagTree(is, ignoreAttr, types);        
+    }    
+    public static Tag getTagTree(final InputStream is,
+                                 final List<String> ignoreAttr,
+                                 Map<QName, Set<String>> types) throws Exception {
         Tag root = new Tag();
         root.setName(new QName("root", "root"));
 
@@ -123,25 +134,25 @@ public final class ToolsStaxUtils {
                 }
 
                 for (int i = 0; i < reader.getAttributeCount(); i++) {
-                    if ("type".equals(reader.getAttributeLocalName(i))
-                        && "element".equals(reader.getLocalName())) {
-                        //probably a qname to a type, pull namespace in differently
-                        String tp = reader.getAttributeValue(i);
-                        if (tp.contains(":")) {
-                            String ns = tp.substring(0, tp.indexOf(":"));
-                            if ("tns".equals(ns)) {
-                                tp = tp.substring(tp.indexOf(":") + 1);
-                            } else {
-                                ns = reader.getNamespaceURI(ns);
-                                tp = "{" + ns + "}" + tp.substring(tp.indexOf(":") + 1);
+                    //probably a qname to a type, pull namespace in differently
+                    String tp = reader.getAttributeValue(i);
+                    if (isType(types, reader.getName(), reader.getAttributeName(i))) {
+                        int idx = tp.indexOf(':');
+                        if (idx > 0 && tp.length() > idx && tp.substring(idx + 1).indexOf(':') == -1) {
+                            String pfx = tp.substring(0, idx);
+                            String ns = reader.getNamespaceURI(pfx);
+                            if (ns != null) {
+                                tp = "{" + ns + "}" + tp.substring(idx + 1);
+                            }
+                        } else { 
+                            String ns = reader.getNamespaceURI("");
+                            if (ns != null) {
+                                tp = "{" + ns + "}" + tp.substring(idx + 1);
                             }
                         }
-                        newTag.getAttributes().put(reader.getAttributeName(i), 
-                                                   tp);
-                    } else {
-                        newTag.getAttributes().put(reader.getAttributeName(i), 
-                                                   reader.getAttributeValue(i));
                     }
+                    newTag.getAttributes().put(reader.getAttributeName(i), 
+                                               tp);
                 }
 
                 newTag.setParent(currentTag);
@@ -160,8 +171,12 @@ public final class ToolsStaxUtils {
         return root;
     }
 
-    public Tag getLastTag(Tag tag) {
-        int lastIndex = tag.getTags().size() - 1;
-        return tag.getTags().get(lastIndex);
+    private static boolean isType(Map<QName, Set<String>> types, QName name, QName attributeName) {
+        if (types == null) {
+            return false;
+        }
+        Set<String> a = types.get(name);
+        return a != null && a.contains(attributeName.getLocalPart());
     }
+
 }
