@@ -21,6 +21,7 @@ package org.apache.cxf.staxutils.transform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,13 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,10 +72,11 @@ public class OutTransformWriterTest extends Assert {
     }
     
     @Test
-    public void testNamespaceConversion() throws Exception {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, "UTF-8");
-        
+    public void testNamespaceConversion() throws Exception {        
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+
+        JAXBContext context = JAXBContext.newInstance(TestBean.class);
+        Marshaller m = context.createMarshaller();
         Map<String, String> outMap = new HashMap<String, String>();
         outMap.put("{http://testbeans.com}testBean", "{http://testbeans.com/v2}testBean");
         outMap.put("{http://testbeans.com}bean", "{http://testbeans.com/v3}bean");
@@ -78,26 +86,21 @@ public class OutTransformWriterTest extends Assert {
                                                                     Collections.<String>emptyList(),
                                                                     false,
                                                                     "");
-        JAXBContext context = JAXBContext.newInstance(TestBean.class);
-        Marshaller m = context.createMarshaller();
         m.marshal(new TestBean(), transformWriter);
         
-        String xmlPI = "<?xml version='1.0' encoding='UTF-8'?>";
-        String start = "<ps1:testBean xmlns:ps1=\"http://testbeans.com/v2\"";
-        String expected1 = xmlPI + start
-            + " xmlns:ps2=\"http://testbeans.com/v3\"><ps2:bean/></ps1:testBean>";
-        String expected2 = xmlPI + start
-            + "><ps2:bean xmlns:ps2=\"http://testbeans.com/v3\"/></ps1:testBean>";
-        String out = os.toString();
-        assertTrue("Output \"" + out + "\" does not match expected values",
-                expected1.equals(out) || expected2.equals(out));
+        Element el = writer.getDocument().getDocumentElement();
+        assertEquals("http://testbeans.com/v2", el.getNamespaceURI());
+        assertFalse(StringUtils.isEmpty(el.getPrefix()));
+        
+        Element el2 = DOMUtils.getFirstElement(el);
+        assertEquals("http://testbeans.com/v3", el2.getNamespaceURI());
+        assertFalse(StringUtils.isEmpty(el2.getPrefix()));
         
     }
     
     @Test
     public void testNamespaceConversionAndDefaultNS() throws Exception {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, "UTF-8");
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         
         Map<String, String> outMap = new HashMap<String, String>();
         outMap.put("{http://testbeans.com}testBean", "{http://testbeans.com/v2}testBean");
@@ -112,15 +115,13 @@ public class OutTransformWriterTest extends Assert {
         Marshaller m = context.createMarshaller();
         m.marshal(new TestBean(), transformWriter);
         
-        String xmlPI = "<?xml version='1.0' encoding='UTF-8'?>";
-        String start = "<testBean xmlns=\"http://testbeans.com/v2\"";
-        String expected1 = xmlPI + start
-            + " xmlns:ps2=\"http://testbeans.com/v3\"><ps2:bean/></testBean>";
-        String expected2 = xmlPI + start
-            + "><ps2:bean xmlns:ps2=\"http://testbeans.com/v3\"/></testBean>";
-        String out = os.toString();
-        assertTrue("Output \"" + out + "\" does not match expected values",
-                expected1.equals(out) || expected2.equals(out));
+        Element el = writer.getDocument().getDocumentElement();
+        assertEquals("http://testbeans.com/v2", el.getNamespaceURI());
+        assertTrue(StringUtils.isEmpty(el.getPrefix()));
+        
+        el = DOMUtils.getFirstElement(el);
+        assertEquals("http://testbeans.com/v3", el.getNamespaceURI());
+        assertFalse(StringUtils.isEmpty(el.getPrefix()));
     }
  
     @XmlRootElement(name = "testBean", namespace = "http://testbeans.com")
