@@ -77,7 +77,6 @@ import org.apache.cxf.common.jaxb.JAXBContextProxy;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XmlSchemaPrimitiveUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -1383,8 +1382,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         if (useJaxbContextForQnames) {
             if (context != null) {
-                JAXBContextProxy proxy = ReflectionInvokationHandler
-                    .createProxyWrapper(context, JAXBContextProxy.class);
+                JAXBContextProxy proxy = JAXBUtils.createJAXBContextProxy(context);
                 return new JaxbContextQNameResolver(proxy);
             } else {
                 return null;

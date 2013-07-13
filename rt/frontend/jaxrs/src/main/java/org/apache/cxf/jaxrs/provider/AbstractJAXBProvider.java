@@ -69,7 +69,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
-import org.apache.cxf.common.jaxb.NamespaceMapper;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -141,11 +140,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     protected void setNamespaceMapper(Marshaller ms, 
                                       Map<String, String> map) throws Exception {
-        NamespaceMapper nsMapper = new NamespaceMapper(map);
+        Object nsMapper = JAXBUtils.setNamespaceWrapper(map, ms);
         if (namespaceMapperPropertyName != null) {
             setMarshallerProp(ms, nsMapper, namespaceMapperPropertyName, null);
-        } else {
-            setMarshallerProp(ms, nsMapper, NS_MAPPER_PROPERTY_RI, NS_MAPPER_PROPERTY_RI_INT);
         }
     }
     

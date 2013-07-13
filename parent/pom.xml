@@ -403,6 +403,7 @@
                             <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
                             <org.apache.cxf.transport.http.async.usePolicy>ALWAYS</org.apache.cxf.transport.http.async.usePolicy>
+                            <!--javax.xml.bind.JAXBContext>org.eclipse.persistence.jaxb.JAXBContextFactory</javax.xml.bind.JAXBContext-->
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

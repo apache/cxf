@@ -50,7 +50,6 @@ import org.apache.cxf.common.jaxb.JAXBBeanInfo;
 import org.apache.cxf.common.jaxb.JAXBContextProxy;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.interceptor.Fault;
@@ -87,7 +86,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                                  boolean q) {
         super(serviceInfo);
         schemas = col;
-        this.context = ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
+        this.context = JAXBUtils.createJAXBContextProxy(context);
         this.qualifiedSchemas = q;
     }
 

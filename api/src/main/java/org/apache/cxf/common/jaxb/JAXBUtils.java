@@ -37,6 +37,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,7 +70,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelper.ClassWriter;
 import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
@@ -114,7 +115,6 @@ public final class JAXBUtils {
     
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
     private static ClassLoader jaxbXjcLoader;
 
     static {
@@ -577,28 +577,20 @@ public final class JAXBUtils {
             throw new JAXBException(e);
         }
     }
-    public static void setNamespaceWrapper(final Map<String, String> nspref,
+    public static Object setNamespaceWrapper(final Map<String, String> nspref,
                                            Marshaller marshaller) throws PropertyException {
-        Object mapper = null;
+        Object mapper = createNamespaceWrapper(marshaller.getClass(), nspref);
         if (marshaller.getClass().getName().contains(".internal.")) {
-            mapper = createNamespaceWrapper(nspref);
-            if (mapper == null) {
-                LOG.log(Level.INFO, "Could not create namespace mapper for JDK internal"
-                        + " JAXB implementation.");
-            } else {
-                marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
+            marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
                                    mapper);
-            }
-        } else {
-            try {
-                Class<?> cls = Class.forName("org.apache.cxf.common.jaxb.NamespaceMapper");
-                mapper = cls.getConstructor(Map.class).newInstance(nspref);
-            } catch (Exception ex) {
-                LOG.log(Level.INFO, "Could not create NamespaceMapper", ex);
-            }
+        } else if (marshaller.getClass().getName().contains("com.sun")) {
             marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",
                                    mapper);
+        } else if (marshaller.getClass().getName().contains("eclipse")) {
+            marshaller.setProperty("eclipselink.namespace-prefix-mapper",
+                                   mapper);
         }
+        return mapper;
     }
     public static BridgeWrapper createBridge(Set<Class<?>> ctxClasses,
                                       QName qname,
@@ -1027,16 +1019,26 @@ public final class JAXBUtils {
         return false;
     }
     
-    private static synchronized Object createNamespaceWrapper(Map<String, String> map) {
+    private static synchronized Object createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
         ASMHelper helper = new ASMHelper();
-        String className = "org.apache.cxf.jaxb.NamespaceMapperInternal";
+        String className = "org.apache.cxf.jaxb.NamespaceMapper";
+        String postFix = ""; 
+        if (mcls.getName().contains("eclipse")) {
+            //can use the map directly
+            return map;
+        } else if (mcls.getName().contains(".internal")) {
+            postFix = "Internal";
+        } else if (mcls.getName().contains("com.sun")) {
+            postFix = "RI";
+        }
+        className += postFix;
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
         if (cls == null) {
             ClassWriter cw = helper.createClassWriter();
             if (cw == null) {
                 return null;
             }
-            cls = createNamespaceWrapperInternal(helper, cw);
+            cls = createNamespaceWrapperInternal(helper, cw, postFix, mcls);
         }
         try {
             return cls.getConstructor(Map.class).newInstance(map);
@@ -1044,14 +1046,18 @@ public final class JAXBUtils {
             return null;
         }
     }
-    private static Class<?> createNamespaceWrapperInternal(ASMHelper helper, ClassWriter cw) {
-        String className = "org.apache.cxf.jaxb.NamespaceMapperInternal";
+    private static Class<?> createNamespaceWrapperInternal(ASMHelper helper, ClassWriter cw, 
+                                                           String postFix, Class<?> ref) {
+        String className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
+        String superName = "com/sun/xml/" 
+            + ("RI".equals(postFix) ? "" : "internal/") 
+            + "bind/marshaller/NamespacePrefixMapper";
         FieldVisitor fv;
         MethodVisitor mv;
         cw.visit(Opcodes.V1_5, 
                  Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL + Opcodes.ACC_SUPER,
-                 "org/apache/cxf/jaxb/NamespaceMapperInternal", null,
-                 "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", null);
+                 "org/apache/cxf/jaxb/NamespaceMapper" + postFix, null,
+                 superName, null);
 
         cw.visitSource("NamespaceMapper.java", null);
 
@@ -1069,13 +1075,13 @@ public final class JAXBUtils {
         mv.visitLineNumber(30, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
-                           "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", "<init>", "()V");
+                           superName, "<init>", "()V");
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(31, l1);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, "org/apache/cxf/jaxb/NamespaceMapperInternal",
+        mv.visitFieldInsn(Opcodes.PUTFIELD, "org/apache/cxf/jaxb/NamespaceMapper" + postFix,
                           "nspref", "Ljava/util/Map;");
         Label l2 = helper.createLabel();
         mv.visitLabel(l2);
@@ -1083,7 +1089,7 @@ public final class JAXBUtils {
         mv.visitInsn(Opcodes.RETURN);
         Label l3 = helper.createLabel();
         mv.visitLabel(l3);
-        mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapperInternal;", null, l0, l3, 0);
+        mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapper" + postFix + ";", null, l0, l3, 0);
         mv.visitLocalVariable("nspref", "Ljava/util/Map;",
                               "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;", 
                               l0, l3, 1);
@@ -1099,7 +1105,7 @@ public final class JAXBUtils {
         mv.visitLineNumber(38, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitFieldInsn(Opcodes.GETFIELD, 
-                          "org/apache/cxf/jaxb/NamespaceMapperInternal", 
+                          "org/apache/cxf/jaxb/NamespaceMapper" + postFix, 
                           "nspref", "Ljava/util/Map;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", 
@@ -1123,7 +1129,7 @@ public final class JAXBUtils {
         mv.visitInsn(Opcodes.ARETURN);
         Label l4 = helper.createLabel();
         mv.visitLabel(l4);
-        mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapperInternal;", null, l0, l4, 0);
+        mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapper" + postFix + ";", null, l0, l4, 0);
         mv.visitLocalVariable("namespaceUri", "Ljava/lang/String;", null, l0, l4, 1);
         mv.visitLocalVariable("suggestion", "Ljava/lang/String;", null, l0, l4, 2);
         mv.visitLocalVariable("requirePrefix", "Z", null, l0, l4, 3);
@@ -1133,28 +1139,60 @@ public final class JAXBUtils {
         cw.visitEnd();
 
         byte bts[] = cw.toByteArray();
-        
-        
-        Class<?> cls;
-        try {
-            cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            try {
-                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
-            } catch (ClassNotFoundException e1) {
-                cls = JAXBUtils.class;
-            }
-        }
-        
         return helper.loadClass(className,
-                                cls, bts);
+                                ref, bts);
     }
     
+    public static JAXBContextProxy createJAXBContextProxy(final JAXBContext ctx) {
+        if (ctx.getClass().getName().contains("eclipse")) {
+            final org.eclipse.persistence.jaxb.JAXBContext c = (org.eclipse.persistence.jaxb.JAXBContext)ctx;
+            return new JAXBContextProxy() {
+                public Object getBeanInfo(Class<?> cls) {
+                    final org.eclipse.persistence.oxm.XMLDescriptor xd 
+                        = (org.eclipse.persistence.oxm.XMLDescriptor)c.getXMLContext().getSession().getDescriptor(cls);
+                    final QName schemaType = xd.getSchemaReference().getSchemaContextAsQName();
+                    if (xd.getDefaultRootElementField() != null) {
+                        return new JAXBBeanInfo() {
+                            public boolean isElement() {
+                                return true;
+                            }
+                            public Collection<QName> getTypeNames() {
+                                return Collections.singletonList(schemaType);
+                            }
+                            public String getElementNamespaceURI(Object object) {
+                                return xd.getDefaultRootElementField().getXPathFragment().getNamespaceURI();
+                            }
+                            public String getElementLocalName(Object object) {
+                                return xd.getDefaultRootElementField().getXPathFragment().getLocalName();
+                            }
+                        };
+                    }
+                    return new JAXBBeanInfo() {
+                        public boolean isElement() {
+                            return false;
+                        }
+                        public Collection<QName> getTypeNames() {
+                            return Collections.singletonList(schemaType);
+                        }
+                        public String getElementNamespaceURI(Object object) {
+                            return null;
+                        }
+                        public String getElementLocalName(Object object) {
+                            return null;
+                        }
+                    };
+                }
+            };
+        }
+        return ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
+    }
     public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
         Object o = context.getBeanInfo(cls);
         if (o == null) {
             return null;
+        }
+        if (o instanceof JAXBBeanInfo) {
+            return (JAXBBeanInfo)o;
         }
         return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
     }

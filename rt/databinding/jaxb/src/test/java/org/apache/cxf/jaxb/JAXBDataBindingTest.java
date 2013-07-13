@@ -48,8 +48,8 @@ import org.w3c.dom.Node;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.jaxb.JAXBContextProxy;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.helpers.CastUtils;
@@ -65,6 +65,7 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -184,13 +185,16 @@ public class JAXBDataBindingTest extends Assert {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(ObjectFactory.class);
         JAXBContext ctx = db.createJAXBContext(classes);
-        JAXBContextProxy ctxp = ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
+        JAXBContextProxy ctxp = JAXBUtils.createJAXBContextProxy(ctx);
         assertNotNull(JAXBSchemaInitializer.getBeanInfo(ctxp, TestJAXBClass.class));
     }
     
     @Test 
     public void testContextProperties() throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
+        Map<String, String> nsMap = new HashMap<String, String>();
+        nsMap.put("uri:ultima:thule", "");
+        db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<String, Object>();
         contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
@@ -206,7 +210,7 @@ public class JAXBDataBindingTest extends Assert {
         writer.write(bean, xmlWriter);
         xmlWriter.flush();
         String xml = stringWriter.toString();
-        assertTrue(xml.contains("uri:ultima:thule"));
+        assertTrue(xml, xml.contains("uri:ultima:thule"));
     }
     
     @Test
@@ -216,7 +220,7 @@ public class JAXBDataBindingTest extends Assert {
         nsMap.put("uri:ultima:thule", "greenland");
         db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<String, Object>();
-        contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
+        //contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(QualifiedBean.class);
