@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -76,6 +77,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.transform.OutTransformWriter;
 
 
 /**
@@ -327,6 +329,16 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     return ret;
                 }
             });
+            if (namespace != null && !namespace.equals(jaxbNamespace)) {
+                Map<String, String> outMap = new HashMap<String, String>();
+                outMap.put("{" + jaxbNamespace + "}*", "{" + namespace + "}*");
+                writer = new OutTransformWriter(writer,
+                                                outMap,
+                                                Collections.<String, String>emptyMap(),
+                                                Collections.<String>emptyList(),
+                                                false,
+                                                "");
+            }
             
             u.marshal(mObj, writer);
             writer.flush();            
