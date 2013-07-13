@@ -19,25 +19,25 @@
 -->
 <wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Struct" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Struct/typemap">
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:OutsideStruct:1.0" type="OutsideStruct" name="OutsideStruct">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" repositoryID="IDL:OutsideStruct:1.0" type="OutsideStruct" name="OutsideStruct">
       <corba:member name="number" idltype="corba:long" />
       <corba:member name="word" idltype="corba:string" />
     </corba:struct>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/Employee:1.0" type="StructTest.Employee" name="StructTest.Employee">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" repositoryID="IDL:StructTest/Employee:1.0" type="StructTest.Employee" name="StructTest.Employee">
       <corba:member name="name" idltype="corba:string" />
       <corba:member name="dept" idltype="corba:string" />
     </corba:struct>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/Compensation:1.0" type="StructTest.Compensation" name="StructTest.Compensation">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" repositoryID="IDL:StructTest/Compensation:1.0" type="StructTest.Compensation" name="StructTest.Compensation">
       <corba:member name="amount" idltype="corba:long" />
       <corba:member name="currency" idltype="corba:string" />
       <corba:member name="praise" idltype="corba:string" />
     </corba:struct>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/NestedOutsideStruct:1.0" type="StructTest.NestedOutsideStruct" name="StructTest.NestedOutsideStruct">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" repositoryID="IDL:StructTest/NestedOutsideStruct:1.0" type="StructTest.NestedOutsideStruct" name="StructTest.NestedOutsideStruct">
       <corba:member name="aShort" idltype="corba:short" />
       <corba:member name="aLong" idltype="corba:long" />
       <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" name="outsider" idltype="ns4:OutsideStruct" />
     </corba:struct>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:StructTest/NestedStructs:1.0" type="StructTest.NestedStructs" name="StructTest.NestedStructs">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Struct" repositoryID="IDL:StructTest/NestedStructs:1.0" type="StructTest.NestedStructs" name="StructTest.NestedStructs">
       <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" name="employStruct" idltype="ns4:StructTest.Employee" />
       <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Struct/typemap" name="compensationStruct" idltype="ns4:StructTest.Compensation" />
     </corba:struct>

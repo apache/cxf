@@ -19,18 +19,18 @@
 -->
 <wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopedStruct" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/scopedStruct" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/scopedStruct/typemap">
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:globalStruct:1.0" type="globalStruct" name="globalStruct">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/scopedStruct" repositoryID="IDL:globalStruct:1.0" type="globalStruct" name="globalStruct">
       <corba:member name="time" idltype="corba:long" />
     </corba:struct>
     <corba:alias basetype="corba:short" repositoryID="IDL:var:1.0" name="var" />
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:firstModule/var:1.0" type="firstModule.var" name="firstModule.var">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/scopedStruct" repositoryID="IDL:firstModule/var:1.0" type="firstModule.var" name="firstModule.var">
       <corba:member name="number" idltype="corba:long" />
     </corba:struct>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:firstModule/firstInterface/firstStruct:1.0" type="firstModule.firstInterface.firstStruct" name="firstModule.firstInterface.firstStruct">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/scopedStruct" repositoryID="IDL:firstModule/firstInterface/firstStruct:1.0" type="firstModule.firstInterface.firstStruct" name="firstModule.firstInterface.firstStruct">
       <corba:member name="number" idltype="corba:long" />
       <corba:member name="word" idltype="corba:string" />
     </corba:struct>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:secondModule/secondInterface/secondStruct:1.0" type="secondModule.secondInterface.secondStruct" name="secondModule.secondInterface.secondStruct">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/scopedStruct" repositoryID="IDL:secondModule/secondInterface/secondStruct:1.0" type="secondModule.secondInterface.secondStruct" name="secondModule.secondInterface.secondStruct">
       <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/scopedStruct/typemap" name="hour" idltype="ns4:globalStruct" />
       <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/scopedStruct/typemap" name="minute" idltype="ns4:firstModule.firstInterface.firstStruct" />
       <corba:member xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/scopedStruct/typemap" name="second" idltype="ns4:firstModule.firstInterface.firstStruct" />
