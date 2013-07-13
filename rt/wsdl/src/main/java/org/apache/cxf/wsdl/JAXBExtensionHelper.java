@@ -64,6 +64,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ASMHelper.AnnotationVisitor;
@@ -311,7 +312,12 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                                 false,
                                                 "");
             }
-            
+            Map<String, String> nspref = new HashMap<String, String>();
+            for (Object ent : wsdl.getNamespaces().entrySet()) {
+                Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
+                nspref.put((String)entry.getValue(), (String)entry.getKey());
+            }
+            JAXBUtils.setNamespaceWrapper(nspref, u);
             u.marshal(mObj, writer);
             writer.flush();            
         } catch (Exception ex) {
