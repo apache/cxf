@@ -103,11 +103,19 @@ public class WSDLGenerationTester {
                 //skip this atribute
                 origAttrCount--;
             } else {
+                String s1 = orig.getAttributeValue(origAttrName.getNamespaceURI(),
+                                                   origAttrName.getLocalPart());
+                String s2 = actual.getAttributeValue(origAttrName.getNamespaceURI(),
+                                                     origAttrName.getLocalPart());
+                
+                if (!s1.equals(s2)
+                    && (s1.contains(":") || s2.contains(":"))) {
+                    s1 = mapToQName(orig, s1);
+                    s2 = mapToQName(actual, s2);
+                }
+                
                 Assert.assertEquals("Attribute " + origAttrName + " not found or value not matching",
-                                    orig.getAttributeValue(origAttrName.getNamespaceURI(),
-                                    origAttrName.getLocalPart()),
-                                    actual.getAttributeValue(origAttrName.getNamespaceURI(),
-                                    origAttrName.getLocalPart()));
+                                    s1, s2);
             }
         }
         for (int i = 0; i < actualAttrCount; i++) {
@@ -121,6 +129,22 @@ public class WSDLGenerationTester {
         Assert.assertEquals("Attribute count is not matched for element " + orig.getName(),
                             origAttrCount,
                             actualAttrCount);
+    }
+
+    private String mapToQName(XMLStreamReader reader, String s2) {
+        int idx = s2.indexOf(':');
+        String ns = null;
+        if (idx == -1) {
+            ns = reader.getNamespaceURI("");
+        } else {
+            ns = reader.getNamespaceURI(s2.substring(0, idx));
+            if (ns == null) {
+                ns = reader.getNamespaceURI("");
+            } else {
+                s2 = s2.substring(idx + 1);
+            }
+        }
+        return new QName(ns, s2).toString();
     }
 
     private void compareEndElement(XMLStreamReader orig, XMLStreamReader actual)
