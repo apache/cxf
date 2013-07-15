@@ -57,6 +57,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -96,6 +97,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address);
         Response r = wc.form(new org.apache.cxf.jaxrs.ext.form.Form());
         assertEquals("empty form", r.readEntity(String.class));
+    }
+    
+    @Test
+    public void testGetBookDescriptionHttpResponse() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/httpresponse";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getInInterceptors().add(new LoggingInInterceptor());
+        Response r = wc.get();
+        assertEquals("text/plain", r.getMediaType().toString());
+        assertEquals("Good Book", r.readEntity(String.class));
     }
 
     @Test
