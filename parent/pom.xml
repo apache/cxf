@@ -156,7 +156,7 @@
         <cxf.woodstox.core.version>4.2.0</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.wss4j.version>1.6.10</cxf.wss4j.version>
+        <cxf.wss4j.version>1.6.11</cxf.wss4j.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
