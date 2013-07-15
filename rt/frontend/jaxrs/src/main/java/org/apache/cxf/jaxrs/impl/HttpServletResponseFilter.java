@@ -41,6 +41,21 @@ public class HttpServletResponseFilter extends HttpServletResponseWrapper {
     }
     
     @Override
+    public void setContentType(String ct) {
+        super.setContentType(ct);
+        m.getExchange().put(Message.CONTENT_TYPE, ct);
+    }
+    
+    @Override
+    public void addHeader(String name, String value) {
+        if (Message.CONTENT_TYPE.equals(name)) {
+            setContentType(value);
+        } else {
+            super.addHeader(name, value);
+        }
+    }
+    
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStreamFilter(super.getOutputStream(), m);
     }

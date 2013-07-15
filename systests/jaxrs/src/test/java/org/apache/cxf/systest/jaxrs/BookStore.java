@@ -169,6 +169,17 @@ public class BookStore {
         return doGetBook("123");
     }
     
+    @GET
+    @Path("/httpresponse")
+    public void getBookDesciptionHttpResponse(@Context HttpServletResponse response) {
+        response.setContentType("text/plain");
+        try {
+            response.getOutputStream().write("Good Book".getBytes());
+        } catch (IOException ex) {
+            throw new WebApplicationException(ex);
+        }
+    }
+    
     @RETRIEVE
     @Path("/retrieve")
     @Produces("application/xml")
