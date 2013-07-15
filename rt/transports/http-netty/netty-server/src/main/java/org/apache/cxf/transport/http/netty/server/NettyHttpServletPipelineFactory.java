@@ -65,9 +65,11 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
     private final ExecutionHandler executionHandler;
 
     private final Map<String, NettyHttpContextHandler> handlerMap;
+    
+    private final int maxChunkContentSize;
 
     public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters, 
-                                           boolean supportSession, int threadPoolSize,
+                                           boolean supportSession, int threadPoolSize, int maxChunkContentSize,
                                            Map<String, NettyHttpContextHandler> handlerMap,
                                            IdleStateHandler idleStateHandler) {
         this.supportSession = supportSession;
@@ -75,6 +77,7 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         this.watchdog = new HttpSessionWatchdog();
         this.handlerMap = handlerMap;
         this.tlsServerParameters = tlsServerParameters;
+        this.maxChunkContentSize = maxChunkContentSize;
         // TODO need to check the if we need pass other setting
         this.executionHandler = 
             new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(threadPoolSize, 2048576, 204857600));
@@ -148,7 +151,7 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         }
 
         pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));
+        pipeline.addLast("aggregator", new HttpChunkAggregator(maxChunkContentSize));
         pipeline.addLast("encoder", new HttpResponseEncoder());
 
         // Remove the following line if you don't want automatic content

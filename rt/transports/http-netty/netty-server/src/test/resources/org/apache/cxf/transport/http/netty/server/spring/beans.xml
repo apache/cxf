@@ -65,7 +65,7 @@
 	      <hn:threadingParameters threadPoolSize="400"/>
 	   </hn:engine>
 	   
-	   <hn:engine port="9001" readIdleTime="40000">
+	   <hn:engine port="9001" readIdleTime="40000" maxChunkContentSize="10000">
 	     <hn:threadingParameters threadPoolSize="99" />	      
 	     <hn:sessionSupport>true</hn:sessionSupport>
 	  </hn:engine> 

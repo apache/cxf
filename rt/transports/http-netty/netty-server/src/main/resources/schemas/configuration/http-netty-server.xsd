@@ -143,6 +143,11 @@
                 <xs:documentation>Specifies the maximum write idle time for a Netty connection. The timer is reset whenever there are any write actions on the underlying stream.</xs:documentation> 
            </xs:annotation>
        </xs:attribute>
+       <xs:attribute name="maxChunkContentSize" type="ptp:ParameterizedInt">
+           <xs:annotation>  
+                <xs:documentation>Specifies the maximum aggregated content size for a Netty connection. The default value is 10M.</xs:documentation> 
+           </xs:annotation>
+       </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="NettyHttpServerEngineFactoryConfigType">

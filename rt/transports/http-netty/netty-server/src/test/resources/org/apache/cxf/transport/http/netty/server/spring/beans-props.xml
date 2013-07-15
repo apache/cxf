@@ -76,7 +76,7 @@
 	      <hn:threadingParametersRef id="sampleThreading1"/>	      
 	   </hn:engine>
        
-	   <hn:engine port="$(engine.port.nine.one)" readIdleTime="$(engine.port.nine.one.readIdle)">
+	   <hn:engine port="$(engine.port.nine.one)" readIdleTime="$(engine.port.nine.one.readIdle)" maxChunkContentSize="${engine.port.nine.one.maxChunkContentSize}">
 	     <hn:threadingParameters threadPoolSize="$(engine.port.nine.one.threadPoolSize)" />	
          <hn:sessionSupport>true</hn:sessionSupport>
 	  </hn:engine> 

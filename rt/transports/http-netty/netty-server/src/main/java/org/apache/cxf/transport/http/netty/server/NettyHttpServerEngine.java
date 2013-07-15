@@ -75,6 +75,8 @@ public class NettyHttpServerEngine implements ServerEngine {
     
     private int writeIdleTime = 30;
     
+    private int maxChunkContentSize = 1048576; 
+    
     private boolean sessionSupport;
     
     public NettyHttpServerEngine() {
@@ -141,7 +143,8 @@ public class NettyHttpServerEngine implements ServerEngine {
         servletPipeline = 
             new NettyHttpServletPipelineFactory(
                  tlsServerParameters, sessionSupport, 
-                 threadingParameters.getThreadPoolSize(), 
+                 threadingParameters.getThreadPoolSize(),
+                 maxChunkContentSize,
                  handlerMap, idleStateHandler);
         // Start the servletPipeline's timer
         servletPipeline.start();
@@ -232,6 +235,14 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     public void setSessionSupport(boolean session) {
         this.sessionSupport = session;
+    }
+    
+    public int getMaxChunkContentSize() {
+        return maxChunkContentSize;
+    }
+
+    public void setMaxChunkContentSize(int maxChunkContentSize) {
+        this.maxChunkContentSize = maxChunkContentSize;
     }
     
     public int getPort() {

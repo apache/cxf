@@ -133,6 +133,7 @@ public class ApplicationContextTest extends Assert {
         
         engine = (NettyHttpServerEngine)jd2.getEngine();
         assertEquals(40000, engine.getReadIdleTime());
+        assertEquals(10000, engine.getMaxChunkContentSize());
         assertTrue("The engine should support session manager", engine.isSessionSupport());
         
         NettyHttpDestination jd3 = 

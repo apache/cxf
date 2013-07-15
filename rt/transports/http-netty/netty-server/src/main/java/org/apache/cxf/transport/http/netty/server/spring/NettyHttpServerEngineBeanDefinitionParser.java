@@ -85,6 +85,12 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             bean.addPropertyValue("writeIdleTime", writeIdleTimeStr);
         }
         
+        String maxChunkContentSizeStr = element.getAttribute("maxChunkContentSize");
+        if (maxChunkContentSizeStr != null && !"".equals(maxChunkContentSizeStr.trim())) {
+            bean.addPropertyValue("maxChunkContentSize", maxChunkContentSizeStr);
+        }
+        
+        
         ValueHolder busValue = ctx.getContainingBeanDefinition()
             .getConstructorArgumentValues().getArgumentValue(0, Bus.class);
         bean.addPropertyValue("bus", busValue.getValue());

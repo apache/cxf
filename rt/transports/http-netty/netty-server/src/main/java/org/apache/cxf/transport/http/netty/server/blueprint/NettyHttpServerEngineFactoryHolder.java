@@ -120,6 +120,9 @@ public class NettyHttpServerEngineFactoryHolder {
                 if (engine.getWriteIdleTime() != null) {
                     eng.setWriteIdleTime(engine.getWriteIdleTime());
                 }
+                if (engine.getMaxChunkContentSize() != null) {
+                    eng.setMaxChunkContentSize(engine.getMaxChunkContentSize());
+                }
                 if (engine.getPort() != null) {
                     eng.setPort(engine.getPort());
                 }
