@@ -19,18 +19,18 @@
 -->
 <wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Union" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Union" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Union/typemap">
-    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:e1:1.0" type="e1" name="e1">
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Union" repositoryID="IDL:e1:1.0" type="e1" name="e1">
       <corba:enumerator value="e1_1" />
       <corba:enumerator value="e1_2" />
       <corba:enumerator value="e1_3" />
       <corba:enumerator value="e1_4" />
     </corba:enum>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:s1:1.0" type="s1" name="s1">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Union" repositoryID="IDL:s1:1.0" type="s1" name="s1">
       <corba:member name="s1_1" idltype="corba:short" />
       <corba:member name="s1_2" idltype="corba:short" />
       <corba:member name="s1_3" idltype="corba:short" />
     </corba:struct>
-    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="e1" repositoryID="IDL:u1:1.0" type="ns4:u1" name="u1">
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Union" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="e1" repositoryID="IDL:u1:1.0" type="ns4:u1" name="u1">
       <corba:unionbranch name="u1_1" idltype="corba:long">
         <corba:case label="e1_1" />
       </corba:unionbranch>
@@ -41,18 +41,18 @@
       </corba:unionbranch>
       <corba:unionbranch name="u1_3" idltype="s1" default="true" />
     </corba:union>
-    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:if/e2:1.0" type="if.e2" name="if.e2">
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Union" repositoryID="IDL:if/e2:1.0" type="if.e2" name="if.e2">
       <corba:enumerator value="e2_1" />
       <corba:enumerator value="e2_2" />
       <corba:enumerator value="e2_3" />
       <corba:enumerator value="e2_4" />
     </corba:enum>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:if/s2:1.0" type="if.s2" name="if.s2">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Union" repositoryID="IDL:if/s2:1.0" type="if.s2" name="if.s2">
       <corba:member name="s2_1" idltype="corba:short" />
       <corba:member name="s2_2" idltype="corba:short" />
       <corba:member name="s2_3" idltype="corba:short" />
     </corba:struct>
-    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="if.e2" repositoryID="IDL:if/u2:1.0" type="ns4:if.u2" name="if.u2">
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Union" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="if.e2" repositoryID="IDL:if/u2:1.0" type="ns4:if.u2" name="if.u2">
       <corba:unionbranch name="u2_1" idltype="corba:long">
         <corba:case label="e2_1" />
       </corba:unionbranch>
@@ -63,18 +63,18 @@
       </corba:unionbranch>
       <corba:unionbranch name="u2_3" idltype="if.s2" default="true" />
     </corba:union>
-    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:m/e3:1.0" type="m.e3" name="m.e3">
+    <corba:enum xmlns="http://cxf.apache.org/bindings/corba/idl/Union" repositoryID="IDL:m/e3:1.0" type="m.e3" name="m.e3">
       <corba:enumerator value="e3_1" />
       <corba:enumerator value="e3_2" />
       <corba:enumerator value="e3_3" />
       <corba:enumerator value="e3_4" />
     </corba:enum>
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Exception/types" repositoryID="IDL:m/s3:1.0" type="m.s3" name="m.s3">
+    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/Union" repositoryID="IDL:m/s3:1.0" type="m.s3" name="m.s3">
       <corba:member name="s3_1" idltype="corba:short" />
       <corba:member name="s3_2" idltype="corba:short" />
       <corba:member name="s3_3" idltype="corba:short" />
     </corba:struct>
-    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Exception/types" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="m.e3" repositoryID="IDL:m/u3:1.0" type="ns4:m.u3" name="m.u3">
+    <corba:union xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Union" xmlns="http://cxf.apache.org/bindings/corba/idl/Union/typemap" discriminator="m.e3" repositoryID="IDL:m/u3:1.0" type="ns4:m.u3" name="m.u3">
       <corba:unionbranch name="u3_1" idltype="corba:long">
         <corba:case label="e3_1" />
       </corba:unionbranch>
