@@ -106,6 +106,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         } catch (Exception e) {
             assertTrue(true);
         }
+        
+        ctx.close();
     }
 
     @org.junit.Test
@@ -140,6 +142,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         } catch (Exception e) {
             assertTrue(true);
         }
+        
+        ctx.close();
     }
 
     @Test
@@ -172,6 +176,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
+        
+        clientContext.close();
     }
 
     @Test
@@ -201,6 +207,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         // this is successful because the alternative policy allows a password to be specified.
         simpleService.doStuff();
+        
+        clientContext.close();
     }
 
     @Test
@@ -250,6 +258,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.ping();
+        
+        clientContext.close();
     }
 
     @Test
@@ -294,6 +304,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.ping();
+        
+        clientContext.close();
     }
 
     @Test
@@ -330,6 +342,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         // this is successful because the alternative policy allows a password to be specified.
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
+        
+        clientContext.close();
     }
 
     @Test
@@ -361,6 +375,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         // this is successful because the alternative policy allows a password to be specified.
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
+        
+        clientContext.close();
     }
 
     private WSS4JOutInterceptor addToClient(Object svc) {
