@@ -213,14 +213,14 @@ public abstract class AbstractHTTPDestination
         if (inMessage == null) {
             LOG.fine("Create a new message for processing");
             inMessage = new MessageImpl();
+            ExchangeImpl exchange = new ExchangeImpl();
+            exchange.setInMessage(inMessage);
             setupMessage(inMessage,
                      config,
                      context,
                      req,
                      resp);
 
-            ExchangeImpl exchange = new ExchangeImpl();
-            exchange.setInMessage(inMessage);
             exchange.setSession(new HTTPSession(req));
             ((MessageImpl)inMessage).setDestination(this);
         } else {
@@ -261,13 +261,15 @@ public abstract class AbstractHTTPDestination
                           req, 
                           resp);
         
+        final Exchange exchange = inMessage.getExchange();
         DelegatingInputStream in = new DelegatingInputStream(req.getInputStream()) {
             public void cacheInput() {
-                if (!cached && inMessage.getExchange().getOutMessage() == null) {
+                if (!cached && exchange.isOneWay()) {
                     //For one-ways, we need to cache the values of the HttpServletRequest
                     //so they can be queried later for things like paths and schemes 
                     //and such like that.                   
-                    inMessage.put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
+                    //Please note, exchange used to always get the "current" message
+                    exchange.getInMessage().put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
                 }
                 super.cacheInput();
             }
