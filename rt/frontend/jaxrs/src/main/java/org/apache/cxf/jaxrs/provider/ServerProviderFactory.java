@@ -143,6 +143,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         List<ProviderInfo<ContainerRequestFilter>> filters, boolean syncNeeded) {
         ProviderInfo<ContainerRequestFilter> generator = wadlGenerator != null ? wadlGenerator 
             : ((ServerProviderFactory)getBaseFactory()).wadlGenerator;
+        if (generator == null) { 
+            return filters;
+        }
         if (filters.size() == 0) {
             return Collections.singletonList(generator);
         } else if (!syncNeeded) {
