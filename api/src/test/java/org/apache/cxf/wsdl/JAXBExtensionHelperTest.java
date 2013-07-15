@@ -30,6 +30,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.wsdl.extensions.ExtensionRegistry;
+import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
@@ -39,6 +40,7 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.abc.test.AnotherPolicyType;
 import org.apache.cxf.abc.test.NewServiceType;
 import org.apache.cxf.abc.test.TestPolicyType;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -134,16 +136,16 @@ public class JAXBExtensionHelperTest extends Assert {
     
     @Test
     public void testMappedNamespace() throws Exception {
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
-            "org.apache.cxf.abc.test.TestPolicyType",
+        JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Port.class,
+            org.apache.cxf.abc.test.TestPolicyType.class,
             "http://cxf.apache.org/abc/test/remapped");
 
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Port",
-            "org.apache.cxf.abc.test.AnotherPolicyType",
+        JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Port.class,
+            org.apache.cxf.abc.test.AnotherPolicyType.class,
             "http://cxf.apache.org/abc/test/remapped");
 
-        JAXBExtensionHelper.addExtensions(registry, "javax.wsdl.Definition",
-            "org.apache.cxf.abc.test.NewServiceType",
+        JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Definition.class,
+            org.apache.cxf.abc.test.NewServiceType.class,
             "http://cxf.apache.org/abc/test/remapped");
 
         String file = this.getClass().getResource("/wsdl/test_ext_remapped.wsdl").toURI().toString();
@@ -169,9 +171,11 @@ public class JAXBExtensionHelperTest extends Assert {
         for (Object ext : extPortList) {
             if (ext instanceof TestPolicyType) {
                 tp = (TestPolicyType) ext;
-            }
-            if (ext instanceof AnotherPolicyType) {
+            } else if (ext instanceof AnotherPolicyType) {
                 ap = (AnotherPolicyType) ext;
+            } else if (ext instanceof UnknownExtensibilityElement) {
+                UnknownExtensibilityElement e = (UnknownExtensibilityElement)ext;
+                System.out.println(e.getElementType());
             }
         }
         assertNotNull("Could not find extension element TestPolicyType", tp);
