@@ -52,7 +52,7 @@ public class ProviderImplTest extends org.junit.Assert {
         String expected = "<wsdl:definitions"; 
         assertTrue("Embeded wsdl element is not generated", sw.toString().indexOf(expected) > -1);
         assertTrue("wsdlLocation attribute has the wrong value", 
-                   sw.toString().contains("wsdli:wsdlLocation=\"http://cxf.apache.org wsdlLoc\""));
+                   sw.toString().contains(":wsdlLocation=\"http://cxf.apache.org wsdlLoc\""));
     }
 
     @org.junit.Test

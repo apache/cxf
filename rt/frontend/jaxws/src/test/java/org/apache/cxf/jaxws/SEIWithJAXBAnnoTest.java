@@ -42,13 +42,10 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         
         AddNumbersImpl serviceImpl = new AddNumbersImpl();
         Endpoint.publish("local://localhost:9000/Hello", serviceImpl);
-        
-        
      
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setBus(SpringBusFactory.getDefaultBus());
         factory.setServiceClass(AddNumbers.class);
-        
 
         factory.setAddress(address);
         AddNumbers proxy = (AddNumbers)factory.create();
@@ -61,8 +58,7 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         args.add("str2");
         args.add("str3");
         List<Integer> result = proxy.addNumbers(args);
-        String expected = "<ns2:addNumbers xmlns:ns2=\"http://service.jaxws.cxf.apache.org/\">" 
-            + "<arg0>str1 str2 str3</arg0></ns2:addNumbers>";
+        String expected = "<arg0>str1 str2 str3</arg0>";
         assertTrue("Client does not use the generated wrapper class to marshal request parameters",
                      strWriter.toString().indexOf(expected) > -1);
         assertEquals("Get the wrong result", 100, (int)result.get(0));

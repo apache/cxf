@@ -208,7 +208,8 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
         this.addNamespace("http://www.example.org/contract/DoubleIt", "tns");
         //org.apache.cxf.helpers.XMLUtils.printDOM(d);
-        assertValid("//xsd:element[@ref='tns:CustomMessageBean']", d);
+        assertXPathEquals("//xsd:element/@ref", new QName("http://www.example.org/contract/DoubleIt",
+                                                          "CustomMessageBean"), d);
     }
 
 
