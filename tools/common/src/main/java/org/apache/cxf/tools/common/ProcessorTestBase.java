@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -31,9 +30,12 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -43,6 +45,8 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
+import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
@@ -71,7 +75,20 @@ public class ProcessorTestBase extends Assert {
 
     protected File output;
     protected ToolContext env = new ToolContext();
-
+    protected Map<QName, Set<String>> qnameAtts = new HashMap<QName, Set<String>>();
+    
+    public ProcessorTestBase() {
+        addQNameAttribute(new QName(Constants.URI_2001_SCHEMA_XSD, "element"), "type");
+    }
+    
+    protected final void addQNameAttribute(QName element, String local) {
+        Set<String> a = qnameAtts.get(element);
+        if (a == null) {
+            qnameAtts.put(element, new HashSet<String>());
+            a = qnameAtts.get(element);
+        }
+        a.add(local);
+    }
 
     @After
     public void tearDown() {
@@ -296,7 +313,7 @@ public class ProcessorTestBase extends Assert {
                 }
                 Tag sourceTag = getFromSource(source, expectedTag);
                 if (sourceTag == null) {
-                    throw new AssertionError("\n" + expected.toString()
+                    throw new AssertionError("\n" + expectedTag.toString()
                                              + " is missing in the source file:"
                                              + "\n" + source.toString());
                 }
@@ -316,8 +333,8 @@ public class ProcessorTestBase extends Assert {
 
     public void assertWsdlEquals(final File expected, final File source, List<String> attr, List<String> tag)
         throws Exception {
-        Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr);
-        Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr);
+        Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr, qnameAtts);
+        Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr, qnameAtts);
         assertTagEquals(expectedTag, sourceTag, attr, tag);
     }
 
@@ -328,8 +345,8 @@ public class ProcessorTestBase extends Assert {
     public void assertWsdlEquals(final InputStream expected, final InputStream source,
                                  List<String> attr, List<String> tag)
         throws Exception {
-        Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr);
-        Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr);
+        Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr, qnameAtts);
+        Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr, qnameAtts);
         assertTagEquals(expectedTag, sourceTag, attr, tag);
     }
 
