@@ -177,6 +177,17 @@ public class TestUtilities {
     public void assertXPathEquals(String xpath, String value, Node node) throws Exception {
         XPathAssert.assertXPathEquals(xpath, value, node, namespaces);
     }
+    /**
+     * Assert that the text of the xpath node retrieved is equal to the value
+     * specified.
+     * 
+     * @param xpath
+     * @param value
+     * @param node
+     */
+    public void assertXPathEquals(String xpath, QName value, Node node) throws Exception {
+        XPathAssert.assertXPathEquals(xpath, value, node, namespaces);
+    }
 
     /**
      * Assert that this node is not a Soap fault body.
