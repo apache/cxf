@@ -252,7 +252,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         // DOM
         pt.doubleIt(5);
         
-        // TODO EncryptBeforeSigning + EncryptSignature not working
+        // TODO See WSS-464
         // SecurityTestUtil.enableStreaming(pt);
         // pt.doubleIt(5);
         
@@ -659,7 +659,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Error during certificate path validation"));
         }
         
-        // TODO EncryptBeforeSigning + EncryptSignature not working
+        // TODO See WSS-464
         /*
         SecurityTestUtil.enableStreaming(pt);
         try {
