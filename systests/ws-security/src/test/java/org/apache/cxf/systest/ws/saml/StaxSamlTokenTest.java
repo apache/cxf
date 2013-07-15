@@ -682,9 +682,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // See WSS-446
     @org.junit.Test
-    @org.junit.Ignore
     public void testSaml2EndorsingOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -714,9 +712,7 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // See WSS-446
     @org.junit.Test
-    @org.junit.Ignore
     public void testSaml2EndorsingPKOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

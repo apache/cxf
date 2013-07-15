@@ -992,9 +992,12 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         service.getInInterceptors().add(inhandler);
         
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        outProperties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE});
+        outProperties.setOutAction(
+            new XMLSecurityConstants.Action[] {
+                WSSConstants.SIGNATURE, WSSConstants.SIGNATURE_CONFIRMATION
+            }
+        );
         outProperties.setSignatureUser("myalias");
-        outProperties.setEnableSignatureConfirmation(true);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
