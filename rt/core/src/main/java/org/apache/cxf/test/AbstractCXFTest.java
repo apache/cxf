@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.wsdl.WSDLException;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -140,6 +141,19 @@ public class AbstractCXFTest extends Assert {
     public void assertXPathEquals(String xpath, String value, Node node) throws Exception {
         testUtilities.assertXPathEquals(xpath, value, node);
     }
+    
+
+    /**
+     * Assert that the text of the xpath node retrieved is equal to the value
+     * specified.
+     * 
+     * @param xpath
+     * @param value
+     * @param node
+     */
+    public void assertXPathEquals(String xpath, QName value, Node node) throws Exception {
+        testUtilities.assertXPathEquals(xpath, value, node);
+    }    
 
     /**
      * Assert that this node is not a SOAP fault part.
