@@ -228,8 +228,14 @@ public abstract class BusFactory {
             }
             return b.bus;
         }
-        BusHolder b = threadBus.get();
-        return b == null ? null : b.bus;
+        BusHolder h = threadBus.get();
+        if (h == null || h.stale) {
+            Thread cur = Thread.currentThread();
+            synchronized (threadBusses) {
+                h = threadBusses.get(cur);
+            }
+        }
+        return h == null || h.stale ? null : h.bus;
     }
     private static synchronized Bus createThreadBus() {
         BusHolder b = getThreadBusHolder(false);
