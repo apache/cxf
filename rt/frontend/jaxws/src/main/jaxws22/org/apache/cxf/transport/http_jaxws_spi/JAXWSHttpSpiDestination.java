@@ -135,12 +135,12 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
             LOG.fine("Service http request on thread: " + Thread.currentThread());
         }
         Message inMessage = new MessageImpl();
+        ExchangeImpl exchange = new ExchangeImpl();
+        exchange.setInMessage(inMessage);
         setupMessage(inMessage, null, req, resp);
 
         ((MessageImpl)inMessage).setDestination(this);
 
-        ExchangeImpl exchange = new ExchangeImpl();
-        exchange.setInMessage(inMessage);
         exchange.setSession(new HTTPSession(req));
 
         try {
