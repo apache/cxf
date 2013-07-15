@@ -46,7 +46,6 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.http.UrlUtilities;
 
 /**
  * 
