@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -34,11 +35,21 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class CXFBusImplTest extends Assert {
 
+    @Test
+    public void testThreadBus() throws BusException {
+        BusFactory.setDefaultBus(null);
+        BusFactory.setThreadDefaultBus(null);
+        Bus bus = BusFactory.newInstance().createBus();
+        Bus b2 = BusFactory.getThreadDefaultBus(false);
+        assertSame(bus, b2);
+        bus.shutdown(true);
+    }
     @Test
     public void testConstructionWithoutExtensions() throws BusException {
         
@@ -47,6 +58,7 @@ public class CXFBusImplTest extends Assert {
         assertNotNull(bus.getExtension(ConduitInitiatorManager.class));   
         assertNotNull(bus.getExtension(DestinationFactoryManager.class));
         assertNotNull(bus.getExtension(PhaseManager.class));
+        bus.shutdown(true);
     }
     
     @Test
@@ -82,6 +94,7 @@ public class CXFBusImplTest extends Assert {
         String extension = "CXF";
         bus.setExtension(extension, String.class);
         assertSame(extension, bus.getExtension(String.class));
+        bus.shutdown(true);
     }
     
     @Test
@@ -91,6 +104,7 @@ public class CXFBusImplTest extends Assert {
         assertEquals("The bus id should be cxf", id, Bus.DEFAULT_BUS_ID + Math.abs(bus.hashCode()));
         bus.setId("test");
         assertEquals("The bus id should be changed", "test", bus.getId());
+        bus.shutdown(true);
     }
     
     @Test
@@ -107,7 +121,7 @@ public class CXFBusImplTest extends Assert {
         lifeCycleManager.registerLifeCycleListener(listener);
         bus.shutdown(true);
         EasyMock.verify(listener);
-        
+        bus.shutdown(true);        
     }
 
 }
