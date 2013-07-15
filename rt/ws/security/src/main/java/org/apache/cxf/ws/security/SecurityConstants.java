@@ -454,6 +454,13 @@ public final class SecurityConstants {
      */
     public static final String MUST_UNDERSTAND = "ws-security.must-understand";
 
+    /**
+     * Set this to "false" if security context must not be created from JAAS Subject.
+     *
+     * The default value is "true".
+     */
+    public static final String SC_FROM_JAAS_SUBJECT = "ws-security.sc.jaas-subject";
+
     //
     // Internal tags
     //

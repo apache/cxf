@@ -34,6 +34,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
@@ -457,7 +458,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             final Subject subject = (Subject)o.get(WSSecurityEngineResult.TAG_SUBJECT);
-            if (subject != null) {
+            final boolean useJAASSubject = MessageUtils
+                .getContextualBoolean(msg, SecurityConstants.SC_FROM_JAAS_SUBJECT, true);
+            if ((subject != null) && !(p instanceof KerberosPrincipal) && useJAASSubject) {
                 String roleClassifier = 
                     (String)msg.getContextualProperty(SecurityConstants.SUBJECT_ROLE_CLASSIFIER);
                 if (roleClassifier != null && !"".equals(roleClassifier)) {
