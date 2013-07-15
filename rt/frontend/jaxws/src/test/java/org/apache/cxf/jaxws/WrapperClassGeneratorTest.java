@@ -105,20 +105,16 @@ public class WrapperClassGeneratorTest extends Assert {
         
         //check marshall wrapper
         marshaller.marshal(requestObj, bout);      
-        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" 
-            + "<ns2:addNumbers xmlns:ns2=\"http://service.jaxws.cxf.apache.org/\">" 
-            + "<arg0>str1 str2 str3</arg0></ns2:addNumbers>";
+        String expected = "<arg0>str1 str2 str3</arg0>";
 
-        assertEquals("The generated request wrapper class does not contain the correct annotations", 
-                     expected, bout.toString());
+        assertTrue("The generated request wrapper class does not contain the correct annotations", 
+                   bout.toString().contains(expected));
        
         
         bout.reset();
         marshaller.marshal(responseObj, bout);       
-        expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" 
-            + "<ns2:addNumbersResponse xmlns:ns2=\"http://service.jaxws.cxf.apache.org/\">" 
-            + "<return>1</return><return>2</return><return>3</return></ns2:addNumbersResponse>";
-        assertEquals("The generated response wrapper class is not correct", expected,  bout.toString());
+        expected = "<return>1</return><return>2</return><return>3</return>";
+        assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
      
     }
   
