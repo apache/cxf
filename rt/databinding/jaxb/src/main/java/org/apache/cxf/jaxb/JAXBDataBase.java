@@ -34,6 +34,8 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentUnmarshaller;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.service.model.AbstractMessageContainer;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
@@ -99,6 +101,7 @@ public abstract class JAXBDataBase {
         }
         if (annoList.size() == 0 && mpi != null 
             && mpi.getMessageInfo() != null
+            && isOutputMessage(mpi.getMessageInfo())
             && mpi.getMessageInfo().getOperation() != null
             && mpi.getMessageInfo().getOperation().getProperty("method.return.annotations") != null) {
             OperationInfo op = mpi.getMessageInfo().getOperation();
@@ -112,6 +115,13 @@ public abstract class JAXBDataBase {
             
         }
         return annoList.toArray(new Annotation[]{});       
+    }
+    
+    protected boolean isOutputMessage(AbstractMessageContainer messageContainer) {
+        if (messageContainer instanceof MessageInfo) {
+            return MessageInfo.Type.OUTPUT.equals(((MessageInfo)messageContainer).getType());
+        }
+        return false;
     }
 
     public Integer getMtomThreshold() {
