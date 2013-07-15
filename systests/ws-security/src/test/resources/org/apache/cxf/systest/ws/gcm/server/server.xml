@@ -79,6 +79,7 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+          <entry key="ws-security.is-bsp-compliant" value="false" />
        </jaxws:properties> 
      
     </jaxws:endpoint> 
