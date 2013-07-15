@@ -40,9 +40,11 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.cxf.aegis.type.java5.IgnoreProperty;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
-import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
+import org.apache.cxf.jaxrs.ext.xml.ElementClass;
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
+import org.apache.cxf.jaxrs.model.wadl.jaxb.packageinfo.Book2;
 
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })

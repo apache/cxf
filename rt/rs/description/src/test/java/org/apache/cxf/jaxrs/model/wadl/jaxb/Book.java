@@ -20,31 +20,39 @@ package org.apache.cxf.jaxrs.model.wadl.jaxb;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.model.wadl.Description;
-import org.apache.cxf.jaxrs.model.wadl.XMLName;
+import org.apache.cxf.jaxrs.model.wadl.FormInterface;
 
-@XmlRootElement(name = "thechapter", namespace = "http://superbooks")
-@XmlType(name = "chapter", namespace = "http://superbooks")
-@Description("Chapter subresource")
-@XMLName(value = "{http://books}thesuperchapter")
-public class Chapter {
+@XmlRootElement(name = "thebook", namespace = "http://superbooks")
+@XmlType(name = "book", namespace = "http://superbooks")
+@Description("Book subresource")
+@XMLName(value = "{http://books}thesuperbook")
+public class Book implements FormInterface {
 
     private int id;
-    public Chapter() {
+    @XmlElement(name = "thechapter", namespace = "http://superbooks")
+    private Chapter chapter;
+    
+    public Book() {
     }
-    public Chapter(int id) {
+    
+    public Book(int id) {
         this.id = id;
     }
     
     @GET
-    @Path("/id")
+    @Path("/book")
     @Produces({"application/xml", "application/json" })
-    @Description("Get the chapter")
-    public Chapter getIt() {
+    @Description("Get the book")
+    public Book getIt() {
         return this;
     }
     
@@ -55,5 +63,25 @@ public class Chapter {
     public int getId() {
         return id;
     }
+    
+    @Path("/chapter/{cid}")
+    public Chapter getChapter(@PathParam("cid") int cid) {
+        return chapter;
+    }
+    
+    public void form1(MultivaluedMap<String, String> map) {
+    }
+    
+    public String form2(String f1, String f2) {
+        return "";
+    }
 
+    public String form3(String headerId, String identificator, String f1, String f2) {
+        return "";
+    }
+
+    public String form4(String theid, String f1, String f2) {
+        return "";
+    }
+    
 }

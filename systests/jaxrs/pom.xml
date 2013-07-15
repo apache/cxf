@@ -52,6 +52,12 @@
             <artifactId>abdera-extensions-json</artifactId>
             <version>${cxf.abdera.version}</version>
         </dependency>
+         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-service-description</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
           <groupId>org.apache.ant</groupId>
           <artifactId>ant</artifactId>

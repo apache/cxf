@@ -54,7 +54,6 @@ import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
-import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
@@ -66,6 +65,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                         ContainerResponseFilter.class,
                         ReaderInterceptor.class,
                         WriterInterceptor.class};
+    private static final String WADL_PROVIDER_NAME = "org.apache.cxf.jaxrs.model.wadl.WadlGenerator";
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     
@@ -85,7 +85,16 @@ public final class ServerProviderFactory extends ProviderFactory {
     private ServerProviderFactory(ProviderFactory baseFactory, Bus bus) {
         super(baseFactory, bus);
         if (baseFactory == null) {
-            wadlGenerator = new ProviderInfo<ContainerRequestFilter>(new WadlGenerator(), bus);
+            wadlGenerator = createWadlGenerator(bus);
+        }
+    }
+    
+    private static ProviderInfo<ContainerRequestFilter> createWadlGenerator(Bus bus) {
+        Object provider = createProvider(WADL_PROVIDER_NAME);
+        if (provider == null) {
+            return null;
+        } else {
+            return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus);
         }
     }
     
@@ -251,7 +260,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         List<ProviderInfo<ContainerRequestFilter>> postMatchFilters,
         ProviderInfo<ContainerRequestFilter> p) {
         ContainerRequestFilter filter = p.getProvider();
-        if (filter instanceof WadlGenerator) {
+        if (isWadlGenerator(filter.getClass())) {
             wadlGenerator = p; 
         } else {
             if (isPrematching(filter.getClass())) {
@@ -261,6 +270,17 @@ public final class ServerProviderFactory extends ProviderFactory {
             }
         }
         
+    }
+    
+    private static boolean isWadlGenerator(Class<?> filterCls) {
+        if (filterCls == null || filterCls == Object.class) {
+            return false;
+        }
+        if (WADL_PROVIDER_NAME.equals(filterCls.getName())) {
+            return true;
+        } else {
+            return isWadlGenerator(filterCls.getSuperclass());
+        }
     }
     
     public RequestPreprocessor getRequestPreprocessor() {

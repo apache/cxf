@@ -138,7 +138,7 @@ public abstract class ProviderFactory {
                                     new MultipartProvider());
     }
     
-    private static Object createProvider(String className) {
+    protected static Object createProvider(String className) {
         
         try {
             return ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();

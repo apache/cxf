@@ -29,7 +29,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
@@ -102,9 +101,9 @@ public class RequestPreprocessor {
                     // WADL type (xml or json or html - other options)
                     String query = (String)m.get(Message.QUERY_STRING);
                     if (StringUtils.isEmpty(query)) {
-                        query = WadlGenerator.WADL_QUERY;
-                    } else if (!query.contains(WadlGenerator.WADL_QUERY)) {
-                        query += "&" + WadlGenerator.WADL_QUERY;
+                        query = "_wadl";
+                    } else if (!query.contains("_wadl")) {
+                        query += "&_wadl";
                     }
                     m.put(Message.QUERY_STRING, query);
                 }

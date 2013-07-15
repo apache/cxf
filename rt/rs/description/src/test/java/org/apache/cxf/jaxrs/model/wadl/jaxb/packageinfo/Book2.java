@@ -16,44 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.resources;
+package org.apache.cxf.jaxrs.model.wadl.jaxb.packageinfo;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
-import org.apache.cxf.jaxrs.ext.xml.XMLName;
-import org.apache.cxf.jaxrs.model.wadl.Description;
+@XmlRootElement(name = "thebook2")
+public class Book2 {
 
-@XmlRootElement(name = "thechapter", namespace = "http://superbooks")
-@XmlType(name = "chapter", namespace = "http://superbooks")
-@Description("Chapter subresource")
-@XMLName(value = "{http://books}thesuperchapter")
-public class Chapter {
-
+    private String name;
     private int id;
-    public Chapter() {
+    
+    public Book2() {
     }
-    public Chapter(int id) {
+    
+    public Book2(int id) {
         this.id = id;
-    }
-    
-    @GET
-    @Path("/id")
-    @Produces({"application/xml", "application/json" })
-    @Description("Get the chapter")
-    public Chapter getIt() {
-        return this;
-    }
-    
-    public void setId(int ident) {
-        id = ident;
     }
     
     public int getId() {
         return id;
     }
+    
+    public void setId(int ident) {
+        id = ident;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

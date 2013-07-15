@@ -16,44 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.resources;
+package org.apache.cxf.jaxrs.model.wadl;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.ext.xml.XMLName;
-import org.apache.cxf.jaxrs.model.wadl.Description;
+import org.apache.cxf.jaxrs.ext.xml.ElementClass;
+import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 
-@XmlRootElement(name = "thechapter", namespace = "http://superbooks")
-@XmlType(name = "chapter", namespace = "http://superbooks")
-@Description("Chapter subresource")
-@XMLName(value = "{http://books}thesuperchapter")
-public class Chapter {
-
-    private int id;
-    public Chapter() {
+@Path("/")
+public class BookStoreWithSingleSlash {
+    
+    @QueryParam("name")
+    private String name;
+    
+    @PathParam("id")
+    public void setId(int id) {
     }
-    public Chapter(int id) {
-        this.id = id;
-    }
+    
     
     @GET
-    @Path("/id")
-    @Produces({"application/xml", "application/json" })
-    @Description("Get the chapter")
-    public Chapter getIt() {
-        return this;
+    @Path("book")
+    @ElementClass(response = Book.class)
+    @Produces("application/xml")
+    public Response getBookName() {
+        return Response.ok().entity(name).build();
     }
-    
-    public void setId(int ident) {
-        id = ident;
-    }
-    
-    public int getId() {
-        return id;
-    }
-
 }

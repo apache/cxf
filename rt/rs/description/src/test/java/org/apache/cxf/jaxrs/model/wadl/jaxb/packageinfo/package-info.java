@@ -16,28 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://superbooks",
+ xmlns = { @XmlNs(prefix = "os", namespaceURI = "http://superbooks") })
+package org.apache.cxf.jaxrs.model.wadl.jaxb.packageinfo;
 
-package org.apache.cxf.jaxrs.model.wadl;
+import javax.xml.bind.annotation.XmlNs;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * Can be used to assign qualified XML names to arbitrary classes
- * for the purpose of matching them with external schema definitions 
- * 
- */
-@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface XMLName {
-    /**
-     * Qualified name, example {http://books}book
-     */
-    String value() default "";
-    /**
-     * Optional prefix 
-     **/
-    String prefix() default "";
-}
