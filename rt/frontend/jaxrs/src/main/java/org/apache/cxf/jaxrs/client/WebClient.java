@@ -31,11 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.ClientException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
@@ -1211,11 +1213,16 @@ public class WebClient extends AbstractClient {
         }
     }
 
-    // Async related code, consider pushing most of it to AbstractClient
+    // Link to JAX-RS 2.0 AsyncInvoker
     public AsyncInvoker async() {
         return new AsyncInvokerImpl();
     }
     
+    // Link to JAX-RS 2.0 SyncInvoker
+    public SyncInvoker sync() {
+        return new SyncInvokerImpl();
+    }
+
     class ClientAsyncResponseInterceptor extends AbstractPhaseInterceptor<Message> {
         public ClientAsyncResponseInterceptor() {
             super(Phase.UNMARSHAL);
@@ -1237,6 +1244,16 @@ public class WebClient extends AbstractClient {
             handleAsyncFault(message);
         }
 
+    }
+
+    private void setEntityHeaders(Entity<?> entity) {
+        type(entity.getMediaType());
+        if (entity.getLanguage() != null) {
+            language(entity.getLanguage().toString());
+        }
+        if (entity.getEncoding() != null) {
+            encoding(entity.getEncoding());
+        }
     }
     
     class AsyncInvokerImpl implements AsyncInvoker {
@@ -1399,34 +1416,154 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, Class<T> responseType) {
-            setEntityHeaders(entity);
+            WebClient.this.setEntityHeaders(entity);
             return doInvokeAsync(name, entity.getEntity(), entity.getEntity().getClass(), null, 
                                  responseType, responseType, null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-            setEntityHeaders(entity);
+            WebClient.this.setEntityHeaders(entity);
             return doInvokeAsync(name, entity.getEntity(), entity.getEntity().getClass(), null, 
                                  responseType.getRawType(), responseType.getType(), null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
-            setEntityHeaders(entity);
+            WebClient.this.setEntityHeaders(entity);
             return doInvokeAsyncCallback(name, entity.getEntity(), entity.getEntity().getClass(), null, 
                 callback);
         }
-
-        private void setEntityHeaders(Entity<?> entity) {
-            WebClient.this.type(entity.getMediaType());
-            if (entity.getLanguage() != null) {
-                WebClient.this.language(entity.getLanguage().toString());
-            }
-            if (entity.getEncoding() != null) {
-                WebClient.this.encoding(entity.getEncoding());
-            }
-        }       
     }
+
+    class SyncInvokerImpl implements SyncInvoker {
+
+        @Override
+        public Response delete() {
+            return method(HttpMethod.DELETE);
+        }
+
+        @Override
+        public <T> T delete(Class<T> cls) {
+            return method(HttpMethod.DELETE, cls);
+        }
+
+        @Override
+        public <T> T delete(GenericType<T> genericType) {
+            return method(HttpMethod.DELETE, genericType);
+        }
+
+        @Override
+        public Response get() {
+            return method(HttpMethod.GET);
+        }
+
+        @Override
+        public <T> T get(Class<T> cls) {
+            return method(HttpMethod.GET, cls);
+        }
+
+        @Override
+        public <T> T get(GenericType<T> genericType) {
+            return method(HttpMethod.GET, genericType);
+        }
+
+        @Override
+        public Response head() {
+            return method(HttpMethod.HEAD);
+        }
+
+        @Override
+        public Response options() {
+            return method(HttpMethod.OPTIONS);
+        }
+
+        @Override
+        public <T> T options(Class<T> cls) {
+            return method(HttpMethod.OPTIONS, cls);
+        }
+
+        @Override
+        public <T> T options(GenericType<T> genericType) {
+            return method(HttpMethod.OPTIONS, genericType);
+        }
+
+        @Override
+        public Response post(Entity<?> entity) {
+            return method(HttpMethod.POST, entity);
+        }
+
+        @Override
+        public <T> T post(Entity<?> entity, Class<T> cls) {
+            return method(HttpMethod.POST, entity, cls);
+        }
+
+        @Override
+        public <T> T post(Entity<?> entity, GenericType<T> genericType) {
+            return method(HttpMethod.POST, genericType);
+        }
+
+        @Override
+        public Response put(Entity<?> entity) {
+            return method(HttpMethod.PUT, entity);
+        }
+
+        @Override
+        public <T> T put(Entity<?> entity, Class<T> cls) {
+            return method(HttpMethod.PUT, entity, cls);
+        }
+
+        @Override
+        public <T> T put(Entity<?> entity, GenericType<T> genericType) {
+            return method(HttpMethod.PUT, entity, genericType);
+        }
+
+        @Override
+        public Response trace() {
+            return method("TRACE");
+        }
+
+        @Override
+        public <T> T trace(Class<T> cls) {
+            return method("TRACE", cls);
+        }
+
+        @Override
+        public <T> T trace(GenericType<T> genericType) {
+            return method("TRACE", genericType);
+        }
+        
+        @Override
+        public Response method(String method) {
+            return method(method, Response.class);
+        }
+
+        @Override
+        public <T> T method(String method, Class<T> cls) {
+            return invoke(method, null, cls);
+        }
+
+        @Override
+        public <T> T method(String method, GenericType<T> genericType) {
+            return invoke(method, null, genericType);
+        }
+
+        @Override
+        public Response method(String method, Entity<?> entity) {
+            return method(method, entity, Response.class);
+        }
+
+        @Override
+        public <T> T method(String method, Entity<?> entity, Class<T> cls) {
+            WebClient.this.setEntityHeaders(entity);
+            return invoke(method, entity.getEntity(), cls);
+        }
+
+        @Override
+        public <T> T method(String method, Entity<?> entity, GenericType<T> genericType) {
+            WebClient.this.setEntityHeaders(entity);
+            return invoke(method, entity.getEntity(), genericType);
+        }
+    } 
     
 }
