@@ -246,8 +246,6 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
-        /*
-         * TODO - See WSS-462
         // This should fail, as the client is not following the correct steps for this property
         portQName = new QName(NAMESPACE, "DoubleItEncryptBeforeSigningPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -258,8 +256,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting before signing");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            System.out.println("ERR: " + ex.getMessage());
-            String error = "Not encrypted before signed";
+            String error = "Policy enforces EncryptBeforeSigning";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -269,10 +266,10 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting before signing");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "Not encrypted before signed";
+            // String error = "Policy enforces EncryptBeforeSigning";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
+        
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -303,8 +300,6 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
-        /*
-         * TODO - See WSS-462
         // This should fail, as the client is not following the correct steps for this property
         portQName = new QName(NAMESPACE, "DoubleItSignBeforeEncryptingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -315,7 +310,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing before encrypting");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "Not signed before encrypted";
+            String error = "Policy enforces SignBeforeEncrypting";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -325,10 +320,10 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing before encrypting");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "Not signed before encrypted";
+            // String error = "Policy enforces SignBeforeEncrypting";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
+        
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
