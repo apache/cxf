@@ -81,7 +81,7 @@ public class EHCacheSPStateManager implements SPStateManager {
             // ignore
         }
         if (configFileURL == null) {
-            cacheManager = CacheManager.create();
+            cacheManager = EHCacheUtil.createCacheManager();
         } else {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
             
@@ -95,7 +95,7 @@ public class EHCacheSPStateManager implements SPStateManager {
                 }
             }
             
-            cacheManager = CacheManager.create(conf);
+            cacheManager = EHCacheUtil.createCacheManager(conf);
         }
         
         CacheConfiguration requestCC = EHCacheUtil.getCacheConfiguration(REQUEST_CACHE_KEY, cacheManager);
