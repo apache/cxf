@@ -79,7 +79,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
             // ignore
         }
         if (configFileURL == null) {
-            cacheManager = CacheManager.create();
+            cacheManager = EHCacheUtil.createCacheManager();
         } else {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
             
@@ -93,7 +93,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
                 }
             }
             
-            cacheManager = CacheManager.create(conf);
+            cacheManager = EHCacheUtil.createCacheManager(conf);
         }
         
         CacheConfiguration cc = EHCacheUtil.getCacheConfiguration(CACHE_KEY, cacheManager);
