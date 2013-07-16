@@ -63,7 +63,7 @@ public class XkmsCryptoProvider extends CryptoBase {
     public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException {
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info(String
-                .format("TESB Runtime: getting public certificate for alias: %s; issuer: %s; subjectDN: %s",
+                .format("XKMS Runtime: getting public certificate for alias: %s; issuer: %s; subjectDN: %s",
                         cryptoType.getAlias(), cryptoType.getIssuer(), cryptoType.getSubjectDN()));
         }
         X509Certificate[] certs = getX509CertificatesInternal(cryptoType);
