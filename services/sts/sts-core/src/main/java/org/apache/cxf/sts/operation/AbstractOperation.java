@@ -34,7 +34,6 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,6 +47,8 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.event.AbstractSTSEvent;
+import org.apache.cxf.sts.event.STSEventListener;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -82,14 +83,10 @@ import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-
 /**
  * This abstract class contains some common functionality for different operations.
  */
-public abstract class AbstractOperation implements ApplicationEventPublisherAware {
+public abstract class AbstractOperation {
 
     public static final QName TOKEN_TYPE = 
         new QName(WSConstants.WSSE11_NS, WSConstants.TOKEN_TYPE, WSConstants.WSSE11_PREFIX);
@@ -104,7 +101,7 @@ public abstract class AbstractOperation implements ApplicationEventPublisherAwar
     protected boolean returnReferences = true;
     protected TokenStore tokenStore;
     protected ClaimsManager claimsManager = new ClaimsManager();
-    protected ApplicationEventPublisher eventPublisher;
+    protected STSEventListener eventPublisher;
     
     public boolean isReturnReferences() {
         return returnReferences;
@@ -644,15 +641,14 @@ public abstract class AbstractOperation implements ApplicationEventPublisherAwar
         }
     }
     
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.eventPublisher = applicationEventPublisher;
+    public void setEventListener(STSEventListener eventListener) {
+        this.eventPublisher = eventListener;
     }
     
     
-    protected void publishEvent(ApplicationEvent event) {
+    protected void publishEvent(AbstractSTSEvent event) {
         if (eventPublisher != null) {
-            eventPublisher.publishEvent(event);
+            eventPublisher.handleSTSEvent(event);
         }
     }
 }

@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-jdk14</artifactId>
             <version>${cxf.slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>

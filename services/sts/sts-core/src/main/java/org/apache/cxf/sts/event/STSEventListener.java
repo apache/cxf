@@ -19,31 +19,9 @@
 
 package org.apache.cxf.sts.event;
 
-public abstract class AbstractSTSEvent {
-
-    private static final long serialVersionUID = 1L;
-    
-    private long duration;
-    private final long timestamp;
-    private final Object source;
-
-    public AbstractSTSEvent(Object source, long duration) {
-        this.duration = duration;
-        this.timestamp = System.currentTimeMillis();
-        this.source = source;
-    }
-
-    
-    public abstract String getOperation();
-    
-    public long getDuration() {
-        return duration;
-    }
-    public final long getTimestamp() {
-        return this.timestamp;
-    }
-    public final Object getSource() {
-        return source;
-    }
-
+/**
+ * 
+ */
+public interface STSEventListener {
+    void handleSTSEvent(AbstractSTSEvent event);
 }

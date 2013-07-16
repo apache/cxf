@@ -39,10 +39,7 @@ import org.apache.cxf.sts.token.renewer.TokenRenewerParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import org.springframework.context.ApplicationListener;
-
-
-public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
+public class LoggerListener implements STSEventListener {
     
     public enum KEYS {
         TIME,
@@ -102,7 +99,7 @@ public class LoggerListener implements ApplicationListener<AbstractSTSEvent> {
     }
     
     @Override
-    public void onApplicationEvent(AbstractSTSEvent event) {
+    public void handleSTSEvent(AbstractSTSEvent event) {
         
         if (event instanceof TokenProviderParametersSupport) {
             handleEvent((TokenProviderParametersSupport)event);

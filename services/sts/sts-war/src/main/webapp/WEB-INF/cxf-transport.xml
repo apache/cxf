@@ -45,6 +45,7 @@
 	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
 	    <property name="services" ref="transportService" />
 		<property name="stsProperties" ref="transportSTSProperties" />
+        <property name="eventListener" ref="loggerListener"/>
     </bean>
 
 	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">

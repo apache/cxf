@@ -53,7 +53,6 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.springframework.context.ApplicationEvent;
 
 /**
  * An implementation of the IssueOperation interface to renew tokens.
@@ -184,7 +183,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
                     createResponse(
                         encryptionProperties, tokenRenewerResponse, tokenRequirements, keyRequirements, context
                     );
-                ApplicationEvent event = new STSRenewSuccessEvent(renewerParameters,
+                STSRenewSuccessEvent event = new STSRenewSuccessEvent(renewerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
                 return response;
@@ -193,7 +192,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
                 throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
             }
         } catch (RuntimeException ex) {
-            ApplicationEvent event = new STSRenewFailureEvent(renewerParameters,
+            STSRenewFailureEvent event = new STSRenewFailureEvent(renewerParameters,
                                                               System.currentTimeMillis() - start, ex);
             publishEvent(event);
             throw ex;
