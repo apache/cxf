@@ -21,10 +21,12 @@ package org.apache.cxf.ws.security.cache;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
@@ -40,6 +42,28 @@ import org.apache.cxf.resource.ResourceManager;
 public final class EHCacheManagerHolder {
     private static final ConcurrentHashMap<String, AtomicInteger> COUNTS 
         = new ConcurrentHashMap<String, AtomicInteger>(8, 0.75f, 2);
+
+    private static Method cacheManagerCreateMethodNoArg;
+    private static Method createMethodURLArg;
+    private static Method cacheManagerCreateMethodConfigurationArg;
+    static {
+        // these methods are either completely available or absent (valid assumption from 2.5.0 to 2.7.2 so far)
+        try {
+            // from 2.5.2
+            cacheManagerCreateMethodNoArg = CacheManager.class.getMethod("newInstance", (Class<?>[])null);
+            createMethodURLArg = CacheManager.class.getMethod("newInstance", URL.class);
+            cacheManagerCreateMethodConfigurationArg = CacheManager.class.getMethod("newInstance", Configuration.class);
+        } catch (NoSuchMethodException e) {
+            try {
+                // before 2.5.2
+                cacheManagerCreateMethodNoArg = CacheManager.class.getMethod("create", (Class<?>[])null);
+                createMethodURLArg = CacheManager.class.getMethod("create", URL.class);
+                cacheManagerCreateMethodConfigurationArg = CacheManager.class.getMethod("create", Configuration.class);
+            } catch (Throwable t) {
+                // ignore
+            }
+        }
+    }
     
     private EHCacheManagerHolder() {
         //utility
@@ -73,9 +97,9 @@ public final class EHCacheManagerHolder {
         }
         if (cacheManager == null) {
             if (configFileURL == null) {
-                cacheManager = CacheManager.create();
+                cacheManager = createCacheManager();
             } else {
-                cacheManager = CacheManager.create(configFileURL);
+                cacheManager = createCacheManager(configFileURL);
             }
         }
         AtomicInteger a = COUNTS.get(cacheManager.getName());
@@ -123,7 +147,7 @@ public final class EHCacheManagerHolder {
                     + bus.getId();
                 conf.getDiskStoreConfiguration().setPath(path);
             }
-            return CacheManager.create(conf);
+            return createCacheManager(conf);
         } catch (Throwable t) {
             return null;
         }
@@ -141,4 +165,27 @@ public final class EHCacheManagerHolder {
         }
     }
     
+    static CacheManager createCacheManager() throws CacheException {
+        try {
+            return (CacheManager)cacheManagerCreateMethodNoArg.invoke(null, (Object[])null);
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
+    }
+
+    static CacheManager createCacheManager(URL url) throws CacheException {
+        try {
+            return (CacheManager)createMethodURLArg.invoke(null, new Object[]{url});
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
+    }
+
+    static CacheManager createCacheManager(Configuration conf) throws CacheException {
+        try {
+            return (CacheManager)cacheManagerCreateMethodConfigurationArg.invoke(null, new Object[]{conf});
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
+    }
 }
