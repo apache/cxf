@@ -28,6 +28,7 @@ import org.apache.cxf.message.Message;
 import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
+import org.opensaml.xacml.ctx.AttributeValueType;
 import org.opensaml.xacml.ctx.EnvironmentType;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
@@ -96,20 +97,38 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         attributes.add(createAttribute(XACMLConstants.SUBJECT_ID, XACMLConstants.XS_STRING, issuer,
                                        principal.getName()));
 
-        for (String role : roles) {
-            if (role != null) {
-                attributes.add(createAttribute(XACMLConstants.SUBJECT_ROLE, XACMLConstants.XS_ANY_URI,
-                                               issuer, role));
+        if (roles != null) {
+            List<AttributeValueType> roleAttributes = new ArrayList<AttributeValueType>();
+            for (String role : roles) {
+                if (role != null) {
+                    AttributeValueType subjectRoleAttributeValue = 
+                        RequestComponentBuilder.createAttributeValueType(role);
+                    roleAttributes.add(subjectRoleAttributeValue);
+                }
+            }
+
+            if (!roleAttributes.isEmpty()) {
+                AttributeType subjectRoleAttribute = 
+                    createAttribute(
+                        XACMLConstants.SUBJECT_ROLE,
+                        XACMLConstants.XS_ANY_URI,
+                        issuer,
+                        roleAttributes
+                    );
+                attributes.add(subjectRoleAttribute);
             }
         }
 
         return RequestComponentBuilder.createSubjectType(attributes, null);
     }
 
+    private AttributeType createAttribute(String id, String type, String issuer, List<AttributeValueType> values) {
+        return RequestComponentBuilder.createAttributeType(id, type, issuer, values);
+    }
+    
     private AttributeType createAttribute(String id, String type, String issuer, String value) {
-        return RequestComponentBuilder.createAttributeType(id, type, issuer, 
-                                                           Collections.singletonList(
-                                                           RequestComponentBuilder.createAttributeValueType(value)));
+        return createAttribute(id, type, issuer, 
+                               Collections.singletonList(RequestComponentBuilder.createAttributeValueType(value)));
     }
 
     /**
