@@ -28,6 +28,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.management.JMException;
+import javax.management.ObjectName;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -39,13 +42,16 @@ import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.management.ManagedComponent;
+import org.apache.cxf.management.ManagementConstants;
+import org.apache.cxf.management.annotation.ManagedOperation;
+import org.apache.cxf.management.annotation.ManagedResource;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedResource;
 
 /**
  * A EH-Cache based cache to cache identities in different realms where
@@ -53,7 +59,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  */
 @ManagedResource()
 public class EHCacheIdentityCache 
-    implements IdentityCache, IdentityMapper, Closeable, BusLifeCycleListener {
+    implements IdentityCache, IdentityMapper, Closeable, BusLifeCycleListener, ManagedComponent {
     
     private static final Logger LOG = LogUtils.getL7dLogger(EHCacheIdentityCache.class);
     
@@ -78,6 +84,14 @@ public class EHCacheIdentityCache
         bus = b;
         if (bus != null) {
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+            InstrumentationManager im = b.getExtension(InstrumentationManager.class);
+            if (im != null) {
+                try {
+                    im.register(this);
+                } catch (JMException e) {
+                    LOG.log(Level.WARNING, "Registering EHCacheIdentityCache failed.", e);
+                }
+            }
         }
 
         if (configFileURL != null) {
@@ -93,7 +107,7 @@ public class EHCacheIdentityCache
     
     public MemoryIdentityCacheStatistics getStatistics() {
         if (statistics == null) {
-            this.statistics = new MemoryIdentityCacheStatistics();
+            this.statistics = new MemoryIdentityCacheStatistics(bus, this);
         }
         return statistics;
     }
@@ -252,6 +266,16 @@ public class EHCacheIdentityCache
             // Do nothing
         }
         return null;
+    }
+
+    public ObjectName getObjectName() throws JMException {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
+        buffer.append(ManagementConstants.TYPE_PROP).append('=').append("EHCacheIdentityCache").append(',');
+        buffer.append(ManagementConstants.NAME_PROP).append('=')
+            .append("EHCacheIdentityCache-" + System.identityHashCode(this));
+        return new ObjectName(buffer.toString());
     }
 }
 
