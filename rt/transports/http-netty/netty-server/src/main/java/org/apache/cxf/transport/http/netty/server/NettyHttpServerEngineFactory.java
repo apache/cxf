@@ -32,10 +32,12 @@ import javax.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 
 
+@NoJSR250Annotations(unlessNull = "bus")
 public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpServerEngineFactory.class);
@@ -84,7 +86,6 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
      */
     @Resource(name = "cxf")
     public final void setBus(Bus bus) {
-        assert this.bus == null || this.bus == bus;
         this.bus = bus;
         if (bus != null) {
             bus.setExtension(this, NettyHttpServerEngineFactory.class);
