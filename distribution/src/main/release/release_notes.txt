@@ -1,4 +1,4 @@
-Apache CXF 2.7.5 Release Notes
+Apache CXF 2.7.6 Release Notes
 
 1. Overview
 
@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.5 fixes over 40 JIRA issues reported by users and the community.
+2.7.6 fixes over 75 JIRA issues reported by users and the community.
 
 
 
@@ -72,59 +72,88 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-4924] - Many docLocation for a server address
-
 ** Bug
-    * [CXF-4897] - STS: check not found certificates in DefaultSubjectProvider for symmetric key type
-    * [CXF-4938] - Setting RuntimeDelegate instance in CXFNonSpringJaxrsServlet is too aggresive
-    * [CXF-4940] - CXF not (always) responding with the correct exception when working with an exception hierarchy
-    * [CXF-4941] - WS-RM related faults do not contain the correct addressing action
-    * [CXF-4946] - SourceGenerator needs to use URI resolve function when dealing with relative references containing parent folders
-    * [CXF-4947] - Potential problems with the JAXBContext being null
-    * [CXF-4949] - FIQL - searchContext returns null SearchCondition
-    * [CXF-4951] - cxf-codegen-plugin wsdlArtifact ignores classifier
-    * [CXF-4954] - CryptoCoverageChecker prevents handling of SOAPFault-Responses
-    * [CXF-4955] - Interoperability Issue of the Discovery Hello Message  - wrong SOAP-Header-Action
-    * [CXF-4957] - remove dependency="true" for jsr339-api specs bundle
-    * [CXF-4960] - Race conditions in SOAP/HTTP startup
-    * [CXF-4964] - NPE is thrown when WS-RM's destination has no ackPolicy configured
-    * [CXF-4967] - JSONProvider will throw NPE if DOM Document is used and dropRootElement and ignoreNamespaces properties are set
-    * [CXF-4969] - ExceptionMapper not used for exception in resource setter
-    * [CXF-4970] - cxf servlet transport doesn't work when the endpoint deployed by using Spring within OSGi
-    * [CXF-4975] - CXFNonSpringJaxrsServlet needs to ensure an optional Application path starts from "/"
-    * [CXF-4979] - WadlGenerator generates invalid xml for QueryParameters with a default value containing " characters
-    * [CXF-4982] - Codegen maven plugin fails forked execution on Windows XP environment
-    * [CXF-4983] - Response.getStatusInfo does not work if the status code can not be mapped to Status enum 
-    * [CXF-4986] - jax-rs2 request filter is unable to modify request header by adding a new header 
-    * [CXF-4990] - When thrown the fault from logical handle, the namespace setting doesn't work 
-    * [CXF-4991] - Classloading issue with EH-Cache availability checks
-    * [CXF-4992] - proxy sub-resources creating wrong request URIs with non-HTTP transports
-    * [CXF-4993] - LdapClaimsHandler can't find attributes if user authenticated against LDAP
+    * [CXF-4832] - META-INF/services/org.apache.cxf.bus.factory contains extra data on a second line
+    * [CXF-4953] - JAXRSClientFactoryBean doesn't take the bus features into consideration 
+    * [CXF-4985] - ResponseBuilder should set 204 status if the status has not been set and the entity is null
+    * [CXF-4996] - Issue after upgrading to jackson-jaxrs-json-provider 2.2.0 (from 2.1.4)
+    * [CXF-5000] - NameBindings are ignored for Reader and Writer interceptors 
+    * [CXF-5009] - Allow multiple subcodes in a SOAP 1.2 fault
+    * [CXF-5013] - Need support for SHA256 Signature Algorithms
+    * [CXF-5014] - HTTP Response headers are split by default
+    * [CXF-5016] - ArithmeticException on ResponseTimeCounterMBean.getAvgResponseTime() after counter reset()
+    * [CXF-5017] - CrossOriginResourceSharingFilter FIELD_COMMA_PATTERN mangles firefox headers
+    * [CXF-5018] - EHCache TimeToLive value overriden in EHCacheReplayCache
+    * [CXF-5020] - add NPE guard when we restore original java.class.path system property
+    * [CXF-5021] - Static resources need the "application/javascript" content type for javascript files
+    * [CXF-5022] - Multiple JAX-RS services will start on the same address, but "last one" wins
+    * [CXF-5026] - JAX-RS Async client does not work if HTTP error is returned
+    * [CXF-5027] - JAX-RS XOP marshaller does not support SWA attachments
+    * [CXF-5030] - Exception in opensaml initialization in OSGi: NoClassDefFoundError: org/apache/xml/security/Init
+    * [CXF-5033] - Error No component with id 'blueprintContainer' could be found in pax exam test occurs at BlueprintBeanLocator.getBeansOfType
+    * [CXF-5037] - DefaultSecurityContext Principal is incorrectly set from Subject
+    * [CXF-5040] - support new asm4 shade of xbean
+    * [CXF-5045] - UndeclaredThrowableException thrown in the client side when server responses with wsa:OnlyNonAnonymousAddressSupported soap12 version fault message
+    * [CXF-5046] - EncryptedSupportingTokens used with EncryptBeforeSigning does not encrypt Username token
+    * [CXF-5047] - Wrong soap:address generated in WSDL 
+    * [CXF-5050] - Already connected exception when using CXF client to invoke to the server
+    * [CXF-5051] - ProtectTokens assertion is not respected for SAML tokens
+    * [CXF-5056] - EndorsingSupportingTokens with both transport security and message layer security applied
+    * [CXF-5057] - NPE at the decoupled endpoint when receiving a response message with an unknown identifier
+    * [CXF-5059] - Refine classloader in org.apache.cxf.wsdl11.WSDLManagerImpl
+    * [CXF-5063] - When using AsyncHttpConduit with a certificate alias CXF hangs after a bunch of requests
+    * [CXF-5064] - XmlJavaTypeAdapter ignored on SOAP Headers
+    * [CXF-5065] - Subresource operations do not see root resource Produces or Consumes annotations 
+    * [CXF-5070] - CDATA sections are not taken into account by wsdl2java but are by xjc
+    * [CXF-5071] - Async Http transport: Injecting an sslSocketFactory in the tlsClientParameters has no effect 
+    * [CXF-5073] - endless recursion in creating JAX-RS client proxy
+    * [CXF-5078] - WSDLGetInterceptor holds a lock for too long
+    * [CXF-5082] - JAX-RS frontend has non-optional dependency on blueprint
+    * [CXF-5084] - URIBuilder optimization prevents relative paths that startWith "h" "t" "t" "p"
+    * [CXF-5086] - JSONProvider can not read explicit collections if unmarshallAsJaxbElement property is set
+    * [CXF-5089] - java2ws generate both ref and nillabe attributes in a schema element 
+    * [CXF-5092] - RequestTokenService signature verification bug [OAuthUtils]
+    * [CXF-5093] - HTTPConduit prevents AsyncConduit from sending the payloads when custom HTTP methods are used
+    * [CXF-5095] - Allow adding attachments to the contetx using jaxws attachments
+    * [CXF-5098] - References to Kerberos Tokens are not created correctly in responses
+    * [CXF-5099] - Optional extensions that refer to classes that cannot be found are not treated as optional
+    * [CXF-5100] - JAXB-based providers fail when they try to set JAXB RI-specific properties on non-RI implementations
+    * [CXF-5102] - schema resource loading code in various blueprint namespace handlers not working in some environment
+    * [CXF-5104] - JAX-RS not injecting contexts after resuming a suspended continuation
+    * [CXF-5108] - parameter beans feature not working through dynamic proxy based clients for JAXRS
+    * [CXF-5110] - Wrong processing of @XmlJavaTypeAdapter with RPC style endpoints
+    * [CXF-5111] - JAX-RS providers typed on arrays like String[] are not selected
+    * [CXF-5112] - OAuthUtils causes IllegalArgumentException when returning 400 instead of 401
+    * [CXF-5113] - leading spaces in karaf features.xml bundle elements lead to errors when using karaf 3.0.0
+    * [CXF-5114] - CXF Client issue when try to handle session for One-Way Operation call
+    * [CXF-5115] - Primitive arrays for capturing HTTP parameters are not supported
+    * [CXF-5116] - DelegatingInputStream created in AbstractHTTPDestination is cached into wrong Message instance
+    * [CXF-5119] - jetty endpoint may log exception when it is assigned to a non-default cxf bus in spring beans
+    * [CXF-5129] - Content type is always "text/xml" in case of using @Context HttpServletResponse response
 
 ** Improvement
-    * [CXF-4747] - Support easier configuration of Spring bus with WebClient
-    * [CXF-4825] - Remove static JAX-RS API calls from within JAX-RS server and client runtimes
-    * [CXF-4959] - Support hierarchical mimetypes
-    * [CXF-4961] - Configuration 
-    * [CXF-4966] - KerberosClient does not need the cxf Bus but it is required in the constructor
-    * [CXF-4968] - Add an option to limit the number of active sequences that are created at WS-RM endpoints
-    * [CXF-4971] - JSONProvider should be able to drop a root dynamically
-    * [CXF-4974] - CXF JAX-RS Client interface should support close() calls similarly to frontend Client
-    * [CXF-4978] - Only encrypt an issued token if we have a matching key
-    * [CXF-4997] - Skip PolicyBasedWSS4JInInterceptor processing when AssertionInfoMap not available
-    * [CXF-4998] - JAXRSClientFactory: Missing factory method for username+password and providers
+    * [CXF-4457] - Extend WS-SecureConversation to support SAML Assertions for authentication
+    * [CXF-4577] - Support EHCACHE 2.5.2+ 
+    * [CXF-5025] - Support WS-SecurityPolicy "Strict" Layout validation
+    * [CXF-5031] - Add support for SupportingToken policy assertions without a binding
+    * [CXF-5032] - Support SOAP 1.2 in DynamicClient
+    * [CXF-5039] - IdentityMapping support in ClaimsManager
+    * [CXF-5049] - Support for schema compiler options in DynamicClientFactory
+    * [CXF-5053] - JAX-RS behavior differs from JAX-WS for MessageContext.get( Message.class.getName() ) 
+    * [CXF-5055] - Support Clients pre-registering scopes and OOB response in OAuth2 Authorization Flow
+    * [CXF-5069] - Create utility caching MessageBodyWriter and MessageBodyReader
+    * [CXF-5074] - GZIP Feature activation
+    * [CXF-5079] - Add support for mustunderstand = false in PolicyBasedWSS4JOutInterceptor
+    * [CXF-5081] - FIQL - use custome query param name instead of default _s
+    * [CXF-5088] - Make the service file of cxf-core.jar Web Application Server friendly
+    * [CXF-5101] - Add more options for validating the search values
+    * [CXF-5130] - Update WebClient to provide a link to SyncInvoker
 
 ** New Feature
-    * [CXF-4936] - (PATCH) Expose FastInfoset serializer tuning properties
+    * [CXF-3883] - Support for identity mapping as part of issue token process
+    * [CXF-4464] - Support ClaimsHandler per realm
+    * [CXF-5010] - Add customizable request logging capability to STS
 
 ** Task
-    * [CXF-4950] - Support 'qs' media type parameters
-    * [CXF-4988] - JAX-RS Provider improvements
-
-** Wish
-    * [CXF-4898] - Allow to specify types in WSDiscoveryService registration
-
-
-
+    * [CXF-5090] - Update Jettison version to 1.3.4
 
