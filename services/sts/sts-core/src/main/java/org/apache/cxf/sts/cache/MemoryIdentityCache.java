@@ -26,18 +26,25 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.management.JMException;
+import javax.management.ObjectName;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.management.ManagedComponent;
+import org.apache.cxf.management.ManagementConstants;
+import org.apache.cxf.management.annotation.ManagedOperation;
+import org.apache.cxf.management.annotation.ManagedResource;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.ws.security.CustomTokenPrincipal;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedResource;
 
 /**
  * A simple in-memory HashMap based cache to cache identities in different realms where
  * the relationship is of type FederateIdentity.
  */
 @ManagedResource()
-public class MemoryIdentityCache implements IdentityCache, IdentityMapper {
+public class MemoryIdentityCache implements IdentityCache, IdentityMapper, ManagedComponent {
     
     private static final Logger LOG = LogUtils.getL7dLogger(MemoryIdentityCache.class);
     
@@ -47,21 +54,37 @@ public class MemoryIdentityCache implements IdentityCache, IdentityMapper {
     private long maxCacheItems = 10000L;
     
     private IdentityMapper identityMapper;
+    private final Bus bus;
     
     private MemoryIdentityCacheStatistics statistics;
     
 
     protected MemoryIdentityCache() {
-        
+        this.bus = null;
     }
     
     public MemoryIdentityCache(IdentityMapper identityMapper) {
         this.identityMapper = identityMapper;
+        this.bus = null;
+    }
+    public MemoryIdentityCache(Bus bus, IdentityMapper identityMapper) {
+        this.identityMapper = identityMapper;
+        this.bus = bus;
+        if (bus != null) {
+            InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
+            if (im != null) {
+                try {
+                    im.register(this);
+                } catch (JMException e) {
+                    LOG.log(Level.WARNING, "Registering MemoryIdentityCache failed.", e);
+                }
+            }
+        }
     }
     
     public MemoryIdentityCacheStatistics getStatistics() {
         if (statistics == null) {
-            this.statistics = new MemoryIdentityCacheStatistics();
+            this.statistics = new MemoryIdentityCacheStatistics(bus, this);
         }
         return statistics;
     }
@@ -187,5 +210,15 @@ public class MemoryIdentityCache implements IdentityCache, IdentityMapper {
             from.put(key, to.get(key));
         }
     }
+    
+    public ObjectName getObjectName() throws JMException {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
+        buffer.append(ManagementConstants.TYPE_PROP).append('=').append("MemoryIdentityCache").append(',');
+        buffer.append(ManagementConstants.NAME_PROP).append('=')
+            .append("MemoryIdentityCache-" + System.identityHashCode(this));
+        return new ObjectName(buffer.toString());
+    }    
 }
 
