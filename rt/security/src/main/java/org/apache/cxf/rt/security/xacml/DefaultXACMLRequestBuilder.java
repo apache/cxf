@@ -94,16 +94,23 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             );
         attributes.add(subjectIdAttribute);
         
-        for (String role : roles) {
-            if (role != null) {
-                AttributeValueType subjectRoleAttributeValue = 
-                    RequestComponentBuilder.createAttributeValueType(role);
+        if (roles != null) {
+            List<AttributeValueType> roleAttributes = new ArrayList<AttributeValueType>();
+            for (String role : roles) {
+                if (role != null) {
+                    AttributeValueType subjectRoleAttributeValue = 
+                        RequestComponentBuilder.createAttributeValueType(role);
+                    roleAttributes.add(subjectRoleAttributeValue);
+                }
+            }
+            
+            if (!roleAttributes.isEmpty()) {
                 AttributeType subjectRoleAttribute = 
                     RequestComponentBuilder.createAttributeType(
                             XACMLConstants.SUBJECT_ROLE,
                             XACMLConstants.XS_ANY_URI,
                             issuer,
-                            Collections.singletonList(subjectRoleAttributeValue)
+                            roleAttributes
                     );
                 attributes.add(subjectRoleAttribute);
             }
