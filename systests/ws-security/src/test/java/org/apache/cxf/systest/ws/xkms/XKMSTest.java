@@ -87,6 +87,37 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         port.doubleIt(25);
         
         // Streaming
+        // SecurityTestUtil.enableStreaming(port);
+        // port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // TODO The client uses XKMS to locate the public key of the service with which to encrypt
+    // the message.
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testAsymmetricBinding() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = XKMSTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = XKMSTest.class.getResource("DoubleItXKMS.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
         // SecurityTestUtil.enableStreaming(x509Port);
         // x509Port.doubleIt(25);
         
