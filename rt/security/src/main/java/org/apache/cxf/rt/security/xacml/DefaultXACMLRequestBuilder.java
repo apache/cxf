@@ -72,12 +72,27 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
 
     private ResourceType createResourceType(List<String> resources) {
         List<AttributeType> attributes = new ArrayList<AttributeType>();
+        
+        List<AttributeValueType> resourceAttributes = new ArrayList<AttributeValueType>();
         for (String resource : resources) {
             if (resource != null) {
-                attributes.add(createAttribute(XACMLConstants.RESOURCE_ID, XACMLConstants.XS_STRING, null,
-                                               resource));
+                AttributeValueType resourceAttributeValue = 
+                    RequestComponentBuilder.createAttributeValueType(resource);
+                resourceAttributes.add(resourceAttributeValue);
             }
         }
+
+        if (!resourceAttributes.isEmpty()) {
+            AttributeType resourceAttribute = 
+                createAttribute(
+                    XACMLConstants.RESOURCE_ID,
+                    XACMLConstants.XS_STRING,
+                    null,
+                    resourceAttributes
+                );
+            attributes.add(resourceAttribute);
+        }
+        
         return RequestComponentBuilder.createResourceType(attributes, null);
     }
 
