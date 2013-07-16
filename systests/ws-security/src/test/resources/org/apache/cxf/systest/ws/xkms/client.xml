@@ -49,6 +49,16 @@
         serviceName="serviceNamespace:XKMSPortType" endpointName="serviceNamespace:XKMSService"
         address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
         <jaxws:properties>
+            <entry key="jaxb.additionalContextClasses">
+                <bean
+                    class="org.apache.cxf.xkms.model.extensions.ClassArrayFactoryBean">
+                    <property name="classNames">
+                        <list>
+                            <value>org.apache.cxf.xkms.model.extensions.ResultDetails</value>
+                        </list>
+                    </property>
+                </bean>
+            </entry>
         </jaxws:properties>
     </jaxws:client>
     
