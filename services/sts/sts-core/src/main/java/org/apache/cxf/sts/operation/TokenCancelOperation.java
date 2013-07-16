@@ -46,7 +46,6 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedTokenCancelledType;
 import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
 import org.apache.ws.security.WSSecurityException;
-import org.springframework.context.ApplicationEvent;
 
 /**
  *  An implementation for Cancel operation interface.
@@ -132,7 +131,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
             // prepare response
             try {
                 RequestSecurityTokenResponseType response = createResponse(tokenRequirements);
-                ApplicationEvent event = new STSCancelSuccessEvent(cancellerParameters,
+                STSCancelSuccessEvent event = new STSCancelSuccessEvent(cancellerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
                 return response;
@@ -142,7 +141,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
             }
         
         } catch (RuntimeException ex) {
-            ApplicationEvent event = new STSCancelFailureEvent(cancellerParameters,
+            STSCancelFailureEvent event = new STSCancelFailureEvent(cancellerParameters,
                                                               System.currentTimeMillis() - start, ex);
             publishEvent(event);
             throw ex;

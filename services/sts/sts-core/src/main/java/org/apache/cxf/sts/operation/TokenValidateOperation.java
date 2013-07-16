@@ -52,7 +52,6 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.ws.security.WSSecurityException;
-import org.springframework.context.ApplicationEvent;
 
 /**
  * An implementation of the ValidateOperation interface.
@@ -172,7 +171,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             try {
                 RequestSecurityTokenResponseType response =
                     createResponse(tokenResponse, tokenProviderResponse, tokenRequirements);
-                ApplicationEvent event = new STSValidateSuccessEvent(validatorParameters,
+                STSValidateSuccessEvent event = new STSValidateSuccessEvent(validatorParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
                 return response;
@@ -182,7 +181,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             }
             
         } catch (RuntimeException ex) {
-            ApplicationEvent event = new STSValidateFailureEvent(validatorParameters,
+            STSValidateFailureEvent event = new STSValidateFailureEvent(validatorParameters,
                                                               System.currentTimeMillis() - start, ex);
             publishEvent(event);
             throw ex;

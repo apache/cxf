@@ -65,7 +65,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.springframework.context.ApplicationEvent;
 
 /**
  * An implementation of the IssueOperation interface.
@@ -209,7 +208,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                     createResponse(
                             encryptionProperties, tokenResponse, tokenRequirements, keyRequirements, context
                     );
-                ApplicationEvent event = new STSIssueSuccessEvent(providerParameters,
+                STSIssueSuccessEvent event = new STSIssueSuccessEvent(providerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
                 return response;
@@ -219,7 +218,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             }
         
         } catch (RuntimeException ex) {
-            ApplicationEvent event = new STSIssueFailureEvent(providerParameters,
+            STSIssueFailureEvent event = new STSIssueFailureEvent(providerParameters,
                                                               System.currentTimeMillis() - start, ex);
             publishEvent(event);
             throw ex;

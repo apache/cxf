@@ -26,6 +26,7 @@ import javax.xml.transform.Source;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
+import org.apache.cxf.sts.event.STSEventListener;
 import org.apache.cxf.sts.operation.AbstractOperation;
 import org.apache.cxf.sts.operation.TokenIssueOperation;
 import org.apache.cxf.sts.operation.TokenRenewOperation;
@@ -56,6 +57,7 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
     private boolean returnReferences = true;
     private TokenStore tokenStore;
     private ClaimsManager claimsManager = new ClaimsManager();
+    private STSEventListener eventListener;
 
     public DefaultSecurityTokenServiceProvider() throws Exception {
         super();
@@ -83,6 +85,10 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
     
     public void setClaimsManager(ClaimsManager claimsManager) {
         this.claimsManager = claimsManager;
+    }
+    
+    public void setEventListener(STSEventListener listener) {
+        this.eventListener = listener;
     }
     
     @Override
@@ -141,5 +147,6 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
         abstractOperation.setReturnReferences(returnReferences);
         abstractOperation.setTokenStore(tokenStore);
         abstractOperation.setClaimsManager(claimsManager);
+        abstractOperation.setEventListener(eventListener);
     }
 }
