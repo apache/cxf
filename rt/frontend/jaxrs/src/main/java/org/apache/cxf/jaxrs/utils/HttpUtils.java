@@ -580,4 +580,8 @@ public final class HttpUtils {
         return relative.resolve(relToCommon);
         
     }
+    
+    public static String toHttpLanguage(Locale locale) {
+        return Headers.toHttpLanguage(locale);
+    }
 }

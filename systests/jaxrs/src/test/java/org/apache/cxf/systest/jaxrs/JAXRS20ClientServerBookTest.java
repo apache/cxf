@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseContext;
@@ -100,6 +101,14 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Book book = wc.sync().get(Book.class);
         assertEquals(124L, book.getId());
         validateResponse(wc);
+    }
+    
+    @Test
+    public void testGetBookSpec() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        Book book = ClientBuilder.newClient().target(address)
+            .request("application/xml").get(Book.class);
+        assertEquals(124L, book.getId());
     }
     
     @Test
