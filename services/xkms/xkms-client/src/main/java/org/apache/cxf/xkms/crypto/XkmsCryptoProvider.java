@@ -96,18 +96,19 @@ public class XkmsCryptoProvider extends CryptoBase {
     }
 
     @Override
-    public boolean verifyTrust(X509Certificate[] certs, boolean enableRevocation)
+    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation)
         throws WSSecurityException {
-        if (certs == null) {
-            return false;
+        if (certs != null) {
+            LOG.fine(String.format("Verifying certificate id: %s", certs[0].getSubjectDN()));
         }
-        LOG.fine(String.format("Verifying certificate id: %s", certs[0].getSubjectDN()));
-        return xkmsInvoker.validateCertificate(certs[0]);
+        if (certs == null || !xkmsInvoker.validateCertificate(certs[0])) {
+            throw new CryptoProviderException("The given certificate is not valid");
+        }
     }
 
     @Override
-    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException {
-        return false;
+    public void verifyTrust(PublicKey publicKey) throws WSSecurityException {
+        throw new CryptoProviderException("PublicKeys cannot be verified");
     }
 
     private void assertDefaultCryptoProvider() {

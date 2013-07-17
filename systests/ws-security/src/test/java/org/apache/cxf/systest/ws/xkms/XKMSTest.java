@@ -94,10 +94,10 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO The client uses XKMS to locate the public key of the service with which to encrypt
-    // the message.
+    // The client uses XKMS to locate the public key of the service with which to encrypt
+    // the message. Then the client uses XKMS to both locate + validate the signing cert
+    // on processing the service response
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricBinding() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
