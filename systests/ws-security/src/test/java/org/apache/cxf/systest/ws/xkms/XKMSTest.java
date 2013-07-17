@@ -33,6 +33,8 @@ import org.junit.BeforeClass;
 
 /**
  * A set of tests that uses XKMS with WS-Security to locate + validate X.509 tokens.
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class XKMSTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -87,8 +89,8 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         port.doubleIt(25);
         
         // Streaming
-        // SecurityTestUtil.enableStreaming(port);
-        // port.doubleIt(25);
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -118,8 +120,8 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         port.doubleIt(25);
         
         // Streaming
-        // SecurityTestUtil.enableStreaming(x509Port);
-        // x509Port.doubleIt(25);
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
