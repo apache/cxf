@@ -44,9 +44,9 @@
     </cxf:bus>
     
     <!-- Begin Symmetric -->
-    <jaxws:client id="xkmsClient" xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
+    <jaxws:client id="xkmsClient"
         serviceClass="org.w3._2002._03.xkms_wsdl.XKMSPortType"
-        serviceName="serviceNamespace:XKMSPortType" endpointName="serviceNamespace:XKMSService"
+        name="{http://www.w3.org/2002/03/xkms#wsdl}XKMSPort" 
         address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">
