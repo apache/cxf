@@ -35,7 +35,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -45,6 +44,7 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.token.provider.ConditionsProvider;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
@@ -212,7 +212,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
             
             // Cache the token
             storeTokenInCache(
-                tokenStore, renewedAssertion, tokenParameters.getPrincipal(), tokenParameters.getRealm()
+                tokenStore, renewedAssertion, tokenParameters.getPrincipal(), tokenParameters
             );
             
             response.setToken(token);
@@ -556,7 +556,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         TokenStore tokenStore, 
         SamlAssertionWrapper assertion, 
         Principal principal,
-        String tokenRealm
+        TokenRenewerParameters tokenParameters
     ) throws WSSecurityException {
         // Store the successfully renewed token in the cache
         byte[] signatureValue = assertion.getSignatureValue();
@@ -572,11 +572,29 @@ public class SAMLTokenRenewer implements TokenRenewer {
             securityToken.setToken(assertion.getElement());
             securityToken.setPrincipal(principal);
             
+            Properties props = new Properties();
+            String tokenRealm = tokenParameters.getRealm();
             if (tokenRealm != null) {
-                Properties props = new Properties();
                 props.setProperty(STSConstants.TOKEN_REALM, tokenRealm);
-                securityToken.setProperties(props);
             }
+            
+            // Handle Renewing logic
+            Renewing renewing = tokenParameters.getTokenRequirements().getRenewing();
+            if (renewing != null) {
+                props.put(
+                    STSConstants.TOKEN_RENEWING_ALLOW, 
+                    String.valueOf(renewing.isAllowRenewing())
+                );
+                props.put(
+                    STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, 
+                    String.valueOf(renewing.isAllowRenewingAfterExpiry())
+                );
+            } else {
+                props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW, "true");
+                props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
+            }
+            
+            securityToken.setProperties(props);
 
             int hash = Arrays.hashCode(signatureValue);
             securityToken.setTokenHash(hash);
