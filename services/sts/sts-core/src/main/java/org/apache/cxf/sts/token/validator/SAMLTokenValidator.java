@@ -209,7 +209,7 @@ public class SAMLTokenValidator implements TokenValidator {
                     Properties props = secToken.getProperties();
                     if (props != null) {
                         String cachedRealm = props.getProperty(STSConstants.TOKEN_REALM);
-                        if (!tokenRealm.equals(cachedRealm)) {
+                        if (cachedRealm != null && !tokenRealm.equals(cachedRealm)) {
                             return response;
                         }
                     }

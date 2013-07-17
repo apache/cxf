@@ -138,10 +138,7 @@ public class SAMLTokenProvider implements TokenProvider {
                 securityToken.setToken(token);
                 securityToken.setPrincipal(tokenParameters.getPrincipal());
 
-                Properties props = securityToken.getProperties();
-                if (props == null) {
-                    props = new Properties();
-                }
+                Properties props = new Properties();
                 securityToken.setProperties(props);
                 if (tokenParameters.getRealm() != null) {
                     props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
