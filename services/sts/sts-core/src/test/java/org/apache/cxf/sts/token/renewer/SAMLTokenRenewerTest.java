@@ -135,6 +135,17 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+        
+        // Now try to renew it again!
+        renewerParameters.setToken(validatorResponse.getToken());
+        
+        samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
+        assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
+        
+        renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
+        assertTrue(renewerResponse != null);
+        assertTrue(renewerResponse.getToken() != null);
     }
     
     /**
