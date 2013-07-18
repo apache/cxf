@@ -195,7 +195,7 @@
 
         <cxf.downloadSources>true</cxf.downloadSources>
 
-        <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset.xml</cxf.pmd.eclipse.ruleset>
+        <cxf.pmd.eclipse.ruleset.ext/>
 
         <cxf.resources.base.path />
     </properties>
@@ -287,11 +287,11 @@
                             </file>
                             <file>
                                 <name>.pmd</name>
-                                <location>/cxf-eclipse-pmd</location>
+                                <location>/cxf-eclipse-pmd${cxf.pmd.eclipse.ruleset.ext}</location>
                             </file>
                             <file>
                                 <name>.ruleset</name>
-                                <location>/${cxf.pmd.eclipse.ruleset}</location>
+                                <location>/cxf-pmd-ruleset${cxf.pmd.eclipse.ruleset.ext}.xml</location>
                             </file>
                         </additionalConfig>
                     </configuration>
@@ -332,7 +332,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>2.7.1</version>
+                    <version>3.0.1</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
@@ -1795,7 +1795,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <version>2.7.1</version>
+                        <version>3.0.1</version>
                         <dependencies>
                             <dependency>
                                 <groupId>org.apache.cxf.build-utils</groupId>
