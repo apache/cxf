@@ -339,6 +339,11 @@
                             <artifactId>cxf-buildtools</artifactId>
                             <version>${cxf.build-utils.version}</version>
                         </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd</artifactId>
+                            <version>5.0.4</version>
+                        </dependency>
                     </dependencies>
                     <configuration>
                         <rulesets>
