@@ -22,8 +22,6 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.renewer.TokenRenewerParameters;
 
 public class STSRenewFailureEvent extends AbstractSTSFailureEvent implements TokenRenewerParametersSupport {
-
-    private static final long serialVersionUID = 1L;
     
     private static final String OPERATION = "Renew";
     

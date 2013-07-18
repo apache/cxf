@@ -20,9 +20,6 @@
 package org.apache.cxf.sts.event;
 
 public abstract class AbstractSTSEvent {
-
-    private static final long serialVersionUID = 1L;
-    
     private long duration;
     private final long timestamp;
     private final Object source;

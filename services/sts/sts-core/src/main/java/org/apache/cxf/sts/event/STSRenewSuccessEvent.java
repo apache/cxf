@@ -23,8 +23,6 @@ import org.apache.cxf.sts.token.renewer.TokenRenewerParameters;
 
 public class STSRenewSuccessEvent extends AbstractSTSSuccessEvent implements TokenRenewerParametersSupport {
 
-    private static final long serialVersionUID = 1L;
-    
     private static final String OPERATION = "Renew";
     
     

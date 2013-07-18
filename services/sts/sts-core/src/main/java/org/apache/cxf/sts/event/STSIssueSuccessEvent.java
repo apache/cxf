@@ -23,8 +23,6 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 
 public class STSIssueSuccessEvent extends AbstractSTSSuccessEvent implements TokenProviderParametersSupport {
 
-    private static final long serialVersionUID = 1L;
-    
     private static final String OPERATION = "Issue";
     
     
