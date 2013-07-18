@@ -272,7 +272,6 @@
         <dependency>
             <groupId>nekohtml</groupId>
             <artifactId>nekohtml</artifactId>
-            <version>1.9.6.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -369,27 +368,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.servicemix</groupId>
-            <artifactId>servicemix-core</artifactId>
-            <version>3.3.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>jaxen</groupId>
-                    <artifactId>jaxen</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jencks</groupId>
-                    <artifactId>jencks</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-            </exclusions>
+             <groupId>xerces</groupId>
+             <artifactId>xercesImpl</artifactId>
         </dependency>
         <dependency>
              <groupId>com.sun.xml.fastinfoset</groupId>
