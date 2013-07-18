@@ -1536,13 +1536,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.9.1</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                </exclusions>
+                <version>2.11.0</version>
             </dependency>
             <!-- if we use the new woodstox artifact, we're using the new version -->
             <dependency>
