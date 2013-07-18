@@ -42,7 +42,7 @@
         <gwt.hostedmode.dir>${project.build.directory}/war</gwt.hostedmode.dir>
         <gwt.classes.dir>${gwt.hostedmode.dir}/WEB-INF/classes</gwt.classes.dir>
 
-        <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</cxf.pmd.eclipse.ruleset>
+        <cxf.pmd.eclipse.ruleset.ext>-generated</cxf.pmd.eclipse.ruleset.ext>
     </properties>
 
     <dependencies>
