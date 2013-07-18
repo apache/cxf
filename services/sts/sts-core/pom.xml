@@ -98,12 +98,14 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
              
    </dependencies>
