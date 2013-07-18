@@ -518,8 +518,12 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (!dropElementsInXmlStream && super.outDropElements != null) {
             config.setIgnoredElements(outDropElements);
         }
-        config.setWriteNullAsString(writeNullAsString);
-        config.setDropRootElement(dropRootElement && !dropElementsInXmlStream);
+        if (!writeNullAsString) {
+            config.setWriteNullAsString(writeNullAsString);
+        }
+        if (dropRootElement && !dropElementsInXmlStream) {
+            config.setDropRootElement(true);
+        }
         if (ignoreNamespaces && serializeAsArray && arrayKeys == null) {
             arrayKeys = CastUtils.cast((List<?>)Collections.singletonList(qname.getLocalPart()));
         }
