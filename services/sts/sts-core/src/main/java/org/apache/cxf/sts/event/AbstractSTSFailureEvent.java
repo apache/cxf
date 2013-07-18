@@ -20,8 +20,6 @@
 package org.apache.cxf.sts.event;
 
 public abstract class AbstractSTSFailureEvent extends AbstractSTSEvent {
-
-    private static final long serialVersionUID = 1L;
     
     //private static final String OPERATION = "Issue";
     private Exception exception;

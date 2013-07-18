@@ -22,8 +22,6 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 
 public class STSIssueFailureEvent extends AbstractSTSFailureEvent implements TokenProviderParametersSupport {
-
-    private static final long serialVersionUID = 1L;
     
     private static final String OPERATION = "Issue";
     

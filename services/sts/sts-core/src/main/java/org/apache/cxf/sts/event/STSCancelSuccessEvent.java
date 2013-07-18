@@ -22,8 +22,6 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
 
 public class STSCancelSuccessEvent extends AbstractSTSSuccessEvent implements TokenCancellerParametersSupport {
-
-    private static final long serialVersionUID = 1L;
     
     private static final String OPERATION = "Cancel";
     

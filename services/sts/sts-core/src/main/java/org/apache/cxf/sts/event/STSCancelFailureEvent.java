@@ -23,10 +23,7 @@ import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
 
 public class STSCancelFailureEvent extends AbstractSTSFailureEvent implements TokenCancellerParametersSupport {
 
-    private static final long serialVersionUID = 1L;
-    
     private static final String OPERATION = "Cancel";
-       
     
     public STSCancelFailureEvent(TokenCancellerParameters parameters, long duration, Exception exception) {
         super(parameters, duration, exception);
