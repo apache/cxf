@@ -19,12 +19,10 @@
 
 package org.apache.cxf.systest.simple.impl;
 
-import javax.ejb.Stateless;
 import javax.jws.WebService;
 
 import org.apache.cxf.systest.simple.intf.WSSimple;
 
-@Stateless
 @WebService(name = "WSSimpleImpl123", targetNamespace = "http://systest.cxf.apache.org")
 public class WSSimpleImpl implements WSSimple {
 
