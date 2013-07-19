@@ -84,8 +84,6 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
-        /*
-         * TODO WSS-459
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -109,7 +107,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             // String error = "RequiredParts: No header element";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
+        
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
