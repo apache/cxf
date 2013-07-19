@@ -553,12 +553,16 @@ public abstract class AbstractClient implements Client {
     }
     
     protected void checkClientException(Message outMessage, Exception ex) throws Exception {
+        Throwable actualEx = ex instanceof Fault ? ((Fault)ex).getCause() : ex;
+        
         Integer responseCode = getResponseCode(outMessage.getExchange());
-        if (responseCode == null) {
-            if (ex instanceof ProcessingException) {
+        if (responseCode == null 
+            || actualEx instanceof IOException 
+                && outMessage.getExchange().get("client.redirect.exception") != null) {
+            if (actualEx instanceof ProcessingException) {
                 throw ex;
-            } else if (ex != null) {
-                throw new ProcessingException(ex);
+            } else if (actualEx != null) {
+                throw new ProcessingException(actualEx);
             } else if (!outMessage.getExchange().isOneWay() || cfg.isResponseExpectedForOneway()) {
                 waitForResponseCode(outMessage.getExchange());
             }
