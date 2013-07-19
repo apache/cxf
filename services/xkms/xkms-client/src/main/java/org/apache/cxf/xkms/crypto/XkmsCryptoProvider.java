@@ -22,14 +22,14 @@ package org.apache.cxf.xkms.crypto;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.xkms.cache.EHCacheXKMSClientCache;
+import org.apache.cxf.xkms.cache.XKMSClientCache;
 import org.apache.cxf.xkms.client.XKMSInvoker;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -44,21 +44,26 @@ public class XkmsCryptoProvider extends CryptoBase {
     private static final Logger LOG = LogUtils.getL7dLogger(XkmsCryptoProvider.class);
 
     private final XKMSInvoker xkmsInvoker;
-    private final Map<String, X509Certificate> certsCache = new ConcurrentHashMap<String, X509Certificate>();
     private Crypto defaultCrypto;
+    private XKMSClientCache xkmsClientCache;
 
     public XkmsCryptoProvider(XKMSPortType xkmsConsumer) {
         this(xkmsConsumer, null);
     }
 
     public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto defaultCrypto) {
+        this(xkmsConsumer, defaultCrypto, new EHCacheXKMSClientCache());
+    }
+    
+    public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto defaultCrypto, XKMSClientCache xkmsClientCache) {
         if (xkmsConsumer == null) {
             throw new IllegalArgumentException("xkmsConsumer may not be null");
         }
         this.xkmsInvoker = new XKMSInvoker(xkmsConsumer);
         this.defaultCrypto = defaultCrypto;
+        this.xkmsClientCache = xkmsClientCache;
     }
-
+    
     @Override
     public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException {
         if (LOG.isLoggable(Level.INFO)) {
@@ -124,8 +129,24 @@ public class XkmsCryptoProvider extends CryptoBase {
         } else if (type == TYPE.ALIAS) {
             return getX509CertificatesFromXKMS(cryptoType);
         } else if (type == TYPE.ISSUER_SERIAL) {
+            String key = cryptoType.getIssuer() + "-" + cryptoType.getSerial().toString(16);
+            // Try local cache first
+            if (xkmsClientCache != null) {
+                X509Certificate cachedCert = xkmsClientCache.get(key);
+                if (cachedCert != null) {
+                    return new X509Certificate[] {cachedCert};
+                }
+            }
+            // Now ask the XKMS Service
             X509Certificate certificate = xkmsInvoker.getCertificateForIssuerSerial(cryptoType
                 .getIssuer(), cryptoType.getSerial());
+            
+            // Store in the cache
+            if (certificate != null && xkmsClientCache != null) {
+                xkmsClientCache.put(key, certificate);
+                // Store it using the Subject DN as well
+                xkmsClientCache.put(certificate.getSubjectX500Principal().getName(), certificate);
+            }
             return new X509Certificate[] {
                 certificate
             };
@@ -154,13 +175,27 @@ public class XkmsCryptoProvider extends CryptoBase {
         if (id == null) {
             throw new CryptoProviderException("Id is not specified for certificate request");
         }
-        X509Certificate cert;
-        if (certsCache.containsKey(id.toLowerCase())) {
-            cert = certsCache.get(id.toLowerCase());
-        } else {
-            cert = xkmsInvoker.getCertificateForId(application, id);
-            certsCache.put(id.toLowerCase(), cert);
+        
+        // Try local cache first
+        if (xkmsClientCache != null) {
+            X509Certificate cachedCert = xkmsClientCache.get(id.toLowerCase());
+            if (cachedCert != null) {
+                return new X509Certificate[] {cachedCert};
+            }
         }
+        
+        // Now ask the XKMS Service
+        X509Certificate cert = xkmsInvoker.getCertificateForId(application, id);
+        
+        // Store in the cache
+        if (cert != null && xkmsClientCache != null) {
+            xkmsClientCache.put(id.toLowerCase(), cert);
+            // Store it using IssuerSerial as well
+            String key = cert.getIssuerX500Principal().getName() + "-" 
+                + cert.getSerialNumber().toString(16);
+            xkmsClientCache.put(key, cert);
+        }
+
         return new X509Certificate[] {
             cert
         };
