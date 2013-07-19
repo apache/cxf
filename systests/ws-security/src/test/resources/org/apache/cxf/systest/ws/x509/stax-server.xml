@@ -86,6 +86,60 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="KeyIdentifierDerived"
+       address="http://localhost:${testutil.ports.StaxServer}/DoubleItX509KeyIdentifierDerived" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKeyIdentifierDerivedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.crypto" value-ref="crypto"/>
+          <entry key="ws-security.enable.streaming" value="true"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="KeyIdentifierEncryptBeforeSigning"
+       address="http://localhost:${testutil.ports.StaxServer}/DoubleItX509KeyIdentifierEncryptBeforeSigning" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKeyIdentifierEncryptBeforeSigningPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.crypto" value-ref="crypto"/>
+          <entry key="ws-security.enable.streaming" value="true"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="KeyIdentifierEncryptBeforeSigningDerived"
+       address="http://localhost:${testutil.ports.StaxServer}/DoubleItX509KeyIdentifierEncryptBeforeSigningDerived" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKeyIdentifierEncryptBeforeSigningDerivedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.crypto" value-ref="crypto"/>
+          <entry key="ws-security.enable.streaming" value="true"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
     <bean id="crypto" class="org.apache.wss4j.common.crypto.CryptoFactory" 
         factory-method="getInstance">
         <constructor-arg>

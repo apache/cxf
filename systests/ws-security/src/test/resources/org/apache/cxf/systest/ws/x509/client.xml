@@ -47,6 +47,30 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierDerivedPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierEncryptBeforeSigningPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierEncryptBeforeSigningDerivedPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
+           <entry key="ws-security.encryption.username" value="bob"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort2" 
                   createdFromAPI="true">
        <jaxws:properties>

@@ -49,6 +49,63 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItKeyIdentifierDerivedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItKeyIdentifierDerivedPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItKeyIdentifierEncryptBeforeSigningBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItKeyIdentifierEncryptBeforeSigningPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItKeyIdentifierEncryptBeforeSigningDerivedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItKeyIdentifierEncryptBeforeSigningDerivedPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItIssuerSerialBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItIssuerSerialPolicy" />
         <soap:binding style="document"
@@ -389,6 +446,18 @@
         <wsdl:port name="DoubleItKeyIdentifierPort" binding="tns:DoubleItKeyIdentifierBinding">
             <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifier" />
         </wsdl:port>
+        <wsdl:port name="DoubleItKeyIdentifierDerivedPort" 
+                   binding="tns:DoubleItKeyIdentifierDerivedBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifierDerived" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItKeyIdentifierEncryptBeforeSigningPort" 
+                   binding="tns:DoubleItKeyIdentifierEncryptBeforeSigningBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifierEncryptBeforeSigning" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItKeyIdentifierEncryptBeforeSigningDerivedPort" 
+                   binding="tns:DoubleItKeyIdentifierEncryptBeforeSigningDerivedBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifierEncryptBeforeSigningDerived" />
+        </wsdl:port>
         <wsdl:port name="DoubleItIssuerSerialPort" binding="tns:DoubleItIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509IssuerSerial" />
         </wsdl:port>
@@ -505,6 +574,112 @@
                     </sp:Layout>
                     <sp:IncludeTimestamp/>
                     <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:AlgorithmSuite>
+                       <wsp:Policy>
+                          <sp:Basic128/>
+                       </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                 </wsp:Policy>
+              </sp:SymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItKeyIdentifierDerivedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                  <wsp:Policy>
+                    <sp:ProtectionToken>
+                       <wsp:Policy>
+                          <sp:X509Token
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                             <wsp:Policy>
+                                <sp:WssX509V3Token10 />
+                                <sp:RequireKeyIdentifierReference />
+                                <sp:RequireDerivedKeys />
+                             </wsp:Policy>
+                          </sp:X509Token>
+                       </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:Layout>
+                       <wsp:Policy>
+                          <sp:Lax/>
+                       </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                    <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:AlgorithmSuite>
+                       <wsp:Policy>
+                          <sp:Basic128/>
+                       </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                 </wsp:Policy>
+              </sp:SymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItKeyIdentifierEncryptBeforeSigningPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                  <wsp:Policy>
+                    <sp:ProtectionToken>
+                       <wsp:Policy>
+                          <sp:X509Token
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                             <wsp:Policy>
+                                <sp:WssX509V3Token10 />
+                                <sp:RequireKeyIdentifierReference />
+                             </wsp:Policy>
+                          </sp:X509Token>
+                       </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:Layout>
+                       <wsp:Policy>
+                          <sp:Lax/>
+                       </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                    <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:EncryptBeforeSigning/>
+                    <sp:AlgorithmSuite>
+                       <wsp:Policy>
+                          <sp:Basic128/>
+                       </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                 </wsp:Policy>
+              </sp:SymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItKeyIdentifierEncryptBeforeSigningDerivedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                  <wsp:Policy>
+                    <sp:ProtectionToken>
+                       <wsp:Policy>
+                          <sp:X509Token
+                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                             <wsp:Policy>
+                                <sp:WssX509V3Token10 />
+                                <sp:RequireKeyIdentifierReference />
+                                <sp:RequireDerivedKeys />
+                             </wsp:Policy>
+                          </sp:X509Token>
+                       </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:Layout>
+                       <wsp:Policy>
+                          <sp:Lax/>
+                       </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                    <sp:OnlySignEntireHeadersAndBody/>
+                    <sp:EncryptBeforeSigning/>
                     <sp:AlgorithmSuite>
                        <wsp:Policy>
                           <sp:Basic128/>
