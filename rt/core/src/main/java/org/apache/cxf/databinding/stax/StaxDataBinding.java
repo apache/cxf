@@ -30,14 +30,17 @@ import javax.xml.validation.Schema;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.databinding.AbstractDataBinding;
+import org.apache.cxf.databinding.AbstractInterceptorProvidingDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -49,7 +52,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  * A simple databinding implementation which reads and writes Source objects.
  * This will not work with the standard databinding interceptors.
  */
-public class StaxDataBinding extends AbstractDataBinding {
+public class StaxDataBinding extends AbstractInterceptorProvidingDataBinding {
 
     private XMLStreamDataReader xsrReader;
     private XMLStreamDataWriter xswWriter;
@@ -58,7 +61,26 @@ public class StaxDataBinding extends AbstractDataBinding {
         super();
         this.xsrReader = new XMLStreamDataReader();
         this.xswWriter = new XMLStreamDataWriter();
+        inInterceptors.add(new StaxInEndingInterceptor(Phase.POST_INVOKE));
+        inFaultInterceptors.add(new StaxInEndingInterceptor(Phase.POST_INVOKE));
+
+        inInterceptors.add(RemoveStaxInEndingInterceptor.INSTANCE);
+        inFaultInterceptors.add(RemoveStaxInEndingInterceptor.INSTANCE);
     }
+    
+    static class RemoveStaxInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
+        static final RemoveStaxInEndingInterceptor INSTANCE = new RemoveStaxInEndingInterceptor();
+        
+        public RemoveStaxInEndingInterceptor() {
+            super(Phase.PRE_INVOKE);
+            addBefore(StaxInEndingInterceptor.class.getName());
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            message.getInterceptorChain().remove(StaxInEndingInterceptor.INSTANCE);
+        }
+    }
+    
 
     public void initialize(Service service) {
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
@@ -148,7 +170,7 @@ public class StaxDataBinding extends AbstractDataBinding {
                                                             + obj.getClass() + " are not supported.");
                 }
             } catch (XMLStreamException e) {
-                throw new Fault(new Message("COULD_NOT_READ_XML_STREAM", LOG), e);
+                throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
             }
         }
 

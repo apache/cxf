@@ -68,23 +68,20 @@ import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.jaxb.JAXBContextProxy;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.databinding.AbstractDataBinding;
+import org.apache.cxf.databinding.AbstractInterceptorProvidingDataBinding;
 import org.apache.cxf.databinding.AbstractWrapperHelper;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentSchemaValidationHack;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -95,7 +92,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.ObjectFactory;
 
 @NoJSR250Annotations
-public class JAXBDataBinding extends AbstractDataBinding
+public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     implements WrapperCapableDatabinding, InterceptorProvider {
 
     public static final String SCHEMA_RESOURCE = "SCHEMRESOURCE";
@@ -205,15 +202,6 @@ public class JAXBDataBinding extends AbstractDataBinding
     private boolean scanPackages = true;
     private boolean qualifiedSchemas;
 
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> in
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> out
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> outFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> inFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-
     public JAXBDataBinding() {
     }
 
@@ -306,8 +294,8 @@ public class JAXBDataBinding extends AbstractDataBinding
     @SuppressWarnings("unchecked")
     public synchronized void initialize(Service service) {
 
-        in.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
-        inFault.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
+        inInterceptors.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
+        inFaultInterceptors.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
 
         // context is already set, don't redo it
         if (context != null) {
@@ -836,19 +824,4 @@ public class JAXBDataBinding extends AbstractDataBinding
                                                           jaxbMethods, fields, objectFactory);
     }
 
-    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
-        return outFault;
-    }
-
-    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
-        return inFault;
-    }
-
-    public List<Interceptor<? extends Message>> getInInterceptors() {
-        return in;
-    }
-
-    public List<Interceptor<? extends Message>> getOutInterceptors() {
-        return out;
-    }
 }

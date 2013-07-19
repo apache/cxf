@@ -43,6 +43,7 @@ public class XMLStreamDataReaderTest extends Assert {
     public void testCloseOriginalInputStream() throws Exception {
         XMLStreamDataReader reader = new XMLStreamDataReader();
         Message msg = new MessageImpl();
+        
         TestInputStream in1 = new TestInputStream(DUMMY_DATA);
         
         msg.setContent(InputStream.class, in1);

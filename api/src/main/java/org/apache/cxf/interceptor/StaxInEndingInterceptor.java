@@ -35,7 +35,10 @@ public class StaxInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final StaxInEndingInterceptor INSTANCE = new StaxInEndingInterceptor();
     
     public StaxInEndingInterceptor() {
-        super(Phase.POST_INVOKE);
+        super(Phase.PRE_INVOKE);
+    }
+    public StaxInEndingInterceptor(String phase) {
+        super(phase);
     }
 
     public void handleMessage(Message message) throws Fault {

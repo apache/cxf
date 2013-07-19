@@ -45,9 +45,11 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.FragmentStreamReader;
@@ -167,11 +169,15 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         }
         return null;
     }
-    
     private XMLStreamReader resetForStreaming(XMLStreamReader input) throws XMLStreamException {
         //Need to mark the message as streaming this so input stream
         //is not closed and additional parts are not read and such
         if (message != null) {
+            if (message.getInterceptorChain() != null) {
+                message.getInterceptorChain().remove(StaxInEndingInterceptor.INSTANCE);
+                message.getInterceptorChain().add(new StaxInEndingInterceptor(Phase.POST_INVOKE));
+            }
+            
             message.removeContent(XMLStreamReader.class);
             final InputStream ins = message.getContent(InputStream.class);
             message.removeContent(InputStream.class);
