@@ -147,6 +147,35 @@ public class BookStore {
     }
     
     @GET
+    @Path("/redirect")
+    public Response getBookRedirect(@QueryParam("redirect") Boolean done,
+                                    @QueryParam("sameuri") Boolean sameuri) {
+        if (done == null) {
+            String uri = sameuri.equals(Boolean.TRUE) 
+                ? ui.getAbsolutePathBuilder().queryParam("redirect", "true").build().toString()
+                : "http://otherhost/redirect";
+            return Response.status(303).header("Location", uri).build();
+        } else {
+            return Response.ok(new Book("CXF", 123L), "application/xml").build();
+        }
+    }
+    
+    @GET
+    @Path("/redirect/relative")
+    public Response getBookRedirectRel(@QueryParam("redirect") Boolean done,
+                                       @QueryParam("loop") boolean loop) {
+        if (done == null) {
+            if (loop) {
+                return Response.status(303).header("Location", "/?a").build();                
+            } else {
+                return Response.status(303).header("Location", "/?redirect=true").build();    
+            }
+        } else {
+            return Response.ok(new Book("CXF", 124L), "application/xml").build();
+        }
+    }
+    
+    @GET
     @Path("/booklist")
     public List<String> getBookListArray() {
         return Collections.singletonList("Good book");
@@ -1416,7 +1445,7 @@ public class BookStore {
         public void write(OutputStream output) throws IOException, WebApplicationException {
             if (failEarly) {
                 throw new WebApplicationException(
-                     Response.status(410).type("text/plain")
+                     Response.status(410).header("content-type", "text/plain")
                      .entity("This is supposed to go on the wire").build());
             } else {
                 output.write("This is not supposed to go on the wire".getBytes());

@@ -157,8 +157,6 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
         if (HttpUtils.isDateRelatedHeader(name)) {
             Object theValue = value instanceof Date ? toHttpDate((Date)value) : value;  
             return setHeader(name, theValue);
-        } else if (HttpHeaders.LOCATION.equals(name)) {
-            return location(URI.create(value.toString()));
         } else {
             return addHeader(name, value);
         }
