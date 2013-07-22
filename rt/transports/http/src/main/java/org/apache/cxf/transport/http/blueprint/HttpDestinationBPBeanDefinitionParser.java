@@ -27,6 +27,7 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -39,11 +40,11 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
         bean.setRuntimeClass(AbstractHTTPDestination.class);
 
         mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "server"), "server", null);
+                new QName(HTTP_NS, "server"), "server", HTTPServerPolicy.class);
         mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "fixedParameterOrder"), "fixedParameterOrder", null); 
+                new QName(HTTP_NS, "fixedParameterOrder"), "fixedParameterOrder", Boolean.class); 
         mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "contextMatchStrategy"), "contextMatchStrategy", null);
+                new QName(HTTP_NS, "contextMatchStrategy"), "contextMatchStrategy", String.class);
         
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
