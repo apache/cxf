@@ -32,6 +32,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         <jaxrs:serviceBeans>
             <ref bean="petstore"/>
             <ref bean="bookstore"/>
+            <ref bean="servletconfigstore"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.BadgerFishProvider"/>
@@ -40,8 +41,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
             <ref bean="plainTextProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
-    <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
-    <bean id="petstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.PetStore"/>
+    <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
+    <bean id="petstore" class="org.apache.cxf.systest.jaxrs.PetStore"/>
+    <bean id="servletconfigstore" class="org.apache.cxf.systest.jaxrs.SpringServletConfigStore"/>
     <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
         <property name="toHandle" value="true"/>
     </bean>   
