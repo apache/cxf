@@ -32,7 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 
 public class Extension {
-    private static final Logger LOG = LogUtils.getL7dLogger(Extension.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(Extension.class);
     
     protected String className;
     protected ClassLoader classloader;
@@ -60,6 +60,9 @@ public class Extension {
         clazz = cls;
         className = cls.getName();
         classloader = cls.getClassLoader();
+    }
+    public Extension(ClassLoader loader) {
+        classloader = loader;
     }
     
     public Extension(Extension ext) {
@@ -153,7 +156,7 @@ public class Extension {
         args = a;
     }
     
-    private  Class<?> tryClass(String name, ClassLoader cl) {
+    protected Class<?> tryClass(String name, ClassLoader cl) {
         if (classloader != null) {
             try {
                 return classloader.loadClass(name);

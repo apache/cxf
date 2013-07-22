@@ -157,7 +157,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             URL url = urls.nextElement();
             InputStream is = url.openStream();
             try {
-                List<Extension> exts = new TextExtensionFragmentParser().getExtensions(is);
+                List<Extension> exts = new TextExtensionFragmentParser(loader).getExtensions(is);
                 for (Extension e : exts) {
                     if (loader != l) {
                         e.classloader = l;
