@@ -59,8 +59,6 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
 
     private List<NettyInterceptor> interceptors;
 
-    //private List<String> contexts = new ArrayList<String>();
-
     public NettyHttpServletHandler(NettyHttpServletPipelineFactory pipelineFactory) {
         this.allChannels = pipelineFactory.getAllChannels();
         this.pipelineFactory = pipelineFactory;
