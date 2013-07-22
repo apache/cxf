@@ -148,8 +148,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (encryptionToken instanceof KerberosToken) {
                 tok = getSecurityToken();
                 addKerberosToken((KerberosToken)encryptionToken, false, false);
-            } else if (encryptionToken instanceof IssuedToken 
-                || encryptionToken instanceof SecureConversationToken
+            } else if (encryptionToken instanceof IssuedToken) {
+                tok = getSecurityToken();
+                addIssuedToken((IssuedToken)encryptionToken, tok, false, false);
+            } else if (encryptionToken instanceof SecureConversationToken
                 || encryptionToken instanceof SecurityContextToken
                 || encryptionToken instanceof SpnegoContextToken) {
                 tok = getSecurityToken();
@@ -242,9 +244,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (sigToken instanceof KerberosToken) {
                     sigTok = getSecurityToken();
                     addKerberosToken((KerberosToken)sigToken, false, false);
+                } else if (sigToken instanceof IssuedToken) {
+                    sigTok = getSecurityToken();
+                    addIssuedToken((IssuedToken)sigToken, sigTok, false, false);
                 } else if (sigToken instanceof SecureConversationToken
                     || sigToken instanceof SecurityContextToken
-                    || sigToken instanceof IssuedToken 
                     || sigToken instanceof SpnegoContextToken) {
                     sigTok = getSecurityToken();
                 } else if (sigToken instanceof X509Token) {
@@ -373,7 +377,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
             }
             
-            if (encrToken instanceof KerberosToken) {
+            if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken) {
                 config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
             }
         }
@@ -443,6 +447,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
         } else if (policyToken instanceof KerberosToken && !isRequestor()) {
             config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
+        } else if (policyToken instanceof IssuedToken) {
+            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
         }
         
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
@@ -455,7 +461,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         Date created = new Date();
         Date expires = new Date();
-        expires.setTime(created.getTime() + 300000);
+        expires.setTime(created.getTime() + 300000L);
         SecurityToken tempTok = 
             new SecurityToken(IDGenerator.generateID(null), created, expires);
         
@@ -560,9 +566,13 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     
     private void storeSecurityToken(SecurityToken tok) {
         TokenType tokenType = WSSecurityTokenConstants.EncryptedKeyToken;
-        if (tok.getTokenType() != null 
-            && tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
-            tokenType = WSSecurityTokenConstants.KerberosToken;
+        if (tok.getTokenType() != null) {
+            if (tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
+                tokenType = WSSecurityTokenConstants.KerberosToken;
+            } else if (tok.getTokenType().startsWith(WSSConstants.NS_SAML10_TOKEN_PROFILE)
+                || tok.getTokenType().startsWith(WSSConstants.NS_SAML11_TOKEN_PROFILE)) {
+                tokenType = WSSecurityTokenConstants.Saml11Token;
+            }
         }
         
         final Key key = tok.getKey();
@@ -576,7 +586,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         return key;
                     }
                     if (secret != null) {
-                        return new SecretKeySpec(secret, algorithmURI);
+                        return new SecretKeySpec(secret, JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI));
                     }
                 
                     return super.getSecretKey(algorithmURI);
