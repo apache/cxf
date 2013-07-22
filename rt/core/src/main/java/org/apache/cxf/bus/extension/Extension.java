@@ -157,11 +157,14 @@ public class Extension {
     }
     
     protected Class<?> tryClass(String name, ClassLoader cl) {
+        Throwable origEx = null;
         if (classloader != null) {
             try {
                 return classloader.loadClass(name);
             } catch (Throwable nex) {
                 //ignore, fall into the stuff below
+                //save the exception though as this is likely the important one
+                origEx = nex;
             }
         }                
         try {
@@ -173,7 +176,10 @@ public class Extension {
             } catch (Throwable nex) {
                 notFound = true;
                 if (!optional) {
-                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, name), nex);
+                    if (origEx != null) {
+                        ex = origEx;
+                    }
+                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, name), ex);
                 }
             }
         }
