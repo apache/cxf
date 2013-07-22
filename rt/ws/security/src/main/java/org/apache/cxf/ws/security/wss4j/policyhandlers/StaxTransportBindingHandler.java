@@ -239,7 +239,9 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     ) throws Exception {
         if (token instanceof IssuedToken) {
             addIssuedToken((IssuedToken)token, getSecurityToken(), false, true);
-            doSignature(token, wrapper);
+            signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
+            
+            configureSignature(wrapper, token, false);
         /* TODO if (token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
             || token instanceof SpnegoContextToken) {

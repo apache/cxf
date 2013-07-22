@@ -57,6 +57,8 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.bean.KeyInfoBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -325,6 +327,18 @@ public abstract class AbstractStaxBindingHandler {
                 config.put(ConfigurationConstants.ACTION, samlAction);
             }
             
+            // Mock up a Subject so that the SAMLTokenOutProcessor can get access to the certificate
+            final SubjectBean subjectBean;
+            if (signed || endorsing) {
+                KeyInfoBean keyInfo = new KeyInfoBean();
+                keyInfo.setCertificate(secToken.getX509Certificate());
+                keyInfo.setEphemeralKey(secToken.getSecret());
+                subjectBean = new SubjectBean("", "", "");
+                subjectBean.setKeyInfo(keyInfo);
+            } else {
+                subjectBean = null;
+            }
+            
             CallbackHandler callbackHandler = new CallbackHandler() {
 
                 @Override
@@ -333,6 +347,7 @@ public abstract class AbstractStaxBindingHandler {
                         if (callback instanceof SAMLCallback) {
                             SAMLCallback samlCallback = (SAMLCallback)callback;
                             samlCallback.setAssertionElement(el);
+                            samlCallback.setSubject(subjectBean);
                         }
                     }
                 }

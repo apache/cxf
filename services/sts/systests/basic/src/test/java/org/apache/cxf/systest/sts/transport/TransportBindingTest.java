@@ -233,7 +233,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, STSPORT);
         }
         SecurityTestUtil.enableStreaming(transportSaml1Port);
-        // TODO doubleIt(transportSaml1Port, 25);
+        doubleIt(transportSaml1Port, 25);
         
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
