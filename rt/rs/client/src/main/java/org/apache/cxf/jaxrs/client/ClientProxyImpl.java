@@ -24,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -591,9 +592,16 @@ public class ClientProxyImpl extends AbstractClient implements
                     && ((InputStream)r.getEntity()).available() == 0)) {
                 return r;
             }
-            
-            return readBody(r, outMessage, method.getReturnType(), 
-                            method.getGenericReturnType(), method.getDeclaredAnnotations());
+            Type genericType = method.getGenericReturnType();
+            if (genericType instanceof TypeVariable) {
+                genericType = InjectionUtils.getSuperType(method.getDeclaringClass(), 
+                                                   (TypeVariable<?>)genericType);
+            }
+            return readBody(r, 
+                            outMessage, 
+                            method.getReturnType(), 
+                            genericType, 
+                            method.getDeclaredAnnotations());
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }

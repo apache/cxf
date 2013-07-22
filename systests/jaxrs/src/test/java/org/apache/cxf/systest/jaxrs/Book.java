@@ -29,7 +29,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
+@JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
 @XmlRootElement(name = "Book")
 public class Book {
     private String name;
