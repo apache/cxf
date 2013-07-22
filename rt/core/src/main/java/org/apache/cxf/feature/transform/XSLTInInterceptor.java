@@ -88,7 +88,11 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
         } catch (IOException e) {
             throw new Fault("GET_CACHED_INPUT_STREAM", LOG, e, e.getMessage());
         } finally {
-            StaxUtils.close(xReader);
+            try {
+                StaxUtils.close(xReader);
+            } catch (XMLStreamException ex) {
+                throw new Fault(ex);
+            }
             try {
                 cachedOS.close();
             } catch (IOException e) {

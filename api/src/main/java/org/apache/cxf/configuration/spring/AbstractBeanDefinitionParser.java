@@ -38,7 +38,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
@@ -436,7 +435,11 @@ public abstract class AbstractBeanDefinitionParser
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            StaxUtils.close(data);
+            try {
+                StaxUtils.close(data);
+            } catch (XMLStreamException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
     

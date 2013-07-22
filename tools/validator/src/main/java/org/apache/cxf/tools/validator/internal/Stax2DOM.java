@@ -65,7 +65,11 @@ public class Stax2DOM {
         } catch (Exception e) {
             throw new ToolException(e);
         } finally {
-            StaxUtils.close(reader);
+            try {
+                StaxUtils.close(reader);
+            } catch (XMLStreamException e1) {
+                throw new ToolException(e1);
+            }
             if (input != null) {
                 try {
                     input.close();

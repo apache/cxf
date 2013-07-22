@@ -457,7 +457,11 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             LOG.log(Level.WARNING, e.getMessage());
             return null;
         } finally {
-            StaxUtils.close(reader);
+            try {
+                StaxUtils.close(reader);
+            } catch (XMLStreamException e) {
+                LOG.log(Level.WARNING, e.getMessage());
+            }
         }
     }
     

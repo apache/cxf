@@ -36,13 +36,12 @@ import javax.wsdl.extensions.mime.MIMEPart;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.xml.sax.InputSource;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -236,7 +235,11 @@ public class WSDLManagerImpl implements WSDLManager {
             } catch (Exception e) {
                 throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
             } finally {
-                StaxUtils.close(xmlReader);
+                try {
+                    StaxUtils.close(xmlReader);
+                } catch (XMLStreamException ex) {
+                    throw new WSDLException(WSDLException.PARSER_ERROR, ex.getMessage(), ex);
+                }
             }
             def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
         } else {

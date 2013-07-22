@@ -498,7 +498,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         } catch (XMLStreamException e) {
             // ignore
         } finally {
-            StaxUtils.close(reader);
+            try {
+                StaxUtils.close(reader);
+            } catch (XMLStreamException e) {
+             // ignore
+            }
             StaxUtils.close(resultWriter);
         }
         return null;

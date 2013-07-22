@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -150,7 +151,11 @@ public final class TLSClientParametersConfig {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            StaxUtils.close(data);
+            try {
+                StaxUtils.close(data);
+            } catch (XMLStreamException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
     

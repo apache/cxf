@@ -19,6 +19,7 @@
 
 package org.apache.cxf.interceptor;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.message.Message;
@@ -44,7 +45,11 @@ public class StaxInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         XMLStreamReader xtr = message.getContent(XMLStreamReader.class);
         if (xtr != null && !MessageUtils.getContextualBoolean(message, STAX_IN_NOCLOSE, false)) {
-            StaxUtils.close(xtr);
+            try {
+                StaxUtils.close(xtr);
+            } catch (XMLStreamException ex) {
+                throw new Fault(ex);
+            }
             message.removeContent(XMLStreamReader.class);
         }
     }

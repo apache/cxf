@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -265,7 +266,11 @@ public final class ColocUtil {
             streamReader = StaxUtils.createXMLStreamReader(source);
             wrappedObject = reader.read(mpi, streamReader);
         } finally {
-            StaxUtils.close(streamReader);
+            try {
+                StaxUtils.close(streamReader);
+            } catch (XMLStreamException e) {
+                // Ignore
+            }
         }
         MessageContentsList parameters = new MessageContentsList();
         parameters.put(mpi, wrappedObject);

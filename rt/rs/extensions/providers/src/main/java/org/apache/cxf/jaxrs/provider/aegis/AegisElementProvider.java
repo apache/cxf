@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -72,7 +73,11 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
         } catch (Exception e) {
             throw new BadRequestException(e);
         } finally {
-            StaxUtils.close(xmlStreamReader);
+            try {
+                StaxUtils.close(xmlStreamReader);
+            } catch (XMLStreamException e) {
+                throw new BadRequestException(e);
+            }
         }
     }
 

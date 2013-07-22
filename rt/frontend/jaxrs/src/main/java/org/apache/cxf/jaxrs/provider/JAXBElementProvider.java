@@ -204,7 +204,11 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             LOG.warning(getStackTrace(e));
             throw new BadRequestException(e);        
         } finally {
-            StaxUtils.close(reader);
+            try {
+                StaxUtils.close(reader);
+            } catch (XMLStreamException e) {
+                // Ignore
+            }
         }
         // unreachable
         return null;
@@ -219,7 +223,11 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             } catch (JAXBException e) {
                 throw e;
             } finally {
-                StaxUtils.close(reader);
+                try {
+                    StaxUtils.close(reader);
+                } catch (XMLStreamException e) {
+                    // Ignore
+                }
             }
         }
         return unmarshalFromInputStream(unmarshaller, is, mt);
@@ -271,7 +279,11 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             }
             return unmarshaller.unmarshal(xmlReader);
         } finally {
-            StaxUtils.close(xmlReader);
+            try {
+                StaxUtils.close(xmlReader);
+            } catch (XMLStreamException e) {
+                // Ignore
+            }
         }
     }
 

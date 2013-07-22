@@ -254,7 +254,12 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                                 message.getVersion().getSender());
         } finally {
             if (closeNeeded) {
-                StaxUtils.close(xmlReader);
+                try {
+                    StaxUtils.close(xmlReader);
+                } catch (XMLStreamException e) {
+                    throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
+                                        message.getVersion().getSender());
+                }
             }
         }
     }

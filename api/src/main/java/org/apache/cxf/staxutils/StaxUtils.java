@@ -1768,13 +1768,9 @@ public final class StaxUtils {
         }        
         return sw.toString();        
     }
-    public static void close(XMLStreamReader reader) {
+    public static void close(XMLStreamReader reader) throws XMLStreamException {
         if (reader != null) {
-            try {
-                reader.close();
-            } catch (Exception e) {
-                //ignore
-            }
+            reader.close();
         }
     }
     

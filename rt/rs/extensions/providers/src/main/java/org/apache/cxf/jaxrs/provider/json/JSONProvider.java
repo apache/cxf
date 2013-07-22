@@ -257,7 +257,11 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (Exception e) {
             throw new BadRequestException(e);
         } finally {
-            StaxUtils.close(reader);
+            try {
+                StaxUtils.close(reader);
+            } catch (XMLStreamException e) {
+                throw new BadRequestException(e);
+            }
         }
         // unreachable
         return null;

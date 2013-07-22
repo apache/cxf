@@ -161,7 +161,11 @@ public final class CustomizationParser {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
             throw new ToolException(msg, e);
         } finally {
-            StaxUtils.close(reader);
+            try {
+                StaxUtils.close(reader);
+            } catch (XMLStreamException e) {
+                //ignore
+            }
             try {
                 ins.close();
             } catch (IOException ex) {

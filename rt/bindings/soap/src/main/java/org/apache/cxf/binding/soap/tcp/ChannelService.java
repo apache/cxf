@@ -79,7 +79,11 @@ public final class ChannelService {
         } catch (XMLStreamException e) {
             e.printStackTrace();
         } finally {
-            StaxUtils.close(xmlReader);
+            try {
+                StaxUtils.close(xmlReader);
+            } catch (XMLStreamException e) {
+                e.printStackTrace();
+            }
         }
     }
     
