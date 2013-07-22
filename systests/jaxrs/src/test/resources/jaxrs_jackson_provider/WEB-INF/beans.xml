@@ -28,15 +28,26 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 	<import resource="classpath:/META-INF/cxf/cxf.xml"/>
 
     <jaxrs:server id="bookservice"
-                  address="/">
+                  address="/store1">
         <jaxrs:serviceBeans>
-            <ref bean="petstore"/>
             <ref bean="bookstore"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+            <ref bean="jackson"/>
         </jaxrs:providers>
     </jaxrs:server>
-    <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
-    <bean id="petstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.PetStore"/>
+    
+    <jaxrs:server id="bookservice2"
+                  address="/store2">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore2"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    
+    <bean id="jackson" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+    <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
+    <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSpring"/>
 </beans>
