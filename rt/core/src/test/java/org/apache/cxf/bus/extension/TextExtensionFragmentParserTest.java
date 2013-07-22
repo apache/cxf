@@ -31,7 +31,7 @@ public class TextExtensionFragmentParserTest extends Assert {
     @Test
     public void testGetExtensions() throws IOException {
         InputStream is = TextExtensionFragmentParserTest.class.getResourceAsStream("extension2.txt");
-        List<Extension> extensions = new TextExtensionFragmentParser().getExtensions(is);
+        List<Extension> extensions = new TextExtensionFragmentParser(null).getExtensions(is);
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
         
         Extension e = extensions.get(0);

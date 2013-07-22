@@ -168,7 +168,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                             new Object[] {resource, url, BUS_EXTENSION_RESOURCE});
                     exts = new XmlExtensionFragmentParser().getExtensions(is);
                 } else {
-                    exts = new TextExtensionFragmentParser().getExtensions(is);
+                    exts = new TextExtensionFragmentParser(loader).getExtensions(is);
                 }
                 for (Extension e : exts) {
                     if (loader != l) {

@@ -36,6 +36,11 @@ public class TextExtensionFragmentParser {
     private static final Logger LOG = LogUtils.getL7dLogger(TextExtensionFragmentParser.class);
     private static Pattern colonPattern = Pattern.compile(":");
     
+    final ClassLoader loader;
+    public TextExtensionFragmentParser(ClassLoader loader) {
+        this.loader = loader;
+    }
+    
     public List<Extension> getExtensions(final URL url) {
         InputStream is = null;
         try {
@@ -83,7 +88,7 @@ public class TextExtensionFragmentParser {
         if (line.length() == 0 || line.charAt(0) == '#') {
             return null;
         }
-        final Extension ext = new Extension();
+        final Extension ext = new Extension(loader);
         String[] parts = colonPattern.split(line, 0);
         ext.setClassname(parts[0]);
         if (ext.getClassname() == null) {

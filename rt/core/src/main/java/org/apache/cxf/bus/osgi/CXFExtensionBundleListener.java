@@ -29,8 +29,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.apache.cxf.bus.extension.Extension;
+import org.apache.cxf.bus.extension.ExtensionException;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
 import org.apache.cxf.bus.extension.TextExtensionFragmentParser;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -71,7 +73,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
     protected void register(final Bundle bundle) {
         Enumeration<?> e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
         while (e != null && e.hasMoreElements()) {
-            List<Extension> orig = new TextExtensionFragmentParser().getExtensions((URL)e.nextElement());
+            List<Extension> orig = new TextExtensionFragmentParser(null).getExtensions((URL)e.nextElement());
             addExtensions(bundle, orig);
         }
     }
@@ -122,24 +124,28 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             bundle = b;
         }
 
-        public Class<?> getClassObject(ClassLoader cl) {
-            if (clazz == null) {
+        protected Class<?> tryClass(String name, ClassLoader cl) {
+            Class<?> c = null;
+            ClassNotFoundException origExc = null;
+            try {
+                c = bundle.loadClass(className);
+            } catch (ClassNotFoundException e) {
+                origExc = e;
+            }
+            if (c == null) {
                 try {
-                    clazz = bundle.loadClass(className);
-                } catch (Throwable e) {
-                    //ignore, fall to super
+                    return super.tryClass(name, cl);
+                } catch (ExtensionException ee) {
+                    if (origExc != null) {
+                        throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS",
+                                                                 Extension.LOG, name),
+                                                     origExc);
+                    } else {
+                        throw ee;
+                    }
                 }
             }
-            return super.getClassObject(cl);
-        }
-
-        public Class<?> loadInterface(ClassLoader cl) {
-            try {
-                return bundle.loadClass(interfaceName);
-            } catch (Throwable e) {
-                //ignore, fall to super
-            }
-            return super.loadInterface(cl);
+            return c;
         }
 
         public Extension cloneNoObject() {
