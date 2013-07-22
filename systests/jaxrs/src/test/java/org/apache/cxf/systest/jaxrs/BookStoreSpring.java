@@ -87,6 +87,25 @@ public class BookStoreSpring {
         return new SuperBook("SuperBook", 999L);
     }
     
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("/books/superbook")
+    @Produces("application/json")
+    public <T extends Book> T getSuperBookJson() {
+        SuperBook book = new SuperBook("SuperBook", 999L);
+        
+        return (T)book;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @POST
+    @Path("/books/superbook")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public <T extends Book> T echoSuperBookJson(T book) {
+        return (T)(SuperBook)book;
+    }
+    
     @POST
     @Path("/books/xsitype")
     @Produces("application/xml")
