@@ -48,18 +48,18 @@ public class CXFServlet extends CXFNonSpringServlet
     }
 
     @Override
-    protected void loadBus(ServletConfig sc) {
+    protected void loadBus(ServletConfig servletConfig) {
         ApplicationContext wac = WebApplicationContextUtils.
-            getWebApplicationContext(sc.getServletContext());
+            getWebApplicationContext(servletConfig.getServletContext());
         
         if (wac instanceof AbstractApplicationContext) {
             addListener((AbstractApplicationContext)wac);
         }
         
-        String configLocation = sc.getInitParameter("config-location");
+        String configLocation = servletConfig.getInitParameter("config-location");
         if (configLocation == null) {
             try {
-                InputStream is = sc.getServletContext().getResourceAsStream("/WEB-INF/cxf-servlet.xml");
+                InputStream is = servletConfig.getServletContext().getResourceAsStream("/WEB-INF/cxf-servlet.xml");
                 if (is != null && is.available() > 0) {
                     is.close();
                     configLocation = "/WEB-INF/cxf-servlet.xml";
@@ -69,7 +69,7 @@ public class CXFServlet extends CXFNonSpringServlet
             }
         }
         if (configLocation != null) {
-            wac = createSpringContext(wac, sc, configLocation);
+            wac = createSpringContext(wac, servletConfig, configLocation);
         }
         if (wac != null) {
             setBus((Bus)wac.getBean("cxf", Bus.class));
@@ -102,12 +102,11 @@ public class CXFServlet extends CXFNonSpringServlet
      * @return
      */
     private ApplicationContext createSpringContext(ApplicationContext ctx,
-                                                   ServletConfig sc,
+                                                   ServletConfig servletConfig,
                                                    String location) {
         XmlWebApplicationContext ctx2 = new XmlWebApplicationContext();
         createdContext = ctx2;
-        ctx2.setServletConfig(sc);
-
+        ctx2.setServletConfig(servletConfig);
         Resource r = ctx2.getResource(location);
         try {
             InputStream in = r.getInputStream();

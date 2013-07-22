@@ -83,7 +83,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     @Test
     public void testMultipleRootsWadl() throws Exception {
         List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/resources",
-                                                         "http://localhost:" + PORT + "/webapp/resources", 2);
+                                                         "http://localhost:" + PORT + "/webapp/resources", 3);
         String path1 = resourceEls.get(0).getAttribute("path");
         int bookStoreInd = path1.contains("/bookstore") ? 0 : 1;
         int petStoreInd = bookStoreInd == 0 ? 1 : 0;
@@ -146,6 +146,17 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(size, resourceEls.size());
         return resourceEls;
+    }
+    
+    @Test
+    public void testServletConfigInitParam() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/webapp/resources/servlet/config/a"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("text/plain");
+
+        assertEquals("avalue", wc.get(String.class));
     }
     
     @Test

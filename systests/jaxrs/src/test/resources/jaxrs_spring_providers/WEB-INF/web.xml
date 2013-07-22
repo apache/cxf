@@ -32,6 +32,10 @@
 			org.apache.cxf.transport.servlet.CXFServlet
 		</servlet-class>
 		<init-param>
+		      <param-name>a</param-name>
+		      <param-value>avalue</param-value>    
+		</init-param>
+		<init-param>
 		      <param-name>config-location</param-name>
 		      <param-value>/WEB-INF/beans.xml</param-value>    
 		</init-param>
