@@ -219,8 +219,6 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
         
-        /*
-         * TODO WSS-459
         // DOM
         try {
             port.doubleIt(25);
@@ -263,7 +261,6 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             // String error = "EncryptedParts";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
