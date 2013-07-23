@@ -171,4 +171,39 @@ public class SearchContextImplTest extends Assert {
                    && "CXF Rocks".equals(sc1.getStatement().getValue()));
         
     }
+    
+    @Test
+    public void testPrimitiveStatement() {
+        Message m = new MessageImpl();
+        m.put(Message.QUERY_STRING, "_s=name==CXF");
+        SearchContext context = new SearchContextImpl(m);
+        SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
+        assertNotNull(sc);
+        
+        PrimitiveStatement ps = sc.getStatement();
+        assertNotNull(ps);
+        
+        assertEquals("name", ps.getProperty());
+        assertEquals("CXF", ps.getValue());
+        assertEquals(ConditionType.EQUALS, ps.getCondition());
+        assertEquals(String.class, ps.getValueType());
+    }
+    
+    @Test
+    public void testSingleEquals() {
+        Message m = new MessageImpl();
+        m.put(Message.QUERY_STRING, "_s=name=CXF");
+        m.put("fiql.support.single.equals.operator", "true");
+        SearchContext context = new SearchContextImpl(m);
+        SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
+        assertNotNull(sc);
+        
+        PrimitiveStatement ps = sc.getStatement();
+        assertNotNull(ps);
+        
+        assertEquals("name", ps.getProperty());
+        assertEquals("CXF", ps.getValue());
+        assertEquals(ConditionType.EQUALS, ps.getCondition());
+        assertEquals(String.class, ps.getValueType());
+    }
 }
