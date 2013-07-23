@@ -74,11 +74,13 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     public static final Map<ConditionType, String> CONDITION_MAP;
         
     public static final String EXTENSION_COUNT = "count";
+    public static final String SUPPORT_SINGLE_EQUALS = "fiql.support.single.equals.operator";
     
     private static final String EXTENSION_COUNT_OPEN = EXTENSION_COUNT + "(";
     
     private static final Map<String, ConditionType> OPERATORS_MAP;
-    private static final Pattern COMPARATORS_PATTERN; 
+    private static final Pattern COMPARATORS_PATTERN;
+    private static final Pattern COMPARATORS_PATTERN_SINGLE_EQUALS;
     
     static {
         // operatorsMap
@@ -103,12 +105,18 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         String comparators = GT + "|" + GE + "|" + LT + "|" + LE + "|" + EQ + "|" + NEQ;
         String s1 = "[\\p{ASCII}]+(" + comparators + ")";
         COMPARATORS_PATTERN = Pattern.compile(s1);
+        
+        String s2 = "[\\p{ASCII}]+(" + comparators + "|" + "=" + ")";
+        COMPARATORS_PATTERN_SINGLE_EQUALS = Pattern.compile(s2);
     }
 
     private Beanspector<T> beanspector;
     private Class<T> conditionClass;
     private Map<String, String> contextProperties;
     private Map<String, String> beanPropertiesMap;
+    
+    private Map<String, ConditionType> operatorsMap = OPERATORS_MAP;
+    private Pattern comparatorsPattern = COMPARATORS_PATTERN;
     /**
      * Creates FIQL parser.
      * 
@@ -146,6 +154,11 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         this.contextProperties = contextProperties == null 
             ? Collections.<String, String>emptyMap() : contextProperties;
         this.beanPropertiesMap = beanProperties;
+        if (MessageUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
+            operatorsMap = new HashMap<String, ConditionType>(operatorsMap);
+            operatorsMap.put("=", ConditionType.EQUALS);
+            comparatorsPattern = COMPARATORS_PATTERN_SINGLE_EQUALS;
+        }
     }
     
     /**
@@ -257,7 +270,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     }
 
     private Comparison parseComparison(String expr) throws SearchParseException {
-        Matcher m = COMPARATORS_PATTERN.matcher(expr);
+        Matcher m = comparatorsPattern.matcher(expr);
         if (m.find()) {
             String propertyName = expr.substring(0, m.start(1));
             String operator = m.group(1);
@@ -560,7 +573,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         public SearchCondition<T> build() throws SearchParseException {
             String templateName = getSetter(name);
             T cond = createTemplate(templateName);
-            ConditionType ct = OPERATORS_MAP.get(operator);
+            ConditionType ct = operatorsMap.get(operator);
             
             if (isPrimitive(cond)) {
                 return new SimpleSearchCondition<T>(ct, cond); 

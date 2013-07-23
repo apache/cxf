@@ -176,6 +176,9 @@ public class SearchContextImpl implements SearchContext {
                       (String)message.getContextualProperty(SearchUtils.TIMEZONE_SUPPORT_PROPERTY));
             props.put(SearchUtils.LAX_PROPERTY_MATCH, 
                       (String)message.getContextualProperty(SearchUtils.LAX_PROPERTY_MATCH));
+            // FIQL specific
+            props.put(FiqlParser.SUPPORT_SINGLE_EQUALS, 
+                      (String)message.getContextualProperty(FiqlParser.SUPPORT_SINGLE_EQUALS)); 
         } else {
             props = parserProperties;
         }
