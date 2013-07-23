@@ -141,7 +141,8 @@ public class JAXRSUtilsTest extends Assert {
         headers.putSingle("Content-Type", ct);
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, messageImpl);
         assertEquals("2 form params should've been identified", 2, params.size());
         assertEquals("First Form Parameter not matched correctly",
@@ -794,7 +795,8 @@ public class JAXRSUtilsTest extends Assert {
         MessageImpl messageImpl = new MessageImpl();
         
         messageImpl.put(Message.QUERY_STRING, "query=24&query2");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(4, params.size());
@@ -811,7 +813,8 @@ public class JAXRSUtilsTest extends Assert {
         MessageImpl messageImpl = new MessageImpl();
         
         messageImpl.put(Message.QUERY_STRING, "query=1&query=2");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -827,7 +830,8 @@ public class JAXRSUtilsTest extends Assert {
         MessageImpl messageImpl = new MessageImpl();
         
         messageImpl.put(Message.QUERY_STRING, "query=1&query=2");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -845,7 +849,8 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, 
                 "query2=query2Value&query2=query2Value2&query3=1&query3=2&query4");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(6, params.size());
@@ -890,7 +895,8 @@ public class JAXRSUtilsTest extends Assert {
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.add("Cookie", "c1=c1Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(params.size(), 2);
@@ -909,7 +915,8 @@ public class JAXRSUtilsTest extends Assert {
         headers.add("Cookie", "c1=c1Value; c2=c2Value");
         headers.add("Cookie", "c3=c3Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(params.size(), 3);
@@ -925,7 +932,8 @@ public class JAXRSUtilsTest extends Assert {
         UUID u = UUID.randomUUID();
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=" + u.toString() + "&p2=1&p3=2");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(3, params.size());
@@ -941,7 +949,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testFromValueParam", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=Europe%2FLondon");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -958,7 +967,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=Fred&p2=Barry&p3=Jack&p4=John");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(3, params.size());
@@ -988,7 +998,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testLocaleParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=en_us");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -1006,7 +1017,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testGenericObjectParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=thequery");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -1024,7 +1036,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testGenericObjectParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=thequery");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -1042,7 +1055,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p3=jack");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(3, params.size());
@@ -1058,7 +1072,8 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testCustomerParam2", argType);
         
         messageImpl.put(Message.QUERY_STRING, "p1=Fred&p1=Barry");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals(1, params.size());
@@ -1074,9 +1089,10 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=1");
         try {
-            JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           null, 
-                                                           messageImpl);
+            JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                             new ClassResourceInfo(Customer.class)),
+                                         null, 
+                                         messageImpl);
             fail("HashMap can not be handled as parameter");
         } catch (WebApplicationException ex) {
             assertEquals(500, ex.getResponse().getStatus());
@@ -1094,9 +1110,10 @@ public class JAXRSUtilsTest extends Assert {
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.QUERY_STRING, "p1=3");
         try {
-            JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           null, 
-                                                           messageImpl);
+            JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                             new ClassResourceInfo(Customer.class)),
+                                         null, 
+                                         messageImpl);
             fail("CustomerGender have no instance with name 3");
         } catch (WebApplicationException ex) {
             assertEquals(404, ex.getResponse().getStatus());
@@ -1131,7 +1148,8 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
 
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
         assertEquals(1, params.size());
         
@@ -1146,7 +1164,8 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
 
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
         assertEquals(1, params.size());
         
@@ -1161,7 +1180,8 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue");
 
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
         assertEquals(1, params.size());
         
@@ -1256,7 +1276,8 @@ public class JAXRSUtilsTest extends Assert {
         String body = "a=aValue&b=123&cb=true";
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
         
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals("Bean should be created", 1, params.size());
@@ -1306,7 +1327,8 @@ public class JAXRSUtilsTest extends Assert {
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         String body = "g.b=1&g.b=2";
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
         assertEquals("Bean should be created", 1, params.size());
@@ -1325,7 +1347,8 @@ public class JAXRSUtilsTest extends Assert {
                                       MessageImpl simpleMessageImpl,
                                       MultivaluedMap<String, String> complexValues,
                                       MessageImpl complexMessageImpl) throws Exception {
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)),
                                                            simpleValues, 
                                                            simpleMessageImpl);
         assertEquals("Bean should be created", 1, params.size());
@@ -1335,9 +1358,10 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("aValue", cb.getA());
         assertEquals(new Long(123), cb.getB());
 
-        params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                       complexValues, 
-                                                       complexMessageImpl);
+        params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                  new ClassResourceInfo(Customer.class)),
+                                              complexValues, 
+                                              complexMessageImpl);
         assertEquals("Bean should be created", 1, params.size());
         Customer.CustomerBean cb1 = (Customer.CustomerBean)params.get(0);
         assertNotNull(cb1);
@@ -1416,7 +1440,8 @@ public class JAXRSUtilsTest extends Assert {
         
         messageImpl.put(Message.QUERY_STRING, 
                         "query=first&query2=second&query3=3&query4=true&query5");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
         assertEquals("First Query Parameter of multiple was not matched correctly", "first", 
                      params.get(0));
@@ -1439,7 +1464,8 @@ public class JAXRSUtilsTest extends Assert {
         MessageImpl messageImpl = new MessageImpl();
         
         messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2/baz;p4=4;p4=5;p5");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
         assertEquals("5 Matrix params should've been identified", 6, params.size());
         
@@ -1468,7 +1494,8 @@ public class JAXRSUtilsTest extends Assert {
         messageImpl.put(Message.REQUEST_URI, "/bar%20foo;p4=0%201");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
         values.add("ps", "bar%20foo;p4=0%201");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            values, 
                                                            messageImpl);
         assertEquals("2 params should've been identified", 2, params.size());
@@ -1503,7 +1530,8 @@ public class JAXRSUtilsTest extends Assert {
         }
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            null, messageImpl);
         assertEquals("2 form params should've been identified", 2, params.size());
         
@@ -1534,7 +1562,8 @@ public class JAXRSUtilsTest extends Assert {
                 }
             });
         
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            new MetadataMap<String, String>(), messageImpl);
         assertEquals("3 params should've been identified", 3, params.size());
         

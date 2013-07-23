@@ -1242,14 +1242,23 @@ public final class InjectionUtils {
             // to invoked.getReturnType(); same applies to the case when a method returns Response
             type = targetObject.getClass(); 
         } else {
-            type = invoked.getGenericReturnType();
-            if (type instanceof TypeVariable) {
-                type = InjectionUtils.getSuperType(invoked.getDeclaringClass(), 
-                                                   (TypeVariable<?>)type);
-            }
+            type = processGenericTypeIfNeeded(invoked.getDeclaringClass(), invoked.getGenericReturnType());
+            
         }
         
         return type;
+    }
+    
+    public static Type processGenericTypeIfNeeded(Class<?> cls, Type type) {
+        if (type instanceof TypeVariable) {
+            return InjectionUtils.getSuperType(cls, (TypeVariable<?>)type);
+        } else if (type instanceof ParameterizedType
+            && ((ParameterizedType)type).getActualTypeArguments()[0] instanceof TypeVariable
+            && isSupportedCollectionOrArray(getRawType(type))) {
+            return new ParameterizedCollectionType(InjectionUtils.getActualType(type, 0));
+        } else {
+            return type;
+        }
     }
     
     public static Object getEntity(Object o) {
