@@ -483,7 +483,7 @@ public class WebClient extends AbstractClient {
     public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body, 
                                                     Class<T> memberClass) {
         Response r = doInvoke(httpMethod, body, null, 
-                              Collection.class, new ParameterizedCollectionType<T>(memberClass));
+                              Collection.class, new ParameterizedCollectionType(memberClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), memberClass);
     }
     
@@ -494,7 +494,7 @@ public class WebClient extends AbstractClient {
      * @return JAX-RS Response
      */
     public <T> Response postCollection(Object collection, Class<T> memberClass) {
-        return doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType<T>(memberClass),
+        return doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass),
                         Response.class, Response.class);
     }
     
@@ -507,7 +507,7 @@ public class WebClient extends AbstractClient {
      */
     public <T1, T2> T2 postCollection(Object collection, Class<T1> memberClass, 
                                             Class<T2> responseClass) {
-        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType<T1>(memberClass),
+        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass),
                               responseClass, responseClass);
         return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
     }
@@ -522,8 +522,8 @@ public class WebClient extends AbstractClient {
     public <T1, T2> Collection<? extends T2> postAndGetCollection(Object collection, 
                                                                   Class<T1> memberClass, 
                                                                   Class<T2> responseClass) {
-        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType<T1>(memberClass), 
-                              Collection.class, new ParameterizedCollectionType<T2>(responseClass));
+        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass), 
+                              Collection.class, new ParameterizedCollectionType(responseClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
     
@@ -537,7 +537,7 @@ public class WebClient extends AbstractClient {
     public <T> Collection<? extends T> postObjectGetCollection(Object body, 
                                                                   Class<T> responseClass) {
         Response r = doInvoke(HttpMethod.POST, body, null, Collection.class, 
-                              new ParameterizedCollectionType<T>(responseClass));
+                              new ParameterizedCollectionType(responseClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
         

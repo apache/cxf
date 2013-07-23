@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -774,21 +773,20 @@ public final class JAXRSUtils {
         
         
         Method method = ori.getMethodToInvoke();
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[ori.getParameters().size()]);  
         Method annotatedMethod = ori.getAnnotatedMethod();
-        Type[] genericParameterTypes = annotatedMethod == null ? method.getGenericParameterTypes() 
-                                      : annotatedMethod.getGenericParameterTypes();
-        Annotation[][] anns = annotatedMethod == null ? null : annotatedMethod.getParameterAnnotations();
+        Method actualMethod = annotatedMethod == null ? method : annotatedMethod;
+        
+        Class<?>[] parameterTypes = actualMethod.getParameterTypes();
+        Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[ori.getParameters().size()]);  
+        
+        Type[] genericParameterTypes = actualMethod.getGenericParameterTypes();
+        Annotation[][] anns = actualMethod.getParameterAnnotations();
         List<Object> params = new ArrayList<Object>(parameterTypes.length);
 
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> param = parameterTypes[i]; 
-            Type genericParam = genericParameterTypes[i];
-            if (genericParam instanceof TypeVariable) {
-                genericParam = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
-                                                           (TypeVariable<?>)genericParam);
-            }
+            Type genericParam = InjectionUtils.processGenericTypeIfNeeded(
+                ori.getClassResourceInfo().getServiceClass(), genericParameterTypes[i]);
             if (param == Object.class) {
                 param = (Class<?>)genericParam; 
             } else if (genericParam == Object.class) {
