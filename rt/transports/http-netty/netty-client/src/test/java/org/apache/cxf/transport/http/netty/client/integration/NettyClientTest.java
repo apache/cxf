@@ -92,8 +92,9 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         assertEquals("Get a wrong response", "Hello test", response);
     }
     
+    @Test
     public void testInvocationWithTransportId() throws Exception {
-        String address =  "//http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address =  "http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
