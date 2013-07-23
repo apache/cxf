@@ -203,7 +203,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "Received Timestamp does not match the requirements";
+            String error = "Timestamp must be present";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -494,7 +494,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO
+    // TODO - See WSS-470
     @org.junit.Test
     @org.junit.Ignore
     public void testTokenProtection() throws Exception {
@@ -574,8 +574,6 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         }
         
         // Streaming
-        /*
-         * TODO - See WSS-460
         try {
             SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
@@ -584,7 +582,6 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             // String error = "Check Signature confirmation";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

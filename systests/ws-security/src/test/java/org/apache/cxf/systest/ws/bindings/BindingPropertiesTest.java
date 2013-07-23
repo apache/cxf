@@ -565,8 +565,6 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         }
         
         // Streaming
-        /*
-         * TODO - See WSS-460
         try {
             SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
@@ -575,7 +573,6 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             // String error = "Check Signature confirmation";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

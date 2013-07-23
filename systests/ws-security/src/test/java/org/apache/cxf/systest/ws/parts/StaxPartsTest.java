@@ -60,6 +60,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testRequiredParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -190,6 +191,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    @org.junit.Ignore
     public void testEncryptedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
