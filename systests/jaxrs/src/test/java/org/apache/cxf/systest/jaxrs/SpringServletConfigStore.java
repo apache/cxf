@@ -23,6 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import org.springframework.web.context.ServletConfigAware;
 
@@ -37,6 +38,13 @@ public class SpringServletConfigStore implements ServletConfigAware {
     @Produces("text/plain")
     @Path("config/{name}")
     public String getServletConfigInitParam(@PathParam("name") String name) {
+        return servletConfig.getInitParameter(name);
+    }
+    
+    @GET
+    @Produces("text/plain")
+    @Path("config/query")
+    public String getServletConfigInitParamQuery(@QueryParam("name") String name) {
         return servletConfig.getInitParameter(name);
     }
 }

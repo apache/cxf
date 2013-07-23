@@ -21,12 +21,14 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
@@ -131,7 +133,10 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
                 if (bus != null) {
                     origBus = BusFactory.getAndSetThreadDefaultBus(bus);
                 }
-                if (controller.filter((HttpServletRequest)request, (HttpServletResponse)response)) {
+                HttpServletRequest httpRequest = (HttpServletRequest)request;
+                if (controller.filter(new HttpServletRequestFilter(httpRequest,
+                                                                   super.getServletName()),
+                                      (HttpServletResponse)response)) {
                     return;
                 }
             } finally {
@@ -187,6 +192,39 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         if (bus != null) {
             bus.shutdown(true);
             bus = null;
+        }
+    }
+    
+    private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
+        private String filterName;
+        public HttpServletRequestFilter(HttpServletRequest request, String filterName) {
+            super(request);
+            this.filterName = filterName;
+        }
+        
+        @Override
+        public String getServletPath() {
+            FilterRegistration fr = super.getServletContext().getFilterRegistration(filterName);
+            if (fr != null && !fr.getUrlPatternMappings().isEmpty()) {
+                String mapping = fr.getUrlPatternMappings().iterator().next();
+                if (mapping.endsWith("/*")) {
+                    return mapping.substring(0, mapping.length() - 2);
+                }
+            }
+            return "";
+        }
+        
+        @Override
+        public String getPathInfo() {
+            String pathInfo = super.getPathInfo();
+            if (pathInfo == null) {
+                pathInfo = getRequestURI();
+            }
+            String prefix = super.getContextPath() + this.getServletPath();
+            if (pathInfo.startsWith(prefix)) {
+                pathInfo = pathInfo.substring(prefix.length());
+            }
+            return pathInfo;
         }
     }
 }
