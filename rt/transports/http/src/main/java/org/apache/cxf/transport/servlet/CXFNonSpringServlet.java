@@ -21,7 +21,6 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
-import javax.servlet.FilterRegistration;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -204,7 +203,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         
         @Override
         public String getServletPath() {
-            FilterRegistration fr = super.getServletContext().getFilterRegistration(filterName);
+            javax.servlet.FilterRegistration fr = super.getServletContext().getFilterRegistration(filterName);
             if (fr != null && !fr.getUrlPatternMappings().isEmpty()) {
                 String mapping = fr.getUrlPatternMappings().iterator().next();
                 if (mapping.endsWith("/*")) {
