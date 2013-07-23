@@ -1174,4 +1174,17 @@ public final class InjectionUtils {
             }
         }
     }
+    
+    public static Type processGenericTypeIfNeeded(Class<?> cls, Type type) {
+        if (type instanceof TypeVariable) {
+            return InjectionUtils.getSuperType(cls, (TypeVariable<?>)type);
+        } else if (type instanceof ParameterizedType
+            && ((ParameterizedType)type).getActualTypeArguments()[0] instanceof TypeVariable
+            && isSupportedCollectionOrArray(getRawType(type))) {
+            return new ParameterizedCollectionType(InjectionUtils.getActualType(type, 0));
+        } else {
+            return type;
+        }
+    }
+    
 }

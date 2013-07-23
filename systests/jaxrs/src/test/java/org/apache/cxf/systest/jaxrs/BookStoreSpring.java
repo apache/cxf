@@ -21,7 +21,9 @@ package org.apache.cxf.systest.jaxrs;
 
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -98,12 +100,34 @@ public class BookStoreSpring {
     }
     
     @SuppressWarnings("unchecked")
+    @GET
+    @Path("/books/superbooks")
+    @Produces("application/json")
+    public <T extends Book> List<T> getSuperBookCollectionJson() {
+        SuperBook book = new SuperBook("SuperBook", 999L);
+        
+        return Collections.singletonList((T)book);
+    }
+    
+    @SuppressWarnings("unchecked")
     @POST
     @Path("/books/superbook")
     @Consumes("application/json")
     @Produces("application/json")
     public <T extends Book> T echoSuperBookJson(T book) {
         return (T)(SuperBook)book;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @POST
+    @Path("/books/superbooks")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public <T extends Book> List<T> echoSuperBookCollectionJson(List<T> book) {
+        if (book.get(0) instanceof SuperBook) {
+            return book;
+        }
+        throw new WebApplicationException(400);
     }
     
     @POST

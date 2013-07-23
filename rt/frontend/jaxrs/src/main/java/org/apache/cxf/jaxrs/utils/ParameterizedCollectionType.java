@@ -23,11 +23,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
-public final class ParameterizedCollectionType<T> implements ParameterizedType {
-    private final Class<T> collectionMemberClass;
+public final class ParameterizedCollectionType implements ParameterizedType {
+    private final Class<?> collectionMemberClass;
     private final Type[] typeArgs;
 
-    public ParameterizedCollectionType(Class<T> collectionMemberClass) {
+    public ParameterizedCollectionType(Class<?> collectionMemberClass) {
         this.collectionMemberClass = collectionMemberClass;
         this.typeArgs = new Type[] {collectionMemberClass};
     }

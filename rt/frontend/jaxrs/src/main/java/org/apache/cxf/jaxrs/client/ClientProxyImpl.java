@@ -24,7 +24,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -580,11 +579,9 @@ public class ClientProxyImpl extends AbstractClient implements
                 return r;
             }
 
-            Type genericType = method.getGenericReturnType();
-            if (genericType instanceof TypeVariable) {
-                genericType = InjectionUtils.getSuperType(method.getDeclaringClass(), 
-                                                   (TypeVariable<?>)genericType);
-            }
+            Type genericType = 
+                InjectionUtils.processGenericTypeIfNeeded(method.getDeclaringClass(), 
+                                                          method.getGenericReturnType());
             
             return readBody(r, 
                             outMessage, 
@@ -645,7 +642,8 @@ public class ClientProxyImpl extends AbstractClient implements
             try {
                 if (bodyIndex != -1) {
                     Type paramType = method.getGenericParameterTypes()[bodyIndex];
-                    
+                    paramType = InjectionUtils.processGenericTypeIfNeeded(method.getDeclaringClass(),
+                                                                          paramType);                      
                     writeBody(body, outMessage, body.getClass(), paramType,
                               anns, headers, os);
                 } else {
