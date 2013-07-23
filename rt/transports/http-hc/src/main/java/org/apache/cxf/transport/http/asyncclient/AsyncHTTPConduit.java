@@ -127,7 +127,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             super.setupConnection(message, uri, csPolicy);
             return;
         }
-        
+        // need to do some clean up work on the URI address
+        String uriString = uri.toString();
+        if (uriString.startsWith("hc://")) {
+            try {
+                uri = new URI(uriString.substring(5));
+            } catch (URISyntaxException ex) {
+                throw new MalformedURLException("unsupport uri: "  + uriString);
+            }
+        }
         String s = uri.getScheme();
         if (!"http".equals(s) && !"https".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);

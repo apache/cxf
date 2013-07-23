@@ -1,2 +1,3 @@
 org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory:org.apache.cxf.transport.http.HTTPConduitFactory:true:true
+org.apache.cxf.transport.http.asyncclient.AsyncHttpTransportFactory:org.apache.cxf.transport.ConduitInitiator:true:true
 

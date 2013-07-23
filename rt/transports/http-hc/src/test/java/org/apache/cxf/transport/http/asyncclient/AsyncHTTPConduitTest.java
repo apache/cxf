@@ -33,6 +33,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world_soap_http.Greeter;
@@ -131,7 +132,30 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //expected
         }
-    }    
+    }
+    
+    @Test
+    public void testInovationWithHCAddress() throws Exception {
+        String address =  "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress(address);
+        Greeter greeter = factory.create(Greeter.class);
+        String response = greeter.greetMe("test");
+        assertEquals("Get a wrong response", "Hello test", response);
+    }
+    
+    @Test
+    public void testInvocationWithTransportId() throws Exception {
+        String address =  "http://localhost:" + PORT + "/SoapContext/SoapPort";
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress(address);
+        factory.setTransportId("http://cxf.apache.org/transports/http/http-client");
+        Greeter greeter = factory.create(Greeter.class);
+        String response = greeter.greetMe("test");
+        assertEquals("Get a wrong response", "Hello test", response);
+    }
     @Test
     public void testCall() throws Exception {
         updateAddressPort(g, PORT);
