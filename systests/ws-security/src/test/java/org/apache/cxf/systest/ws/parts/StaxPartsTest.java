@@ -59,6 +59,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
     
+    // TODO See WSS-471
     @org.junit.Test
     @org.junit.Ignore
     public void testRequiredParts() throws Exception {
@@ -190,6 +191,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // TODO See WSS-471
     @org.junit.Test
     @org.junit.Ignore
     public void testEncryptedParts() throws Exception {
