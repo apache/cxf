@@ -32,10 +32,7 @@ import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -85,32 +82,5 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
         }
     }
     
-    private void mapElementToHolder(ParserContext ctx,
-                                            MutableBeanMetadata bean, Element parent, 
-                                            QName name,
-                                            String propertyName,
-                                            Class<?> cls) {
-        Element data = DOMUtils.getFirstChildWithName(parent, name);
-        if (data == null) {
-            return;
-        }
-        MutableBeanMetadata ef = ctx.createMetadata(MutableBeanMetadata.class);
-        
-        ef.setRuntimeClass(cls);
-
-        try {
-            // Print the DOM node
-
-            String xmlString = StaxUtils.toString(data);
-            ef.addProperty("parsedElement", createValue(ctx, xmlString));
-            ef.setInitMethod("init");
-
-            ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
-            bean.addProperty(propertyName, ef);
-            
-        } catch (Exception e) {
-            throw new RuntimeException("Could not process configuration.", e);
-        }
-        
-    }
+    
 }

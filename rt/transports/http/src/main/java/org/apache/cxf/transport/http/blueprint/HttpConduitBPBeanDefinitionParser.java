@@ -37,12 +37,9 @@ import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.configuration.security.TrustManagersType;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
-import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -174,29 +171,5 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
         }
     }
     
-    private void mapElementToHolder(ParserContext ctx, MutableBeanMetadata bean, Element parent,
-                                          QName name, String propertyName, Class<?> cls) {
-        Element data = DOMUtils.getFirstChildWithName(parent, name);
-        if (data == null) {
-            return;
-        }
-        MutableBeanMetadata ef = ctx.createMetadata(MutableBeanMetadata.class);
-
-        ef.setRuntimeClass(cls);
-
-        try {
-            // Print the DOM node
-
-            String xmlString = StaxUtils.toString(data);
-            ef.addProperty("parsedElement", createValue(ctx, xmlString));
-            ef.setInitMethod("init");
-
-            ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
-            bean.addProperty(propertyName, ef);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Could not process configuration.", e);
-        }
-
-    }
+    
 }
