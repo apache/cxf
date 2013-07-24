@@ -49,7 +49,8 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
         
         bean.setRuntimeClass(AbstractHTTPDestination.class);
 
-        mapElementToServerPoliy(context, bean, element, new QName(HTTP_NS, "server"), "server");
+        mapElementToHolder(context, bean, element, new QName(HTTP_NS, "server"), "server", 
+                           HTTPServerPolicyHolder.class);
         mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "fixedParameterOrder"),
                                  "fixedParameterOrder", Boolean.class);
         mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "contextMatchStrategy"),
@@ -84,17 +85,18 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
         }
     }
     
-    private void mapElementToServerPoliy(ParserContext ctx,
+    private void mapElementToHolder(ParserContext ctx,
                                             MutableBeanMetadata bean, Element parent, 
                                             QName name,
-                                            String propertyName) {
+                                            String propertyName,
+                                            Class<?> cls) {
         Element data = DOMUtils.getFirstChildWithName(parent, name);
         if (data == null) {
             return;
         }
         MutableBeanMetadata ef = ctx.createMetadata(MutableBeanMetadata.class);
         
-        ef.setRuntimeClass(HTTPServerPolicyHolder.class);
+        ef.setRuntimeClass(cls);
 
         try {
             // Print the DOM node
