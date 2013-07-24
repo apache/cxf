@@ -447,6 +447,14 @@ public abstract class AbstractClient implements Client, Retryable {
                 return mbr.readFrom(cls, type, anns, contentType, m, inputStream);
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
+            } finally {
+                if (cls != InputStream.class && inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException ex) { 
+                        // ignore
+                    }
+                }
             }
         } else if (cls == Response.class) {
             return cls.cast(r);
