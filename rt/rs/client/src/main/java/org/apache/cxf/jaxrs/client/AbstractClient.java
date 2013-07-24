@@ -512,6 +512,14 @@ public abstract class AbstractClient implements Client {
                                                             responseMessage);
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
+            } finally {
+                if (cls != InputStream.class && inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException ex) { 
+                        // ignore
+                    }
+                }
             }
         } else {
             reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, r);
