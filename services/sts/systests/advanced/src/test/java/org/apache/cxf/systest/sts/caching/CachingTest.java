@@ -74,9 +74,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
-    // @Ignore'd due to continually failing on Jenkins build
     @org.junit.Test
-    @org.junit.Ignore
     public void testSTSClientCaching() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -91,6 +89,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
+        ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(port, PORT);
         
         // Make a successful invocation
@@ -135,6 +134,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port2");
         DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
+        ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(port, PORT);
         
         // Disable storing tokens per-proxy
