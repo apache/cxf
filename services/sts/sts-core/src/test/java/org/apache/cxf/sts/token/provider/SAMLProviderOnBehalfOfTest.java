@@ -86,7 +86,6 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("OnBehalfOf"));
         assertTrue(tokenString.contains("bob"));
     }
     
@@ -118,7 +117,6 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains(user));
-        assertTrue(tokenString.contains("OnBehalfOf"));
     }
     
     /**

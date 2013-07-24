@@ -20,21 +20,19 @@ package org.apache.cxf.systest.sts.intermediary_transformation;
 
 import java.util.List;
 
-import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.saml2.core.NameID;
+import org.opensaml.saml2.core.Subject;
 
 /**
- * This class validates a SAML 2 Assertion and checks that it has an OnBehalfOf Attribute with
- * a value containing "alice" or "bob".
+ * This class validates a SAML 2 Assertion and checks that it has a Subject with a value 
+ * containing "alice" or bob
  */
 public class OnBehalfOfValidator extends SamlAssertionValidator {
     
@@ -53,20 +51,11 @@ public class OnBehalfOfValidator extends SamlAssertionValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
-        for (AttributeStatement statement : attributeStatements) {
-            List<Attribute> attributes = statement.getAttributes();
-            for (Attribute attribute : attributes) {
-                if (!"OnBehalfOf".equals(attribute.getName())) {
-                    continue;
-                }
-                for (XMLObject attributeValue : attribute.getAttributeValues()) {
-                    Element attributeValueElement = attributeValue.getDOM();
-                    String text = attributeValueElement.getTextContent();
-                    if (text.contains("alice") || text.contains("bob")) {
-                        return validatedCredential;
-                    }
-                }
-            }
+        Subject subject = saml2Assertion.getSubject();
+        NameID nameID = subject.getNameID();
+        String subjectName = nameID.getValue();
+        if ("alice".equals(subjectName) || "bob".equals(subjectName)) {
+            return validatedCredential;
         }
         
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");

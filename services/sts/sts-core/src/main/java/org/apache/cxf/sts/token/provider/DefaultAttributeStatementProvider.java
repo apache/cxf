@@ -55,19 +55,11 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
         AttributeBean attributeBean = createDefaultAttribute(tokenType);
         attributeList.add(attributeBean);
         
-        ReceivedToken onBehalfOf = tokenRequirements.getOnBehalfOf();
         ReceivedToken actAs = tokenRequirements.getActAs();
         try {
-            if (onBehalfOf != null) {
-                AttributeBean parameterBean = 
-                    handleAdditionalParameters(false, onBehalfOf.getToken(), tokenType);
-                if (!parameterBean.getAttributeValues().isEmpty()) {
-                    attributeList.add(parameterBean);
-                }
-            }
             if (actAs != null) {
                 AttributeBean parameterBean = 
-                    handleAdditionalParameters(true, actAs.getToken(), tokenType);
+                    handleAdditionalParameters(actAs.getToken(), tokenType);
                 if (!parameterBean.getAttributeValues().isEmpty()) {
                     attributeList.add(parameterBean);
                 }
@@ -102,16 +94,15 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
     }
 
     /**
-     * Handle ActAs or OnBehalfOf elements.
+     * Handle an ActAs element.
      */
     private AttributeBean handleAdditionalParameters(
-        boolean actAs, 
         Object parameter, 
         String tokenType
     ) throws WSSecurityException {
         AttributeBean parameterBean = new AttributeBean();
 
-        String claimType = actAs ? "ActAs" : "OnBehalfOf";
+        String claimType = "ActAs";
         if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)) {
             parameterBean.setQualifiedName(claimType);
             parameterBean.setNameFormat("http://cxf.apache.org/sts");
