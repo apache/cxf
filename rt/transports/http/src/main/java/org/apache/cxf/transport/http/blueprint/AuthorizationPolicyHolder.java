@@ -19,26 +19,17 @@
 package org.apache.cxf.transport.http.blueprint;
 
 import java.io.ByteArrayInputStream;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.PackageUtils;
+
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 
 public class AuthorizationPolicyHolder extends AuthorizationPolicy {
-    private static final Logger LOG = LogUtils.getL7dLogger(AuthorizationPolicyHolder.class);
-
+    
     private String parsedElement;
     private AuthorizationPolicy authorizationPolicy;
 
@@ -57,7 +48,9 @@ public class AuthorizationPolicyHolder extends AuthorizationPolicy {
             Element element = docFactory.newDocumentBuilder()
                 .parse(new ByteArrayInputStream(parsedElement.getBytes())).getDocumentElement();
 
-            authorizationPolicy = (AuthorizationPolicy)getJaxbObject(element, AuthorizationPolicy.class);
+            authorizationPolicy = (AuthorizationPolicy)HolderUtils.getJaxbObject(
+                                      element, AuthorizationPolicy.class,
+                                      jaxbContext, jaxbClasses, getClass().getClassLoader());
             this.setAuthorization(authorizationPolicy.getAuthorization());
             this.setAuthorizationType(authorizationPolicy.getAuthorizationType());
             this.setPassword(authorizationPolicy.getPassword());
@@ -80,48 +73,4 @@ public class AuthorizationPolicyHolder extends AuthorizationPolicy {
         this.parsedElement = parsedElement;
     }
 
-    protected Object getJaxbObject(Element parent, Class<?> c) {
-
-        try {
-            Unmarshaller umr = getContext(c).createUnmarshaller();
-            JAXBElement<?> ele = (JAXBElement<?>) umr.unmarshal(parent);
-
-            return ele.getValue();
-        } catch (JAXBException e) {
-            LOG.warning("Unable to parse property due to " + e);
-            return null;
-        }
-    }
-
-    protected synchronized JAXBContext getContext(Class<?> cls) {
-        if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
-            try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
-                if (jaxbClasses != null) {
-                    tmp.addAll(jaxbClasses);
-                }
-                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls), 
-                                            cls == null ? getClass().getClassLoader() : cls.getClassLoader());
-                if (cls != null) {
-                    boolean hasOf = false;
-                    for (Class<?> c : tmp) {
-                        if (c.getPackage() == cls.getPackage() && "ObjectFactory".equals(c.getSimpleName())) {
-                            hasOf = true;
-                        }
-                    }
-                    if (!hasOf) {
-                        tmp.add(cls);
-                    }
-                }
-                JAXBContextCache.scanPackages(tmp);
-                JAXBContextCache.CachedContextAndSchemas ccs 
-                    = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
-                jaxbClasses = ccs.getClasses();
-                jaxbContext = ccs.getContext();
-            } catch (JAXBException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return jaxbContext;
-    }
 }
