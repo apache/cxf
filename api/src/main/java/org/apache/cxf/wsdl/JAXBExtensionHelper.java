@@ -54,6 +54,7 @@ import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -118,9 +119,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);
         boolean found = false;
         try {
-            Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
-                                                   true, cls.getClassLoader());
-            Method methods[] = objectFactory.getDeclaredMethods();
+            Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory", true,
+                                                   cls.getClassLoader());
+            Method methods[] = ReflectionUtil.getDeclaredMethods(objectFactory);
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(cls)) {
