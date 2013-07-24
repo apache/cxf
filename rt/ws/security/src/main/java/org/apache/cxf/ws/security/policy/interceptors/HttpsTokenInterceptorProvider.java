@@ -66,7 +66,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
     private static final long serialVersionUID = -13951002554477036L;
 
     public HttpsTokenInterceptorProvider() {
-        super(Arrays.asList(SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
+        super(Arrays.asList(SP11Constants.TRANSPORT_TOKEN, SP12Constants.TRANSPORT_TOKEN, 
+                            SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
         this.getOutInterceptors().add(new HttpsTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new HttpsTokenOutInterceptor());
         this.getInInterceptors().add(new HttpsTokenInInterceptor());
@@ -178,10 +179,19 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
                     NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                boolean requestor = isRequestor(message);
                 if (ais.isEmpty()) {
+                    if (!requestor 
+                        && !NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_TOKEN).isEmpty()) {
+                        try {
+                            assertNonHttpsTransportToken(message);
+                        } catch (XMLSecurityException e) {
+                            LOG.fine(e.getMessage());
+                        }
+                    }
                     return;
                 }
-                if (!isRequestor(message)) {
+                if (!requestor) {
                     try {
                         assertHttps(aim, ais, message);
                     } catch (XMLSecurityException e) {
@@ -303,6 +313,32 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             }
         }
         
+        // We might have an IssuedToken TransportToken
+        private void assertNonHttpsTransportToken(Message message) throws XMLSecurityException {
+            TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);                
+            if (tlsInfo != null) {
+                HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+                if (tlsInfo.getPeerCertificates() != null && tlsInfo.getPeerCertificates().length > 0) {
+                    httpsTokenSecurityEvent.setAuthenticationType(
+                        HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication
+                    );
+                    HttpsSecurityTokenImpl httpsSecurityToken = 
+                        new HttpsSecurityTokenImpl((X509Certificate)tlsInfo.getPeerCertificates()[0]);
+                    httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+                } else if (httpsTokenSecurityEvent.getAuthenticationType() == null) {
+                    httpsTokenSecurityEvent.setAuthenticationType(
+                        HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
+                    );
+                    HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
+                    httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+                }
+                List<SecurityEvent> securityEvents = getSecurityEventList(message);
+                securityEvents.add(httpsTokenSecurityEvent);
+            }
+        }
+
         private List<SecurityEvent> getSecurityEventList(Message message) {
             @SuppressWarnings("unchecked")
             List<SecurityEvent> securityEvents = 

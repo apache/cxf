@@ -152,6 +152,7 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         assertAllAssertionsByLocalname(aim, SPConstants.RECIPIENT_ENCRYPTION_TOKEN);
         assertAllAssertionsByLocalname(aim, SPConstants.RECIPIENT_SIGNATURE_TOKEN);
         assertAllAssertionsByLocalname(aim, SPConstants.RECIPIENT_TOKEN);
+        assertAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
         
         assertAllAssertionsByLocalname(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         assertAllAssertionsByLocalname(aim, SPConstants.PROTECT_TOKENS);
