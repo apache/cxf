@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -154,8 +157,17 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         Enumeration<URL> urls = l.getResources(resource);
         
         while (urls.hasMoreElements()) {
-            URL url = urls.nextElement();
-            InputStream is = url.openStream();
+            final URL url = urls.nextElement();
+            InputStream is;
+            try {
+                is = AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
+                    public InputStream run() throws Exception {
+                        return url.openStream();
+                    }
+                });
+            } catch (PrivilegedActionException pae) {
+                throw (IOException)pae.getException();
+            }
             try {
                 List<Extension> exts = new TextExtensionFragmentParser(loader).getExtensions(is);
                 for (Extension e : exts) {

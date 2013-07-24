@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -787,9 +789,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                                  objectFactory);
     }
 
-    private static Field getElField(String partName, Class<?> wrapperType) {
+    private static Field getElField(String partName, final Class<?> wrapperType) {
         String fieldName = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.VARIABLE);
-        for (Field field : wrapperType.getDeclaredFields()) {
+        Field[] fields = ReflectionUtil.getDeclaredFields(wrapperType);
+        for (Field field : fields) {
             XmlElement el = field.getAnnotation(XmlElement.class);
             if (el != null
                 && partName.equals(el.name())) {

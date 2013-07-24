@@ -235,7 +235,7 @@ public final class LogUtils {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         ClassLoader n = cls.getClassLoader();
         if (n != null) {
-            Thread.currentThread().setContextClassLoader(n);
+            setContextClassLoader(n);
         }
         String bundleName = name;
         try {
@@ -304,9 +304,18 @@ public final class LogUtils {
             return logger;
         } finally {
             if (n != orig) {
-                Thread.currentThread().setContextClassLoader(orig);
+                setContextClassLoader(orig);
             }
         }
+    }
+    
+    private static void setContextClassLoader(final ClassLoader classLoader) {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                Thread.currentThread().setContextClassLoader(classLoader);
+                return null;
+            }
+        });
     }
 
     /**

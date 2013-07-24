@@ -60,6 +60,7 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -199,6 +200,9 @@ public class ServiceImpl extends ServiceDelegate {
         } catch (WebServiceException e) {
             throw e;
         } catch (Throwable e) {
+            if (e instanceof UncheckedException && LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, e.getLocalizedMessage(), e);
+            }
             WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
             Service service = sf.create();
             for (ServiceInfo si : service.getServiceInfos()) { 

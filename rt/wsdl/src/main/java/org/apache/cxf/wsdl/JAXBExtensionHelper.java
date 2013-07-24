@@ -74,6 +74,7 @@ import org.apache.cxf.common.util.ASMHelper.Label;
 import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
 import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -173,7 +174,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         try {
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
                                                    true, cls.getClassLoader());
-            Method methods[] = objectFactory.getDeclaredMethods();
+            Method methods[] = ReflectionUtil.getDeclaredMethods(objectFactory);
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(cls)) {

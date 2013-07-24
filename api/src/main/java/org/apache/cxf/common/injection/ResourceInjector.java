@@ -24,6 +24,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -388,14 +390,14 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
 
         Collection<Method> methods = new LinkedList<Method>(); 
         addAnnotatedMethods(acls, getTarget().getClass().getMethods(), methods); 
-        addAnnotatedMethods(acls, getTarget().getClass().getDeclaredMethods(), methods);
+        addAnnotatedMethods(acls, ReflectionUtil.getDeclaredMethods(getTarget().getClass()), methods);
         if (getTargetClass() != getTarget().getClass()) {
             addAnnotatedMethods(acls, getTargetClass().getMethods(), methods); 
-            addAnnotatedMethods(acls, getTargetClass().getDeclaredMethods(), methods);            
+            addAnnotatedMethods(acls, ReflectionUtil.getDeclaredMethods(getTargetClass()), methods);            
         }
         return methods;
-    } 
-
+    }
+    
     private void addAnnotatedMethods(Class<? extends Annotation> acls, Method[] methods,
         Collection<Method> annotatedMethods) {
         for (Method method : methods) { 

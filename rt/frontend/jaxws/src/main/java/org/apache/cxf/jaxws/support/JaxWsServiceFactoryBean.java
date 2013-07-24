@@ -56,6 +56,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
@@ -263,16 +264,17 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
         try {
             // Find the Async method which returns a Response
-            Method responseMethod = method.getDeclaringClass().getDeclaredMethod(method.getName() + "Async",
-                                                                                 method.getParameterTypes());
+            Method responseMethod = ReflectionUtil.getDeclaredMethod(method.getDeclaringClass(),
+                                                                     method.getName() + "Async",
+                                                                     method.getParameterTypes());
 
             // Find the Async method whic has a Future & AsyncResultHandler
             List<Class<?>> asyncHandlerParams = Arrays.asList(method.getParameterTypes());
             //copy it to may it non-readonly
             asyncHandlerParams = new ArrayList<Class<?>>(asyncHandlerParams);
             asyncHandlerParams.add(AsyncHandler.class);
-            Method futureMethod = method.getDeclaringClass()
-                .getDeclaredMethod(method.getName() + "Async",
+            Method futureMethod = ReflectionUtil
+                .getDeclaredMethod(method.getDeclaringClass(), method.getName() + "Async",
                                    asyncHandlerParams.toArray(new Class<?>[asyncHandlerParams.size()]));
 
             getMethodDispatcher().bind(op, method, responseMethod, futureMethod);
@@ -283,7 +285,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             getMethodDispatcher().bind(op, method);
         }
     }
-
+    
     @Override
     protected void initializeWSDLOperations() {
         if (implInfo.isWebServiceProvider()) {
