@@ -325,16 +325,19 @@ public final class ResponseImpl extends Response {
         checkEntityIsClosed();
         
         if (!hasEntity()) {
-            return null;
+            throw new ProcessingException("Null entity");
         }
         
         if (cls.isAssignableFrom(entity.getClass())) {
-            T response = cls.cast(entity);
-            closeIfNotBufferred(cls);
-            return response;
+            return cls.cast(entity);
         }
-        
-        if (responseMessage != null && entity instanceof InputStream) {
+        if (entity instanceof InputStream) {
+            
+            if (responseMessage == null) {
+                // won't happen, just in case
+                throw new RuntimeException();    
+            }
+            
             MediaType mediaType = getMediaType();
             if (mediaType == null) {
                 mediaType = MediaType.WILDCARD_TYPE;
@@ -347,36 +350,33 @@ public final class ResponseImpl extends Response {
             if (readers != null) {
                 try {
                     responseMessage.put(Message.PROTOCOL_HEADERS, this.getMetadata());
-                    return cls.cast(JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
-                                                                anns, 
-                                                                InputStream.class.cast(entity), 
-                                                                mediaType, 
-                                                                responseMessage));
+                    Object newEntity = JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
+                                                                           anns, 
+                                                                           InputStream.class.cast(entity), 
+                                                                           mediaType, 
+                                                                           responseMessage);
+                    InputStream.class.cast(entity).close();
+                    entity = newEntity;
+                    entityBufferred = true;
+                    
+                    return cls.cast(entity);
                 } catch (Exception ex) {
-                    throw new ResponseProcessingException(this, ex);
-                } finally {
-                    closeIfNotBufferred(cls);
+                    throw new ResponseProcessingException(this, ex.getMessage(), ex);    
                 }
             }
         }
+        throw new IllegalStateException("The entity is not backed by an input stream");
         
-        throw new ResponseProcessingException(this, "No Message Body reader is available");
     }
     
-    private void closeIfNotBufferred(Class<?> responseCls) {
-        if (!entityBufferred && !InputStream.class.isAssignableFrom(responseCls)) {
-            close();
-        }
-    }
     
     public boolean bufferEntity() throws ProcessingException {
-        if (entityClosed) {
-            throw new IllegalStateException();
-        }
+        checkEntityIsClosed();
         if (!entityBufferred && entity instanceof InputStream) {
             try {
                 InputStream oldEntity = (InputStream)entity;
                 entity = IOUtils.loadIntoBAIS(oldEntity);
+                oldEntity.close();
                 entityBufferred = true;
             } catch (IOException ex) {
                 throw new ResponseProcessingException(this, ex);
@@ -387,16 +387,15 @@ public final class ResponseImpl extends Response {
 
     public void close() throws ProcessingException {
         if (!entityClosed) {
-            if (entity instanceof InputStream) {
+            if (!entityBufferred && entity instanceof InputStream) {
                 try {
                     ((InputStream)entity).close();
-                    entity = null;
                 } catch (IOException ex) {
                     throw new ResponseProcessingException(this, ex);
                 }
             }
+            entity = null;
             entityClosed = true;
-            
         }
         
     }
