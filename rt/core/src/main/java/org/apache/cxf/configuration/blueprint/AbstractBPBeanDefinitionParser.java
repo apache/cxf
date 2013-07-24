@@ -46,6 +46,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.CollectionMetadata;
@@ -334,8 +335,34 @@ public abstract class AbstractBPBeanDefinitionParser {
             LOG.warning("Unable to parse property " + propertyName + " due to " + e);
         }
     }
+    
+    protected void mapElementToHolder(ParserContext ctx, MutableBeanMetadata bean, Element parent, QName name,
+                                    String propertyName, Class<?> cls) {
+        Element data = DOMUtils.getFirstChildWithName(parent, name);
+        if (data == null) {
+            return;
+        }
+        MutableBeanMetadata ef = ctx.createMetadata(MutableBeanMetadata.class);
 
-    private synchronized JAXBContext getContext(Class<?> cls) {
+        ef.setRuntimeClass(cls);
+
+        try {
+            // Print the DOM node
+
+            String xmlString = StaxUtils.toString(data);
+            ef.addProperty("parsedElement", createValue(ctx, xmlString));
+            ef.setInitMethod("init");
+
+            ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
+            bean.addProperty(propertyName, ef);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Could not process configuration.", e);
+        }
+
+    }
+
+    protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
             try {
                 Set<Class<?>> tmp = new HashSet<Class<?>>();

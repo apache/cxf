@@ -19,18 +19,25 @@
 
 package org.apache.cxf.transport.http.blueprint;
 
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutableValueMetadata;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
+    private static final Logger LOG = LogUtils.getL7dLogger(HttpDestinationBPBeanDefinitionParser.class);
+    
     private static final String HTTP_NS =
         "http://cxf.apache.org/transports/http/configuration";
 
@@ -39,12 +46,12 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
         
         bean.setRuntimeClass(AbstractHTTPDestination.class);
 
-        mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "server"), "server", HTTPServerPolicy.class);
-        mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "fixedParameterOrder"), "fixedParameterOrder", Boolean.class); 
-        mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "contextMatchStrategy"), "contextMatchStrategy", String.class);
+        mapElementToHolder(context, bean, element, new QName(HTTP_NS, "server"), "server", 
+                           HTTPServerPolicyHolder.class);
+        mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "fixedParameterOrder"),
+                                 "fixedParameterOrder", Boolean.class);
+        mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "contextMatchStrategy"),
+                                 "contextMatchStrategy", String.class);
         
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
@@ -59,4 +66,21 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
                                         String val) {
         bean.setId(val);
     }
+    
+    @Override
+    protected void mapElementToJaxbProperty(ParserContext ctx,
+                                            MutableBeanMetadata bean, Element data, 
+                                            String propertyName, 
+                                            Class<?> c) {
+        try {
+            Unmarshaller unmarshaller = getContext(c).createUnmarshaller();
+            MutableValueMetadata value = ctx.createMetadata(MutableValueMetadata.class);
+            value.setStringValue(unmarshaller.unmarshal(data, c).getValue().toString());
+            bean.addProperty(propertyName, value);
+        } catch (JAXBException e) {
+            LOG.warning("Unable to parse property " + propertyName + " due to " + e);
+        }
+    }
+    
+    
 }
