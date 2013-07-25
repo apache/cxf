@@ -19,13 +19,16 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import java.net.URI;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
@@ -34,13 +37,14 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 
-public class ClientImpl extends ConfigurableImpl<Client> implements Client {
+public class ClientImpl implements Client {
+    private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
     private boolean closed;
     private WebClient template;
     public ClientImpl(Configuration config,
                       TLSConfiguration secConfig) {
-        super(config);
+        configImpl = new ClientConfigurableImpl<Client>(this, config);
         this.secConfig = secConfig;
     }
     
@@ -73,9 +77,18 @@ public class ClientImpl extends ConfigurableImpl<Client> implements Client {
         // This is done to make the creation of individual targets really easy
         if (template == null) {
             JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-            bean.setAddress("http://tempuri");
-            // handle Configuration providers
+            // To make sure that each Client has its own set of JAX-RS providers
+            // We may end up having CXF AbstractClient specific ClientProviderFactory
+            // if even WebTargets will be allowed to have its own specific providers
+            
+            bean.setAddress("http://tempuri/" + UUID.randomUUID().toString());
+            
+            Configuration cfg = getConfiguration();
+            bean.setProperties(cfg.getProperties());
+            bean.setProviders(new LinkedList<Object>(cfg.getInstances()));
+            
             this.template = bean.createWebClient();
+            WebClient.getConfig(template).getConduit();
         }
     }
     
@@ -112,15 +125,66 @@ public class ClientImpl extends ConfigurableImpl<Client> implements Client {
             throw new IllegalStateException();
         }
     }
+
+    @Override
+    public Configuration getConfiguration() {
+        return configImpl.getConfiguration();
+    }
+
+    @Override
+    public Client property(String name, Object value) {
+        return configImpl.property(name, value);
+    }
+
+    @Override
+    public Client register(Class<?> cls) {
+        return configImpl.register(cls);
+    }
+
+    @Override
+    public Client register(Object object) {
+        return configImpl.register(object);
+    }
+
+    @Override
+    public Client register(Class<?> cls, int index) {
+        return configImpl.register(cls, index);
+    }
+
+    @Override
+    public Client register(Class<?> cls, Class<?>... contracts) {
+        return configImpl.register(cls, contracts);
+    }
+
+    @Override
+    public Client register(Class<?> cls, Map<Class<?>, Integer> map) {
+        return configImpl.register(cls, map);
+    }
+
+    @Override
+    public Client register(Object object, int index) {
+        return configImpl.register(object, index);
+    }
+
+    @Override
+    public Client register(Object object, Class<?>... contracts) {
+        return configImpl.register(object, contracts);
+    }
+
+    @Override
+    public Client register(Object object, Map<Class<?>, Integer> map) {
+        return configImpl.register(object, map);
+    }
     
-    class WebTargetImpl extends ConfigurableImpl<WebTarget> implements WebTarget {
+    class WebTargetImpl implements WebTarget {
+        private Configurable<WebTarget> configImpl;
         private UriBuilder uriBuilder;
         private WebClient template; 
         
         public WebTargetImpl(UriBuilder uriBuilder, 
                               Configuration config, 
                               WebClient template) {
-            super(config);
+            configImpl = new ClientConfigurableImpl<WebTarget>(this, config);
             this.uriBuilder = uriBuilder.clone();
             this.template = template;
         }
@@ -129,6 +193,10 @@ public class ClientImpl extends ConfigurableImpl<Client> implements Client {
         public Builder request() {
             checkClosed();
             WebClient wc = WebClient.fromClient(template).to(uriBuilder.build().toString(), false);
+            WebClient.getConfig(wc).getRequestContext().putAll(
+                configImpl.getConfiguration().getProperties());
+            // Can WebTarget have its own specific providers ?
+            
             return new InvocationBuilderImpl(wc);
         }
 
@@ -209,6 +277,56 @@ public class ClientImpl extends ConfigurableImpl<Client> implements Client {
         
         private WebTarget newWebTarget(UriBuilder newBuilder) {
             return new WebTargetImpl(newBuilder, getConfiguration(), template);
+        }
+        
+        @Override
+        public Configuration getConfiguration() {
+            return configImpl.getConfiguration();
+        }
+
+        @Override
+        public WebTarget property(String name, Object value) {
+            return configImpl.property(name, value);
+        }
+
+        @Override
+        public WebTarget register(Class<?> cls) {
+            return configImpl.register(cls);
+        }
+
+        @Override
+        public WebTarget register(Object object) {
+            return configImpl.register(object);
+        }
+
+        @Override
+        public WebTarget register(Class<?> cls, int index) {
+            return configImpl.register(cls, index);
+        }
+
+        @Override
+        public WebTarget register(Class<?> cls, Class<?>... contracts) {
+            return configImpl.register(cls, contracts);
+        }
+
+        @Override
+        public WebTarget register(Class<?> cls, Map<Class<?>, Integer> map) {
+            return configImpl.register(cls, map);
+        }
+
+        @Override
+        public WebTarget register(Object object, int index) {
+            return configImpl.register(object, index);
+        }
+
+        @Override
+        public WebTarget register(Object object, Class<?>... contracts) {
+            return configImpl.register(object, contracts);
+        }
+
+        @Override
+        public WebTarget register(Object object, Map<Class<?>, Integer> map) {
+            return configImpl.register(object, map);
         }
     }
 }

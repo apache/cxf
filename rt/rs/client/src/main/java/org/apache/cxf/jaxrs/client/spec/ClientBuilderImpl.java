@@ -25,15 +25,16 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
 public class ClientBuilderImpl extends ClientBuilder {
 
-    private ConfigurableImpl<ClientBuilder> configImpl = new ConfigurableImpl<ClientBuilder>();
+    private Configurable<ClientBuilder> configImpl;
     private TLSConfiguration secConfig = new TLSConfiguration();
     
     public ClientBuilderImpl() {
-        System.out.println();    
+        configImpl = new ClientConfigurableImpl<ClientBuilder>(this);
     }
     
     @Override
@@ -106,7 +107,7 @@ public class ClientBuilderImpl extends ClientBuilder {
     @Override
     public ClientBuilder keyStore(KeyStore store, char[] password) {
         // TODO Auto-generated method stub
-        return null;
+        return this;
     }
     
     @Override
@@ -117,7 +118,7 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     @Override
     public ClientBuilder withConfig(Configuration cfg) {
-        configImpl = new ConfigurableImpl<ClientBuilder>(cfg);
+        configImpl = new ClientConfigurableImpl<ClientBuilder>(this, cfg);
         return this;
     }
 

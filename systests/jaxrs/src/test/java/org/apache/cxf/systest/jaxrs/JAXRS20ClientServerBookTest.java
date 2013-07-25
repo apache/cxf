@@ -20,6 +20,9 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
@@ -38,7 +42,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -46,6 +52,8 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -108,6 +116,16 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         Book book = ClientBuilder.newClient().target(address)
             .request("application/xml").get(Book.class);
+        assertEquals(124L, book.getId());
+    }
+    
+    @Test
+    public void testGetBookSpecProvider() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        Client client = ClientBuilder.newClient();
+        client.register(new BookInfoReader());
+        BookInfo book = client.target(address)
+            .request("application/xml").get(BookInfo.class);
         assertEquals(124L, book.getId());
     }
     
@@ -559,6 +577,23 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
             context.getHeaders().add("ClientWriterInterceptor", "clientWrite");
             context.proceed();
+        }
+        
+    }
+    
+    private static class BookInfoReader implements MessageBodyReader<BookInfo> {
+
+        @Override
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public BookInfo readFrom(Class<BookInfo> arg0, Type arg1, Annotation[] anns, MediaType mt,
+                                 MultivaluedMap<String, String> headers, InputStream is) throws IOException,
+            WebApplicationException {
+            Book book = new JAXBElementProvider<Book>().readFrom(Book.class, Book.class, anns, mt, headers, is);
+            return new BookInfo(book);
         }
         
     }

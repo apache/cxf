@@ -19,6 +19,9 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,79 +30,113 @@ import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 
 public class ConfigurationImpl implements Configuration {
-
-    public ConfigurationImpl() {
-        
+    private Map<String, Object> props = new HashMap<String, Object>();
+    private RuntimeType runtimeType;
+    private Map<Object, Map<Class<?>, Integer>> providers = 
+        new HashMap<Object, Map<Class<?>, Integer>>(); 
+    private Set<Feature> features = new HashSet<Feature>();
+    
+    public ConfigurationImpl(RuntimeType rt) {
+        this.runtimeType = rt;
     }
     
-    public ConfigurationImpl(Configuration parent) {
-        
+    public ConfigurationImpl(RuntimeType rt, Configuration parent) {
+        props = parent.getProperties();
+        this.runtimeType = rt;
     }
     
     @Override
     public Set<Class<?>> getClasses() {
-        // TODO Auto-generated method stub
-        return null;
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        for (Object o : getInstances()) {
+            classes.add(o.getClass());
+        }
+        return classes;
     }
 
     @Override
-    public Map<Class<?>, Integer> getContracts(Class<?> arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<Class<?>, Integer> getContracts(Class<?> cls) {
+        for (Object o : getInstances()) {
+            if (cls.isAssignableFrom(o.getClass())) {
+                return Collections.unmodifiableMap(providers.get(o));
+            }
+        }
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<Object> getInstances() {
-        // TODO Auto-generated method stub
-        return null;
+        return providers.keySet();
     }
 
     @Override
     public Map<String, Object> getProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.unmodifiableMap(props);
     }
 
     @Override
-    public Object getProperty(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Object getProperty(String name) {
+        return props.get(name);
     }
 
     @Override
     public Collection<String> getPropertyNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return props.keySet();
     }
 
     @Override
     public RuntimeType getRuntimeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return runtimeType;
     }
 
     @Override
-    public boolean isEnabled(Feature arg0) {
-        // TODO Auto-generated method stub
+    public boolean isEnabled(Feature f) {
+        return features.contains(f);
+    }
+
+    @Override
+    public boolean isEnabled(Class<? extends Feature> f) {
+        for (Feature feature : features) {
+            if (feature.getClass().isAssignableFrom(f)) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean isEnabled(Class<? extends Feature> arg0) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isRegistered(Object obj) {
+        return providers.containsKey(obj);
     }
 
     @Override
-    public boolean isRegistered(Object arg0) {
-        // TODO Auto-generated method stub
+    public boolean isRegistered(Class<?> cls) {
+        for (Object o : getInstances()) {
+            if (cls.isAssignableFrom(o.getClass())) {
+                return true;
+            }
+        }
         return false;
     }
 
-    @Override
-    public boolean isRegistered(Class<?> arg0) {
-        // TODO Auto-generated method stub
-        return false;
+    public void setProperty(String name, Object value) {
+        if (name == null) {
+            props.remove(name);
+        } else {
+            props.put(name, value);
+        }
     }
-
+    
+    public void setFeature(Feature f) {
+        features.add(f);
+    }
+    
+    public void register(Object provider, Class<?> contract, int bindingPriority) {
+        Map<Class<?>, Integer> metadata = providers.get(provider);
+        if (metadata == null) {
+            metadata = new HashMap<Class<?>, Integer>();
+            providers.put(provider, metadata);
+        }
+        metadata.put(contract, bindingPriority);
+    }
 }
