@@ -19,28 +19,29 @@
 
 package org.apache.cxf.systest.ws.wssec11;
 
+
 import java.io.IOException;
 
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.wssec11.server.Server11;
-import org.apache.cxf.systest.ws.wssec11.server.Server11Restricted;
+import org.apache.cxf.systest.ws.wssec11.server.StaxServer12;
+import org.apache.cxf.systest.ws.wssec11.server.StaxServer12Restricted;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 /**
- * This class runs the first half of the tests, as having all in 
- * the one class causes an out of memory problem in eclipse.
+ * This class runs the second half of the tests, as having all in 
+ * the one class causes an out of memory problem in eclipse
  * 
- * It tests both DOM + StAX clients against the DOM server.
+ * It tests DOM clients against the StAX server.
  */
-public class WSSecurity111Test extends WSSecurity11Common {
+public class StaxWSSecurity112Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
     
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     };
-
+      
     @BeforeClass
     public static void startServers() throws Exception {
         if (unrestrictedPoliciesInstalled) {
@@ -48,7 +49,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     "Server failed to launch",
                     // run the server in the same process
                     // set this to false to fork
-                    launchServer(Server11.class, true)
+                    launchServer(StaxServer12.class, true)
             );
         } else {
             if (WSSecurity11Common.isIBMJDK16()) {
@@ -60,7 +61,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     "Server failed to launch",
                     // run the server in the same process
                     // set this to false to fork
-                    launchServer(Server11Restricted.class, true)
+                    launchServer(StaxServer12Restricted.class, true)
             );
         }
     }
@@ -73,48 +74,43 @@ public class WSSecurity111Test extends WSSecurity11Common {
 
     @Test
     public void testClientServer() throws IOException {
-        if ((!unrestrictedPoliciesInstalled)
+        if ((!unrestrictedPoliciesInstalled) 
                 && (WSSecurity11Common.isIBMJDK16())) {
             System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
             return;
         }
-        String[] argv = new String[] {
-            "A",
-            "A-NoTimestamp",
-            "AD",
-            "A-ES",
-            "AD-ES",
-            "UX",
-            "UX-NoTimestamp",
-            "UXD",
-            "UX-SEES",
-            "UXD-SEES", 
-        };
-        runClientServer(argv, unrestrictedPoliciesInstalled, false, false);
-    }
-    
-    @Test
-    public void testClientServerStreaming() throws IOException {
-        if ((!unrestrictedPoliciesInstalled)
-                && (WSSecurity11Common.isIBMJDK16())) {
-            System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
-            return;
+
+        String[] argv = null;
+        if (unrestrictedPoliciesInstalled) {
+            argv = new String[] {
+                "X",
+                "X-NoTimestamp",
+                "X-AES128",
+                "X-AES256",
+                "X-TripleDES",
+                /*
+                 * TODO See WSS-472
+                "XD",
+                "XD-ES",
+                "XD-SEES",
+                */
+            };
+        } else {
+            argv = new String[] {
+                "X",
+                "X-NoTimestamp",
+                /*
+                 * TODO See WSS-472
+                "XD",
+                "XD-ES",
+                "XD-SEES",
+                */
+            };
         }
-        String[] argv = new String[] {
-            "A",
-            "A-NoTimestamp",
-            // TODO Derived "AD",
-            // TODO See WSS-468 EncryptBeforeSigning not working "A-ES",
-            // TODO Derived "AD-ES",
-            "UX",
-            "UX-NoTimestamp",
-            // TODO Derived "UXD",
-            "UX-SEES",
-            // TODO Derived "UXD-SEES",
-        };
-        runClientServerStreaming(argv, unrestrictedPoliciesInstalled, false, false);
+        runClientServer(argv, unrestrictedPoliciesInstalled, true, true);
+
     }
     
  
-        
+    
 }

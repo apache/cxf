@@ -32,6 +32,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssec11.server.Server11;
 import org.apache.cxf.systest.ws.wssec11.server.Server12;
+import org.apache.cxf.systest.ws.wssec11.server.StaxServer11;
+import org.apache.cxf.systest.ws.wssec11.server.StaxServer12;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 
@@ -47,7 +49,8 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
     private static final String INPUT = "foo";
 
     public void runClientServer(
-        String[] argv, boolean unrestrictedPoliciesInstalled, boolean wssecurity12
+        String[] argv, boolean unrestrictedPoliciesInstalled, 
+        boolean wssecurity12, boolean streamingServer
     ) throws IOException {
         
         Bus bus = null;
@@ -61,10 +64,18 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         String portNumber = null;
-        if (wssecurity12) {
-            portNumber = Server12.PORT;
+        if (streamingServer) {
+            if (wssecurity12) {
+                portNumber = StaxServer12.PORT;
+            } else {
+                portNumber = StaxServer11.PORT;
+            }
         } else {
-            portNumber = Server11.PORT;
+            if (wssecurity12) {
+                portNumber = Server12.PORT;
+            } else {
+                portNumber = Server11.PORT;
+            }
         }
         
         URL wsdlLocation = null;
@@ -91,7 +102,8 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
     }
     
     public void runClientServerStreaming(
-        String[] argv, boolean unrestrictedPoliciesInstalled, boolean wssecurity12
+        String[] argv, boolean unrestrictedPoliciesInstalled, 
+        boolean wssecurity12, boolean streamingServer
     ) throws IOException {
 
         Bus bus = null;
@@ -105,10 +117,18 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         String portNumber = null;
-        if (wssecurity12) {
-            portNumber = Server12.PORT;
+        if (streamingServer) {
+            if (wssecurity12) {
+                portNumber = StaxServer12.PORT;
+            } else {
+                portNumber = StaxServer11.PORT;
+            }
         } else {
-            portNumber = Server11.PORT;
+            if (wssecurity12) {
+                portNumber = Server12.PORT;
+            } else {
+                portNumber = Server11.PORT;
+            }
         }
 
         URL wsdlLocation = null;

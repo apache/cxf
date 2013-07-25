@@ -27,9 +27,17 @@ import org.apache.cxf.ws.security.SecurityConstants;
 
 abstract class AbstractServer extends AbstractBusTestServerBase {
     String baseUrl;
+    boolean streaming;
+    
     protected AbstractServer(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
     }
+    
+    protected AbstractServer(String baseUrl, boolean streaming) throws Exception {
+        this.baseUrl = baseUrl;
+        this.streaming = streaming;
+    }
+    
     protected void run() {
         doPublish(baseUrl + "/APingService", new APingService());
         doPublish(baseUrl + "/A-NoTimestampPingService", new ANoTimestampPingService());
@@ -55,6 +63,9 @@ abstract class AbstractServer extends AbstractBusTestServerBase {
         ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                 "bob.properties");
+        if (streaming) {
+            ep.getProperties().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+        }
         ep.publish(url);
     }
     

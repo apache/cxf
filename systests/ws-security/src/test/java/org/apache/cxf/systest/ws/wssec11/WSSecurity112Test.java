@@ -99,7 +99,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 "XD-SEES",
             };
         }
-        runClientServer(argv, unrestrictedPoliciesInstalled, true);
+        runClientServer(argv, unrestrictedPoliciesInstalled, true, false);
 
     }
     

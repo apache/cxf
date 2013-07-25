@@ -22,8 +22,8 @@ package org.apache.cxf.systest.ws.wssec11;
 import java.io.IOException;
 
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.wssec11.server.Server11;
-import org.apache.cxf.systest.ws.wssec11.server.Server11Restricted;
+import org.apache.cxf.systest.ws.wssec11.server.StaxServer11;
+import org.apache.cxf.systest.ws.wssec11.server.StaxServer11Restricted;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,9 +32,9 @@ import org.junit.Test;
  * This class runs the first half of the tests, as having all in 
  * the one class causes an out of memory problem in eclipse.
  * 
- * It tests both DOM + StAX clients against the DOM server.
+ * It tests both DOM + StAX clients against the StAX server.
  */
-public class WSSecurity111Test extends WSSecurity11Common {
+public class StaxWSSecurity111Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
     
     static {
@@ -48,7 +48,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     "Server failed to launch",
                     // run the server in the same process
                     // set this to false to fork
-                    launchServer(Server11.class, true)
+                    launchServer(StaxServer11.class, true)
             );
         } else {
             if (WSSecurity11Common.isIBMJDK16()) {
@@ -60,7 +60,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     "Server failed to launch",
                     // run the server in the same process
                     // set this to false to fork
-                    launchServer(Server11Restricted.class, true)
+                    launchServer(StaxServer11Restricted.class, true)
             );
         }
     }
@@ -81,16 +81,16 @@ public class WSSecurity111Test extends WSSecurity11Common {
         String[] argv = new String[] {
             "A",
             "A-NoTimestamp",
-            "AD",
+            // TODO See WSS-472 - "AD",
             "A-ES",
-            "AD-ES",
+            // TODO See WSS-472 - "AD-ES",
             "UX",
             "UX-NoTimestamp",
-            "UXD",
+            // TODO See WSS-472 - "UXD",
             "UX-SEES",
-            "UXD-SEES", 
+            // TODO See WSS-472 - "UXD-SEES",
         };
-        runClientServer(argv, unrestrictedPoliciesInstalled, false, false);
+        runClientServer(argv, unrestrictedPoliciesInstalled, false, true);
     }
     
     @Test
@@ -112,7 +112,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
             "UX-SEES",
             // TODO Derived "UXD-SEES",
         };
-        runClientServerStreaming(argv, unrestrictedPoliciesInstalled, false, false);
+        runClientServerStreaming(argv, unrestrictedPoliciesInstalled, false, true);
     }
     
  

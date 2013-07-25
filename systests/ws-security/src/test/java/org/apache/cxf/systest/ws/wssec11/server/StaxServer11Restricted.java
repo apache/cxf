@@ -23,15 +23,15 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssec11.RestrictedAlgorithmSuiteLoader;
 
-public class Server11Restricted extends AbstractServerRestricted {
-    static final String PORT = allocatePort(Server11.class);
+public class StaxServer11Restricted extends AbstractServerRestricted {
+    static final String PORT = allocatePort(StaxServer11.class);
 
-    public Server11Restricted() throws Exception {
-        super("http://localhost:" + PORT);
+    public StaxServer11Restricted() throws Exception {
+        super("http://localhost:" + PORT, true);
     }
     
-    public Server11Restricted(String baseUrl) throws Exception {
-        super(baseUrl);
+    public StaxServer11Restricted(String baseUrl) throws Exception {
+        super(baseUrl, true);
     }
     
     protected void run()  {

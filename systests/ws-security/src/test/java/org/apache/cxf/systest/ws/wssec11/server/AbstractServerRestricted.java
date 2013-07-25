@@ -21,23 +21,24 @@ package org.apache.cxf.systest.ws.wssec11.server;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
-import org.apache.cxf.systest.ws.wssec11.RestrictedAlgorithmSuiteLoader;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 
 abstract class AbstractServerRestricted extends AbstractBusTestServerBase {
+    String baseUrl;
+    boolean streaming;
     
     protected AbstractServerRestricted(String baseUrl) throws Exception {
-        
-        Bus bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server.xml");
-        new RestrictedAlgorithmSuiteLoader(bus);
-        BusFactory.setDefaultBus(bus);
-        setBus(bus);
-        
+        this.baseUrl = baseUrl;
+    }
+    
+    protected AbstractServerRestricted(String baseUrl, boolean streaming) throws Exception {
+        this.baseUrl = baseUrl;
+        this.streaming = streaming;
+    }
+    
+    protected void run() {
         doPublish(baseUrl + "/APingService", new APingService());
         doPublish(baseUrl + "/A-NoTimestampPingService", new ANoTimestampPingService());
         doPublish(baseUrl + "/ADPingService", new ADPingService());
@@ -61,6 +62,9 @@ abstract class AbstractServerRestricted extends AbstractBusTestServerBase {
         Endpoint ep = Endpoint.create(obj);
         ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES, "restricted/bob.properties");
+        if (streaming) {
+            ep.getProperties().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+        }
         ep.publish(url);
     }
     
