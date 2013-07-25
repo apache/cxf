@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -138,13 +139,13 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
             setTokenValidators(secProps, soapMessage);
             
-            SecurityEventListener securityEventListener = 
-                configureSecurityEventListener(soapMessage, secProps);
+            List<SecurityEventListener> securityEventListeners = 
+                configureSecurityEventListeners(soapMessage, secProps);
             
             inboundWSSec = WSSec.getInboundWSSec(secProps);
             
             newXmlStreamReader = 
-                inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
+                inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListeners);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
 
             // Warning: The exceptions which can occur here are not security relevant exceptions
@@ -162,7 +163,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
     }
     
-    protected SecurityEventListener configureSecurityEventListener(
+    protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
@@ -175,7 +176,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         
-        return securityEventListener;
+        return Collections.singletonList(securityEventListener);
     }
     
     protected void configureProperties(SoapMessage msg) throws WSSecurityException {

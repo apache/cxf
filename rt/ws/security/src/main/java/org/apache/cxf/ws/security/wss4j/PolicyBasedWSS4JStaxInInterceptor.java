@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -389,15 +388,19 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     }
     
     @Override
-    protected SecurityEventListener configureSecurityEventListener(
+    protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
+        List<SecurityEventListener> securityEventListeners = new ArrayList<SecurityEventListener>(2);
+        securityEventListeners.addAll(super.configureSecurityEventListeners(msg, securityProperties));
+        
         Endpoint endoint = msg.getExchange().get(Endpoint.class);
         
         PolicyEnforcer policyEnforcer = createPolicyEnforcer(endoint.getEndpointInfo(), msg);
         securityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, securityProperties));
-
-        return policyEnforcer;
+        securityEventListeners.add(policyEnforcer);
+        
+        return securityEventListeners;
     }
     
     private PolicyEnforcer createPolicyEnforcer(
@@ -457,21 +460,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         
         String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
-        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
-        PolicyEnforcer securityEventListener = 
-            new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), actor) {
-            
-                @Override
-                public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                    incomingSecurityEventList.add(securityEvent);
-                    super.registerSecurityEvent(securityEvent);
-                }
-            };
-        
-        msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
-        msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
-        
-        return securityEventListener;
+        return new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), actor);
     }
     
 }
