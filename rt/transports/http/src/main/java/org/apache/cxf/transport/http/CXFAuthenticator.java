@@ -26,6 +26,8 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.helpers.IOUtils;
@@ -78,10 +80,20 @@ public class CXFAuthenticator extends Authenticator {
                 ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
                                                        b, 0, b.length);
                 Class<?> cls = loader.loadClass(ReferencingAuthenticator.class.getName());
-                Authenticator auth = (Authenticator)cls.getConstructor(Authenticator.class, Authenticator.class)
+                final Authenticator auth = (Authenticator)cls.getConstructor(Authenticator.class, Authenticator.class)
                     .newInstance(instance, wrapped);
                 
-                Authenticator.setDefault(auth);
+                if (System.getSecurityManager() == null) {
+                    Authenticator.setDefault(auth);
+                } else {
+                    AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                        public Boolean run() {
+                            Authenticator.setDefault(auth);
+                            return true;
+                        }
+                    });
+
+                }
             } catch (Throwable t) {
                 //ignore
                 t.printStackTrace();
