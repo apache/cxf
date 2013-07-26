@@ -40,7 +40,6 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
         throws OAuthServiceException {
-        checkIfGrantSupported(client);
                 
         // Get the grant representation from the provider 
         String codeValue = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);

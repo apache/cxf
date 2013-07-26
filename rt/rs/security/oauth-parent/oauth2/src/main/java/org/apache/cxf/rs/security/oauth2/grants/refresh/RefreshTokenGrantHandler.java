@@ -35,7 +35,6 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     private OAuthDataProvider dataProvider;
     private boolean partialMatchScopeValidation;
-    private boolean canSupportPublicClients;
     
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
@@ -47,10 +46,6 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        if (!OAuthUtils.isGrantSupportedForClient(client, canSupportPublicClients, 
-                                                  OAuthConstants.REFRESH_TOKEN_GRANT)) {
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
-        }
         String refreshToken = params.getFirst(OAuthConstants.REFRESH_TOKEN);
         List<String> requestedScopes = OAuthUtils.getRequestedScopes(client,
                                             params.getFirst(OAuthConstants.SCOPE),
@@ -61,9 +56,5 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
-    }
-    
-    public void setCanSupportPublicClients(boolean support) {
-        canSupportPublicClients = support;
     }
 }

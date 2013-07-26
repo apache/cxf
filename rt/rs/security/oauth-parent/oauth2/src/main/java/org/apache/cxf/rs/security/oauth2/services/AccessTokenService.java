@@ -88,6 +88,13 @@ public class AccessTokenService extends AbstractOAuthService {
         // Make sure the client is authenticated
         Client client = authenticateClientIfNeeded(params);
         
+        if (!OAuthUtils.isGrantSupportedForClient(client, 
+                                                  isCanSupportPublicClients(),
+                                                  params.getFirst(OAuthConstants.GRANT_TYPE))) {
+            return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);    
+        }
+        
+        
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
@@ -195,10 +202,11 @@ public class AccessTokenService extends AbstractOAuthService {
     }
     
     /**
-     * Find the mathcing grant handler
+     * Find the matching grant handler
      */
-    protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {
-        String grantType = params.getFirst(OAuthConstants.GRANT_TYPE);        
+    protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {    
+        String grantType = params.getFirst(OAuthConstants.GRANT_TYPE);
+                
         if (grantType != null) {
             for (AccessTokenGrantHandler handler : grantHandlers) {
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
@@ -251,4 +259,10 @@ public class AccessTokenService extends AbstractOAuthService {
     public void setCanSupportPublicClients(boolean support) {
         this.canSupportPublicClients = support;
     }
+
+    public boolean isCanSupportPublicClients() {
+        return canSupportPublicClients;
+    }
+
+    
 }
