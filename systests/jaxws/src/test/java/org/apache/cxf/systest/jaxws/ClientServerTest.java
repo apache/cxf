@@ -38,6 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.AsyncHandler;
@@ -111,6 +112,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus(url.toString());
     }
+    
     @Test
     public void testCXF2419() throws Exception {
         org.apache.cxf.hello_world.elrefs.SOAPService serv 
@@ -823,12 +825,15 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetWSDL() throws Exception {
         String url = "http://localhost:" + PORT + "/SoapContext/SoapPort?wsdl";
-        HttpURLConnection httpConnection = getHttpConnection(url);    
+        HttpURLConnection httpConnection = getHttpConnection(url);
+
+        // just testing that GZIP is not enabled by default
+        httpConnection.setRequestProperty("Accept-Encoding", "gzip, deflate");
         httpConnection.connect();        
         
         assertEquals(200, httpConnection.getResponseCode());
     
-        assertEquals("text/xml", httpConnection.getContentType());
+        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
         assertEquals("OK", httpConnection.getResponseMessage());
         
         InputStream in = httpConnection.getInputStream();
@@ -836,8 +841,23 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         
         Document doc = StaxUtils.read(in);
         assertNotNull(doc);
-       
-                
+    }
+    
+    @Test
+    public void testGetWSDLWithGzip() throws Exception {
+        String url = "http://localhost:" + PORT + "/SoapContext/SoapPortWithGzip?wsdl";
+        HttpURLConnection httpConnection = getHttpConnection(url);
+        httpConnection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+        httpConnection.connect();
+        assertEquals(200, httpConnection.getResponseCode());
+        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
+        assertEquals("OK", httpConnection.getResponseMessage());
+        assertEquals("gzip", httpConnection.getContentEncoding());
+        InputStream in = httpConnection.getInputStream();
+        assertNotNull(in);
+        GZIPInputStream inputStream = new GZIPInputStream(in);
+        Document doc = StaxUtils.read(inputStream);
+        assertNotNull(doc);
     }
     
     @Test

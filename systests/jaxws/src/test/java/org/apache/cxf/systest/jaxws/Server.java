@@ -32,6 +32,8 @@ import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transport.common.gzip.GZIPInInterceptor;
+import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
@@ -71,6 +73,13 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint ep = Endpoint.publish(address, implementor);
         ((EndpointImpl)ep).getService().getInInterceptors().add(new URIMappingInterceptor());
         eps.add(ep);
+        
+        implementor = new GreeterImpl();
+        address = "http://localhost:" + PORT + "/SoapContext/SoapPortWithGzip";
+        Endpoint ep2 = Endpoint.publish(address, implementor);
+        ((EndpointImpl)ep2).getService().getInInterceptors().add(new GZIPInInterceptor());
+        ((EndpointImpl)ep2).getService().getOutInterceptors().add(new GZIPOutInterceptor());
+        eps.add(ep2);
 
         implementor = new RefGreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort2";
@@ -153,7 +162,7 @@ public class Server extends AbstractBusTestServerBase {
                 portName = "SoapPort",
                 endpointInterface = "org.apache.cxf.hello_world.elrefs.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
-                wsdlLocation = "testutils/hello_world_ref.wsdl")
+                wsdlLocation = "testutils/hello_world_ref.wsdl")    
     public class RefGreeterImpl implements org.apache.cxf.hello_world.elrefs.Greeter {
         public String greetMe(String requestType) {
             return "Hello " + requestType;
