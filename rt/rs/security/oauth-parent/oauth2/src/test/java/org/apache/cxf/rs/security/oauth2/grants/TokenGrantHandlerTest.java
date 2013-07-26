@@ -36,15 +36,14 @@ import org.junit.Test;
 
 public class TokenGrantHandlerTest extends Assert {
 
+    
+    
     @Test
-    public void testSimpleGrantNotSupported() {
-        try {
-            new SimpleGrantHandler().createAccessToken(createClient("unsupported"), 
-                                                       createMap("a"));
-            fail("Unsupported Grant");
-        } catch (OAuthServiceException ex) {
-            assertEquals(OAuthConstants.UNAUTHORIZED_CLIENT, ex.getMessage());
-        }
+    public void testSimpleGrantSupported() {
+        SimpleGrantHandler handler = new SimpleGrantHandler(); 
+        handler.setDataProvider(new OAuthDataProviderImpl());
+        ServerAccessToken t = handler.createAccessToken(createClient("a"), createMap("a"));
+        assertTrue(t instanceof BearerAccessToken);
     }
     
     @Test
@@ -59,27 +58,10 @@ public class TokenGrantHandlerTest extends Assert {
     }
     
     @Test
-    public void testSimpleGrantSupported() {
-        ServerAccessToken t = new SimpleGrantHandler().createAccessToken(createClient("a"), 
-                                                                         createMap("a"));
-        assertTrue(t instanceof BearerAccessToken);
-    }
-    
-    @Test
-    public void testComplexGrantNotSupported() {
-        try {
-            new ComplexGrantHandler(Arrays.asList("a", "b"))
-                .createAccessToken(createClient("unsupported"), createMap("a"));
-            fail("Unsupported Grant");
-        } catch (OAuthServiceException ex) {
-            assertEquals(OAuthConstants.UNAUTHORIZED_CLIENT, ex.getMessage());
-        }
-    }
-    
-    @Test
     public void testComplexGrantSupported() {
-        ServerAccessToken t = new ComplexGrantHandler(Arrays.asList("a", "b"))
-            .createAccessToken(createClient("a"), createMap("a"));
+        ComplexGrantHandler handler = new ComplexGrantHandler(Arrays.asList("a", "b")); 
+        handler.setDataProvider(new OAuthDataProviderImpl());
+        ServerAccessToken t = handler.createAccessToken(createClient("a"), createMap("a"));
         assertTrue(t instanceof BearerAccessToken);
     }
     
@@ -109,8 +91,7 @@ public class TokenGrantHandlerTest extends Assert {
         
         public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
             throws OAuthServiceException {
-            super.checkIfGrantSupported(client);
-            return new BearerAccessToken(client, 3600L);
+            return super.doCreateAccessToken(client, client.getSubject(), null);
         } 
         
     }
@@ -123,8 +104,8 @@ public class TokenGrantHandlerTest extends Assert {
         
         public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
             throws OAuthServiceException {
-            super.checkIfGrantSupported(client, params.getFirst(OAuthConstants.GRANT_TYPE));
-            return new BearerAccessToken(client, 3600L);
+            return super.doCreateAccessToken(client, client.getSubject(), 
+                                             params.getFirst(OAuthConstants.GRANT_TYPE), null);
         } 
         
     }

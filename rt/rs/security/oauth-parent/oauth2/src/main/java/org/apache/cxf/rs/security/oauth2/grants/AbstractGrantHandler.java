@@ -70,11 +70,12 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         return Collections.unmodifiableList(supportedGrants);
     }
     
+    @Deprecated
     protected void checkIfGrantSupported(Client client) {
         checkIfGrantSupported(client, getSingleGrantType());
     }
     
-    protected void checkIfGrantSupported(Client client, String requestedGrant) {
+    private void checkIfGrantSupported(Client client, String requestedGrant) {
         if (!OAuthUtils.isGrantSupportedForClient(client, 
                                                   canSupportPublicClients,
                                                   requestedGrant)) {
