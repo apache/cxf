@@ -27,6 +27,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 
 
@@ -34,7 +35,9 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
 
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
-        return new Client("alice", "alice", true);
+        Client client = new Client("alice", "alice", true);
+        client.getAllowedGrantTypes().add(Constants.SAML2_BEARER_GRANT);
+        return client;
     }
 
     @Override

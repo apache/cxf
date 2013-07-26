@@ -21,7 +21,11 @@ package org.apache.cxf.rs.security.oauth2.grants;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -38,13 +42,21 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * Abstract access token grant handler
  */
 public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractGrantHandler.class);
     
-    private String supportedGrant;
+    private List<String> supportedGrants;
     private OAuthDataProvider dataProvider;
     private boolean partialMatchScopeValidation;
     private boolean canSupportPublicClients;
     protected AbstractGrantHandler(String grant) {
-        supportedGrant = grant;
+        supportedGrants = Collections.singletonList(grant);
+    }
+    
+    protected AbstractGrantHandler(List<String> grants) {
+        if (grants.isEmpty()) {
+            throw new IllegalArgumentException("The list of grant types can not be empty");
+        }
+        supportedGrants = grants;
     }
     
     public void setDataProvider(OAuthDataProvider dataProvider) {
@@ -55,13 +67,17 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     }
     
     public List<String> getSupportedGrantTypes() {
-        return Collections.singletonList(supportedGrant);
+        return Collections.unmodifiableList(supportedGrants);
     }
     
     protected void checkIfGrantSupported(Client client) {
+        checkIfGrantSupported(client, getSingleGrantType());
+    }
+    
+    protected void checkIfGrantSupported(Client client, String requestedGrant) {
         if (!OAuthUtils.isGrantSupportedForClient(client, 
                                                   canSupportPublicClients,
-                                                  OAuthConstants.AUTHORIZATION_CODE_GRANT)) {
+                                                  requestedGrant)) {
             throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
     }
@@ -69,13 +85,30 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     List<String> requestedScope) {
+        
+        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope);
+    }
+    
+    private String getSingleGrantType() {
+        if (supportedGrants.size() > 1) {
+            String errorMessage = "Request grant type must be specified";
+            LOG.warning(errorMessage);
+            throw new WebApplicationException(500);
+        }
+        return supportedGrants.get(0);
+    }
+    
+    protected ServerAccessToken doCreateAccessToken(Client client,
+                                                    UserSubject subject,
+                                                    String requestedGrant,
+                                                    List<String> requestedScope) {
         if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(), 
                                        partialMatchScopeValidation)) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));     
         }
         // Check if a pre-authorized  token available
         ServerAccessToken token = dataProvider.getPreauthorizedToken(
-                                     client, requestedScope, subject, supportedGrant);
+                                     client, requestedScope, subject, requestedGrant);
         if (token != null) {
             return token;
         }
@@ -83,7 +116,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         // Delegate to the data provider to create the one
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
-        reg.setGrantType(supportedGrant);
+        reg.setGrantType(requestedGrant);
         reg.setSubject(subject);
         reg.setRequestedScope(requestedScope);        
         
