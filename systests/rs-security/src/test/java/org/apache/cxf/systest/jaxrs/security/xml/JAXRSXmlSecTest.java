@@ -139,7 +139,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ProcessingException ex) {
-            ex.printStackTrace();
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
