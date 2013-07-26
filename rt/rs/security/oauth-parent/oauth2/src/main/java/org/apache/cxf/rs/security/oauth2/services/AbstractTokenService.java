@@ -143,6 +143,10 @@ public class AbstractTokenService extends AbstractOAuthService {
         this.canSupportPublicClients = support;
     }
 
+    public boolean isCanSupportPublicClients() {
+        return canSupportPublicClients;
+    }
+    
     public void setWriteCustomErrors(boolean writeCustomErrors) {
         this.writeCustomErrors = writeCustomErrors;
     }

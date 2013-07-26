@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -67,7 +67,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.dom.validate.Validator;
-
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
 
@@ -78,6 +77,9 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     private static final String ENCODED_SAML2_BEARER_GRANT;
     static {
         WSSConfig.init();
+        //  AccessTokenService may be configured with the form provider
+        // which will not decode by default - so listing both the actual 
+        // and encoded grant type value will help
         ENCODED_SAML2_BEARER_GRANT = HttpUtils.urlEncode(Constants.SAML2_BEARER_GRANT, "UTF-8");
     }
     private Validator samlValidator = new SamlAssertionValidator();
@@ -85,20 +87,9 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     private SecurityContextProvider scProvider = new SecurityContextProviderImpl(); 
     
     public Saml2BearerGrantHandler() {
-        super(Constants.SAML2_BEARER_GRANT);
+        super(Arrays.asList(Constants.SAML2_BEARER_GRANT, ENCODED_SAML2_BEARER_GRANT));
     }
     
-    @Override
-    public List<String> getSupportedGrantTypes() {
-        // AccessTokenService may be configured with the form provider
-        // which will not decode by default - so listing both the actual 
-        // and encoded grant type value will help
-        List<String> types = new LinkedList<String>();
-        types.add(Constants.SAML2_BEARER_GRANT);
-        types.add(ENCODED_SAML2_BEARER_GRANT);
-        return types;
-    }
-
     public void setSamlValidator(Validator validator) {
         samlValidator = validator;
     }
@@ -113,7 +104,6 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        checkIfGrantSupported(client);
         
         String assertion = params.getFirst(Constants.CLIENT_GRANT_ASSERTION_PARAM);
         if (assertion == null) {
@@ -130,7 +120,8 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
             UserSubject grantSubject = getGrantSubject(message, assertionWrapper);
             
             return doCreateAccessToken(client, 
-                                       grantSubject, 
+                                       grantSubject,
+                                       Constants.SAML2_BEARER_GRANT,
                                        OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));
         } catch (OAuthServiceException ex) {
             throw ex;

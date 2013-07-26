@@ -40,7 +40,6 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        checkIfGrantSupported(client);
         
         String ownerName = params.getFirst(OAuthConstants.RESOURCE_OWNER_NAME);
         String ownerPassword = params.getFirst(OAuthConstants.RESOURCE_OWNER_PASSWORD);

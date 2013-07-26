@@ -39,7 +39,6 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        checkIfGrantSupported(client);
         
         return doCreateAccessToken(client, 
                                    client.getSubject(), 
