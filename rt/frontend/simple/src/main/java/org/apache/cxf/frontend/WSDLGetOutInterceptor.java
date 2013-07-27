@@ -44,7 +44,8 @@ public class WSDLGetOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (doc == null) {
             return;
         }
-
+        message.remove(WSDLGetInterceptor.DOCUMENT_HOLDER);
+        
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         if (writer == null) {
             return;
@@ -55,7 +56,5 @@ public class WSDLGetOutInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (XMLStreamException e) {
             throw new Fault(e);
         }
-
-        message.remove(WSDLGetInterceptor.DOCUMENT_HOLDER);
     }
 }

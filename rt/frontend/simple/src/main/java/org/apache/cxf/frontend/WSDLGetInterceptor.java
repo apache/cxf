@@ -52,6 +52,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String query = (String)message.get(Message.QUERY_STRING);
+        
         if (!"GET".equals(method) || StringUtils.isEmpty(query)) {
             return;
         }
@@ -59,49 +60,53 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         String baseUri = (String)message.get(Message.REQUEST_URL);
         String ctx = (String)message.get(Message.PATH_INFO);
 
-        // cannot have two wsdl's being written for the same endpoint at the same
-        // time as the addresses may get mixed up
-        synchronized (message.getExchange().getEndpoint()) {
-            Map<String, String> map = UrlUtils.parseQueryString(query);
-            if (isRecognizedQuery(map, baseUri, ctx, message.getExchange().getEndpoint().getEndpointInfo())) {
-                Document doc = getDocument(message, baseUri, map, ctx, 
-                                           message.getExchange().getEndpoint().getEndpointInfo());
+        Map<String, String> map = UrlUtils.parseQueryString(query);
+        if (isRecognizedQuery(map, baseUri, ctx, message.getExchange().getEndpoint().getEndpointInfo())) {
+            Document doc = getDocument(message, baseUri, map, ctx);
+            
+            Endpoint e = message.getExchange().get(Endpoint.class);
+            Message mout = new MessageImpl();
+            mout.setExchange(message.getExchange());
+            mout = e.getBinding().createMessage(mout);
+            mout.setInterceptorChain(OutgoingChainInterceptor.getOutInterceptorChain(message.getExchange()));
+            message.getExchange().setOutMessage(mout);
 
-                Endpoint e = message.getExchange().get(Endpoint.class);
-                Message mout = new MessageImpl();
-                mout.setExchange(message.getExchange());
-                mout = e.getBinding().createMessage(mout);
-                mout.setInterceptorChain(OutgoingChainInterceptor.getOutInterceptorChain(message
-                    .getExchange()));
-                message.getExchange().setOutMessage(mout);
+            mout.put(DOCUMENT_HOLDER, doc);
 
-                mout.put(DOCUMENT_HOLDER, doc);
-
-                // FIXME - how can I change this to provide a different interceptor chain that just has the
-                // stax, gzip and message sender components.
-                Iterator<Interceptor<? extends Message>> iterator = mout.getInterceptorChain().iterator();
-                while (iterator.hasNext()) {
-                    Interceptor<? extends Message> inInterceptor = iterator.next();
-                    if (!inInterceptor.getClass().equals(StaxOutInterceptor.class)
-                        && !inInterceptor.getClass().equals(GZIPOutInterceptor.class)
-                        && !inInterceptor.getClass().equals(MessageSenderInterceptor.class)) {
-                        mout.getInterceptorChain().remove(inInterceptor);
-                    }
+            // TODO - how can I improve this to provide a specific interceptor chain that just has the
+            // stax, gzip and message sender components, while also ensuring that GZIP is only provided
+            // if its already configured for the endpoint.
+            Iterator<Interceptor<? extends Message>> iterator = mout.getInterceptorChain().iterator();
+            while (iterator.hasNext()) {
+                Interceptor<? extends Message> inInterceptor = iterator.next();
+                if (!inInterceptor.getClass().equals(StaxOutInterceptor.class)
+                    && !inInterceptor.getClass().equals(GZIPOutInterceptor.class)
+                    && !inInterceptor.getClass().equals(MessageSenderInterceptor.class)) {
+                    mout.getInterceptorChain().remove(inInterceptor);
                 }
-
-                mout.getInterceptorChain().add(WSDLGetOutInterceptor.INSTANCE);
-
-                // skip the service executor and goto the end of the chain.
-                message.getInterceptorChain().doInterceptStartingAt(
-                        message,
-                        OutgoingChainInterceptor.class.getName());
             }
+
+            // notice this is being added after the purge above, don't swap the order!
+            mout.getInterceptorChain().add(WSDLGetOutInterceptor.INSTANCE);
+
+            // skip the service executor and goto the end of the chain.
+            message.getInterceptorChain().doInterceptStartingAt(
+                    message,
+                    OutgoingChainInterceptor.class.getName());
         }
     }
 
-    private Document getDocument(Message message, String base, Map<String, String> params, String ctxUri,
-                                EndpointInfo endpointInfo) {
-        return new WSDLGetUtils().getDocument(message, base, params, ctxUri, endpointInfo);
+    private Document getDocument(Message message, String base, Map<String, String> params, String ctxUri) {
+        // cannot have two wsdl's being generated for the same endpoint at the same
+        // time as the addresses may get mixed up
+        // For WSDL's the WSDLWriter does not share any state between documents.
+        // For XSD's, the WSDLGetUtils makes a copy of any XSD schema documents before updating
+        // any addresses and returning them, so for both WSDL and XSD this is the only part that needs
+        // to be synchronized.
+        synchronized (message.getExchange().getEndpoint()) {
+            return new WSDLGetUtils().getDocument(message, base, params, ctxUri, 
+                                                  message.getExchange().getEndpoint().getEndpointInfo());
+        }
     }
 
     private boolean isRecognizedQuery(Map<String, String> map, String baseUri, String ctx,
