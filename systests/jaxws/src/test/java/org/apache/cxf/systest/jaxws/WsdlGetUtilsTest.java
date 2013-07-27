@@ -42,7 +42,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(WsdlGetUtilsTest.class);
 
     @WebService(targetNamespace = "org.apache.cxf.ws.WsdlTest")
     public static class StuffImpl {
