@@ -18,12 +18,9 @@
  */
 package org.apache.cxf.rt.security.xacml;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
@@ -35,32 +32,41 @@ public class CXFMessageParser {
 
     /**
      * @param message
-     * @param fullRequestURL Whether to send the full Request URL as the resource or not. If set to true, the
-     *            full Request URL will be sent for both a JAX-WS and JAX-RS service. If set to false (the
-     *            default), a JAX-WS service will send the "{namespace}operation" QName, and a JAX-RS service
-     *            will send the RequestURI (i.e. minus the initial https:<ip> prefix)
      */
     public CXFMessageParser(Message message) {
         this.message = message;
     }
+    
+    public boolean isSOAPService() {
+        return !(getWSDLService() == null || getWSDLOperation() == null);
+    }
 
+    public QName getWSDLOperation() {
+        if (message != null && message.get(Message.WSDL_OPERATION) != null) {
+            return (QName)message.get(Message.WSDL_OPERATION);
+        }
+        return null;
+    }
+    
+    public QName getWSDLService() {
+        if (message != null && message.get(Message.WSDL_SERVICE) != null) {
+            return (QName)message.get(Message.WSDL_SERVICE);
+        }
+        return null;
+    }
+    
     /**
-     * Return the Resources that have been inserted into the Request
+     * @param fullRequestURL Whether to send the full Request URL as the resource or not. If set to true, the
+     *        full Request URL will be sent for both a JAX-WS and JAX-RS service. If set to false (the
+     *        default), a JAX-WS service will send the "{namespace}operation" QName, and a JAX-RS service
+     *        will send the RequestURI (i.e. minus the initial https:<ip> prefix)
      */
-    public List<String> getResources(boolean fullRequestURL) {
-        if (message == null) {
-            return Collections.emptyList();
-        }
-        List<String> resources = new ArrayList<String>();
-        if (message.get(Message.WSDL_OPERATION) != null) {
-            resources.add(message.get(Message.WSDL_OPERATION).toString());
-        }
+    public String getResourceURI(boolean fullRequestURL) {
         String property = fullRequestURL ? Message.REQUEST_URL : Message.REQUEST_URI;
-        String request = (String)message.get(property);
-        if (request != null) {
-            resources.add(request);
+        if (message != null && message.get(property) != null) {
+            return (String)message.get(property);
         }
-        return resources;
+        return null;
     }
 
     public String getAction(String defaultSOAPAction) {

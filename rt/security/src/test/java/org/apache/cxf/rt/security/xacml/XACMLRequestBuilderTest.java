@@ -21,10 +21,15 @@ package org.apache.cxf.rt.security.xacml;
 
 import java.security.Principal;
 import java.util.Collections;
+import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.RequestType;
+import org.opensaml.xacml.ctx.ResourceType;
 
 
 /**
@@ -47,7 +52,11 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
-        msg.put(Message.WSDL_OPERATION, operation);
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -67,7 +76,11 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
-        msg.put(Message.WSDL_OPERATION, operation);
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURL);
         
         DefaultXACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -98,7 +111,11 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
-        msg.put(Message.WSDL_OPERATION, operation);
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URL, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -112,4 +129,179 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         assertTrue(request.getEnvironment().getAttributes().isEmpty());
     }
     
+    @org.junit.Test
+    public void testSOAPResource() throws Exception {
+        // Mock up a request
+        Principal principal = new Principal() {
+            public String getName() {
+                return "alice";
+            }
+        };
+        
+        String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
+        MessageImpl msg = new MessageImpl();
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URL, resourceURL);
+        
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
+        RequestType request = 
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
+        assertNotNull(request);
+        
+        List<ResourceType> resources = request.getResources();
+        assertNotNull(resources);
+        assertEquals(1, resources.size());
+        
+        ResourceType resource = resources.get(0);
+        assertEquals(4, resource.getAttributes().size());
+        
+        boolean resourceIdSatisfied = false;
+        boolean soapServiceSatisfied = false;
+        boolean soapOperationSatisfied = false;
+        boolean resourceURISatisfied = false;
+        for (AttributeType attribute : resource.getAttributes()) {
+            String attributeValue = attribute.getAttributeValues().get(0).getValue();
+            if (XACMLConstants.RESOURCE_ID.equals(attribute.getAttributeID())
+                && "{http://www.example.org/contract/DoubleIt}DoubleItService#DoubleIt".equals(
+                    attributeValue)) {
+                resourceIdSatisfied = true;
+            } else if (XACMLConstants.RESOURCE_WSDL_SERVICE_ID.equals(attribute.getAttributeID())
+                && service.equals(attributeValue)) {
+                soapServiceSatisfied = true;
+            } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeID())
+                && operation.equals(attributeValue)) {
+                soapOperationSatisfied = true;
+            } else if (XACMLConstants.RESOURCE_WSDL_URI_ID.equals(attribute.getAttributeID())
+                && resourceURL.equals(attributeValue)) {
+                resourceURISatisfied = true;
+            }
+        }
+        
+        assertTrue(resourceIdSatisfied && soapServiceSatisfied && soapOperationSatisfied
+                   && resourceURISatisfied);
+    }
+    
+    @org.junit.Test
+    public void testSOAPResourceDifferentNamespace() throws Exception {
+        // Mock up a request
+        Principal principal = new Principal() {
+            public String getName() {
+                return "alice";
+            }
+        };
+        
+        String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
+        MessageImpl msg = new MessageImpl();
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleItService}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URL, resourceURL);
+        
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
+        RequestType request = 
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
+        assertNotNull(request);
+        
+        List<ResourceType> resources = request.getResources();
+        assertNotNull(resources);
+        assertEquals(1, resources.size());
+        
+        ResourceType resource = resources.get(0);
+        assertEquals(4, resource.getAttributes().size());
+        
+        boolean resourceIdSatisfied = false;
+        boolean soapServiceSatisfied = false;
+        boolean soapOperationSatisfied = false;
+        boolean resourceURISatisfied = false;
+        String expectedResourceId = 
+            service + "#" + operation;
+        for (AttributeType attribute : resource.getAttributes()) {
+            String attributeValue = attribute.getAttributeValues().get(0).getValue();
+            if (XACMLConstants.RESOURCE_ID.equals(attribute.getAttributeID())
+                && expectedResourceId.equals(attributeValue)) {
+                resourceIdSatisfied = true;
+            } else if (XACMLConstants.RESOURCE_WSDL_SERVICE_ID.equals(attribute.getAttributeID())
+                && service.equals(attributeValue)) {
+                soapServiceSatisfied = true;
+            } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeID())
+                && operation.equals(attributeValue)) {
+                soapOperationSatisfied = true;
+            } else if (XACMLConstants.RESOURCE_WSDL_URI_ID.equals(attribute.getAttributeID())
+                && resourceURL.equals(attributeValue)) {
+                resourceURISatisfied = true;
+            }
+        }
+        
+        assertTrue(resourceIdSatisfied && soapServiceSatisfied && soapOperationSatisfied
+                   && resourceURISatisfied);
+    }
+    
+    @org.junit.Test
+    public void testRESTResource() throws Exception {
+        // Mock up a request
+        Principal principal = new Principal() {
+            public String getName() {
+                return "alice";
+            }
+        };
+        
+        MessageImpl msg = new MessageImpl();
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URL, resourceURL);
+        
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
+        RequestType request = 
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
+        assertNotNull(request);
+        
+        List<ResourceType> resources = request.getResources();
+        assertNotNull(resources);
+        assertEquals(1, resources.size());
+        
+        ResourceType resource = resources.get(0);
+        assertEquals(1, resource.getAttributes().size());
+        
+        for (AttributeType attribute : resource.getAttributes()) {
+            String attributeValue = attribute.getAttributeValues().get(0).getValue();
+            assertEquals(attributeValue, resourceURL);
+        }
+    }
+    
+    @org.junit.Test
+    public void testRESTResourceTruncatedURI() throws Exception {
+        // Mock up a request
+        Principal principal = new Principal() {
+            public String getName() {
+                return "alice";
+            }
+        };
+        
+        MessageImpl msg = new MessageImpl();
+        String resourceURL = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URL, resourceURL);
+        String resourceURI = "/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURI);
+        
+        XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
+        ((DefaultXACMLRequestBuilder)builder).setSendFullRequestURL(false);
+        RequestType request = 
+            builder.createRequest(principal, Collections.singletonList("manager"), msg);
+        assertNotNull(request);
+        
+        List<ResourceType> resources = request.getResources();
+        assertNotNull(resources);
+        assertEquals(1, resources.size());
+        
+        ResourceType resource = resources.get(0);
+        assertEquals(1, resource.getAttributes().size());
+        
+        for (AttributeType attribute : resource.getAttributes()) {
+            String attributeValue = attribute.getAttributeValues().get(0).getValue();
+            assertEquals(attributeValue, resourceURI);
+        }
+    }
 }

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.message.Message;
 import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
@@ -35,18 +37,26 @@ import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
 
 /**
- * This class constructs an XACML Request given a Principal, list of roles and MessageContext, following the
- * SAML 2.0 profile of XACML 2.0. The principal name is inserted as the Subject ID, and the list of roles
- * associated with that principal are inserted as Subject roles. The action to send defaults to "execute". The
- * resource is the WSDL Operation for a SOAP service, and the request URI for a REST service. You can also
- * configure the ability to send the full request URL instead for a SOAP or REST service. The current DateTime
- * is also sent in an Environment, however this can be disabled via configuration.
+ * This class constructs an XACML Request given a Principal, list of roles and MessageContext, 
+ * following the SAML 2.0 profile of XACML 2.0. The principal name is inserted as the Subject ID,
+ * and the list of roles associated with that principal are inserted as Subject roles. The action
+ * to send defaults to "execute". 
+ * 
+ * For a SOAP Service, the resource-id Attribute refers to the 
+ * "{serviceNamespace}serviceName#{operationNamespace}operationName" String (shortened to
+ * "{serviceNamespace}serviceName#operationName" if the namespaces are identical). The 
+ * "{serviceNamespace}serviceName", "{operationNamespace}operationName" and resource URI are also
+ * sent to simplify processing at the PDP side.
+ * 
+ * For a REST service the request URL is the resource. You can also configure the ability to 
+ * send the truncated request URI instead for a SOAP or REST service. The current DateTime is 
+ * also sent in an Environment, however this can be disabled via configuration.
  */
 public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
 
     private boolean sendDateTime = true;
     private String action = "execute";
-    private boolean sendFullRequestURL;
+    private boolean sendFullRequestURL = true;
 
     /**
      * Create an XACML Request given a Principal, list of roles and Message.
@@ -55,11 +65,11 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         throws Exception {
         CXFMessageParser messageParser = new CXFMessageParser(message);
         String issuer = messageParser.getIssuer();
-        List<String> resources = messageParser.getResources(sendFullRequestURL);
+        
         String actionToUse = messageParser.getAction(action);
 
         SubjectType subjectType = createSubjectType(principal, roles, issuer);
-        ResourceType resourceType = createResourceType(resources);
+        ResourceType resourceType = createResourceType(messageParser);
         AttributeType actionAttribute = createAttribute(XACMLConstants.ACTION_ID, XACMLConstants.XS_STRING,
                                                         null, actionToUse);
         ActionType actionType = RequestComponentBuilder.createActionType(Collections.singletonList(actionAttribute));
@@ -70,14 +80,47 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
                                                          createEnvironmentType());
     }
 
-    private ResourceType createResourceType(List<String> resources) {
+    private ResourceType createResourceType(CXFMessageParser messageParser) {
         List<AttributeType> attributes = new ArrayList<AttributeType>();
-        for (String resource : resources) {
-            if (resource != null) {
-                attributes.add(createAttribute(XACMLConstants.RESOURCE_ID, XACMLConstants.XS_STRING, null,
-                                               resource));
+        
+        // Resource-id
+        String resourceId = null;
+        boolean isSoapService = messageParser.isSOAPService();
+        if (isSoapService) {
+            QName serviceName = messageParser.getWSDLService();
+            QName operationName = messageParser.getWSDLOperation();
+            
+            resourceId = serviceName.toString() + "#";
+            if (serviceName.getNamespaceURI() != null 
+                && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
+                resourceId += operationName.getLocalPart();
+            } else {
+                resourceId += operationName.toString();
             }
+        } else {
+            resourceId = messageParser.getResourceURI(sendFullRequestURL);
         }
+        
+        attributes.add(createAttribute(XACMLConstants.RESOURCE_ID, XACMLConstants.XS_STRING, null,
+                                           resourceId));
+        
+        if (isSoapService) {
+            // WSDL Service
+            QName wsdlService = messageParser.getWSDLService();
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_SERVICE_ID, XACMLConstants.XS_STRING, null,
+                                           wsdlService.toString()));
+            
+            // WSDL Operation
+            QName wsdlOperation = messageParser.getWSDLOperation();
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_OPERATION_ID, XACMLConstants.XS_STRING, null,
+                                           wsdlOperation.toString()));
+            
+            // Resource URI
+            String resourceURI = messageParser.getResourceURI(sendFullRequestURL);
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_URI_ID, XACMLConstants.XS_STRING, null,
+                                           resourceURI));
+        }
+        
         return RequestComponentBuilder.createResourceType(attributes, null);
     }
 

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -47,7 +48,11 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
-        msg.put(Message.WSDL_OPERATION, operation);
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURI = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURI);
         msg.put(SecurityContext.class, sc);
         
         AbstractXACMLAuthorizingInterceptor authorizingInterceptor = 
@@ -62,7 +67,11 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
-        msg.put(Message.WSDL_OPERATION, operation);
+        msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
+        String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
+        msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
+        String resourceURI = "https://localhost:8080/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURI);
         msg.put(SecurityContext.class, sc);
         
         AbstractXACMLAuthorizingInterceptor authorizingInterceptor = 

@@ -73,6 +73,15 @@ public final class XACMLConstants {
         "urn:oasis:names:tc:xacml:1.0:resource:resource-location";
     public static final String RESOURCE_ID = 
         "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+    
+    // Non-standard (CXF-specific) tags for sending information about SOAP services to the PDP
+    public static final String RESOURCE_WSDL_OPERATION_ID = 
+        "urn:cxf:apache:org:wsdl:operation-id";
+    public static final String RESOURCE_WSDL_SERVICE_ID = 
+        "urn:cxf:apache:org:wsdl:service-id";
+    public static final String RESOURCE_WSDL_URI_ID = 
+        "urn:cxf:apache:org:wsdl:resource-id";
+
     public static final String RESOURCE_FILE_NAME = 
         "urn:oasis:names:tc:xacml:1.0:resource:simple-file-name";
     public static final String ACTION_ID = 
