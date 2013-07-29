@@ -90,12 +90,16 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             QName serviceName = messageParser.getWSDLService();
             QName operationName = messageParser.getWSDLOperation();
             
-            resourceId = serviceName.toString() + "#";
-            if (serviceName.getNamespaceURI() != null 
-                && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
-                resourceId += operationName.getLocalPart();
+            if (serviceName != null) {
+                resourceId = serviceName.toString() + "#";
+                if (serviceName.getNamespaceURI() != null 
+                    && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
+                    resourceId += operationName.getLocalPart();
+                } else {
+                    resourceId += operationName.toString();
+                }
             } else {
-                resourceId += operationName.toString();
+                resourceId = operationName.toString();
             }
         } else {
             resourceId = messageParser.getResourceURI(sendFullRequestURL);

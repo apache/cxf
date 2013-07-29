@@ -38,7 +38,7 @@ public class CXFMessageParser {
     }
     
     public boolean isSOAPService() {
-        return !(getWSDLService() == null || getWSDLOperation() == null);
+        return getWSDLOperation() != null;
     }
 
     public QName getWSDLOperation() {
