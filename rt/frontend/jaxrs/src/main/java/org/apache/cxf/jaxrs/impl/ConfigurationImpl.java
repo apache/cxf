@@ -40,9 +40,14 @@ public class ConfigurationImpl implements Configuration {
         this.runtimeType = rt;
     }
     
-    public ConfigurationImpl(RuntimeType rt, Configuration parent) {
-        props = parent.getProperties();
-        this.runtimeType = rt;
+    public ConfigurationImpl(Configuration parent) {
+        if (parent != null) {
+            this.props.putAll(parent.getProperties());
+            this.runtimeType = parent.getRuntimeType();
+            for (Object o : parent.getInstances()) {
+                providers.put(o, parent.getContracts(o.getClass()));
+            }
+        }
     }
     
     @Override

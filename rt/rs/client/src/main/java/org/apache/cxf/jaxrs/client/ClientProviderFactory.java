@@ -67,6 +67,10 @@ public final class ClientProviderFactory extends ProviderFactory {
         Endpoint e = m.getExchange().get(Endpoint.class);
         return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
     }
+    
+    public static ClientProviderFactory getInstance(Endpoint e) {
+        return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
+    }
        
     private static synchronized ClientProviderFactory initBaseFactory(Bus bus) {
         ClientProviderFactory factory = (ClientProviderFactory)bus.getProperty(SHARED_CLIENT_FACTORY);

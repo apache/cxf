@@ -130,6 +130,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testGetBookWebTargetProvider() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders";
+        Client client = ClientBuilder.newClient();
+        client.register(new BookInfoReader());
+        BookInfo book = client.target(address).path("simple")
+            .request("application/xml").get(BookInfo.class);
+        assertEquals(124L, book.getId());
+        
+    }
+    
+    @Test
     public void testGetBookSyncWithAsync() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBook(address, true);

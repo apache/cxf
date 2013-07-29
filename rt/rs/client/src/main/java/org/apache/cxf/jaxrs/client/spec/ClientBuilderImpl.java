@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Configurable;
@@ -118,6 +119,9 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     @Override
     public ClientBuilder withConfig(Configuration cfg) {
+        if (cfg.getRuntimeType() != RuntimeType.CLIENT) {
+            throw new IllegalArgumentException();
+        }
         configImpl = new ClientConfigurableImpl<ClientBuilder>(this, cfg);
         return this;
     }

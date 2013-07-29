@@ -19,9 +19,10 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -33,7 +34,9 @@ import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 
@@ -41,7 +44,7 @@ public class ClientImpl implements Client {
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
     private boolean closed;
-    private WebClient template;
+    private Set<WebClient> baseClients = new HashSet<WebClient>();
     public ClientImpl(Configuration config,
                       TLSConfiguration secConfig) {
         configImpl = new ClientConfigurableImpl<Client>(this, config);
@@ -51,10 +54,10 @@ public class ClientImpl implements Client {
     @Override
     public void close() {
         if (!closed) {
-            if (template != null) {
-                template.close();
-                template = null;
+            for (WebClient wc : baseClients) {
+                wc.close();
             }
+            baseClients = null;
             closed = true;
         }
         
@@ -69,28 +72,9 @@ public class ClientImpl implements Client {
     @Override
     public WebTarget target(UriBuilder builder) {
         checkClosed();
-        initWebClientTemplateIfNeeded();
-        return new WebTargetImpl(builder, getConfiguration(), template);
+        return new WebTargetImpl(builder, getConfiguration());
     }
-
-    private void initWebClientTemplateIfNeeded() {
-        // This is done to make the creation of individual targets really easy
-        if (template == null) {
-            JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-            // To make sure that each Client has its own set of JAX-RS providers
-            // We may end up having CXF AbstractClient specific ClientProviderFactory
-            // if even WebTargets will be allowed to have its own specific providers
-            
-            bean.setAddress("http://tempuri/" + UUID.randomUUID().toString());
-            
-            Configuration cfg = getConfiguration();
-            bean.setProperties(cfg.getProperties());
-            bean.setProviders(new LinkedList<Object>(cfg.getInstances()));
-            
-            this.template = bean.createWebClient();
-            WebClient.getConfig(template).getConduit();
-        }
-    }
+    
     
     @Override
     public WebTarget target(String address) {
@@ -179,25 +163,51 @@ public class ClientImpl implements Client {
     class WebTargetImpl implements WebTarget {
         private Configurable<WebTarget> configImpl;
         private UriBuilder uriBuilder;
-        private WebClient template; 
+        private WebClient targetClient;
+        
         
         public WebTargetImpl(UriBuilder uriBuilder, 
-                              Configuration config, 
-                              WebClient template) {
-            configImpl = new ClientConfigurableImpl<WebTarget>(this, config);
+                             Configuration config) {
+            this(uriBuilder, config, null);
+        }
+        
+        public WebTargetImpl(UriBuilder uriBuilder, 
+                             Configuration config,
+                             WebClient targetClient) {
+            this.configImpl = new ClientConfigurableImpl<WebTarget>(this, config);
             this.uriBuilder = uriBuilder.clone();
-            this.template = template;
+            this.targetClient = targetClient;
         }
         
         @Override
         public Builder request() {
-            checkClosed();
-            WebClient wc = WebClient.fromClient(template).to(uriBuilder.build().toString(), false);
-            WebClient.getConfig(wc).getRequestContext().putAll(
-                configImpl.getConfiguration().getProperties());
-            // Can WebTarget have its own specific providers ?
+            ClientImpl.this.checkClosed();
             
-            return new InvocationBuilderImpl(wc);
+            initTargetClientIfNeeded(); 
+            // API gives options to register new providers between 
+            // individual requests (sigh) or on per-WebTarget basis so we have to
+            // register directly on the endpoint-specific ClientFactory
+            ClientProviderFactory pf = 
+                ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
+            pf.setUserProviders(new LinkedList<Object>(configImpl.getConfiguration().getInstances()));
+            
+            // Collect the properties which may have been reset the requests
+            WebClient.getConfig(targetClient).getRequestContext().putAll(configImpl.getConfiguration().getProperties());
+            
+            // start building the invocation
+            return new InvocationBuilderImpl(WebClient.fromClient(targetClient));
+        }
+        
+        private void initTargetClientIfNeeded() {
+            URI uri = uriBuilder.build();
+            if (targetClient == null) {
+                JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+                bean.setAddress(uri.toString());
+                targetClient = bean.createWebClient();
+                ClientImpl.this.baseClients.add(targetClient);
+            } else if (!targetClient.getCurrentURI().equals(uri)) {
+                targetClient.to(uri.toString(), false);
+            }
         }
 
         @Override
@@ -212,13 +222,13 @@ public class ClientImpl implements Client {
 
         @Override
         public URI getUri() {
-            checkClosed();
+            ClientImpl.this.checkClosed();
             return uriBuilder.build();
         }
 
         @Override
         public UriBuilder getUriBuilder() {
-            checkClosed();
+            ClientImpl.this.checkClosed();
             return uriBuilder.clone();
         }
 
@@ -259,7 +269,7 @@ public class ClientImpl implements Client {
 
         @Override
         public WebTarget resolveTemplates(Map<String, Object> templatesMap, boolean encodeSlash) {
-            checkClosed();
+            ClientImpl.this.checkClosed();
             if (templatesMap.isEmpty()) {
                 return this;
             }
@@ -268,7 +278,7 @@ public class ClientImpl implements Client {
 
         @Override
         public WebTarget resolveTemplatesFromEncoded(Map<String, Object> templatesMap) {
-            checkClosed();
+            ClientImpl.this.checkClosed();
             if (templatesMap.isEmpty()) {
                 return this;
             }
@@ -276,7 +286,20 @@ public class ClientImpl implements Client {
         }
         
         private WebTarget newWebTarget(UriBuilder newBuilder) {
-            return new WebTargetImpl(newBuilder, getConfiguration(), template);
+            boolean complete = false;
+            if (targetClient != null) {
+                try {
+                    newBuilder.build();
+                    complete = true;
+                } catch (UriBuilderException ex) {
+                    //the builder still has unresolved vars
+                }
+            }
+            if (!complete) {
+                return new WebTargetImpl(newBuilder, getConfiguration());
+            }
+            WebClient newClient = WebClient.fromClient(targetClient);
+            return new WebTargetImpl(newBuilder, getConfiguration(), newClient);
         }
         
         @Override

@@ -35,14 +35,16 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     private C configurable;
     private Class<?>[] supportedProviderClasses;
     public ConfigurableImpl(C configurable, RuntimeType rt, Class<?>[] supportedProviderClasses) {
-        this(configurable, rt, supportedProviderClasses, null);
+        this(configurable, supportedProviderClasses, new ConfigurationImpl(rt));
     }
     
-    public ConfigurableImpl(C configurable, RuntimeType rt, 
-                            Class<?>[] supportedProviderClasses, Configuration config) {
+    public ConfigurableImpl(C configurable, Class<?>[] supportedProviderClasses, Configuration config) {
+        this(configurable, supportedProviderClasses);
+        this.config = config instanceof ConfigurationImpl ? (ConfigurationImpl)config : new ConfigurationImpl(config);
+    }
+    
+    private ConfigurableImpl(C configurable, Class<?>[] supportedProviderClasses) {
         this.configurable = configurable;
-        this.config = config == null ? new ConfigurationImpl(rt) 
-            : new ConfigurationImpl(rt, config);
         this.supportedProviderClasses = supportedProviderClasses;
     }
     
