@@ -54,15 +54,15 @@ import org.opensaml.xacml.ctx.SubjectType;
  * "{serviceNamespace}serviceName", "{operationNamespace}operationName" and resource URI are also
  * sent to simplify processing at the PDP side.
  * 
- * For a REST service the request URL is the resource. You can also configure the ability to 
- * send the truncated request URI instead for a SOAP or REST service. The current DateTime is 
+ * For a REST service the request URI is the resource. You can also configure the ability to 
+ * send the full request URL instead for a SOAP or REST service. The current DateTime is 
  * also sent in an Environment, however this can be disabled via configuration.
  */
 public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     
     private String action = "execute";
     private boolean sendDateTime = true;
-    private boolean sendFullRequestURL = true;
+    private boolean sendFullRequestURL;
     
     /**
      * Set a new Action String to use

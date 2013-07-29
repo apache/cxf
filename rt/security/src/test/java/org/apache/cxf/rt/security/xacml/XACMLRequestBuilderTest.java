@@ -56,7 +56,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
         String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
         msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
-        String resourceURL = "https://localhost:8080/doubleit";
+        String resourceURL = "/doubleit";
         msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
@@ -79,7 +79,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
         String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
         msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
-        String resourceURL = "https://localhost:8080/doubleit";
+        String resourceURL = "/doubleit";
         msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
@@ -114,8 +114,8 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
         String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
         msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
-        String resourceURL = "https://localhost:8080/doubleit";
-        msg.put(Message.REQUEST_URL, resourceURL);
+        String resourceURL = "/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -143,8 +143,8 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
         String service = "{http://www.example.org/contract/DoubleIt}DoubleItService";
         msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
-        String resourceURL = "https://localhost:8080/doubleit";
-        msg.put(Message.REQUEST_URL, resourceURL);
+        String resourceURL = "/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -198,8 +198,8 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
         String service = "{http://www.example.org/contract/DoubleItService}DoubleItService";
         msg.put(Message.WSDL_SERVICE, QName.valueOf(service));
-        String resourceURL = "https://localhost:8080/doubleit";
-        msg.put(Message.REQUEST_URL, resourceURL);
+        String resourceURL = "/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -250,8 +250,8 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         };
         
         MessageImpl msg = new MessageImpl();
-        String resourceURL = "https://localhost:8080/doubleit";
-        msg.put(Message.REQUEST_URL, resourceURL);
+        String resourceURL = "/doubleit";
+        msg.put(Message.REQUEST_URI, resourceURL);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
         RequestType request = 
@@ -272,7 +272,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
     }
     
     @org.junit.Test
-    public void testRESTResourceTruncatedURI() throws Exception {
+    public void testRESTResourceFullURL() throws Exception {
         // Mock up a request
         Principal principal = new Principal() {
             public String getName() {
@@ -287,7 +287,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         msg.put(Message.REQUEST_URI, resourceURI);
         
         XACMLRequestBuilder builder = new DefaultXACMLRequestBuilder();
-        ((DefaultXACMLRequestBuilder)builder).setSendFullRequestURL(false);
+        ((DefaultXACMLRequestBuilder)builder).setSendFullRequestURL(true);
         RequestType request = 
             builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
@@ -301,7 +301,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         
         for (AttributeType attribute : resource.getAttributes()) {
             String attributeValue = attribute.getAttributeValues().get(0).getValue();
-            assertEquals(attributeValue, resourceURI);
+            assertEquals(attributeValue, resourceURL);
         }
     }
 }
