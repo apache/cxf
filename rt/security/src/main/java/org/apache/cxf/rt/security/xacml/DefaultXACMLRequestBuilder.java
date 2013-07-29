@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.w3c.dom.Element;
+import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
@@ -42,20 +43,26 @@ import org.opensaml.xacml.ctx.SubjectType;
 
 
 /**
- * This class constructs an XACML Request given a Principal, list of roles and MessageContext,
+ * This class constructs an XACML Request given a Principal, list of roles and MessageContext, 
  * following the SAML 2.0 profile of XACML 2.0. The principal name is inserted as the Subject ID,
- * and the list of roles associated with that principal are inserted as Subject roles.
+ * and the list of roles associated with that principal are inserted as Subject roles. The action
+ * to send defaults to "execute". 
  * 
- * The action to send defaults to "execute". The resource is the WSDL Operation for a SOAP service,
- * and the request URI for a REST service. You can also configure the ability to send the full
- * request URL instead for a SOAP or REST service. The current DateTime is also sent in an
- * Environment, however this can be disabled via configuration. 
+ * For a SOAP Service, the resource-id Attribute refers to the 
+ * "{serviceNamespace}serviceName#{operationNamespace}operationName" String (shortened to
+ * "{serviceNamespace}serviceName#operationName" if the namespaces are identical). The 
+ * "{serviceNamespace}serviceName", "{operationNamespace}operationName" and resource URI are also
+ * sent to simplify processing at the PDP side.
+ * 
+ * For a REST service the request URL is the resource. You can also configure the ability to 
+ * send the truncated request URI instead for a SOAP or REST service. The current DateTime is 
+ * also sent in an Environment, however this can be disabled via configuration.
  */
 public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     
     private String action = "execute";
     private boolean sendDateTime = true;
-    private boolean sendFullRequestURL;
+    private boolean sendFullRequestURL = true;
     
     /**
      * Set a new Action String to use
@@ -78,7 +85,6 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         Principal principal, List<String> roles, Message message
     ) throws Exception {
         String issuer = getIssuer(message);
-        List<String> resources = getResources(message);
         String actionToUse = getAction(message);
         
         // Subject
@@ -118,22 +124,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         SubjectType subjectType = RequestComponentBuilder.createSubjectType(attributes, null);
         
         // Resource
-        attributes.clear();
-        for (String resource : resources) {
-            if (resource != null) {
-                AttributeValueType resourceAttributeValue = 
-                    RequestComponentBuilder.createAttributeValueType(resource);
-                AttributeType resourceAttribute = 
-                    RequestComponentBuilder.createAttributeType(
-                            XACMLConstants.RESOURCE_ID,
-                            XACMLConstants.XS_STRING,
-                            null,
-                            Collections.singletonList(resourceAttributeValue)
-                    );
-                attributes.add(resourceAttribute);
-            }
-        }
-        ResourceType resourceType = RequestComponentBuilder.createResourceType(attributes, null);
+        ResourceType resourceType = createResourceType(message);
         
         // Action
         AttributeValueType actionAttributeValue = 
@@ -179,6 +170,50 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         return request;
     }
     
+    private ResourceType createResourceType(Message message) {
+        List<AttributeType> attributes = new ArrayList<AttributeType>();
+        
+        // Resource-id
+        String resourceId = null;
+        boolean isSoapService = isSOAPService(message);
+        if (isSoapService) {
+            QName serviceName = getWSDLService(message);
+            QName operationName = getWSDLOperation(message);
+            
+            resourceId = serviceName.toString() + "#";
+            if (serviceName.getNamespaceURI() != null 
+                && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
+                resourceId += operationName.getLocalPart();
+            } else {
+                resourceId += operationName.toString();
+            }
+        } else {
+            resourceId = getResourceURI(message, sendFullRequestURL);
+        }
+        
+        attributes.add(createAttribute(XACMLConstants.RESOURCE_ID, XACMLConstants.XS_STRING, null,
+                                           resourceId));
+        
+        if (isSoapService) {
+            // WSDL Service
+            QName wsdlService = getWSDLService(message);
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_SERVICE_ID, XACMLConstants.XS_STRING, null,
+                                           wsdlService.toString()));
+            
+            // WSDL Operation
+            QName wsdlOperation = getWSDLOperation(message);
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_OPERATION_ID, XACMLConstants.XS_STRING, null,
+                                           wsdlOperation.toString()));
+            
+            // Resource URI
+            String resourceURI = getResourceURI(message, sendFullRequestURL);
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_URI_ID, XACMLConstants.XS_STRING, null,
+                                           resourceURI));
+        }
+        
+        return RequestComponentBuilder.createResourceType(attributes, null);
+    }
+    
     /**
      * Get the Issuer of the SAML Assertion
      */
@@ -211,46 +246,43 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     /**
      * Whether to send the full Request URL as the resource or not. If set to true,
      * the full Request URL will be sent for both a JAX-WS and JAX-RS service. If set
-     * to false (the default), a JAX-WS service will send the "{namespace}operation" QName,
-     * and a JAX-RS service will send the RequestURI (i.e. minus the initial https:<ip> prefix).
+     * to false, a JAX-WS service will send the "{namespace}operation" QName, and a 
+     * JAX-RS service will send the RequestURI (i.e. minus the initial https:<ip> prefix).
      */
     public void setSendFullRequestURL(boolean sendFullRequestURL) {
         this.sendFullRequestURL = sendFullRequestURL;
     }
     
-    
-    /**
-     * Return the Resources that have been inserted into the Request
-     */
-    public List<String> getResources(Message message) {
-        if (message == null) {
-            return Collections.emptyList();
+    private boolean isSOAPService(Message message) {
+        return !(getWSDLService(message) == null || getWSDLOperation(message) == null);
+    }
+
+    private QName getWSDLOperation(Message message) {
+        if (message != null && message.get(Message.WSDL_OPERATION) != null) {
+            return (QName)message.get(Message.WSDL_OPERATION);
         }
-        List<String> resources = new ArrayList<String>();
-        if (message.get(Message.WSDL_OPERATION) != null) {
-            resources.add(message.get(Message.WSDL_OPERATION).toString());
-        } 
-        if (sendFullRequestURL) {
-            resources.add((String)message.get(Message.REQUEST_URL));
-        } else {
-            resources.add((String)message.get(Message.REQUEST_URI));
-        }
-        return resources;
+        return null;
     }
     
-    public String getResource(Message message) {
-        if (message == null) {
-            return null;
+    private QName getWSDLService(Message message) {
+        if (message != null && message.get(Message.WSDL_SERVICE) != null) {
+            return (QName)message.get(Message.WSDL_SERVICE);
         }
-        String resource = null;
-        if (sendFullRequestURL) {
-            resource = (String)message.get(Message.REQUEST_URL);
-        } else if (message.get(Message.WSDL_OPERATION) != null) {
-            resource = message.get(Message.WSDL_OPERATION).toString();
-        } else {
-            resource = (String)message.get(Message.REQUEST_URI);
+        return null;
+    }
+    
+    /**
+     * @param fullRequestURL Whether to send the full Request URL as the resource or not. If set to true, the
+     *        full Request URL will be sent for both a JAX-WS and JAX-RS service. If set to false, a JAX-WS 
+     *        service will send the "{namespace}operation" QName, and a JAX-RS service
+     *        will send the RequestURI (i.e. minus the initial https:<ip> prefix)
+     */
+    private String getResourceURI(Message message, boolean fullRequestURL) {
+        String property = fullRequestURL ? Message.REQUEST_URL : Message.REQUEST_URI;
+        if (message != null && message.get(property) != null) {
+            return (String)message.get(property);
         }
-        return resource;
+        return null;
     }
     
     private String getAction(Message message) {
@@ -262,4 +294,14 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         }
         return actionToUse;
     }
+    
+    private AttributeType createAttribute(String id, String type, String issuer, List<AttributeValueType> values) {
+        return RequestComponentBuilder.createAttributeType(id, type, issuer, values);
+    }
+    
+    private AttributeType createAttribute(String id, String type, String issuer, String value) {
+        return createAttribute(id, type, issuer, 
+                               Collections.singletonList(RequestComponentBuilder.createAttributeValueType(value)));
+    }
+
 }

@@ -129,19 +129,11 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         // Handle any Obligations returned by the PDP
         handleObligations(request, principal, message, result);
         
-        List<String> resources = requestBuilder.getResources(message);
         if (result != null 
-            && (result.getDecision().getDecision() == DecisionType.DECISION.Permit)) {
-            if (result.getResourceId() == null) {
-                LOG.fine("XACML authorization permitted");
-                return true;
-            }
-            for (String resource : resources) {
-                if (resource.equals(result.getResourceId())) {
-                    LOG.fine("XACML authorization permitted");
-                    return true;
-                }
-            }
+            && (result.getDecision().getDecision() == DecisionType.DECISION.Permit)
+            && (result.getResourceId() == null)) {
+            LOG.fine("XACML authorization permitted");
+            return true;
         }
         LOG.fine("XACML authorization not permitted:");
         if (result != null && result.getStatus() != null) {
