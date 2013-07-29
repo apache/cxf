@@ -180,12 +180,16 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             QName serviceName = getWSDLService(message);
             QName operationName = getWSDLOperation(message);
             
-            resourceId = serviceName.toString() + "#";
-            if (serviceName.getNamespaceURI() != null 
-                && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
-                resourceId += operationName.getLocalPart();
+            if (serviceName != null) {
+                resourceId = serviceName.toString() + "#";
+                if (serviceName.getNamespaceURI() != null 
+                    && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
+                    resourceId += operationName.getLocalPart();
+                } else {
+                    resourceId += operationName.toString();
+                }
             } else {
-                resourceId += operationName.toString();
+                resourceId = operationName.toString();
             }
         } else {
             resourceId = getResourceURI(message, sendFullRequestURL);
@@ -254,7 +258,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     }
     
     private boolean isSOAPService(Message message) {
-        return !(getWSDLService(message) == null || getWSDLOperation(message) == null);
+        return getWSDLOperation(message) != null;
     }
 
     private QName getWSDLOperation(Message message) {
