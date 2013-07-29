@@ -111,8 +111,10 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         if (isSoapService) {
             // WSDL Service
             QName wsdlService = messageParser.getWSDLService();
-            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_SERVICE_ID, XACMLConstants.XS_STRING, null,
+            if (wsdlService != null) {
+                attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_SERVICE_ID, XACMLConstants.XS_STRING, null,
                                            wsdlService.toString()));
+            }
             
             // WSDL Operation
             QName wsdlOperation = messageParser.getWSDLOperation();
