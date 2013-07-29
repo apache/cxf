@@ -44,7 +44,7 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataWriter.class);
 
     private AegisDatabinding databinding;
     private Collection<Attachment> attachments;
