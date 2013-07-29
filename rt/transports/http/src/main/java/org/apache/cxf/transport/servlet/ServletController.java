@@ -44,12 +44,17 @@ import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
 public class ServletController {
+    
+    public static final String AUTH_SERVICE_LIST = "auth.service.list";
+    public static final String AUTH_SERVICE_LIST_REALM = "auth.service.list.realm";
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
     private static final String HTTP_PREFIX = "http";
-    
+        
     protected boolean isHideServiceList;
+    protected boolean isAuthServiceListPage;
     protected boolean disableAddressUpdates;
+    protected String authServiceListPageRealm;
     protected String forcedBaseAddress;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
     protected ServletConfig servletConfig;
@@ -112,6 +117,17 @@ public class ServletController {
         if (!StringUtils.isEmpty(hideServiceList)) {
             this.isHideServiceList = Boolean.valueOf(hideServiceList);
         }
+        
+        String authServiceListPage = servletConfig.getInitParameter("service-list-page-authenticate");
+        if (!StringUtils.isEmpty(authServiceListPage)) {
+            this.isAuthServiceListPage = Boolean.valueOf(authServiceListPage);
+        }
+        
+        String authServiceListRealm = servletConfig.getInitParameter("service-list-page-authenticate-realm");
+        if (!StringUtils.isEmpty(authServiceListRealm)) {
+            this.authServiceListPageRealm = authServiceListRealm;
+        }
+        
         String isDisableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
         if (!StringUtils.isEmpty(isDisableAddressUpdates)) {
             this.disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
@@ -141,6 +157,9 @@ public class ServletController {
                     || request.getRequestURI().endsWith(serviceListRelativePath + "/")
                     || StringUtils.isEmpty(pathInfo)
                     || "/".equals(pathInfo))) {
+                    if (isAuthServiceListPage) {
+                        setAuthServiceListPageAttribute(request);
+                    }
                     setBaseURLAttribute(request);
                     serviceListGenerator.service(request, res);
                 } else {
@@ -202,6 +221,12 @@ public class ServletController {
         } catch (IOException e) {
             throw new ServletException(e);
         }
+    }
+
+    private void setAuthServiceListPageAttribute(HttpServletRequest request) {
+        request.setAttribute(ServletController.AUTH_SERVICE_LIST, this.isAuthServiceListPage);
+        request.setAttribute(ServletController.AUTH_SERVICE_LIST_REALM, this.authServiceListPageRealm);
+        
     }
 
     public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,

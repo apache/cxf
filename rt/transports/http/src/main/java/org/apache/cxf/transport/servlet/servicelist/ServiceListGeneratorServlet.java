@@ -39,6 +39,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.servlet.ServletController;
 
 public class ServiceListGeneratorServlet extends HttpServlet {
     private static final long serialVersionUID = -113918058557537996L;
@@ -67,6 +68,19 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     @Override
     public void service(HttpServletRequest request, 
                         HttpServletResponse response) throws ServletException, IOException {
+        Object obj = request.getAttribute(ServletController.AUTH_SERVICE_LIST);
+        boolean isAuthServiceList = false;
+        if (obj != null) {
+            isAuthServiceList = Boolean.valueOf(obj.toString());
+        }
+        if (isAuthServiceList) {
+            String authServiceListRealm = (String)request.getAttribute(ServletController.AUTH_SERVICE_LIST_REALM);
+            ServiceListJAASAuthenticator authenticator = new ServiceListJAASAuthenticator();
+            authenticator.setRealm(authServiceListRealm);
+            if (!authenticator.authenticate(request, response)) {
+                return;
+            }
+        }
         PrintWriter writer = response.getWriter();
         AbstractDestination[] destinations = destinationRegistry.getSortedDestinations();
         if (request.getParameter("stylesheet") != null) {
