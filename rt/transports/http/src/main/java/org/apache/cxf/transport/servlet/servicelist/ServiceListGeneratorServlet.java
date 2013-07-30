@@ -80,6 +80,8 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             if (!authenticator.authenticate(request, response)) {
                 return;
             }
+            request.removeAttribute(ServletController.AUTH_SERVICE_LIST);
+            request.removeAttribute(ServletController.AUTH_SERVICE_LIST_REALM);
         }
         PrintWriter writer = response.getWriter();
         AbstractDestination[] destinations = destinationRegistry.getSortedDestinations();
