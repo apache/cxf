@@ -40,7 +40,8 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     
     public ConfigurableImpl(C configurable, Class<?>[] supportedProviderClasses, Configuration config) {
         this(configurable, supportedProviderClasses);
-        this.config = config instanceof ConfigurationImpl ? (ConfigurationImpl)config : new ConfigurationImpl(config);
+        this.config = config instanceof ConfigurationImpl 
+            ? (ConfigurationImpl)config : new ConfigurationImpl(config, supportedProviderClasses);
     }
     
     private ConfigurableImpl(C configurable, Class<?>[] supportedProviderClasses) {
@@ -93,7 +94,8 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, int bindingPriority) {
-        return doRegister(createProvider(providerClass), bindingPriority, supportedProviderClasses);
+        return doRegister(ConfigurationImpl.createProvider(providerClass), 
+                          bindingPriority, supportedProviderClasses);
     }
 
     @Override
@@ -103,7 +105,7 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, Map<Class<?>, Integer> contracts) {
-        return register(createProvider(providerClass), contracts);
+        return register(ConfigurationImpl.createProvider(providerClass), contracts);
     }
     
     protected C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
@@ -113,22 +115,10 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
             feature.configure(new FeatureContextImpl(this));
             return configurable;
         }
-        for (Class<?> contract : contracts) {
-            if (contract.isAssignableFrom(provider.getClass())) {
-                config.register(provider, contract, bindingPriority);
-            }
-        }
+        config.register(provider, bindingPriority, contracts);
         return configurable;
     }
 
-    private static Object createProvider(Class<?> cls) {
-        try {
-            return cls.newInstance();
-        } catch (Throwable ex) {
-            throw new RuntimeException(ex); 
-        }
-    }
-    
     public static class FeatureContextImpl implements FeatureContext {
         private Configurable<?> cfg;
         public FeatureContextImpl(Configurable<?> cfg) {

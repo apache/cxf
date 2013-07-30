@@ -46,6 +46,7 @@ public class ClientConfigurableImpl<C extends Configurable<C>> extends Configura
     }
     
     public ClientConfigurableImpl(C configurable, Configuration config) {
-        super(configurable, CLIENT_FILTER_INTERCEPTOR_CLASSES, new ConfigurationImpl(config));
+        super(configurable, CLIENT_FILTER_INTERCEPTOR_CLASSES, 
+              new ConfigurationImpl(config, CLIENT_FILTER_INTERCEPTOR_CLASSES));
     }
 }

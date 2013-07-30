@@ -29,6 +29,8 @@ import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+
 public class ConfigurationImpl implements Configuration {
     private Map<String, Object> props = new HashMap<String, Object>();
     private RuntimeType runtimeType;
@@ -40,13 +42,29 @@ public class ConfigurationImpl implements Configuration {
         this.runtimeType = rt;
     }
     
-    public ConfigurationImpl(Configuration parent) {
+    public ConfigurationImpl(Configuration parent, Class<?>[] defaultContracts) {
         if (parent != null) {
             this.props.putAll(parent.getProperties());
             this.runtimeType = parent.getRuntimeType();
+            
+            Set<Class<?>> providerClasses = new HashSet<Class<?>>(parent.getClasses());
             for (Object o : parent.getInstances()) {
-                providers.put(o, parent.getContracts(o.getClass()));
+                registerParentProvider(o, parent);
+                providerClasses.remove(o.getClass());
             }
+            for (Class<?> cls : providerClasses) {
+                registerParentProvider(createProvider(cls), parent);
+            }
+            
+        }
+    }
+    
+    private void registerParentProvider(Object o, Configuration parent) {
+        Map<Class<?>, Integer> contracts = parent.getContracts(o.getClass());
+        if (contracts != null) {
+            providers.put(o, contracts);
+        } else {
+            register(o, AnnotationUtils.getBindingPriority(o.getClass()));
         }
     }
     
@@ -136,12 +154,25 @@ public class ConfigurationImpl implements Configuration {
         features.add(f);
     }
     
-    public void register(Object provider, Class<?> contract, int bindingPriority) {
+    
+    public void register(Object provider, int bindingPriority, Class<?>... contracts) {
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
             metadata = new HashMap<Class<?>, Integer>();
             providers.put(provider, metadata);
         }
-        metadata.put(contract, bindingPriority);
+        for (Class<?> contract : contracts) {
+            if (contract.isAssignableFrom(provider.getClass())) {
+                metadata.put(contract, bindingPriority);
+            }
+        }
+    }
+    
+    public static Object createProvider(Class<?> cls) {
+        try {
+            return cls.newInstance();
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex); 
+        }
     }
 }
