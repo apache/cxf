@@ -44,4 +44,21 @@ public interface XACMLRequestBuilder {
         Principal principal, List<String> roles, Message message
     ) throws Exception;
     
+    /**
+     * Return the list of Resources that have been inserted into the Request.
+     * 
+     * @param message The Message from which to retrieve the resource
+     * @return the list of Resources that have been inserted into the Request
+     */
+    @Deprecated
+    List<String> getResources(Message message);
+    
+    /**
+     * Return the Resource that has been inserted into the Request.
+     * 
+     * @param message The Message from which to retrieve the resource
+     * @return the Resource that has been inserted into the Request
+     */
+    @Deprecated
+    String getResource(Message message);
 }

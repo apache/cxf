@@ -259,6 +259,14 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         this.sendFullRequestURL = sendFullRequestURL;
     }
     
+    public List<String> getResources(Message message) {
+        return Collections.emptyList();
+    }
+    
+    public String getResource(Message message) {
+        return null;
+    }
+    
     private boolean isSOAPService(Message message) {
         return getWSDLOperation(message) != null;
     }
