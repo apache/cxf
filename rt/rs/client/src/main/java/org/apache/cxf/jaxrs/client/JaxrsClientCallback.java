@@ -44,6 +44,10 @@ class JaxrsClientCallback<T> extends ClientCallback {
         this.responseClass = responseClass;
     }
     
+    public InvocationCallback<T> getHandler() {
+        return handler;
+    }
+    
     public Type getOutGenericType() {
         return outType;
     }
@@ -63,6 +67,36 @@ class JaxrsClientCallback<T> extends ClientCallback {
     public Future<T> createFuture() {
         return new JaxrsResponseCallback<T>(this);
     }
+    
+    
+    @SuppressWarnings("unchecked")
+    public void handleResponse(Map<String, Object> ctx, Object[] res) {
+        context = ctx;
+        result = res;
+        if (handler != null) {
+            handler.completed((T)res[0]);
+        }
+        done = true;
+        synchronized (this) {
+            notifyAll();
+        }
+    }
+
+    @Override
+    public void handleException(Map<String, Object> ctx, final Throwable ex) {
+        context = ctx;
+        exception = ex;
+        if (handler != null) {
+            handler.failed(exception);
+        }
+        done = true;
+        synchronized (this) {
+            notifyAll();
+        }
+    }
+    
+    
+    
     static class JaxrsResponseCallback<T> implements Future<T> {
         JaxrsClientCallback<T> callback;
         public JaxrsResponseCallback(JaxrsClientCallback<T> cb) {
@@ -112,33 +146,6 @@ class JaxrsClientCallback<T> extends ClientCallback {
         }
         public boolean isDone() {
             return callback.isDone();
-        }
-    }
-    
-    
-    @SuppressWarnings("unchecked")
-    public void handleResponse(Map<String, Object> ctx, Object[] res) {
-        context = ctx;
-        result = res;
-        if (handler != null) {
-            handler.completed((T)res[0]);
-        }
-        done = true;
-        synchronized (this) {
-            notifyAll();
-        }
-    }
-
-    @Override
-    public void handleException(Map<String, Object> ctx, final Throwable ex) {
-        context = ctx;
-        exception = ex;
-        if (handler != null) {
-            handler.failed(exception);
-        }
-        done = true;
-        synchronized (this) {
-            notifyAll();
         }
     }
 }
