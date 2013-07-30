@@ -43,6 +43,10 @@
                       xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
                     <sp:XPath xmlns:wsa="http://www.w3.org/2005/08/addressing">//wsa:To</sp:XPath>
                 </sp:EncryptedElements>
+                <sp:SignedParts
+                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:Body />
+                </sp:SignedParts>
                 <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
             </wsp:All>
         </wsp:ExactlyOne>

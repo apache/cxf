@@ -43,6 +43,10 @@
                     xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
                     <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing"/>
                 </sp:RequiredParts>
+                <sp:SignedParts
+                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:Body />
+                </sp:SignedParts>
                 <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
             </wsp:All>
         </wsp:ExactlyOne>

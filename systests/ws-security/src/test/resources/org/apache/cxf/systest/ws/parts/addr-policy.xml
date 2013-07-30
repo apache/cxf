@@ -39,6 +39,10 @@
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
                 </sp:AsymmetricBinding>
+                <sp:SignedParts
+                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:Body />
+                </sp:SignedParts>
                 <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
             </wsp:All>
         </wsp:ExactlyOne>

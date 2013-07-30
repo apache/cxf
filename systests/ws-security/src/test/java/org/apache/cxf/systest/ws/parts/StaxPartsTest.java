@@ -59,9 +59,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
     
-    // TODO See WSS-471
     @org.junit.Test
-    @org.junit.Ignore
     public void testRequiredParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -96,8 +94,8 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "RequiredParts: No header element";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "must be present";
+            assertTrue(ex.getMessage().contains(error));
         }
 
         // Streaming
@@ -106,7 +104,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "RequiredParts: No header element";
+            // String error = "must be present";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -191,9 +189,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-471
     @org.junit.Test
-    @org.junit.Ignore
     public void testEncryptedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -228,8 +224,8 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "EncryptedParts";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "Body must be encrypted";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         // Streaming
@@ -238,7 +234,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "EncryptedParts";
+            // String error = "Body must be encrypted";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -252,8 +248,8 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "EncryptedParts";
-            // (ex.getMessage().contains(error));
+            String error = "To must be encrypted";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         // Streaming
@@ -262,7 +258,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "EncryptedParts";
+            // String error = "To must be encrypted";
             // assertTrue(ex.getMessage().contains(error));
         }
         
