@@ -34,6 +34,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 
@@ -57,7 +58,7 @@ public class LocalConduit extends AbstractConduit {
     }
     
     public void prepare(final Message message) throws IOException {
-        if (!Boolean.TRUE.equals(message.get(DIRECT_DISPATCH))) {
+        if (!MessageUtils.isTrue(message.getContextualProperty(DIRECT_DISPATCH))) {
             dispatchViaPipe(message);
         } else {
             // prepare the stream here
@@ -71,7 +72,7 @@ public class LocalConduit extends AbstractConduit {
 
     @Override
     public void close(Message message) throws IOException {
-        if (Boolean.TRUE.equals(message.get(DIRECT_DISPATCH))
+        if (MessageUtils.isTrue(message.getContextualProperty(DIRECT_DISPATCH))
             && !Boolean.TRUE.equals(message.get(Message.INBOUND_MESSAGE))) {
             dispatchDirect(message);
         } 
