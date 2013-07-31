@@ -53,7 +53,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     private boolean createdFromModel; 
     private String consumesTypes;
     private String producesTypes;
-    private List<String> nameBindings = Collections.emptyList();
+    private Set<String> nameBindings = Collections.emptySet();
     private ClassResourceInfo parent;
     private Set<String> injectedSubInstances = new HashSet<String>();
     public ClassResourceInfo(ClassResourceInfo cri) {
@@ -188,7 +188,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
         return Collections.unmodifiableCollection(subResources.values());
     }
     
-    public List<String> getNameBindings() {
+    public Set<String> getNameBindings() {
         if (parent == null) {
             return nameBindings;
         } else {
@@ -196,7 +196,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
         }
     }
     
-    public void setNameBindings(List<String> names) {
+    public void setNameBindings(Set<String> names) {
         nameBindings = names;
     }
     

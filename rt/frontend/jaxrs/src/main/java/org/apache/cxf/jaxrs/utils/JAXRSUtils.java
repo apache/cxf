@@ -1693,7 +1693,7 @@ public final class JAXRSUtils {
     public static boolean runContainerRequestFilters(ServerProviderFactory pf, 
                                                      Message m, 
                                                      boolean preMatch, 
-                                                     List<String> names,
+                                                     Set<String> names,
                                                      boolean sub) {
         List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
             ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);

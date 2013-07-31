@@ -23,8 +23,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -134,11 +133,11 @@ public final class AnnotationUtils {
         Priority b = getClassAnnotation(providerCls, Priority.class);
         return b == null ? Priorities.USER : b.value();
     }
-    public static List<String> getNameBindings(Annotation[] targetAnns) {
+    public static Set<String> getNameBindings(Annotation[] targetAnns) {
         if (targetAnns.length == 0) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        List<String> names = new LinkedList<String>();
+        Set<String> names = new LinkedHashSet<String>();
         for (Annotation a : targetAnns) {
             NameBinding nb = a.annotationType().getAnnotation(NameBinding.class);
             if (nb != null) {

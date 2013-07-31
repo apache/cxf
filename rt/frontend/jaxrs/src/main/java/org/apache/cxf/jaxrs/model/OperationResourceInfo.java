@@ -20,9 +20,9 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -47,7 +47,7 @@ public class OperationResourceInfo {
     private String defaultParamValue;
     private List<Parameter> parameters;
     private boolean oneway; 
-    private List<String> nameBindings = new LinkedList<String>();
+    private Set<String> nameBindings = new LinkedHashSet<String>();
 
     public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
         this(mInvoke, mInvoke, cri);
@@ -106,13 +106,12 @@ public class OperationResourceInfo {
         nameBindings.addAll(names);
     }
     
-    public List<String> getNameBindings() {
-        List<String> criNames = classResourceInfo.getNameBindings();
+    public Set<String> getNameBindings() {
+        Set<String> criNames = classResourceInfo.getNameBindings();
         if (criNames.isEmpty()) {
             return nameBindings;
         } else {
-            List<String> all = new ArrayList<String>(criNames.size() + nameBindings.size());
-            all.addAll(criNames);
+            Set<String> all = new LinkedHashSet<String>(criNames);
             all.addAll(nameBindings);
             return all;
         }

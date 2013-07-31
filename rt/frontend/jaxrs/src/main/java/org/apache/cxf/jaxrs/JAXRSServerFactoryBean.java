@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -101,9 +101,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      */
     public void setApplication(Application app) {
         appProvider = new ProviderInfo<Application>(app, getBus());
-        List<String> appNameBindings = AnnotationUtils.getNameBindings(app.getClass().getAnnotations());
+        Set<String> appNameBindings = AnnotationUtils.getNameBindings(app.getClass().getAnnotations());
         for (ClassResourceInfo cri : getServiceFactory().getClassResourceInfo()) {
-            List<String> clsNameBindings = new LinkedList<String>(appNameBindings);
+            Set<String> clsNameBindings = new LinkedHashSet<String>(appNameBindings);
             clsNameBindings.addAll(AnnotationUtils.getNameBindings(cri.getServiceClass().getAnnotations()));
             cri.setNameBindings(clsNameBindings);
         }

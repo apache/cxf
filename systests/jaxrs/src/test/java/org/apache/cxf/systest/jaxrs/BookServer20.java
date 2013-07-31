@@ -30,7 +30,9 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -302,8 +304,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
     }
     
-    @Priority(2)
-    public static class PostMatchDynamicContainerResponseFilter implements ContainerResponseFilter {
+    public static class PostMatchDynamicContainerResponseFilter 
+        implements ContainerRequestFilter, ContainerResponseFilter {
 
         @Override
         public void filter(ContainerRequestContext requestContext,
@@ -312,6 +314,12 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("DynamicResponse", "Dynamic");
+            
+        }
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            throw new RuntimeException();
             
         }
         
@@ -407,7 +415,10 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void configure(ResourceInfo resourceInfo, FeatureContext configurable) {
             
             configurable.register(new PreMatchDynamicContainerRequestFilter());
-            configurable.register(new PostMatchDynamicContainerResponseFilter());
+            Map<Class<?>, Integer> contracts = new HashMap<Class<?>, Integer>();
+            contracts.put(ContainerResponseFilter.class, 2);
+            configurable.register(new PostMatchDynamicContainerResponseFilter(), 
+                                  contracts);
         }
         
     }

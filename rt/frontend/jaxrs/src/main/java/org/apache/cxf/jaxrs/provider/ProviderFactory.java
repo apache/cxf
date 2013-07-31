@@ -31,11 +31,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
@@ -65,6 +65,7 @@ import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -87,9 +88,9 @@ public abstract class ProviderFactory {
     private static final String BUS_PROVIDERS_ALL = "org.apache.cxf.jaxrs.bus.providers";
     
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors = 
-        new LinkedHashMap<NameKey, ProviderInfo<ReaderInterceptor>>();
+        new NameKeyMap<ProviderInfo<ReaderInterceptor>>(true);
     protected Map<NameKey, ProviderInfo<WriterInterceptor>> writerInterceptors = 
-        new LinkedHashMap<NameKey, ProviderInfo<WriterInterceptor>>();
+        new NameKeyMap<ProviderInfo<WriterInterceptor>>(true);
     
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
@@ -333,7 +334,7 @@ public abstract class ProviderFactory {
                                                             Annotation[] parameterAnnotations,
                                                             MediaType mediaType,
                                                             Message m,
-                                                            List<String> names) {
+                                                            Set<String> names) {
         MessageBodyReader<T> mr = createMessageBodyReader(bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
@@ -368,7 +369,7 @@ public abstract class ProviderFactory {
                                                                           Annotation[] parameterAnnotations,
                                                                           MediaType mediaType,
                                                                           Message m,
-                                                                          List<String> names) {
+                                                                          Set<String> names) {
         MessageBodyWriter<T> mw = createMessageBodyWriter(bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
@@ -510,11 +511,11 @@ public abstract class ProviderFactory {
                 contextProviders.add((ProviderInfo<ContextProvider<?>>)provider); 
             }
             
-            if (ReaderInterceptor.class.isAssignableFrom(providerCls)) {
+            if (filterContractSupported(provider, providerCls, ReaderInterceptor.class)) {
                 readInts.add((ProviderInfo<ReaderInterceptor>)provider);
             }
             
-            if (WriterInterceptor.class.isAssignableFrom(providerCls)) {
+            if (filterContractSupported(provider, providerCls, WriterInterceptor.class)) {
                 writeInts.add((ProviderInfo<WriterInterceptor>)provider);
             }
             
@@ -531,8 +532,8 @@ public abstract class ProviderFactory {
         sortWriters();
         sortContextResolvers();
         
-        mapContainerFilters(readerInterceptors, readInts, true);
-        mapContainerFilters(writerInterceptors, writeInts, true);
+        mapInterceptorFilters(readerInterceptors, readInts, true);
+        mapInterceptorFilters(writerInterceptors, writeInts, true);
         
         injectContextProxies(messageReaders, messageWriters, contextResolvers, 
             readerInterceptors.values(), writerInterceptors.values());
@@ -860,11 +861,11 @@ public abstract class ProviderFactory {
     }
 
     protected static <T> List<ProviderInfo<T>> getPostMatchContainerFilters(Map<NameKey, ProviderInfo<T>> boundFilters,
-                                                                          List<String> names) {
+                                                                          Set<String> names) {
         if (boundFilters.isEmpty()) {
             return Collections.emptyList();
         }
-        names = names == null ? Collections.<String>emptyList() : names;
+        names = names == null ? Collections.<String>emptySet() : names;
         
         MultivaluedMap<ProviderInfo<T>, String> map = 
             new MetadataMap<ProviderInfo<T>, String>();
@@ -977,32 +978,32 @@ public abstract class ProviderFactory {
         return getGenericInterfaces(cls.getSuperclass(), expectedClass);
     }
     
-    protected static class BindingPriorityComparator extends AbstactBindingPriorityComparator {
-        public BindingPriorityComparator(boolean ascending) {
-            super(ascending);
-        }
-    }
-    
-    private abstract static class AbstactBindingPriorityComparator implements 
-        Comparator<ProviderInfo<?>> {
+    protected static class AbstractPriorityComparator {
     
         private boolean ascending; 
         
-        protected AbstactBindingPriorityComparator(boolean ascending) {
+        protected AbstractPriorityComparator(boolean ascending) {
             this.ascending = ascending; 
         }
         
-        public int compare(ProviderInfo<?> p1, ProviderInfo<?> p2) {
-            Integer b1Value = getBindingPriorityValue(p1);
-            Integer b2Value = getBindingPriorityValue(p2);
-            
+        protected int compare(Integer b1Value, Integer b2Value) {
             int result = b1Value.compareTo(b2Value);
             return ascending ? result : result * -1;      
         }
         
-        private int getBindingPriorityValue(ProviderInfo<?> p) {
-            return AnnotationUtils.getBindingPriority(p.getProvider().getClass());
+    }
+    
+    protected static class BindingPriorityComparator extends AbstractPriorityComparator
+        implements Comparator<ProviderInfo<?>> {
+    
+        public BindingPriorityComparator(boolean ascending) {
+            super(ascending); 
         }
+        
+        public int compare(ProviderInfo<?> p1, ProviderInfo<?> p2) {
+            return compare(getFilterPriority(p1), getFilterPriority(p2));
+        }
+        
     }
     
     static class ContextResolverProxy<T> implements ContextResolver<T> {
@@ -1050,7 +1051,7 @@ public abstract class ProviderFactory {
     
     protected static class NameKey { 
         private String name;
-        private int bindingPriority;
+        private Integer bindingPriority;
         public NameKey(String name, int priority) {
             this.name = name;
             this.bindingPriority = priority;
@@ -1060,49 +1061,92 @@ public abstract class ProviderFactory {
             return name;
         }
         
-        public int getPriority() {
+        public Integer getPriority() {
             return bindingPriority;
+        }
+                
+        public String toString() {
+            return name + ":" + bindingPriority;
         }
     }
     
-    protected static <T> void mapContainerFilters(Map<NameKey, ProviderInfo<T>> map,
-                                                List<ProviderInfo<T>> postMatchFilters,
-                                                boolean ascending) {
+    protected static <T> void mapInterceptorFilters(Map<NameKey, ProviderInfo<T>> map,
+                                                    List<ProviderInfo<T>> filters,
+                                                    boolean ascending) {
         
-        Collections.sort(postMatchFilters, new PostMatchFilterComparator(ascending));
-        for (ProviderInfo<T> p : postMatchFilters) { 
-            List<String> names = AnnotationUtils.getNameBindings(
-                p.getProvider().getClass().getAnnotations());
-            names = names.isEmpty() ? Collections.singletonList(DEFAULT_FILTER_NAME_BINDING) : names;
+        for (ProviderInfo<T> p : filters) { 
+            Set<String> names = getFilterNameBindings(p);
+            
+            int priority = getFilterPriority(p);
+            
             for (String name : names) {
-                map.put(new NameKey(name, AnnotationUtils.getBindingPriority(p.getProvider().getClass())), 
-                        p);
+                map.put(new NameKey(name, priority), p);
             }
         }
         
     }
     
-    protected static class PostMatchFilterComparator extends BindingPriorityComparator {
-        public PostMatchFilterComparator(boolean ascending) {
+    protected static Set<String> getFilterNameBindings(ProviderInfo<?> p) {
+        Set<String> names = null;
+        if (p instanceof FilterProviderInfo) {
+            names = ((FilterProviderInfo<?>)p).getNameBinding();
+        }
+        if (names == null) {
+            names = AnnotationUtils.getNameBindings(p.getProvider().getClass().getAnnotations());
+        }
+        if (names.isEmpty()) {
+            names = Collections.singleton(DEFAULT_FILTER_NAME_BINDING);
+        }
+        return names;
+    }
+    
+    protected static int getFilterPriority(ProviderInfo<?> p) {
+        return p instanceof FilterProviderInfo ? ((FilterProviderInfo<?>)p).getPriority()
+            : AnnotationUtils.getBindingPriority(p.getProvider().getClass());
+    }
+    
+    protected static class NameKeyComparator extends AbstractPriorityComparator
+        implements Comparator<NameKey> {
+
+        public NameKeyComparator(boolean ascending) {
             super(ascending);
         }
         
         @Override
-        public int compare(ProviderInfo<?> p1, ProviderInfo<?> p2) {
-            int result = super.compare(p1, p2);
-            if (result == 0) {
-                Integer namesSize1 = 
-                    AnnotationUtils.getNameBindings(p1.getProvider().getClass().getAnnotations()).size();
-                Integer namesSize2 = 
-                    AnnotationUtils.getNameBindings(p2.getProvider().getClass().getAnnotations()).size();
-                
-                // if we have two filters with the same binding priority, 
-                // then put a filter with more name bindings upfront 
-                // (this effectively puts name bound filters before global ones)
-                result = namesSize1.compareTo(namesSize2) * -1;
+        public int compare(NameKey key1, NameKey key2) {
+            int result = compare(key1.getPriority(), key2.getPriority());
+            if (result != 0) {
+                return result;
             }
-            return result; 
+            return compare(key1.hashCode(), key2.hashCode());
         }
+        
+    }
+    
+    protected static class NameKeyMap<T> extends TreeMap<NameKey, T> {
+        private static final long serialVersionUID = -4352258671270502204L;
+
+        public NameKeyMap(boolean ascending) {
+            super(new NameKeyComparator(ascending));
+        }
+    }
+    
+    protected static boolean filterContractSupported(ProviderInfo<?> provider, 
+                                                     Class<?> providerCls, 
+                                                     Class<?> contract) {
+        boolean result = false;
+        if (contract.isAssignableFrom(providerCls)) {
+            List<Class<?>> actualContracts = null;
+            if (provider instanceof FilterProviderInfo) {    
+                actualContracts = ((FilterProviderInfo<?>)provider).getSupportedContracts();
+            }
+            if (actualContracts != null) {
+                result = actualContracts.contains(contract); 
+            } else {
+                result = true;
+            }
+        }
+        return result;
     }
     
     protected List<ProviderInfo<? extends Object>> prepareProviders(Object[] providers,
@@ -1117,7 +1161,9 @@ public abstract class ProviderFactory {
                 Map<Class<?>, Object> values = CastUtils.cast(application == null ? null 
                     : Collections.singletonMap(Application.class, application.getProvider()));
                 theProviders.add(createProviderFromConstructor((Constructor<?>)o, values));
-            } else {
+            } else if (o instanceof ProviderInfo) {
+                theProviders.add((ProviderInfo<?>)o);
+            } else {    
                 theProviders.add(new ProviderInfo<Object>(o, getBus()));
             }
         }

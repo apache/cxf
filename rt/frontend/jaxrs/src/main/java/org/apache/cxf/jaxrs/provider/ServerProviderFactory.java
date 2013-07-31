@@ -19,11 +19,11 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,7 @@ import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -61,11 +62,12 @@ import org.apache.cxf.message.Message;
 
 public final class ServerProviderFactory extends ProviderFactory {
     private static final String SHARED_SERVER_FACTORY = "jaxrs.shared.server.factory";
-    private static final Class<?>[] SERVER_FILTER_INTERCEPTOR_CLASSES = 
-        new Class<?>[] {ContainerRequestFilter.class,
-                        ContainerResponseFilter.class,
-                        ReaderInterceptor.class,
-                        WriterInterceptor.class};
+    private static final Set<Class<?>> SERVER_FILTER_INTERCEPTOR_CLASSES = 
+        new HashSet<Class<?>>(Arrays.<Class<?>>asList(ContainerRequestFilter.class,
+                                                      ContainerResponseFilter.class,
+                                                      ReaderInterceptor.class,
+                                                      WriterInterceptor.class));
+    
     private static final String WADL_PROVIDER_NAME = "org.apache.cxf.jaxrs.model.wadl.WadlGenerator";
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
@@ -73,9 +75,9 @@ public final class ServerProviderFactory extends ProviderFactory {
     private List<ProviderInfo<ContainerRequestFilter>> preMatchContainerRequestFilters = 
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
     private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters = 
-        new LinkedHashMap<NameKey, ProviderInfo<ContainerRequestFilter>>();
+        new NameKeyMap<ProviderInfo<ContainerRequestFilter>>(true);
     private Map<NameKey, ProviderInfo<ContainerResponseFilter>> postMatchContainerResponseFilters = 
-        new LinkedHashMap<NameKey, ProviderInfo<ContainerResponseFilter>>();
+        new NameKeyMap<ProviderInfo<ContainerResponseFilter>>(false);
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
     private List<DynamicFeature> dynamicFeatures = new LinkedList<DynamicFeature>();
@@ -135,7 +137,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         return getContainerRequestFilters(preMatchContainerRequestFilters, true);
     }
     
-    public List<ProviderInfo<ContainerRequestFilter>> getPostMatchContainerRequestFilters(List<String> names) {
+    public List<ProviderInfo<ContainerRequestFilter>> getPostMatchContainerRequestFilters(Set<String> names) {
         return getPostMatchContainerFilters(postMatchContainerRequestFilters, names);
         
     }
@@ -162,7 +164,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
     
-    public List<ProviderInfo<ContainerResponseFilter>> getContainerResponseFilters(List<String> names) {
+    public List<ProviderInfo<ContainerResponseFilter>> getContainerResponseFilters(Set<String> names) {
         return getPostMatchContainerFilters(postMatchContainerResponseFilters, 
                                             names);
     }
@@ -200,6 +202,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         return (ExceptionMapper<T>) candidates.get(0);
     }
     
+    
     @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(Object... providers) {
@@ -213,13 +216,13 @@ public final class ServerProviderFactory extends ProviderFactory {
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
-                        
-            if (ContainerRequestFilter.class.isAssignableFrom(providerCls)) {
+            
+            if (filterContractSupported(provider, providerCls, ContainerRequestFilter.class)) {
                 addContainerRequestFilter(postMatchRequestFilters, 
                                           (ProviderInfo<ContainerRequestFilter>)provider);
             }
             
-            if (ContainerResponseFilter.class.isAssignableFrom(providerCls)) {
+            if (filterContractSupported(provider, providerCls, ContainerResponseFilter.class)) {
                 postMatchResponseFilters.add((ProviderInfo<ContainerResponseFilter>)provider); 
             }
             
@@ -237,8 +240,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         
         Collections.sort(preMatchContainerRequestFilters, new BindingPriorityComparator(true));
-        mapContainerFilters(postMatchContainerRequestFilters, postMatchRequestFilters, true);
-        mapContainerFilters(postMatchContainerResponseFilters, postMatchResponseFilters, false);
+        mapInterceptorFilters(postMatchContainerRequestFilters, postMatchRequestFilters, true);
+        mapInterceptorFilters(postMatchContainerResponseFilters, postMatchResponseFilters, false);
         
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
@@ -358,7 +361,6 @@ public final class ServerProviderFactory extends ProviderFactory {
         private Configurable<FeatureContext> configImpl;    
         private OperationResourceInfo ori;
         private String nameBinding;
-        private boolean bindingSet;
         
         public MethodFeatureContextImpl(OperationResourceInfo ori) {
             this.ori = ori;
@@ -420,130 +422,37 @@ public final class ServerProviderFactory extends ProviderFactory {
             return configImpl.register(object, map);
         }
         
-        FeatureContext doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
+        FeatureContext doRegister(Object provider, int priority, Class<?>... contracts) {
         
             if (provider instanceof Feature) {
                 ((Feature)provider).configure(this);
                 return this;
             }
             
-            boolean setIsNeeded = false;
-            for (Class<?> contract : contracts) {
-                if (contract == ContainerRequestFilter.class && provider instanceof ContainerRequestFilter) {
-                    if (isPrematching(provider.getClass())) {
-                        addToInterceptors(preMatchContainerRequestFilters, provider, bindingPriority, true);
-                    } else {
-                        postMatchContainerRequestFilters = 
-                            addToPostMatching(postMatchContainerRequestFilters, provider, bindingPriority, true);
-                        setIsNeeded = true;
-                    }
-                }
-                if (contract == ContainerResponseFilter.class && provider instanceof ContainerResponseFilter) {
-                    postMatchContainerResponseFilters = 
-                        addToPostMatching(postMatchContainerResponseFilters, provider, bindingPriority, false);
-                    setIsNeeded = true;    
-                }
-                if (contract == ReaderInterceptor.class && provider instanceof ReaderInterceptor) {
-                    readerInterceptors = 
-                        addToPostMatching(readerInterceptors, provider, bindingPriority, true);
-                    setIsNeeded = true;
-                }
-                if (contract == WriterInterceptor.class && provider instanceof WriterInterceptor) {
-                    writerInterceptors = 
-                        addToPostMatching(writerInterceptors, provider, bindingPriority, false);
-                    setIsNeeded = true;
-                }
-            }
+            List<Class<?>> actualContracts = new LinkedList<Class<?>>();
             
-            if (setIsNeeded && !bindingSet) {
-                ori.addNameBindings(Collections.singletonList(nameBinding));
-                bindingSet = true;
+            for (Class<?> contract : contracts) {
+                if (SERVER_FILTER_INTERCEPTOR_CLASSES.contains(contract)
+                    && contract.isAssignableFrom(provider.getClass())) {
+                    actualContracts.add(contract);
+                }
             }
-
+            if (!actualContracts.isEmpty()) {
+                registerUserProvider(new FilterProviderInfo<Object>(provider, 
+                    getBus(),
+                    nameBinding,
+                    priority,
+                    actualContracts));
+                ori.addNameBindings(Collections.singletonList(nameBinding));
+            }
             return this;
         }
         
-        @SuppressWarnings("unchecked")
-        private <T> void addToInterceptors(List<ProviderInfo<T>> providers, Object provider, 
-                                           int priority, boolean asc) {
-            int size = providers.size();
-            if (size > 0) {
-                for (int i = 0; i < size; i++) {
-                    int providerPriority = AnnotationUtils.getBindingPriority(
-                        providers.get(i).getProvider().getClass());
-                    if (asc) {
-                        if (priority < providerPriority || i + 1 == size) {
-                            int index = priority < providerPriority ? i : i + 1;
-                            providers.add(index, (ProviderInfo<T>)newProvider(provider));
-                            break;
-                        }
-                    } else if (priority > providerPriority || i + 1 == size) {
-                        int index = priority > providerPriority ? i : i + 1; 
-                        providers.add(index, (ProviderInfo<T>)newProvider(provider));
-                        break;
-                    }
-                }
-            } else {
-                providers.add((ProviderInfo<T>)newProvider(provider));
-            }
-        }
-        
-        private <T> ProviderInfo<T> newProvider(T provider) {
-            ProviderInfo<T> newProvider = new ProviderInfo<T>(provider, getBus());
-            injectContextProxiesIntoProvider(newProvider);
-            return newProvider;
-        }
-        
-        @SuppressWarnings("unchecked")
-        private <T> Map<NameKey, ProviderInfo<T>> addToPostMatching(
-            Map<NameKey, ProviderInfo<T>> map, Object provider, int priority, boolean asc) {
-            Map<NameKey, ProviderInfo<T>> newMap = new LinkedHashMap<NameKey, ProviderInfo<T>>();
-            
-            Iterator<Map.Entry<NameKey, ProviderInfo<T>>> it = map.entrySet().iterator();
-            if (it.hasNext()) {
-                boolean added = false;
-                while (it.hasNext()) {
-                    Map.Entry<NameKey, ProviderInfo<T>> entry = it.next();
-                    int providerPriority = entry.getKey().getPriority();
-                    // this surely can be collapsed further
-                    if (!added && asc && (priority < providerPriority || !it.hasNext())) {
-                        addNewProvider(newMap, entry, provider, priority, providerPriority >= priority);
-                        added = true;
-                    } else if (!added && !asc && (priority > providerPriority || !it.hasNext())) {
-                        addNewProvider(newMap, entry, provider, priority, priority > providerPriority);
-                        added = true;
-                    } else {
-                        newMap.put(entry.getKey(), entry.getValue());
-                    }   
-                }
-            } else {
-                newMap.put(new NameKey(nameBinding, priority), (ProviderInfo<T>)newProvider(provider));
-            }
-            return newMap;
-            
-                
-        }
-        
-        @SuppressWarnings("unchecked")
-        private <T> void addNewProvider(Map<NameKey, ProviderInfo<T>> newMap, 
-                                        Map.Entry<NameKey, ProviderInfo<T>> entry,
-                                        Object provider, 
-                                        int priority,
-                                        boolean first) {
-            if (first) {
-                newMap.put(new NameKey(nameBinding, priority), (ProviderInfo<T>)newProvider(provider));
-                newMap.put(entry.getKey(), entry.getValue());
-            } else {
-                newMap.put(entry.getKey(), entry.getValue());
-                newMap.put(new NameKey(nameBinding, priority), (ProviderInfo<T>)newProvider(provider));
-            }
-        }
-        
-        
     }
+    
     private static class MethodFeatureContextConfigurable extends ConfigurableImpl<FeatureContext> {
         protected MethodFeatureContextConfigurable(MethodFeatureContextImpl mc) {
-            super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES);
+            super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES.toArray(new Class<?>[]{}));
         }
         @Override
         protected FeatureContext doRegister(Object provider, int bindingPriority, Class<?>... contracts) {

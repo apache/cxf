@@ -224,8 +224,8 @@ public class ClassResourceInfoTest extends Assert {
         Application app = new TestApplication();
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, true, true);
         ClassResourceInfo cri = bean.getServiceFactory().getClassResourceInfo().get(0);
-        List<String> names = cri.getNameBindings();
-        assertEquals(Collections.singletonList(CustomNameBinding.class.getName()), names);
+        Set<String> names = cri.getNameBindings();
+        assertEquals(Collections.singleton(CustomNameBinding.class.getName()), names);
     }
     
     @Target({ ElementType.TYPE, ElementType.METHOD })
