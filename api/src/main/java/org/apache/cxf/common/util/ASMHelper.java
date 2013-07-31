@@ -38,6 +38,7 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 public class ASMHelper {
     protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<Class<?>, String>();
     protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<Class<?>, String>();
+    protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<Class<?>, Integer>();
     
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> LOADER_MAP 
         = new WeakIdentityHashMap<Class<?>, WeakReference<TypeHelperClassLoader>>();
@@ -127,6 +128,11 @@ public class ASMHelper {
         public static int IFNONNULL = 0;
         public static int SIPUSH = 0;
         public static int INVOKESTATIC = 0;
+        public static int ICONST_0;
+        public static int LCONST_0;
+        public static int FCONST_0;
+        public static int DCONST_0;
+        
         //CHECKSTYLE:ON
         static {
             try {
@@ -139,6 +145,15 @@ public class ASMHelper {
             } catch (Throwable e) {
                 //ignore
             }
+            
+            PRIMITIVE_ZERO_MAP.put(Byte.TYPE, Opcodes.ICONST_0);
+            PRIMITIVE_ZERO_MAP.put(Boolean.TYPE, Opcodes.ICONST_0);
+            PRIMITIVE_ZERO_MAP.put(Long.TYPE, Opcodes.LCONST_0);
+            PRIMITIVE_ZERO_MAP.put(Integer.TYPE, Opcodes.ICONST_0);
+            PRIMITIVE_ZERO_MAP.put(Short.TYPE, Opcodes.ICONST_0);
+            PRIMITIVE_ZERO_MAP.put(Character.TYPE, Opcodes.ICONST_0);
+            PRIMITIVE_ZERO_MAP.put(Float.TYPE, Opcodes.FCONST_0);
+            PRIMITIVE_ZERO_MAP.put(Double.TYPE, Opcodes.DCONST_0);
         }
     }
     
