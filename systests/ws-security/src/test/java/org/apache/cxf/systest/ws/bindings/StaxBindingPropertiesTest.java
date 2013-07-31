@@ -494,9 +494,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - See WSS-470
     @org.junit.Test
-    @org.junit.Ignore
     public void testTokenProtection() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -513,6 +511,12 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTokenProtectionPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
+        
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         // This should fail, as the property is not enabled
@@ -520,13 +524,22 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
         
+        // DOM
         try {
             port.doubleIt(25);
             fail("Failure expected on not protecting the token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "Layout does not match the requirements";
+            String error = "BinarySecurityToken must be signed by its signature";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not protecting the token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "BinarySecurityToken must be signed by its signature";
             // assertTrue(ex.getMessage().contains(error));
-            System.out.println("EX: " + ex.getMessage());
         }
         
         ((java.io.Closeable)port).close();
