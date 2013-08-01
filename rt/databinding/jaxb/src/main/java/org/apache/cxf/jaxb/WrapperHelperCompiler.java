@@ -38,7 +38,6 @@ final class WrapperHelperCompiler extends ASMHelper {
     final Object objectFactory;
     final ClassWriter cw;
 
-    
     private WrapperHelperCompiler(Class<?> wrapperType,
                                   Method setMethods[],
                                   Method getMethods[],
@@ -263,22 +262,39 @@ final class WrapperHelperCompiler extends ASMHelper {
                 
                 if (tp.isPrimitive()) {
                     mv.visitTypeInsn(Opcodes.CHECKCAST, NONPRIMITIVE_MAP.get(tp));
+                    Label l45 = createLabel();
+                    Label l46 = createLabel();
+                    mv.visitInsn(Opcodes.DUP);
+                    mv.visitJumpInsn(Opcodes.IFNULL, l45);
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, NONPRIMITIVE_MAP.get(tp), 
                                        tp.getName() + "Value", "()" + PRIMITIVE_MAP.get(tp));
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                                       periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V");
+                    mv.visitJumpInsn(Opcodes.GOTO, l46);
+                    mv.visitLabel(l45);
+                    mv.visitInsn(Opcodes.POP);
+                    mv.visitLabel(l46);
                 } else if (JAXBElement.class.isAssignableFrom(tp)) {
                     mv.visitTypeInsn(Opcodes.CHECKCAST,
                                      periodToSlashes(jaxbMethods[x].getParameterTypes()[0].getName()));
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, periodToSlashes(objectFactoryClass.getName()),
                                        jaxbMethods[x].getName(),
                                        getMethodSignature(jaxbMethods[x]));
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                                       periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V");
                 } else if (tp.isArray()) { 
                     mv.visitTypeInsn(Opcodes.CHECKCAST, getClassCode(tp));
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                                       periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V");
                 } else {
                     mv.visitTypeInsn(Opcodes.CHECKCAST, periodToSlashes(tp.getName()));
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                                       periodToSlashes(wrapperType.getName()),
+                                       setMethods[x].getName(), "(" + getClassCode(tp) + ")V");
                 }
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                   periodToSlashes(wrapperType.getName()),
-                                   setMethods[x].getName(), "(" + getClassCode(tp) + ")V");
             }
         }
         
