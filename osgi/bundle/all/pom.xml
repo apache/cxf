@@ -464,6 +464,7 @@
                             <createSourcesJar>${createSourcesJar}</createSourcesJar>
                             <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <dependencyReducedPomLocation>${basedir}/target/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                             <filters>
                                 <filter>
                                     <artifact>${project.groupId}:${project.artifactId}</artifact>
