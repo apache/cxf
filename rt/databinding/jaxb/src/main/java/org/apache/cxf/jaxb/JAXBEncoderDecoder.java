@@ -26,6 +26,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -37,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +52,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
@@ -357,9 +362,31 @@ public final class JAXBEncoderDecoder {
             } else {
                 LOG.warning("Schema associated with " + namespace + " is null");
             }
+            List<Member> combinedMembers = new ArrayList<Member>();
+
+
             for (Field f : Utils.getFields(cls, accessType)) {
                 XmlAttribute at = f.getAnnotation(XmlAttribute.class);
                 if (at == null) {
+                    combinedMembers.add(f);
+                }
+            }
+            for (Method m : Utils.getGetters(cls, accessType)) {
+                combinedMembers.add(m);
+            }
+
+            XmlAccessorOrder xmlAccessorOrder = cls.getAnnotation(XmlAccessorOrder.class);
+            if (xmlAccessorOrder != null && xmlAccessorOrder.value().equals(XmlAccessOrder.ALPHABETICAL)) {
+                Collections.sort(combinedMembers, new Comparator<Member>() {
+                    public int compare(Member m1, Member m2) {
+                        return m1.getName().compareTo(m2.getName());
+                    }
+                });
+            }
+
+            for (Member member : combinedMembers) {
+                if (member instanceof Field) {
+                    Field f = (Field)member;
                     QName fname = new QName(namespace, f.getName());
                     ReflectionUtil.setAccessible(f);
                     if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
@@ -368,18 +395,18 @@ public final class JAXBEncoderDecoder {
                         Object o = Utils.getFieldValue(f, elValue); 
                         writeObject(marshaller, writer, newJAXBElement(fname, String.class, o));
                     }
-                }
-            }
-            for (Method m : Utils.getGetters(cls, accessType)) {
-                int idx = m.getName().startsWith("get") ? 3 : 2;
-                String name = m.getName().substring(idx);
-                name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                QName mname = new QName(namespace, name);
-                if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
-                    writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
-                } else {
-                    Object o = Utils.getMethodValue(m, elValue); 
-                    writeObject(marshaller, writer, newJAXBElement(mname, String.class, o));
+                } else { // it's a Method
+                    Method m = (Method)member;
+                    int idx = m.getName().startsWith("get") ? 3 : 2;
+                    String name = m.getName().substring(idx);
+                    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+                    QName mname = new QName(namespace, name);
+                    if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
+                        writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
+                    } else {
+                        Object o = Utils.getMethodValue(m, elValue); 
+                        writeObject(marshaller, writer, new JAXBElement(mname, String.class, o));
+                    }
                 }
             }
 
