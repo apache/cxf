@@ -63,7 +63,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         BookStore localProxy = 
             JAXRSClientFactory.create("local://books", BookStore.class);
         
-        WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+        //WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         
         Book book = localProxy.getBook("123");
         assertEquals(123L, book.getId());
