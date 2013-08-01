@@ -30,11 +30,6 @@
         <version>2.6.10-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    <properties>
-        <cxf.osgi.import>
-            net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
-        </cxf.osgi.import>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -112,6 +107,7 @@
                             org.apache.cxf.*;version=${project.version},
                             javax.xml.ws*;version="[0.0,3)",
                             org.springframework.ldap*;resolution:=optional,
+                            net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
                             *
                         </Import-Package>
                         <Bundle-SymbolicName>org.apache.cxf.services.sts.core</Bundle-SymbolicName>
