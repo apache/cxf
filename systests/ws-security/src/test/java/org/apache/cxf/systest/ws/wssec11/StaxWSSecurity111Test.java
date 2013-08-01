@@ -81,14 +81,14 @@ public class StaxWSSecurity111Test extends WSSecurity11Common {
         String[] argv = new String[] {
             "A",
             "A-NoTimestamp",
-            // TODO See WSS-472 - "AD",
+            // TODO Derived - "AD",
             "A-ES",
-            // TODO See WSS-472 - "AD-ES",
+            // TODO Derived - "AD-ES",
             "UX",
             "UX-NoTimestamp",
-            // TODO See WSS-472 - "UXD",
+            // TODO Derived - "UXD",
             "UX-SEES",
-            // TODO See WSS-472 - "UXD-SEES",
+            // TODO Derived - "UXD-SEES",
         };
         runClientServer(argv, unrestrictedPoliciesInstalled, false, true);
     }

@@ -89,7 +89,7 @@ public class StaxWSSecurity112Test extends WSSecurity11Common {
                 "X-AES256",
                 "X-TripleDES",
                 /*
-                 * TODO See WSS-472
+                 * TODO Derived
                 "XD",
                 "XD-ES",
                 "XD-SEES",
@@ -100,7 +100,7 @@ public class StaxWSSecurity112Test extends WSSecurity11Common {
                 "X",
                 "X-NoTimestamp",
                 /*
-                 * TODO See WSS-472
+                 * TODO Derived
                 "XD",
                 "XD-ES",
                 "XD-SEES",
