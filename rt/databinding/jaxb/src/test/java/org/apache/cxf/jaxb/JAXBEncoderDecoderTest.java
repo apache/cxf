@@ -56,8 +56,13 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb_form.ObjectWithQualifiedElementElement;
 import org.apache.cxf.jaxb_misc.Base64WithDefaultValueType;
 import org.apache.cxf.jaxb_misc.ObjectFactory;
+import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxStreamFilter;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.apache.hello_world_soap_http.types.StringStruct;
@@ -428,6 +433,46 @@ public class JAXBEncoderDecoderTest extends Assert {
         assertEquals("Hello Test", ((GreetMe)obj).getRequestType());
     }
 
+    @Test
+    public void testMarshallExceptionWithOrder() throws Exception {
+        Document doc = DOMUtils.createDocument();
+        Element elNode = doc.createElementNS("http://cxf.apache.org",  "ExceptionRoot");
+        
+        OrderException exception = new OrderException("Mymessage");
+        exception.setAValue("avalue");
+        exception.setDetail("detail");
+        exception.setInfo1("info1");
+        exception.setInfo2("info2");
+        exception.setIntVal(10000);
+       
+        QName elName = new QName("http://cxf.apache.org", "OrderException");       
+        ServiceInfo serviceInfo = new ServiceInfo();
+        InterfaceInfo interfaceInfo = new InterfaceInfo(serviceInfo, null);
+        OperationInfo op = interfaceInfo.addOperation(new QName("http://cxf.apache.org", "operation"));     
+        MessageInfo message = new MessageInfo(op, null, null);
+        MessagePartInfo part = new MessagePartInfo(elName, message);
+        part.setElement(true);
+        part.setElementQName(elName);
+        part.setTypeClass(OrderException.class);
+            
+        JAXBContext exceptionContext = JAXBContext.newInstance(new Class[] {
+            OrderException.class,
+        });
+        JAXBEncoderDecoder.marshallException(exceptionContext.createMarshaller(), exception, part, elNode);
+        
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        StaxUtils.writeTo(elNode, bout);
+        int a = bout.toString().lastIndexOf("aValue");
+        int b = bout.toString().lastIndexOf("detail");
+        int c = bout.toString().lastIndexOf("info1");
+        int d = bout.toString().lastIndexOf("info2");
+        int e = bout.toString().lastIndexOf("intVal");
+        assertTrue(a < b);
+        assertTrue(b < c);
+        assertTrue(c < d);
+        assertTrue(d < e);
+    }
+    
     @Test
     public void testMarshallWithoutQNameInfo() throws Exception {
         GreetMe obj = new GreetMe();
