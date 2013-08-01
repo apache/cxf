@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client.spec;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,6 +40,7 @@ import javax.ws.rs.core.UriBuilderException;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 
 public class ClientImpl implements Client {
     private Configurable<Client> configImpl;
@@ -189,7 +191,19 @@ public class ClientImpl implements Client {
             // register directly on the endpoint-specific ClientFactory
             ClientProviderFactory pf = 
                 ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
-            pf.setUserProviders(new LinkedList<Object>(configImpl.getConfiguration().getInstances()));
+            List<Object> providers = new LinkedList<Object>();
+            Configuration cfg = configImpl.getConfiguration();
+            for (Object p : cfg.getInstances()) {
+                Map<Class<?>, Integer> contracts = cfg.getContracts(p.getClass());
+                if (contracts == null || contracts.isEmpty()) {
+                    providers.add(p);
+                } else {
+                    providers.add(
+                        new FilterProviderInfo<Object>(p, pf.getBus(), null, contracts));
+                }
+            }
+            
+            pf.setUserProviders(providers);
             
             // Collect the properties which may have been reset the requests
             WebClient.getConfig(targetClient).getRequestContext().putAll(configImpl.getConfiguration().getProperties());

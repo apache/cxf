@@ -116,7 +116,7 @@ public abstract class ProviderFactory {
         this.bus = bus;
     }
     
-    protected Bus getBus() {
+    public Bus getBus() {
         return bus;
     }
     
@@ -532,8 +532,8 @@ public abstract class ProviderFactory {
         sortWriters();
         sortContextResolvers();
         
-        mapInterceptorFilters(readerInterceptors, readInts, true);
-        mapInterceptorFilters(writerInterceptors, writeInts, true);
+        mapInterceptorFilters(readerInterceptors, readInts, ReaderInterceptor.class, true);
+        mapInterceptorFilters(writerInterceptors, writeInts, WriterInterceptor.class, true);
         
         injectContextProxies(messageReaders, messageWriters, contextResolvers, 
             readerInterceptors.values(), writerInterceptors.values());
@@ -995,13 +995,16 @@ public abstract class ProviderFactory {
     
     protected static class BindingPriorityComparator extends AbstractPriorityComparator
         implements Comparator<ProviderInfo<?>> {
-    
-        public BindingPriorityComparator(boolean ascending) {
+        private Class<?> providerCls;
+        
+        public BindingPriorityComparator(Class<?> providerCls, boolean ascending) {
             super(ascending); 
+            this.providerCls = providerCls;
         }
         
         public int compare(ProviderInfo<?> p1, ProviderInfo<?> p2) {
-            return compare(getFilterPriority(p1), getFilterPriority(p2));
+            return compare(getFilterPriority(p1, providerCls), 
+                           getFilterPriority(p2, providerCls));
         }
         
     }
@@ -1072,12 +1075,13 @@ public abstract class ProviderFactory {
     
     protected static <T> void mapInterceptorFilters(Map<NameKey, ProviderInfo<T>> map,
                                                     List<ProviderInfo<T>> filters,
+                                                    Class<?> providerCls,
                                                     boolean ascending) {
         
         for (ProviderInfo<T> p : filters) { 
             Set<String> names = getFilterNameBindings(p);
             
-            int priority = getFilterPriority(p);
+            int priority = getFilterPriority(p, providerCls);
             
             for (String name : names) {
                 map.put(new NameKey(name, priority), p);
@@ -1100,8 +1104,8 @@ public abstract class ProviderFactory {
         return names;
     }
     
-    protected static int getFilterPriority(ProviderInfo<?> p) {
-        return p instanceof FilterProviderInfo ? ((FilterProviderInfo<?>)p).getPriority()
+    protected static int getFilterPriority(ProviderInfo<?> p, Class<?> providerCls) {
+        return p instanceof FilterProviderInfo ? ((FilterProviderInfo<?>)p).getPriority(providerCls)
             : AnnotationUtils.getBindingPriority(p.getProvider().getClass());
     }
     
@@ -1136,7 +1140,7 @@ public abstract class ProviderFactory {
                                                      Class<?> contract) {
         boolean result = false;
         if (contract.isAssignableFrom(providerCls)) {
-            List<Class<?>> actualContracts = null;
+            Set<Class<?>> actualContracts = null;
             if (provider instanceof FilterProviderInfo) {    
                 actualContracts = ((FilterProviderInfo<?>)provider).getSupportedContracts();
             }

@@ -23,8 +23,6 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 
@@ -35,8 +33,6 @@ public class ClientConfigurableImpl<C extends Configurable<C>> extends Configura
     private static final Class<?>[] CLIENT_FILTER_INTERCEPTOR_CLASSES = 
         new Class<?>[] {ClientRequestFilter.class,
                         ClientResponseFilter.class,
-                        MessageBodyReader.class,
-                        MessageBodyWriter.class,
                         ReaderInterceptor.class,
                         WriterInterceptor.class};
     

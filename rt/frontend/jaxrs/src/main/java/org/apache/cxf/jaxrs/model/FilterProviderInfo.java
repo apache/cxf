@@ -20,7 +20,7 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
@@ -28,17 +28,14 @@ import org.apache.cxf.Bus;
 public class FilterProviderInfo<T> extends ProviderInfo<T> {
 
     private Set<String> nameBinding;
-    private int priority;
-    private List<Class<?>> supportedContracts;
+    private Map<Class<?>, Integer> supportedContracts;
     
     public FilterProviderInfo(T provider,
                               Bus bus,
                               String nameBinding,
-                              int priority,
-                              List<Class<?>> supportedContracts) {
+                              Map<Class<?>, Integer> supportedContracts) {
         super(provider, bus);
         this.nameBinding = Collections.singleton(nameBinding);
-        this.priority = priority;
         this.supportedContracts = supportedContracts;        
     }
 
@@ -46,12 +43,12 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
         return nameBinding;
     }
 
-    public int getPriority() {
-        return priority;
+    public int getPriority(Class<?> contract) {
+        return supportedContracts.get(contract);
     }
 
-    public List<Class<?>> getSupportedContracts() {
-        return supportedContracts;
+    public Set<Class<?>> getSupportedContracts() {
+        return supportedContracts.keySet();
     }
 
 }

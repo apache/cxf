@@ -49,22 +49,22 @@ public class ConfigurationImpl implements Configuration {
             
             Set<Class<?>> providerClasses = new HashSet<Class<?>>(parent.getClasses());
             for (Object o : parent.getInstances()) {
-                registerParentProvider(o, parent);
+                registerParentProvider(o, parent, defaultContracts);
                 providerClasses.remove(o.getClass());
             }
             for (Class<?> cls : providerClasses) {
-                registerParentProvider(createProvider(cls), parent);
+                registerParentProvider(createProvider(cls), parent, defaultContracts);
             }
             
         }
     }
     
-    private void registerParentProvider(Object o, Configuration parent) {
+    private void registerParentProvider(Object o, Configuration parent, Class<?>[] defaultContracts) {
         Map<Class<?>, Integer> contracts = parent.getContracts(o.getClass());
         if (contracts != null) {
             providers.put(o, contracts);
         } else {
-            register(o, AnnotationUtils.getBindingPriority(o.getClass()));
+            register(o, AnnotationUtils.getBindingPriority(o.getClass()), defaultContracts);
         }
     }
     
@@ -155,17 +155,29 @@ public class ConfigurationImpl implements Configuration {
     }
     
     
-    public void register(Object provider, int bindingPriority, Class<?>... contracts) {
+    private void register(Object provider, int bindingPriority, Class<?>... contracts) {
+        register(provider, initContractsMap(bindingPriority, contracts));
+    }
+    
+    public void register(Object provider, Map<Class<?>, Integer> contracts) {    
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
             metadata = new HashMap<Class<?>, Integer>();
             providers.put(provider, metadata);
         }
-        for (Class<?> contract : contracts) {
+        for (Class<?> contract : contracts.keySet()) {
             if (contract.isAssignableFrom(provider.getClass())) {
-                metadata.put(contract, bindingPriority);
+                metadata.put(contract, contracts.get(contract));
             }
         }
+    }
+    
+    public static Map<Class<?>, Integer> initContractsMap(int bindingPriority, Class<?>... contracts) {
+        Map<Class<?>, Integer> metadata = new HashMap<Class<?>, Integer>();
+        for (Class<?> contract : contracts) {
+            metadata.put(contract, bindingPriority);
+        }
+        return metadata;
     }
     
     public static Object createProvider(Class<?> cls) {

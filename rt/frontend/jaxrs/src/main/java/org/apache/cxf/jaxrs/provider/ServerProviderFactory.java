@@ -37,7 +37,6 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.ReaderInterceptor;
@@ -239,9 +238,12 @@ public final class ServerProviderFactory extends ProviderFactory {
             
         }
         
-        Collections.sort(preMatchContainerRequestFilters, new BindingPriorityComparator(true));
-        mapInterceptorFilters(postMatchContainerRequestFilters, postMatchRequestFilters, true);
-        mapInterceptorFilters(postMatchContainerResponseFilters, postMatchResponseFilters, false);
+        Collections.sort(preMatchContainerRequestFilters, 
+            new BindingPriorityComparator(ContainerRequestFilter.class, true));
+        mapInterceptorFilters(postMatchContainerRequestFilters, postMatchRequestFilters,
+                              ContainerRequestFilter.class, true);
+        mapInterceptorFilters(postMatchContainerResponseFilters, postMatchResponseFilters,
+                              ContainerResponseFilter.class, false);
         
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
@@ -422,26 +424,20 @@ public final class ServerProviderFactory extends ProviderFactory {
             return configImpl.register(object, map);
         }
         
-        FeatureContext doRegister(Object provider, int priority, Class<?>... contracts) {
+        FeatureContext doRegister(Object provider, Map<Class<?>, Integer> contracts) {
         
-            if (provider instanceof Feature) {
-                ((Feature)provider).configure(this);
-                return this;
-            }
+            Map<Class<?>, Integer> actualContracts = new HashMap<Class<?>, Integer>();
             
-            List<Class<?>> actualContracts = new LinkedList<Class<?>>();
-            
-            for (Class<?> contract : contracts) {
+            for (Class<?> contract : contracts.keySet()) {
                 if (SERVER_FILTER_INTERCEPTOR_CLASSES.contains(contract)
                     && contract.isAssignableFrom(provider.getClass())) {
-                    actualContracts.add(contract);
+                    actualContracts.put(contract, contracts.get(contract));
                 }
             }
             if (!actualContracts.isEmpty()) {
                 registerUserProvider(new FilterProviderInfo<Object>(provider, 
                     getBus(),
                     nameBinding,
-                    priority,
                     actualContracts));
                 ori.addNameBindings(Collections.singletonList(nameBinding));
             }
@@ -455,10 +451,10 @@ public final class ServerProviderFactory extends ProviderFactory {
             super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES.toArray(new Class<?>[]{}));
         }
         @Override
-        protected FeatureContext doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
-            super.doRegister(provider, bindingPriority, contracts);
+        public FeatureContext register(Object provider, Map<Class<?>, Integer> contracts) {
+            super.register(provider, contracts);
             return ((MethodFeatureContextImpl)super.getConfigurable())
-                .doRegister(provider, bindingPriority, contracts);
+                .doRegister(provider, contracts);
         }
         
     }

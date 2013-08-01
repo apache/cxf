@@ -92,11 +92,11 @@ public final class ClientProviderFactory extends ProviderFactory {
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
-            if (ClientRequestFilter.class.isAssignableFrom(providerCls)) {
+            if (filterContractSupported(provider, providerCls, ClientRequestFilter.class)) {
                 clientRequestFilters.add((ProviderInfo<ClientRequestFilter>)provider);
             }
             
-            if (ClientResponseFilter.class.isAssignableFrom(providerCls)) {
+            if (filterContractSupported(provider, providerCls, ClientResponseFilter.class)) {
                 clientResponseFilters.add((ProviderInfo<ClientResponseFilter>)provider);
             }
             
@@ -104,8 +104,10 @@ public final class ClientProviderFactory extends ProviderFactory {
                 responseExceptionMappers.add((ProviderInfo<ResponseExceptionMapper<?>>)provider); 
             }
         }
-        Collections.sort(clientRequestFilters, new BindingPriorityComparator(true));
-        Collections.sort(clientResponseFilters, new BindingPriorityComparator(false));
+        Collections.sort(clientRequestFilters, 
+                         new BindingPriorityComparator(ClientRequestFilter.class, true));
+        Collections.sort(clientResponseFilters, 
+                         new BindingPriorityComparator(ClientResponseFilter.class, false));
         
         injectContextProxies(responseExceptionMappers, clientRequestFilters, clientResponseFilters);
     }

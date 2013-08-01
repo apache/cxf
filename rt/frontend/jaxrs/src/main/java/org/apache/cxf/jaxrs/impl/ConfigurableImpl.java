@@ -81,9 +81,13 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     
     @Override
     public C register(Object provider, Map<Class<?>, Integer> contracts) {
-        for (Map.Entry<Class<?>, Integer> entry : contracts.entrySet()) {
-            doRegister(provider, entry.getValue(), entry.getKey());
+        if (provider instanceof Feature) {
+            Feature feature = (Feature)provider;
+            config.setFeature(feature);
+            feature.configure(new FeatureContextImpl(this));
+            return configurable;
         }
+        config.register(provider, contracts);
         return configurable;
     }
     
@@ -108,15 +112,8 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
         return register(ConfigurationImpl.createProvider(providerClass), contracts);
     }
     
-    protected C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
-        if (provider instanceof Feature) {
-            Feature feature = (Feature)provider;
-            config.setFeature(feature);
-            feature.configure(new FeatureContextImpl(this));
-            return configurable;
-        }
-        config.register(provider, bindingPriority, contracts);
-        return configurable;
+    private C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
+        return register(provider, ConfigurationImpl.initContractsMap(bindingPriority, contracts));
     }
 
     public static class FeatureContextImpl implements FeatureContext {
