@@ -752,9 +752,7 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO WSS-438
     @org.junit.Test
-    @org.junit.Ignore
     public void testTransportSupportingSignedCertConstraints() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

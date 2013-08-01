@@ -22,13 +22,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -140,7 +144,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
         if (certConstraints != null) {
             if (securityProperties != null) {
-                // TODO
+                securityProperties.setSubjectCertConstraints(convertCertConstraints(certConstraints));
             } else {
                 properties.put(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
             }
@@ -172,6 +176,24 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         if (properties != null) {
             properties.put(ConfigurationConstants.MUST_UNDERSTAND, Boolean.toString(mustUnderstand));
         }
+    }
+    
+    private  Collection<Pattern> convertCertConstraints(String certConstraints) {
+        String[] certConstraintsList = certConstraints.split(",");
+        if (certConstraintsList != null) {
+            Collection<Pattern> subjectCertConstraints = 
+                new ArrayList<Pattern>(certConstraintsList.length);
+            for (String certConstraint : certConstraintsList) {
+                try {
+                    subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
+                } catch (PatternSyntaxException ex) {
+                    LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
+            return subjectCertConstraints;
+        }
+        
+        return null;
     }
     
     protected void configureCallbackHandler(SoapMessage soapMessage) throws WSSecurityException {

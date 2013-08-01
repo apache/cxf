@@ -283,8 +283,7 @@ public final class SecurityConstants {
     /**
      * A comma separated String of regular expressions which will be applied to the subject DN of 
      * the certificate used for signature validation, after trust verification of the certificate 
-     * chain associated with the  certificate. These constraints are not used when the certificate 
-     * is contained in the keystore (direct trust).
+     * chain associated with the  certificate.
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
     
