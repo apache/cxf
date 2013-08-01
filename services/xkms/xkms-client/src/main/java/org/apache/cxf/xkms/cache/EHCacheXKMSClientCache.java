@@ -22,7 +22,6 @@ package org.apache.cxf.xkms.cache;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.security.cert.X509Certificate;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -100,26 +99,29 @@ public class EHCacheXKMSClientCache implements XKMSClientCache {
     }
     
     /**
-     * Store an X509Certificate in the Cache
+     * Store an XKMSCacheToken in the Cache using the given key
      */
-    public void put(String key, X509Certificate certificate) {
-        cache.put(new Element(key, certificate, false, null, null));
+    public void put(String key, XKMSCacheToken cacheToken) {
+        cache.put(new Element(key, cacheToken, false));
     }
     
     /**
-     * Get an X509Certificate from the cache matching the given key. Returns null if there
-     * is no such certificate in the cache.
+     * Get an XKMSCacheToken from the cache matching the given key. Returns null if there
+     * is no such XKMSCacheToken in the cache, or if the certificate has expired in the cache
      */
-    public X509Certificate get(String key) {
+    public XKMSCacheToken get(String key) {
         Element element = cache.get(key);
         if (element != null && !element.isExpired()) {
-            return (X509Certificate)element.getObjectValue();
+            return (XKMSCacheToken)element.getObjectValue();
         }
         return null;
     }
     
     public void close() throws IOException {
         if (cacheManager != null) {
+            if (cache != null) {
+                cache.removeAll();
+            }
             cacheManager.shutdown();
             cacheManager = null;
             cache = null;

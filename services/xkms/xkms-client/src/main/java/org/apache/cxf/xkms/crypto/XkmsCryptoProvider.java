@@ -19,6 +19,7 @@
 
 package org.apache.cxf.xkms.crypto;
 
+import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -29,6 +30,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.cache.EHCacheXKMSClientCache;
+import org.apache.cxf.xkms.cache.XKMSCacheToken;
 import org.apache.cxf.xkms.cache.XKMSClientCache;
 import org.apache.cxf.xkms.client.XKMSInvoker;
 import org.apache.cxf.xkms.handlers.Applications;
@@ -129,12 +131,12 @@ public class XkmsCryptoProvider extends CryptoBase {
         } else if (type == TYPE.ALIAS) {
             return getX509CertificatesFromXKMS(cryptoType);
         } else if (type == TYPE.ISSUER_SERIAL) {
-            String key = cryptoType.getIssuer() + "-" + cryptoType.getSerial().toString(16);
+            String key = getKeyForIssuerSerial(cryptoType.getIssuer(), cryptoType.getSerial());
             // Try local cache first
             if (xkmsClientCache != null) {
-                X509Certificate cachedCert = xkmsClientCache.get(key);
-                if (cachedCert != null) {
-                    return new X509Certificate[] {cachedCert};
+                XKMSCacheToken cachedToken = xkmsClientCache.get(key);
+                if (cachedToken != null && cachedToken.getX509Certificate() != null) {
+                    return new X509Certificate[] {cachedToken.getX509Certificate()};
                 }
             }
             // Now ask the XKMS Service
@@ -143,9 +145,10 @@ public class XkmsCryptoProvider extends CryptoBase {
             
             // Store in the cache
             if (certificate != null && xkmsClientCache != null) {
-                xkmsClientCache.put(key, certificate);
+                XKMSCacheToken cacheToken = new XKMSCacheToken(certificate);
+                xkmsClientCache.put(key, cacheToken);
                 // Store it using the Subject DN as well
-                xkmsClientCache.put(certificate.getSubjectX500Principal().getName(), certificate);
+                xkmsClientCache.put(certificate.getSubjectX500Principal().getName(), cacheToken);
             }
             return new X509Certificate[] {
                 certificate
@@ -178,9 +181,9 @@ public class XkmsCryptoProvider extends CryptoBase {
         
         // Try local cache first
         if (xkmsClientCache != null) {
-            X509Certificate cachedCert = xkmsClientCache.get(id.toLowerCase());
-            if (cachedCert != null) {
-                return new X509Certificate[] {cachedCert};
+            XKMSCacheToken cachedToken = xkmsClientCache.get(id.toLowerCase());
+            if (cachedToken != null && cachedToken.getX509Certificate() != null) {
+                return new X509Certificate[] {cachedToken.getX509Certificate()};
             }
         }
         
@@ -189,11 +192,12 @@ public class XkmsCryptoProvider extends CryptoBase {
         
         // Store in the cache
         if (cert != null && xkmsClientCache != null) {
-            xkmsClientCache.put(id.toLowerCase(), cert);
+            XKMSCacheToken cacheToken = new XKMSCacheToken(cert);
+            xkmsClientCache.put(id.toLowerCase(), cacheToken);
             // Store it using IssuerSerial as well
-            String key = cert.getIssuerX500Principal().getName() + "-" 
-                + cert.getSerialNumber().toString(16);
-            xkmsClientCache.put(key, cert);
+            String key = getKeyForIssuerSerial(cert.getIssuerX500Principal().getName(), 
+                                               cert.getSerialNumber());
+            xkmsClientCache.put(key, cacheToken);
         }
 
         return new X509Certificate[] {
@@ -226,5 +230,9 @@ public class XkmsCryptoProvider extends CryptoBase {
      */
     private boolean isServiceName(CryptoType cryptoType) {
         return cryptoType.getAlias().contains("{");
+    }
+    
+    private String getKeyForIssuerSerial(String issuer, BigInteger serial) {
+        return issuer + "-" + serial.toString(16);
     }
 }

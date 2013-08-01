@@ -19,21 +19,40 @@
 
 package org.apache.cxf.xkms.cache;
 
-import java.io.Closeable;
-import java.io.IOException;
+import java.io.Serializable;
+import java.security.cert.X509Certificate;
 
-public interface XKMSClientCache extends Closeable {
-
-    /**
-     * Store an XKMSCacheToken in the Cache using the given key
-     */
-    void put(String key, XKMSCacheToken cacheToken);
-
-    /**
-     * Get an XKMSCacheToken from the cache matching the given key. Returns null if there
-     * is no such XKMSCacheToken in the cache.
-     */
-    XKMSCacheToken get(String key);
+public class XKMSCacheToken implements Serializable {
     
-    void close() throws IOException;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7097585680022947024L;
+    private X509Certificate x509Certificate;
+    private boolean xkmsValidated;
+    
+    public XKMSCacheToken() {
+        // 
+    }
+    
+    public XKMSCacheToken(X509Certificate x509Certificate) {
+        this.x509Certificate = x509Certificate;
+    }
+
+    public X509Certificate getX509Certificate() {
+        return x509Certificate;
+    }
+
+    public void setX509Certificate(X509Certificate x509Certificate) {
+        this.x509Certificate = x509Certificate;
+    }
+
+    public boolean isXkmsValidated() {
+        return xkmsValidated;
+    }
+
+    public void setXkmsValidated(boolean xkmsValidated) {
+        this.xkmsValidated = xkmsValidated;
+    }
+
 }
