@@ -455,8 +455,9 @@ public class JAXBEncoderDecoderTest extends Assert {
         part.setElementQName(elName);
         part.setTypeClass(OrderException.class);
             
+        //just need a simple generic context to handle the exceptions internal primitives
         JAXBContext exceptionContext = JAXBContext.newInstance(new Class[] {
-            OrderException.class,
+            String.class,
         });
         JAXBEncoderDecoder.marshallException(exceptionContext.createMarshaller(), exception, part, elNode);
         
