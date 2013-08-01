@@ -29,7 +29,7 @@ public class ExtensionException extends UncheckedException {
     /**
      * Constructs a <code>ExtensionException</code> with the provided detail message.
      */
-    ExtensionException(Message msg) {
+    public ExtensionException(Message msg) {
         super(msg);
     }
 
@@ -37,14 +37,14 @@ public class ExtensionException extends UncheckedException {
      * Constructs a <code>ExtensionException</code> with the detail message and cause
      * provided.
      */
-    ExtensionException(Message msg, Throwable cause) {
+    public ExtensionException(Message msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
      * Constructs an <code>ExtensionException</code> with the provided cause.
      */
-    ExtensionException(Throwable cause) {
+    public ExtensionException(Throwable cause) {
         super(cause);
     }
 }
