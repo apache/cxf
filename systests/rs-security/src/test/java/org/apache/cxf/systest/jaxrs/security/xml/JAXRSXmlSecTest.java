@@ -56,10 +56,22 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookWithEnvelopedSigAndProxy() throws Exception {
         String address = "https://localhost:" + PORT + "/xmlsig";
-        doTestSignatureProxy(address, false);
+        doTestSignatureProxy(address, false, null);
     }
     
-    private void doTestSignatureProxy(String address, boolean enveloping) {
+    @Test
+    public void testPostBookWithEnvelopedSigAndProxy2() throws Exception {
+        String address = "https://localhost:" + PORT + "/xmlsig";
+        doTestSignatureProxy(address, false, "");
+    }
+    
+    @Test
+    public void testPostBookEnvelopingSigAndProxy() throws Exception {
+        String address = "https://localhost:" + PORT + "/xmlsig";
+        doTestSignatureProxy(address, true, "file:");
+    }
+    
+    private void doTestSignatureProxy(String address, boolean enveloping, String cryptoUrlPrefix) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -72,8 +84,12 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.callback-handler", 
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put("ws-security.signature.username", "alice");
-        properties.put("ws-security.signature.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        
+        String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
+        if (cryptoUrlPrefix != null) {
+            cryptoUrl = cryptoUrlPrefix + this.getClass().getResource("/" + cryptoUrl).toURI().getPath();
+        }
+        properties.put("ws-security.signature.properties", cryptoUrl);
         bean.setProperties(properties);
         XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
         if (enveloping) {
