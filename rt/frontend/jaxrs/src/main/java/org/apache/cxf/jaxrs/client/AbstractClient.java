@@ -509,7 +509,7 @@ public abstract class AbstractClient implements Client, Retryable {
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
             } finally {
-                if (cls != InputStream.class && inputStream != null) {
+                if (inputStream != null && responseStreamCanBeClosed(outMessage, cls)) {
                     try {
                         inputStream.close();
                     } catch (IOException ex) { 
@@ -523,6 +523,10 @@ public abstract class AbstractClient implements Client, Retryable {
         return null;                                                
     }
     
+    private boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
+        return MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
+    }    
+
     protected void completeExchange(Object response, Exchange exchange, boolean proxy) {
         // higher level conduits such as FailoverTargetSelector need to
         // clear the request state but a fair number of response objects 
