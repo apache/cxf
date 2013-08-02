@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -983,8 +982,8 @@ public class WebClient extends AbstractClient {
         if (r == null) {
             try {
                 r = handleResponse(message.getExchange().getOutMessage(),
-                                            cb.getResponseClass(),
-                                            cb.getOutGenericType());
+                                   cb.getResponseClass(),
+                                   cb.getOutGenericType());
             } catch (Throwable t) {
                 cb.handleException(message, t);
                 return;
@@ -994,15 +993,14 @@ public class WebClient extends AbstractClient {
             cb.handleResponse(message, new Object[] {r});
         } else if (r.getStatus() >= 300) {
             cb.handleException(message, convertToWebApplicationException(r));
-            closeResponseIfPossible(r);
         } else {
             cb.handleResponse(message, new Object[] {r.getEntity()});
-            closeResponseIfPossible(r);
+            closeAsyncResponseIfPossible(r, message, cb);
         }
     }
     
-    private void closeResponseIfPossible(Response r) {
-        if (!(r.getEntity() instanceof InputStream)) {
+    private void closeAsyncResponseIfPossible(Response r, Message outMessage, JaxrsClientCallback<?> cb) {
+        if (responseStreamCanBeClosed(outMessage, cb.getResponseClass())) {
             r.close();
         }
     }
