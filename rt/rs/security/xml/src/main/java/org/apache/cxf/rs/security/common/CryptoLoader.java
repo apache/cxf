@@ -19,8 +19,10 @@
 
 package org.apache.cxf.rs.security.common;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
@@ -63,15 +65,18 @@ public class CryptoLoader {
         if (o == null) {
             return null;
         }
-        Map<Object, Crypto> cryptoCache = getCryptoCache(message); 
-        crypto = cryptoCache != null ? cryptoCache.get(o) : null;
+        
+        String propResourceName = (String)o;
+        
+        Map<Object, Crypto> cryptoCache = getCryptoCache(message);
+        crypto = cryptoCache != null ? cryptoCache.get(propResourceName) : null;
         if (crypto != null) {
             return crypto;
         }
         
         ClassLoaderHolder orig = null;
         try {
-            URL url = ClassLoaderUtils.getResource((String)o, this.getClass());
+            URL url = ClassLoaderUtils.getResource(propResourceName, this.getClass());
             if (url == null) {
                 ResourceManager manager = message.getExchange()
                         .getBus().getExtension(ResourceManager.class);
@@ -79,12 +84,27 @@ public class CryptoLoader {
                 if (loader != null) {
                     orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
-                url = manager.resolveResource((String)o, URL.class);
+                url = manager.resolveResource(propResourceName, URL.class);
+            }
+            if (url == null) {
+                URI propResourceUri = URI.create(propResourceName);
+                if (propResourceUri.getScheme() != null) {
+                    url = propResourceUri.toURL();
+                } else {
+                    try {
+                        File f = new File(propResourceUri.toString());
+                        if (f.exists()) { 
+                            url = f.toURI().toURL();
+                        }
+                    } catch (IOException ex) {
+                        // let CryptoFactory try to load it
+                    }
+                }
             }
             if (url != null) {
                 crypto = loadCryptoFromURL(url);
             } else {
-                crypto = CryptoFactory.getInstance((String)o);
+                crypto = CryptoFactory.getInstance(propResourceName, Thread.currentThread().getContextClassLoader());
             }
             if (cryptoCache != null) {
                 cryptoCache.put(o, crypto);
