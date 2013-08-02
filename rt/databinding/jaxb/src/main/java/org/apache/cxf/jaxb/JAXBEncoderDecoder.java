@@ -405,7 +405,7 @@ public final class JAXBEncoderDecoder {
                         writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
                     } else {
                         Object o = Utils.getMethodValue(m, elValue); 
-                        writeObject(marshaller, writer, new JAXBElement(mname, String.class, o));
+                        writeObject(marshaller, writer, newJAXBElement(mname, String.class, o));
                     }
                 }
             }
