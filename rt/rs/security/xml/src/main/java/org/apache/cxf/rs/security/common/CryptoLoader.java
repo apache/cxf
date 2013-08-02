@@ -87,19 +87,19 @@ public class CryptoLoader {
                 url = manager.resolveResource(propResourceName, URL.class);
             }
             if (url == null) {
-                URI propResourceUri = URI.create(propResourceName);
-                if (propResourceUri.getScheme() != null) {
-                    url = propResourceUri.toURL();
-                } else {
-                    try {
+                try {
+                    URI propResourceUri = URI.create(propResourceName);
+                    if (propResourceUri.getScheme() != null) {
+                        url = propResourceUri.toURL();
+                    } else {
                         File f = new File(propResourceUri.toString());
                         if (f.exists()) { 
                             url = f.toURI().toURL();
                         }
-                    } catch (IOException ex) {
-                        // let CryptoFactory try to load it
                     }
-                }
+                } catch (IOException ex) {
+                    // let CryptoFactory try to load it
+                }   
             }
             if (url != null) {
                 crypto = loadCryptoFromURL(url);
