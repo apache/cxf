@@ -83,6 +83,7 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 
@@ -1144,6 +1145,11 @@ public final class JAXBUtils {
     }
     
     public static JAXBContextProxy createJAXBContextProxy(final JAXBContext ctx) {
+        return createJAXBContextProxy(ctx, null, null);
+    }
+    public static JAXBContextProxy createJAXBContextProxy(final JAXBContext ctx,
+                                                          final SchemaCollection collection,
+                                                          final String defaultNs) {
         if (ctx.getClass().getName().contains("eclipse")) {
             final org.eclipse.persistence.jaxb.JAXBContext c = (org.eclipse.persistence.jaxb.JAXBContext)ctx;
             return new JAXBContextProxy() {
@@ -1184,7 +1190,11 @@ public final class JAXBUtils {
                 }
             };
         }
-        return ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
+        if (ctx.getClass().getName().contains("com.sun.")
+            || collection == null) {
+            return ReflectionInvokationHandler.createProxyWrapper(ctx, JAXBContextProxy.class);
+        }
+        return new SchemaCollectionContextProxy(ctx, collection, defaultNs);
     }
     public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
         Object o = context.getBeanInfo(cls);

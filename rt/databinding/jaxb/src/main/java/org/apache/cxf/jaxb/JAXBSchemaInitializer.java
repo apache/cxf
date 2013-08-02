@@ -83,10 +83,11 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     public JAXBSchemaInitializer(ServiceInfo serviceInfo,
                                  SchemaCollection col,
                                  JAXBContext context,
-                                 boolean q) {
+                                 boolean q,
+                                 String defaultNs) {
         super(serviceInfo);
         schemas = col;
-        this.context = JAXBUtils.createJAXBContextProxy(context);
+        this.context = JAXBUtils.createJAXBContextProxy(context, serviceInfo.getXmlSchemaCollection(), defaultNs);
         this.qualifiedSchemas = q;
     }
 
