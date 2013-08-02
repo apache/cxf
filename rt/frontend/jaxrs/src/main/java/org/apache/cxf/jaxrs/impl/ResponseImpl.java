@@ -51,6 +51,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public final class ResponseImpl extends Response {
     private int status;
@@ -326,7 +327,9 @@ public final class ResponseImpl extends Response {
                                                                            InputStream.class.cast(entity), 
                                                                            mediaType, 
                                                                            responseMessage);
-                    InputStream.class.cast(entity).close();
+                    if (responseStreamCanBeClosed(cls)) {
+                        InputStream.class.cast(entity).close();
+                    }
                     entity = newEntity;
                     entityBufferred = true;
                     
@@ -340,6 +343,10 @@ public final class ResponseImpl extends Response {
         
     }
     
+    protected boolean responseStreamCanBeClosed(Class<?> cls) {
+        return cls != InputStream.class
+            && MessageUtils.isTrue(responseMessage.getContextualProperty("response.stream.auto.close"));
+    }
     
     public boolean bufferEntity() throws MessageProcessingException {
         checkEntityIsClosed();

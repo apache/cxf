@@ -523,7 +523,7 @@ public abstract class AbstractClient implements Client, Retryable {
         return null;                                                
     }
     
-    private boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
+    protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
         return cls != InputStream.class
             && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
     }    

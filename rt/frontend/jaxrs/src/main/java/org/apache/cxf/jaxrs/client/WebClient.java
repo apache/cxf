@@ -998,11 +998,17 @@ public class WebClient extends AbstractClient {
             cb.handleException(message, convertToWebApplicationException(r));
         } else {
             cb.handleResponse(message, new Object[] {r.getEntity()});
+            closeAsyncResponseIfPossible(r, message, cb);
         }
     }
     private void handleAsyncFault(Message message) {
     }
 
+    private void closeAsyncResponseIfPossible(Response r, Message outMessage, JaxrsClientCallback<?> cb) {
+        if (responseStreamCanBeClosed(outMessage, cb.getResponseClass())) {
+            r.close();
+        }
+    } 
 
     //TODO: retry invocation will not work in case of async request failures for the moment
     @Override
