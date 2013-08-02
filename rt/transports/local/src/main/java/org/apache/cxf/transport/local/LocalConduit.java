@@ -40,6 +40,64 @@ import org.apache.cxf.workqueue.SynchronousExecutor;
 
 public class LocalConduit extends AbstractConduit {
 
+    private final class LocalConduitOutputStream extends AbstractWrappedOutputStream {
+        private final LocalConduit conduit;
+        private final Exchange exchange;
+        private final Message message;
+
+        private LocalConduitOutputStream(LocalConduit conduit, Exchange exchange, Message message) {
+            this.conduit = conduit;
+            this.exchange = exchange;
+            this.message = message;
+        }
+
+        public void close() throws IOException {
+            if (!written) {
+                dispatchToService(true);
+            }
+            super.close();
+        }
+
+        protected void onFirstWrite() throws IOException {
+            dispatchToService(false);
+        }
+        protected void dispatchToService(boolean empty) throws IOException {
+            final MessageImpl inMsg = new MessageImpl();
+            transportFactory.copy(message, inMsg);
+            
+            if (!empty) {
+                final PipedInputStream stream = new PipedInputStream();
+                wrappedStream = new PipedOutputStream(stream);
+
+                inMsg.setContent(InputStream.class, stream);
+            }
+            inMsg.setDestination(destination);
+            inMsg.put(IN_CONDUIT, conduit);
+
+            final Runnable receiver = new Runnable() {
+                public void run() {                            
+                    ExchangeImpl ex = new ExchangeImpl();
+                    ex.setInMessage(inMsg);
+                    inMsg.setExchange(ex);
+                    ex.put(IN_EXCHANGE, exchange);
+                    destination.getMessageObserver().onMessage(inMsg);
+                }
+            };
+            Executor ex = message.getExchange() != null
+                ? message.getExchange().get(Executor.class) : null;
+            if (ex == null || SynchronousExecutor.isA(ex)) {
+                ex = transportFactory.getExecutor();
+                if (ex != null) {
+                    ex.execute(receiver);
+                } else {
+                    new Thread(receiver).start();
+                }
+            } else {
+                ex.execute(receiver);
+            }
+        }
+    }
+
     public static final String IN_CONDUIT = LocalConduit.class.getName() + ".inConduit";
     public static final String RESPONSE_CONDUIT = LocalConduit.class.getName() + ".inConduit";
     public static final String IN_EXCHANGE = LocalConduit.class.getName() + ".inExchange";
@@ -124,40 +182,7 @@ public class LocalConduit extends AbstractConduit {
         
         
         AbstractWrappedOutputStream cout 
-            = new AbstractWrappedOutputStream() {
-                protected void onFirstWrite() throws IOException {
-                    final PipedInputStream stream = new PipedInputStream();
-                    wrappedStream = new PipedOutputStream(stream);
-
-                    final MessageImpl inMsg = new MessageImpl();
-                    transportFactory.copy(message, inMsg); 
-
-                    inMsg.setContent(InputStream.class, stream);
-                    inMsg.setDestination(destination);
-                    inMsg.put(IN_CONDUIT, conduit);
-
-                    final Runnable receiver = new Runnable() {
-                        public void run() {                            
-                            ExchangeImpl ex = new ExchangeImpl();
-                            ex.setInMessage(inMsg);
-                            ex.put(IN_EXCHANGE, exchange);
-                            destination.getMessageObserver().onMessage(inMsg);
-                        }
-                    };
-                    Executor ex = message.getExchange() != null
-                        ? message.getExchange().get(Executor.class) : null;
-                    if (ex == null || SynchronousExecutor.isA(ex)) {
-                        ex = transportFactory.getExecutor();
-                        if (ex != null) {
-                            ex.execute(receiver);
-                        } else {
-                            new Thread(receiver).start();
-                        }
-                    } else {
-                        ex.execute(receiver);
-                    }
-                }
-            };
+            = new LocalConduitOutputStream(conduit, exchange, message);
         message.setContent(OutputStream.class, cout);
     }
     
