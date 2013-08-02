@@ -34,7 +34,6 @@ import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class UriBuilderImplTest extends Assert {
@@ -1260,7 +1259,6 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(expected, uri.toString());        
     }
 
-    @Ignore
     @Test
     public void testPathParamSpaceBuild() {
         String expected = "http://localhost:8080/name/%20";
@@ -1310,7 +1308,6 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(expected, uri.toString());
     }
     
-    @Ignore
     @Test
     public void testQueryParamSpaceBuild2() {
         String expected = "http://localhost:8080?name=%2520";
