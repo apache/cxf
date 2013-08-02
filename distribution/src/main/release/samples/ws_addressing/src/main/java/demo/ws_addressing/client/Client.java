@@ -29,7 +29,6 @@ import javax.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.ws.addressing.AddressingBuilder;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ObjectFactory;
@@ -124,8 +123,7 @@ public final class Client {
 
     private static AddressingProperties createMaps() {
         // get Message Addressing Properties instance
-        AddressingBuilder builder = AddressingBuilder.getAddressingBuilder();
-        AddressingProperties maps = builder.newAddressingProperties();
+        AddressingProperties maps = new AddressingProperties();
 
         // set MessageID property
         AttributedURIType messageID = WSA_OBJECT_FACTORY.createAttributedURIType();
