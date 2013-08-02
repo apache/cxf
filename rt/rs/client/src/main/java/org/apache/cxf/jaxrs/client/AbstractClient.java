@@ -527,8 +527,9 @@ public abstract class AbstractClient implements Client {
         return null;                                                
     }
     
-    private boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
-        return MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
+    protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
+        return cls != InputStream.class
+            && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
     }
     
     protected void completeExchange(Object response, Exchange exchange, boolean proxy) {
