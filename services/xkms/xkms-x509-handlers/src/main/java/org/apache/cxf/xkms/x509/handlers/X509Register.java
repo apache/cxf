@@ -31,6 +31,8 @@ import org.apache.cxf.xkms.handlers.Register;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
 import org.apache.cxf.xkms.model.xkms.KeyBindingType;
 import org.apache.cxf.xkms.model.xkms.PrototypeKeyBindingType;
+import org.apache.cxf.xkms.model.xkms.RecoverRequestType;
+import org.apache.cxf.xkms.model.xkms.RecoverResultType;
 import org.apache.cxf.xkms.model.xkms.RegisterRequestType;
 import org.apache.cxf.xkms.model.xkms.RegisterResultType;
 import org.apache.cxf.xkms.model.xkms.ReissueRequestType;
@@ -58,6 +60,9 @@ public class X509Register implements Register {
 
     @Override
     public boolean canProcess(RequestAbstractType request) {
+        if (request instanceof RecoverRequestType) {
+            return false;
+        }
         List<String> respondWithList = request.getRespondWith();
         if ((respondWithList != null) && !(respondWithList.isEmpty())) {
             return respondWithList.contains(RespondWithEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_X_509_CERT);
@@ -136,6 +141,11 @@ public class X509Register implements Register {
 
         }
         return certList;
+    }
+
+    @Override
+    public RecoverResultType recover(RecoverRequestType request, RecoverResultType response) {
+        throw new UnsupportedOperationException("Recover is currently not supported");
     }
 
 }

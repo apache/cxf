@@ -19,6 +19,8 @@
 
 package org.apache.cxf.xkms.handlers;
 
+import org.apache.cxf.xkms.model.xkms.RecoverRequestType;
+import org.apache.cxf.xkms.model.xkms.RecoverResultType;
 import org.apache.cxf.xkms.model.xkms.RegisterRequestType;
 import org.apache.cxf.xkms.model.xkms.RegisterResultType;
 import org.apache.cxf.xkms.model.xkms.ReissueRequestType;
@@ -36,5 +38,7 @@ public interface Register {
     ReissueResultType reissue(ReissueRequestType request, ReissueResultType response);
 
     RevokeResultType revoke(RevokeRequestType request, RevokeResultType response);
+    
+    RecoverResultType recover(RecoverRequestType request, RecoverResultType response);
 
 }

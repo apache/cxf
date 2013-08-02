@@ -69,9 +69,12 @@ public class XKMSService implements XKMSPortType {
     private List<Validator> validators = new ArrayList<Validator>();
 
     private List<Register> keyRegisterHandlers = new ArrayList<Register>();
+    
+    private boolean enableXKRSS = true;
 
     @Override
     public ReissueResultType reissue(ReissueRequestType request) {
+        assertXKRSSAllowed();
         try {
             validateRequest(request);
             ReissueResultType response = XKMSResponseFactory.createResponse(request, new ReissueResultType());
@@ -95,13 +98,15 @@ public class XKMSService implements XKMSPortType {
     public CompoundResultType compound(CompoundRequestType request) {
         validateRequest(request);
 
-        return ExceptionMapper.toResponse(new UnsupportedOperationException("XKMS request is currently not supported"),
-                XKMSResponseFactory.createResponse(request, new CompoundResultType()));
+        RuntimeException ex = new UnsupportedOperationException("XKMS compound request is currently not supported");
+        CompoundResultType response = XKMSResponseFactory.createResponse(request, new CompoundResultType());
+        return ExceptionMapper.toResponse(ex, response);
     }
 
     @Override
     public RegisterResultType register(RegisterRequestType request) {
         try {
+            assertXKRSSAllowed();
             validateRequest(request);
             RegisterResultType response = XKMSResponseFactory.createResponse(request, new RegisterResultType());
             try {
@@ -131,6 +136,7 @@ public class XKMSService implements XKMSPortType {
     @Override
     public RevokeResultType revoke(RevokeRequestType request) {
         try {
+            assertXKRSSAllowed();
             validateRequest(request);
             RevokeResultType response = XKMSResponseFactory.createResponse(request, new RevokeResultType());
             try {
@@ -156,7 +162,7 @@ public class XKMSService implements XKMSPortType {
             // Create basic response
             LocateResultType result = XKMSResponseFactory.createResponse(request, new LocateResultType());
             // Search
-            for (Locator locator : getLocators()) {
+            for (Locator locator : locators) {
                 UnverifiedKeyBindingType keyBinding = locator.locate(request);
                 if (keyBinding != null) {
                     result.getUnverifiedKeyBinding().add(keyBinding);
@@ -173,10 +179,24 @@ public class XKMSService implements XKMSPortType {
 
     @Override
     public RecoverResultType recover(RecoverRequestType request) {
-        validateRequest(request);
-
-        return ExceptionMapper.toResponse(new UnsupportedOperationException("XKMS request is currently not supported"),
-                XKMSResponseFactory.createResponse(request, new RecoverResultType()));
+        try {
+            assertXKRSSAllowed();
+            validateRequest(request);
+            RecoverResultType response = XKMSResponseFactory.createResponse(request, new RecoverResultType());
+            try {
+                for (Register handler : keyRegisterHandlers) {
+                    if (handler.canProcess(request)) {
+                        return handler.recover(request, response);
+                    }
+                }
+                throw new UnsupportedOperationException("Service was unable to handle your request");
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, "Error during recover: " + e.getMessage(), e);
+                return ExceptionMapper.toResponse(e, response);
+            }
+        } catch (Exception e) {
+            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new RecoverResultType()));
+        }
     }
 
     @Override
@@ -223,18 +243,10 @@ public class XKMSService implements XKMSPortType {
             throw new IllegalArgumentException("Message Id is not set");
         }
         // Check if Service matches this instance
-        if (!getServiceName().equals(request.getService())) {
+        if (!serviceName.equals(request.getService())) {
             throw new IllegalArgumentException("Service " + request.getService()
                                                + " is not responsible to process request");
         }
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
     }
 
     // TODO refactoring into factory class?
@@ -254,6 +266,10 @@ public class XKMSService implements XKMSPortType {
         resultStatus.getValidReason().addAll(status.getValidReason());
         resultStatus.getInvalidReason().addAll(status.getInvalidReason());
         resultStatus.getIndeterminateReason().addAll(status.getIndeterminateReason());
+    }
+    
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public void setLocators(List<Locator> locators) {
@@ -301,12 +317,13 @@ public class XKMSService implements XKMSPortType {
         keyBinding.getKeyUsage().add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_EXCHANGE);
     }
 
-    public List<Validator> getValidators() {
-        return validators;
+    public void setEnableXKRSS(boolean enableXKRSS) {
+        this.enableXKRSS = enableXKRSS;
     }
 
-    public List<Locator> getLocators() {
-        return locators;
+    private void assertXKRSSAllowed() {
+        if (!enableXKRSS) {
+            throw new UnsupportedOperationException("XKRSS Operations are disabled");
+        }
     }
-
 }

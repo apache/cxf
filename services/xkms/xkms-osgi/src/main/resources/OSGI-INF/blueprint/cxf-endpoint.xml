@@ -20,7 +20,57 @@
                         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
 ">
 
+	<cm:property-placeholder persistent-id="org.apache.cxf.xkms" />
+
+    <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSearch">
+        <argument value="${xkms.ldap.url}" />
+        <argument value="${xkms.ldap.user}" />
+        <argument value="${xkms.ldap.pwd}" />
+        <argument value="${xkms.ldap.retry}" />
+    </bean>
+
+    <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig">
+        <property name="certObjectClass" value="${xkms.ldap.schema.certObjectClass}" />
+        <property name="attrUID" value="${xkms.ldap.schema.attrUID}" />
+        <property name="attrIssuerID" value="${xkms.ldap.schema.attrIssuerID}" />
+        <property name="attrSerialNumber" value="${xkms.ldap.schema.attrSerialNumber}" />
+        <property name="attrCrtBinary" value="${xkms.ldap.schema.attrCrtBinary}" />
+        <property name="constAttrNamesCSV" value="${xkms.ldap.schema.constAttrNamesCSV}" />
+        <property name="constAttrValuesCSV" value="${xkms.ldap.schema.constAttrValuesCSV}" />
+        <property name="serviceCertRDNTemplate"
+            value="${xkms.ldap.schema.serviceCertRDNTemplate}" />
+        <property name="serviceCertUIDTemplate"
+            value="${xkms.ldap.schema.serviceCertUIDTemplate}" />
+        <property name="trustedAuthorityFilter" value="${xkms.ldap.schema.trustedAuthorities}" />
+        <property name="intermediateFilter" value="${xkms.ldap.schema.intermediates}" />
+    </bean>
+
+    <bean id="certificateRepo" class="org.apache.cxf.xkms.x509.repo.CertificateRepoFactory"
+        factory-method="createRepository">
+        <argument value="${xkms.certificate.repo}" />
+        <argument ref="ldapSearch" />
+        <argument ref="ldapSchemaConfig" />
+        <argument value="${xkms.ldap.rootDN}" />
+        <argument value="${xkms.file.storageDir}" />
+    </bean>
+
+    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
+    <bean id="trustedAuthorityValidator"
+        class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
+        <argument ref="certificateRepo" />
+    </bean>
+
+    <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">
+        <argument ref="certificateRepo" />
+    </bean>
+
+    <bean id="x509Register"
+        class="org.apache.cxf.xkms.x509.handlers.X509Register">
+        <argument ref="certificateRepo" />
+    </bean>
+
     <bean id="xkmsProviderBean" class="org.apache.cxf.xkms.service.XKMSService">
+    	<property name="enableXKRSS" value="${xkms.enableXKRSS}" />
         <property name="validators">
             <list>
                 <ref component-id="dateValidator" />
