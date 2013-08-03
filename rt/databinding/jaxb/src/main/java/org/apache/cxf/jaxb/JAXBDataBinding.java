@@ -413,7 +413,7 @@ public class JAXBDataBinding extends AbstractDataBinding
             }
 
             JAXBSchemaInitializer schemaInit = new JAXBSchemaInitializer(serviceInfo, col, riContext,
-                                                                         this.qualifiedSchemas);
+                                                                         this.qualifiedSchemas, tns);
             schemaInit.walk();
             if (cachedContextAndSchemas != null && !schemasFromCache) {
                 cachedContextAndSchemas.setSchemas(schemas);
@@ -424,13 +424,13 @@ public class JAXBDataBinding extends AbstractDataBinding
     private void justCheckForJAXBAnnotations(ServiceInfo serviceInfo) {
         for (MessageInfo mi: serviceInfo.getMessages().values()) {
             for (MessagePartInfo mpi : mi.getMessageParts()) {
-                checkForJAXBAnnotations(mpi);
+                checkForJAXBAnnotations(mpi, serviceInfo.getXmlSchemaCollection(), serviceInfo.getTargetNamespace());
             }
         }
     }
-    private void checkForJAXBAnnotations(MessagePartInfo mpi) {
+    private void checkForJAXBAnnotations(MessagePartInfo mpi, SchemaCollection schemaCollection, String ns) {
         Annotation[] anns = (Annotation[])mpi.getProperty("parameter.annotations");
-        JAXBContextProxy ctx = ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
+        JAXBContextProxy ctx = JAXBUtils.createJAXBContextProxy(context, schemaCollection, ns);
         XmlJavaTypeAdapter jta = JAXBSchemaInitializer.findFromTypeAdapter(ctx, mpi.getTypeClass(), anns);
         JAXBBeanInfo jtaBeanInfo = null;
         if (jta != null) {
