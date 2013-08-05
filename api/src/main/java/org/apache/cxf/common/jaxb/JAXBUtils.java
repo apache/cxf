@@ -37,8 +37,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -85,7 +83,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
-
 
 public final class JAXBUtils {
     
@@ -556,28 +553,6 @@ public final class JAXBUtils {
         return jaxbXjcLoader;
     }
     
-    public static JAXBContext createRIContext(Class<?> clss[], String defaultNS) throws JAXBException {
-        try {
-            Class<?> cls;
-            Map<String, Object> map = new HashMap<String, Object>();
-            try {
-                cls = Class.forName("com.sun.xml.bind.v2.ContextFactory");
-                if (defaultNS != null) {
-                    map.put("com.sun.xml.bind.defaultNamespaceRemap", defaultNS);
-                }
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                cls = Class.forName("com.sun.xml.internal.bind.v2.ContextFactory", true, getXJCClassLoader());
-                if (defaultNS != null) {
-                    map.put("com.sun.xml.internal.bind.defaultNamespaceRemap", defaultNS);
-                }
-            }
-            Method meth = cls.getMethod("createContext", clss.getClass(), Map.class);
-            return (JAXBContext)meth.invoke(null, clss, map);
-        } catch (Exception e) {
-            throw new JAXBException(e);
-        }
-    }
     public static Object setNamespaceWrapper(final Map<String, String> nspref,
                                            Marshaller marshaller) throws PropertyException {
         Object mapper = createNamespaceWrapper(marshaller.getClass(), nspref);
@@ -771,7 +746,6 @@ public final class JAXBUtils {
                 return result;
             }
         });
-
         return results;
     }
     

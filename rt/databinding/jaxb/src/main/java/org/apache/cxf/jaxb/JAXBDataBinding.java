@@ -398,20 +398,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                                   r.getSystemId());
             }
 
-            JAXBContext riContext;
-            if (context.getClass().getName().contains("com.sun.xml.")) {
-                riContext = context;
-            } else {
-                // fall back if we're using another jaxb implementation
-                try {
-                    riContext = JAXBUtils.createRIContext(contextClasses
-                        .toArray(new Class[contextClasses.size()]), tns);
-                } catch (JAXBException e) {
-                    throw new ServiceConstructionException(e);
-                }
-            }
-
-            JAXBSchemaInitializer schemaInit = new JAXBSchemaInitializer(serviceInfo, col, riContext,
+            JAXBSchemaInitializer schemaInit = new JAXBSchemaInitializer(serviceInfo, col, context,
                                                                          this.qualifiedSchemas, tns);
             schemaInit.walk();
             if (cachedContextAndSchemas != null && !schemasFromCache) {
