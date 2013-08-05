@@ -71,7 +71,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
@@ -432,14 +431,13 @@ public class JAXBDataBinding extends AbstractDataBinding
         Annotation[] anns = (Annotation[])mpi.getProperty("parameter.annotations");
         JAXBContextProxy ctx = JAXBUtils.createJAXBContextProxy(context, schemaCollection, ns);
         XmlJavaTypeAdapter jta = JAXBSchemaInitializer.findFromTypeAdapter(ctx, mpi.getTypeClass(), anns);
-        JAXBBeanInfo jtaBeanInfo = null;
         if (jta != null) {
-            jtaBeanInfo = JAXBSchemaInitializer.findFromTypeAdapter(ctx, jta.value());
-        }
-        JAXBBeanInfo beanInfo = JAXBSchemaInitializer.getBeanInfo(ctx, mpi.getTypeClass());
-        if (jtaBeanInfo != beanInfo && jta != null) {
-            mpi.setProperty("parameter.annotations", anns);
-            mpi.setProperty("honor.jaxb.annotations", Boolean.TRUE);
+            JAXBBeanInfo jtaBeanInfo = JAXBSchemaInitializer.findFromTypeAdapter(ctx, jta.value());
+            JAXBBeanInfo beanInfo = JAXBSchemaInitializer.getBeanInfo(ctx, mpi.getTypeClass());
+            if (jtaBeanInfo != beanInfo) {
+                mpi.setProperty("parameter.annotations", anns);
+                mpi.setProperty("honor.jaxb.annotations", Boolean.TRUE);
+            }
         }
     }
 

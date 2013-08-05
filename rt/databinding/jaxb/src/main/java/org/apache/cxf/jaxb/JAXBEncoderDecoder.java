@@ -552,6 +552,9 @@ public final class JAXBEncoderDecoder {
                         }
                     }                
                 }
+                if (reader.getEventType() == XMLStreamReader.END_ELEMENT && q.equals(reader.getName())) {
+                    reader.next();
+                }
             }
             return (Exception)obj;
         } catch (Exception e) {
