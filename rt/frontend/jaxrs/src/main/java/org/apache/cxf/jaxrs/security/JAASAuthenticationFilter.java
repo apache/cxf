@@ -137,7 +137,7 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
                 sb.append("Basic");
             }
             if (realmName != null) {
-                sb.append(' ').append(realmName);
+                sb.append(" realm=\"").append(realmName).append('"');
             }
             builder.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
             
