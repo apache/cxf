@@ -32,8 +32,7 @@
         <version>2.7.7-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
-    
-
+        
     <properties>
         <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
         <cxf.osgi.export>

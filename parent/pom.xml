@@ -190,6 +190,7 @@
 
 
         <cxf.checkstyle.extension />
+        <cxf.jaxb.context.class/>
 
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
 
@@ -405,6 +406,8 @@
                             <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
                             <org.apache.cxf.transport.http.async.usePolicy>ALWAYS</org.apache.cxf.transport.http.async.usePolicy>
+                            <javax.xml.bind.JAXBContext>${cxf.jaxb.context.class}</javax.xml.bind.JAXBContext>
+                            <!--javax.xml.bind.JAXBContext>org.eclipse.persistence.jaxb.JAXBContextFactory</javax.xml.bind.JAXBContext-->
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -1621,7 +1624,32 @@
                 <checkstyle.skip>true</checkstyle.skip>
             </properties>
         </profile>
-
+        <profile>
+            <!-- Profile for testing with EclipseLink MOXy based JAXB implementation -->
+            <id>eclipse.moxy</id>
+            <properties>
+                <cxf.jaxb.context.class>org.eclipse.persistence.jaxb.JAXBContextFactory</cxf.jaxb.context.class>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.moxy</artifactId>
+                    <version>2.5.1-SNAPSHOT</version>
+                    <scope>provided</scope>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+            <repositories>
+                <repository>
+                    <id>oss.sonatype.org</id>
+                    <name>OSS Sonatype Staging</name>
+                    <url>https://oss.sonatype.org/content/groups/staging</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>            
+        </profile>
+        
         <profile>
             <id>nospringvalidation</id>
             <properties>
