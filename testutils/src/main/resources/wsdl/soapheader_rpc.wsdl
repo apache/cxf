@@ -76,7 +76,7 @@
             </wsdl:input>
             <wsdl:output>
                 <soap:body message="tns:testInOutHeaderResponse" parts="out" use="literal" namespace="http://apache.org/header_test"/>
-                <soap:header message="tns:testInOutHeaderRequest" part="inOutHeader" use="literal"/>
+                <soap:header message="tns:testInOutHeaderResponse" part="inOutHeader" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
