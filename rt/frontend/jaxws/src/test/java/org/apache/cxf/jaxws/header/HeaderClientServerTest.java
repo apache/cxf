@@ -23,6 +23,7 @@ package org.apache.cxf.jaxws.header;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
@@ -52,6 +53,8 @@ import org.apache.header_test.types.TestHeader6Response;
 import org.apache.tests.type_test.all.SimpleAll;
 import org.apache.tests.type_test.choice.SimpleChoice;
 import org.apache.tests.type_test.sequence.SimpleStruct;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,23 +65,37 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
     private final QName portName = new QName("http://apache.org/header_test",
                                              "SoapHeaderPort");
 
+    private EndpointImpl endpoint;   
+    private EndpointImpl rpcEndpoint;
+    
     @Before
     public void setUp() throws Exception {
         BusFactory.setDefaultBus(getBus());
         
         Object implementor = new TestHeaderImpl();
         String address = "http://localhost:9104/SoapHeaderContext/SoapHeaderPort";
-        EndpointImpl e = (EndpointImpl) Endpoint.publish(address, implementor);        
-        e.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        e.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        endpoint = (EndpointImpl) Endpoint.publish(address, implementor);        
+        endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         
         implementor = new TestRPCHeaderImpl();
         address = "http://localhost:9104/SoapHeaderRPCContext/SoapHeaderRPCPort";
-        e = (EndpointImpl)Endpoint.publish(address, implementor);        
-        e.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        e.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        rpcEndpoint = (EndpointImpl)Endpoint.publish(address, implementor);        
+        rpcEndpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        rpcEndpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
     }
-
+    
+    @After
+    public void stopendpoints() {
+        if (endpoint != null) {
+            endpoint.stop();
+        }
+        if (rpcEndpoint != null) {
+            rpcEndpoint.stop();
+        }
+        endpoint = null;
+        rpcEndpoint = null;
+    }
     @Test
     public void testInHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
