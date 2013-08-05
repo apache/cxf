@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
@@ -171,9 +172,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         final Exchange exchange = message.getExchange();
         
         Object entity = response.getEntity();
-        if (response.getStatus() == 200 && entity != null && firstTry 
-            && ori != null && JAXRSUtils.headMethodPossible(ori.getHttpMethod(), 
-                (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
+        boolean headResponse = response.getStatus() == 200 && firstTry 
+            && ori != null && HttpMethod.HEAD.equals(ori.getHttpMethod());
+        if (headResponse && entity != null) {
             LOG.info(new org.apache.cxf.common.i18n.Message("HEAD_WITHOUT_ENTITY", BUNDLE).toString());
             entity = null;
         }
@@ -229,9 +230,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         entity = InjectionUtils.getEntity(response.getEntity());
         setResponseStatus(message, getActualStatus(response.getStatus(), entity));
         if (entity == null) {
-            responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, "0");
-            responseHeaders.remove(HttpHeaders.CONTENT_TYPE);
-            message.remove(Message.CONTENT_TYPE);
+            if (!headResponse) {
+                responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, "0");
+                responseHeaders.remove(HttpHeaders.CONTENT_TYPE);
+                message.remove(Message.CONTENT_TYPE);
+            }
             return;
         }
         
@@ -243,14 +246,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         
-        Object mediaTypeHeader = responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
-        MediaType responseMediaType;
-        if (mediaTypeHeader instanceof MediaType) {
-            responseMediaType = (MediaType)mediaTypeHeader;
-        } else {
-            responseMediaType = mediaTypeHeader == null ? MediaType.WILDCARD_TYPE
-                : JAXRSUtils.toMediaType(mediaTypeHeader.toString());
-        }
+        MediaType responseMediaType = 
+            getResponseMediaType(responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE));
         
         Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
         Type genericType = 
@@ -304,6 +301,17 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         } catch (Throwable ex) {
             handleWriteException(providerFactory, message, ex, firstTry);
         }
+    }
+    
+    private MediaType getResponseMediaType(Object mediaTypeHeader) {
+        MediaType responseMediaType;
+        if (mediaTypeHeader instanceof MediaType) {
+            responseMediaType = (MediaType)mediaTypeHeader;
+        } else {
+            responseMediaType = mediaTypeHeader == null ? MediaType.WILDCARD_TYPE
+                : JAXRSUtils.toMediaType(mediaTypeHeader.toString());
+        }
+        return responseMediaType;
     }
     
     private int getActualStatus(int status, Object responseObj) {
