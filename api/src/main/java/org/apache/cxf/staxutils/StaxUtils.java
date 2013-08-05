@@ -1728,6 +1728,18 @@ public final class StaxUtils {
             //shouldn't get here
         }
     }
+    public static void print(Node node) {
+        XMLStreamWriter writer = null;
+        try {
+            writer = createXMLStreamWriter(System.out);
+            copy(new DOMSource(node), writer);
+            writer.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        } finally {
+            StaxUtils.close(writer);
+        }
+    }
 
     public static String toString(Source src) throws XMLStreamException {
         StringWriter sw = new StringWriter(1024);
