@@ -131,7 +131,6 @@ public class BookStoreSpring {
         return (T)(SuperBook)book;
     }
     
-    @SuppressWarnings("unchecked")
     @POST
     @Path("/books/superbooks")
     @Consumes("application/json")
