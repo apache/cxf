@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.xacml.pdp.api.PolicyDecisionPoint;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 
@@ -41,6 +42,7 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
     }
 
+    @SuppressWarnings("deprecation")
     @org.junit.Test
     public void testPermit() throws Exception {
         // Mock up a Security Context
@@ -55,11 +57,12 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         msg.put(Message.REQUEST_URI, resourceURI);
         msg.put(SecurityContext.class, sc);
         
-        AbstractXACMLAuthorizingInterceptor authorizingInterceptor = 
-            new DummyXACMLAuthorizingInterceptor();
+        PolicyDecisionPoint pdp = new DummyPDP();
+        XACMLAuthorizingInterceptor authorizingInterceptor = new XACMLAuthorizingInterceptor(pdp);
         authorizingInterceptor.handleMessage(msg);
     }
     
+    @SuppressWarnings("deprecation")
     @org.junit.Test
     public void testDeny() throws Exception {
         // Mock up a Security Context
@@ -74,8 +77,8 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         msg.put(Message.REQUEST_URI, resourceURI);
         msg.put(SecurityContext.class, sc);
         
-        AbstractXACMLAuthorizingInterceptor authorizingInterceptor = 
-            new DummyXACMLAuthorizingInterceptor();
+        PolicyDecisionPoint pdp = new DummyPDP();
+        XACMLAuthorizingInterceptor authorizingInterceptor = new XACMLAuthorizingInterceptor(pdp);
         
         try {
             authorizingInterceptor.handleMessage(msg);

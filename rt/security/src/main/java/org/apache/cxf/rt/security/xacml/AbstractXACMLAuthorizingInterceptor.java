@@ -54,7 +54,10 @@ import org.opensaml.xacml.ctx.StatusType;
  * statement. 
  * 
  * This class must be subclassed to actually perform the request to the PDP.
+ * 
+ * @deprecated: Use XACMLAuthorizingInterceptor instead
  */
+@Deprecated
 public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractXACMLAuthorizingInterceptor.class);
