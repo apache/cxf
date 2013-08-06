@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
 // importation convention: if the same class name is used for 
 // 2005/08 and 2004/08, then the former version is imported
 // and the latter is fully qualified when used
-import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.v200408.AttributedQName;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
@@ -521,9 +520,8 @@ public class VersionTransformer {
             WSA_NAMESPACE_NAME + "/role/none";
         public static final ObjectFactory WSA_OBJECT_FACTORY = 
             new ObjectFactory();
-        public static final Class<org.apache.cxf.ws.addressing.v200408.EndpointReferenceType>
-        EPR_TYPE = 
-            org.apache.cxf.ws.addressing.v200408.EndpointReferenceType.class;
+        public static final Class<org.apache.cxf.ws.addressing.v200408.EndpointReferenceType> EPR_TYPE 
+            = org.apache.cxf.ws.addressing.v200408.EndpointReferenceType.class;
         
         private static JAXBContext jaxbContext;
         
@@ -539,10 +537,7 @@ public class VersionTransformer {
         public static JAXBContext getJAXBContext() throws JAXBException {
             synchronized (Names200408.class) {
                 if (jaxbContext == null) {
-                    Class<?> clz = org.apache.cxf.ws.addressing.v200408.ObjectFactory.class;
-                    jaxbContext =
-                        JAXBContext.newInstance(PackageUtils.getPackageName(clz),
-                                                clz.getClassLoader());
+                    jaxbContext = JAXBContext.newInstance(org.apache.cxf.ws.addressing.v200408.ObjectFactory.class);
                 }
             }
             return jaxbContext;
@@ -585,8 +580,7 @@ public class VersionTransformer {
         public static JAXBContext getJAXBContext() throws JAXBException {
             synchronized (Names200403.class) {
                 if (jaxbContext == null) {
-                    Class<?> clz = org.apache.cxf.ws.addressing.v200403.ObjectFactory.class;
-                    jaxbContext = JAXBContext.newInstance(clz.getPackage().getName(), clz.getClassLoader());
+                    jaxbContext = JAXBContext.newInstance(org.apache.cxf.ws.addressing.v200403.ObjectFactory.class);
                 }
             }
             return jaxbContext;
