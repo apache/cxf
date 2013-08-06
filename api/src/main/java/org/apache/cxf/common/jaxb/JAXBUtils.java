@@ -553,7 +553,7 @@ public final class JAXBUtils {
         return jaxbXjcLoader;
     }
     
-    public static Object setNamespaceWrapper(final Map<String, String> nspref,
+    public static Object setNamespaceMapper(final Map<String, String> nspref,
                                            Marshaller marshaller) throws PropertyException {
         Object mapper = createNamespaceWrapper(marshaller.getClass(), nspref);
         if (marshaller.getClass().getName().contains(".internal.")) {
