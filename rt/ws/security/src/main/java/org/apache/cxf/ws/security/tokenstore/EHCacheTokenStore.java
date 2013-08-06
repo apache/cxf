@@ -61,8 +61,9 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
         cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
-        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
-        cc.overflowToDisk(false); //tokens not writable
+        @SuppressWarnings("deprecation")
+        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)
+            .overflowToDisk(false); //tokens not writable
         
         Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
@@ -91,7 +92,10 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             int parsedTTL = getTTL(token);
             if (parsedTTL > 0) {
-                cache.put(new Element(token.getId(), token, false, parsedTTL, parsedTTL));
+                Element element = new Element(token.getId(), token);
+                element.setTimeToLive(parsedTTL);
+                element.setTimeToIdle(parsedTTL);
+                cache.put(element);
             }
         }
     }
@@ -100,7 +104,10 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (token != null && !StringUtils.isEmpty(identifier)) {
             int parsedTTL = getTTL(token);
             if (parsedTTL > 0) {
-                cache.put(new Element(identifier, token, false, parsedTTL, parsedTTL));
+                Element element = new Element(identifier, token);
+                element.setTimeToLive(parsedTTL);
+                element.setTimeToIdle(parsedTTL);
+                cache.put(element);
             }
         }
     }
