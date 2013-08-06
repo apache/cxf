@@ -109,7 +109,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             
             final Map<String, String> nspref = databinding.getDeclaredNamespaceMappings();
             if (nspref != null) {
-                JAXBUtils.setNamespaceWrapper(nspref, marshaller);
+                JAXBUtils.setNamespaceMapper(nspref, marshaller);
             }
             if (databinding.getMarshallerProperties() != null) {
                 for (Map.Entry<String, Object> propEntry 

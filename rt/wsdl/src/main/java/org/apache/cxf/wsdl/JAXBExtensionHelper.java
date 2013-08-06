@@ -318,7 +318,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
                 nspref.put((String)entry.getValue(), (String)entry.getKey());
             }
-            JAXBUtils.setNamespaceWrapper(nspref, u);
+            JAXBUtils.setNamespaceMapper(nspref, u);
             u.marshal(mObj, writer);
             writer.flush();            
         } catch (Exception ex) {

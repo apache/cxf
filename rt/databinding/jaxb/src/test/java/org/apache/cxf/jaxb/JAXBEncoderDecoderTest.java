@@ -245,7 +245,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         opFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
         XMLEventWriter writer = opFactory.createXMLEventWriter(stringWriter);
         Marshaller m = context.createMarshaller();
-        JAXBUtils.setNamespaceWrapper(mapper, m);
+        JAXBUtils.setNamespaceMapper(mapper, m);
         JAXBEncoderDecoder.marshall(m, testObject, part, writer);
         writer.flush();
         writer.close();
