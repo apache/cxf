@@ -45,6 +45,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+        	<groupId>net.sf.ehcache</groupId>
+        	<artifactId>ehcache</artifactId>
+    		<version>${cxf.ehcache.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${project.version}</version>

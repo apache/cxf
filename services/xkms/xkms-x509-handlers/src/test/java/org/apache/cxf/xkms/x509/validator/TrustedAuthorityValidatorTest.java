@@ -120,7 +120,7 @@ public class TrustedAuthorityValidatorTest extends BasicValidationTest {
 
     private StatusType processRequest(String path) throws JAXBException, CertificateException {
         @SuppressWarnings("unchecked")
-        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>)u.unmarshal(this
+        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>)unmarshaller.unmarshal(this
             .getClass().getResourceAsStream(PATH_TO_RESOURCES + path));
         TrustedAuthorityValidator validator = new TrustedAuthorityValidator(certificateRepo);
         return validator.validate(request.getValue());

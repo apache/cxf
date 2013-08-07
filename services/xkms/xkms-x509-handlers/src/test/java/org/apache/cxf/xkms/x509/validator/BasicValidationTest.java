@@ -23,16 +23,17 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
 import org.junit.Before;
 
 public class BasicValidationTest {
-    protected JAXBContext jc;
-    protected Unmarshaller u;
+    protected JAXBContext jaxbContext;
+    protected Unmarshaller unmarshaller;
 
 
     @Before
     public void setUp() throws JAXBException {
-        jc = JAXBContext.newInstance("org.apache.cxf.xkms.model.xkms");
-        u = jc.createUnmarshaller();
+        jaxbContext = JAXBContext.newInstance(MessageAbstractType.class.getPackage().getName());
+        unmarshaller = jaxbContext.createUnmarshaller();
     }
 }

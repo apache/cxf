@@ -12,3 +12,8 @@ xkms-itests - Integration tests
 xkms-osgi - OSGi blueprint configuration for OSGi deployment
 xkms-war - Web spring configuration for Web depoyment
 
+Installation
+------------
+
+features:addurl mvn:org.apache.cxf.services.xkms/cxf-services-xkms-features/3.0.0-SNAPSHOT/xml
+features:install cxf-xkms-service cxf-xkms-client

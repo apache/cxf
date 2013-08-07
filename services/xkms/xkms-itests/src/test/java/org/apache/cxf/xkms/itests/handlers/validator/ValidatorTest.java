@@ -42,23 +42,31 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(PaxExam.class)
 public class ValidatorTest extends BasicIntegrationTest {
-
     private static final String PATH_TO_RESOURCES = "/data/xkms/certificates/";
 
     private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF = 
         new org.apache.cxf.xkms.model.xmldsig.ObjectFactory();
     private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
+    
+    private static final Logger LOG = LoggerFactory.getLogger(ValidatorTest.class);
 
     @Test
     public void testRootCertIsValid() throws CertificateException {
-
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         X509Certificate rootCertificate = readCertificate("trusted_cas/root.cer");
         ValidateRequestType request = prepareValidateXKMSRequest(rootCertificate);
-        StatusType result = xkmsService.validate(request).getKeyBinding().get(0).getStatus();
+        StatusType result = doValidate(request);
 
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
         Assert.assertFalse(result.getValidReason().isEmpty());
@@ -72,7 +80,7 @@ public class ValidatorTest extends BasicIntegrationTest {
     public void testAliceSignedByRootIsValid() throws JAXBException, CertificateException {
         X509Certificate aliceCertificate = readCertificate("cas/alice.cer");
         ValidateRequestType request = prepareValidateXKMSRequest(aliceCertificate);
-        StatusType result = xkmsService.validate(request).getKeyBinding().get(0).getStatus();
+        StatusType result = doValidate(request);
 
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
         Assert.assertFalse(result.getValidReason().isEmpty());
@@ -86,7 +94,7 @@ public class ValidatorTest extends BasicIntegrationTest {
     public void testDaveSignedByAliceSginedByRootIsValid() throws JAXBException, CertificateException {
         X509Certificate daveCertificate = readCertificate("dave.cer");
         ValidateRequestType request = prepareValidateXKMSRequest(daveCertificate);
-        StatusType result = xkmsService.validate(request).getKeyBinding().get(0).getStatus();
+        StatusType result = doValidate(request);
 
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
         Assert.assertFalse(result.getValidReason().isEmpty());
@@ -100,7 +108,7 @@ public class ValidatorTest extends BasicIntegrationTest {
     public void testSelfSignedCertOscarIsNotValid() throws JAXBException, CertificateException {
         X509Certificate oscarCertificate = readCertificate("oscar.cer");
         ValidateRequestType request = prepareValidateXKMSRequest(oscarCertificate);
-        StatusType result = xkmsService.validate(request).getKeyBinding().get(0).getStatus();
+        StatusType result = doValidate(request);
 
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_INVALID, result.getStatusValue());
         Assert.assertFalse(result.getInvalidReason().isEmpty());
@@ -112,7 +120,7 @@ public class ValidatorTest extends BasicIntegrationTest {
     public void testExpiredCertIsNotValid() throws CertificateException {
         X509Certificate expiredCertificate = readCertificate("expired.cer");
         ValidateRequestType request = prepareValidateXKMSRequest(expiredCertificate);
-        StatusType result = xkmsService.validate(request).getKeyBinding().get(0).getStatus();
+        StatusType result = doValidate(request);
 
         Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_INVALID, result.getStatusValue());
         Assert.assertFalse(result.getInvalidReason().isEmpty());
@@ -157,6 +165,16 @@ public class ValidatorTest extends BasicIntegrationTest {
         InputStream inputStream = ValidatorTest.class.getResourceAsStream(PATH_TO_RESOURCES + path);
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509Certificate)cf.generateCertificate(inputStream);
+    }
+    
+    private StatusType doValidate(ValidateRequestType request) {
+        try {
+            return xkmsService.validate(request).getKeyBinding().get(0).getStatus();
+        } catch (Exception e) {
+            // Avoid serialization problems for some exceptions when transported by pax exam 
+            LOG.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 }

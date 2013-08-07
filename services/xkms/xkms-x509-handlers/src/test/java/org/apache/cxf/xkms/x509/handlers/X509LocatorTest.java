@@ -19,12 +19,8 @@
 package org.apache.cxf.xkms.x509.handlers;
 
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-
-import org.apache.cxf.xkms.client.X509AppId;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
@@ -76,24 +72,19 @@ public class X509LocatorTest {
     @Ignore
     @Test
     public void locate() {
-        List<X509AppId> ids = new ArrayList<X509AppId>();
-        X509AppId id = new X509AppId(Applications.PKIX, "alice");
-        ids.add(id);
-        LocateRequestType request = prepareLocateXKMSRequest(ids);
+        LocateRequestType request = prepareLocateXKMSRequest();
         UnverifiedKeyBindingType result = locator.locate(request);
         Assert.assertNotNull(result.getKeyInfo());
     }
 
-    private LocateRequestType prepareLocateXKMSRequest(List<X509AppId> ids) {
+    private LocateRequestType prepareLocateXKMSRequest() {
         QueryKeyBindingType queryKeyBindingType = XKMS_OF.createQueryKeyBindingType();
 
-        for (X509AppId id : ids) {
-            UseKeyWithType useKeyWithType = XKMS_OF.createUseKeyWithType();
-            useKeyWithType.setIdentifier(id.getId());
-            useKeyWithType.setApplication(id.getApplication().getUri());
+        UseKeyWithType useKeyWithType = XKMS_OF.createUseKeyWithType();
+        useKeyWithType.setIdentifier("alice");
+        useKeyWithType.setApplication(Applications.PKIX.getUri());
 
-            queryKeyBindingType.getUseKeyWith().add(useKeyWithType);
-        }
+        queryKeyBindingType.getUseKeyWith().add(useKeyWithType);
 
         LocateRequestType locateRequestType = XKMS_OF.createLocateRequestType();
         locateRequestType.setQueryKeyBinding(queryKeyBindingType);

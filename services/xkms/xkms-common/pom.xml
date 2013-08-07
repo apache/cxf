@@ -37,6 +37,8 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
+            <!-- Not needed in OSGi when using blueprint -->
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

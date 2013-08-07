@@ -43,5 +43,14 @@
       <module>xkms-osgi</module>
       <module>xkms-war</module>
     </modules>
+    
+    <profiles>
+    	<profile>
+    		<id>xkms-ldap-test</id>
+    		<modules>
+    			<module>xkms-itests</module>
+    		</modules>
+    	</profile>
+    </profiles>
 
 </project>

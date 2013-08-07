@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.xkms.x509.validator;
 
+import java.io.InputStream;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
@@ -49,9 +51,9 @@ public class DateValidatorTest extends BasicValidationTest {
     }
 
     private StatusType processRequest(String path) throws JAXBException {
+        InputStream is = this.getClass().getResourceAsStream(path);
         @SuppressWarnings("unchecked")
-        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>) u.unmarshal(this.getClass()
-                .getResourceAsStream(path));
+        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>) unmarshaller.unmarshal(is);
         DateValidator validator = new DateValidator();
         return validator.validate(request.getValue());
 

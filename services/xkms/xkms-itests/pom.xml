@@ -25,7 +25,7 @@
     </parent>
 
     <properties>
-        <pax-exam.version>3.1.0-SNAPSHOT</pax-exam.version>
+        <pax-exam.version>3.2.0</pax-exam.version>
         <karaf.version>2.3.1</karaf.version>
     </properties>
 
@@ -72,17 +72,23 @@
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>1.5.2</version>
+            <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
-
+        
         <dependency>
-            <groupId>org.apache.karaf.features</groupId>
-            <artifactId>org.apache.karaf.features.core</artifactId>
-            <version>${karaf.version}</version>
-            <scope>test</scope>
+        	<groupId>org.apache.karaf</groupId>
+        	<artifactId>apache-karaf</artifactId>
+        	<version>${karaf.version}</version>
+        	<type>tar.gz</type>
+        	<exclusions>
+        		<exclusion>	
+        			<groupId>org.apache.karaf</groupId>
+        			<artifactId>org.apache.karaf.client</artifactId>
+        		</exclusion>
+        	</exclusions>
         </dependency>
-
+         
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -109,19 +115,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>ops4j.snapshot</id>
-            <name>The OPS4J SNAPSHOT Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/ops4j-snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
 </project>

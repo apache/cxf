@@ -19,7 +19,9 @@
 
 package org.apache.cxf.xkms.model.extensions;
 
-
+/**
+ * Needed for detail messages in OSGi blueprint deployment
+ */
 public class AdditionalClassesFactory {
     public Class<?>[] create() {
         return new Class[]{ResultDetails.class};

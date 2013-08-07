@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
+/**
+ * Needed for detail messages in war deployment (spring)
+ */
 public class ClassArrayFactoryBean implements FactoryBean<Object> {
 
     private List<String> classNames;

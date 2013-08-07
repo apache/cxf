@@ -19,6 +19,7 @@
 
 package org.apache.cxf.xkms.x509.utils;
 
+import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -36,9 +37,9 @@ public class X509UtilsTest extends BasicValidationTest {
     private static final String CERT_DN = "CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS";
 
     public void extractValidatingCertsOK() throws JAXBException {
+        InputStream is = this.getClass().getResourceAsStream("/validateRequestOK.xml");
         @SuppressWarnings("unchecked")
-        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>)u.unmarshal(this.getClass()
-            .getResourceAsStream("/validateRequestOK.xml"));
+        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>)unmarshaller.unmarshal(is);
         List<X509Certificate> certs = ValidateRequestParser.parse(request.getValue());
         Assert.assertEquals("Exactly one certificate should be found", 1, certs.size());
         Assert.assertEquals("Unexcpected certificate DN", CERT_DN, certs.get(0).getSubjectDN().getName());
@@ -46,9 +47,9 @@ public class X509UtilsTest extends BasicValidationTest {
 
     @Test(expected = XKMSRequestException.class)
     public void extractValidatingCertsCorrupted() throws JAXBException {
+        InputStream is = this.getClass().getResourceAsStream("/validateRequestCorrupted.xml");
         @SuppressWarnings("unchecked")
-        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>)u.unmarshal(this.getClass()
-            .getResourceAsStream("/validateRequestCorrupted.xml"));
+        JAXBElement<ValidateRequestType> request = (JAXBElement<ValidateRequestType>)unmarshaller.unmarshal(is);
         ValidateRequestParser.parse(request.getValue());
     }
 }

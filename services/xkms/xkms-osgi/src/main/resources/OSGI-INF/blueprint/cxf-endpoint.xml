@@ -20,7 +20,15 @@
                         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
 ">
 
-	<cm:property-placeholder persistent-id="org.apache.cxf.xkms" />
+	<cm:property-placeholder persistent-id="org.apache.cxf.xkms">
+		<cm:default-properties>
+			<cm:property name="xkms.enableXKRSS" value="true"/>
+			<cm:property name="xkms.ldap.url" value="tcp:localhost:389"/>
+			<cm:property name="xkms.ldap.user" value=""/>
+			<cm:property name="xkms.ldap.pwd" value=""/>
+			<cm:property name="xkms.ldap.retry" value=""/>
+		</cm:default-properties>
+	</cm:property-placeholder>
 
     <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSearch">
         <argument value="${xkms.ldap.url}" />
@@ -70,7 +78,7 @@
     </bean>
 
     <bean id="xkmsProviderBean" class="org.apache.cxf.xkms.service.XKMSService">
-    	<property name="enableXKRSS" value="${xkms.enableXKRSS}" />
+    	<!-- <property name="enableXKRSS" value="${xkms.enableXKRSS}" /> -->
         <property name="validators">
             <list>
                 <ref component-id="dateValidator" />
