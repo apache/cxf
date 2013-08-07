@@ -73,12 +73,10 @@ under the License.
     </service-properties>
   </service>
 
-  <service ref="destinationRegistry" interface="org.apache.cxf.transport.http.DestinationRegistry">
-  </service>
-  <service ref="httpTransport" interface="org.apache.cxf.transport.ConduitInitiator">
-  </service>
-  <service ref="httpTransport" interface="org.apache.cxf.transport.DestinationFactory">
-  </service>
+  <service ref="destinationRegistry" interface="org.apache.cxf.transport.http.DestinationRegistry"/>
+  <service ref="httpTransport" 
+    id="org.apache.cxf.transport.http.HTTPTransportFactory"
+    interface="org.apache.cxf.transport.http.HTTPTransportFactory"/>
 
 </blueprint>
 

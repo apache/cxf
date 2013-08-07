@@ -47,13 +47,13 @@ public final class ExtensionRegistry {
         return exts;
     }
 
-    public static void removeExtensions(List<Extension> list) {
+    public static void removeExtensions(List<? extends Extension> list) {
         for (Extension e : list) {
             extensions.remove(e.getName(), e);
         }
     }
 
-    public static void addExtensions(List<Extension> list) {
+    public static void addExtensions(List<? extends Extension> list) {
         for (Extension e : list) {
             extensions.putIfAbsent(e.getName(), e);
         }

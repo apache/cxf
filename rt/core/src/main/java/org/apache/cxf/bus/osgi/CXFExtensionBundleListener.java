@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionException;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
@@ -37,13 +38,14 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 
 public class CXFExtensionBundleListener implements SynchronousBundleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFActivator.class);
     private long id;
-    private ConcurrentMap<Long, List<Extension>> extensions 
-        = new ConcurrentHashMap<Long, List<Extension>>(16, 0.75f, 4);
+    private ConcurrentMap<Long, List<OSGiExtension>> extensions 
+        = new ConcurrentHashMap<Long, List<OSGiExtension>>(16, 0.75f, 4);
     
     public CXFExtensionBundleListener(long bundleId) {
         this.id = bundleId;
@@ -69,7 +71,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             unregister(event.getBundle().getBundleId());
         }
     }
-    
+  
     protected void register(final Bundle bundle) {
         Enumeration<?> e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
         while (e != null && e.hasMoreElements()) {
@@ -78,9 +80,9 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         }
     }
 
-    private void addExtensions(final Bundle bundle, List<Extension> orig) {
+    private boolean addExtensions(final Bundle bundle, List<Extension> orig) {
         if (orig.isEmpty()) {
-            return;
+            return false;
         }
         
         List<String> names = new ArrayList<String>(orig.size());
@@ -89,10 +91,10 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         }
         LOG.info("Adding the extensions from bundle " + bundle.getSymbolicName() 
                  + " (" + bundle.getBundleId() + ") " + names); 
-        List<Extension> list = extensions.get(bundle.getBundleId());
+        List<OSGiExtension> list = extensions.get(bundle.getBundleId());
         if (list == null) {
-            list = new CopyOnWriteArrayList<Extension>();
-            List<Extension> preList = extensions.putIfAbsent(bundle.getBundleId(), list);
+            list = new CopyOnWriteArrayList<OSGiExtension>();
+            List<OSGiExtension> preList = extensions.putIfAbsent(bundle.getBundleId(), list);
             if (preList != null) {
                 list = preList;
             }
@@ -101,10 +103,11 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             list.add(new OSGiExtension(ext, bundle));
         }
         ExtensionRegistry.addExtensions(list);
+        return !list.isEmpty();
     }
 
     protected void unregister(final long bundleId) {
-        List<Extension> list = extensions.remove(bundleId);
+        List<OSGiExtension> list = extensions.remove(bundleId);
         if (list != null) {
             LOG.info("Removing the extensions for bundle " + bundleId);
             ExtensionRegistry.removeExtensions(list);
@@ -119,11 +122,28 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
     
     public class OSGiExtension extends Extension {
         final Bundle bundle;
+        Object serviceObject;
         public OSGiExtension(Extension e, Bundle b) {
             super(e);
             bundle = b;
         }
 
+        public void setServiceObject(Object o) {
+            serviceObject = o;
+            obj = o;
+        }
+        public Object load(ClassLoader cl, Bus b) {
+            if (interfaceName == null && bundle.getBundleContext() != null) {
+                ServiceReference ref = bundle.getBundleContext().getServiceReference(className);
+                if (ref != null && ref.getBundle().getBundleId() == bundle.getBundleId()) {
+                    Object o = bundle.getBundleContext().getService(ref);
+                    serviceObject = o;
+                    obj = o;
+                    return obj;
+                }
+            }
+            return super.load(cl, b);
+        }
         protected Class<?> tryClass(String name, ClassLoader cl) {
             Class<?> c = null;
             Throwable origExc = null;
@@ -150,7 +170,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
 
         public Extension cloneNoObject() {
             OSGiExtension ext = new OSGiExtension(this, bundle);
-            ext.obj = null;
+            ext.obj = serviceObject;
             return ext;
         }
 
