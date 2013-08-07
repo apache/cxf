@@ -1620,14 +1620,12 @@ public abstract class AbstractBindingBuilder {
         String encrUser = (String)message.getContextualProperty(sign 
                                                                 ? SecurityConstants.SIGNATURE_USERNAME
                                                                 : SecurityConstants.ENCRYPT_USERNAME);
-        if (crypto != null && encrUser == null) {
+        if (crypto != null && (encrUser == null || "".equals(encrUser))) {
             try {
                 encrUser = crypto.getDefaultX509Identifier();
             } catch (WSSecurityException e1) {
                 throw new Fault(e1);
             }
-        } else if (encrUser == null || "".equals(encrUser)) {
-            policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " crypto object found.");
         }
         if (encrUser == null || "".equals(encrUser)) {
             policyNotAsserted(token, "A " + (sign ? "signature" : "encryption") + " username needs to be declared.");
