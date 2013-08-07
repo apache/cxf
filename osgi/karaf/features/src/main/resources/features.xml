@@ -136,13 +136,6 @@
     </feature>
     <feature name="cxf-http" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
-        
-        <!--
-       	  	Running into .ClassNotFoundException: org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider
-			not found by org.apache.cxf.cxf-rt-transports-http
-        	if this is not present. FIXME This does not look correct
-        -->
-        <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="[2,4)">http-whiteboard</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
     </feature>
