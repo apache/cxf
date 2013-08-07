@@ -129,9 +129,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             Throwable origExc = null;
             try {
                 c = bundle.loadClass(className);
-            } catch (NoClassDefFoundError e) {
-                origExc = e;
-            } catch (ClassNotFoundException e) {
+            } catch (Throwable e) {
                 origExc = e;
             }
             if (c == null) {
