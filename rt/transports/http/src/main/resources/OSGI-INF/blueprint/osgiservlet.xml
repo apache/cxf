@@ -46,6 +46,9 @@ under the License.
   </cm:property-placeholder>
 
   <bean id="destinationRegistry" class="org.apache.cxf.transport.http.DestinationRegistryImpl"/>
+  <bean id="httpTransport" class="org.apache.cxf.transport.http.HTTPTransportFactory">
+    <argument ref="destinationRegistry"/>
+  </bean>
 
   <bean id="osgiServlet" class="org.apache.cxf.transport.servlet.CXFNonSpringServlet">
     <argument ref="destinationRegistry"/>
@@ -71,6 +74,10 @@ under the License.
   </service>
 
   <service ref="destinationRegistry" interface="org.apache.cxf.transport.http.DestinationRegistry">
+  </service>
+  <service ref="httpTransport" interface="org.apache.cxf.transport.ConduitInitiator">
+  </service>
+  <service ref="httpTransport" interface="org.apache.cxf.transport.DestinationFactory">
   </service>
 
 </blueprint>

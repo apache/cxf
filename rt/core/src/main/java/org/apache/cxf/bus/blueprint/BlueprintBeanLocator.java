@@ -123,7 +123,6 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
                 list.add(type.cast(container.getComponentInstance(s)));
             }
         }
-        list.addAll(orig.getBeansOfType(type));
         if (list.isEmpty()) {
             try {
                 ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
@@ -138,6 +137,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
                     + " from OSGi services and get error: " + ex);  
             }
         }
+        list.addAll(orig.getBeansOfType(type));
         
         return list;
     }
@@ -166,7 +166,27 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
                 loaded = true;
             }
         }
-        return loaded || orig.loadBeansOfType(type, listener);
+        
+        try {
+            ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+            if (refs != null) {
+                for (ServiceReference r : refs) {
+                    Object o2 = context.getService(r);
+                    Class<? extends T> t = o2.getClass().asSubclass(type);
+                    if (listener.loadBean(t.getName(), t)) {
+                        if (listener.beanLoaded(t.getName(), type.cast(o2))) {
+                            return true;
+                        }
+                        loaded = true;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            //ignore, just don't support the OSGi services
+            LOG.info("Try to find the Bean with type:" + type 
+                + " from OSGi services and get error: " + ex);  
+        }        
+        return orig.loadBeansOfType(type, listener) || loaded;
     }
 
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
