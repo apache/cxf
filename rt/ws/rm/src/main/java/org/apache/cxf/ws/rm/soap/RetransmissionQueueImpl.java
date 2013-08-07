@@ -514,7 +514,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             nextInterval = baseRetransmissionInterval * backoff;
             RetryPolicyType rmrp = null != manager.getSourcePolicy() 
                 ? manager.getSourcePolicy().getRetryPolicy() : null; 
-            maxRetries = null != rmrp ? rmrp.getMaxRetries() : 0;
+            maxRetries = null != rmrp ? rmrp.getMaxRetries() : -1;
             
             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
             AttributedURIType to = null;
@@ -530,7 +530,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             if (null != rmprops) {
                 number = rmprops.getSequence().getMessageNumber();
             }
-            if (null != manager.getTimer()) {
+            if (null != manager.getTimer() && maxRetries != 0) {
                 schedule();
             }
         }

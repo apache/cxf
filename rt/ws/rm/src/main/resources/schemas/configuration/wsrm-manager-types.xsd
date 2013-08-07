@@ -197,11 +197,11 @@
     </xs:complexType>
      
     <xs:complexType name="RetryPolicyType">
-        <xs:attribute name="maxRetries" type="xs:int" use="optional" default="0">
+        <xs:attribute name="maxRetries" type="xs:int" use="optional" default="-1">
             <xs:annotation>
                 <xs:documentation>
                     The maximum number of retries of a message.
-                    A value of 0 means the number is unbound.
+                    A negative value means the number is unbound.
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute> 
