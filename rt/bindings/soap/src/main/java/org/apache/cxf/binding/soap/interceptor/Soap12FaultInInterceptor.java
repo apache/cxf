@@ -74,6 +74,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         String role = null;
         String node = null;
         Element detail = null;
+        String lang = null;
 
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
@@ -122,6 +123,10 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                                              fault,
                                              XPathConstants.STRING);
             
+            lang = (String) xu.getValue("//s:Fault/s:Reason/s:Text/@xml:lang", 
+                                             fault,
+                                             XPathConstants.STRING);
+            
             Node detailNode = (Node) xu.getValue("//s:Fault/s:Detail",
                                                  fault,
                                                  XPathConstants.NODE);
@@ -152,6 +157,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         fault.setDetail(detail);
         fault.setRole(role);
         fault.setNode(node);
+        fault.setLang(lang);
         return fault;
     }
 
