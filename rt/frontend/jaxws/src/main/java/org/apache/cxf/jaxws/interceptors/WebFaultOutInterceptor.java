@@ -101,7 +101,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                     String convertedLang = lang.getLanguage();
                     String country = lang.getCountry();
                     if (country.length() > 0) {
-                        convertedLang = convertedLang + '-' + country;
+                        convertedLang = convertedLang + '_' + country;
                     }
                     f.setLang(convertedLang);
                 }

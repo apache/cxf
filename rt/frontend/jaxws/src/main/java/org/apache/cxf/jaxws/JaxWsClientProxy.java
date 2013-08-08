@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -214,14 +215,20 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                     //ignore
                 }
             }
-            soapFault.setFaultString(((SoapFault)ex).getReason());
+            final boolean isSoap11 = SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE.equals(soapFault.getNamespaceURI());
+            
+            if (isSoap11 || ((SoapFault)ex).getLang() == null) {
+                soapFault.setFaultString(((SoapFault)ex).getReason());
+            } else {
+                soapFault.setFaultString(((SoapFault)ex).getReason(), stringToLocale(((SoapFault)ex).getLang()));
+            }
+            
             SAAJUtils.setFaultCode(soapFault, ((SoapFault)ex).getFaultCode());
             String role = ((SoapFault)ex).getRole();
             if (role != null) {
                 soapFault.setFaultActor(role);
             }
-            if (((SoapFault)ex).getSubCodes() != null 
-                && !SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE.equals(soapFault.getNamespaceURI())) {
+            if (((SoapFault)ex).getSubCodes() != null && !isSoap11) {
                 // set the subcode only if it is supported (e.g, 1.2)
                 for (QName fsc : ((SoapFault)ex).getSubCodes()) {
                     soapFault.appendFaultSubcode(fsc);    
@@ -246,6 +253,17 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
         }      
         return soapFault;
+    }
+    
+    private static Locale stringToLocale(String locale) {
+        String parts[] = locale.split("_", -1);
+        if (parts.length == 1) {
+            return new Locale(parts[0]);
+        } else if (parts.length == 2) {
+            return new Locale(parts[0], parts[1]);
+        } else {
+            return new Locale(parts[0], parts[1], parts[2]);
+        }
     }
 
     private boolean addressChanged(String address) {
