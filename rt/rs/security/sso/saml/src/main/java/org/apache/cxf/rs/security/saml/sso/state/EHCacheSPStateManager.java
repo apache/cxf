@@ -156,8 +156,11 @@ public class EHCacheSPStateManager implements SPStateManager {
             // Fall back to 5 minutes if the default TTL is set incorrectly
             parsedTTL = 60 * 5;
         }
+        Element element = new Element(securityContextKey, state);
+        element.setTimeToLive(parsedTTL);
+        element.setTimeToIdle(parsedTTL);
         
-        responseCache.put(new Element(securityContextKey, state, false, parsedTTL, parsedTTL));
+        responseCache.put(element);
     }
     
     public void setRequestState(String relayState, RequestState state) {
@@ -171,7 +174,10 @@ public class EHCacheSPStateManager implements SPStateManager {
             parsedTTL = 3600;
         }
         
-        requestCache.put(new Element(relayState, state, false, parsedTTL, parsedTTL));
+        Element element = new Element(relayState, state);
+        element.setTimeToLive(parsedTTL);
+        element.setTimeToIdle(parsedTTL);
+        requestCache.put(element);
     }
 
     public RequestState removeRequestState(String relayState) {
