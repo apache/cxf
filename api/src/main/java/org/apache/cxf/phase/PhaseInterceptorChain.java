@@ -41,6 +41,7 @@ import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.MessageObserver;
@@ -315,7 +316,8 @@ public class PhaseInterceptorChain implements InterceptorChain {
                             if (message.getContent(Exception.class) != null) {
                                 message.getExchange().put(Exception.class, ex2);
                             }
-                            isOneWay = message.getExchange().isOneWay();
+                            isOneWay = message.getExchange().isOneWay() 
+                                && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
                         }
                         
                         if (faultObserver != null && !isOneWay) {

@@ -68,7 +68,9 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
         inPhases.add(new Phase(Phase.PRE_PROTOCOL_FRONTEND, ++i * 1000));
         inPhases.add(new Phase(Phase.USER_PROTOCOL, ++i * 1000));
         inPhases.add(new Phase(Phase.POST_PROTOCOL, ++i * 1000));
+        inPhases.add(new Phase(Phase.PRE_UNMARSHAL, ++i * 1000));
         inPhases.add(new Phase(Phase.UNMARSHAL, ++i * 1000));
+        inPhases.add(new Phase(Phase.POST_UNMARSHAL, ++i * 1000));
         inPhases.add(new Phase(Phase.PRE_LOGICAL, ++i * 1000));
         inPhases.add(new Phase(Phase.USER_LOGICAL, ++i * 1000));
         inPhases.add(new Phase(Phase.POST_LOGICAL, ++i * 1000));
