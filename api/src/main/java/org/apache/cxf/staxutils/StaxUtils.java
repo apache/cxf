@@ -1518,6 +1518,7 @@ public final class StaxUtils {
         if (value == null) {
             return null;
         }
+        value = value.trim();
         
         int index = value.indexOf(":");
 

@@ -334,4 +334,34 @@ public class StaxUtilsTest extends Assert {
         
         assertEquals(in.toString(), out.toString());
     }
+    
+    @Test
+    public void testQName() throws Exception {
+        StringBuilder in = new StringBuilder();
+        in.append("<f:foo xmlns:f=\"http://example.com/\">");
+        in.append("<bar>f:Bar</bar>");
+        in.append("<bar> f:Bar </bar>");
+        in.append("<bar>x:Bar</bar>");
+        in.append("</f:foo>");
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(
+             new ByteArrayInputStream(in.toString().getBytes()));
+        
+        QName qname = new QName("http://example.com/", "Bar");
+        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        // first bar
+        assertEquals(qname, StaxUtils.readQName(reader));
+        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        // second bar
+        assertEquals(qname, StaxUtils.readQName(reader));
+        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        // third bar
+        try {
+            StaxUtils.readQName(reader);
+            fail("invalid qname in mapping");
+        } catch (Exception e) {
+            // ignore
+        }
+    }
 }
