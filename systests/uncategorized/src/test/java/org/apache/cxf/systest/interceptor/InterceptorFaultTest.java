@@ -127,7 +127,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     private Greeter greeter;
     private List<Phase> inPhases;
     private PhaseComparator comparator;
-    private Phase preLogicalPhase;
+    private Phase postUnMarshalPhase;
     
     
 
@@ -211,7 +211,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         // all interceptors pass
         testInterceptorsPass(robust);
         
-        // test failure in phases before Phase.PRE_LOGICAL
+        // test failure in phases <= Phase.UNMARSHALL
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
             .createFaultLocation();
         location.setAfter(MAPAggregator.class.getName());
@@ -226,9 +226,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         throws PingMeFault {
         for (Phase p : phases) {
             location.setPhase(p.getName());
-            if (Phase.PRE_LOGICAL.equals(p.getName())) {
-                continue;
-            } else if (Phase.POST_INVOKE.equals(p.getName())) {
+            if (Phase.POST_INVOKE.equals(p.getName())) {
                 break;
             }   
             testFail(location, true, robust);
@@ -265,8 +263,10 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
         // oneway reports a plain fault (although server sends a soap fault)
 
-        boolean expectOnewayFault = robust 
-            || comparator.compare(preLogicalPhase, getPhase(location.getPhase())) > 0;
+        boolean expectOnewayFault = robust;
+        if (comparator.compare(getPhase(location.getPhase()), postUnMarshalPhase) < 0) {
+            expectOnewayFault = true;
+        }
         
         try {
             greeter.greetMeOneWay("oneway");
@@ -331,8 +331,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             inPhases.addAll(greeterBus.getExtension(PhaseManager.class).getInPhases());
             Collections.sort(inPhases, comparator);
         }        
-        if (null == preLogicalPhase) {
-            preLogicalPhase = getPhase(Phase.PRE_LOGICAL);
+        if (null == postUnMarshalPhase) {
+            postUnMarshalPhase = getPhase(Phase.POST_UNMARSHAL);
         }
        
         GreeterService gs = new GreeterService();
