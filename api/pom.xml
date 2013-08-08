@@ -219,20 +219,30 @@
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/http.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/http.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <extensionArgs>
+                                        <extensionArg>-npa</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/ws-addr.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.addressing</packagename>
+                                    <extensionArgs>
+                                        <extensionArg>-npa</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/addressing.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/addressing.xjb</bindingFile>
+                                    <extensionArgs>
+                                        <extensionArg>-npa</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/security.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/configuration/security.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <extensionArgs>
+                                        <extensionArg>-npa</extensionArg>
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
@@ -240,10 +250,16 @@
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
                                     <extension>true</extension>
+                                    <extensionArgs>
+                                        <extensionArg>-npa</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/addressing200403.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/addressing200403.xjb</bindingFile>
+                                    <extensionArgs>
+                                        <extensionArg>-npa</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
