@@ -58,7 +58,9 @@ public class Phase implements Comparable<Object> {
     public static final String RECEIVE = "receive";
     public static final String READ = "read";
     public static final String PROTOCOL = "protocol";
+    public static final String PRE_UNMARSHAL = "pre-unmarshal";
     public static final String UNMARSHAL = "unmarshal";
+    public static final String POST_UNMARSHAL = "post-unmarshal";
     public static final String PRE_INVOKE = "pre-invoke";
     public static final String INVOKE = "invoke";
     public static final String POST_INVOKE = "post-invoke";
