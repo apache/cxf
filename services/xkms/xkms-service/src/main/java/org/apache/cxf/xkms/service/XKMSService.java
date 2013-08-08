@@ -319,6 +319,7 @@ public class XKMSService implements XKMSPortType {
 
     public void setEnableXKRSS(boolean enableXKRSS) {
         this.enableXKRSS = enableXKRSS;
+        LOG.info("enableXKRSS:" + enableXKRSS);
     }
 
     private void assertXKRSSAllowed() {

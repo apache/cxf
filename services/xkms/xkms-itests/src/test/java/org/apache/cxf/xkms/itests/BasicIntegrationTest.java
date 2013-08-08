@@ -73,19 +73,23 @@ public class BasicIntegrationTest {
             keepRuntimeFolder(),
 
             replaceConfigurationFile("data/xkms/certificates/trusted_cas/root.cer",
-                                     new File(
-                                              "src/test/resources/data/xkms/certificates/trusted_cas/root.cer")),
+                                     new File("src/test/resources/data/xkms/certificates/trusted_cas/root.cer")),
             replaceConfigurationFile("data/xkms/certificates/cas/alice.cer",
                                      new File("src/test/resources/data/xkms/certificates/cas/alice.cer")),
-            replaceConfigurationFile("etc/org.apache.cxf.xkms.cfg",
-                                     new File("src/test/resources/etc/org.apache.cxf.xkms.cfg")),
-
-            features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client"),
+            replaceConfigurationFile("data/xkms/certificates/dave.cer",
+                                     new File("src/test/resources/data/xkms/certificates/dave.cer")),
+            replaceConfigurationFile("etc/org.apache.cxf.xkms.cfg", getConfigFile()),
 
             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS), 
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", HTTP_PORT),
-            editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", XKMS_ENDPOINT)
+            editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", XKMS_ENDPOINT),
+            features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client"),
+            //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
+    }
+
+    protected File getConfigFile() {
+        return new File("src/test/resources/etc/org.apache.cxf.xkms.cfg");
     }
 
 }

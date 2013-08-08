@@ -58,12 +58,6 @@ public class ValidatorTest extends BasicIntegrationTest {
 
     @Test
     public void testRootCertIsValid() throws CertificateException {
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         X509Certificate rootCertificate = readCertificate("trusted_cas/root.cer");
         ValidateRequestType request = prepareValidateXKMSRequest(rootCertificate);
         StatusType result = doValidate(request);

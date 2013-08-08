@@ -49,9 +49,13 @@ public class FileCertificateRepo implements CertificateRepo {
     private final File storageDir;
     private final CertificateFactory certFactory;
 
-    public FileCertificateRepo(String path) throws CertificateException {
+    public FileCertificateRepo(String path) {
         storageDir = new File(path);
-        this.certFactory = CertificateFactory.getInstance("X.509");
+        try {
+            this.certFactory = CertificateFactory.getInstance("X.509");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public void saveCertificate(X509Certificate cert, UseKeyWithType id) {
@@ -199,6 +203,8 @@ public class FileCertificateRepo implements CertificateRepo {
                     continue;
                 }
                 X509Certificate cert = readCertificate(certFile);
+                LOG.debug("Searching for " + subjectDn + ". Checking cert " 
+                    + cert.getSubjectDN().getName() + ", " + cert.getSubjectX500Principal().getName());
                 if (subjectDn.equalsIgnoreCase(cert.getSubjectDN().getName())
                     || subjectDn.equalsIgnoreCase(cert.getSubjectX500Principal().getName())) {
                     result.add(cert);

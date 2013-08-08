@@ -26,7 +26,7 @@
 			<cm:property name="xkms.ldap.url" value="tcp:localhost:389"/>
 			<cm:property name="xkms.ldap.user" value=""/>
 			<cm:property name="xkms.ldap.pwd" value=""/>
-			<cm:property name="xkms.ldap.retry" value=""/>
+			<cm:property name="xkms.ldap.retry" value="2"/>
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -77,8 +77,8 @@
         <argument ref="certificateRepo" />
     </bean>
 
-    <bean id="xkmsProviderBean" class="org.apache.cxf.xkms.service.XKMSService">
-    	<!-- <property name="enableXKRSS" value="${xkms.enableXKRSS}" /> -->
+    <bean id="xkmsService" class="org.apache.cxf.xkms.service.XKMSService">
+    	<property name="enableXKRSS" value="${xkms.enableXKRSS}" />
         <property name="validators">
             <list>
                 <ref component-id="dateValidator" />
@@ -100,10 +100,10 @@
     <bean id="additionalClasses"
         class="org.apache.cxf.xkms.model.extensions.AdditionalClassesFactory" />
 
-    <jaxws:endpoint id="XKMSService"
+    <jaxws:endpoint id="XKMSServiceEndpoint"
         xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
         serviceName="serviceNamespace:XKMSService" endpointName="serviceNamespace:XKMSPort"
-        implementor="#xkmsProviderBean" address="/XKMS">
+        implementor="#xkmsService" address="/XKMS">
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">
                 <bean class="java.lang.Object" factory-ref="additionalClasses"

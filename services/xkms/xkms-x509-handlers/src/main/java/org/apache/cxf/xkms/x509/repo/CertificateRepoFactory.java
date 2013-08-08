@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.xkms.x509.repo;
 
-import java.security.cert.CertificateException;
-
 import org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapCertificateRepo;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig;
@@ -32,18 +30,14 @@ public final class CertificateRepoFactory {
 
     public static CertificateRepo createRepository(String type, LdapSearch ldapSearch,
                                                    LdapSchemaConfig ldapSchemaConfig, String rootDN,
-                                                   String storageDir) throws CertificateException {
-        CertificateRepo certificateRepo = null;
-
+                                                   String storageDir) {
         if ("ldap".equals(type)) {
-            certificateRepo = new LdapCertificateRepo(ldapSearch, ldapSchemaConfig, rootDN);
+            return new LdapCertificateRepo(ldapSearch, ldapSchemaConfig, rootDN);
+        } else if ("file".equals(type)) {
+            return new FileCertificateRepo(storageDir);
+        } else {
+            throw new RuntimeException("Invalid repo type " + type + ". Valid types are file, ldap");
         }
-
-        if ("file".equals(type)) {
-            certificateRepo = new FileCertificateRepo(storageDir);
-        }
-
-        return certificateRepo;
     }
 
 }
