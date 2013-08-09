@@ -124,7 +124,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
         out.close();
-        assertEquals(37448, out.size());
+        assertEquals(27364, out.size());
     }
 
     @Test

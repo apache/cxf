@@ -144,6 +144,7 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-javamail_1.4_spec</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.fastinfoset</groupId>

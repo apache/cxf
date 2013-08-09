@@ -76,7 +76,7 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         assertEquals("Get a wrong ResourceClasses size", 1, sfb.getResourceClasses().size());
         assertEquals("Get a wrong resource class", BookStoreNoAnnotations.class, 
                      sfb.getResourceClasses().get(0));
-        
+        ctx.close();
     }
     
     private void verifyJaxbProvider(List<?> providers) throws Exception {

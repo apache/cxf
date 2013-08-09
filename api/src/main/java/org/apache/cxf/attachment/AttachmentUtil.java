@@ -31,7 +31,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,8 +48,6 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
-import javax.mail.Header;
-import javax.mail.internet.InternetHeaders;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -287,16 +284,40 @@ public final class AttachmentUtil {
         return id;
     }
     
-    
-    public static Attachment createAttachment(InputStream stream, InternetHeaders headers) 
+    static String getHeaderValue(List<String> v) {
+        if (v != null && v.size() > 0) {
+            return v.get(0);
+        }
+        return null;
+    }
+    static String getHeaderValue(List<String> v, String delim) {
+        if (v != null && v.size() > 0) {
+            StringBuilder b = new StringBuilder();
+            for (String s : v) {
+                if (b.length() > 0) {
+                    b.append(delim);
+                }
+                b.append(s);
+            }
+            return b.toString();
+        }
+        return null;
+    }
+    static String getHeader(Map<String, List<String>> headers, String h) {
+        return getHeaderValue(headers.get(h));
+    }
+    static String getHeader(Map<String, List<String>> headers, String h, String delim) {
+        return getHeaderValue(headers.get(h), delim);
+    }
+    public static Attachment createAttachment(InputStream stream, Map<String, List<String>> headers) 
         throws IOException {
      
-        String id = cleanContentId(headers.getHeader("Content-ID", null));
+        String id = cleanContentId(getHeader(headers, "Content-ID"));
 
         AttachmentImpl att = new AttachmentImpl(id);
         
-        final String ct = headers.getHeader("Content-Type", null);
-        String cd = headers.getHeader("Content-Disposition", null);
+        final String ct = getHeader(headers, "Content-Type");
+        String cd = getHeader(headers, "Content-Disposition");
         String fileName = null;
         if (!StringUtils.isEmpty(cd)) {
             StringTokenizer token = new StringTokenizer(cd, ";");
@@ -315,38 +336,47 @@ public final class AttachmentUtil {
             }
         }
         
-        boolean quotedPrintable = false;
+        String encoding = null;
         
-        for (Enumeration<?> e = headers.getAllHeaders(); e.hasMoreElements();) {
-            Header header = (Header) e.nextElement();
-            if (header.getName().equalsIgnoreCase("Content-Transfer-Encoding")) {
-                if (header.getValue().equalsIgnoreCase("binary")) {
+        for (Map.Entry<String, List<String>> e : headers.entrySet()) {
+            String name = e.getKey();
+            if (name.equalsIgnoreCase("Content-Transfer-Encoding")) {
+                encoding = getHeader(headers, name);
+                if ("binary".equalsIgnoreCase(encoding)) {
                     att.setXOP(true);
-                } else if (header.getValue().equalsIgnoreCase("quoted-printable")) {
-                    quotedPrintable = true;
                 }
             }
-            att.setHeader(header.getName(), header.getValue());
+            att.setHeader(name, getHeaderValue(e.getValue()));
         }
-        
-        if (quotedPrintable) {
-            DataSource source = new AttachmentDataSource(ct, 
-                                                         new QuotedPrintableDecoderStream(stream));
-            if (!StringUtils.isEmpty(fileName)) {
-                ((AttachmentDataSource)source).setName(fileName);
-            }
-            att.setDataHandler(new DataHandler(source));
-        } else {
-            DataSource source = new AttachmentDataSource(ct, stream);
-            if (!StringUtils.isEmpty(fileName)) {
-                ((AttachmentDataSource)source).setName(fileName);
-            }
-            att.setDataHandler(new DataHandler(source));
+        if (encoding == null) {
+            encoding = "binary";
         }
-        
+        DataSource source = new AttachmentDataSource(ct, 
+                                                     decode(stream, encoding));
+        if (!StringUtils.isEmpty(fileName)) {
+            ((AttachmentDataSource)source).setName(fileName);
+        }
+        att.setDataHandler(new DataHandler(source));        
         return att;
     }
     
+    
+    public static InputStream decode(InputStream in, String encoding) throws IOException {
+        encoding = encoding.toLowerCase();
+
+        // some encodings are just pass-throughs, with no real decoding.
+        if ("binary".equals(encoding) 
+            || "7bit".equals(encoding) 
+            || "8bit".equals(encoding)) {
+            return in;
+        } else if ("base64".equals(encoding)) {
+            return new Base64DecoderStream(in);
+        } else if ("quoted-printable".equals(encoding)) {
+            return new QuotedPrintableDecoderStream(in);
+        } else {
+            throw new IOException("Unknown encoding " + encoding);
+        }
+    }    
     public static boolean isTypeSupported(String contentType, List<String> types) {
         if (contentType == null) {
             return false;

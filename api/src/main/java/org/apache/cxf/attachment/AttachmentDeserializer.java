@@ -26,13 +26,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.activation.DataSource;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetHeaders;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -42,7 +42,7 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
 public class AttachmentDeserializer {
-
+    public static final String ATTACHMENT_PART_HEADERS = AttachmentDeserializer.class.getName() + ".headers";
     public static final String ATTACHMENT_DIRECTORY = "attachment-directory";
 
     public static final String ATTACHMENT_MEMORY_THRESHOLD = "attachment-memory-threshold";
@@ -123,18 +123,14 @@ public class AttachmentDeserializer {
                 throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
 
-            try {
-                InternetHeaders ih = new InternetHeaders(stream);
-                message.put(InternetHeaders.class.getName(), ih);
-                String val = ih.getHeader("Content-Type", "; ");
-                if (!StringUtils.isEmpty(val)) {
-                    String cs = HttpHeaderHelper.findCharset(val);
-                    if (!StringUtils.isEmpty(cs)) {
-                        message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
-                    }
+            Map<String, List<String>> ih = loadPartHeaders(stream);
+            message.put(ATTACHMENT_PART_HEADERS, ih);
+            String val = AttachmentUtil.getHeader(ih, "Content-Type", "; ");
+            if (!StringUtils.isEmpty(val)) {
+                String cs = HttpHeaderHelper.findCharset(val);
+                if (!StringUtils.isEmpty(cs)) {
+                    message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
                 }
-            } catch (MessagingException e) {
-                throw new RuntimeException(e);
             }
 
             body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
@@ -180,15 +176,7 @@ public class AttachmentDeserializer {
         }
         stream.unread(v);
 
-
-        InternetHeaders headers;
-        try {
-            headers = new InternetHeaders(stream);
-        } catch (MessagingException e) {
-            // TODO create custom IOException
-            throw new RuntimeException(e);
-        }
-
+        Map<String, List<String>> headers = loadPartHeaders(stream);
         return (AttachmentImpl)createAttachment(headers);
     }
 
@@ -281,7 +269,7 @@ public class AttachmentDeserializer {
      * @return
      * @throws IOException
      */
-    private Attachment createAttachment(InternetHeaders headers) throws IOException {
+    private Attachment createAttachment(Map<String, List<String>> headers) throws IOException {
         InputStream partStream = 
             new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
                                       this);
@@ -326,6 +314,122 @@ public class AttachmentDeserializer {
         }
         stream.unread(v);
         return true;
+    }
+    
+    
+
+    private Map<String, List<String>> loadPartHeaders(InputStream in) throws IOException {
+        List<String> headerLines = new ArrayList<String>(10);
+        StringBuffer buffer = new StringBuffer(128);
+        String line;
+        // loop until we hit the end or a null line
+        while ((line = readLine(in)) != null) {
+            // lines beginning with white space get special handling
+            if (line.startsWith(" ") || line.startsWith("\t")) {
+                // this gets handled using the logic defined by
+                // the addHeaderLine method.  If this line is a continuation, but
+                // there's nothing before it, just call addHeaderLine to add it
+                // to the last header in the headers list
+                if (buffer.length() == 0) {
+                    addHeaderLine(headerLines, line);
+                } else {
+                    // preserve the line break and append the continuation
+                    buffer.append("\r\n");
+                    buffer.append(line);
+                }
+            } else {
+                // if we have a line pending in the buffer, flush it
+                if (buffer.length() > 0) {
+                    addHeaderLine(headerLines, buffer.toString());
+                    buffer.setLength(0);
+                }
+                // add this to the accumulator
+                buffer.append(line);
+            }
+        }
+
+        // if we have a line pending in the buffer, flush it
+        if (buffer.length() > 0) {
+            addHeaderLine(headerLines, buffer.toString());
+        }
+        Map<String, List<String>> heads = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        for (String h: headerLines) {
+            int separator = h.indexOf(':');
+            String name = null;
+            String value = "";
+            if (separator == -1) {
+                name = h.trim();
+            } else {
+                name = h.substring(0, separator);
+                // step past the separator.  Now we need to remove any leading white space characters.
+                separator++;
+
+                while (separator < h.length()) {
+                    char ch = h.charAt(separator);
+                    if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n') {
+                        break;
+                    }
+                    separator++;
+                }
+                value = h.substring(separator);
+            }
+            List<String> v = heads.get(name);
+            if (v == null) {
+                v = new ArrayList<String>(1);
+                heads.put(name, v);
+            }
+            v.add(value);
+        }
+        return heads;
+    }
+
+    private String readLine(InputStream in) throws IOException {
+        StringBuffer buffer = new StringBuffer(128);
+
+        int c;
+
+        while ((c = in.read()) != -1) {
+            // a linefeed is a terminator, always.
+            if (c == '\n') {
+                break;
+            } else if (c == '\r') {
+                //just ignore the CR.  The next character SHOULD be an NL.  If not, we're
+                //just going to discard this
+                continue;
+            } else {
+                // just add to the buffer
+                buffer.append((char)c);
+            }
+        }
+
+        // no characters found...this was either an eof or a null line.
+        if (buffer.length() == 0) {
+            return null;
+        }
+
+        return buffer.toString();
+    }    
+    private void addHeaderLine(List<String> headers, String line) {
+        // null lines are a nop
+        if (line.length() == 0) {
+            return;
+        }
+
+        // we need to test the first character to see if this is a continuation whitespace
+        char ch = line.charAt(0);
+
+        // tabs and spaces are special.  This is a continuation of the last header in the list.
+        if (ch == ' ' || ch == '\t') {
+            int size = headers.size();
+            // it's possible that we have a leading blank line.
+            if (size > 0) {
+                line = headers.remove(size - 1) + line;
+                headers.add(line);
+            }
+        } else {
+            // this just gets appended to the end, preserving the addition order.
+            headers.add(line);
+        }
     }
 
 }

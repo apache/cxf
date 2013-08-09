@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.internet.InternetHeaders;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -264,9 +263,11 @@ public class MessageContextImpl implements MessageContext {
     
         List<Attachment> newAttachments = new LinkedList<Attachment>();
         try {
+            Map<String, List<String>> headers 
+                = CastUtils.cast((Map<?, ?>)inMessage.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS));
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
                                      inMessage.getContent(InputStream.class), 
-                                     (InternetHeaders)inMessage.get(InternetHeaders.class.getName())),
+                                     headers),
                                      new ProvidersImpl(inMessage));
             newAttachments.add(first);
         } catch (IOException ex) {
