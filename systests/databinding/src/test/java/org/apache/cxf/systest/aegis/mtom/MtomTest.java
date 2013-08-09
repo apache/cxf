@@ -120,7 +120,13 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         client.acceptDataHandler(dhBean);
         DataHandlerBean accepted = impl.getLastDhBean();
         Assert.assertNotNull(accepted);
-        String data = (String) accepted.getDataHandler().getContent();
+        Object o = accepted.getDataHandler().getContent();
+        String data = null;
+        if (o instanceof String) {
+            data = (String)o;
+        } else if (o instanceof InputStream) {
+            data = IOUtils.toString((InputStream)o);
+        }
         Assert.assertNotNull(data);
         Assert.assertEquals("This is the cereal shot from guns.", data);
     }

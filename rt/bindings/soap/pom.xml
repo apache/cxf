@@ -87,6 +87,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-javamail_1.4_spec</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.easymock</groupId>

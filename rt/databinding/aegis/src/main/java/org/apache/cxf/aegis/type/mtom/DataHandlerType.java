@@ -21,13 +21,11 @@ package org.apache.cxf.aegis.type.mtom;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.activation.DataHandler;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.attachment.AttachmentImpl;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 
 /**
@@ -70,8 +68,7 @@ public class DataHandlerType extends AbstractXOPType {
         DataHandler handler = (DataHandler) object;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            InputStream stream = handler.getInputStream();
-            IOUtils.copy(stream, baos);
+            handler.writeTo(baos);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

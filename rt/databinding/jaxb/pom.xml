@@ -143,10 +143,6 @@
                      <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                      <scope>test</scope>
                  </dependency>
-                 <dependency>
-                      <groupId>org.apache.geronimo.specs</groupId>
-                      <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                  </dependency>
                   <dependency>
                       <groupId>org.apache.geronimo.specs</groupId>
                       <artifactId>geronimo-activation_1.1_spec</artifactId>
