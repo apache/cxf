@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RegisterResult xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="I92ed24772e43843b3d23020ad9ec9754"
+    Service="http://www.example.org/XKMS" ResultMajor="http://www.w3.org/2002/03/xkms#Success"
+    RequestId="I1494ac4351b7de5c174d455b7000e18f" xmlns="http://www.w3.org/2002/03/xkms#">
+    <KeyBinding Id="Ia26450ebe93f62b3b3ab137fc6a61c36">
+        <ds:KeyInfo>
+            <ds:X509Data>
+                <ds:X509Certificate>
+                    MIICEDCCAX2gAwIBAgIQimXeUAxYJbJMady9vV1bLjAJBgUrDgMCHQUAMBIxEDA
+                    OBgNVBAMTB1Rlc3QgQ0EwHhcNMDMwODE1MDcwMDAwWhcNMDUwODE1MDY1OTU5Wj
+                    ArMSkwJwYDVQQDEyBBbGljZSBBYXJkdmFyayBPPUFsaWNlIENvcnAgQz1VUzCBn
+                    zANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA0nIsmR+aVW2egl5MIfOKy4HuMKkk
+                    9AZ/IQuDLVPlhzOfgngjVQCjr8uvmnqtNu8HBupui8LgGthO6U9D0CNT5mbmhIA
+                    ErRADUMIAFsi7LzBarUvNWTqYNEJmcHsAUZdrdcDrkNnG7SzbuJx+GDNiHKVDQg
+                    gPBLc1XagW20RMvokCAwEAAaNWMFQwDQYDVR0KBAYwBAMCBkAwQwYDVR0BBDwwO
+                    oAQAaVOkaVLLKoFmLN37pC8uqEUMBIxEDAOBgNVBAMTB1Rlc3QgQ0GCEC4MndUX
+                    jPG1TZxVKg+HutAwCQYFKw4DAh0FAAOBgQABU91ka7IlkXCfv4Zh2Ohwgg2yObt
+                    Y3+6C/BTFGrOEBJDy+DoxJ/NuBF18w3rrrR18xE6jNKYLCQb8zUGk4QOG5Y+HT/
+                    QTTFvWkiOLXcpTuhnOhXatr42FoYpDkjx2QWK+J5Q2l/Rgjgc/0ZV8U/kD8UuRk
+                    Xp4AZh7QsiX8AcO0w==
+                </ds:X509Certificate>
+                <ds:X509Certificate>
+                    MIIB9zCCAWSgAwIBAgIQLgyd1ReM8bVNnFUqD4e60DAJBgUrDgMCHQUAMBIxEDA
+                    OBgNVBAMTB1Rlc3QgQ0EwHhcNMDMwODE1MDcwMDAwWhcNMTAwODE1MDcwMDAwWj
+                    ASMRAwDgYDVQQDEwdUZXN0IENBMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBg
+                    QCn23HHp+HtXpiyKVSDtdE3dO0r0oLB/H9sxUEkeXB8oMxwbhdcizWH92zrtm1V
+                    fVtxkfmwF14ZXoyDZHeZXuCOtAfz/mW6s2gmfD45TfFFVGksDGVRNK5XmKXA5sE
+                    C51RCvaxzGBdGDlCuVPqX7Cq3IcZpRU1IXbi5YzGwV7j6LwIDAQABo1YwVDANBg
+                    NVHQoEBjAEAwIHgDBDBgNVHQEEPDA6gBABpU6RpUssqgWYs3fukLy6oRQwEjEQM
+                    A4GA1UEAxMHVGVzdCBDQYIQLgyd1ReM8bVNnFUqD4e60DAJBgUrDgMCHQUAA4GB
+                    ABDYD4Fwx2dscu+BgYcZ+GoQQtCJkwJEXytb4zlNl7HLFKbXSw4m0blQquIsfsi
+                    QgFYAQBXSbu7aeUqqmSGHvILu3BGwVOKjxbHfcM4/MefuTtpOpCN40wy3YwwngD
+                    tHTaIqm8NwS966PE+W9f8kD70q5FNwf+GF/lX9qGc/x435
+                </ds:X509Certificate>
+            </ds:X509Data>
+        </ds:KeyInfo>
+        <KeyUsage>http://www.w3.org/2002/03/xkms#Signature</KeyUsage>
+        <KeyUsage>http://www.w3.org/2002/03/xkms#Encryption</KeyUsage>
+        <KeyUsage>http://www.w3.org/2002/03/xkms#Exchange</KeyUsage>
+        <UseKeyWith Application="urn:ietf:rfc:2459"
+            Identifier='C="US"
+          O="Alice Corp" CN="Alice Aardvark"' />
+        <UseKeyWith Application="urn:ietf:rfc:2633"
+            Identifier="alice@example.com" />
+        <UseKeyWith Application="http://ca.example.com/cps/20030401/class3"
+            Identifier="alice@example.com" />
+        <Status StatusValue="http://www.w3.org/2002/03/xkms#Valid">
+            <ValidReason>http://www.w3.org/2002/03/xkms#Signature
+            </ValidReason>
+            <ValidReason>http://www.w3.org/2002/03/xkms#IssuerTrust
+            </ValidReason>
+            <ValidReason>http://www.w3.org/2002/03/xkms#RevocationStatus
+            </ValidReason>
+            <ValidReason>http://www.w3.org/2002/03/xkms#ValidityInterval
+            </ValidReason>
+        </Status>
+    </KeyBinding>
+</RegisterResult>

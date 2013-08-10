@@ -1,0 +1,12 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <ns2:LocateRequest xmlns="http://www.w3.org/2000/09/xmldsig#"
+            xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#">
+            <ns2:QueryKeyBinding>
+                <ns2:UseKeyWith Application="urn:ietf:rfc:2459"
+                    Identifier="CN=www.issuer.com" />
+            </ns2:QueryKeyBinding>
+        </ns2:LocateRequest>
+    </soap:Body>
+</soap:Envelope>
+

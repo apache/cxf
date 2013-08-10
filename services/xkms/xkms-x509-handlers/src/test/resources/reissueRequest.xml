@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReissueRequest xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="I3a682dfb94cc8e9b3b648026783a8094"
+    Service="http://www.example.org/XKMS" xmlns="http://www.w3.org/2002/03/xkms#">
+    <RespondWith>http://www.w3.org/2002/03/xkms#X509Cert</RespondWith>
+    <RespondWith>http://www.w3.org/2002/03/xkms#X509Chain</RespondWith>
+    <ReissueKeyBinding Id="I518fc89b03369bccec3d1ee9d985c436">
+        <ds:KeyInfo>
+            <ds:X509Data>
+                <ds:X509Certificate>
+                    MIICEDCCAX2gAwIBAgIQimXeUAxYJbJMady9vV1bLjAJBgUrDgMCHQUAMBIxEDA
+                    OBgNVBAMTB1Rlc3QgQ0EwHhcNMDMwODE1MDcwMDAwWhcNMDUwODE1MDY1OTU5Wj
+                    ArMSkwJwYDVQQDEyBBbGljZSBBYXJkdmFyayBPPUFsaWNlIENvcnAgQz1VUzCBn
+                    zANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA0nIsmR+aVW2egl5MIfOKy4HuMKkk
+                    9AZ/IQuDLVPlhzOfgngjVQCjr8uvmnqtNu8HBupui8LgGthO6U9D0CNT5mbmhIA
+                    ErRADUMIAFsi7LzBarUvNWTqYNEJmcHsAUZdrdcDrkNnG7SzbuJx+GDNiHKVDQg
+                    gPBLc1XagW20RMvokCAwEAAaNWMFQwDQYDVR0KBAYwBAMCBkAwQwYDVR0BBDwwO
+                    oAQAaVOkaVLLKoFmLN37pC8uqEUMBIxEDAOBgNVBAMTB1Rlc3QgQ0GCEC4MndUX
+                    jPG1TZxVKg+HutAwCQYFKw4DAh0FAAOBgQABU91ka7IlkXCfv4Zh2Ohwgg2yObt
+                    Y3+6C/BTFGrOEBJDy+DoxJ/NuBF18w3rrrR18xE6jNKYLCQb8zUGk4QOG5Y+HT/
+                    QTTFvWkiOLXcpTuhnOhXatr42FoYpDkjx2QWK+J5Q2l/Rgjgc/0ZV8U/kD8UuRk
+                    Xp4AZh7QsiX8AcO0w==
+                </ds:X509Certificate>
+            </ds:X509Data>
+        </ds:KeyInfo>
+        <Status StatusValue="http://www.w3.org/2002/03/xkms#Valid" />
+    </ReissueKeyBinding>
+    <Authentication>
+        <KeyBindingAuthentication>
+            <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <SignedInfo>
+                    <CanonicalizationMethod
+                        Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                    <SignatureMethod
+                        Algorithm="http://www.w3.org/2000/09/xmldsig#hmac-sha1" />
+                    <Reference URI="#I518fc89b03369bccec3d1ee9d985c436">
+                        <Transforms>
+                            <Transform
+                                Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+                                <ec:InclusiveNamespaces
+                                    PrefixList="ds xenc #default"
+                                    xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                            </Transform>
+                        </Transforms>
+                        <DigestMethod
+                            Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                        <DigestValue>qnhsUF9RMxxGydG/5KdJjWhtBFE=
+                        </DigestValue>
+                    </Reference>
+                </SignedInfo>
+                <SignatureValue>+gKw3b0qi9BaIqmN1gIyvj1UxRs=
+                </SignatureValue>
+            </Signature>
+        </KeyBindingAuthentication>
+    </Authentication>
+    <ProofOfPossession>
+        <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <SignedInfo>
+                <CanonicalizationMethod
+                    Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                <SignatureMethod
+                    Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+                <Reference URI="#I518fc89b03369bccec3d1ee9d985c436">
+                    <Transforms>
+                        <Transform
+                            Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+                            <ec:InclusiveNamespaces
+                                PrefixList="ds xenc #default"
+                                xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                        </Transform>
+                    </Transforms>
+                    <DigestMethod
+                        Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                    <DigestValue>qnhsUF9RMxxGydG/5KdJjWhtBFE=
+                    </DigestValue>
+                </Reference>
+            </SignedInfo>
+            <SignatureValue>
+                sP/RWAA7fnv86ZgwOlfxTwN05akxyf65rCw7rwXNkJmx0fxUNFJ+qKDqmIh2KyvFyBut6FredSXj
+                t3iDIXUKMmjA2/VPGEX8yyd71DbRqf9dXb2FzkvkKrCbYumlavbrChpEwiMUqk2rd5tjkFAZjYRA
+                tuURoFfmoOYY/M+mNUU=
+            </SignatureValue>
+        </Signature>
+    </ProofOfPossession>
+</ReissueRequest>

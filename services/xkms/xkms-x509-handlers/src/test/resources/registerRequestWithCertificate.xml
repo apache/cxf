@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RegisterRequest xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="I1494ac4351b7de5c174d455b7000e18f"
+    Service="http://www.example.org/XKMS" xmlns="http://www.w3.org/2002/03/xkms#">
+    <RespondWith>http://www.w3.org/2002/03/xkms#X509Cert</RespondWith>
+    <RespondWith>http://www.w3.org/2002/03/xkms#X509Chain</RespondWith>
+    <PrototypeKeyBinding Id="I269e655567dbae568591c0a06957529e">
+        <ds:KeyInfo>
+            <ds:X509Data>
+                <ds:X509Certificate>MIIFIjCCAwoCAQEwDQYJKoZIhvcNAQEFBQAwUzEPMA0GA1UEChMGSXNzdWVyMQswCQYDVQQGEwJERTEMMAoGA1UECBMDTlJXMQwwCgYDVQQHEwNDR04xFzAVBgNVBAMTDnd3dy5pc3N1ZXIuY29tMB4XDTEyMDIyOTEyMjMxOVoXDTEzMDIyODEyMjMxOVowWzETMBEGA1UEChMKQW5vdGhlclNUUzELMAkGA1UEBhMCREUxDDAKBgNVBAgTA05SVzEMMAoGA1UEBxMDQ0dOMRswGQYDVQQDExJ3d3cuYW5vdGhlcnN0cy5jb20wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC89tdiW7NQcof51k/9T0X12bAuXlxS+KhRhwnruus1D5zLhw391fGUEU/3gGdQ5HXuwE2sIGVWfoaR71nd0uWl7ACfwuv4Isgblvvaa6XKzhGsG2bLDM/M0Swghr/YgO/627iuESOJ2Ub2ejYDVWk6HOTZOHdA9IUcXwJxntG1eiFCxcAsJOVs5fu4BFVq2gu2idi4QCuhxpAOEqY/hT5HsMT7sTPhsLZxC9MDY3Z04bikulOwRSpi+21w4xqlkVxAjxMFuB7kANQONNfapgOf2rY/sDETH8catfBvPiDXfRFouIPmqVssvRTbHlIXm3z0dM9fw6N/mkfNdt/BmONtfHr12qgErWg3kUpnDxshOPI7qqISQHR76zxLSTZaLeSplPVE5aPuvCTGQMNpujJIMKTQCUo9sgabu0JpwkaT0zMAJJXIDPV1kwEMf7jU/IhsppCBW1il02LC5I9hytYZyXHylpyEOqR0VOLw+7a0F5NGz95X6K6YMKUlmCnPjhdJDz4CFSqeyH0/7O69vooEYIHEOWEQRKtqb1qYWcx/P/gYU49IcQMB7Z87+i0StsA1D66FK5l3ejEWYOR0UIonzXTtCukmRgCXeUBbO5skE70HMoJmQfKTfhNLdx480SbfkwJ9cLc5lRFimjEbtcYn/bYQvbnR+hprGnd4+36jvwIDAQABMA0GCSqGSIb3DQEBBQUAA4ICAQBLKToriq3mex/ZHPTPh14RIONwzpXzmLvx9UjsxUI2k49OJHWrowLyEtyX4TLf9Gd9POAmjFBWxWK2nQLYisWQg07NSgOWDvtGj1Ql6XjGdY59JYh1N1h+Ppd/Sb/FsPDN+CQ7+8Xf2nfocbJafktOI6xZJe4PynENi/TIjjX6mdBN4pirNtLXCPzEVyP8MDphrmBrSGGTYU3loz9TzsLfiDLbh5x2Nyg33hSolGOpfHXFNFAo3T/fMA47vmr07qh7cKwJw6loxcU1AcC/Uhab6QgWySHyTyguH7EFGN9a0/7IRynd+UVqErA2DyjCE6mgzzT7mqVg5ox8W4Flzq2kmip8foLAZ4zW6b19y71+2LUVIPguEfufhLbpmmF65ezDZUmYRYFFHWulhPufSpfEUZguKXIM0voIXAgYrbdtLmHPTGb8Qm3qPDcVQJsOEeqTDbRB9nnXP1t+gaSKr/IO597Mr9o9+TUq2WlH1H3NauLL3XCsWmL0pBEBM8a5fMxs04xPdW9V6A8EyHk4CcSOofMJiAZQIlllqsdYQBsOD/iGVHeVYXSnP0PnQmCjdQMaoGIl/dC6oLuk2EerekIuR1NVMdGchpPY/Q2GQmpnnou0faCK/pE9nUEoh+uxva6iOi7Ns2O3gR2aXxeZM1Bgm4SwTnAl5Acnpy5Forg5pg==
+                </ds:X509Certificate>
+            </ds:X509Data>
+        </ds:KeyInfo>
+        <KeyUsage>http://www.w3.org/2002/03/xkms#Signature</KeyUsage>
+        <KeyUsage>http://www.w3.org/2002/03/xkms#Encryption</KeyUsage>
+        <KeyUsage>http://www.w3.org/2002/03/xkms#Exchange</KeyUsage>
+        <UseKeyWith Application="urn:ietf:rfc:2459"
+            Identifier='C="US" O="Alice Corp" CN="Alice Aardvark"' />
+        <!-- <UseKeyWith Application="urn:ietf:rfc:2633" Identifier="alice@example.com" 
+            /> <UseKeyWith Application="http://ca.example.com/cps/20030401/class3" Identifier="alice@example.com" 
+            /> -->
+        <RevocationCodeIdentifier>
+            5AEAai06hFJEkuqyDyqNh8k/u3M=
+        </RevocationCodeIdentifier>
+    </PrototypeKeyBinding>
+    <Authentication>
+        <KeyBindingAuthentication>
+            <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <SignedInfo>
+                    <CanonicalizationMethod
+                        Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                    <SignatureMethod
+                        Algorithm="http://www.w3.org/2000/09/xmldsig#hmac-sha1" />
+                    <Reference URI="#I269e655567dbae568591c0a06957529e">
+                        <Transforms>
+                            <Transform
+                                Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                        </Transforms>
+                        <DigestMethod
+                            Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                        <DigestValue>WCbpkifxJ1zIJ+V6/knZgxRhR34=</DigestValue>
+                    </Reference>
+                </SignedInfo>
+                <SignatureValue>iJSKM+98hj5ae+btC2WjwBYP+/k=
+                </SignatureValue>
+            </Signature>
+        </KeyBindingAuthentication>
+    </Authentication>
+    <ProofOfPossession>
+        <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <SignedInfo>
+                <CanonicalizationMethod
+                    Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                <SignatureMethod
+                    Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+                <Reference URI="#I269e655567dbae568591c0a06957529e">
+                    <Transforms>
+                        <Transform
+                            Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                    </Transforms>
+                    <DigestMethod
+                        Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                    <DigestValue>WCbpkifxJ1zIJ+V6/knZgxRhR34=
+                    </DigestValue>
+                </Reference>
+            </SignedInfo>
+            <SignatureValue>
+                DcPw742vN120QNrCjCKw0jiCX3pUvbMeRkYjktZkn4nbgo1b7leXU0sJgXM2CY/
+                oQugaRsgz18+qUzM0UX+jr1t1wtCMci5fjzVKZB63oZyKZ9+CJLcBCbirsgJAId
+                +Pq9w4WiwKDf2AytsdXHlN5V1byQIkpfR1CypvBzQa1b4=
+            </SignatureValue>
+        </Signature>
+    </ProofOfPossession>
+</RegisterRequest> 

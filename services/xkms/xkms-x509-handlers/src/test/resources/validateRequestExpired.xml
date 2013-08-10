@@ -1,0 +1,12 @@
+<ns2:ValidateRequest xmlns="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#"
+    Id="CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS">
+    <ns2:QueryKeyBinding>
+        <KeyInfo>
+            <X509Data>
+                <X509Certificate>MIIDETCCAs+gAwIBAgIEULOjdjALBgcqhkjOOAQDBQAwbDEQMA4GA1UEBhMHVW5rbm93bjEQMA4GA1UECBMHVW5rbm93bjEQMA4GA1UEBxMHVW5rbm93bjEQMA4GA1UEChMHVW5rbm93bjEQMA4GA1UECxMHVW5rbm93bjEQMA4GA1UEAxMHVW5rbm93bjAeFw0xMjExMjYxNzE0MzBaFw0xMjExMjcxNzE0MzBaMGwxEDAOBgNVBAYTB1Vua25vd24xEDAOBgNVBAgTB1Vua25vd24xEDAOBgNVBAcTB1Vua25vd24xEDAOBgNVBAoTB1Vua25vd24xEDAOBgNVBAsTB1Vua25vd24xEDAOBgNVBAMTB1Vua25vd24wggG3MIIBLAYHKoZIzjgEATCCAR8CgYEA/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuAHTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOuK2HXKu/yIgMZndFIAccCFQCXYFCPFSMLzLKSuYKi64QL8Fgc9QKBgQD34aCF1ps93su8q1w2uFe5eZSvu/o66oL5V0wLPQeCZ1FZV4661FlP5nEHEIGAtEkWcSPoTCgWE7fPCTKMyKbhPBZ6i1R8jSjgo64eK7OmdZFuo38L+iE1YvH7YnoBJDvMpPG+qFGQiaiD3+Fa5Z8GkotmXoB7VSVkAUw7/s9JKgOBhAACgYAsPxaTY+hEmXhYaKDXWDWLqrVl+rGb9IZvP9rkR5la8bQ44e8hMmUg+M8HmamCdyO8YAjGEcRGvrR+ztdAdltspfedBkfJJ52nQu7NNWGq72Q+Z2MRMOSPvhtgOx0zlXWyyU1zOSXLaoaaojmplZrWfCgJFKk8rvyD82zTQRil0DALBgcqhkjOOAQDBQADLwAwLAIUJiMH3APdS6pwQg8WBKvPOP/yZ+8CFEVErmoasRYXeJfZf+nl9gPEzIdt
+                </X509Certificate>
+            </X509Data>
+        </KeyInfo>
+    </ns2:QueryKeyBinding>
+</ns2:ValidateRequest>
