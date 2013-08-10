@@ -29,9 +29,11 @@ import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.ops4j.pax.exam.util.Filter;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
@@ -54,6 +56,7 @@ public class BasicIntegrationTest {
 //        + "http://oss.sonatype.org/content/repositories/releases/@id=sonatype"; 
 
     @Inject
+    @Filter(timeout = 20000)
     protected XKMSPortType xkmsService;
 
     @Configuration
@@ -70,6 +73,7 @@ public class BasicIntegrationTest {
             karafDistributionConfiguration().frameworkUrl(karafUrl).karafVersion(karafVersion)
                 .unpackDirectory(new File("target/paxexam/unpack/")).useDeployFolder(false),
             logLevel(LogLevel.INFO),
+            systemProperty("java.awt.headless").value("true"),
             keepRuntimeFolder(),
 
             replaceConfigurationFile("data/xkms/certificates/trusted_cas/root.cer",
