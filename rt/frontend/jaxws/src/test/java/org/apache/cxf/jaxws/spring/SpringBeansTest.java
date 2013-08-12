@@ -359,6 +359,7 @@ public class SpringBeansTest extends Assert {
         Greeter g1 = greeters.getGreet1();
         Greeter g2 = greeters.getGreet2();
         assertNotSame(g1, g2);
+        ctx.close();
     }
     @Test
     public void testClientFromFactory() throws Exception {
@@ -377,6 +378,7 @@ public class SpringBeansTest extends Assert {
                 return;
             }
         }
+        ctx.close();
         fail("Did not configure the client");
     }
     @Test
@@ -396,7 +398,7 @@ public class SpringBeansTest extends Assert {
         assertNotNull(greeter2);
         Client client2 = ClientProxy.getClient(greeter2);
         assertSame(client1.getBus(), client2.getBus());
-
+        ctx.close();
     }
 
     @Test

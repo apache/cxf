@@ -40,7 +40,9 @@ public class BusApplicationContextTest extends Assert {
         String cfgFile = "/org/apache/cxf/bus/spring/resources/bus-overwrite.xml";
         ctx = new BusApplicationContext(cfgFile, false);
         assertEquals("Unexpected number of resources", 1, ctx.getConfigResources().length);
+        ctx.close();
         ctx = new BusApplicationContext(cfgFile, true);
         assertEquals("Unexpected number of resources", 2, ctx.getConfigResources().length);
+        ctx.close();
     }
 }

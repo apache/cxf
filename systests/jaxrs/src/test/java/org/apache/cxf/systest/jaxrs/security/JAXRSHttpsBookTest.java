@@ -103,6 +103,7 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         assertEquals(b.getId(), 123);
         b = wc.get(TheBook.class);
         assertEquals(b.getId(), 123);
+        ctx.close();
     }
     
     @Test
@@ -123,6 +124,7 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         assertEquals(b.getId(), 123);
         b = wc.get(TheBook.class);
         assertEquals(b.getId(), 123);
+        ctx.close();
     }
     
     private void doTestGetBook123ProxyFromSpring(String cfgFile) throws Exception {
@@ -145,6 +147,7 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         assertEquals(b.getId(), 123);
         b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
+        ctx.close();
     }
     
     @Test

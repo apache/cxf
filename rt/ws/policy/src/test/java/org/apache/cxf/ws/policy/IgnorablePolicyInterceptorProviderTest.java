@@ -167,6 +167,7 @@ public class IgnorablePolicyInterceptorProviderTest extends Assert {
 
             assertEquals(pips1.iterator().next(), pips2.iterator().next());
 
+            context.close();
         } finally {
             if (null != cxf1) {
                 cxf1.shutdown(true);

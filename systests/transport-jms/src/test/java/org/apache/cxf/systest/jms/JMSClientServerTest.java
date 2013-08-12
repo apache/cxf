@@ -513,6 +513,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 } 
             }
         } catch (UndeclaredThrowableException ex) {
+            ctx.close();
             throw (Exception)ex.getCause();
         }
         

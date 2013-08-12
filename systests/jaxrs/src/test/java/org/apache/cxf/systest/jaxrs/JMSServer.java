@@ -23,15 +23,19 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JMSServer extends AbstractBusTestServerBase {
 
-
+    ClassPathXmlApplicationContext context;
+    
     protected void run()  {
         // create the application context
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+        context = new ClassPathXmlApplicationContext(
             "org/apache/cxf/systest/jaxrs/resources/jms_server_config.xml");
         context.start();
     }
 
-
+    public void tearDown() {
+        context.close();
+    }
+    
     public static void main(String[] args) {
         try {
             JMSServer s = new JMSServer();

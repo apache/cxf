@@ -46,14 +46,15 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
     static EmbeddedJMSBrokerLauncher broker;
 
     public static class Server extends AbstractBusTestServerBase {
-    
+        ClassPathXmlApplicationContext context;
+        EndpointImpl endpoint;
         protected void run()  {
             // create the application context
-            ClassPathXmlApplicationContext context = 
+            context = 
                 new ClassPathXmlApplicationContext("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
             context.start();
             
-            EndpointImpl endpoint = new EndpointImpl(new GreeterImplWithTransaction());
+            endpoint = new EndpointImpl(new GreeterImplWithTransaction());
             endpoint.setAddress("jms://");
             JMSConfiguration jmsConfig = new JMSConfiguration();
     
@@ -71,6 +72,10 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             jmsConfigFeature.setJmsConfig(jmsConfig);
             endpoint.getFeatures().add(jmsConfigFeature);
             endpoint.publish();
+        }
+        public void tearDown() {
+            endpoint.stop();
+            context.close();
         }
     }
 
