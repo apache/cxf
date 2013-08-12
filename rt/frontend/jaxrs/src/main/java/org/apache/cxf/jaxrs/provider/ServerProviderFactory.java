@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         new NameKeyMap<ProviderInfo<ContainerResponseFilter>>(false);
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
-    private List<DynamicFeature> dynamicFeatures = new LinkedList<DynamicFeature>();
+    private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<DynamicFeature>();
     
     private Map<Class<?>, BeanParamInfo> beanParams = new HashMap<Class<?>, BeanParamInfo>();
     private ProviderInfo<ContainerRequestFilter> wadlGenerator;
@@ -233,7 +234,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             
             
             if (ExceptionMapper.class.isAssignableFrom(providerCls)) {
-                exceptionMappers.add((ProviderInfo<ExceptionMapper<?>>)provider); 
+                addProviderToList(exceptionMappers, provider); 
             }
             
         }
@@ -273,7 +274,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             wadlGenerator = p; 
         } else {
             if (isPrematching(filter.getClass())) {
-                preMatchContainerRequestFilters.add(p);
+                addProviderToList(preMatchContainerRequestFilters, p);
             } else {
                 postMatchFilters.add(p);
             }

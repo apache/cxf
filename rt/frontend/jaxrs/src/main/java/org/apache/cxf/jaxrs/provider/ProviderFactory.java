@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,7 @@ public abstract class ProviderFactory {
     private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     
-    private List<ParamConverterProvider> newParamConverters;
+    private Set<ParamConverterProvider> newParamConverters;
     
     // List of injected providers
     private Collection<ProviderInfo<?>> injectedProviders = 
@@ -496,19 +497,19 @@ public abstract class ProviderFactory {
             Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
             
             if (MessageBodyReader.class.isAssignableFrom(providerCls)) {
-                messageReaders.add((ProviderInfo<MessageBodyReader<?>>)provider); 
+                addProviderToList(messageReaders, provider);
             }
             
             if (MessageBodyWriter.class.isAssignableFrom(providerCls)) {
-                messageWriters.add((ProviderInfo<MessageBodyWriter<?>>)provider); 
+                addProviderToList(messageWriters, provider);
             }
             
             if (ContextResolver.class.isAssignableFrom(providerCls)) {
-                contextResolvers.add((ProviderInfo<ContextResolver<?>>)provider); 
+                addProviderToList(contextResolvers, provider);
             }
             
             if (ContextProvider.class.isAssignableFrom(providerCls)) {
-                contextProviders.add((ProviderInfo<ContextProvider<?>>)provider); 
+                addProviderToList(contextProviders, provider);
             }
             
             if (filterContractSupported(provider, providerCls, ReaderInterceptor.class)) {
@@ -523,7 +524,7 @@ public abstract class ProviderFactory {
                 //TODO: review the possibility of ParamConverterProvider needing to have Contexts injected
                 Object converter = provider.getProvider();
                 if (newParamConverters == null) {
-                    newParamConverters = new LinkedList<ParamConverterProvider>();
+                    newParamConverters = new LinkedHashSet<ParamConverterProvider>();
                 }
                 newParamConverters.add((ParamConverterProvider)converter);
             }
@@ -543,6 +544,16 @@ public abstract class ProviderFactory {
         if (m != null) {
             InjectionUtils.injectContexts(pi.getProvider(), pi, m);
         }
+    }
+    
+    protected void addProviderToList(List<?> list, ProviderInfo<?> provider) {
+        List<ProviderInfo<?>> list2 = CastUtils.cast(list);
+        for (ProviderInfo<?> pi : list2) {
+            if (pi.getProvider().getClass() == provider.getProvider().getClass()) {
+                return;
+            }
+        }
+        list2.add(provider);
     }
     
     protected void injectContextProxies(Collection<?> ... providerLists) {
@@ -1054,10 +1065,14 @@ public abstract class ProviderFactory {
     
     protected static class NameKey { 
         private String name;
-        private Integer bindingPriority;
-        public NameKey(String name, int priority) {
+        private Integer priority;
+        private Class<?> providerCls;
+        public NameKey(String name, 
+                       int priority,
+                       Class<?> providerCls) {
             this.name = name;
-            this.bindingPriority = priority;
+            this.priority = priority;
+            this.providerCls = providerCls;
         }
         
         public String getName() {
@@ -1065,11 +1080,24 @@ public abstract class ProviderFactory {
         }
         
         public Integer getPriority() {
-            return bindingPriority;
+            return priority;
         }
-                
+        
+        public boolean equals(Object o) {
+            if (!(o instanceof NameKey)) {
+                return false;
+            }
+            NameKey other = (NameKey)o;
+            return name.equals(other.name) && priority.equals(other.priority)
+                && providerCls == other.providerCls;  
+        }
+        
+        public int hashCode() {
+            return super.hashCode();
+        }
+        
         public String toString() {
-            return name + ":" + bindingPriority;
+            return name + ":" + priority;
         }
     }
     
@@ -1084,7 +1112,7 @@ public abstract class ProviderFactory {
             int priority = getFilterPriority(p, providerCls);
             
             for (String name : names) {
-                map.put(new NameKey(name, priority), p);
+                map.put(new NameKey(name, priority, p.getClass()), p);
             }
         }
         

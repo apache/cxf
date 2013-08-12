@@ -186,9 +186,7 @@ public class ClientImpl implements Client {
             ClientImpl.this.checkClosed();
             
             initTargetClientIfNeeded(); 
-            // API gives options to register new providers between 
-            // individual requests (sigh) or on per-WebTarget basis so we have to
-            // register directly on the endpoint-specific ClientFactory
+            
             ClientProviderFactory pf = 
                 ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
             List<Object> providers = new LinkedList<Object>();
@@ -205,7 +203,6 @@ public class ClientImpl implements Client {
             
             pf.setUserProviders(providers);
             
-            // Collect the properties which may have been reset the requests
             WebClient.getConfig(targetClient).getRequestContext().putAll(configImpl.getConfiguration().getProperties());
             
             // start building the invocation

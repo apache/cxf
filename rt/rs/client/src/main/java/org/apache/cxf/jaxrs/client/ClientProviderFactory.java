@@ -84,7 +84,6 @@ public final class ClientProviderFactory extends ProviderFactory {
     }
     
     
-    @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(Object... providers) {
         List<ProviderInfo<? extends Object>> theProviders = 
@@ -93,15 +92,15 @@ public final class ClientProviderFactory extends ProviderFactory {
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
             if (filterContractSupported(provider, providerCls, ClientRequestFilter.class)) {
-                clientRequestFilters.add((ProviderInfo<ClientRequestFilter>)provider);
+                addProviderToList(clientRequestFilters, provider);
             }
             
             if (filterContractSupported(provider, providerCls, ClientResponseFilter.class)) {
-                clientResponseFilters.add((ProviderInfo<ClientResponseFilter>)provider);
+                addProviderToList(clientResponseFilters, provider);
             }
             
             if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
-                responseExceptionMappers.add((ProviderInfo<ResponseExceptionMapper<?>>)provider); 
+                addProviderToList(responseExceptionMappers, provider);
             }
         }
         Collections.sort(clientRequestFilters, 
