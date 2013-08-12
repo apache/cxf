@@ -256,7 +256,7 @@ public final class ReflectionUtil {
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     } catch (InvocationTargetException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException(e.getCause());
                     } 
                 }
                 return descriptors.toArray(new PropertyDescriptor[descriptors.size()]);
