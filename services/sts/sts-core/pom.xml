@@ -67,6 +67,12 @@
            <version>${cxf.spring.ldap.version}</version>
            <scope>provided</scope>
            <optional>true</optional>
+           <exclusions>
+               <exclusion>
+                   <groupId>commons-logging</groupId>
+                   <artifactId>commons-logging</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
            <groupId>com.hazelcast</groupId>
@@ -84,6 +90,11 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
