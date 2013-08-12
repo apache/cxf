@@ -342,8 +342,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
         for (OperationResourceInfo ori : oris) {
             for (DynamicFeature feature : dynamicFeatures) {
-                FeatureContext methodConfigurable = new MethodFeatureContextImpl(ori);
-                feature.configure(new ResourceInfoImpl(ori), methodConfigurable);
+                FeatureContext featureContext = new MethodFeatureContextImpl(ori);
+                feature.configure(new ResourceInfoImpl(ori), featureContext);
+                super.setDynamicConfiguration(featureContext.getConfiguration());
             }
         }
         Collection<ClassResourceInfo> subs = cri.getSubResources();

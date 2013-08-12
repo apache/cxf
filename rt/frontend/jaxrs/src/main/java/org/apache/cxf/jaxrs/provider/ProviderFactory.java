@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -92,6 +93,8 @@ public abstract class ProviderFactory {
         new NameKeyMap<ProviderInfo<ReaderInterceptor>>(true);
     protected Map<NameKey, ProviderInfo<WriterInterceptor>> writerInterceptors = 
         new NameKeyMap<ProviderInfo<WriterInterceptor>>(true);
+    private Configuration dynamicConfiguration;
+    
     
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
@@ -154,6 +157,16 @@ public abstract class ProviderFactory {
             LOG.fine(message);
         }
         return null;
+    }
+    
+    public void setDynamicConfiguration(Configuration config) {
+        // Whatever is set inside Configuration is also set in this ProviderFactory
+        // We use it only to support Configuration injection at a basic level
+        this.dynamicConfiguration = config;
+    }
+    
+    public Configuration getDynamicConfiguration() {
+        return dynamicConfiguration;
     }
     
     public <T> ContextResolver<T> createContextResolver(Type contextType, 

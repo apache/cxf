@@ -202,8 +202,8 @@ public class ClientImpl implements Client {
             }
             
             pf.setUserProviders(providers);
-            
-            WebClient.getConfig(targetClient).getRequestContext().putAll(configImpl.getConfiguration().getProperties());
+            pf.setDynamicConfiguration(getConfiguration());
+            WebClient.getConfig(targetClient).getRequestContext().putAll(getConfiguration().getProperties());
             
             // start building the invocation
             return new InvocationBuilderImpl(WebClient.fromClient(targetClient));
