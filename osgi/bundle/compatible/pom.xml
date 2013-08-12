@@ -136,7 +136,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-api</artifactId>
+            <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -263,7 +263,7 @@
                             javax.xml.ws*;version="[0.0,3)",
                             *
                         </Import-Package>
-                        <Require-Bundle>org.apache.cxf.cxf-api;visibility:=reexport,
+                        <Require-Bundle>org.apache.cxf.cxf-core;visibility:=reexport,
                             org.apache.cxf.cxf-rt-core;visibility:=reexport,
                             org.apache.cxf.cxf-rt-frontend-jaxws;visibility:=reexport,
                             org.apache.cxf.cxf-rt-frontend-jaxrs;visibility:=reexport, 

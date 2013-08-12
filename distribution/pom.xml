@@ -132,7 +132,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-api</artifactId>
+            <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -458,7 +458,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>cxf-api</artifactId>
+                                    <artifactId>cxf-core</artifactId>
                                     <classifier>javadoc</classifier>
                                     <version>${project.version}</version>
                                 </artifactItem>
