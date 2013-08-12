@@ -44,7 +44,7 @@ public class CatalogTest extends Assert {
 
         ExtendedURIResolver resolver = new ExtendedURIResolver();
         InputSource in = resolver.resolve(resolvedSchemaLocation, null);
-        assertTrue(in.getSystemId().indexOf("api") != -1);
-        assertTrue(in.getSystemId().indexOf("/schemas/wsdl/ws-addr.xsd") != -1);
+        assertTrue(in.getSystemId(), in.getSystemId().indexOf("core") != -1);
+        assertTrue(in.getSystemId(), in.getSystemId().indexOf("/schemas/wsdl/ws-addr.xsd") != -1);
     }
 }
