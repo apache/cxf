@@ -70,20 +70,11 @@
             <version>${project.version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-javascript</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
 
         <dependency>
             <groupId>junit</groupId>
@@ -91,13 +82,11 @@
             <scope>test</scope>
         </dependency>
 
-
         <dependency>
             <groupId>${cxf.asm.groupId}</groupId>
             <artifactId>${cxf.asm.artifactId}</artifactId>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>wsdl4j</groupId>

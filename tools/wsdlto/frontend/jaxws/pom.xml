@@ -50,14 +50,8 @@
          </dependency> 
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-core</artifactId>
+            <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-testutils</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
