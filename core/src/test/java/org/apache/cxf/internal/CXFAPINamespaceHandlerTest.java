@@ -34,6 +34,7 @@ public class CXFAPINamespaceHandlerTest extends Assert {
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/configuration/parameterized-types"));
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/configuration/security"));
         assertNotNull(handler.getSchemaLocation("http://schemas.xmlsoap.org/wsdl/"));
+        assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/blueprint/core"));
     }
 
 }

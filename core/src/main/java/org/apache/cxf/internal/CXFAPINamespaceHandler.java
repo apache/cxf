@@ -27,6 +27,12 @@ import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.cxf.bus.blueprint.BusDefinitionParser;
+import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
+import org.apache.cxf.feature.FastInfosetFeature;
+import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -44,12 +50,41 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
             return getClass().getClassLoader().getResource("schemas/configuration/security.xsd");
         } else if ("http://schemas.xmlsoap.org/wsdl/".equals(namespace)) {
             return getClass().getClassLoader().getResource("schemas/wsdl/wsdl.xsd");
+        } else if ("http://cxf.apache.org/blueprint/core".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/blueprint/core.xsd");
         }
         return null;
     }
 
 
     public Metadata parse(Element element, ParserContext context) {
+        String s = element.getLocalName();
+        if ("bus".equals(s)) {
+            //parse bus
+            return new BusDefinitionParser().parse(element, context);
+        } else if ("logging".equals(s)) {
+            //logging feature
+            return new SimpleBPBeanDefinitionParser(LoggingFeature.class).parse(element, context);
+        } else if ("fastinfoset".equals(s)) {
+            //fastinfosetfeature
+            return new SimpleBPBeanDefinitionParser(FastInfosetFeature.class).parse(element, context);
+        } else if ("workqueue".equals(s)) {
+            return new SimpleBPBeanDefinitionParser(AutomaticWorkQueueImpl.class) {
+                public String getId(Element element, ParserContext context) {
+                    String id = element.hasAttribute("id") ? element.getAttribute("id") : null;
+                    if (id == null) {
+                        id = "cxf.workqueue."; 
+                        id += element.hasAttribute("name") ? element.getAttribute("name") : "def";
+                    }
+                    return id;
+                }
+
+                protected void processNameAttribute(Element element, ParserContext ctx,
+                                                    MutableBeanMetadata bean, String val) {
+                    bean.addProperty("name", createValue(ctx, val));
+                }
+            } .parse(element, context);
+        }
         return null;
     }
 
