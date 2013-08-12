@@ -21,19 +21,15 @@ package org.apache.cxf.common.xmlschema;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.logging.Logger;
 
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.LSInput;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * 
@@ -45,14 +41,7 @@ class DOMLSInput implements LSInput {
     
     DOMLSInput(Document doc, String systemId) throws TransformerException {
         this.systemId = systemId;
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer();
-        DOMSource source = new DOMSource(doc);
-        source.setSystemId(systemId);
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        transformer.transform(source, result);
-        data = writer.toString();
+        data = StaxUtils.toString(doc);
         LOG.fine(systemId + ": " + data);
         
     }

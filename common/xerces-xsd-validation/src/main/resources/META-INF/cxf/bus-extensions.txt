@@ -1,1 +1,0 @@
-org.apache.cxf.xsdvalidation.XercesXsdValidationImpl:org.apache.cxf.common.xmlschema.XmlSchemaValidationManager:true:true

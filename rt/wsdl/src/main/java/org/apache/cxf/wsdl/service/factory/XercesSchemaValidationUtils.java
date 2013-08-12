@@ -17,8 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.xsdvalidation;
+package org.apache.cxf.wsdl.service.factory;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
@@ -63,6 +66,89 @@ class XercesSchemaValidationUtils {
             return (LSInput)get(index);
         }
     }
+    
+    class DOMLSInput implements LSInput {
+        private String systemId;
+        private String data;
+        
+        DOMLSInput(Document doc, String systemId) throws TransformerException {
+            this.systemId = systemId;
+            data = StaxUtils.toString(doc);           
+        }
+
+        /** {@inheritDoc}*/
+        public String getBaseURI() {
+            return null;
+        }
+
+        /** {@inheritDoc}*/
+        public InputStream getByteStream() {
+            return null;
+        }
+
+        /** {@inheritDoc}*/
+        public boolean getCertifiedText() {
+            return false;
+        }
+
+        /** {@inheritDoc}*/
+        public Reader getCharacterStream() {
+            return null;
+        }
+
+        /** {@inheritDoc}*/
+        public String getEncoding() {
+            return "utf-8";
+        }
+
+        /** {@inheritDoc}*/
+        public String getPublicId() {
+            return null;
+        }
+
+        /** {@inheritDoc}*/
+        public String getStringData() {
+            return data;
+        }
+
+        /** {@inheritDoc}*/
+        public String getSystemId() {
+            return systemId;
+        }
+
+        /** {@inheritDoc}*/
+        public void setBaseURI(String baseURI) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setByteStream(InputStream byteStream) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setCertifiedText(boolean certifiedText) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setCharacterStream(Reader characterStream) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setEncoding(String encoding) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setPublicId(String publicId) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setStringData(String stringData) {
+        }
+
+        /** {@inheritDoc}*/
+        public void setSystemId(String systemId) {
+        }
+    }
+    
     
     private XSImplementation impl;
 

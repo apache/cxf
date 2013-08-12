@@ -71,7 +71,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.databinding.source.mime.MimeSerializer;
@@ -560,12 +559,8 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     public void validateServiceModel() {
 
-        XmlSchemaValidationManager xsdValidator = getBus().getExtension(XmlSchemaValidationManager.class);
-
         for (ServiceInfo si : getService().getServiceInfos()) {
-            if (xsdValidator != null) {
-                validateSchemas(xsdValidator, si.getXmlSchemaCollection());
-            }
+            validateSchemas(si.getXmlSchemaCollection());
 
             for (OperationInfo opInfo : si.getInterface().getOperations()) {
                 for (MessagePartInfo mpi : opInfo.getInput().getMessageParts()) {
@@ -622,10 +617,10 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         }
     }
 
-    private void validateSchemas(XmlSchemaValidationManager xsdValidator,
-                                 SchemaCollection xmlSchemaCollection) {
+    private void validateSchemas(SchemaCollection xmlSchemaCollection) {
         final StringBuilder errorBuilder = new StringBuilder();
-        xsdValidator.validateSchemas(xmlSchemaCollection.getXmlSchemaCollection(), new DOMErrorHandler() {
+        XercesXsdValidationImpl v = new XercesXsdValidationImpl();
+        v.validateSchemas(xmlSchemaCollection.getXmlSchemaCollection(), new DOMErrorHandler() {
             public boolean handleError(DOMError error) {
                 errorBuilder.append(error.getMessage());
                 LOG.warning(error.getMessage());

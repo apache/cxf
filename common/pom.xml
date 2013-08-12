@@ -34,7 +34,6 @@
 
     <modules>
         <module>wstx-msv-validation</module>
-        <module>xerces-xsd-validation</module>
     </modules>
 
 </project>

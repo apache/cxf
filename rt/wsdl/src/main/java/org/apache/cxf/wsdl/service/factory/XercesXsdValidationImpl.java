@@ -17,58 +17,37 @@
  * under the License.
  */
 
-package org.apache.cxf.xsdvalidation;
+package org.apache.cxf.wsdl.service.factory;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
 import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.DOMErrorHandler;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
 
-/**
- * 
- */
-@NoJSR250Annotations(unlessNull = "bus")
-public class XercesXsdValidationImpl implements XmlSchemaValidationManager {
+class XercesXsdValidationImpl  {
     private static final Logger LOG = LogUtils.getL7dLogger(XercesXsdValidationImpl.class);
-
-    private Bus bus;
     private XercesSchemaValidationUtils utils;
 
     public XercesXsdValidationImpl() {
-    }
-    
-    public XercesXsdValidationImpl(Bus b) {
-        setBus(b);
-    }
-    
-    @Resource
-    public final void setBus(Bus b) {
-        bus = b;
-
         try {
             utils = new XercesSchemaValidationUtils();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             /* If the dependencies are missing ... */
             return;
-        }
-
-        if (null != bus) {
-            bus.setExtension(this, XmlSchemaValidationManager.class);
         }
     }
 
     /** {@inheritDoc} */
     public void validateSchemas(XmlSchemaCollection schemas, DOMErrorHandler errorHandler) {
+        if (utils == null) {
+            return;
+        }
         try {
             utils.tryToParseSchemas(schemas, errorHandler);
         } catch (XmlSchemaSerializerException e) {
