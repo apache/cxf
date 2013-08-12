@@ -174,7 +174,7 @@
     <modules>
         <module>parent</module>
         <module>common</module>
-        <module>api</module>
+        <module>core</module>
         <module>tools</module>
         <module>testutils</module>
         <module>rt</module>
