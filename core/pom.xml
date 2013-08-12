@@ -42,7 +42,7 @@
             org.apache.cxf.*
         </cxf.osgi.export>
         <cxf.osgi.import>
-            com.ctc.wstx.stax*;resolution:=optional,
+            com.ctc.wstx*;resolution:=optional,
             org.codehaus.stax2*;resolution:=optional,
             com.sun*;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
@@ -175,6 +175,19 @@
             <artifactId>org.osgi.compendium</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.java.dev.msv</groupId>
+            <artifactId>msv-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.java.dev.msv</groupId>
+                    <artifactId>msv-testharness</artifactId>
+                </exclusion>
+            </exclusions>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        
     </dependencies>
 
     <build>

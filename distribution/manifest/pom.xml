@@ -222,11 +222,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-wstx-msv-validation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
             <version>${project.version}</version>
         </dependency>

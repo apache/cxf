@@ -60,6 +60,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.validation.StaxSchemaValidationInInterceptor;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
@@ -232,7 +233,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         aegisContext.initialize();
         this.service = s;
         s.getInInterceptors()
-            .add(new AegisSchemaValidationInInterceptor(getBus(), s.getServiceInfos().get(0)));
+            .add(new StaxSchemaValidationInInterceptor());
 
         Set<AegisType> deps = new HashSet<AegisType>();
 

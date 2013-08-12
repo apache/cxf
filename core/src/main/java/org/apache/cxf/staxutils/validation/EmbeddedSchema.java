@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.wstx_msv_validation;
+package org.apache.cxf.staxutils.validation;
 
 import org.w3c.dom.Element;
 

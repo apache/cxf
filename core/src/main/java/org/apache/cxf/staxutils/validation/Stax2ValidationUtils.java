@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.wstx_msv_validation;
+package org.apache.cxf.staxutils.validation;
 
 import java.util.Map;
 import java.util.TreeMap;

@@ -21,7 +21,7 @@
  * carries a ASL 2.0 license.
  */
 
-package org.apache.cxf.wstx_msv_validation;
+package org.apache.cxf.staxutils.validation;
 
 import java.util.Map;
 

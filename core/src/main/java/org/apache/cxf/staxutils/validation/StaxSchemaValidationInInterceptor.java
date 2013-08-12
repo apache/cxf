@@ -17,38 +17,27 @@
  * under the License.
  */
 
-package org.apache.cxf.aegis.databinding;
+package org.apache.cxf.staxutils.validation;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
-import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
-import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.model.ServiceInfo;
 
-public class AegisSchemaValidationInInterceptor extends AbstractPhaseInterceptor<Message> {
-    private static final Logger LOG = LogUtils.getL7dLogger(AegisSchemaValidationInInterceptor.class);
-    
-    private ServiceInfo service;
-    private Bus bus;
-    
-    public AegisSchemaValidationInInterceptor(Bus bus, ServiceInfo service) {
-        super(Phase.READ);
-        this.bus = bus;
-        this.service = service;
-        addBefore(StartBodyInterceptor.class.getName());
-        addAfter(ReadHeadersInterceptor.class.getName());
+public class StaxSchemaValidationInInterceptor extends AbstractPhaseInterceptor<Message> {
+    private static final Logger LOG = LogUtils.getL7dLogger(StaxSchemaValidationInInterceptor.class);
+        
+    public StaxSchemaValidationInInterceptor() {
+        super(Phase.PRE_UNMARSHAL);
     }
 
 
@@ -64,9 +53,14 @@ public class AegisSchemaValidationInInterceptor extends AbstractPhaseInterceptor
     
     private void setSchemaInMessage(Message message, XMLStreamReader reader) throws XMLStreamException  {
         if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
-            StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
-            if (mgr != null) {
-                mgr.setupValidation(reader, service);
+            try {
+                WoodstoxValidationImpl mgr = new WoodstoxValidationImpl();
+                if (mgr != null) {
+                    mgr.setupValidation(reader, message.getExchange().getService().getServiceInfos().get(0));
+                }
+            } catch (Throwable t) {
+                //likely no MSV or similar
+                LOG.log(Level.FINE, "Problem initializing MSV validation", t);
             }
         }
     }

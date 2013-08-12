@@ -97,9 +97,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-wstx-msv-validation</artifactId>
-            <version>${project.version}</version>
+            <groupId>net.java.dev.msv</groupId>
+            <artifactId>msv-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
