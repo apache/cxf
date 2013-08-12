@@ -29,3 +29,4 @@ http\://schemas.xmlsoap.org/ws/2004/08/addressing=schemas/wsdl/addressing.xsd
 http\://cxf.apache.org/schemas/configuration/security.xsd=schemas/configuration/security.xsd
 http\://cxf.apache.org/schemas/configuration/parameterized-types.xsd=schemas/configuration/parameterized-types.xsd
 
+http\://cxf.apache.org/schemas/core.xsd=schemas/core.xsd

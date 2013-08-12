@@ -35,9 +35,11 @@
         
     <properties>
         <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
+        <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
         <cxf.osgi.export>
             !org.apache.cxf.internal,
-            org.apache.cxf.*,
+            META-INF.cxf,
+            org.apache.cxf.*
         </cxf.osgi.export>
         <cxf.osgi.import>
             com.ctc.wstx.stax*;resolution:=optional,
@@ -59,7 +61,7 @@
             org.apache.aries*;version="${cxf.aries.version.range}"
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
-            org.apache.cxf.bus,org.apache.cxf.*
+            org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*
         </cxf.osgi.dynamic.import>
     </properties>
 
@@ -80,6 +82,12 @@
             <artifactId>${cxf.asm.artifactId}</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
@@ -160,6 +168,12 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
