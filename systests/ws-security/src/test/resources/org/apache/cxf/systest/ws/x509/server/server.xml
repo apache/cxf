@@ -197,9 +197,69 @@
         
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                 value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="AsymmetricEncryptBeforeSigning"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricEncryptBeforeSigning" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricEncryptBeforeSigningPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                 value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="AsymmetricEncryptBeforeSigningNoEnc"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricEncryptBeforeSigningNoEnc" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricEncryptBeforeSigningNoEncPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                 value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="AsymmetricEncryptSignature"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricEncryptSignature" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricEncryptSignaturePort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                 value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
