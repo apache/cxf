@@ -21,11 +21,17 @@ package org.apache.cxf.systest.provider;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -43,7 +49,14 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
 
         protected void run() {
             Object implementor = new HWSoapMessageDocProvider();
-            Endpoint.publish(ADDRESS, implementor);                                 
+            Endpoint ep = Endpoint.create(implementor);
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
+            ep.setProperties(map);
+            ((EndpointImpl)ep).getInInterceptors().add(new LoggingInInterceptor());
+            ((EndpointImpl)ep).getOutInterceptors().add(new LoggingOutInterceptor());
+            ep.publish(ADDRESS);
+            
         }
 
         public static void main(String[] args) {
@@ -106,6 +119,49 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
             } catch (SOAPFaultException ex) {
                 assertTrue(ex.getMessage().contains("Test Fault String"));
             }
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        }
+        
+    }
+
+    
+    @Test
+    public void testSOAPMessageModeDocLitWithSchemaValidation() throws Exception {
+        
+        QName serviceName = 
+            new QName("http://apache.org/hello_world_soap_http", "SOAPProviderService");
+        QName portName = 
+            new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
+
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        assertNotNull(service);
+
+        
+        try {
+            Greeter greeter = service.getPort(portName, Greeter.class);
+            setAddress(greeter, ADDRESS);
+            try {
+                greeter.greetMe("this is a greetMe message which length is more " 
+                    + "than 30 so that I wanna a schema validation error");
+                fail("Should have thrown an exception");
+            } catch (Exception ex) {
+                //expected 
+                assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
+            }
+            
+            try {
+                String ret = greeter.greetMe("exceed maxLength");
+                System.out.println("the ret is " + ret);
+                fail("Should have thrown an exception");
+            } catch (Exception ex) {
+                //expected 
+                assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
+            }
+            
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
