@@ -262,32 +262,31 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             throw new Fault(ex);
         }
         
-        //if (encryptionToken == null && encrParts.size() > 0) {
-            //REVISIT - no token to encrypt with  
-        //}
-        
+        WSSecBase encrBase = null;
         if (encryptionToken != null && encrParts.size() > 0) {
-            WSSecBase encrBase = doEncryption(wrapper, encrParts, true);
+            encrBase = doEncryption(wrapper, encrParts, true);
             handleEncryptedSignedHeaders(encrParts, sigParts);
-            
-            if (timestampEl != null) {
-                WSEncryptionPart timestampPart = 
-                    convertToEncryptionPart(timestampEl.getElement());
-                sigParts.add(timestampPart);
-            }
-            
-            if (isRequestor()) {
-                try {
-                    addSupportingTokens(sigParts);
-                } catch (WSSecurityException ex) {
-                    policyNotAsserted(encryptionToken, ex);
-                }
-            } else {
-                addSignatureConfirmation(sigParts);
-            }
-            
+        }
+
+        if (timestampEl != null) {
+            WSEncryptionPart timestampPart = 
+                convertToEncryptionPart(timestampEl.getElement());
+            sigParts.add(timestampPart);
+        }
+
+        if (isRequestor()) {
             try {
-                if ((sigParts.size() > 0) && initiatorWrapper != null && isRequestor()) {
+                addSupportingTokens(sigParts);
+            } catch (WSSecurityException ex) {
+                policyNotAsserted(encryptionToken, ex);
+            }
+        } else {
+            addSignatureConfirmation(sigParts);
+        }
+
+        try {
+            if (sigParts.size() > 0) {
+                if (initiatorWrapper != null && isRequestor()) {
                     doSignature(initiatorWrapper, sigParts, attached);
                 } else if (!isRequestor()) {
                     TokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
@@ -298,16 +297,18 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         doSignature(recipientSignatureToken, sigParts, attached);
                     }
                 }
-            } catch (WSSecurityException ex) {
-                throw new Fault(ex);
-            } catch (SOAPException ex) {
-                throw new Fault(ex);
             }
+        } catch (WSSecurityException ex) {
+            throw new Fault(ex);
+        } catch (SOAPException ex) {
+            throw new Fault(ex);
+        }
 
-            if (isRequestor()) {
-                doEndorse();
-            }
-            
+        if (isRequestor()) {
+            doEndorse();
+        }
+
+        if (encrBase != null) {
             encryptTokensInSecurityHeader(encryptionToken, encrBase);
         }
     }
