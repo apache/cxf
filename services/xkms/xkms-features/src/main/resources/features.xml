@@ -24,7 +24,7 @@
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>
         <feature>wss4j</feature>
-        <bundle start-level='40' dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
+        <bundle start-level='40' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-common/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-client/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.cxf.xkms.client.cfg">
