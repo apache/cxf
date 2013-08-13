@@ -154,6 +154,7 @@
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>1.6.11</cxf.wss4j.version>
+        <cxf.xerces.version>2.9.1</cxf.xerces.version>
         <cxf.xmlbeans.version>2.5.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
@@ -173,7 +174,7 @@
         <cxf.jaxb.bundle.version>2.2.1.1_2</cxf.jaxb.bundle.version>
         <cxf.saaj-impl.bundle.version>1.3.20_1</cxf.saaj-impl.bundle.version>
         <cxf.wsdl4j.bundle.version>1.6.2_6</cxf.wsdl4j.bundle.version>
-        <cxf.xmlsec.bundle.version>1.5.4</cxf.xmlsec.bundle.version>
+        <cxf.xmlsec.bundle.version>1.5.5</cxf.xmlsec.bundle.version>
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xerces.bundle.version>2.9.1_5</cxf.xerces.bundle.version>
@@ -1492,7 +1493,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.9.1</version>
+                <version>${cxf.xerces.version}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>xml-apis</artifactId>
