@@ -24,15 +24,9 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.annotation.Priority;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
@@ -47,31 +41,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
-
-import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 
 public final class AnnotationUtils {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(AnnotationUtils.class);
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AnnotationUtils.class);
-
-    private static final Set<Class<?>> CONTEXT_CLASSES;
     private static final Set<Class<?>> PARAM_ANNOTATION_CLASSES;
     private static final Set<Class<?>> METHOD_ANNOTATION_CLASSES;
     static {
-        CONTEXT_CLASSES = initContextClasses();
         PARAM_ANNOTATION_CLASSES = initParamAnnotationClasses();
         METHOD_ANNOTATION_CLASSES = initMethodAnnotationClasses();
     }
@@ -79,34 +55,7 @@ public final class AnnotationUtils {
     private AnnotationUtils() {
 
     }
-
-    private static Set<Class<?>> initContextClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(UriInfo.class);
-        classes.add(SecurityContext.class);
-        classes.add(HttpHeaders.class);
-        classes.add(ContextResolver.class);
-        classes.add(Providers.class);
-        classes.add(Request.class);
-        classes.add(ResourceInfo.class);
-        classes.add(ResourceContext.class);
-        classes.add(Application.class);
-        // Servlet API
-        try {
-            classes.add(HttpServletRequest.class);
-            classes.add(HttpServletResponse.class);
-            classes.add(ServletConfig.class);
-            classes.add(ServletContext.class);
-        } catch (Throwable ex) {
-            // it is not a problem on the client side and the exception will be
-            // thrown later on if the injection of one of these contexts will be
-            // attempted on the server side
-            LOG.fine(new org.apache.cxf.common.i18n.Message("NO_SERVLET_API", BUNDLE).toString());
-        }
-        // CXF-specific
-        classes.add(MessageContext.class);
-        return classes;
-    }
+    
 
     private static Set<Class<?>> initParamAnnotationClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -147,10 +96,6 @@ public final class AnnotationUtils {
         return names;
     }
     
-    public static boolean isContextClass(Class<?> contextClass) {
-        return CONTEXT_CLASSES.contains(contextClass);
-    }
-
     public static boolean isParamAnnotationClass(Class<?> annotationClass) {
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass);
     }

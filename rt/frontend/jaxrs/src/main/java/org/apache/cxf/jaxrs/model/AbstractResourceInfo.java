@@ -29,14 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Resource;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public abstract class AbstractResourceInfo {
@@ -118,8 +116,7 @@ public abstract class AbstractResourceInfo {
         }
         for (Field f : cls.getDeclaredFields()) {
             for (Annotation a : f.getAnnotations()) {
-                if (a.annotationType() == Context.class || a.annotationType() == Resource.class 
-                    && AnnotationUtils.isContextClass(f.getType())) {
+                if (a.annotationType() == Context.class) {
                     contextFields = addContextField(contextFields, f);
                     if (f.getType() != Application.class) {
                         addToMap(getFieldProxyMap(true), f, InjectionUtils.createThreadLocalProxy(f.getType()));

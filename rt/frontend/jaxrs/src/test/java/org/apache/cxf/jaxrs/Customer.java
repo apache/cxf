@@ -29,7 +29,6 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -138,9 +137,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     private Application application2;
     private int applicationInjections;
     
-    @Resource private HttpServletRequest servletRequest;
-    @Resource private HttpServletResponse servletResponse;
-    @Resource private ServletContext servletContext;
+    @Context private HttpServletRequest servletRequest;
+    @Context private HttpServletResponse servletResponse;
+    @Context private ServletContext servletContext;
     @Context private HttpServletRequest servletRequest2;
     @Context private HttpServletResponse servletResponse2;
     @Context private ServletContext servletContext2;

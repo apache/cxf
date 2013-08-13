@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,9 +58,9 @@ public class ClassResourceInfoTest extends Assert {
     public static class TestClass {
         @Context UriInfo u;
         @Context HttpHeaders h;
-        @Resource HttpServletRequest req;
-        @Resource HttpServletResponse res;
-        @Resource ServletContext c;
+        @Context HttpServletRequest req;
+        @Context HttpServletResponse res;
+        @Context ServletContext c;
         int i;
         
         @GET
@@ -95,9 +94,9 @@ public class ClassResourceInfoTest extends Assert {
     }
     
     static class TestClass3 {
-        @Resource HttpServletRequest req;
-        @Resource HttpServletResponse res;
-        @Resource ServletContext c;
+        @Context HttpServletRequest req;
+        @Context HttpServletResponse res;
+        @Context ServletContext c;
         
         @GET
         public void getIt() { 

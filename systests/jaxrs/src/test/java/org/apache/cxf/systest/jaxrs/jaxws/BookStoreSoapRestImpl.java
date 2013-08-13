@@ -27,6 +27,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.bind.JAXBContext;
@@ -47,7 +48,7 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private boolean ignoreJaxrsClient;
-    @Resource
+    @Context
     private MessageContext jaxrsContext;
     
     @Resource(name = "restClient")
