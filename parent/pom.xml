@@ -160,6 +160,7 @@
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.0-SNAPSHOT</cxf.wss4j.version>
+        <cxf.xerces.version>2.11.0</cxf.xerces.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
@@ -185,7 +186,7 @@
         <cxf.xmlsec.bundle.version>2.0.0-SNAPSHOT</cxf.xmlsec.bundle.version>
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
-        <cxf.xerces.bundle.version>2.9.1_5</cxf.xerces.bundle.version>
+        <cxf.xerces.bundle.version>2.11.0_1</cxf.xerces.bundle.version>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
         <cxf.xalan.bundle.version>2.7.1_6</cxf.xalan.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
@@ -1603,7 +1604,7 @@
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.11.0</version>
+                <version>${cxf.xerces.version}</version>
             </dependency>
             <!-- if we use the new woodstox artifact, we're using the new version -->
             <dependency>
