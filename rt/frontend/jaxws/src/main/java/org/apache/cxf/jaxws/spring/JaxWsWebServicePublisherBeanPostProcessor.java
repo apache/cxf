@@ -143,11 +143,11 @@ public class JaxWsWebServicePublisherBeanPostProcessor
             createAndPublishEndpoint(url, bean);
             registerHandler(url, new ServletAdapter(shadowCxfServlet));
         } else {
-            if (logger.isDebugEnabled()) {
-                Message message = new Message("REJECTED_NO_ANNOTATION", LOG, beanName,
+            
+            Message message = new Message("REJECTED_NO_ANNOTATION", LOG, beanName,
                                               clazz.getName());
-                LOG.fine(message.toString());
-            }
+            LOG.fine(message.toString());
+            
         }
 
         return bean;
