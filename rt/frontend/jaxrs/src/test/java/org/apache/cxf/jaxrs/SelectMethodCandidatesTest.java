@@ -609,7 +609,7 @@ public class SelectMethodCandidatesTest extends Assert {
                      ori.getMethodToInvoke().getName());
         
         
-        acceptContentTypes = "application/xml,application/json";
+        acceptContentTypes = "application/xml,application/json;q=0.8";
         ori = findTargetResourceClass(resources, null, 
                                                             "/1/2/3/d/1",
                                                             "GET",
