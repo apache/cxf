@@ -188,7 +188,6 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
                                     || msg.contains(":" + message.getVersion().getAttrNameMustUnderstand()))) {
                                 return;
                             }
-                            System.out.println("2");
                             throw exception;
                         }
                         public void fatalError(SAXParseException exception) throws SAXException {
