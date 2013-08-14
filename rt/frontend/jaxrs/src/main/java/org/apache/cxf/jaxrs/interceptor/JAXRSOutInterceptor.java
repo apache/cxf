@@ -250,8 +250,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             getResponseMediaType(responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE));
         
         Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
+
+        Class<?> serviceCls = invoked != null ? ori.getClassResourceInfo().getServiceClass() : null;
         Type genericType = 
-            InjectionUtils.getGenericResponseType(invoked, response.getEntity(), targetType, exchange);
+            InjectionUtils.getGenericResponseType(invoked, serviceCls,
+                                                  response.getEntity(), targetType, exchange);
         annotations = ((ResponseImpl)response).getEntityAnnotations();        
         
         List<WriterInterceptor> writers = providerFactory

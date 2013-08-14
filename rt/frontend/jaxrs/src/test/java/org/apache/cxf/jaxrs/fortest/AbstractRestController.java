@@ -16,30 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.fortest;
 
-package org.apache.cxf.systest.jaxrs;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Response;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-
-@XmlRootElement(name = "SuperBook")
-public class SuperBook extends Book implements SuperBookInterface {
-    private boolean superBook;
-    
-    public SuperBook() {
-        
+public class AbstractRestController<T extends RestResource> {
+    @POST
+    @Consumes("text/xml")
+    public Response add(final T resource) {
+        // build some response
+        return null;
     }
-    
-    public SuperBook(String name, long id, boolean superStatus) {
-        super(name, id);
-        this.superBook = superStatus;
-    }
-
-    public boolean isSuperBook() {
-        return superBook;
-    }
-
-    public void setSuperBook(boolean superBook) {
-        this.superBook = superBook;
-    }
-}
+} 

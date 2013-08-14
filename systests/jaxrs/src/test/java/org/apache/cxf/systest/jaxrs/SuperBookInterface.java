@@ -16,30 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.systest.jaxrs;
 
-import javax.xml.bind.annotation.XmlRootElement;
+public interface SuperBookInterface {
 
-
-@XmlRootElement(name = "SuperBook")
-public class SuperBook extends Book implements SuperBookInterface {
-    private boolean superBook;
-    
-    public SuperBook() {
-        
-    }
-    
-    public SuperBook(String name, long id, boolean superStatus) {
-        super(name, id);
-        this.superBook = superStatus;
-    }
-
-    public boolean isSuperBook() {
-        return superBook;
-    }
-
-    public void setSuperBook(boolean superBook) {
-        this.superBook = superBook;
-    }
 }
