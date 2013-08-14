@@ -201,6 +201,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         List<MediaType> availableContentTypes = computeAvailableContentTypes(message, response);  
         
+
         Method invoked = null;
         if (firstTry) {
             invoked = ori == null ? null : ori.getAnnotatedMethod() == null
@@ -210,7 +211,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Type genericType = getGenericResponseType(invoked, responseObj, targetType);
         if (ori != null) {
             genericType = InjectionUtils.processGenericTypeIfNeeded(
-                ori.getClassResourceInfo().getServiceClass(), genericType);
+                ori.getClassResourceInfo().getServiceClass(), targetType, genericType);
         }
                
         Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};

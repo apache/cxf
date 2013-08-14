@@ -30,6 +30,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -132,6 +133,19 @@ public class ResourceUtilsTest extends Assert {
         assertTrue(types.containsKey(Chapter.class));
     }
     
+    @Test
+    public void testGetAllJaxbClassesComplexGenericType() {
+        ClassResourceInfo cri1 = 
+            ResourceUtils.createClassResourceInfo(OrderResource.class, 
+                                                  OrderResource.class, true, true);
+        Map<Class<?>, Type> types = 
+            ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true)
+                .getAllTypes();
+        assertEquals(2, types.size());
+        assertTrue(types.containsKey(OrderItemsDTO.class));
+        assertTrue(types.containsKey(OrderItemDTO.class));
+    }
+    
     public interface IProductResource {
         @Path("/parts")
         IPartsResource getParts();
@@ -155,5 +169,25 @@ public class ResourceUtilsTest extends Assert {
         IProductResource getProducts();
         @GET
         Book get();
+    }
+    
+    @XmlRootElement
+    public static class OrderItem {
+        
+    }
+    @XmlRootElement
+    public static class OrderItemDTO<T> {
+        
+    }
+    @XmlRootElement
+    public static class OrderItemsDTO<E> {
+        
+    }
+    
+    public static class OrderResource {
+        @GET
+        public OrderItemsDTO<? extends OrderItemDTO<? extends OrderItem>> getOrders() {
+            return null;
+        }
     }
 }

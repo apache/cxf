@@ -86,7 +86,7 @@ public class BookStoreSpring {
     @Path("/books/xsitype")
     @Produces("application/xml")
     public Book getBookXsiType() {
-        return new SuperBook("SuperBook", 999L);
+        return new SuperBook("SuperBook", 999L, true);
     }
     
     @SuppressWarnings("unchecked")
@@ -94,7 +94,7 @@ public class BookStoreSpring {
     @Path("/books/superbook")
     @Produces("application/json")
     public <T extends Book> T getSuperBookJson() {
-        SuperBook book = new SuperBook("SuperBook", 999L);
+        SuperBook book = new SuperBook("SuperBook", 999L, true);
         
         return (T)book;
     }
@@ -104,18 +104,20 @@ public class BookStoreSpring {
     @Path("/books/superbooks")
     @Produces("application/json")
     public <T extends Book> List<T> getSuperBookCollectionJson() {
-        SuperBook book = new SuperBook("SuperBook", 999L);
+        SuperBook book = new SuperBook("SuperBook", 999L, true);
         
         return Collections.singletonList((T)book);
     }
     
-    @SuppressWarnings("unchecked")
     @POST
     @Path("/books/superbook")
     @Consumes("application/json")
     @Produces("application/json")
     public <T extends Book> T echoSuperBookJson(T book) {
-        return (T)(SuperBook)book;
+        if (((SuperBook)book).isSuperBook()) {
+            return book;
+        }
+        throw new WebApplicationException(400);
     }
     
     @SuppressWarnings("unchecked")
@@ -124,7 +126,7 @@ public class BookStoreSpring {
     @Consumes("application/json")
     @Produces("application/json")
     public <T extends Book> List<T> echoSuperBookCollectionJson(List<T> book) {
-        if (book.get(0) instanceof SuperBook) {
+        if (((SuperBook)book.get(0)).isSuperBook()) {
             return book;
         }
         throw new WebApplicationException(400);

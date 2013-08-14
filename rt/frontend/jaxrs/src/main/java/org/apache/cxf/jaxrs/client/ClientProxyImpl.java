@@ -538,7 +538,7 @@ public class ClientProxyImpl extends AbstractClient implements
         
         Object response = null;
         try {
-            response = handleResponse(outMessage);
+            response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
             return response;
         } catch (Exception ex) {
             response = ex;
@@ -564,7 +564,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                    body, bodyIndex, exchange, invContext);
     }
     
-    protected Object handleResponse(Message outMessage) 
+    protected Object handleResponse(Message outMessage, Class<?> serviceCls) 
         throws Throwable {
         try {
             Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
@@ -578,14 +578,15 @@ public class ClientProxyImpl extends AbstractClient implements
                     && ((InputStream)r.getEntity()).available() == 0)) {
                 return r;
             }
-
+            Class<?> returnType = method.getReturnType(); 
             Type genericType = 
-                InjectionUtils.processGenericTypeIfNeeded(method.getDeclaringClass(), 
+                InjectionUtils.processGenericTypeIfNeeded(serviceCls,
+                                                          returnType,   
                                                           method.getGenericReturnType());
-            
+            returnType = InjectionUtils.updateParamClassToTypeIfNeeded(returnType, genericType);
             return readBody(r, 
                             outMessage, 
-                            method.getReturnType(), 
+                            returnType, 
                             genericType, 
                             method.getDeclaredAnnotations());
         } finally {
@@ -641,11 +642,10 @@ public class ClientProxyImpl extends AbstractClient implements
             Object body = objs.get(0);
             try {
                 if (bodyIndex != -1) {
-                    Type paramType = method.getGenericParameterTypes()[bodyIndex];
-                    paramType = InjectionUtils.processGenericTypeIfNeeded(method.getDeclaringClass(),
-                                                                          paramType);                      
-                    writeBody(body, outMessage, body.getClass(), paramType,
-                              anns, headers, os);
+                    Type genericType = method.getGenericParameterTypes()[bodyIndex];
+                    genericType = InjectionUtils.processGenericTypeIfNeeded(
+                        ori.getClassResourceInfo().getServiceClass(), body.getClass(), genericType);
+                    writeBody(body, outMessage, body.getClass(), genericType, anns, headers, os);
                 } else {
                     writeBody(body, outMessage, body.getClass(), body.getClass(), 
                               anns, headers, os);

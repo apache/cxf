@@ -29,6 +29,8 @@ import javax.ws.rs.core.MediaType;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.fortest.BookEntity;
 import org.apache.cxf.jaxrs.fortest.BookEntity2;
+import org.apache.cxf.jaxrs.fortest.ConcreteRestController;
+import org.apache.cxf.jaxrs.fortest.ConcreteRestResource;
 import org.apache.cxf.jaxrs.fortest.GenericEntityImpl;
 import org.apache.cxf.jaxrs.fortest.GenericEntityImpl2;
 import org.apache.cxf.jaxrs.fortest.GenericEntityImpl3;
@@ -125,6 +127,51 @@ public class SelectMethodCandidatesTest extends Assert {
         Book book = (Book)books.get(0);
         assertNotNull(book);
         assertEquals(2L, book.getId());
+        assertEquals("The Book", book.getName());
+    }
+    @Test
+    public void testFindFromAbstractGenericImpl5() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(ConcreteRestController.class);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        Message m = new MessageImpl();
+        m.put(Message.CONTENT_TYPE, "text/xml");
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        m.setExchange(ex);
+        Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        e.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        e.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        e.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(3);
+        e.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.replay(e);
+        ex.put(Endpoint.class, e);
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/", values,
+                                                                    m);
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                                                m, 
+                                    "POST", values, "text/xml", 
+                                    JAXRSUtils.sortMediaTypes("*/*"),
+                                    true);
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "add",
+                     ori.getMethodToInvoke().getName());
+        
+        String value = "<concreteRestResource><name>The Book</name></concreteRestResource>";
+        m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
+        List<Object> params = JAXRSUtils.processParameters(ori, values, m);
+        assertEquals(1, params.size());
+        ConcreteRestResource book = (ConcreteRestResource)params.get(0);
+        assertNotNull(book);
         assertEquals("The Book", book.getName());
     }
     
