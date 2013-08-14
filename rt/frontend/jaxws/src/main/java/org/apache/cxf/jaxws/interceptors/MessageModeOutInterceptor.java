@@ -34,15 +34,11 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.validation.Schema;
 
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
-import org.xml.sax.SAXException;
 
-import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -53,7 +49,6 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingIntercep
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
@@ -64,13 +59,10 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message> {
     MessageModeOutInterceptorInternal internal;
@@ -90,7 +82,6 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         this.bindingName = bname;
     }
     public void handleMessage(Message message) throws Fault {
-        checkSchemaValidation(message);
         BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
         if (bop != null && !bindingName.equals(bop.getBinding().getName())) {
             return;
@@ -303,50 +294,6 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
     }
     
-    private void checkSchemaValidation(Message message) {
-        
-        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
-            Service service = ServiceModelUtil.getService(message.getExchange());
-            if (service == null) {
-                return;
-            }
-            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
-                            message.getExchange().getBus());
-            if (schema == null) {
-                return;
-            }
-            MessageContentsList list = (MessageContentsList)message.getContent(List.class);
-            if (list == null || list.isEmpty()) {
-                return;
-            }
-            Object o = list.get(0);
-            SOAPMessage soapMessage = null;
-            
-            if (o instanceof SOAPMessage) {
-                soapMessage = (SOAPMessage)o;
-                
-                try {
-                    DOMSource source = new DOMSource(soapMessage.getSOAPBody().getFirstChild());
-                    schema.newValidator().validate(source);
-                } catch (SAXException e) {
-                    throw new Fault(e);
-                } catch (IOException e) {
-                    throw new Fault(e);
-                } catch (SOAPException e) {
-                    throw new Fault(e);
-                }
-            } else if (o instanceof Source) {
-                Source source = (Source)o;
-                try {
-                    schema.newValidator().validate(source);
-                } catch (SAXException e) {
-                    throw new Fault(e);
-                } catch (IOException e) {
-                    throw new Fault(e);
-                }
-            }
-        }
-        
-    }
+    
         
 }

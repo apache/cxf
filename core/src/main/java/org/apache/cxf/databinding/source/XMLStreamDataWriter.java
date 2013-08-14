@@ -28,11 +28,14 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
+
+import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -46,6 +49,8 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataWriter.class);
 
+    private Schema schema;
+    
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
         write(obj, output);
     }
@@ -55,14 +60,24 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
             XMLStreamReader reader = null;
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
+                if (schema != null) {
+                    StreamSource ss = new StreamSource(ds.getInputStream());
+                    schema.newValidator().validate(ss);
+                }
                 reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
                 StaxUtils.copy(reader, writer);
                 reader.close();
             } else if (obj instanceof Node) {
+                if (schema != null) {
+                    schema.newValidator().validate(new DOMSource((Node)obj));
+                }
                 Node nd = (Node)obj;
                 writeNode(nd, writer);
             } else {
                 Source s = (Source) obj;
+                if (schema != null) {
+                    schema.newValidator().validate(s);
+                }
                 if (s instanceof DOMSource
                     && ((DOMSource) s).getNode() == null) {
                     return;
@@ -74,6 +89,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                             e.getClass().getCanonicalName(), e.getMessage());
         } catch (IOException e) {
             throw new Fault(new Message("COULD_NOT_WRITE_XML_STREAM", LOG), e);
+        } catch (SAXException e) {
+            throw new Fault("COULD_NOT_WRITE_XML_STREAM_CAUSED_BY", LOG, e,
+                            e.getClass().getCanonicalName(), e.getMessage());
         }
     }
 
@@ -119,6 +137,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     }
 
     public void setSchema(Schema s) {
+        this.schema = s;
     }
 
     public void setAttachments(Collection<Attachment> attachments) {
