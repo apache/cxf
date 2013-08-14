@@ -26,6 +26,7 @@ public class InheritanceService {
         Employee e = new Employee();
         e.setDivision("foo");
         e.setName("Dan D. Man");
+        e.setNickname("bar");
         return e;
     }
 

@@ -21,9 +21,13 @@
  */
 package org.apache.cxf.aegis.inheritance;
 
+import org.apache.cxf.aegis.type.java5.XmlAttribute;
+
 // @XmlType(namespace="urn:xfire:inheritance")
 public abstract class AbstractUser {
     private String name;
+
+    private String nickname;
 
     public String getName() {
         return name;
@@ -31,5 +35,14 @@ public abstract class AbstractUser {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @XmlAttribute
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
