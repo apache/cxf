@@ -203,7 +203,7 @@ public final class EndpointReferenceUtils {
             // searching for a namespace match
             if (namespaceURI != null) {
                 for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
-                    if (ent.getKey().endsWith(namespaceURI)) {
+                    if (ent.getKey().endsWith(":" + namespaceURI)) {
                         schemas.remove(ent.getKey());
                         impl = new LSInputImpl();
                         impl.setSystemId(newId);
