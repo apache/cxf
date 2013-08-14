@@ -38,6 +38,7 @@ import javax.xml.transform.Source;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
+
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -159,6 +160,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         Object o = list.get(0);
         if (o instanceof SOAPMessage) {
             SOAPMessage soapMessage = (SOAPMessage)o;
+            
             if (soapMessage.countAttachments() > 0) {
                 message.put("write.attachments", Boolean.TRUE);
             }
@@ -291,5 +293,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             message.getInterceptorChain().add(SAAJOutEndingInterceptor.INSTANCE);
         }
     }
+    
+    
         
 }
