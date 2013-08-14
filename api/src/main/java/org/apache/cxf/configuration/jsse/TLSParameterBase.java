@@ -121,7 +121,7 @@ public class TLSParameterBase {
     }
 
     /**
-     * This sets the secure random provider and alogorithm. If left unset or set
+     * This sets the secure random provider and algorithm. If left unset or set
      * to null, it uses the system default.
      */
     public final void setSecureRandom(SecureRandom random) {
@@ -143,7 +143,7 @@ public class TLSParameterBase {
     }
 
     /**
-     * Returns the secure random alogorithm.
+     * Returns the secure random algorithm.
      */
     public SecureRandom getSecureRandom() {
         return secureRandom;
