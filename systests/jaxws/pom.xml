@@ -47,6 +47,7 @@
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest_jaxws</testWsdlRoot>
                             <defaultOptions>
+                                <extendedSoapHeaders>true</extendedSoapHeaders>
                                 <validate>basic</validate>
                             </defaultOptions>
                         </configuration>

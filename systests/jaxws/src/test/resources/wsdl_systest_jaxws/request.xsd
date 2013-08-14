@@ -38,4 +38,17 @@
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+    
+    <xsd:element name="RequestHeaderElement" type="RequestHeader"/>
+    <xsd:complexType name="RequestHeader">
+      <xsd:sequence>
+        <xsd:element name="HeaderValue">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="10" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>    
 </xsd:schema>
