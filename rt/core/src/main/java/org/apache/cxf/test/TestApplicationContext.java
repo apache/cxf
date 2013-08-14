@@ -42,7 +42,7 @@ public class TestApplicationContext extends ClassPathXmlApplicationContext {
     @Override
     protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        reader.setEntityResolver(new BusEntityResolver(new BeansDtdResolver(),
+        reader.setEntityResolver(new BusEntityResolver(cl, new BeansDtdResolver(),
             new PluggableSchemaResolver(cl)));
     }
    

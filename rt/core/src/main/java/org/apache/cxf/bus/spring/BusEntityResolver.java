@@ -20,6 +20,9 @@
 package org.apache.cxf.bus.spring;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +32,10 @@ import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 
@@ -39,11 +46,23 @@ public class BusEntityResolver extends DelegatingEntityResolver  {
     
     private EntityResolver dtdResolver;
     private EntityResolver schemaResolver;
+    private Map<String, String> schemaMappings;
+    private ClassLoader classLoader;
     
-    public BusEntityResolver(EntityResolver dr, EntityResolver sr) {
+    public BusEntityResolver(ClassLoader loader, EntityResolver dr, EntityResolver sr) {
         super(dr, sr);
+        classLoader = loader;
         dtdResolver = dr;
         schemaResolver = sr;
+        
+        try {
+            Properties mappings = PropertiesLoaderUtils.loadAllProperties("META-INF/spring.schemas", 
+                                                                          classLoader);
+            schemaMappings = new ConcurrentHashMap<String, String>(mappings.size());
+            CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
+        } catch (IOException e) {
+            //ignore
+        }
     }
 
     @Override
@@ -55,6 +74,14 @@ public class BusEntityResolver extends DelegatingEntityResolver  {
             source = schemaResolver.resolveEntity(publicId, systemId);                
             if (null == source) {
                 source = dtdResolver.resolveEntity(publicId, systemId); 
+            }
+        }
+        String resourceLocation = schemaMappings.get(systemId);
+        if (resourceLocation != null && publicId == null) {
+            Resource resource = new ClassPathResource(resourceLocation, classLoader);
+            if (resource != null && resource.exists()) {
+                source.setPublicId(systemId);    
+                source.setSystemId(resource.getURL().toString());
             }
         }
         return source;
