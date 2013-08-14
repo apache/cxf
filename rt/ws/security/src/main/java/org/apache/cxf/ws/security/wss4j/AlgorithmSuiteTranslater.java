@@ -139,7 +139,7 @@ public final class AlgorithmSuiteTranslater {
     /**
      * Get all of the WS-SecurityPolicy Bindings that are in operation
      */
-    private List<Binding> getBindings(AssertionInfoMap aim) {
+    public static List<Binding> getBindings(AssertionInfoMap aim) {
         List<Binding> bindings = new ArrayList<Binding>();
         if (aim != null) {
             Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
@@ -167,7 +167,7 @@ public final class AlgorithmSuiteTranslater {
     /**
      * Get all of the CXF AlgorithmSuites from the bindings
      */
-    private List<org.apache.cxf.ws.security.policy.model.AlgorithmSuite> getAlgorithmSuites(
+    public static List<org.apache.cxf.ws.security.policy.model.AlgorithmSuite> getAlgorithmSuites(
         List<Binding> bindings
     ) {
         List<org.apache.cxf.ws.security.policy.model.AlgorithmSuite> algorithmSuites = 

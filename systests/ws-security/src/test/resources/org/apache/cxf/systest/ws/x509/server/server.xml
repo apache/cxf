@@ -187,6 +187,29 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="AsymmetricSHA256"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricSHA256" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItAsymmetricSHA256Port"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.encryption.username" value="alice"/>
+          <entry key="ws-security.asymmetric.signature.algorithm" 
+                 value="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="AsymmetricThumbprint"
        address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricThumbprint" 
        serviceName="s:DoubleItService"
