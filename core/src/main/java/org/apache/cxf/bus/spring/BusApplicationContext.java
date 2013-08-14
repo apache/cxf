@@ -313,7 +313,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
     
     void setEntityResolvers(XmlBeanDefinitionReader reader) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        reader.setEntityResolver(new BusEntityResolver(new BeansDtdResolver(),
+        reader.setEntityResolver(new BusEntityResolver(cl, new BeansDtdResolver(),
             new PluggableSchemaResolver(cl)));
     }
     @Override
