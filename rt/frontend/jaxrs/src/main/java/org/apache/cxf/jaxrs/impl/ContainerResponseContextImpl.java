@@ -32,12 +32,15 @@ import org.apache.cxf.message.Message;
 public class ContainerResponseContextImpl extends AbstractResponseContextImpl 
     implements ContainerResponseContext {
 
+    private Class<?> serviceCls;
     private Method invoked;
     
     public ContainerResponseContextImpl(ResponseImpl r, 
                                         Message m,
+                                        Class<?> serviceCls,
                                         Method invoked) {
         super(r, m);
+        this.serviceCls = serviceCls;
         this.invoked = invoked;
     }
     
@@ -53,7 +56,8 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
 
     @Override
     public Type getEntityType() {
-        return InjectionUtils.getGenericResponseType(invoked, 
+        return InjectionUtils.getGenericResponseType(invoked,
+                                              serviceCls,       
                                               super.r.getActualEntity(), 
                                               getEntityClass(), 
                                               super.m.getExchange());

@@ -548,7 +548,7 @@ public class ClientProxyImpl extends AbstractClient implements
         
         Object response = null;
         try {
-            response = handleResponse(outMessage);
+            response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
             return response;
         } catch (Exception ex) {
             response = ex;
@@ -574,7 +574,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                    body, bodyIndex, exchange, invContext);
     }
     
-    protected Object handleResponse(Message outMessage) 
+    protected Object handleResponse(Message outMessage, Class<?> serviceCls) 
         throws Throwable {
         try {
             Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
@@ -591,12 +591,15 @@ public class ClientProxyImpl extends AbstractClient implements
                     && ((InputStream)r.getEntity()).available() == 0)) {
                 return r;
             }
+            Class<?> returnType = method.getReturnType();
             Type genericType = 
-                InjectionUtils.processGenericTypeIfNeeded(method.getDeclaringClass(), 
+                InjectionUtils.processGenericTypeIfNeeded(serviceCls, 
+                                                          returnType,
                                                           method.getGenericReturnType());
+            returnType = InjectionUtils.updateParamClassToTypeIfNeeded(returnType, genericType);
             return readBody(r, 
                             outMessage, 
-                            method.getReturnType(), 
+                            returnType, 
                             genericType, 
                             method.getDeclaredAnnotations());
         } finally {
@@ -647,15 +650,14 @@ public class ClientProxyImpl extends AbstractClient implements
                     Class<?> paramClass = method.getParameterTypes()[bodyIndex];
                     Class<?> bodyClass = 
                         paramClass.isAssignableFrom(body.getClass()) ? paramClass : body.getClass();
-                    Type paramType = method.getGenericParameterTypes()[bodyIndex];
+                    Type genericType = method.getGenericParameterTypes()[bodyIndex];
                     if (bodyType != null) {
-                        paramType = bodyType;
+                        genericType = bodyType;
                     }
-                    paramType = InjectionUtils.processGenericTypeIfNeeded(method.getDeclaringClass(),
-                                                                          paramType);
-                    
-                    writeBody(body, outMessage, bodyClass, paramType,
-                              anns, os);
+                    genericType = InjectionUtils.processGenericTypeIfNeeded(
+                        ori.getClassResourceInfo().getServiceClass(), bodyClass, genericType);
+                    bodyClass = InjectionUtils.updateParamClassToTypeIfNeeded(bodyClass, genericType);
+                    writeBody(body, outMessage, bodyClass, genericType, anns, os);
                 } else {
                     Type paramType = body.getClass();
                     if (bodyType != null) {

@@ -787,13 +787,8 @@ public final class JAXRSUtils {
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> param = parameterTypes[i]; 
             Type genericParam = InjectionUtils.processGenericTypeIfNeeded(
-                ori.getClassResourceInfo().getServiceClass(), genericParameterTypes[i]);
-            if (param == Object.class) {
-                param = (Class<?>)genericParam; 
-            } else if (genericParam == Object.class) {
-                genericParam = param;
-            }
-            
+                ori.getClassResourceInfo().getServiceClass(), param, genericParameterTypes[i]);
+            param = InjectionUtils.updateParamClassToTypeIfNeeded(param, genericParam);
             
             Object paramValue = processParameter(param, 
                                                  genericParam,
@@ -1732,7 +1727,8 @@ public final class JAXRSUtils {
                                                false,
                                                true);
             ContainerResponseContext responseContext = 
-                new ContainerResponseContextImpl(r, m, invoked);
+                new ContainerResponseContextImpl(r, m, 
+                    ori == null ? null : ori.getClassResourceInfo().getServiceClass(), invoked);
             for (ProviderInfo<ContainerResponseFilter> filter : containerFilters) {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, m);
                 filter.getProvider().filter(requestContext, responseContext);

@@ -47,7 +47,18 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         </jaxrs:providers>
     </jaxrs:server>
     
+    <jaxrs:server id="genericBookStore"
+                  address="/genericstore">
+        <jaxrs:serviceBeans>
+            <ref bean="gBookStore"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    
     <bean id="jackson" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
     <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
     <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSpring"/>
+    <bean id="gBookStore" class="org.apache.cxf.systest.jaxrs.GenericBookStoreSpring"/>
 </beans>

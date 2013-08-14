@@ -19,27 +19,38 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import javax.xml.bind.annotation.XmlRootElement;
 
+import java.util.List;
 
-@XmlRootElement(name = "SuperBook")
-public class SuperBook extends Book implements SuperBookInterface {
-    private boolean superBook;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+
+@Path("/")
+@Consumes({"application/json", "application/xml" })
+@Produces({"application/json", "application/xml" })
+public abstract class AbstractGenericBookStoreSpring<T extends SuperBookInterface> {
+
+    @POST
+    @Path("/books/superbook")
+    public T echoSuperBookJson(T book) {
+        if (((SuperBook)book).isSuperBook()) {
+            return book;
+        }
+        throw new WebApplicationException(400);
+    }
     
-    public SuperBook() {
+    @POST
+    @Path("/books/superbooks")
+    public List<T> echoSuperBookCollectionJson(List<T> book) {
+        if (((SuperBook)book.get(0)).isSuperBook()) {
+            return book;
+        }
+        throw new WebApplicationException(400);
+    }
         
-    }
-    
-    public SuperBook(String name, long id, boolean superStatus) {
-        super(name, id);
-        this.superBook = superStatus;
-    }
-
-    public boolean isSuperBook() {
-        return superBook;
-    }
-
-    public void setSuperBook(boolean superBook) {
-        this.superBook = superBook;
-    }
 }
+
+

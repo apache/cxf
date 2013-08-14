@@ -398,7 +398,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         WebClient wc = WebClient.create(address, Collections.singletonList(provider));
         wc.accept("application/xml");
         wc.type("application/xml");
-        SuperBook book = new SuperBook("SuperBook2", 999L);
+        SuperBook book = new SuperBook("SuperBook2", 999L, true);
         Book book2 = wc.invoke("POST", book, Book.class, Book.class);
         assertEquals("SuperBook2", book2.getName());
         
@@ -412,7 +412,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
         BookStoreSpring bookStore = JAXRSClientFactory.create(address, BookStoreSpring.class, 
                                                               Collections.singletonList(provider));
-        SuperBook book = new SuperBook("SuperBook2", 999L);
+        SuperBook book = new SuperBook("SuperBook2", 999L, true);
         Book book2 = bookStore.postGetBookXsiType(book);
         assertEquals("SuperBook2", book2.getName());
         
