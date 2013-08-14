@@ -11,7 +11,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/blueprint/core"
     xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws"
-    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
     xmlns:ext="http://www.osgi.org/xmlns/blueprint-ext/v1.1.0"
     xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
                         http://www.osgi.org/xmlns/blueprint-ext/v1.1.0 https://svn.apache.org/repos/asf/aries/tags/blueprint-0.3.1/blueprint-core/src/main/resources/org/apache/aries/blueprint/ext/blueprint-ext.xsd  
@@ -20,13 +20,16 @@
                         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
 ">
 
-	<cm:property-placeholder persistent-id="org.apache.cxf.xkms">
+	<cm:property-placeholder persistent-id="org.apache.cxf.xkms" update-strategy="reload">
 		<cm:default-properties>
 			<cm:property name="xkms.enableXKRSS" value="true"/>
+			<cm:property name="xkms.certificate.repo" value="ldap"/>
+			<cm:property name="xkms.file.storageDir" value="data/xkms/certificates"/>
 			<cm:property name="xkms.ldap.url" value="tcp:localhost:389"/>
 			<cm:property name="xkms.ldap.user" value=""/>
 			<cm:property name="xkms.ldap.pwd" value=""/>
 			<cm:property name="xkms.ldap.retry" value="2"/>
+			<cm:property name="xkms.ldap.rootDN" value=""/>
 		</cm:default-properties>
 	</cm:property-placeholder>
 
