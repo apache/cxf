@@ -50,7 +50,7 @@ import org.apache.cxf.helpers.DOMUtils;
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world.wsdl"
 @WebServiceProvider(portName = "SoapProviderPort", serviceName = "SOAPProviderService",
                     targetNamespace = "http://apache.org/hello_world_soap_http",
- wsdlLocation = "/wsdl/hello_world.wsdl")
+ wsdlLocation = "/org/apache/cxf/systest/provider/hello_world_with_restriction.wsdl")
 @ServiceMode(value = Service.Mode.MESSAGE)            
 public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
 
@@ -62,6 +62,7 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
     
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
+    private SOAPMessage greetMeResponseExceedMaxLengthRestriction;
     
     public HWSoapMessageDocProvider() {
        
@@ -72,6 +73,9 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeDocLiteralResp.xml");
             greetMeResponse =  factory.createMessage(null, is);
+            is.close();
+            is = getClass().getResourceAsStream("resources/GreetMeDocLiteralRespExceedLength.xml");
+            greetMeResponseExceedMaxLengthRestriction =  factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -103,6 +107,8 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
             String v = DOMUtils.getContent(el);
             if (v.contains("Return sayHi")) {
                 response = sayHiResponse;
+            } else if (v.contains("exceed maxLength")) {
+                response = greetMeResponseExceedMaxLengthRestriction;
             } else if (v.contains("throwFault")) {
                 try {
                     SOAPFactory f = SOAPFactory.newInstance(); 

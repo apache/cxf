@@ -88,7 +88,7 @@ public class ClientServerSourceTest extends AbstractBusClientServerTestBase {
         DOMSource ds = new DOMSource(doc);
         DOMSource resp = port.sayHi(ds);
         assertEquals("We should get the right response", "Bonjour", 
-                     DOMUtils.getContent(getElement(resp.getNode())));
+                     DOMUtils.getContent(getElement(resp.getNode().getFirstChild().getFirstChild())));
         
         doc = XMLUtils.newDocument();
         Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",

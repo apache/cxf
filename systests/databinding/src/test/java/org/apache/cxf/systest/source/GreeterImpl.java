@@ -47,9 +47,11 @@ public class GreeterImpl implements Greeter {
             Document doc = XMLUtils.newDocument();
             Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
                 "ns1:sayHiResponse");
-            el.appendChild(doc.createTextNode("Bonjour"));
+            Element el2 = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
+                "ns1:responseType");
+            el2.appendChild(doc.createTextNode("Bonjour"));
+            el.appendChild(el2);
             doc.appendChild(el);
-            
             return new DOMSource(doc);
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
