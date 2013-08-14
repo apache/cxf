@@ -27,6 +27,9 @@
 	
 	<wsdl:message name="ckRIn">
 		<wsdl:part name="ckRIn" element="tns:ckRequest"/>
+    </wsdl:message>
+    <wsdl:message name="ckRInHeader">
+        <wsdl:part name="header" element="tns:RequestHeaderElement"/>
 	</wsdl:message>
 	<wsdl:message name="ckROut">
 		<wsdl:part name="ckROut" element="tns:ckResponse"/>
@@ -45,6 +48,7 @@
 		<wsdl:operation name="ckR">
 		   <wsoap12:operation soapAction="ckR"/>
 		   <wsdl:input>
+                <wsoap12:header message="tns:ckRInHeader" part="header" use="literal"/>
 				<wsoap12:body parts="ckRIn" use="literal"/>
             </wsdl:input>
             <wsdl:output>

@@ -22,12 +22,13 @@ import org.apache.cxf.jaxws.schemavalidation.ActionCheckMajType;
 import org.apache.cxf.jaxws.schemavalidation.CkRequestType;
 import org.apache.cxf.jaxws.schemavalidation.CkResponseType;
 import org.apache.cxf.jaxws.schemavalidation.ProductPostActionType;
+import org.apache.cxf.jaxws.schemavalidation.RequestHeader;
 import org.apache.cxf.jaxws.schemavalidation.ServicePortType;
 
 @javax.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")
 public class ServicePortTypeImpl implements ServicePortType {
     
-    public CkResponseType ckR(CkRequestType ckRIn) {
+    public CkResponseType ckR(CkRequestType ckRIn, RequestHeader header) {
         CkResponseType result = new CkResponseType();
         ActionCheckMajType action = new ActionCheckMajType();
         action.setStatus(4);
@@ -36,4 +37,5 @@ public class ServicePortTypeImpl implements ServicePortType {
         result.getProduct().add(pdt);
         return result;
     }
+
 }

@@ -27,10 +27,12 @@ import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.validation.Schema;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -43,6 +45,7 @@ import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Exchange;
@@ -57,6 +60,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public class SoapOutInterceptor extends AbstractSoapInterceptor {
     public static final String WROTE_ENVELOPE_START = "wrote.envelope.start";
@@ -264,8 +268,15 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 .getName()));
         }
         dataWriter.setAttachments(message.getAttachments());
-
+        setDataWriterValidation(service, message, dataWriter);
         return dataWriter;
+    }
+    private void setDataWriterValidation(Service service, Message message, DataWriter<?> writer) {
+        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
+            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
+                                                             message.getExchange().getBus());
+            writer.setSchema(schema);
+        }
     }
         
     public class SoapOutEndingInterceptor extends AbstractSoapInterceptor {
