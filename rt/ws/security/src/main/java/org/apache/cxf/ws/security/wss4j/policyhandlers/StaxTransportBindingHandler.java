@@ -31,6 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.policy.SPConstants;
@@ -76,6 +77,12 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         if (this.isRequestor()) {
             tbinding = (TransportBinding)getBinding(aim);
             if (tbinding != null) {
+                String asymSignatureAlgorithm = 
+                    (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+                if (asymSignatureAlgorithm != null && tbinding.getAlgorithmSuite() != null) {
+                    tbinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+                }
+                
                 TransportToken token = tbinding.getTransportToken();
                 if (token.getToken() instanceof IssuedToken) {
                     SecurityToken secToken = getSecurityToken();

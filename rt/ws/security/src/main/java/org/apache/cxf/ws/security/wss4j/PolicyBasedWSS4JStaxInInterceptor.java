@@ -62,6 +62,7 @@ import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.stax.OperationPolicy;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyInputProcessor;
@@ -383,6 +384,20 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         checkAsymmetricBinding(aim, msg);
         checkSymmetricBinding(aim, msg);
         checkTransportBinding(aim, msg);
+        
+        // Allow for setting non-standard asymmetric signature algorithms
+        String asymSignatureAlgorithm = 
+            (String)msg.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+        if (asymSignatureAlgorithm != null) {
+            Collection<AssertionInfo> algorithmSuites = 
+                aim.get(SP12Constants.ALGORITHM_SUITE);
+            if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
+                for (AssertionInfo algorithmSuite : algorithmSuites) {
+                    AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
+                    algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                }
+            }
+        }
         
         super.configureProperties(msg);
     }

@@ -114,6 +114,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         configureTimestamp(aim);
         sbinding = (SymmetricBinding)getBinding(aim);
         
+        String asymSignatureAlgorithm = 
+            (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+        if (asymSignatureAlgorithm != null && sbinding.getAlgorithmSuite() != null) {
+            sbinding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+        }
+        
         // Set up CallbackHandler which wraps the configured Handler
         Map<String, Object> config = getProperties();
         TokenStoreCallbackHandler callbackHandler = 

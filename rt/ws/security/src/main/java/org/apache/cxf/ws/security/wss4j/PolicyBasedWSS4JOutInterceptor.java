@@ -167,6 +167,12 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         config = WSSConfig.getNewInstance();
                     }
                     translateProperties(message);
+                    
+                    String asymSignatureAlgorithm = 
+                        (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+                    if (asymSignatureAlgorithm != null && transport.getAlgorithmSuite() != null) {
+                        transport.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
+                    }
 
                     if (transport instanceof TransportBinding) {
                         new TransportBindingHandler(config, (TransportBinding)transport, saaj,

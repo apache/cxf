@@ -304,6 +304,14 @@ public final class SecurityConstants {
      */
     public static final String SUBJECT_ROLE_CLASSIFIER_TYPE = "ws-security.role.classifier.type";
     
+    /**
+     * This configuration tag allows the user to override the default Asymmetric Signature 
+     * algorithm (RSA-SHA1) for use in WS-SecurityPolicy, as the WS-SecurityPolicy specification
+     * does not allow the use of other algorithms at present.
+     */
+    public static final String ASYMMETRIC_SIGNATURE_ALGORITHM = 
+        "ws-security.asymmetric.signature.algorithm";
+    
     //
     // Validator implementations for validating received security tokens
     //
@@ -486,7 +494,8 @@ public final class SecurityConstants {
             STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
-            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND
+            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
+            ASYMMETRIC_SIGNATURE_ALGORITHM
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

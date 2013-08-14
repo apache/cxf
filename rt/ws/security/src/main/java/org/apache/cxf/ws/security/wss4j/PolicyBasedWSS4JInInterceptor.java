@@ -43,7 +43,6 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -94,6 +93,7 @@ import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.RequiredElements;
 import org.apache.wss4j.policy.model.RequiredParts;
@@ -541,6 +541,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     protected void setAlgorithmSuites(SoapMessage message, RequestData data) throws WSSecurityException {
         AlgorithmSuiteTranslater translater = new AlgorithmSuiteTranslater();
         translater.translateAlgorithmSuites(message.get(AssertionInfoMap.class), data);
+        
+        // Allow for setting non-standard asymmetric signature algorithms
+        String asymSignatureAlgorithm = 
+            (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+        if (asymSignatureAlgorithm != null && data.getAlgorithmSuite() != null) {
+            data.getAlgorithmSuite().getSignatureMethods().clear();
+            data.getAlgorithmSuite().getSignatureMethods().add(asymSignatureAlgorithm);
+        }
     }
 
     protected void computeAction(SoapMessage message, RequestData data) throws WSSecurityException {
@@ -558,6 +566,21 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             if ("".equals(action) || (ais != null && !ais.isEmpty())) {
                 action = checkDefaultBinding(aim, action, message);
             }
+            
+            // Allow for setting non-standard asymmetric signature algorithms
+            String asymSignatureAlgorithm = 
+                (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
+            if (asymSignatureAlgorithm != null) {
+                Collection<AssertionInfo> algorithmSuites = 
+                    aim.get(SP12Constants.ALGORITHM_SUITE);
+                if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
+                    for (AssertionInfo algorithmSuite : algorithmSuites) {
+                        AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
+                        algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                    }
+                }
+            }
+            
             checkUsernameToken(aim, message);
             
             // stuff we can default to asserted and un-assert if a condition isn't met
