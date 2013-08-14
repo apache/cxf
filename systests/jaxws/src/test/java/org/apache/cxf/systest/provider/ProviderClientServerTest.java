@@ -154,8 +154,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
             }
             
             try {
-                String ret = greeter.greetMe("exceed maxLength");
-                System.out.println("the ret is " + ret);
+                greeter.greetMe("exceed maxLength");
                 fail("Should have thrown an exception");
             } catch (Exception ex) {
                 //expected 

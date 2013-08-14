@@ -62,6 +62,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -860,6 +861,34 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         StreamSource streamSourceResp3 = tssh.getStreamSource();
         assertNotNull(streamSourceResp3);
         assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp3).contains(expected3));
+    }
+    
+    
+    @Test
+    public void testStreamSourcePAYLOADWithSchemaValidation() throws Exception {
+
+        URL wsdl = getClass().getResource("/org/apache/cxf/systest/provider/hello_world_with_restriction.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
+        assertNotNull(service);
+        Dispatch<StreamSource> disp = service.createDispatch(PORT_NAME, StreamSource.class,
+                                                             Service.Mode.PAYLOAD);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                     "http://localhost:" 
+                                     + greeterPort
+                                     + "/SOAPDispatchService/SoapDispatchPort");
+        disp.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
+        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReqExceedMaxLength.xml");
+        StreamSource streamSourceReq = new StreamSource(is);
+        assertNotNull(streamSourceReq);
+        try {
+            disp.invoke(streamSourceReq);
+            fail("Should have thrown an exception");
+        } catch (Exception ex) {
+            // expected
+            assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
+        }
     }
     
     @Test
