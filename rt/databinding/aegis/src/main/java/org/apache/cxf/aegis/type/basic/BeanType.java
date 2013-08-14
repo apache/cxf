@@ -359,6 +359,10 @@ public class BeanType extends AegisType {
 
         for (QName name : inf.getAttributes()) {
 
+            if (isInheritedProperty(inf, name)) {
+                continue;
+            }
+
             Object value = readProperty(object, name);
             if (value != null) {
                 AegisType type = getType(inf, name);
@@ -385,11 +389,10 @@ public class BeanType extends AegisType {
 
         for (QName name : inf.getElements()) {
 
-            if (inf.isExtension()
-                && inf.getPropertyDescriptorFromMappedName(name).getReadMethod().getDeclaringClass() != inf
-                    .getTypeClass()) {
+            if (isInheritedProperty(inf, name)) {
                 continue;
             }
+
             Object value = readProperty(object, name);
 
             AegisType defaultType = getType(inf, name);
@@ -412,6 +415,15 @@ public class BeanType extends AegisType {
                 cwriter.close();
             }
         }
+    }
+
+    /**
+     * @return true if the given beanType is extended and its given property is inherited from parent classes
+     */
+    private boolean isInheritedProperty(BeanTypeInfo beanTypeInfo, QName propertyQName) {
+        return beanTypeInfo.isExtension()
+               && beanTypeInfo.getPropertyDescriptorFromMappedName(propertyQName).getReadMethod().
+                getDeclaringClass() != beanTypeInfo.getTypeClass();
     }
 
     protected void writeElement(QName name, Object value,
@@ -522,13 +534,14 @@ public class BeanType extends AegisType {
         BeanTypeInfo inf = getTypeInfo();
 
         for (QName name : inf.getAttributes()) {
+            if (isInheritedProperty(inf, name)) {
+                continue;
+            }
             deps.add(inf.getType(name));
         }
 
         for (QName name : inf.getElements()) {
-            if (inf.isExtension()
-                && inf.getPropertyDescriptorFromMappedName(name).getReadMethod().getDeclaringClass() != inf
-                    .getTypeClass()) {
+            if (isInheritedProperty(inf, name)) {
                 continue;
             }
             deps.add(inf.getType(name));
@@ -716,14 +729,8 @@ public class BeanType extends AegisType {
         // Write out schema for elements
         for (QName name : inf.getElements()) {
 
-            if (isExtension) {
-                PropertyDescriptor pd = inf.getPropertyDescriptorFromMappedName(name);
-
-                // assert pd.getReadMethod() != null && pd.getWriteMethod() != null;
-
-                if (pd.getReadMethod().getDeclaringClass() != inf.getTypeClass()) {
-                    continue;
-                }
+            if (isInheritedProperty(inf, name)) {
+                continue;
             }
 
             XmlSchemaElement element = new XmlSchemaElement(root, false);
@@ -771,6 +778,11 @@ public class BeanType extends AegisType {
 
         // Write out schema for attributes
         for (QName name : inf.getAttributes()) {
+
+            if (isInheritedProperty(inf, name)) {
+                continue;
+            }
+
             XmlSchemaAttribute attribute = new XmlSchemaAttribute(root, false);
             complex.getAttributes().add(attribute);
             attribute.setName(name.getLocalPart());
