@@ -54,13 +54,13 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
 
-
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -72,6 +72,7 @@ import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeLater;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -682,6 +683,45 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(saxSourceResp3);
         assertTrue("Expected: " + expected, XMLUtils.toString(saxSourceResp3).contains(expected3));
     }
+    
+    @Test
+    public void testSAXSourceMESSAGEWithSchemaValidation() throws Exception {
+
+        URL wsdl = getClass().getResource("/org/apache/cxf/systest/provider/hello_world_with_restriction.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
+        assertNotNull(service);
+        
+        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputSource inputSource = new InputSource(is);
+        SAXSource saxSourceReq = new SAXSource(inputSource);
+        assertNotNull(saxSourceReq);
+
+        Dispatch<SAXSource> disp = service.createDispatch(PORT_NAME, SAXSource.class, Service.Mode.MESSAGE);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                     "http://localhost:" 
+                                     + greeterPort
+                                     + "/SOAPDispatchService/SoapDispatchPort");
+        disp.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
+        SAXSource saxSourceResp = disp.invoke(saxSourceReq);
+        assertNotNull(saxSourceResp);
+        String expected = "Hello TestSOAPInputMessage";
+        assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp).contains(expected));
+        
+        is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReqWithExceedMaxLength.xml");
+        inputSource = new InputSource(is);
+        saxSourceReq = new SAXSource(inputSource);
+        assertNotNull(saxSourceReq);
+        
+        try {
+            disp.invoke(saxSourceReq);
+            fail("Should have thrown an exception");
+        } catch (Exception ex) {
+            // expected
+            assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
+        }
+    }
 
     @Test
     public void testSAXSourcePAYLOAD() throws Exception {
@@ -885,6 +925,14 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             // expected
             assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
         }
+        
+        is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq.xml");
+        streamSourceReq = new StreamSource(is);
+        assertNotNull(streamSourceReq);
+        StreamSource streamSourceResp = disp.invoke(streamSourceReq);
+        assertNotNull(streamSourceResp);
+        String expected = "Hello TestSOAPInputMessage";
+        assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp).contains(expected));
     }
     
 
