@@ -19,6 +19,8 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +54,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 @Path("/token")
 public class AccessTokenService extends AbstractOAuthService {
     private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
+    private List<String> audiences = new LinkedList<String>();
     private boolean writeCustomErrors;
     private boolean canSupportPublicClients;
     
@@ -94,7 +97,12 @@ public class AccessTokenService extends AbstractOAuthService {
             return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
         
-        
+        try {
+            checkAudience(params);
+        } catch (OAuthServiceException ex) {
+            return createErrorResponseFromBean(ex.getError());
+        }        
+
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
@@ -201,6 +209,28 @@ public class AccessTokenService extends AbstractOAuthService {
         return client;
     }
     
+    protected void checkAudience(MultivaluedMap<String, String> params) { 
+        if (audiences.isEmpty()) {
+            return;
+        }
+        
+        String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
+        if (audienceParam == null) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+        }
+        // must be URL
+        try {
+            new URL(audienceParam);
+        } catch (MalformedURLException ex) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+        }
+        
+        if (!audiences.contains(audienceParam)) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
+        }
+        
+    }
+
     /**
      * Find the matching grant handler
      */
@@ -264,5 +294,11 @@ public class AccessTokenService extends AbstractOAuthService {
         return canSupportPublicClients;
     }
 
-    
+    public List<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
+    }   
 }

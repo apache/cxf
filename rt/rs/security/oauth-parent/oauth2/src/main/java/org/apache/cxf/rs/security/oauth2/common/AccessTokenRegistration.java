@@ -30,6 +30,7 @@ public class AccessTokenRegistration {
     private List<String> approvedScope = new LinkedList<String>();
     private String grantType;
     private UserSubject subject;
+    private String audience;
     
     /**
      * Sets the {@link Client} instance
@@ -110,6 +111,14 @@ public class AccessTokenRegistration {
      */
     public String getGrantType() {
         return grantType;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
     
 }

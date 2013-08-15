@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
@@ -83,13 +84,6 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         }
     }
     
-    protected ServerAccessToken doCreateAccessToken(Client client,
-                                                    UserSubject subject,
-                                                    List<String> requestedScope) {
-        
-        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope);
-    }
-    
     private String getSingleGrantType() {
         if (supportedGrants.size() > 1) {
             String errorMessage = "Request grant type must be specified";
@@ -101,8 +95,41 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
+                                                    MultivaluedMap<String, String> params) {
+        
+        return doCreateAccessToken(client, 
+                                   subject, 
+                                   OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)), 
+                                   params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+    }
+    
+    protected ServerAccessToken doCreateAccessToken(Client client,
+                                                    UserSubject subject,
+                                                    List<String> requestedScope) {
+        
+        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, null);
+    }
+    
+    protected ServerAccessToken doCreateAccessToken(Client client,
+                                                    UserSubject subject,
+                                                    List<String> requestedScope,
+                                                    String audience) {
+        
+        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScope, audience);
+    }
+    
+    protected ServerAccessToken doCreateAccessToken(Client client,
+                                                    UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScope) {
+        return doCreateAccessToken(client, subject, requestedGrant, requestedScope, null);
+    }
+    
+    protected ServerAccessToken doCreateAccessToken(Client client,
+                                                    UserSubject subject,
+                                                    String requestedGrant,
+                                                    List<String> requestedScope,
+                                                    String audience) {
         if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(), 
                                        partialMatchScopeValidation)) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));     
@@ -120,6 +147,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         reg.setGrantType(requestedGrant);
         reg.setSubject(subject);
         reg.setRequestedScope(requestedScope);        
+        reg.setAudience(audience);
         
         return dataProvider.createAccessToken(reg);
     }

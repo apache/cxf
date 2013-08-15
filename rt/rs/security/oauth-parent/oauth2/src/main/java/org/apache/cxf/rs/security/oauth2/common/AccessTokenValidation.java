@@ -44,6 +44,7 @@ public class AccessTokenValidation {
     private long tokenLifetime;
     private UserSubject tokenSubject;
     private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
+    private String audience;
     
     public AccessTokenValidation() {
         
@@ -60,7 +61,8 @@ public class AccessTokenValidation {
         this.tokenLifetime = token.getExpiresIn();
         
         this.tokenSubject = token.getSubject();
-        this.tokenScopes = token.getScopes();        
+        this.tokenScopes = token.getScopes();
+        this.audience = token.getAudience();
     }
     
     public String getClientId() {
@@ -118,6 +120,14 @@ public class AccessTokenValidation {
 
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
     
 }

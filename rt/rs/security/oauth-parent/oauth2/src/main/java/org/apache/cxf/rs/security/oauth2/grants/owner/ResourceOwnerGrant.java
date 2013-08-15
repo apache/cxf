@@ -20,37 +20,33 @@ package org.apache.cxf.rs.security.oauth2.grants.owner;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
+import org.apache.cxf.rs.security.oauth2.grants.AbstractGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class ResourceOwnerGrant implements AccessTokenGrant {
+public class ResourceOwnerGrant extends AbstractGrant {
     private String ownerName;
     private String ownerPassword;
-    private String scope;
     
     public ResourceOwnerGrant(String name, String password) {
         this(name, password, null);
     }
     
     public ResourceOwnerGrant(String name, String password, String scope) {
-        this.ownerName = name;
-        this.ownerPassword = password;
-        this.scope = scope;
+        this(name, password, scope, null);
     }
     
-    public String getType() {
-        return OAuthConstants.RESOURCE_OWNER_GRANT;
+    public ResourceOwnerGrant(String name, String password, 
+                              String scope, String audience) {
+        super(OAuthConstants.RESOURCE_OWNER_GRANT, scope, audience);
+        this.ownerName = name;
+        this.ownerPassword = password;
     }
-
+    
     public MultivaluedMap<String, String> toMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.RESOURCE_OWNER_GRANT);
+        MultivaluedMap<String, String> map = super.toMap();
         map.putSingle(OAuthConstants.RESOURCE_OWNER_NAME, ownerName);
         map.putSingle(OAuthConstants.RESOURCE_OWNER_PASSWORD, ownerPassword);
-        if (scope != null) {
-            map.putSingle(OAuthConstants.SCOPE, scope);
-        }
+        
         return map;
     }
 

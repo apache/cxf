@@ -18,33 +18,20 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.clientcred;
 
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
+import org.apache.cxf.rs.security.oauth2.grants.AbstractGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class ClientCredentialsGrant implements AccessTokenGrant {
-    private String scope;
+public class ClientCredentialsGrant extends AbstractGrant {
     
     public ClientCredentialsGrant() {
+        this(null);
     }
     
     public ClientCredentialsGrant(String scope) {
-        this.scope = scope;
+        this(scope, null);
     }
-    
-    public String getType() {
-        return OAuthConstants.CLIENT_CREDENTIALS_GRANT;
+     
+    public ClientCredentialsGrant(String scope, String audience) {
+        super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, scope, audience);
     }
-
-    public MultivaluedMap<String, String> toMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.CLIENT_CREDENTIALS_GRANT);
-        if (scope != null) {
-            map.putSingle(OAuthConstants.SCOPE, scope);
-        }
-        return map;
-    }
-
 }

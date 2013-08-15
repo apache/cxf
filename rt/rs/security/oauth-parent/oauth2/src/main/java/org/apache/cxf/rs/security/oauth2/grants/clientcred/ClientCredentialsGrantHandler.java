@@ -25,7 +25,6 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * The "client_credentials" grant handler
@@ -42,7 +41,7 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
         
         return doCreateAccessToken(client, 
                                    client.getSubject(), 
-                                   OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));
+                                   params);
     }
 
 
