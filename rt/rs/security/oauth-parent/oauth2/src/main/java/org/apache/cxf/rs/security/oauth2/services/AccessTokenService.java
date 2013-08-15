@@ -19,6 +19,8 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +34,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
@@ -47,6 +50,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 @Path("/token")
 public class AccessTokenService extends AbstractTokenService {
     private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
+    private List<String> audiences = new LinkedList<String>();
     
     /**
      * Sets the list of optional grant handlers
@@ -83,6 +87,11 @@ public class AccessTokenService extends AbstractTokenService {
             return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
         
+        try {
+            checkAudience(params);
+        } catch (OAuthServiceException ex) {
+            return super.createErrorResponseFromBean(ex.getError());
+        }
         
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
@@ -121,6 +130,28 @@ public class AccessTokenService extends AbstractTokenService {
                         .build();
     }
     
+    protected void checkAudience(MultivaluedMap<String, String> params) { 
+        if (audiences.isEmpty()) {
+            return;
+        }
+        
+        String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
+        if (audienceParam == null) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+        }
+        // must be URL
+        try {
+            new URL(audienceParam);
+        } catch (MalformedURLException ex) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
+        }
+        
+        if (!audiences.contains(audienceParam)) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
+        }
+        
+    }
+    
     /**
      * Find the matching grant handler
      */
@@ -145,5 +176,13 @@ public class AccessTokenService extends AbstractTokenService {
         }
         
         return null;
+    }
+
+    public List<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
     }
 }

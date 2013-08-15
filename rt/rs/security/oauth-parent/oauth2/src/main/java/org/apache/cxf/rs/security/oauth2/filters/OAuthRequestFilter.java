@@ -95,6 +95,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         
         oauthContext.setClientId(accessTokenV.getClientId());
         oauthContext.setTokenKey(accessTokenV.getTokenKey());
+        oauthContext.setTokenAudience(accessTokenV.getAudience());
         
         m.setContent(OAuthContext.class, oauthContext);
     }

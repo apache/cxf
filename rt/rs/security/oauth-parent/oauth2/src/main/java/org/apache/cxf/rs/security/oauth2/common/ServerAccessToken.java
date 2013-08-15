@@ -29,6 +29,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private Client client;
     private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
     private UserSubject subject;
+    private String audience;
     
     protected ServerAccessToken(Client client, 
                                         String tokenType,
@@ -106,6 +107,14 @@ public abstract class ServerAccessToken extends AccessToken {
      */
     public String getGrantType() {
         return grantType;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
 
 }

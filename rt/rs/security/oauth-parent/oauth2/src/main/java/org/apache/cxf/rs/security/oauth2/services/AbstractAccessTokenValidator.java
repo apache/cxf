@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +45,10 @@ public abstract class AbstractAccessTokenValidator {
     private MessageContext mc;
 
     private List<AccessTokenValidator> tokenHandlers = Collections.emptyList();
+    private List<String> audiences = new LinkedList<String>();
+    
     private Set<String> supportedSchemes = new HashSet<String>();
+    
     private OAuthDataProvider dataProvider;
     private String realm;
     
@@ -134,11 +138,27 @@ public abstract class AbstractAccessTokenValidator {
             }
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
+        
+        // Check audiences
+        if (accessTokenV.getAudience() != null 
+            && !audiences.isEmpty()
+            && !audiences.contains(accessTokenV.getAudience())) {
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+        }
+        
         return accessTokenV;
     }
 
     public void setRealm(String realm) {
         this.realm = realm;
+    }
+
+    public List<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
     }
     
     
