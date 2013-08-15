@@ -209,12 +209,18 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     public void shutdown() {
         // just unbind the channel
-        if (serverChannel != null) {
-            serverChannel.close();
-        }
         if (servletPipeline != null) {
             servletPipeline.shutdown();
         }
+        
+        /*if (serverChannel != null) {
+            try {
+                serverChannel.close().sync();
+            } catch (InterruptedException exception) {
+                // do nothing here;
+            }
+        }*/
+        
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
         

@@ -115,7 +115,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
     
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.fireChannelReadComplete();
+        ctx.flush();
     }
    
     protected void handleHttpServletRequest(ChannelHandlerContext ctx,
@@ -180,7 +180,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
             }
 
         }
-
+        ctx.close();
     }
 
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
