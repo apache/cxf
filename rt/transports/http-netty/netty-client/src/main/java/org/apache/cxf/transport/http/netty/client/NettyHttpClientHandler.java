@@ -19,51 +19,60 @@
 
 package org.apache.cxf.transport.http.netty.client;
 
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 
-public class NettyHttpClientHandler extends SimpleChannelHandler {
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.http.HttpResponse;
 
+public class NettyHttpClientHandler extends ChannelDuplexHandler {
+    private final BlockingQueue<NettyHttpClientRequest> sendedQueue = 
+        new LinkedBlockingDeque<NettyHttpClientRequest>();
+        
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-        throws Exception {
-        HttpResponse response = (HttpResponse)e.getMessage();
-        Channel ch = ctx.getChannel();
-        @SuppressWarnings("unchecked")
-        BlockingQueue<NettyHttpClientRequest> sendedQueue = (BlockingQueue<NettyHttpClientRequest>)ch.getAttachment();
-        NettyHttpClientRequest request = sendedQueue.poll();
-        request.setResponse(response);
-        // calling the callback here
-        request.getCxfResponseCallback().responseReceived(response);
-    }
-
-
-    @Override
-    public void writeRequested(ChannelHandlerContext ctx, MessageEvent e)
-        throws Exception {
-        Object p = e.getMessage();
-        // need to deal with the request
-        if (p instanceof NettyHttpClientRequest) {
-            NettyHttpClientRequest request = (NettyHttpClientRequest)e.getMessage();
-            Channel ch = ctx.getChannel();
-            @SuppressWarnings("unchecked")
-            BlockingQueue<NettyHttpClientRequest> sendedQueue = 
-                (BlockingQueue<NettyHttpClientRequest>)ch.getAttachment();
-            if (sendedQueue == null) {
-                sendedQueue = new LinkedBlockingDeque<NettyHttpClientRequest>();
-                ch.setAttachment(sendedQueue);
-            }
-            sendedQueue.put(request);
-            ctx.getChannel().write(request.getRequest());
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        
+        if (msg instanceof HttpResponse) {
+            // just make sure we can combine the request and response together
+            HttpResponse response = (HttpResponse)msg;
+            NettyHttpClientRequest request = sendedQueue.poll();
+            request.setResponse(response);
+            // calling the callback here
+            request.getCxfResponseCallback().responseReceived(response);
         } else {
-            super.writeRequested(ctx, e);
+            super.channelRead(ctx, msg);
         }
     }
+
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        
+        // need to deal with the request
+        if (msg instanceof NettyHttpClientRequest) {
+            NettyHttpClientRequest request = (NettyHttpClientRequest)msg;
+            sendedQueue.put(request);
+            ctx.writeAndFlush(request.getRequest());
+        } else {
+            super.write(ctx, msg, promise);
+        }
+    }
+    
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+        throws Exception {
+        //TODO need to handle the exception here
+        cause.printStackTrace();
+        ctx.close();
+    }
+    
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
+    }
+    
+    
 
 }

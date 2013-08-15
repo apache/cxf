@@ -19,7 +19,7 @@
 
 package org.apache.cxf.transport.http.netty.client;
 
-import org.jboss.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponse;
 
 public interface CxfResponseCallBack {
 

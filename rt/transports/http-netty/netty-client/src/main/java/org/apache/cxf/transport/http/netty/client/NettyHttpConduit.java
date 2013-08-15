@@ -40,6 +40,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -53,43 +54,52 @@ import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
-import org.jboss.netty.buffer.ChannelBufferOutputStream;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.ssl.SslHandler;
 
-public class NettyHttpConduit extends URLConnectionHTTPConduit {
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.ssl.SslHandler;
+
+public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLifeCycleListener {
     public static final String USE_ASYNC = "use.async.http.conduit";
     final NettyHttpConduitFactory factory;
-    private final ClientBootstrap bootstrap;
+    private Bootstrap bootstrap;
+    // TODO do we need to use the EventLoop from NettyHttpConduitFactory
+    private final EventLoopGroup group;
     
     public NettyHttpConduit(Bus b, EndpointInfo ei, EndpointReferenceType t, NettyHttpConduitFactory conduitFactory)
         throws IOException {
         super(b, ei, t);
         factory = conduitFactory;
-        bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory());
+        group = new NioEventLoopGroup();
+        bootstrap = new Bootstrap();
+        bootstrap.group(group);
+        bootstrap.channel(NioSocketChannel.class);
+        bootstrap.handler(new NettyHttpClientPipelineFactory(this));
     }
-
+    
     public NettyHttpConduitFactory getNettyHttpConduitFactory() {
         return factory;
     }
     
     public void close() {
         super.close();
-        // clean up the resource that ClientChannelFactory used
-        bootstrap.shutdown();
+        // clean up thread of the group
+        group.shutdownGracefully().syncUninterruptibly();
     }
 
     // Using Netty API directly
     protected void setupConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
-
         // need to do some clean up work on the URI address
         String uriString = uri.toString();
         if (uriString.startsWith("netty://")) {
@@ -122,12 +132,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
         request.setConnectionTimeout(ctimeout);
         request.setReceiveTimeout(rtimeout);
-        request.getRequest().setChunked(true);
-        request.getRequest().setHeader(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
-        // need to socket connection timeout
-
+        
         message.put(NettyHttpClientRequest.class, request);
-        bootstrap.setPipelineFactory(new NettyHttpClientPipelineFactory(getTlsClientParameters()));
+        
     }
 
     protected OutputStream createOutputStream(Message message,
@@ -142,7 +149,10 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 chunkThreshold,
                 getConduitName(),
                 entity.getUri());
-        entity.getRequest().setContent(out.getOutBuffer());
+        entity.createRequest(out.getOutBuffer());
+        // TODO need to check how to set the Chunked feature
+        //request.getRequest().setChunked(true);
+        entity.getRequest().headers().set(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
         return out;
 
 
@@ -156,7 +166,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         volatile Channel channel;
         volatile SSLSession session;
         boolean isAsync;
-        ChannelBuffer outBuffer;
+        ByteBuf outBuffer;
         OutputStream outputStream;
 
         protected NettyWrappedOutputStream(Message message, boolean possibleRetransmit,
@@ -165,11 +175,11 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
             csPolicy = getClient(message);
             entity  = message.get(NettyHttpClientRequest.class);
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
-            outBuffer = ChannelBuffers.dynamicBuffer(bufSize);
-            outputStream = new ChannelBufferOutputStream(outBuffer);
+            outBuffer = Unpooled.buffer(bufSize);
+            outputStream = new ByteBufOutputStream(outBuffer);
         }
 
-        protected ChannelBuffer getOutBuffer() {
+        protected ByteBuf getOutBuffer() {
             return outBuffer;
         }
 
@@ -199,6 +209,10 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 }
             }
             return httpResponse;
+        }
+        
+        protected HttpContent getHttpResponseContent() throws IOException {
+            return (HttpContent) getHttpResponse();
         }
 
 
@@ -248,7 +262,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception {
                             if (!future.isSuccess()) {
-                                setException(future.getCause());
+                                setException(future.cause());
                             }
                         }
                     };
@@ -277,13 +291,13 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        setChannel(future.getChannel());
-                        SslHandler sslHandler = channel.getPipeline().get(SslHandler.class);
+                        setChannel(future.channel());
+                        SslHandler sslHandler = channel.pipeline().get(SslHandler.class);
                         if (sslHandler != null) {
-                            session = sslHandler.getEngine().getSession();
+                            session = sslHandler.engine().getSession();
                         }
                     } else {
-                        setException((Exception) future.getCause());
+                        setException((Exception) future.cause());
                     }
                 }
             };
@@ -291,9 +305,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
             connFuture.addListener(listener);
 
             if (!output) {
-                entity.getRequest().removeHeader("Transfer-Encoding");
-                entity.getRequest().removeHeader("Content-Type");
-                entity.getRequest().setContent(null);
+                entity.getRequest().headers().remove("Transfer-Encoding");
+                entity.getRequest().headers().remove("Content-Type");
+                entity.getRequest().headers().remove(null);
             }
 
             // setup the CxfResponseCallBack
@@ -347,7 +361,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         @Override
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
-            entity.getRequest().setHeader(Message.CONTENT_TYPE, h.determineContentType());
+            entity.getRequest().headers().set(Message.CONTENT_TYPE, h.determineContentType());
             boolean addHeaders = MessageUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
 
             for (Map.Entry<String, List<String>> header : h.headerMap().entrySet()) {
@@ -356,7 +370,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 }
                 if (addHeaders || HttpHeaderHelper.COOKIE.equalsIgnoreCase(header.getKey())) {
                     for (String s : header.getValue()) {
-                        entity.getRequest().addHeader(HttpHeaderHelper.COOKIE, s);
+                        entity.getRequest().headers().add(HttpHeaderHelper.COOKIE, s);
                     }
                 } else if (!"Content-Length".equalsIgnoreCase(header.getKey())) {
                     StringBuilder b = new StringBuilder();
@@ -366,10 +380,10 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                             b.append(',');
                         }
                     }
-                    entity.getRequest().setHeader(header.getKey(), b.toString());
+                    entity.getRequest().headers().set(header.getKey(), b.toString());
                 }
-                if (!entity.getRequest().containsHeader("User-Agent")) {
-                    entity.getRequest().setHeader("User-Agent", Version.getCompleteVersionString());
+                if (!entity.getRequest().headers().contains("User-Agent")) {
+                    entity.getRequest().headers().set("User-Agent", Version.getCompleteVersionString());
                 }
             }
         }
@@ -377,18 +391,19 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         @Override
         protected void setFixedLengthStreamingMode(int i) {
             // Here we can set the Content-Length
-            entity.getRequest().setHeader("Content-Length", i);
-            entity.getRequest().setChunked(false);
+            entity.getRequest().headers().set("Content-Length", i);
+            // TODO we need to deal with the Chunked information ourself
+            //entity.getRequest().setChunked(false);
         }
 
         @Override
         protected int getResponseCode() throws IOException {
-            return getHttpResponse().getStatus().getCode();
+            return getHttpResponse().getStatus().code();
         }
 
         @Override
         protected String getResponseMessage() throws IOException {
-            return getHttpResponse().getStatus().getReasonPhrase();
+            return getHttpResponse().getStatus().reasonPhrase();
         }
 
         @Override
@@ -399,13 +414,13 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         }
 
         private String readHeaders(Headers h) throws IOException {
-            Set<String> headerNames = getHttpResponse().getHeaderNames();
+            Set<String> headerNames = getHttpResponse().headers().names();
             String ct = null;
             for (String name : headerNames) {
-                List<String> s = getHttpResponse().getHeaders(name);
+                List<String> s = getHttpResponse().headers().getAll(name);
                 h.headerMap().put(name, s);
                 if (Message.CONTENT_TYPE.equalsIgnoreCase(name)) {
-                    ct = getHttpResponse().getHeader(name);
+                    ct = getHttpResponse().headers().get(name);
                 }
             }
             return ct;
@@ -419,7 +434,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
         @Override
         protected void closeInputStream() throws IOException {
             //We just clear the buffer
-            getHttpResponse().getContent().clear();
+            getHttpResponseContent().content().clear();
         }
 
         @Override
@@ -430,7 +445,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
 
         @Override
         protected InputStream getInputStream() throws IOException {
-            return new ChannelBufferInputStream(getHttpResponse().getContent());
+            return new ByteBufInputStream(getHttpResponseContent().content());
         }
 
         @Override
@@ -440,14 +455,14 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
             if (responseCode == HttpURLConnection.HTTP_ACCEPTED
                     || responseCode == HttpURLConnection.HTTP_OK) {
 
-                String head = httpResponse.getHeader(HttpHeaderHelper.CONTENT_LENGTH);
+                String head = httpResponse.headers().get(HttpHeaderHelper.CONTENT_LENGTH);
                 int cli = 0;
                 if (head != null) {
                     cli = Integer.parseInt(head);
                 }
-                head = httpResponse.getHeader(HttpHeaderHelper.TRANSFER_ENCODING);
+                head = httpResponse.headers().get(HttpHeaderHelper.TRANSFER_ENCODING);
                 boolean isChunked = head != null &&  HttpHeaderHelper.CHUNKED.equalsIgnoreCase(head);
-                head = httpResponse.getHeader(HttpHeaderHelper.CONNECTION);
+                head = httpResponse.headers().get(HttpHeaderHelper.CONNECTION);
                 boolean isEofTerminated = head != null &&  HttpHeaderHelper.CLOSE.equalsIgnoreCase(head);
                 if (cli > 0) {
                     in = getInputStream();
@@ -486,7 +501,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
                 entity = outMessage.get(NettyHttpClientRequest.class);
                 //reset the buffers
                 outBuffer.clear();
-                outputStream = new ChannelBufferOutputStream(outBuffer);
+                outputStream = new ByteBufOutputStream(outBuffer);
 
             } catch (URISyntaxException e) {
                 throw new IOException(e);
@@ -511,7 +526,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
 
         @Override
         public void thresholdReached() throws IOException {
-            entity.getRequest().setChunked(true);
+            //TODO need to support the chunked version
+            //entity.getRequest().setChunked(true);
         }
 
         protected synchronized void setHttpResponse(HttpResponse r) {
@@ -546,6 +562,25 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit {
             channel = ch;
             notifyAll();
         }
+    }
+
+    @Override
+    public void initComplete() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void postShutdown() {
+        // shutdown the conduit
+        this.close();
+        
+    }
+
+    @Override
+    public void preShutdown() {
+        // TODO Auto-generated method stub
+        
     }
 
 

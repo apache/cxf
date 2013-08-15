@@ -26,12 +26,15 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.Response;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -41,6 +44,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.netty.client.NettyHttpConduit;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
+import org.apache.hello_world_soap_http.types.GreetMeResponse;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -95,6 +100,25 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         setAddress(g, address);
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
+        
+        GreetMeResponse resp = (GreetMeResponse)g.greetMeAsync("asyncTest", new AsyncHandler<GreetMeResponse>() {
+            public void handleResponse(Response<GreetMeResponse> res) {
+                try {
+                    res.get().getResponseType();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).get();
+        assertEquals("Hello asyncTest", resp.getResponseType());
+
+        MyLaterResponseHandler handler = new MyLaterResponseHandler();
+        g.greetMeLaterAsync(1000, handler).get();
+        // need to check the result here
+        assertEquals("Hello, finally!", handler.getResponse().getResponseType());
+
     }
     
     private static void setupTLS(Greeter port)
@@ -136,6 +160,25 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         KeyManagerFactory fac = KeyManagerFactory.getInstance(alg);
         fac.init(keyStore, keyPass);
         return fac.getKeyManagers();
+    }
+    
+    private class MyLaterResponseHandler implements AsyncHandler<GreetMeLaterResponse> {
+        GreetMeLaterResponse response;
+        @Override
+        public void handleResponse(Response<GreetMeLaterResponse> res) {
+            try {
+                response = res.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        GreetMeLaterResponse getResponse() {
+            return response;
+        }
+
     }
     
 

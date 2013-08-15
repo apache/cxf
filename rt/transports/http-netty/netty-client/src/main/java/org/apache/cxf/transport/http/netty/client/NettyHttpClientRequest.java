@@ -20,39 +20,43 @@
 package org.apache.cxf.transport.http.netty.client;
 
 import java.net.URI;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpVersion;
 
 public class NettyHttpClientRequest {
 
     private HttpRequest request;
     private HttpResponse response;
     private URI uri;
+    private String method;
     private CxfResponseCallBack cxfResponseCallback;
     private int connectionTimeout;
     private int receiveTimeout;
 
     public NettyHttpClientRequest(URI requestUri, String method) {
         this.uri = requestUri;
+        this.method = method;
+    }
+    
+    public void createRequest(ByteBuf content) {
         this.request  = 
-            new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.valueOf(method), uri.getPath().toString());
+            new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
+                                       HttpMethod.valueOf(method),
+                                       uri.getPath().toString(), content);
         // setup the default headers
-        request.setHeader("Connection", "keep-alive");
-        request.setHeader("Host", uri.getHost() + ":" + uri.getPort());
-
+        request.headers().set("Connection", "keep-alive");
+        request.headers().set("Host", uri.getHost() + ":" + uri.getPort());
     }
 
     public HttpRequest getRequest() {
         return request;
     }
-
-    public void setRequest(HttpRequest request) {
-        this.request = request;
-    }
-
+    
     public HttpResponse getResponse() {
         return response;
     }

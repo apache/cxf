@@ -66,7 +66,8 @@ public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPCondui
 
     @Override
     public void postShutdown() {
-        // TODO Do we need to keep the track of the NettyHttpConduit?
+        // shutdown the group
+        
     }
 
     public boolean isShutdown() {

@@ -86,7 +86,6 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
-        //factory.setTransportId("http://cxf.apache.org/transports/http/netty/client");
         Greeter greeter = factory.create(Greeter.class);
         String response = greeter.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
