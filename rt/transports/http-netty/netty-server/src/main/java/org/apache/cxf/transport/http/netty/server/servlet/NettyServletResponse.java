@@ -28,14 +28,15 @@ import java.util.Locale;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.netty.handler.codec.http.Cookie;
-import org.jboss.netty.handler.codec.http.CookieEncoder;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.ClientCookieEncoder;
+import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.LOCATION;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
+import static io.netty.handler.codec.http.HttpHeaders.Names.LOCATION;
+import static io.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
 
 
 public class NettyServletResponse implements HttpServletResponse {
@@ -50,7 +51,7 @@ public class NettyServletResponse implements HttpServletResponse {
 
     public NettyServletResponse(HttpResponse response) {
         this.originalResponse = response;
-        this.outputStream = new NettyServletOutputStream(response);
+        this.outputStream = new NettyServletOutputStream((HttpContent)response);
         this.writer = new PrintWriter(this.outputStream);
     }
 
@@ -59,10 +60,9 @@ public class NettyServletResponse implements HttpServletResponse {
     }
 
     public void addCookie(Cookie cookie) {
-        CookieEncoder cookieEncoder = new CookieEncoder(true);
-        cookieEncoder.addCookie(cookie.getName(), cookie.getValue());
-        HttpHeaders.addHeader(this.originalResponse, SET_COOKIE, cookieEncoder
-                .encode());
+        HttpHeaders.addHeader(this.originalResponse, 
+                              SET_COOKIE, 
+                              ClientCookieEncoder.encode(cookie.getName(), cookie.getValue()));
     }
 
     public void addDateHeader(String name, long date) {
@@ -83,7 +83,7 @@ public class NettyServletResponse implements HttpServletResponse {
     }
 
     public boolean containsHeader(String name) {
-        return this.originalResponse.containsHeader(name);
+        return this.originalResponse.headers().contains(name);
     }
 
     public void sendError(int sc) throws IOException {
@@ -153,7 +153,7 @@ public class NettyServletResponse implements HttpServletResponse {
             throw new IllegalStateException("Response already commited!");
         }
 
-        this.originalResponse.clearHeaders();
+        this.originalResponse.headers().clear();
         this.resetBuffer();
     }
 

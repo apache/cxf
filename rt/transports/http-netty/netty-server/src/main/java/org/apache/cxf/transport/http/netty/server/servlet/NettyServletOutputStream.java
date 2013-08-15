@@ -20,21 +20,20 @@
 package org.apache.cxf.transport.http.netty.server.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.ServletOutputStream;
-import org.jboss.netty.buffer.ChannelBufferOutputStream;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.handler.codec.http.HttpResponse;
+
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.handler.codec.http.HttpContent;
 
 public class NettyServletOutputStream extends ServletOutputStream {
-    private HttpResponse response;
-
-    private ChannelBufferOutputStream out;
+    
+    private ByteBufOutputStream out;
 
     private boolean flushed;
 
-    public NettyServletOutputStream(HttpResponse response) {
-        this.response = response;
-        this.out = new ChannelBufferOutputStream(ChannelBuffers.dynamicBuffer());
+    public NettyServletOutputStream(HttpContent httpContent) {
+        this.out = new ByteBufOutputStream(httpContent.content());
     }
 
     @Override
@@ -54,7 +53,7 @@ public class NettyServletOutputStream extends ServletOutputStream {
 
     @Override
     public void flush() throws IOException {
-        this.response.setContent(out.buffer());
+        out.flush();
         this.flushed = true;
     }
 
@@ -69,4 +68,6 @@ public class NettyServletOutputStream extends ServletOutputStream {
     public int getBufferSize() {
         return this.out.buffer().capacity();
     }
+    
+    
 }

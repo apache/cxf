@@ -19,7 +19,7 @@
 
 package org.apache.cxf.transport.http.netty.server.servlet;
 
-import org.jboss.netty.channel.Channel;
+import io.netty.channel.Channel;
 
 public final class ChannelThreadLocal {
     public static final ThreadLocal<Channel> CHANNEL_THREAD_LOCAL

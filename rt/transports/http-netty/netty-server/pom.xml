@@ -36,7 +36,7 @@
     
     <properties>
         <cxf.osgi.import>
-	    org.jboss.netty.*;version="${cxf.netty.version.range}",
+	    io.netty.*;version="${cxf.netty.version.range}",
 	    javax.annotation;version="${cxf.osgi.javax.annotation.version}",
 	    org.apache.aries*;version="${cxf.aries.version.range}",
         org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
@@ -55,7 +55,8 @@
 
         <dependency>
             <groupId>io.netty</groupId>
-            <artifactId>netty</artifactId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>${cxf.netty.version}</version>
         </dependency>
 
         <dependency>

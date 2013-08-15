@@ -25,15 +25,13 @@ import org.apache.cxf.transport.http.netty.server.servlet.HttpSessionThreadLocal
 import org.apache.cxf.transport.http.netty.server.servlet.NettyHttpSession;
 import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
 import org.apache.cxf.transport.http.netty.server.util.Utils;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.Cookie;
-import org.jboss.netty.handler.codec.http.CookieEncoder;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.ClientCookieEncoder;
+import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 public class HttpSessionInterceptor implements NettyInterceptor {
     private boolean sessionRequestedByCookie;
@@ -43,11 +41,10 @@ public class HttpSessionInterceptor implements NettyInterceptor {
     }
 
     @Override
-    public void onRequestReceived(ChannelHandlerContext ctx, MessageEvent e) {
+    public void onRequestReceived(ChannelHandlerContext ctx, HttpRequest request) {
 
         HttpSessionThreadLocal.unset();
-
-        HttpRequest request = (HttpRequest) e.getMessage();
+        
         Collection<Cookie> cookies = Utils.getCookies(
                 NettyHttpSession.SESSION_ID_KEY, request);
         if (cookies != null) {
@@ -65,20 +62,20 @@ public class HttpSessionInterceptor implements NettyInterceptor {
     }
 
     @Override
-    public void onRequestSuccessed(ChannelHandlerContext ctx, MessageEvent e,
+    public void onRequestSuccessed(ChannelHandlerContext ctx, 
                                    HttpResponse response) {
 
         NettyHttpSession s = HttpSessionThreadLocal.get();
         if (s != null && !this.sessionRequestedByCookie) {
-            CookieEncoder cookieEncoder = new CookieEncoder(true);
-            cookieEncoder.addCookie(NettyHttpSession.SESSION_ID_KEY, s.getId());
-            HttpHeaders.addHeader(response, Names.SET_COOKIE, cookieEncoder.encode());
+            // setup the Cookie for session
+            HttpHeaders.addHeader(response, Names.SET_COOKIE,  
+                                  ClientCookieEncoder.encode(NettyHttpSession.SESSION_ID_KEY, s.getId()));
         }
 
     }
 
     @Override
-    public void onRequestFailed(ChannelHandlerContext ctx, ExceptionEvent e) {
+    public void onRequestFailed(ChannelHandlerContext ctx, Throwable e) {
         this.sessionRequestedByCookie = false;
         HttpSessionThreadLocal.unset();
     }

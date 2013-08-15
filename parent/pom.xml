@@ -134,8 +134,8 @@
         <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
         <cxf.msv.version>2011.1</cxf.msv.version>
         <cxf.neethi.version>3.0.2</cxf.neethi.version>
-        <cxf.netty.version>3.6.5.Final</cxf.netty.version>
-        <cxf.netty.version.range>[3,4)</cxf.netty.version.range>
+        <cxf.netty.version>4.0.7.Final</cxf.netty.version>
+        <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.opensaml.version>2.5.3</cxf.opensaml.version>
         <cxf.opensaml.osgi.version>2.5.3_1</cxf.opensaml.osgi.version>

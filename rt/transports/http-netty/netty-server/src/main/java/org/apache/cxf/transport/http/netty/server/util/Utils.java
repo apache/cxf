@@ -33,12 +33,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.netty.handler.codec.http.Cookie;
-import org.jboss.netty.handler.codec.http.CookieDecoder;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.CookieDecoder;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
+import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 
 
 public final class Utils {
@@ -104,11 +104,10 @@ public final class Utils {
 
     public static Collection<Cookie> getCookies(String name,
                                                       HttpRequest request) {
-        String cookieString = request.getHeader(COOKIE);
+        String cookieString = request.headers().get(COOKIE);
         if (cookieString != null) {
             List<Cookie> foundCookie = new ArrayList<Cookie>();
-            CookieDecoder cookieDecoder = new CookieDecoder();
-            Set<Cookie> cookies = cookieDecoder.decode(cookieString);
+            Set<Cookie> cookies = CookieDecoder.decode(cookieString);
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
                     foundCookie.add(cookie);
@@ -122,11 +121,10 @@ public final class Utils {
 
     public static Collection<Cookie> getCookies(String name,
                                                 HttpResponse response) {
-        String cookieString = response.getHeader(COOKIE);
+        String cookieString = response.headers().get(COOKIE);
         if (cookieString != null) {
             List<Cookie> foundCookie = new ArrayList<Cookie>();
-            CookieDecoder cookieDecoder = new CookieDecoder();
-            Set<Cookie> cookies = cookieDecoder.decode(cookieString);
+            Set<Cookie> cookies = CookieDecoder.decode(cookieString);
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
                     foundCookie.add(cookie);

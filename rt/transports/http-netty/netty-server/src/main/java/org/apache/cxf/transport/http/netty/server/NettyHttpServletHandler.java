@@ -28,31 +28,32 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.http.netty.server.interceptor.NettyInterceptor;
 import org.apache.cxf.transport.http.netty.server.servlet.NettyHttpServletRequest;
 import org.apache.cxf.transport.http.netty.server.servlet.NettyServletResponse;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.handler.codec.frame.TooLongFrameException;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
-import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.jboss.netty.util.CharsetUtil;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.handler.codec.TooLongFrameException;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.timeout.IdleState;
+import io.netty.util.CharsetUtil;
 
-public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
+public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpServletHandler.class);
+   
     private final ChannelGroup allChannels;
 
     private final NettyHttpServletPipelineFactory pipelineFactory;
@@ -75,54 +76,62 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
     }
 
     @Override
-    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e)
-        throws Exception {
-        LOG.log(Level.FINE, "Opening new channel: {}", e.getChannel().getId());
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        LOG.log(Level.FINE, "Opening new channel: {}", ctx.channel());
         // Agent map
-        allChannels.add(e.getChannel());
+        allChannels.add(ctx.channel());
     }
 
+   
     @Override
-    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
-        LOG.log(Level.FINE, "Closing idle channel: {}", e.getChannel().getId());
-        e.getChannel().close();
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleState) {
+            IdleState e = (IdleState) evt;
+            if (e == IdleState.READER_IDLE || e == IdleState.WRITER_IDLE) {
+                LOG.log(Level.FINE, "Closing idle channel: {}", e);
+                ctx.close();
+            } 
+        }
     }
-
+    
+    
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-        throws Exception {
-
-        HttpRequest request = (HttpRequest) e.getMessage();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        HttpRequest request = (HttpRequest) msg;
         if (HttpHeaders.is100ContinueExpected(request)) {
-            e.getChannel().write(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
+            ctx.write(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
         }
 
         // find the nettyHttpContextHandler by lookup the request url
         NettyHttpContextHandler nettyHttpContextHandler = pipelineFactory.getNettyHttpHandler(request.getUri());
         if (nettyHttpContextHandler != null) {
-            handleHttpServletRequest(ctx, e, nettyHttpContextHandler);
+            handleHttpServletRequest(ctx, request, nettyHttpContextHandler);
         } else {
             throw new RuntimeException(
                     "No handler found for uri: " + request.getUri());
         }
-
     }
 
+    
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelReadComplete();
+    }
+   
     protected void handleHttpServletRequest(ChannelHandlerContext ctx,
-                                            MessageEvent e, NettyHttpContextHandler nettyHttpContextHandler)
+                                            HttpRequest request, NettyHttpContextHandler nettyHttpContextHandler)
         throws Exception {
 
-        interceptOnRequestReceived(ctx, e);
-
-        HttpRequest request = (HttpRequest) e.getMessage();
-        HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+        interceptOnRequestReceived(ctx, request);
+        
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 
         NettyServletResponse nettyServletResponse = buildHttpServletResponse(response);
         NettyHttpServletRequest nettyServletRequest = 
             buildHttpServletRequest(request, nettyHttpContextHandler.getContextPath(), ctx);
 
         nettyHttpContextHandler.handle(request.getUri(), nettyServletRequest, nettyServletResponse);
-        interceptOnRequestSuccessed(ctx, e, response);
+        interceptOnRequestSuccessed(ctx, response);
 
         nettyServletResponse.getWriter().flush();
 
@@ -130,16 +139,15 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
 
         if (keepAlive) {
             // Add 'Content-Length' header only for a keep-alive connection.
-            response.setHeader(Names.CONTENT_LENGTH, response.getContent()
-                    .readableBytes());
+            response.headers().set(Names.CONTENT_LENGTH, response.content().readableBytes());
             // Add keep alive header as per:
             // -
             // http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-            response.setHeader(Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            response.headers().set(Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
 
         // write response...
-        ChannelFuture future = e.getChannel().write(response);
+        ChannelFuture future = ctx.write(response);
 
         if (!keepAlive) {
             future.addListener(ChannelFutureListener.CLOSE);
@@ -149,13 +157,13 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
 
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        Throwable cause = e.getCause();
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        
         LOG.log(Level.SEVERE, "Unexpected exception from downstream.", cause);
 
-        interceptOnRequestFailed(ctx, e);
+        interceptOnRequestFailed(ctx, cause);
 
-        Channel ch = e.getChannel();
+        Channel ch = ctx.channel();
         if (cause instanceof IllegalArgumentException) {
 
             ch.close();
@@ -167,7 +175,7 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
                 return;
             }
 
-            if (ch.isConnected()) {
+            if (ch.isActive()) {
                 sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }
 
@@ -176,37 +184,37 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
     }
 
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
-        HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status);
-        response.setHeader(Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
-        response.setContent(ChannelBuffers.copiedBuffer("Failure: "
-                + status.toString() + "\r\n", CharsetUtil.UTF_8));
-        ctx.getChannel().write(response).addListener(
-                ChannelFutureListener.CLOSE);
+        ByteBuf content = Unpooled.copiedBuffer("Failure: " + status.toString() + "\r\n", CharsetUtil.UTF_8);
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, 
+                                                                status,
+                                                                content);
+        response.headers().set(Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
+        
+        ctx.write(response).addListener(ChannelFutureListener.CLOSE);
     }
 
-    private void interceptOnRequestReceived(ChannelHandlerContext ctx,
-                                            MessageEvent e) {
+    private void interceptOnRequestReceived(ChannelHandlerContext ctx, HttpRequest request) {
 
         if (this.interceptors != null) {
             for (NettyInterceptor interceptor : this.interceptors) {
-                interceptor.onRequestReceived(ctx, e);
+                interceptor.onRequestReceived(ctx, request);
             }
         }
 
     }
 
     private void interceptOnRequestSuccessed(ChannelHandlerContext ctx,
-                                             MessageEvent e, HttpResponse response) {
+                                             HttpResponse response) {
         if (this.interceptors != null) {
             for (NettyInterceptor interceptor : this.interceptors) {
-                interceptor.onRequestSuccessed(ctx, e, response);
+                interceptor.onRequestSuccessed(ctx, response);
             }
         }
 
     }
 
     private void interceptOnRequestFailed(ChannelHandlerContext ctx,
-                                          ExceptionEvent e) {
+                                          Throwable e) {
         if (this.interceptors != null) {
             for (NettyInterceptor interceptor : this.interceptors) {
                 interceptor.onRequestFailed(ctx, e);
@@ -217,6 +225,7 @@ public class NettyHttpServletHandler extends IdleStateAwareChannelHandler {
 
     protected NettyServletResponse buildHttpServletResponse(
             HttpResponse response) {
+        // need to access the 
         return new NettyServletResponse(response);
     }
 

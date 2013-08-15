@@ -19,18 +19,16 @@
 
 package org.apache.cxf.transport.http.netty.server.interceptor;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponse;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 
 public interface NettyInterceptor {
 
-    void onRequestReceived(ChannelHandlerContext ctx, MessageEvent e);
+    void onRequestReceived(ChannelHandlerContext ctx, HttpRequest request);
 
-    void onRequestSuccessed(ChannelHandlerContext ctx, MessageEvent e,
-                            HttpResponse response);
-
-    void onRequestFailed(ChannelHandlerContext ctx, ExceptionEvent e);
+    void onRequestSuccessed(ChannelHandlerContext ctx, HttpResponse response);
+    
+    void onRequestFailed(ChannelHandlerContext ctx, Throwable cause);
 }

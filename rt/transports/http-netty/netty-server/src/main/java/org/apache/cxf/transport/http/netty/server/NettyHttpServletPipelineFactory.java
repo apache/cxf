@@ -33,26 +33,29 @@ import org.apache.cxf.transport.http.netty.server.interceptor.HttpSessionInterce
 import org.apache.cxf.transport.http.netty.server.session.DefaultHttpSessionStore;
 import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
 import org.apache.cxf.transport.https.SSLUtils;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
-import org.jboss.netty.handler.codec.http.HttpContentCompressor;
-import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
-import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
-import org.jboss.netty.handler.execution.ExecutionHandler;
-import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
-import org.jboss.netty.handler.ssl.SslHandler;
-import org.jboss.netty.handler.timeout.IdleStateHandler;
 
-public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.handler.codec.http.HttpContentCompressor;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
+
+public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel> {
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpServletPipelineFactory.class);
     
-    private final ChannelGroup allChannels = new DefaultChannelGroup();
+    //TODO how to manage the allChannels
+    private final ChannelGroup allChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);;
 
     private final HttpSessionWatchdog watchdog;
 
@@ -62,8 +65,6 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
     
     private final boolean supportSession;
     
-    private final ExecutionHandler executionHandler;
-
     private final Map<String, NettyHttpContextHandler> handlerMap;
     
     private final int maxChunkContentSize;
@@ -78,9 +79,6 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         this.handlerMap = handlerMap;
         this.tlsServerParameters = tlsServerParameters;
         this.maxChunkContentSize = maxChunkContentSize;
-        // TODO need to check the if we need pass other setting
-        this.executionHandler = 
-            new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(threadPoolSize, 2048576, 204857600));
     }
 
 
@@ -110,17 +108,9 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
     }
     
     public void shutdown() {
-        this.watchdog.stopWatching();
-        this.allChannels.close().awaitUninterruptibly();
-    }
-
-    @Override
-    public final ChannelPipeline getPipeline() throws Exception {
-        ChannelPipeline pipeline = this.getDefaulHttpChannelPipeline();
-        // need to add another executor handler for invocation the service
-        pipeline.addLast("executionHandler", executionHandler);
-        pipeline.addLast("handler", this.getServletHandler());
-        return pipeline;
+        allChannels.close().awaitUninterruptibly();
+        watchdog.stopWatching();
+        
     }
 
     protected HttpSessionStore getHttpSessionStore() {
@@ -137,10 +127,10 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         return handler;
     }
 
-    protected ChannelPipeline getDefaulHttpChannelPipeline() throws Exception {
+    protected ChannelPipeline getDefaulHttpChannelPipeline(Channel channel) throws Exception {
 
         // Create a default pipeline implementation.
-        ChannelPipeline pipeline = Channels.pipeline();
+        ChannelPipeline pipeline = channel.pipeline();
         
         SslHandler sslHandler = configureServerSSLOnDemand();
         if (sslHandler != null) {
@@ -151,7 +141,7 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
         }
 
         pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("aggregator", new HttpChunkAggregator(maxChunkContentSize));
+        pipeline.addLast("aggregator", new HttpObjectAggregator(maxChunkContentSize));
         pipeline.addLast("encoder", new HttpResponseEncoder());
 
         // Remove the following line if you don't want automatic content
@@ -199,6 +189,14 @@ public class NettyHttpServletPipelineFactory implements ChannelPipelineFactory {
             this.shouldStopWatching = true;
         }
 
+    }
+
+    @Override
+    protected void initChannel(Channel ch) throws Exception {
+        ChannelPipeline pipeline = getDefaulHttpChannelPipeline(ch);
+        //TODO need to configure the thread size of EventExecutorGroup
+        EventExecutorGroup e1 = new DefaultEventExecutorGroup(16);
+        pipeline.addLast(e1, "handler", this.getServletHandler());
     }
 
 }

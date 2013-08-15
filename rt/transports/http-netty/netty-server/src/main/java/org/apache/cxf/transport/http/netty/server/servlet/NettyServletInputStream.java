@@ -19,21 +19,20 @@
 
 package org.apache.cxf.transport.http.netty.server.servlet;
 
-
 import java.io.IOException;
+
 import javax.servlet.ServletInputStream;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
-import org.jboss.netty.handler.codec.http.HttpRequest;
+
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.handler.codec.http.HttpContent;
+
 
 public class NettyServletInputStream extends ServletInputStream {
 
-    private final HttpRequest request;
+    private final ByteBufInputStream in;
 
-    private final ChannelBufferInputStream in;
-
-    public NettyServletInputStream(HttpRequest request) {
-        this.request = request;
-        this.in = new ChannelBufferInputStream(this.request.getContent());
+    public NettyServletInputStream(HttpContent httpContent) {
+        this.in = new ByteBufInputStream(httpContent.content());
     }
 
     @Override
@@ -50,4 +49,5 @@ public class NettyServletInputStream extends ServletInputStream {
     public int read(byte[] buf, int offset, int len) throws IOException {
         return this.in.read(buf, offset, len);
     }
+    
 }

@@ -23,18 +23,17 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.HttpUriMapper;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.timeout.IdleStateHandler;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
 public class NettyHttpServerEngine implements ServerEngine {
 
@@ -58,8 +57,6 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     private NettyHttpServletPipelineFactory servletPipeline;
     
-    private Timer timer = new HashedWheelTimer();
-
     private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<String, NettyHttpContextHandler>();
     
     /**
@@ -78,6 +75,10 @@ public class NettyHttpServerEngine implements ServerEngine {
     private int maxChunkContentSize = 1048576; 
     
     private boolean sessionSupport;
+    
+    // TODO need to setup configuration about them
+    private EventLoopGroup bossGroup = new NioEventLoopGroup();
+    private EventLoopGroup workerGroup = new NioEventLoopGroup();
     
     public NettyHttpServerEngine() {
         
@@ -132,13 +133,13 @@ public class NettyHttpServerEngine implements ServerEngine {
     }
       
     protected Channel startServer() {
-        // TODO Configure the server.
-        final ServerBootstrap bootstrap = new ServerBootstrap(
-                new NioServerSocketChannelFactory(Executors
-                        .newCachedThreadPool(), Executors.newCachedThreadPool()));
+          
+        final ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class);
+                
         // Set up the idle handler
         IdleStateHandler idleStateHandler = 
-            new IdleStateHandler(this.timer, getReadIdleTime(), getWriteIdleTime(), 0);
+            new IdleStateHandler(getReadIdleTime(), getWriteIdleTime(), 0);
         // Set up the event pipeline factory.
         servletPipeline = 
             new NettyHttpServletPipelineFactory(
@@ -148,7 +149,7 @@ public class NettyHttpServerEngine implements ServerEngine {
                  handlerMap, idleStateHandler);
         // Start the servletPipeline's timer
         servletPipeline.start();
-        bootstrap.setPipelineFactory(servletPipeline);
+        bootstrap.childHandler(servletPipeline);
         InetSocketAddress address = null;
         if (host == null) {
             address = new InetSocketAddress(port);
@@ -156,7 +157,12 @@ public class NettyHttpServerEngine implements ServerEngine {
             address = new InetSocketAddress(host, port);
         }
         // Bind and start to accept incoming connections.
-        return bootstrap.bind(address);
+        try {
+            return bootstrap.bind(address).sync().channel();
+        } catch (InterruptedException ex) {
+            // do nothing here
+            return null;
+        }
     }
 
 
@@ -202,14 +208,26 @@ public class NettyHttpServerEngine implements ServerEngine {
     }
 
     public void shutdown() {
-        // stop the timer
-        timer.stop();
         // just unbind the channel
         if (serverChannel != null) {
             serverChannel.close();
         }
         if (servletPipeline != null) {
             servletPipeline.shutdown();
+        }
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+        
+        // Wait until all threads are terminated.
+        try {
+            bossGroup.terminationFuture().sync();
+        } catch (InterruptedException exception) {
+            // do nothing here;
+        }
+        try {
+            workerGroup.terminationFuture().sync();
+        } catch (InterruptedException exception) {
+            // do nothing here;
         }
     }
 

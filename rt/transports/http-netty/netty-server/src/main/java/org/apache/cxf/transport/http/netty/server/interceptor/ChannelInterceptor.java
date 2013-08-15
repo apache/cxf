@@ -21,24 +21,24 @@ package org.apache.cxf.transport.http.netty.server.interceptor;
 
 import org.apache.cxf.transport.http.netty.server.servlet.ChannelThreadLocal;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpResponse;
+import io.netty.channel.ChannelHandlerContext;
+
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 
 public class ChannelInterceptor implements NettyInterceptor {
     @Override
-    public void onRequestFailed(ChannelHandlerContext ctx, ExceptionEvent e) {
+    public void onRequestFailed(ChannelHandlerContext ctx, Throwable e) {
         ChannelThreadLocal.unset();
     }
 
     @Override
-    public void onRequestReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        ChannelThreadLocal.set(e.getChannel());
+    public void onRequestReceived(ChannelHandlerContext ctx, HttpRequest request) {
+        ChannelThreadLocal.set(ctx.channel());
     }
 
     @Override
-    public void onRequestSuccessed(ChannelHandlerContext ctx, MessageEvent e,
+    public void onRequestSuccessed(ChannelHandlerContext ctx,
                                    HttpResponse response) {
         ChannelThreadLocal.unset();
     }

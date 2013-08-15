@@ -43,15 +43,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cxf.transport.http.netty.server.util.Utils;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.http.CookieDecoder;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.QueryStringDecoder;
-import org.jboss.netty.handler.ssl.SslHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.CookieDecoder;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.ssl.SslHandler;
 
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
+import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 
 public class NettyHttpServletRequest implements HttpServletRequest {
     
@@ -71,9 +72,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     private QueryStringDecoder queryStringDecoder;
 
     private Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-
-    private CookieDecoder cookieDecoder = new CookieDecoder();
-
+  
     private String characterEncoding;
 
     private String contextPath;
@@ -84,14 +83,14 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         this.originalRequest = request;
         this.contextPath = contextPath;
         this.uriParser = new URIParser(contextPath);
-        this.inputStream = new NettyServletInputStream(request);
+        this.inputStream = new NettyServletInputStream((HttpContent)request);
         this.reader = new BufferedReader(new InputStreamReader(inputStream));
         this.queryStringDecoder = new QueryStringDecoder(request.getUri());
         // setup the SSL security attributes
         this.channelHandlerContext = ctx;
-        SslHandler sslHandler = channelHandlerContext.getPipeline().get(SslHandler.class);
+        SslHandler sslHandler = channelHandlerContext.pipeline().get(SslHandler.class);
         if (sslHandler != null) {
-            SSLSession session = sslHandler.getEngine().getSession();
+            SSLSession session = sslHandler.engine().getSession();
             if (session != null) {
                 attributes.put(SSL_CIPHER_SUITE_ATTRIBUTE, session.getCipherSuite());
                 try {
@@ -114,18 +113,17 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public Cookie[] getCookies() {
-        String cookieString = this.originalRequest.getHeader(COOKIE);
+        String cookieString = this.originalRequest.headers().get(COOKIE);
         if (cookieString != null) {
-            Set<org.jboss.netty.handler.codec.http.Cookie> cookies = cookieDecoder
-                    .decode(cookieString);
+            Set<io.netty.handler.codec.http.Cookie> cookies = CookieDecoder.decode(cookieString);
             if (!cookies.isEmpty()) {
                 Cookie[] cookiesArray = new Cookie[cookies.size()];
                 int indx = 0;
-                for (org.jboss.netty.handler.codec.http.Cookie c : cookies) {
+                for (io.netty.handler.codec.http.Cookie c : cookies) {
                     Cookie cookie = new Cookie(c.getName(), c.getValue());
                     cookie.setComment(c.getComment());
                     cookie.setDomain(c.getDomain());
-                    cookie.setMaxAge(c.getMaxAge());
+                    cookie.setMaxAge((int)c.getMaxAge());
                     cookie.setPath(c.getPath());
                     cookie.setSecure(c.isSecure());
                     cookie.setVersion(c.getVersion());
@@ -157,13 +155,13 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getHeaderNames() {
-        return Utils.enumeration(this.originalRequest.getHeaderNames());
+        return Utils.enumeration(this.originalRequest.headers().names());
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getHeaders(String name) {
-        return Utils.enumeration(this.originalRequest.getHeaders(name));
+        return Utils.enumeration(this.originalRequest.headers().getAll(name));
     }
 
     @Override
@@ -173,7 +171,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getMethod() {
-        return this.originalRequest.getMethod().getName();
+        return this.originalRequest.getMethod().name();
     }
 
     @Override
@@ -240,19 +238,18 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     @SuppressWarnings("rawtypes")
     @Override
     public Map getParameterMap() {
-        return this.queryStringDecoder.getParameters();
+        return this.queryStringDecoder.parameters();
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public Enumeration getParameterNames() {
-        return Utils.enumerationFromKeys(this.queryStringDecoder
-                .getParameters());
+        return Utils.enumerationFromKeys(this.queryStringDecoder.parameters());
     }
 
     @Override
     public String[] getParameterValues(String name) {
-        List<String> values = this.queryStringDecoder.getParameters().get(name);
+        List<String> values = this.queryStringDecoder.parameters().get(name);
         if (values == null || values.isEmpty()) {
             return null;
         }
@@ -327,36 +324,31 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getRemoteAddr() {
-        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get()
-                .getRemoteAddress();
+        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get().remoteAddress();
         return addr.getAddress().getHostAddress();
     }
 
     @Override
     public String getRemoteHost() {
-        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get()
-                .getRemoteAddress();
+        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get().remoteAddress();
         return addr.getHostName();
     }
 
     @Override
     public int getRemotePort() {
-        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get()
-                .getRemoteAddress();
+        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get().remoteAddress();
         return addr.getPort();
     }
 
     @Override
     public String getServerName() {
-        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get()
-                .getLocalAddress();
+        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get().localAddress();
         return addr.getHostName();
     }
 
     @Override
     public int getServerPort() {
-        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get()
-                .getLocalAddress();
+        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get().localAddress();
         return addr.getPort();
     }
 
@@ -376,7 +368,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public boolean isSecure() {
-        return ChannelThreadLocal.get().getPipeline().get(SslHandler.class) != null;
+        return ChannelThreadLocal.get().pipeline().get(SslHandler.class) != null;
     }
 
     @Override
@@ -386,8 +378,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getLocalAddr() {
-        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get()
-                .getLocalAddress();
+        InetSocketAddress addr = (InetSocketAddress) ChannelThreadLocal.get().localAddress();
         return addr.getAddress().getHostAddress();
     }
 
