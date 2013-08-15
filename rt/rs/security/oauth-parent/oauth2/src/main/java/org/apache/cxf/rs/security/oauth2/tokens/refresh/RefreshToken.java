@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.refresh;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -31,7 +31,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 public class RefreshToken extends ServerAccessToken {
     
-    private Set<String> accessTokens = new HashSet<String>();
+    private List<String> accessTokens = new LinkedList<String>();
     
     public RefreshToken(Client client, 
                         long lifetime) {
@@ -53,11 +53,11 @@ public class RefreshToken extends ServerAccessToken {
               issuedAt);
     }
 
-    public Set<String> getAccessTokens() {
+    public List<String> getAccessTokens() {
         return accessTokens;
     }
 
-    public void setAccessTokens(Set<String> accessTokens) {
+    public void setAccessTokens(List<String> accessTokens) {
         this.accessTokens = accessTokens;
     }
     
