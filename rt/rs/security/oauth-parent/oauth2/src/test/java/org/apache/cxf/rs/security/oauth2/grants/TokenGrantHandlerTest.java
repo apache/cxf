@@ -92,7 +92,7 @@ public class TokenGrantHandlerTest extends Assert {
         @Override
         public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
             throws OAuthServiceException {
-            return super.doCreateAccessToken(client, client.getSubject(), null);
+            return super.doCreateAccessToken(client, client.getSubject(), params);
         } 
         
     }

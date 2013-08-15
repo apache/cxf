@@ -68,7 +68,10 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                 || !client.getRedirectUris().contains(expectedRedirectUri))) {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
-        return doCreateAccessToken(client, grant.getSubject(), grant.getApprovedScopes());
+        return doCreateAccessToken(client, 
+                                   grant.getSubject(), 
+                                   grant.getApprovedScopes(),
+                                   params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
     }
     
     

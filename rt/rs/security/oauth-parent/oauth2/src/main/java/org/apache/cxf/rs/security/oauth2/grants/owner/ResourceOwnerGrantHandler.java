@@ -26,7 +26,6 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * The "resource owner" grant handler
@@ -55,8 +54,8 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
         }
         
         return doCreateAccessToken(client, 
-                                   subject, 
-                                   OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));
+                                   subject,
+                                   params);
     }
 
     public void setLoginHandler(ResourceOwnerLoginHandler loginHandler) {
