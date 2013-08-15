@@ -60,7 +60,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 public class SoapOutInterceptor extends AbstractSoapInterceptor {
     public static final String WROTE_ENVELOPE_START = "wrote.envelope.start";
