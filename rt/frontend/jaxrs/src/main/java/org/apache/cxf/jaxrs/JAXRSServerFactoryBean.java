@@ -197,7 +197,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             
             
             if (start) {
-                server.start();
+                try {
+                    server.start();
+                } catch (RuntimeException re) {
+                    server.destroy(); // prevent resource leak
+                    throw re;
+                }
             }
         } catch (EndpointException e) {
             throw new ServiceConstructionException(e);
