@@ -213,13 +213,13 @@ public class NettyHttpServerEngine implements ServerEngine {
             servletPipeline.shutdown();
         }
         
-        /*if (serverChannel != null) {
+        if (serverChannel != null) {
             try {
-                serverChannel.close().sync();
+                serverChannel.closeFuture().sync();
             } catch (InterruptedException exception) {
                 // do nothing here;
             }
-        }*/
+        }
         
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
