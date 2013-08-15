@@ -214,27 +214,12 @@ public class NettyHttpServerEngine implements ServerEngine {
         }
         
         if (serverChannel != null) {
-            try {
-                serverChannel.closeFuture().sync();
-            } catch (InterruptedException exception) {
-                // do nothing here;
-            }
+            serverChannel.close();
         }
         
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-        
-        // Wait until all threads are terminated.
-        try {
-            bossGroup.terminationFuture().sync();
-        } catch (InterruptedException exception) {
-            // do nothing here;
-        }
-        try {
-            workerGroup.terminationFuture().sync();
-        } catch (InterruptedException exception) {
-            // do nothing here;
-        }
+       
     }
 
     public int getReadIdleTime() {
