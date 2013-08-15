@@ -141,5 +141,10 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>3.0.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-javamail_1.4_spec</artifactId>
+        </dependency>
+        
     </dependencies>
 </project>
