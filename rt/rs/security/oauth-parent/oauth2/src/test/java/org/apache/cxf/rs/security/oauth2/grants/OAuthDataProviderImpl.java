@@ -32,7 +32,6 @@ import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 
 public class OAuthDataProviderImpl implements OAuthDataProvider {
 
-    @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return new Client("alice", "alice", true);
     }
@@ -65,7 +64,6 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
         
     }
 
-    @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
         // TODO Auto-generated method stub
         return null;
