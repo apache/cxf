@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-rs-extension-search</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <version>3.0.0-SNAPSHOT</version>
     <name>Apache CXF JAX-RS Extensions: Search</name>
     <description>Apache CXF JAX-RS Extensions: Search</description>
@@ -37,9 +37,6 @@
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
         <cxf.lucene.version>4.0.0-BETA</cxf.lucene.version>
-        <cxf.osgi.import>
-            org.apache.cxf.jaxrs.impl.tl
-        </cxf.osgi.import>
     </properties>
 
     <dependencies>

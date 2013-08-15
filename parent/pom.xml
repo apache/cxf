@@ -44,7 +44,6 @@
         <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
-        <cxf.manifest.location>${project.build.outputDirectory}/META-INF/MANIFEST.MF</cxf.manifest.location>
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
@@ -67,9 +66,6 @@
         <cxf.bundle.activator />
         <cxf.osgi.import />
         <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
-        <cxf.osgi.export>
-            org.apache.cxf.*;-split-package:=first,
-        </cxf.osgi.export>
         <cxf.osgi.dynamic.import />
         <cxf.osgi.spring.version>[3.1,4)</cxf.osgi.spring.version>
         <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
@@ -421,7 +417,6 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <configuration>
                         <archive>
-                            <manifestFile>${cxf.manifest.location}</manifestFile>
                             <manifestEntries>
                                 <Specification-Title>${project.name}</Specification-Title>
                                 <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
@@ -489,6 +484,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
                         <id>versions</id>
@@ -502,38 +498,30 @@
                             </versions>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
-                                <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                                <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                                <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
-                                <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                                <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
-                                <Bundle-DocURL>http://cxf.apache.org</Bundle-DocURL>
-                                <Fragment-Host>${cxf.fragment.host}</Fragment-Host>
-                                <_failok>true</_failok>
-                                <_nouses>true</_nouses>
-                                <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                                <Export-Package>${cxf.osgi.export}</Export-Package>
-                                <Import-Package>
-                                    ${cxf.osgi.import},
-                                    *
-                                </Import-Package>
-                                <DynamicImport-Package>
-                                    ${cxf.osgi.dynamic.import}
-                                </DynamicImport-Package>
-                                <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
-                            </instructions>
-                        </configuration>
-                    </execution>
                 </executions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+                        <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
+                        <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
+                        <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
+                        <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
+                        <Bundle-DocURL>http://cxf.apache.org</Bundle-DocURL>
+                        <Fragment-Host>${cxf.fragment.host}</Fragment-Host>
+                        <_failok>true</_failok>
+                        <_nouses>true</_nouses>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+                        <Import-Package>
+                            ${cxf.osgi.import},
+                            *
+                        </Import-Package>
+                        <DynamicImport-Package>
+                            ${cxf.osgi.dynamic.import}
+                        </DynamicImport-Package>
+                        <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
 

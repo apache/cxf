@@ -23,7 +23,7 @@
     <artifactId>cxf-rt-rs-security-oauth2</artifactId>
     <version>3.0.0-SNAPSHOT</version>
 
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Apache CXF Runtime OAuth 2.0</name>
     <description>Apache CXF Runtime OAuth 2.0</description>
     <url>http://cxf.apache.org</url>

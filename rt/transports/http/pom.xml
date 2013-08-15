@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-transports-http</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <version>3.0.0-SNAPSHOT</version>
     <name>Apache CXF Runtime HTTP Transport</name>
     <description>Apache CXF Runtime HTTP Transport</description>
@@ -39,10 +39,6 @@
             org.apache.aries*;version="${cxf.aries.version.range}",
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
-        <cxf.osgi.export>
-            '=META-INF.cxf.osgi',
-            org.apache.cxf.*,
-        </cxf.osgi.export>
     </properties>
 
     <dependencies>
