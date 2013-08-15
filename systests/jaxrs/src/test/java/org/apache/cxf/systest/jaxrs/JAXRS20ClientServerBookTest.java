@@ -187,6 +187,9 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertNull(response.getHeaderString("DynamicResponse"));
         assertNull(response.getHeaderString("Custom"));
         assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("serverWrite2", response.getHeaderString("ServerWriterInterceptor2"));
+        assertEquals("serverWriteHttpResponse", 
+                     response.getHeaderString("ServerWriterInterceptorHttpResponse"));
         assertEquals("text/plain;charset=us-ascii", response.getMediaType().toString());
     }
     

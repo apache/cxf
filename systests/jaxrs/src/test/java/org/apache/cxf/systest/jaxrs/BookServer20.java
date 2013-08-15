@@ -36,6 +36,7 @@ import java.util.Map;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NameBinding;
 import javax.ws.rs.WebApplicationException;
@@ -396,9 +397,13 @@ public class BookServer20 extends AbstractBusTestServerBase {
     
     public static class CustomWriterInterceptor implements WriterInterceptor {
 
+        @Context
+        private HttpServletResponse response;
         @Override
         public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
             context.getHeaders().add("ServerWriterInterceptor", "serverWrite");
+            context.getHeaders().putSingle("ServerWriterInterceptor2", "serverWrite2");
+            response.addHeader("ServerWriterInterceptorHttpResponse", "serverWriteHttpResponse");
             String ct = context.getHeaders().getFirst("Content-Type").toString();
             if (!ct.endsWith("ISO-8859-1")) {
                 ct += "us-ascii";
