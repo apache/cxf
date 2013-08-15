@@ -32,6 +32,8 @@ public final class OAuthConstants {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_TYPE = "token_type";
     public static final String ACCESS_TOKEN_EXPIRES_IN = "expires_in";
+    // CXF-Specific
+    public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
     public static final String GRANT_TYPE = "grant_type";
     public static final String RESPONSE_TYPE = "response_type";
     public static final String TOKEN_RESPONSE_TYPE = "token";
@@ -47,7 +49,9 @@ public final class OAuthConstants {
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "bearer";
     public static final String MAC_TOKEN_TYPE = "mac";
-    
+    // CXF-specific
+    public static final String REFRESH_TOKEN_TYPE = "refresh";
+        
     // MAC token parameters
     // Set by Access Token Service
     public static final String MAC_TOKEN_KEY = "mac_key";
@@ -97,11 +101,6 @@ public final class OAuthConstants {
     public static final String INVALID_CLIENT = "invalid_client";
     public static final String INVALID_SCOPE = "invalid_scope";
     public static final String ACCESS_DENIED = "access_denied";
-    
-    // CXF-Specific parameters
-    public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
-    // End Of CXF-Specific
-    
     
     
     private OAuthConstants() {
