@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
 import org.w3c.dom.Document;
@@ -61,12 +60,15 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
                 if (schema != null) {
-                    StreamSource ss = new StreamSource(ds.getInputStream());
-                    schema.newValidator().validate(ss);
+                    DOMSource domSource = new DOMSource(StaxUtils.read(ds.getInputStream()));
+                    schema.newValidator().validate(domSource);
+                    StaxUtils.copy(domSource, writer);
+                } else {
+                    reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
+                    StaxUtils.copy(reader, writer);
+                    reader.close();
                 }
-                reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
-                StaxUtils.copy(reader, writer);
-                reader.close();
+                
             } else if (obj instanceof Node) {
                 if (schema != null) {
                     schema.newValidator().validate(new DOMSource((Node)obj));
@@ -76,6 +78,10 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
             } else {
                 Source s = (Source) obj;
                 if (schema != null) {
+                    if (!(s instanceof DOMSource)) {
+                        //make the source re-readable.
+                        s = new DOMSource(StaxUtils.read(s));
+                    }
                     schema.newValidator().validate(s);
                 }
                 if (s instanceof DOMSource
