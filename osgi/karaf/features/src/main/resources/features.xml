@@ -152,12 +152,22 @@
     </feature>
     <feature name="cxf-http-netty-client" version="${project.version}" resolver='(obr)'>
          <feature version="[3,4)">cxf-http</feature>
-         <bundle start-level='40'>mvn:io.netty/netty/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
          <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-netty-client/${project.version}</bundle>
     </feature>
     <feature name="cxf-http-netty-server" version="${project.version}" resolver='(obr)'>
          <feature version="[3,4)">cxf-http</feature>
-         <bundle start-level='40'>mvn:io.netty/netty/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
+         <bundle start-level='40'>mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
          <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-netty-server/${project.version}</bundle>
     </feature>
     <feature name="cxf-bindings-soap" version="${project.version}" resolver='(obr)'>
