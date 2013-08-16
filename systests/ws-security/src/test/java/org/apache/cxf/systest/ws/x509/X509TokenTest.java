@@ -151,9 +151,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         // DOM
         x509Port.doubleIt(25);
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(x509Port);
-        x509Port.doubleIt(25);
+        // TODO Streaming
+        // SecurityTestUtil.enableStreaming(x509Port);
+        // x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);

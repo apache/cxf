@@ -62,6 +62,10 @@ public abstract class TokenStoreFactory {
     
     protected URL getConfigFileURL(Message message) {
         Object o = message.getContextualProperty(SecurityConstants.CACHE_CONFIG_FILE);
+        if (o == null) {
+            o = "cxf-ehcache.xml";
+        }
+        
         if (o instanceof String) {
             URL url = null;
             ResourceManager rm = message.getExchange().getBus().getExtension(ResourceManager.class);

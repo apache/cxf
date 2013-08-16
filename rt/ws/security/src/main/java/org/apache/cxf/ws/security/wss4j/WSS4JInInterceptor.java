@@ -238,11 +238,17 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
                 );
             reqData.setNonceReplayCache(nonceCache);
+            if (nonceCache == null) {
+                reqData.setEnableNonceReplayCache(false);
+            }
             ReplayCache timestampCache = 
                 getReplayCache(
                     msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
                 );
             reqData.setTimestampReplayCache(timestampCache);
+            if (timestampCache == null) {
+                reqData.setEnableTimestampReplayCache(false);
+            }
             
             TLSSessionInfo tlsInfo = msg.get(TLSSessionInfo.class);
             if (tlsInfo != null) {

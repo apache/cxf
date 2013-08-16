@@ -58,8 +58,11 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (bus != null) {
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
-
-        cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
+        String confName = "";
+        if (bus != null) {
+            confName = bus.getId();
+        }
+        cacheManager = EHCacheManagerHolder.getCacheManager(confName, configFileURL);
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
         @SuppressWarnings("deprecation")
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)

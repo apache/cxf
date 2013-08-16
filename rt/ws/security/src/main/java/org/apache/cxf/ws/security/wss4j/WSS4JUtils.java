@@ -30,6 +30,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.cache.CXFEHCacheReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 
@@ -79,13 +80,20 @@ public final class WSS4JUtils {
                     replayCache = (ReplayCache)info.getProperty(instanceKey);
                 }
                 if (replayCache == null) {
-                    ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
                     String cacheKey = instanceKey;
                     if (info.getName() != null) {
                         cacheKey += "-" + info.getName().toString().hashCode();
                     }
                     URL configFile = getConfigFileURL(message);
-                    replayCache = replayCacheFactory.newReplayCache(cacheKey, configFile);
+
+                    if (ReplayCacheFactory.isEhCacheInstalled()) {
+                        Bus bus = message.getExchange().getBus();
+                        replayCache = new CXFEHCacheReplayCache(cacheKey, bus, configFile);
+                    } else {
+                        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
+                        replayCache = replayCacheFactory.newReplayCache(cacheKey, configFile);
+                    }
+                    
                     info.setProperty(instanceKey, replayCache);
                 }
                 return replayCache;

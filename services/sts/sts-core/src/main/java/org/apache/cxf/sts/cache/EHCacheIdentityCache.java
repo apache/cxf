@@ -95,9 +95,9 @@ public class EHCacheIdentityCache
         }
 
         if (configFileURL != null) {
-            cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
+            cacheManager = EHCacheManagerHolder.getCacheManager(bus.getId(), configFileURL);
         } else {
-            cacheManager = EHCacheManagerHolder.getCacheManager(getDefaultConfigFileURL());
+            cacheManager = EHCacheManagerHolder.getCacheManager(bus.getId(), getDefaultConfigFileURL());
         }
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         
