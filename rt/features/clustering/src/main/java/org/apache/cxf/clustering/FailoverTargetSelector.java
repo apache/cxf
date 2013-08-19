@@ -315,7 +315,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                                                              String endpointAddress,
                                                              Conduit cond) {
         String requestURI = (String)message.get(Message.REQUEST_URI);
-        if (requestURI != null && endpointAddress != null && !requestURI.startsWith(endpointAddress)) {
+        if (requestURI != null && endpointAddress != null && !requestURI.equals(endpointAddress)) {
             String basePath = (String)message.get(Message.BASE_PATH);
             if (basePath != null && requestURI.startsWith(basePath)) {
                 String pathInfo = requestURI.substring(basePath.length());
