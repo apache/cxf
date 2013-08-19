@@ -107,7 +107,6 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     private List<WebServiceFeature> setWsFeatures;
     private List<WebServiceFeature> wsFeatures;
 
-    private boolean wrapperBeanGenerated;
     private Set<Class<?>> wrapperClasses;
 
 
@@ -132,7 +131,6 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     @Override
     public void reset() {
         super.reset();
-        wrapperBeanGenerated = false;
         wrapperClasses = null;
     }
 
@@ -634,9 +632,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     @Override
     protected Set<Class<?>> getExtraClass() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        if (!wrapperBeanGenerated) {
-            wrapperClasses = generatedWrapperBeanClass();
-        }
+        wrapperClasses = generatedWrapperBeanClass();
         if (wrapperClasses != null) {
             classes.addAll(wrapperClasses);
         }
