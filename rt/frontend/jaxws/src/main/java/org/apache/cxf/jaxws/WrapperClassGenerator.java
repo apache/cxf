@@ -110,21 +110,6 @@ public final class WrapperClassGenerator extends ASMHelper {
     }
 
     public Set<Class<?>> generate() {
-        try {
-            if (createClassWriter() == null) {
-                throw new ClassNotFoundException();
-            }
-        } catch (Throwable t) {
-            for (OperationInfo opInfo : interfaceInfo.getOperations()) {
-                if (opInfo.isUnwrappedCapable()
-                    && (opInfo.getUnwrappedOperation()
-                        .getProperty(ReflectionServiceFactoryBean.WRAPPERGEN_NEEDED) != null)) {
-                    LOG.warning(opInfo.getName() + "requires a wrapper bean but problems with"
-                                + " ASM has prevented creating one.  Operation may not work correctly.");
-                }
-            }
-            return wrapperBeans;
-        }
         for (OperationInfo opInfo : interfaceInfo.getOperations()) {
             if (opInfo.isUnwrappedCapable()) {
                 Method method = (Method)opInfo.getProperty(ReflectionServiceFactoryBean.METHOD);
@@ -162,11 +147,16 @@ public final class WrapperClassGenerator extends ASMHelper {
                                         Method method, 
                                         boolean isRequest) {
 
-        QName wrapperElement = messageInfo.getName();
-        
-        boolean anonymous = factory.getAnonymousWrapperTypes();
 
         ClassWriter cw = createClassWriter();
+        if (cw == null) {
+            LOG.warning(op.getName() + "requires a wrapper bean but problems with"
+                + " ASM has prevented creating one.  Operation may not work correctly.");
+            return;
+        }
+        QName wrapperElement = messageInfo.getName();
+        boolean anonymous = factory.getAnonymousWrapperTypes();
+
         String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
         String className =  pkg + "." 
             + StringUtils.capitalize(op.getName().getLocalPart());
