@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
+import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.LoadDistributorTargetSelector;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -74,9 +75,26 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
     }
     
     @Test    
-    public void testSequentialStrategy() throws Exception {
+    public void testMultipleAltAddresses() throws Exception {
         FailoverFeature feature = getFeature(Server.ADDRESS2, Server.ADDRESS3); 
         strategyTest(Server.ADDRESS1, feature);
+    }
+    
+    @Test    
+    public void testSingleAltAddress() throws Exception {
+        LoadDistributorFeature feature = new LoadDistributorFeature();
+        List<String> alternateAddresses = new ArrayList<String>();
+        alternateAddresses.add(Server.ADDRESS2);
+        SequentialStrategy strategy = new SequentialStrategy();
+        strategy.setAlternateAddresses(alternateAddresses);
+        feature.setStrategy(strategy);
+        
+        BookStore bookStore = getBookStore(Server.ADDRESS1, feature);
+        Book book = bookStore.getBook("123");
+        assertEquals("unexpected id", 123L, book.getId());
+        
+        book = bookStore.getBook("123");
+        assertEquals("unexpected id", 123L, book.getId());
     }
     
     
