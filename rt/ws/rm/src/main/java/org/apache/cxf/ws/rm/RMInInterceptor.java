@@ -59,9 +59,11 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             } catch (RMException e) {
                 LOG.log(Level.WARNING, "Failed to revert the delivering status");
             }
-        } 
-        if (!ContextUtils.isRequestor(message)) {
-            // force the fault to be returned.
+        }
+        // make sure the fault is returned for an ws-rm related fault or an invalid ws-rm message
+        // note that OneWayProcessingInterceptor handles the robust case, hence not handled here.
+        if (isProtocolFault(message)
+            && !MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
             Exchange exchange = message.getExchange();
             exchange.setOneWay(false);
 
@@ -71,6 +73,12 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 exchange.setDestination(ContextUtils.createDecoupledDestination(exchange, maps.getFaultTo()));
             }
         }
+    }
+
+    private boolean isProtocolFault(Message message) {
+        return !ContextUtils.isRequestor(message)
+            && (RMContextUtils.getProtocolVariation(message) == null
+                || message.getContent(Exception.class) instanceof SequenceFault);
     }
 
     protected void handle(Message message) throws SequenceFault, RMException {
