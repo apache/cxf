@@ -106,6 +106,7 @@
         <cxf.geronimo.servlet.version>1.0</cxf.geronimo.servlet.version>
         <cxf.geronimo.servlet25.version>1.1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
+        <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
         <cxf.javax.ws.rs.version>2.0</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
@@ -117,8 +118,7 @@
         <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb21.impl.version}</cxf.jaxb.impl.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb21.xjc.version}</cxf.jaxb.xjc.version>
-        <cxf.joda.time.version>1.6.2</cxf.joda.time.version>
-        <cxf.joda.time.version2>2.1</cxf.joda.time.version2>
+        <cxf.joda.time.version>2.2</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.4</cxf.jettison.version>
         <cxf.jetty.version>8.1.12.v20130726</cxf.jetty.version>

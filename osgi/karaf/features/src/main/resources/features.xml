@@ -60,7 +60,9 @@
 
     <feature name="wss4j" version="${cxf.wss4j.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-specs</feature>
-        <bundle start-level='25' dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
+        <!--bundle start-level='25' dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle-->
+        <!-- temporary until we get an opensaml 2.6.0 bundle that can use the 2.x version of joda-time -->
+        <bundle start-level='25' dependency="true">mvn:joda-time/joda-time/1.6.2</bundle>
         <bundle start-level='25' dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
         <bundle start-level='25' dependency="true">mvn:org.apache.santuario/xmlsec/${cxf.xmlsec.bundle.version}</bundle>
         <bundle start-level='25' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.opensaml/${cxf.opensaml.osgi.version}</bundle>
@@ -70,7 +72,7 @@
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/${cxf.bcel.bundle.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/${cxf.xalan.bundle.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.neethi/neethi/${cxf.neethi.version}</bundle>
-
+        <bundle start-level='30' dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jasypt/${cxf.jasypt.bundle.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-bindings-wsu10/${cxf.wss4j.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-bindings-wss10/${cxf.wss4j.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-bindings-wss11/${cxf.wss4j.version}</bundle>
@@ -234,7 +236,7 @@
     <feature name="cxf-databinding-jibx" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-tools</feature>
-        <bundle start-level='25' dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version2}</bundle>
+        <bundle start-level='25' dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
         <bundle start-level='40' dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${cxf.xpp3.bundle.version}</bundle>
         <bundle start-level='40' dependency='true'>mvn:org.jibx/jibx-run/${cxf.jibx.version}</bundle>
         <bundle start-level='40' dependency='true'>mvn:org.jibx/jibx-bind/${cxf.jibx.version}</bundle>
