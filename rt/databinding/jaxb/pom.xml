@@ -34,7 +34,8 @@
         <cxf.osgi.import>
             javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
+            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
+            com.sun.tools*;resolution:=optional,
         </cxf.osgi.import>
     </properties>
     <build>
@@ -113,6 +114,10 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
         </dependency>
         <dependency>
             <groupId>${cxf.asm.groupId}</groupId>
