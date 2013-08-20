@@ -33,6 +33,8 @@ import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -110,12 +112,14 @@ public class WebServiceContextImpl implements WebServiceContext {
             }
         }
         
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoaderHolder orig = null;
         try {
-            Thread.currentThread().setContextClassLoader(EndpointReferenceBuilder.class.getClassLoader());
+            orig = ClassLoaderUtils.setThreadContextClassloader(EndpointReferenceBuilder.class.getClassLoader());
             return builder.build();
         } finally {
-            Thread.currentThread().setContextClassLoader(cl);
+            if (orig != null) {
+                orig.reset();
+            }
         }
     }
 

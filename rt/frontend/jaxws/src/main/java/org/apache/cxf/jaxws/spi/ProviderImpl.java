@@ -21,6 +21,9 @@ package org.apache.cxf.jaxws.spi;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -242,7 +245,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                             + " when serviceName or portName is null");
         }
         try {
-            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+            final W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             writer.setPrefix(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.NS_WSA);
             writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_ERF_NAME,
                                      JAXWSAConstants.NS_WSA);
@@ -359,8 +362,21 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             writer.writeEndElement();
             writer.flush();
 
-            Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
-            return (W3CEndpointReference)unmarshaller.unmarshal(writer.getDocument());
+            try {
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<W3CEndpointReference>() {
+                    public W3CEndpointReference run() throws Exception {
+                        Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
+                        return (W3CEndpointReference)unmarshaller.unmarshal(writer.getDocument());
+                    }
+                });
+            } catch (PrivilegedActionException pae) {
+                Exception e = pae.getException();
+                if (e instanceof JAXBException) {
+                    throw (JAXBException)e;
+                } else {
+                    throw new SecurityException(e);
+                }
+            }
         } catch (Exception e) {
             throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
                                           e);
@@ -375,16 +391,27 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     }
 
     public EndpointReference readEndpointReference(Source eprInfoset) {
-        XMLStreamReader reader = null;
         try {
-            Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
-            reader = StaxUtils.createXMLStreamReader(eprInfoset);
-            return (EndpointReference)unmarshaller.unmarshal(reader);
-        } catch (JAXBException e) {
-            throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
-                                          e);
-        } finally {
-            StaxUtils.close(reader);
+            final XMLStreamReader reader = StaxUtils.createXMLStreamReader(eprInfoset);
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<EndpointReference>() {
+                public EndpointReference run() throws Exception {
+                    try {
+                        Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
+                        return (EndpointReference)unmarshaller.unmarshal(reader);
+                    } finally {
+                        StaxUtils.close(reader);
+                    }
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof JAXBException) {
+                throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG)
+                                                  .toString(),
+                                              e);
+            } else {
+                throw new SecurityException(e);
+            }
         }
     }
 

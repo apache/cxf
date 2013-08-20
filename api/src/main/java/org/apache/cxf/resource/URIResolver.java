@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.CXFPermissions;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
@@ -135,7 +136,7 @@ public class URIResolver {
             
             
             uriFile = new File(uriFile.getAbsolutePath());
-            if (!uriFile.exists()) {
+            if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
                 try {
                     URI urif = new URI(URLDecoder.decode(orig, "ASCII"));
                     if ("file".equals(urif.getScheme()) && urif.isAbsolute()) {
@@ -148,7 +149,7 @@ public class URIResolver {
                     //ignore
                 }
             }
-            if (!uriFile.exists()) {
+            if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
                 relative =  new URI(uriStr.replaceAll(" ", "%20"));
             } else {
                 relative = uriFile.getAbsoluteFile().toURI();
