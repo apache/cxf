@@ -379,10 +379,12 @@ public class RMInInterceptorTest extends Assert {
         
         interceptor.setManager(manager);
         
+        // test 1. a normal sequence fault case without non-anonymous faultTo
         EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
             .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        EasyMock.expect(message.getContent(Exception.class)).andReturn(new SequenceFault("test")).anyTimes();
         exchange.setOneWay(false);
         EasyMock.expectLastCall();
         control.replay();
@@ -395,6 +397,7 @@ public class RMInInterceptorTest extends Assert {
 
         control.verify();
         
+        // 2. a sequence fault case with non anonymous faultTo
         control.reset();
         Destination d = control.createMock(Destination.class);
         Endpoint ep = control.createMock(Endpoint.class);
@@ -407,6 +410,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
             .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        EasyMock.expect(message.getContent(Exception.class)).andReturn(new SequenceFault("test")).anyTimes();
         exchange.setOneWay(false);
         EasyMock.expectLastCall();
         exchange.setDestination(EasyMock.anyObject(org.apache.cxf.transport.Destination.class));
@@ -420,17 +424,16 @@ public class RMInInterceptorTest extends Assert {
         }
         control.verify();
         
+        // 3. a robust oneway case
         control.reset();
         EasyMock.expect(maps.getFaultTo())
             .andReturn(RMUtils.createAnonymousReference()).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
+        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps).anyTimes();
         EasyMock.expect(manager.getDestination(message)).andReturn(d);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY)).andReturn(true).anyTimes();
         EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
             .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
-        exchange.setOneWay(false);
-        EasyMock.expectLastCall();
         control.replay();
         
         try {
@@ -438,7 +441,24 @@ public class RMInInterceptorTest extends Assert {
         } catch (Exception e) {
             fail("unexpected exception thrown from handleFault: " + e);
         }
-        // verified in tearDown
+
+        // 4. a runtime exception case
+        control.reset();
+        EasyMock.expect(maps.getFaultTo())
+            .andReturn(RMUtils.createAnonymousReference()).anyTimes();
+        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps).anyTimes();
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(message.get(RMMessageConstants.RM_PROTOCOL_VARIATION))
+            .andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        EasyMock.expect(message.getContent(Exception.class)).andReturn(new RuntimeException("test")).anyTimes();
+        control.replay();
+        
+        try {
+            interceptor.handleFault(message);
+        } catch (Exception e) {
+            fail("unexpected exception thrown from handleFault: " + e);
+        }
+//      verified in tearDown
     }
 
     private Message setupInboundMessage(String action, boolean serverSide) throws RMException {
