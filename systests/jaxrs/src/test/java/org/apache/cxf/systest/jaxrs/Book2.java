@@ -19,9 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -45,6 +47,10 @@ public class Book2 {
     @Context
     @XmlTransient
     private UriInfo uriInfo; 
+    
+    @BeanParam
+    @XmlTransient
+    private QueryBean2 queryBean;
     
     public Book2() {
     }
@@ -78,5 +84,50 @@ public class Book2 {
         name = params.getFirst("bookname");
         return this;
     }
+    
+    @GET
+    @Path("rc/bean")
+    @Produces("application/xml")
+    public Book2 initFromQueryBean(@BeanParam QueryBean bean) {
+        id = bean.getBookid();
+        name = bean.getBookname();
+        return this;
+    }
+    
+    @GET
+    @Path("rc/bean2")
+    @Produces("application/xml")
+    public Book2 initFromQueryBean2() {
+        id = queryBean.getBookid();
+        name = queryBean.getBookname();
+        return this;
+    }
 
+    public static class QueryBean {
+        private long id;
+        private String name;
+
+        public long getBookid() {
+            return id;
+        }
+
+        @QueryParam("bookid")
+        public void setBookid(long i) {
+            this.id = i;
+        }
+        
+        public String getBookname() {
+            return name;
+        }
+
+        @QueryParam("bookname")
+        public void setBookname(String bookname) {
+            this.name = bookname;
+        }
+        
+    }
+    
+    public static class QueryBean2 extends QueryBean {
+        
+    }
 }

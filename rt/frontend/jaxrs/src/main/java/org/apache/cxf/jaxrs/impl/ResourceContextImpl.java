@@ -26,6 +26,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class ResourceContextImpl implements ResourceContext {
 
@@ -53,7 +56,11 @@ public class ResourceContextImpl implements ResourceContext {
     }
 
     private <T> T doInitResource(Class<?> cls, T resource) {
-        cri.getSubResource(subClass, cls, resource, true);
+        ClassResourceInfo sub = cri.getSubResource(subClass, cls, resource, true);
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        if (m != null) {
+            sub.initBeanParamInfo(ProviderFactory.getInstance(m));
+        } 
         return resource;
     }
 

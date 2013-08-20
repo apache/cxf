@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -34,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -278,5 +282,33 @@ public class ClassResourceInfo extends BeanResourceInfo {
     
     public ClassResourceInfo getParent() {
         return parent;
+    }
+    
+    public void initBeanParamInfo(ProviderFactory factory) {
+        Set<OperationResourceInfo> oris = getMethodDispatcher().getOperationResourceInfos();
+        for (OperationResourceInfo ori : oris) {
+            List<Parameter> params = ori.getParameters();
+            for (Parameter param : params) {
+                if (param.getType() == ParameterType.BEAN) {
+                    Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[param.getIndex()];
+                    BeanParamInfo bpi = new BeanParamInfo(cls, getBus());
+                    factory.addBeanParamInfo(bpi);
+                }
+            }
+        }
+        List<Method> methods =  super.getParameterMethods();
+        for (Method m : methods) {
+            if (m.getAnnotation(BeanParam.class) != null) {
+                BeanParamInfo bpi = new BeanParamInfo(m.getParameterTypes()[0], getBus());
+                factory.addBeanParamInfo(bpi);
+            }
+        }
+        List<Field> fields = super.getParameterFields();
+        for (Field f : fields) {
+            if (f.getAnnotation(BeanParam.class) != null) {
+                BeanParamInfo bpi = new BeanParamInfo(f.getType(), getBus());
+                factory.addBeanParamInfo(bpi);
+            }
+        }
     }
 }

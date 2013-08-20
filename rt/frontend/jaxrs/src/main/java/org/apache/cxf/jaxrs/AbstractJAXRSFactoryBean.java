@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.NotFoundException;
@@ -47,11 +46,7 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.Parameter;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.DataBindingProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -344,17 +339,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     protected void setBeanInfo(ProviderFactory factory) {
         List<ClassResourceInfo> cris = serviceFactory.getClassResourceInfo();
         for (ClassResourceInfo cri : cris) {
-            Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
-            for (OperationResourceInfo ori : oris) {
-                List<Parameter> params = ori.getParameters();
-                for (Parameter param : params) {
-                    if (param.getType() == ParameterType.BEAN) {
-                        Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[param.getIndex()];
-                        BeanParamInfo bpi = new BeanParamInfo(cls, getBus());
-                        factory.addBeanParamInfo(bpi);
-                    }
-                }
-            }
+            cri.initBeanParamInfo(factory);
         }
         
     }
