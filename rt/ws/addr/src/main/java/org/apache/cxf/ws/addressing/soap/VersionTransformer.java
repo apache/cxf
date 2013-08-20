@@ -22,6 +22,7 @@ package org.apache.cxf.ws.addressing.soap;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -137,8 +138,10 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
     public <T> T decodeAsNative(String encodedAs, Class<T> clz, Element headerElement,
                                 Unmarshaller unmarshaller) throws JAXBException {
         T ret = null;
-        LOG.fine("decodeAsNative: encodedAs: " + encodedAs);
-        LOG.fine("                class: " + clz.getName());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("decodeAsNative: encodedAs: " + encodedAs);
+            LOG.fine("                class: " + clz.getName());
+        }
 
         if (NATIVE_VERSION.equals(encodedAs)) {
             ret = codec.decodeMAP(clz, headerElement, unmarshaller);
