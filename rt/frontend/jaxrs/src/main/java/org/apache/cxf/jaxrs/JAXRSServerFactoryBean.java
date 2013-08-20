@@ -43,11 +43,7 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.Parameter;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -232,17 +228,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     protected void setBeanInfo(ServerProviderFactory factory) {
         List<ClassResourceInfo> cris = serviceFactory.getClassResourceInfo();
         for (ClassResourceInfo cri : cris) {
-            Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
-            for (OperationResourceInfo ori : oris) {
-                List<Parameter> params = ori.getParameters();
-                for (Parameter param : params) {
-                    if (param.getType() == ParameterType.BEAN) {
-                        Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[param.getIndex()];
-                        BeanParamInfo bpi = new BeanParamInfo(cls, getBus());
-                        factory.addBeanParamInfo(bpi);
-                    }
-                }
-            }
+            cri.initBeanParamInfo(factory);
         }
         
     }

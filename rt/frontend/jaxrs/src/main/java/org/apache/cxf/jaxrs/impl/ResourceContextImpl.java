@@ -23,6 +23,7 @@ import javax.ws.rs.container.ResourceContext;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Message;
 
 public class ResourceContextImpl implements ResourceContext {
@@ -47,7 +48,8 @@ public class ResourceContextImpl implements ResourceContext {
     }
 
     private <T> T doInitResource(Class<?> cls, T resource) {
-        cri.getSubResource(subClass, cls, resource, true, m);
+        ClassResourceInfo sub = cri.getSubResource(subClass, cls, resource, true, m);
+        sub.initBeanParamInfo(ServerProviderFactory.getInstance(m));
         return resource;
     }
 }

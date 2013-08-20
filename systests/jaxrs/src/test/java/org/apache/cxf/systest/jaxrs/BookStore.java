@@ -92,7 +92,6 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
-import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
@@ -1046,8 +1045,7 @@ public class BookStore {
     
     @Path("/booksubresource/instance/context")
     public Book2 getBookSubResourceInstanceRC(@Context ResourceContext rc) {
-        // This cast is temporarily
-        return ((ResourceContextImpl)rc).initResource(book2Sub);
+        return rc.initResource(book2Sub);
     }
     
     @Path("/booksubresourceobject/{bookId}/")
