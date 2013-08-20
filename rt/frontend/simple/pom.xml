@@ -127,6 +127,12 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 
