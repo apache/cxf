@@ -26,16 +26,16 @@ import javax.annotation.Resource;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
-public class SecureBookStore implements SecureBookInterface, Injectable {
+public class SecureBookStore extends AbstractSecureBookStore implements SecureBookInterface {
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private SecureBookInterface subresource;
-    private SecurityContext securityContext; 
+    private UriInfo uriInfo; 
     
     public SecureBookStore() {
         Book book = new Book();
@@ -45,8 +45,8 @@ public class SecureBookStore implements SecureBookInterface, Injectable {
     }
     
     @Context
-    public void setSecurityContext(SecurityContext sc) {
-        securityContext = sc;
+    public void setUriInfo(UriInfo ui) {
+        uriInfo = ui;
     }
     
     @Resource
@@ -66,6 +66,9 @@ public class SecureBookStore implements SecureBookInterface, Injectable {
     }
     
     public Book getThatBook() throws BookNotFoundFault {
+        if (!uriInfo.getBaseUri().getScheme().startsWith("http")) {
+            throw new WebApplicationException(500);
+        }
         if ((securityContext.isUserInRole("ROLE_ADMIN")
             || securityContext.isUserInRole("ROLE_BOOK_OWNER"))
             && !securityContext.isUserInRole("ROLE_BAZ")) {

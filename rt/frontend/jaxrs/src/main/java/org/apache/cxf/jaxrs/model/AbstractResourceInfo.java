@@ -185,6 +185,10 @@ public abstract class AbstractResourceInfo {
         for (Class<?> i : interfaces) {
             findContextSetterMethods(i);
         }
+        Class<?> superCls = cls.getSuperclass();
+        if (superCls != null && superCls != Object.class) {
+            findContextSetterMethods(superCls);
+        }
     }
     
     private void checkContextMethod(Method m) {
