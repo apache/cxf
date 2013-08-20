@@ -50,6 +50,7 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxTransportBindingHandl
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -298,7 +299,9 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
             
-            encrCrypto = CryptoFactory.getInstance(props);
+            encrCrypto = CryptoFactory.getInstance(props,
+                                                   Loader.getClassLoader(CryptoFactory.class),
+                                                   getPasswordEncryptor(message));
 
             EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
             synchronized (info) {
@@ -321,7 +324,9 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
             
-            signCrypto = CryptoFactory.getInstance(props);
+            signCrypto = CryptoFactory.getInstance(props,
+                                                   Loader.getClassLoader(CryptoFactory.class),
+                                                   getPasswordEncryptor(message));
 
             EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
             synchronized (info) {

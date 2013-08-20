@@ -182,6 +182,25 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricEncryptedPasswordBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItAsymmetricIssuerSerialPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItAsymmetricSHA256Binding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricSHA256Policy" />
         <soap:binding style="document"
@@ -509,6 +528,10 @@
         <wsdl:port name="DoubleItAsymmetricIssuerSerialPort" 
                    binding="tns:DoubleItAsymmetricIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Asymmetric" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricEncryptedPasswordPort" 
+                   binding="tns:DoubleItAsymmetricEncryptedPasswordBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricEncryptedPassword" />
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricSHA256Port" 
                    binding="tns:DoubleItAsymmetricSHA256Binding">

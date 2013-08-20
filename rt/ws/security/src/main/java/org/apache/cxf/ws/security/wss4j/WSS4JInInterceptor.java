@@ -219,6 +219,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         try {
             reqData.setMsgContext(msg);
             setAlgorithmSuites(msg, reqData);
+            
+            reqData.setCallbackHandler(getCallback(reqData, utWithCallbacks));
+            
             computeAction(msg, reqData);
             List<Integer> actions = new ArrayList<Integer>();
             String action = getAction(msg, version);
@@ -230,8 +233,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
             }
 
-            reqData.setCallbackHandler(getCallback(reqData, doAction, utWithCallbacks));
-            
             // Configure replay caching
             ReplayCache nonceCache = 
                 getReplayCache(
@@ -611,57 +612,51 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
     }
 
-    protected CallbackHandler getCallback(RequestData reqData, int doAction, boolean utWithCallbacks) 
+    protected CallbackHandler getCallback(RequestData reqData, boolean utWithCallbacks) 
         throws WSSecurityException {
-        if (!utWithCallbacks 
-            && ((doAction & WSConstants.UT) != 0 || (doAction & WSConstants.UT_NOPASSWORD) != 0)) {
+        if (!utWithCallbacks) {
             CallbackHandler pwdCallback = null;
             try {
-                pwdCallback = getCallback(reqData, doAction);
+                pwdCallback = getCallback(reqData);
             } catch (Exception ex) {
                 // ignore
             }
             return new DelegatingCallbackHandler(pwdCallback);
         } else {
-            return getCallback(reqData, doAction);
+            return getCallback(reqData);
         }
     }
     
-    protected CallbackHandler getCallback(RequestData reqData, int doAction) throws WSSecurityException {
-        /*
-         * To check a UsernameToken or to decrypt an encrypted message we need a
-         * password.
-         */
-        CallbackHandler cbHandler = null;
-        if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-            Object o = ((SoapMessage)reqData.getMsgContext())
-                .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-            if (o instanceof String) {
-                try {
-                    o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-                } catch (Exception e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                }
-            }            
-            if (o instanceof CallbackHandler) {
-                cbHandler = (CallbackHandler)o;
+    protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {
+        Object o = ((SoapMessage)reqData.getMsgContext())
+            .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        if (o instanceof String) {
+            try {
+                o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
-            if (cbHandler == null) {
-                try {
-                    cbHandler = getPasswordCallbackHandler(reqData);
-                } catch (WSSecurityException sec) {
-                    Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
-                    if (ep != null && ep.getEndpointInfo() != null) {
-                        TokenStore store = (TokenStore)ep.getEndpointInfo()
-                            .getProperty(TokenStore.class.getName());
-                        if (store != null) {
-                            return new TokenStoreCallbackHandler(null, store);
-                        }
-                    }                    
-                    throw sec;
-                }
+        }         
+        CallbackHandler cbHandler = null;
+        if (o instanceof CallbackHandler) {
+            cbHandler = (CallbackHandler)o;
+        }
+        if (cbHandler == null) {
+            try {
+                cbHandler = getPasswordCallbackHandler(reqData);
+            } catch (WSSecurityException sec) {
+                Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
+                if (ep != null && ep.getEndpointInfo() != null) {
+                    TokenStore store = (TokenStore)ep.getEndpointInfo()
+                        .getProperty(TokenStore.class.getName());
+                    if (store != null) {
+                        return new TokenStoreCallbackHandler(null, store);
+                    }
+                }                    
+                throw sec;
             }
         }
+            
         Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
         if (ep != null && ep.getEndpointInfo() != null) {
             TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());

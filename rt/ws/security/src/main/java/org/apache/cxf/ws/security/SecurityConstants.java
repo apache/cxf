@@ -312,6 +312,20 @@ public final class SecurityConstants {
     public static final String ASYMMETRIC_SIGNATURE_ALGORITHM = 
         "ws-security.asymmetric.signature.algorithm";
     
+    /**
+     * This holds a reference to a PasswordEncryptor instance, which is used to encrypt or 
+     * decrypt passwords in the Merlin Crypto implementation (or any custom Crypto implementations).
+     * 
+     * By default, WSS4J uses the StrongJasyptPasswordEncryptor, which must be instantiated with a 
+     * master password to use to decrypt keystore passwords in the Merlin Crypto properties file.
+     * This master password is obtained via the CallbackHandler defined via PW_CALLBACK_CLASS
+     * or PW_CALLBACK_REF.
+     * 
+     * The encrypted passwords must be stored in the format "ENC(encoded encrypted password)".
+     */
+    public static final String PASSWORD_ENCRYPTOR_INSTANCE = 
+        "ws-security.password.encryptor.instance";
+    
     //
     // Validator implementations for validating received security tokens
     //
@@ -495,7 +509,7 @@ public final class SecurityConstants {
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
-            ASYMMETRIC_SIGNATURE_ALGORITHM
+            ASYMMETRIC_SIGNATURE_ALGORITHM, PASSWORD_ENCRYPTOR_INSTANCE
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

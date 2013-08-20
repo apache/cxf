@@ -120,8 +120,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
             
             translateProperties(soapMessage);
-            configureProperties(soapMessage);
             configureCallbackHandler(soapMessage);
+            configureProperties(soapMessage);
             
             InboundWSSec inboundWSSec = null;
             WSSSecurityProperties secProps = null;

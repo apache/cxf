@@ -54,12 +54,16 @@ public class KeystorePasswordCallback implements CallbackHandler {
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-            String pass = passwords.get(pc.getIdentifier());
-            if (pass != null) {
-                pc.setPassword(pass);
-                return;
+            if (pc.getUsage() == WSPasswordCallback.Usage.PASSWORD_ENCRYPTOR_PASSWORD) {
+                pc.setPassword("this-is-a-secret");
             } else {
-                pc.setPassword("password");
+                String pass = passwords.get(pc.getIdentifier());
+                if (pass != null) {
+                    pc.setPassword(pass);
+                    return;
+                } else {
+                    pc.setPassword("password");
+                }
             }
         }
     }

@@ -53,7 +53,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
@@ -82,6 +81,8 @@ import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -90,6 +91,7 @@ import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
@@ -1101,6 +1103,7 @@ public abstract class AbstractBindingBuilder {
             try {
                 handler = (CallbackHandler)ClassLoaderUtils
                     .loadClass((String)o, this.getClass()).newInstance();
+                message.setContextualProperty(SecurityConstants.CALLBACK_HANDLER, handler);
             } catch (Exception e) {
                 handler = null;
             }
@@ -1613,10 +1616,29 @@ public abstract class AbstractBindingBuilder {
         }
         
         if (properties != null) {
-            crypto = CryptoFactory.getInstance(properties);
+            crypto = CryptoFactory.getInstance(properties, 
+                                               Loader.getClassLoader(CryptoFactory.class),
+                                               getPasswordEncryptor());
             getCryptoCache().put(o, crypto);
         }
         return crypto;
+    }
+    
+    protected PasswordEncryptor getPasswordEncryptor() {
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)message.getContextualProperty(
+                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
+            );
+        if (passwordEncryptor != null) {
+            return passwordEncryptor;
+        }
+        
+        CallbackHandler callbackHandler = getCallbackHandler();
+        if (callbackHandler != null) {
+            return new StrongJasyptPasswordEncryptor(callbackHandler);
+        }
+        
+        return null;
     }
     
     public void setKeyIdentifierType(WSSecBase secBase, AbstractTokenWrapper wrapper, AbstractToken token) {

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
@@ -81,7 +82,10 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -236,7 +240,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
 
     private String checkAsymmetricBinding(
-        AssertionInfoMap aim, String action, SoapMessage message
+        AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
             getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
@@ -255,12 +259,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto encrCrypto = getEncryptionCrypto(e, message, data);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
-            signCrypto = getSignatureCrypto(s, message);
+            signCrypto = getSignatureCrypto(s, message, data);
         }
         
         if (signCrypto != null) {
@@ -280,7 +284,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     
     private String checkDefaultBinding(
-        AssertionInfoMap aim, String action, SoapMessage message
+        AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
@@ -293,12 +297,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto encrCrypto = getEncryptionCrypto(e, message, data);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
-            signCrypto = getSignatureCrypto(s, message);
+            signCrypto = getSignatureCrypto(s, message, data);
         }
         
         if (signCrypto != null) {
@@ -334,7 +338,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     
     private String checkSymmetricBinding(
-        AssertionInfoMap aim, String action, SoapMessage message
+        AssertionInfoMap aim, String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
             getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
@@ -353,12 +357,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto encrCrypto = getEncryptionCrypto(e, message, data);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
-            signCrypto = getSignatureCrypto(s, message);
+            signCrypto = getSignatureCrypto(s, message, data);
         }
         
         if (isRequestor(message)) {
@@ -402,7 +406,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return action;
     }
     
-    private Crypto getEncryptionCrypto(Object e, SoapMessage message) throws WSSecurityException {
+    private Crypto getEncryptionCrypto(Object e, 
+                                       SoapMessage message, 
+                                       RequestData requestData) throws WSSecurityException {
         Crypto encrCrypto = null;
         if (e instanceof Crypto) {
             encrCrypto = (Crypto)e;
@@ -415,7 +421,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
             
-            encrCrypto = CryptoFactory.getInstance(props);
+            PasswordEncryptor passwordEncryptor = getPasswordEncryptor(message, requestData);
+            encrCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
+                                                   passwordEncryptor);
 
             EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
             synchronized (info) {
@@ -425,7 +433,29 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return encrCrypto;
     }
     
-    private Crypto getSignatureCrypto(Object s, SoapMessage message) throws WSSecurityException {
+    private PasswordEncryptor getPasswordEncryptor(SoapMessage soapMessage, RequestData requestData) {
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)soapMessage.getContextualProperty(
+                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
+            );
+        if (passwordEncryptor != null) {
+            return passwordEncryptor;
+        }
+        
+        if (requestData.getPasswordEncryptor() != null) {
+            return requestData.getPasswordEncryptor();
+        }
+        
+        CallbackHandler callbackHandler = requestData.getCallbackHandler();
+        if (callbackHandler != null) {
+            return new StrongJasyptPasswordEncryptor(callbackHandler);
+        }
+        
+        return null;
+    }
+    
+    private Crypto getSignatureCrypto(Object s, SoapMessage message, 
+                                      RequestData requestData) throws WSSecurityException {
         Crypto signCrypto = null;
         if (s instanceof Crypto) {
             signCrypto = (Crypto)s;
@@ -438,7 +468,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
             
-            signCrypto = CryptoFactory.getInstance(props);
+            PasswordEncryptor passwordEncryptor = getPasswordEncryptor(message, requestData);
+            signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
+                                                   passwordEncryptor);
 
             EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
             synchronized (info) {
@@ -560,11 +592,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (aim != null) {
             //things that DO impact setup
             handleWSS11(aim, message);
-            action = checkAsymmetricBinding(aim, action, message);
-            action = checkSymmetricBinding(aim, action, message);
+            action = checkAsymmetricBinding(aim, action, message, data);
+            action = checkSymmetricBinding(aim, action, message, data);
             Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
             if ("".equals(action) || (ais != null && !ais.isEmpty())) {
-                action = checkDefaultBinding(aim, action, message);
+                action = checkDefaultBinding(aim, action, message, data);
             }
             
             // Allow for setting non-standard asymmetric signature algorithms

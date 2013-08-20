@@ -40,8 +40,10 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -200,6 +202,12 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
             Boolean.toString(validateSAMLSubjectConf)
         );
+        
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)msg.getContextualProperty(SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+        if (passwordEncryptor != null) {
+            msg.setContextualProperty(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
+        }
     }
 
     @Override
@@ -226,7 +234,8 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
                     props.load(in);
                     in.close();
                     return CryptoFactory.getInstance(props,
-                                                     this.getClassLoader(reqData.getMsgContext()));
+                                                     this.getClassLoader(reqData.getMsgContext()),
+                                                     getPasswordEncryptor(reqData));
                 }
             } catch (Exception e) {
                 //ignore

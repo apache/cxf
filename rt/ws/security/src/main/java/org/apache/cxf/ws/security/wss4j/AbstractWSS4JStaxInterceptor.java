@@ -57,6 +57,8 @@ import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
@@ -175,6 +177,12 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             MessageUtils.getContextualBoolean(msg, SecurityConstants.MUST_UNDERSTAND, true);
         if (properties != null) {
             properties.put(ConfigurationConstants.MUST_UNDERSTAND, Boolean.toString(mustUnderstand));
+        }
+        
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)msg.getContextualProperty(SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+        if (passwordEncryptor != null && securityProperties == null) {
+            properties.put(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
         }
     }
     
@@ -369,7 +377,9 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             if (crypto == null) {
                 Object obj = getProperty(soapMessage, refId);
                 if (obj instanceof Properties) {
-                    crypto = CryptoFactory.getInstance((Properties)obj);
+                    crypto = CryptoFactory.getInstance((Properties)obj, 
+                                                       getClassLoader(),
+                                                       getPasswordEncryptor(soapMessage));
                     cryptos.put(refId, crypto);
                 } else if (obj instanceof Crypto) {
                     crypto = (Crypto)obj;
@@ -427,7 +437,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                     InputStream in = url.openStream(); 
                     props.load(in);
                     in.close();
-                    return CryptoFactory.getInstance(props, getClassLoader());
+                    return CryptoFactory.getInstance(props, getClassLoader(), 
+                                                     getPasswordEncryptor(soapMessage));
                 }
             } catch (Exception e) {
                 //ignore
@@ -438,6 +449,28 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                 orig.reset();
             }
         }
+    }
+    
+    protected PasswordEncryptor getPasswordEncryptor(SoapMessage soapMessage) {
+        PasswordEncryptor passwordEncryptor = 
+            (PasswordEncryptor)soapMessage.getContextualProperty(
+                SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
+            );
+        if (passwordEncryptor != null) {
+            return passwordEncryptor;
+        }
+        
+        CallbackHandler callbackHandler = null;
+        if (securityProperties != null) {
+            callbackHandler = securityProperties.getCallbackHandler();
+        } else {
+            callbackHandler = (CallbackHandler)getProperties().get(ConfigurationConstants.PW_CALLBACK_REF);
+        }
+        if (callbackHandler != null) {
+            return new StrongJasyptPasswordEncryptor(callbackHandler);
+        }
+        
+        return null;
     }
     
     private ClassLoader getClassLoader() {
