@@ -1246,7 +1246,7 @@ public final class InjectionUtils {
         }
         Type type = null;
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
-            type = ((GenericEntity<?>)targetObject).getType();
+            type = processGenericTypeIfNeeded(serviceCls, targetType, ((GenericEntity<?>)targetObject).getType());
         } else if (invoked == null 
                    || !invoked.getReturnType().isAssignableFrom(targetType)) {
             // when a method has been invoked it is still possible that either an ExceptionMapper
