@@ -23,9 +23,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
     <name>Apache CXF Parent</name>
     <description>Apache CXF Parent POM</description>
     <url>http://cxf.apache.org</url>

@@ -23,7 +23,6 @@
     <packaging>jar</packaging>
     <name>WS-Discovery Sample</name>
     <description>WS-Discovery Sample</description>
-    <version>3.0.0-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

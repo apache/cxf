@@ -18,16 +18,14 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wssec_stax_sign_enc</artifactId>
     <name>CXF WS-Security StaX Sign Encoding Demo</name>
     <description>CXF WS-Security StaX Sign Encoding Demo</description>
-    <version>2.8.0-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.8.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 

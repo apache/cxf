@@ -27,7 +27,6 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.cxf.karaf</groupId>
     <artifactId>cxf-karaf-commands</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Karaf Commands</name>

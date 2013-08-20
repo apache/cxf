@@ -29,7 +29,6 @@
     <artifactId>cxf-systests-container-integration</artifactId>
     <name>Apache CXF Container Integration System Tests</name>
     <description>Apache CXF Container Integration System Tests</description>
-    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://cxf.apache.org</url>
     <modules>

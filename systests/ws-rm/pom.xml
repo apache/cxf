@@ -29,7 +29,6 @@
     <artifactId>cxf-systests-ws-rm</artifactId>
     <name>Apache CXF WS-RM Specifications System Tests</name>
     <description>Apache CXF WS-RM Specifications System Tests</description>
-    <version>3.0.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
 
     <dependencies>

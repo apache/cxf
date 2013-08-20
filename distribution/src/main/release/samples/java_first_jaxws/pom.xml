@@ -18,12 +18,10 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.samples</groupId>
     <artifactId>java_first_jaxws</artifactId>
     <packaging>war</packaging>
     <name>Java First demo using JAX-WS APIs</name>
     <description>Java First demo using JAX-WS APIs</description>
-    <version>3.0.0-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

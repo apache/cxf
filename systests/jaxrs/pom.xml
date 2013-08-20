@@ -29,7 +29,6 @@
     <artifactId>cxf-systests-jaxrs</artifactId>
     <name>Apache CXF JAX-RS System Tests</name>
     <description>Apache CXF JAX-RS System Tests</description>
-    <version>3.0.0-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     
     <dependencies>
