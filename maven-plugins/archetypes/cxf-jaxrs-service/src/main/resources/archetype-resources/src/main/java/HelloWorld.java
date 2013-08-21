@@ -22,8 +22,8 @@ public class HelloWorld {
     @Consumes("application/json")
     @Path("/jsonBean")
     public Response modifyJson(JsonBean input) {
-	input.setVal2(input.getVal1());
-	return Response.ok().entity(input).build();
+        input.setVal2(input.getVal1());
+        return Response.ok().entity(input).build();
     }
 }
 
