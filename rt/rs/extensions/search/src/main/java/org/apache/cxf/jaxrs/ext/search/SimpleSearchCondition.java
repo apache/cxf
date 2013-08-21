@@ -154,7 +154,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 : ((SearchBean)condition).getKeySet();
             
             for (String getter : keySet) {
-                ConditionType ct = getters2operators == null ? sharedType : getters2operators.get(getter);
+                ConditionType ct = getters2operators == null ? sharedType 
+                    : getters2operators.get(getter.toLowerCase());
                 if (ct == null) {
                     continue;
                 }
