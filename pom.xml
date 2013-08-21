@@ -46,7 +46,7 @@
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
         <cxf.build-utils.version>2.5.1-SNAPSHOT</cxf.build-utils.version>
-        <cxf.xjc-utils.version>2.6.1</cxf.xjc-utils.version>
+        <cxf.xjc-utils.version>2.6.2</cxf.xjc-utils.version>
         <cxf.jdk.version>1.6</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
