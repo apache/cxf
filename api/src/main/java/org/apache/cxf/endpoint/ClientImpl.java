@@ -877,7 +877,7 @@ public class ClientImpl
         Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
-        setExchangeProperties(exchange, null, null);
+        setExchangeProperties(exchange, getEndpoint(), null);
         return getConduitSelector().selectConduit(message);
     }
 
@@ -937,10 +937,11 @@ public class ClientImpl
         exchange.put(Client.class, this);
         exchange.put(Bus.class, bus);
 
-        if (endpoint != null && boi != null) {
-
+        if (endpoint != null) {
             EndpointInfo endpointInfo = endpoint.getEndpointInfo();
-            exchange.put(Message.WSDL_OPERATION, boi.getName());
+            if (boi != null) {
+                exchange.put(Message.WSDL_OPERATION, boi.getName());
+            }
 
             QName serviceQName = endpointInfo.getService().getName();
             exchange.put(Message.WSDL_SERVICE, serviceQName);
