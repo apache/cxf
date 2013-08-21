@@ -20,7 +20,6 @@
 package org.apache.cxf.xkms.cache;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import net.sf.ehcache.Cache;
@@ -34,38 +33,45 @@ import net.sf.ehcache.config.DiskStoreConfiguration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
 /**
  * An in-memory EHCache implementation of the XKMSClientCache interface. 
  */
-public class EHCacheXKMSClientCache implements XKMSClientCache {
+public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListener {
     
     public static final String CACHE_KEY = "cxf.xkms.client.cache";
     private static final String DEFAULT_CONFIG_URL = "cxf-xkms-client-ehcache.xml";
     
     private Ehcache cache;
     private CacheManager cacheManager;
+    private Bus bus;
     
     public EHCacheXKMSClientCache() {
         this(DEFAULT_CONFIG_URL, null);
     }
     
-    public EHCacheXKMSClientCache(Bus bus) {
-        this(DEFAULT_CONFIG_URL, bus);
+    public EHCacheXKMSClientCache(Bus cxfBus) {
+        this(DEFAULT_CONFIG_URL, cxfBus);
     }
     
     public EHCacheXKMSClientCache(String configFileURL) {
         this(configFileURL, null);
     }
     
-    public EHCacheXKMSClientCache(String configFileURL, Bus bus) {
-        createCache(configFileURL, bus);
+    public EHCacheXKMSClientCache(String configFileURL, Bus cxfBus) {
+        createCache(configFileURL, cxfBus);
+        this.bus = cxfBus;
+        if (bus != null) {
+            bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+        }
     }
     
-    private void createCache(String configFile, Bus bus) {
-        if (bus == null) {
-            bus = BusFactory.getThreadDefaultBus(true);
+    private void createCache(String configFile, Bus cxfBus) {
+        if (cxfBus == null) {
+            cxfBus = BusFactory.getThreadDefaultBus(true);
         }
         URL configFileURL = null;
         try {
@@ -79,12 +85,12 @@ public class EHCacheXKMSClientCache implements XKMSClientCache {
         } else {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
             
-            if (bus != null) {
-                conf.setName(bus.getId());
+            if (cxfBus != null) {
+                conf.setName(cxfBus.getId());
                 DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
                 if (dsc != null && "java.io.tmpdir".equals(dsc.getOriginalPath())) {
                     String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                        + bus.getId();
+                        + cxfBus.getId();
                     conf.getDiskStoreConfiguration().setPath(path);
                 }
             }
@@ -117,7 +123,7 @@ public class EHCacheXKMSClientCache implements XKMSClientCache {
         return null;
     }
     
-    public void close() throws IOException {
+    public void close() {
         if (cacheManager != null) {
             if (cache != null) {
                 cache.removeAll();
@@ -125,7 +131,22 @@ public class EHCacheXKMSClientCache implements XKMSClientCache {
             cacheManager.shutdown();
             cacheManager = null;
             cache = null;
+            
+            if (bus != null) {
+                bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
+            }
         }
+    }
+    
+    public void initComplete() {
+    }
+
+    public void preShutdown() {
+        close();
+    }
+
+    public void postShutdown() {
+        close();
     }
     
 }

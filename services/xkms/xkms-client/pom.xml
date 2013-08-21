@@ -32,7 +32,7 @@
         <version>2.7.7-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf.services.xkms</groupId>
@@ -73,9 +73,29 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
