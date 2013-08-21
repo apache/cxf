@@ -37,7 +37,6 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
@@ -74,7 +73,6 @@ public class BasicIntegrationTest {
                 .unpackDirectory(new File("target/paxexam/unpack/")).useDeployFolder(false),
             logLevel(LogLevel.INFO),
             systemProperty("java.awt.headless").value("true"),
-            keepRuntimeFolder(),
 
             replaceConfigurationFile("data/xkms/certificates/trusted_cas/root.cer",
                                      new File("src/test/resources/data/xkms/certificates/trusted_cas/root.cer")),
