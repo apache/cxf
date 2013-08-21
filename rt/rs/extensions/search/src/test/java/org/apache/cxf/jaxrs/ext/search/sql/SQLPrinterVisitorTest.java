@@ -59,6 +59,18 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
+    public void testSQLCamelNameSearchBean() throws SearchParseException {
+        FiqlParser<SearchBean> beanParser = new FiqlParser<SearchBean>(SearchBean.class);
+        SearchCondition<SearchBean> filter = beanParser.parse("theName==ami*;theLevel=gt=10");
+        SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
+        filter.accept(visitor);
+        String sql = visitor.getQuery();
+        
+        assertTrue("SELECT * FROM table WHERE (theName LIKE 'ami%') AND (theLevel > '10')".equals(sql)
+                   || "SELECT * FROM table WHERE (theLevel > '10') AND (theName LIKE 'ami%')".equals(sql));
+    }
+    
+    @Test
     public void testSQL2() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
