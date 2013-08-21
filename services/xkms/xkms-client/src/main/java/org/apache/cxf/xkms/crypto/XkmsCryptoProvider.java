@@ -108,9 +108,34 @@ public class XkmsCryptoProvider extends CryptoBase {
         if (certs != null) {
             LOG.fine(String.format("Verifying certificate id: %s", certs[0].getSubjectDN()));
         }
-        if (certs == null || !xkmsInvoker.validateCertificate(certs[0])) {
+        
+        XKMSCacheToken cachedToken = null;
+        // Try local cache first
+        if (certs != null && certs.length > 0 && xkmsClientCache != null) {
+            String key = certs[0].getSubjectX500Principal().getName();
+            // Try by Subject DN and IssuerSerial
+            cachedToken = xkmsClientCache.get(key);
+            if (cachedToken == null) {
+                key = getKeyForIssuerSerial(certs[0].getIssuerX500Principal().getName(),
+                                            certs[0].getSerialNumber());
+                cachedToken = xkmsClientCache.get(key);
+            }
+            if (cachedToken != null && cachedToken.isXkmsValidated()) {
+                LOG.fine("Certificate has already been validated by the XKMS service");
+                return;
+            }
+        }
+        if (certs == null || certs[0] == null || !xkmsInvoker.validateCertificate(certs[0])) {
             throw new CryptoProviderException("The given certificate is not valid");
         }
+        
+        // Validate Cached token
+        if (cachedToken != null) {
+            cachedToken.setXkmsValidated(true);
+        }
+        
+        // Otherwise, Store in the cache as a validated certificate
+        storeCertificateInCache(certs[0], null, true);
     }
 
     @Override
@@ -144,12 +169,8 @@ public class XkmsCryptoProvider extends CryptoBase {
                 .getIssuer(), cryptoType.getSerial());
             
             // Store in the cache
-            if (certificate != null && xkmsClientCache != null) {
-                XKMSCacheToken cacheToken = new XKMSCacheToken(certificate);
-                xkmsClientCache.put(key, cacheToken);
-                // Store it using the Subject DN as well
-                xkmsClientCache.put(certificate.getSubjectX500Principal().getName(), cacheToken);
-            }
+            storeCertificateInCache(certificate, key, false);
+
             return new X509Certificate[] {
                 certificate
             };
@@ -191,14 +212,7 @@ public class XkmsCryptoProvider extends CryptoBase {
         X509Certificate cert = xkmsInvoker.getCertificateForId(application, id);
         
         // Store in the cache
-        if (cert != null && xkmsClientCache != null) {
-            XKMSCacheToken cacheToken = new XKMSCacheToken(cert);
-            xkmsClientCache.put(id.toLowerCase(), cacheToken);
-            // Store it using IssuerSerial as well
-            String key = getKeyForIssuerSerial(cert.getIssuerX500Principal().getName(), 
-                                               cert.getSerialNumber());
-            xkmsClientCache.put(key, cacheToken);
-        }
+        storeCertificateInCache(cert, id.toLowerCase(), false);
 
         return new X509Certificate[] {
             cert
@@ -216,8 +230,8 @@ public class XkmsCryptoProvider extends CryptoBase {
         try {
             localCerts = defaultCrypto.getX509Certificates(cryptoType);
         } catch (Exception e) {
-            LOG.info("Certificate is not found in local keystore and will be requested from XKMS: "
-                     + cryptoType.getAlias());
+            LOG.info("Certificate is not found in local keystore and will be requested from "
+                + "XKMS (first trying the cache): " + cryptoType.getAlias());
         }
         return localCerts;
     }
@@ -234,5 +248,29 @@ public class XkmsCryptoProvider extends CryptoBase {
     
     private String getKeyForIssuerSerial(String issuer, BigInteger serial) {
         return issuer + "-" + serial.toString(16);
+    }
+    
+    private void storeCertificateInCache(X509Certificate certificate, String key, boolean validated) {
+        // Store in the cache
+        if (certificate != null && xkmsClientCache != null) {
+            XKMSCacheToken cacheToken = new XKMSCacheToken(certificate);
+            cacheToken.setXkmsValidated(validated);
+            // Store using a custom key (if any)
+            if (key != null) {
+                xkmsClientCache.put(key, cacheToken);
+            }
+            // Store it using IssuerSerial as well
+            String issuerSerialKey = 
+                getKeyForIssuerSerial(certificate.getIssuerX500Principal().getName(), 
+                                      certificate.getSerialNumber());
+            if (!issuerSerialKey.equals(key)) {
+                xkmsClientCache.put(issuerSerialKey, cacheToken);
+            }
+            // Store it using the Subject DN as well
+            String subjectDNKey = certificate.getSubjectX500Principal().getName();
+            if (!subjectDNKey.equals(key)) {
+                xkmsClientCache.put(subjectDNKey, cacheToken);
+            }
+        }
     }
 }

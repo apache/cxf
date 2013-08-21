@@ -20,7 +20,6 @@
 package org.apache.cxf.xkms.cache;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 public interface XKMSClientCache extends Closeable {
 
@@ -35,5 +34,5 @@ public interface XKMSClientCache extends Closeable {
      */
     XKMSCacheToken get(String key);
     
-    void close() throws IOException;
+    void close();
 }
