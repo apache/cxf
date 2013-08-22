@@ -19,8 +19,8 @@
 --
 
 
-SYSTEM "http://schemas.xmlsoap.org/ws/2004/08/addressing" "../../../../../../api/src/main/resources/schemas/wsdl/addressing.xsd"
-SYSTEM "http://www.w3.org/2006/03/addressing/ws-addr.xsd" "../../../../../../api/src/main/resources/schemas/wsdl/ws-addr.xsd"
+SYSTEM "http://schemas.xmlsoap.org/ws/2004/08/addressing" "../../../../../../core/src/main/resources/schemas/wsdl/addressing.xsd"
+SYSTEM "http://www.w3.org/2006/03/addressing/ws-addr.xsd" "../../../../../../core/src/main/resources/schemas/wsdl/ws-addr.xsd"
 
 SYSTEM "http://docs.oasis-open.org/ws-rx/wsrm/200702" "../resources/schemas/wsdl/wsrm-1.1.xsd"
 
