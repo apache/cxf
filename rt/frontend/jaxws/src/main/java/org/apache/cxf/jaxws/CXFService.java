@@ -24,6 +24,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.spi.ServiceDelegate;
 
@@ -60,10 +61,15 @@ public abstract class CXFService extends Service {
     private ServiceImpl findDelegate() {
         for (Field f : ReflectionUtil.getDeclaredFields(Service.class)) {
             if (ServiceDelegate.class.equals(f.getType())) { 
-                return ReflectionUtil.accessDeclaredField(f, this, ServiceImpl.class);
+                ServiceDelegate del = ReflectionUtil.accessDeclaredField(f, this, ServiceDelegate.class);
+                if (del instanceof ServiceImpl) {
+                    return (ServiceImpl)del;
+                }
+                throw new WebServiceException("Delegate of class " + del.getClass() + " is not a CXF delegate.  "
+                                              + " Check the classpath to make sure CXF is loaded first.");
             }
         }
-        throw null;
+        throw new WebServiceException("Could not find CXF service delegate");
     }
 
 }
