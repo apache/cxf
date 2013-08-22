@@ -469,6 +469,8 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC,
                            "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;", null, null);
         fv.visitEnd();        
+        fv = cw.visitField(0, "qn", "Ljavax/xml/namespace/QName;", null, null);
+        fv.visitEnd();
         
 
         boolean hasAttributes = false;
@@ -481,9 +483,6 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             //ignore 
         }
         if (hasAttributes) {
-            fv = cw.visitField(0, "qn", "Ljavax/xml/namespace/QName;", null, null);
-            fv.visitEnd();
-            
             mv = cw.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
             mv.visitCode();
             Label l0 = helper.createLabel();
