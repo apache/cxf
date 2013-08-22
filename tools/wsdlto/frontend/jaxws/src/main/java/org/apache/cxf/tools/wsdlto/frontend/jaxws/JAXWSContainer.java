@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.xml.ws.Service;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -51,7 +53,19 @@ public class JAXWSContainer extends WSDLToJavaContainer {
         return set;
     }
 
+    public String getServiceSuperclass() {
+        return Service.class.getName();
+    }
+    public String getServiceTarget() {
+        return isJaxws22() ? "jaxws22" : "jaxws21";
+    }
+    public boolean isJaxws22() {
+        return Service.class.getDeclaredConstructors().length == 2;
+    }
+    
     public void validate(ToolContext env) throws ToolException {
+        env.put("service.target", getServiceTarget());
+        env.put("service.superclass", getServiceSuperclass());
         super.validate(env);
         if (env.containsKey(ToolConstants.CFG_BINDING)) {
             String[] bindings = (String[])env.get(ToolConstants.CFG_BINDING);

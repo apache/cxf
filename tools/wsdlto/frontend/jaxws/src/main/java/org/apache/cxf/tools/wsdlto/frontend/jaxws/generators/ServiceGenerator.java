@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
@@ -123,10 +122,12 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     location = url;
                 }
                 
-                String serviceSuperclass = "Service";
+                String serviceSuperclass = (String)env.get("service.superclass");
+                String simpleServiceName = serviceSuperclass.substring(serviceSuperclass.lastIndexOf('.') + 1);
                 for (String s : collector.getGeneratedFileInfo()) {
-                    if (s.equals(js.getPackageName() + ".Service")) {
-                        serviceSuperclass = "javax.xml.ws.Service";
+                    if (s.equals(js.getPackageName() + "." + simpleServiceName)) {
+                        simpleServiceName = serviceSuperclass;
+                        break;
                     }
                 }
                 clearAttributes();
@@ -142,14 +143,16 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 setAttributes("service", js);
                 setAttributes("wsdlLocation", location);
                 setAttributes("useGetResource", useGetResource);
-                setAttributes("serviceSuperclass", serviceSuperclass);
-                if ("Service".equals(serviceSuperclass)) {
-                    js.addImport("javax.xml.ws.Service");
+                setAttributes("serviceSuperclass", simpleServiceName);
+                if (!simpleServiceName.equals(serviceSuperclass)) {
+                    js.addImport(serviceSuperclass);
                 }
                 setAttributes("wsdlUrl", url);
                 setCommonAttributes();
-                
-                if (isJaxws22()) {
+
+                String target = (String)env.get("service.target");
+                setAttributes("service-target", target);
+                if ("jaxws22".equals(target)) {
                     setAttributes("jaxws22", true);
                 }
     
@@ -159,10 +162,6 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
         }
     }
     
-    public boolean isJaxws22() {
-        return Service.class.getDeclaredConstructors().length == 2;
-    }
-
     public void register(final ClassCollector collector, String packageName, String fileName) {
         collector.addServiceClassName(packageName , fileName , packageName + "." + fileName);
     }

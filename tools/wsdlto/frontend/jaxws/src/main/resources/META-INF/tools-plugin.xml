@@ -44,7 +44,21 @@ under the License.
            <generator name="ImplGenerator"/>
            <generator name="SEIGenerator"/>
            <generator name="ServerGenerator"/>
-           <generator name="JAXWS21ServiceGenerator"/>
+           <generator name="ServiceGenerator"/>
        </generators>
+    </frontend>
+    <frontend name="cxf" package="org.apache.cxf.tools.wsdlto.frontend.jaxws" profile="JAXWSProfile">
+	   <container name="CXFJAXWSContainer" toolspec="jaxws-toolspec.xml"/>
+	   <processor name="WSDLToJavaProcessor" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.processor"/>
+	   <builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
+	   <generators package="org.apache.cxf.tools.wsdlto.frontend.jaxws.generators">
+	       <generator name="AntGenerator"/>
+	       <generator name="ClientGenerator"/>
+	       <generator name="FaultGenerator"/>
+	       <generator name="ImplGenerator"/>
+	       <generator name="SEIGenerator"/>
+	       <generator name="ServerGenerator"/>
+	       <generator name="ServiceGenerator"/>
+	   </generators>
     </frontend>
 </plugin>

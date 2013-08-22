@@ -119,23 +119,34 @@ public class ServiceImpl extends ServiceDelegate {
     private WebServiceFeature serviceFeatures[];
 
     public ServiceImpl(Bus b, URL url, QName name, Class<?> cls, WebServiceFeature ... f) {
-        bus = b;
-        this.serviceName = name;
         clazz = cls;
-        serviceFeatures = f;
+        this.serviceName = name;
         
-        handlerResolver = new HandlerResolverImpl(bus, name, clazz);
+        //If the class is a CXFService, then it will call initialize directly later
+        //when the bus is determined
+        if (cls == null || !CXFService.class.isAssignableFrom(cls)) {
+            initialize(b, url, f);
+        }
+    }
+    
+    void initialize(Bus b, URL url, WebServiceFeature ... f) {
+        if (b == null) {
+            b = BusFactory.getThreadDefaultBus(true);
+        }
+        serviceFeatures = f;
+        bus = b;
+        handlerResolver = new HandlerResolverImpl(bus, serviceName, clazz);
         
         if (null == url && null != bus) {
             ServiceContractResolverRegistry registry = 
                 bus.getExtension(ServiceContractResolverRegistry.class);
             if (null != registry) {
-                URI uri = registry.getContractLocation(name);
+                URI uri = registry.getContractLocation(serviceName);
                 if (null != uri) {
                     try {
                         url = uri.toURL();
                     } catch (MalformedURLException e) {
-                        LOG.log(Level.FINE, "resolve qname failed", name);
+                        LOG.log(Level.FINE, "resolve qname failed", serviceName);
                         throw new WebServiceException(e);
                     }
                 }

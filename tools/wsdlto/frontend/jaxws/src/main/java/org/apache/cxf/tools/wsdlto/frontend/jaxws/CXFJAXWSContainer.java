@@ -17,13 +17,23 @@
  * under the License.
  */
 
-package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
+package org.apache.cxf.tools.wsdlto.frontend.jaxws;
+
+
+import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
 /**
  * 
  */
-public class JAXWS21ServiceGenerator extends ServiceGenerator {
-    public boolean isJaxws22() {
-        return false;
+public class CXFJAXWSContainer extends JAXWSContainer {
+    public CXFJAXWSContainer(ToolSpec toolspec) throws Exception {
+        super(toolspec);
+    }
+    public String getServiceSuperclass() {
+        return "org.apache.cxf.jaxws.CXFService";
+    }
+
+    public String getServiceTarget() {
+        return "cxf";
     }
 }

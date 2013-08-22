@@ -47,6 +47,7 @@
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
+                                <frontEnd>cxf</frontEnd>
                              </defaultOptions>
 
                             <wsdlOptions>

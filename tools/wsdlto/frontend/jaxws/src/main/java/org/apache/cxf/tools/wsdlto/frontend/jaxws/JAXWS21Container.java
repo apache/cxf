@@ -31,6 +31,9 @@ public class JAXWS21Container extends JAXWSContainer {
     public JAXWS21Container(ToolSpec toolspec) throws Exception {
         super(toolspec);
     }
+    public String getServiceTarget() {
+        return "jaxws21";
+    }
     public void validate(ToolContext env) throws ToolException {
         super.validate(env);
         Object o = env.get(ToolConstants.CFG_XJC_ARGS);

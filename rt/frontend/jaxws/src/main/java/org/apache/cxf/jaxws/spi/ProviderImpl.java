@@ -96,21 +96,19 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     @Override
     public ServiceDelegate createServiceDelegate(URL url, QName qname,
                                                  @SuppressWarnings("rawtypes") Class cls) {
-        Bus bus = BusFactory.getThreadDefaultBus();
-        return new ServiceImpl(bus, url, qname, cls);
+        return new ServiceImpl(null, url, qname, cls);
     }
     //new in 2.2
     public ServiceDelegate createServiceDelegate(URL wsdlDocumentLocation,
                                                  QName serviceName,
                                                  @SuppressWarnings("rawtypes") Class serviceClass,
                                                  WebServiceFeature ... features) {
-        Bus bus = BusFactory.getThreadDefaultBus();
         for (WebServiceFeature f : features) {
             if (!f.getClass().getName().startsWith("javax.xml.ws")) {
                 throw new WebServiceException("Unknown feature error: " + f.getClass().getName());
             }
         }
-        return new ServiceImpl(bus, wsdlDocumentLocation,
+        return new ServiceImpl(null, wsdlDocumentLocation,
                                serviceName, serviceClass, features);
         
     }

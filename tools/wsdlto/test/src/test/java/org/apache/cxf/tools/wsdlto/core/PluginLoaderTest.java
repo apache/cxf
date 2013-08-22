@@ -41,7 +41,7 @@ public class PluginLoaderTest extends Assert {
         
         Map<String, FrontEnd> frontends = loader.getFrontEnds();
         assertNotNull(frontends);
-        assertEquals(2, frontends.size());
+        assertEquals(3, frontends.size());
 
         FrontEnd frontend = getFrontEnd(frontends, 0);
         assertEquals("jaxws", frontend.getName());

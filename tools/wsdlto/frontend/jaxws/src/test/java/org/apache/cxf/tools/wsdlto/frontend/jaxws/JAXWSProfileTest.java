@@ -19,8 +19,10 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws;
 
+import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.tools.common.FrontEndGenerator;
 import org.apache.cxf.tools.common.Processor;
 import org.apache.cxf.tools.plugin.FrontEnd;
 import org.apache.cxf.tools.plugin.Generator;
@@ -28,8 +30,11 @@ import org.apache.cxf.tools.plugin.Plugin;
 import org.apache.cxf.tools.wsdlto.core.AbstractWSDLBuilder;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.AntGenerator;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.ImplGenerator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,7 +62,7 @@ public class JAXWSProfileTest extends Assert {
 
         Map<String, FrontEnd> frontends = loader.getFrontEnds();
         assertNotNull(frontends);
-        assertEquals(2, frontends.size());
+        assertEquals(3, frontends.size());
 
         FrontEnd frontend = getFrontEnd(frontends, 0);
         assertEquals("jaxws", frontend.getName());
@@ -71,13 +76,11 @@ public class JAXWSProfileTest extends Assert {
 
         FrontEndProfile profile = loader.getFrontEndProfile("jaxws");
         assertNotNull(profile);
-        //TODO: After generator completed ,umcomment these linses
-        /*List<FrontEndGenerator> generators = profile.getGenerators();
+        List<FrontEndGenerator> generators = profile.getGenerators();
         assertNotNull(generators);
         assertEquals(2, generators.size());
         assertTrue(generators.get(0) instanceof AntGenerator);
         assertTrue(generators.get(1) instanceof ImplGenerator);
-        */
         Processor processor = profile.getProcessor();
         assertNotNull(processor);
         assertTrue(processor instanceof WSDLToJavaProcessor);
