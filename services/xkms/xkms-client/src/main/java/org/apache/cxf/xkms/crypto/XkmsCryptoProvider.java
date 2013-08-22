@@ -66,6 +66,23 @@ public class XkmsCryptoProvider extends CryptoBase {
         this.xkmsClientCache = xkmsClientCache;
     }
     
+    public XkmsCryptoProvider(XKMSInvoker xkmsInvoker) {
+        this(xkmsInvoker, null);
+    }
+    
+    public XkmsCryptoProvider(XKMSInvoker xkmsInvoker, Crypto defaultCrypto) {
+        this(xkmsInvoker, defaultCrypto, new EHCacheXKMSClientCache());
+    }
+    
+    public XkmsCryptoProvider(XKMSInvoker xkmsInvoker, Crypto defaultCrypto, XKMSClientCache xkmsClientCache) {
+        if (xkmsInvoker == null) {
+            throw new IllegalArgumentException("xkmsInvoker may not be null");
+        }
+        this.xkmsInvoker = xkmsInvoker;
+        this.defaultCrypto = defaultCrypto;
+        this.xkmsClientCache = xkmsClientCache;
+    }
+    
     @Override
     public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException {
         if (LOG.isLoggable(Level.INFO)) {

@@ -44,6 +44,7 @@
     </cxf:bus>
     
     <!-- Begin Symmetric -->
+    <!--
     <jaxws:client id="xkmsClient"
         serviceClass="org.w3._2002._03.xkms_wsdl.XKMSPortType"
         name="{http://www.w3.org/2002/03/xkms#wsdl}XKMSPort" 
@@ -61,10 +62,19 @@
             </entry>
         </jaxws:properties>
     </jaxws:client>
+    -->
+    
+    <bean id="xkmsInvoker" class="org.apache.cxf.xkms.client.XKMSInvoker">
+        <constructor-arg>
+            <value>https://localhost:${testutil.ports.XKMSServer}/XKMS</value>
+        </constructor-arg>
+        <constructor-arg ref="cxf"/>
+    </bean>
     
     <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.XkmsCryptoProvider">
         <constructor-arg>
-            <ref bean="xkmsClient" />
+            <!-- <ref bean="xkmsClient" /> -->
+            <ref bean="xkmsInvoker" />
         </constructor-arg>
     </bean>
     
@@ -88,7 +98,8 @@
     
     <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.XkmsCryptoProvider">
         <constructor-arg>
-            <ref bean="xkmsClient" />
+            <!-- <ref bean="xkmsClient" /> -->
+            <ref bean="xkmsInvoker" />
         </constructor-arg>
         <constructor-arg>
              <ref bean="crypto" />
