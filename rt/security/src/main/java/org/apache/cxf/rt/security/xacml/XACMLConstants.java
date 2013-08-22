@@ -79,8 +79,8 @@ public final class XACMLConstants {
         "urn:cxf:apache:org:wsdl:operation-id";
     public static final String RESOURCE_WSDL_SERVICE_ID = 
         "urn:cxf:apache:org:wsdl:service-id";
-    public static final String RESOURCE_WSDL_URI_ID = 
-        "urn:cxf:apache:org:wsdl:resource-id";
+    public static final String RESOURCE_WSDL_ENDPOINT = 
+        "urn:cxf:apache:org:wsdl:endpoint";
 
     public static final String RESOURCE_FILE_NAME = 
         "urn:oasis:names:tc:xacml:1.0:resource:simple-file-name";

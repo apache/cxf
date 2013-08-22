@@ -121,10 +121,10 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_OPERATION_ID, XACMLConstants.XS_STRING, null,
                                            wsdlOperation.toString()));
             
-            // Resource URI
-            String resourceURI = messageParser.getResourceURI(sendFullRequestURL);
-            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_URI_ID, XACMLConstants.XS_STRING, null,
-                                           resourceURI));
+            // WSDL Endpoint
+            String endpointURI = messageParser.getResourceURI(sendFullRequestURL);
+            attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_ENDPOINT, XACMLConstants.XS_STRING, null,
+                                           endpointURI));
         }
         
         return RequestComponentBuilder.createResourceType(attributes, null);

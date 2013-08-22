@@ -174,7 +174,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
             } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeID())
                 && operation.equals(attributeValue)) {
                 soapOperationSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_URI_ID.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_ENDPOINT.equals(attribute.getAttributeID())
                 && resourceURL.equals(attributeValue)) {
                 resourceURISatisfied = true;
             }
@@ -230,7 +230,7 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
             } else if (XACMLConstants.RESOURCE_WSDL_OPERATION_ID.equals(attribute.getAttributeID())
                 && operation.equals(attributeValue)) {
                 soapOperationSatisfied = true;
-            } else if (XACMLConstants.RESOURCE_WSDL_URI_ID.equals(attribute.getAttributeID())
+            } else if (XACMLConstants.RESOURCE_WSDL_ENDPOINT.equals(attribute.getAttributeID())
                 && resourceURL.equals(attributeValue)) {
                 resourceURISatisfied = true;
             }
