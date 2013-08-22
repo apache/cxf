@@ -162,9 +162,6 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xjb</bindingFile>
-                                    <extensionArgs>
-                                         <extensionArg>-Xwsdlextension</extensionArg>
-                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
@@ -176,7 +173,6 @@
                 <configuration>
                      <extensions>
                          <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
-                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-wsdlextension:${cxf.xjc-utils.version}</extension>
                      </extensions>
                  </configuration>
             </plugin>
