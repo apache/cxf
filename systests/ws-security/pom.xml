@@ -211,6 +211,22 @@
              <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.cxf.services.xkms</groupId>
+            <artifactId>cxf-services-xkms-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.xkms</groupId>
+            <artifactId>cxf-services-xkms-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.xkms</groupId>
+            <artifactId>cxf-services-xkms-x509-handlers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
     <profiles>
         <profile>
