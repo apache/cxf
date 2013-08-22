@@ -31,7 +31,10 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.xkms.exception.ExceptionMapper;
 import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.exception.XKMSLocateException;
@@ -53,6 +56,7 @@ import org.apache.cxf.xkms.model.xmldsig.X509DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
+import org.w3._2002._03.xkms_wsdl.XKMSService;
 
 public class XKMSInvoker {
     private static final Logger LOG = LoggerFactory.getLogger(XKMSInvoker.class);
@@ -71,7 +75,22 @@ public class XKMSInvoker {
     public XKMSInvoker(XKMSPortType xkmsConsumer) {
         this.xkmsConsumer = xkmsConsumer;
     }
-
+    
+    public XKMSInvoker(String endpointAddress, Bus bus) {
+        
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        XKMSService xkmsService = new XKMSService();
+        xkmsConsumer = xkmsService.getPort(XKMSPortType.class);
+        
+        if (endpointAddress != null && !"".equals(endpointAddress)) {
+            ((BindingProvider)xkmsConsumer).getRequestContext().put(
+                BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress
+            );
+        }
+    }
+    
     public X509Certificate getServiceCertificate(QName serviceName) {
         return getCertificateForId(Applications.SERVICE_SOAP, serviceName.toString());
     }
@@ -245,5 +264,5 @@ public class XKMSInvoker {
         request.setService(XKMSConstants.XKMS_ENDPOINT_NAME);
         request.setId(UUID.randomUUID().toString());
     }
-
+    
 }
