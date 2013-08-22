@@ -21,16 +21,13 @@ package org.apache.cxf.transport.jms;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.springframework.beans.factory.annotation.Required;
@@ -53,8 +50,6 @@ public class JMSConfigFeature extends AbstractFeature {
         if (!(conduit instanceof JMSConduit)) {
             throw new ConfigurationException(new Message("JMSCONFIGFEATURE_ONLY_JMS", LOG));
         }
-        Endpoint ep = client.getEndpoint();
-        changeTransportUriToJms(ep);
         JMSConduit jmsConduit = (JMSConduit)conduit;
         jmsConduit.setJmsConfig(jmsConfig);
         super.initialize(client, bus);
@@ -67,25 +62,9 @@ public class JMSConfigFeature extends AbstractFeature {
         if (!(destination instanceof JMSDestination)) {
             throw new ConfigurationException(new Message("JMSCONFIGFEATURE_ONLY_JMS", LOG));
         }
-        Endpoint ep = server.getEndpoint();
-        changeTransportUriToJms(ep);
         JMSDestination jmsDestination = (JMSDestination)destination;
         jmsDestination.setJmsConfig(jmsConfig);
         super.initialize(server, bus);
-    }
-
-    private void changeTransportUriToJms(Endpoint ep) {
-        if (ep.getBinding() == null) {
-            return;
-        }
-        if (ep.getBinding().getBindingInfo() == null) {
-            return;
-        }
-        BindingInfo bindingInfo = ep.getBinding().getBindingInfo();
-        if (bindingInfo instanceof SoapBindingInfo) {
-            SoapBindingInfo soapBindingInfo = (SoapBindingInfo) bindingInfo;
-            soapBindingInfo.setTransportURI("http://schemas.xmlsoap.org/soap/jms");
-        }
     }
 
     public JMSConfiguration getJmsConfig() {
