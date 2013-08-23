@@ -569,7 +569,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         }
         // Create element in xsd:sequence for Exception.class
-        if (cls.equals(Exception.class)) {
+        if (Exception.class.isAssignableFrom(cls)) {
             JAXBBeanInfo beanInfo = getBeanInfo(java.lang.String.class);
             XmlSchemaElement exEle = new XmlSchemaElement(schema, false);
             exEle.setName("message");
