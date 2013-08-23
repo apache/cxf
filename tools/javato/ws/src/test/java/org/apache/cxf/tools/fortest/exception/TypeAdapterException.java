@@ -18,35 +18,17 @@
  */
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-@javax.xml.ws.WebFault
-@XmlType(namespace = "http://cxf.apache.org/test/HelloService",
-         name = "MyException", 
-         propOrder = { "summary", "from", "id", "message" })
-public class MyException extends SuperException {
-    private static final long serialVersionUID = 8575109064272599936L;
-    private String summary;
-    private String from;
-
-    public MyException(String message) {
-        super(message);
+public class TypeAdapterException extends Exception {
+    private MyClass1 adapted;
+    
+    @XmlJavaTypeAdapter(Cl1ToCl2Adapter.class)
+    public MyClass1 getAdapted() {
+        return this.adapted;
     }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
+    
+    public void setAdapted(MyClass1 adapted) {
+        this.adapted = adapted;
     }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
 }
