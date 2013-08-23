@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
 @javax.xml.ws.WebFault
 @XmlType(namespace = "http://cxf.apache.org/test/HelloService",
          name = "MyException", 
-         propOrder = { "summary", "from", "id" })
+         propOrder = { "summary", "from", "id", "message" })
 public class MyException extends SuperException {
     private static final long serialVersionUID = 8575109064272599936L;
     private String summary;

@@ -707,6 +707,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     @Test
     public void testPropOrderInException() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_prop_order.wsdl");
+        //env.put(ToolConstants.CFG_OUTPUTFILE, "/x1/tmp/exception_prop_order.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.EchoImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         try {
