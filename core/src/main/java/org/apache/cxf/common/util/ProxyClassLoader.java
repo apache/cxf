@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.client;
+package org.apache.cxf.common.util;
 
 import java.net.URL;
 import java.util.HashSet;

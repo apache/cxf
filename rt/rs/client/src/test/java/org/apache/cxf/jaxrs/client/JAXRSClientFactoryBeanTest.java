@@ -27,6 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Fault;
@@ -41,7 +42,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.http.HTTPConduit;
-
 import org.junit.Assert;
 import org.junit.Test;
 

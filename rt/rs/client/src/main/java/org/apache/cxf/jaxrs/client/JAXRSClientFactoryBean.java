@@ -66,8 +66,9 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     /**
-     * Sets the custom class loader to be used 
-     * for creating proxies 
+     * Sets the custom class loader to be used for creating proxies.
+     * By default the class loader of the given serviceClass will be used.
+     * 
      * @param loader
      */
     public void setClassLoader(ClassLoader loader) {
@@ -306,25 +307,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             }
             initClient(proxyImpl, ep, actualState == null);    
             
-            Client actualClient = null;
-            try {
-                ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() 
-                                                            : proxyLoader;
-                actualClient = (Client)ProxyHelper.getProxy(theLoader,
-                                        new Class[]{cri.getServiceClass(), 
-                                                    Client.class, 
-                                                    InvocationHandlerAware.class}, 
-                                        proxyImpl);
-            } catch (Exception ex) {
-                actualClient = (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
-                                                    new Class[]{cri.getServiceClass(), 
-                                                                Client.class, 
-                                                                InvocationHandlerAware.class}, 
-                                     proxyImpl);
-            }
+            ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() : proxyLoader;
+            Class<?>[] ifaces = new Class[]{cri.getServiceClass(), Client.class, InvocationHandlerAware.class};
+            Client actualClient = (Client)ProxyHelper.getProxy(theLoader, ifaces, proxyImpl);
             notifyLifecycleManager(actualClient);
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, actualClient, ep);
-            
             return actualClient;
         } catch (IllegalArgumentException ex) {
             String message = ex.getLocalizedMessage();
@@ -341,9 +328,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             throw new RuntimeException(ex);
         }
         
-        
     }
-    
+
     protected ConduitSelector getConduitSelector(Endpoint ep) {
         ConduitSelector cs = getConduitSelector();
         if (cs == null) {
