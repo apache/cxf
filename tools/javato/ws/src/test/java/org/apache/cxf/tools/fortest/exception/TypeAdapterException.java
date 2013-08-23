@@ -21,6 +21,8 @@ package org.apache.cxf.tools.fortest.exception;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class TypeAdapterException extends Exception {
+    private static final long serialVersionUID = 1L;
+    
     private MyClass1 adapted;
     
     @XmlJavaTypeAdapter(Cl1ToCl2Adapter.class)
