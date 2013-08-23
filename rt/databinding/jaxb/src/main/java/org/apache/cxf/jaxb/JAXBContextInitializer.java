@@ -339,6 +339,14 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             Field fields[] = ReflectionUtil.getDeclaredFields(cls); 
             for (Field f : fields) {
                 if (isFieldAccepted(f, accessType)) {
+                    XmlJavaTypeAdapter xjta = Utils.getFieldXJTA(f);
+                    if (xjta != null) {
+                        Type t = Utils.getTypeFromXmlAdapter(xjta);
+                        if (t != null) {
+                            addType(t);
+                            continue;
+                        }
+                    }
                     addType(f.getGenericType());
                 }
             }
@@ -349,6 +357,14 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             Method methods[] = ReflectionUtil.getDeclaredMethods(cls); 
             for (Method m : methods) {
                 if (isMethodAccepted(m, accessType)) {
+                    XmlJavaTypeAdapter xjta = Utils.getMethodXJTA(m);
+                    if (xjta != null) {
+                        Type t = Utils.getTypeFromXmlAdapter(xjta);
+                        if (t != null) {
+                            addType(t);
+                            continue;
+                        }
+                    }
                     addType(m.getGenericReturnType());
                     for (Type t : m.getGenericParameterTypes()) {
                         addType(t);

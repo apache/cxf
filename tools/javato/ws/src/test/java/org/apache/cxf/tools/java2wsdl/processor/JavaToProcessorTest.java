@@ -798,6 +798,28 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
     }
     
+    @Test
+    public void testExceptionTypeAdapter() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception-type-adapter.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.TypeAdapterEcho");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        File wsdlFile = new File(output, "exception-type-adapter.wsdl");
+        assertTrue(wsdlFile.exists());
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        int class2Element = wsdlContent.indexOf("<xs:complexType name=\"myClass2\">");
+        assertTrue(class2Element > -1);
+        int refElement = wsdlContent.indexOf("<xs:element name=\"adapted\" nillable=\"true\" type=\"tns:myClass2\"/>");
+        assertTrue(refElement > -1);
+
+    }
+    
     
     @Test
     public void testCXF4877() throws Exception {
