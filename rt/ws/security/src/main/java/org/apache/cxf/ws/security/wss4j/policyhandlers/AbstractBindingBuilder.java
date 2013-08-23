@@ -81,8 +81,8 @@ import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -1635,7 +1635,7 @@ public abstract class AbstractBindingBuilder {
         
         CallbackHandler callbackHandler = getCallbackHandler();
         if (callbackHandler != null) {
-            return new StrongJasyptPasswordEncryptor(callbackHandler);
+            return new JasyptPasswordEncryptor(callbackHandler);
         }
         
         return null;
