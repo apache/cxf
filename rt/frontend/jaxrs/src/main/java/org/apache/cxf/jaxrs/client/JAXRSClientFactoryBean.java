@@ -307,22 +307,9 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             }
             initClient(proxyImpl, ep, actualState == null);    
             
-            Client actualClient = null;
-            try {
-                ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() 
-                                                            : proxyLoader;
-                actualClient = (Client)ProxyHelper.getProxy(theLoader,
-                                        new Class[]{cri.getServiceClass(), 
-                                                    Client.class, 
-                                                    InvocationHandlerAware.class}, 
-                                        proxyImpl);
-            } catch (Exception ex) {
-                actualClient = (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
-                                                    new Class[]{cri.getServiceClass(), 
-                                                                Client.class, 
-                                                                InvocationHandlerAware.class}, 
-                                     proxyImpl);
-            }
+            ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() : proxyLoader;
+            Class<?>[] ifaces = new Class[]{cri.getServiceClass(), Client.class, InvocationHandlerAware.class};
+            Client actualClient = (Client)ProxyHelper.getProxy(theLoader, ifaces, proxyImpl);
 
             notifyLifecycleManager(actualClient);
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, actualClient, ep);

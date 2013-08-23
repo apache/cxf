@@ -42,10 +42,44 @@ public class ProxyHelper {
     }
     
     protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
-        return Proxy.newProxyInstance(loader, interfaces, handler);
+        ClassLoader combinedLoader = getClassLoaderForInterfaces(loader, interfaces);
+        return Proxy.newProxyInstance(combinedLoader, interfaces, handler);
     }
-    
-    
+
+    /**
+     * Return a classloader that can see all the given interfaces If the given loader can see all interfaces
+     * then it is used. If not then a combined classloader of all interface classloaders is returned.
+     * 
+     * @param loader use supplied class loader
+     * @param interfaces
+     * @return classloader that sees all interfaces
+     */
+    private ClassLoader getClassLoaderForInterfaces(ClassLoader loader, Class<?>[] interfaces) {
+        if (canSeeAllInterfaces(loader, interfaces)) {
+            return loader;
+        }
+        ProxyClassLoader combined = new ProxyClassLoader();
+        for (Class<?> currentInterface : interfaces) {
+            combined.addLoader(currentInterface.getClassLoader());
+        }
+        return combined;
+    }
+
+    private boolean canSeeAllInterfaces(ClassLoader loader, Class<?>[] interfaces) {
+        for (Class<?> currentInterface : interfaces) {
+            String ifName = currentInterface.getName();
+            try {
+                Class<?> ifClass = Class.forName(ifName, false, loader);
+                if (ifClass != currentInterface) {
+                    return false;
+                }
+            } catch (ClassNotFoundException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static Object getProxy(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
         return HELPER.getProxyInternal(loader, interfaces, handler);
     }
