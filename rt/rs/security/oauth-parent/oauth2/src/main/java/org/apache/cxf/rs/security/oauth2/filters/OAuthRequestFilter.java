@@ -183,10 +183,6 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         return isValid;
     }
     
-    public boolean isAudienceIsEndpointAddress() {
-        return audienceIsEndpointAddress;
-    }
-
     public void setAudienceIsEndpointAddress(boolean audienceIsEndpointAddress) {
         this.audienceIsEndpointAddress = audienceIsEndpointAddress;
     }
