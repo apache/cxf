@@ -71,7 +71,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         return doCreateAccessToken(client, 
                                    grant.getSubject(), 
                                    grant.getApprovedScopes(),
-                                   params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
+                                   grant.getAudience());
     }
     
     

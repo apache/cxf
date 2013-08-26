@@ -123,6 +123,10 @@ public final class OAuthUtils {
             && issuedAt + lifetime < System.currentTimeMillis() / 1000;
     }
     
+    public static boolean validateAudience(String audience, List<String> audiences) {
+        return audience == null || !audiences.isEmpty() && audiences.contains(audience);
+    }
+    
     public static boolean checkRequestURI(String servletPath, String uri) {
         boolean wildcard = uri.endsWith("*");
         String theURI = wildcard ? uri.substring(0, uri.length() - 1) : uri;

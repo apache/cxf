@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -50,6 +51,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthRequestFilter.class);
     
     private boolean useUserSubject;
+    private boolean audienceIsEndpointAddress;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         
@@ -165,6 +167,27 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         // will be blocked by this filter unless CORS filter has done the initial validation
         // and set a message "local_preflight" property to true
         return MessageUtils.isTrue(m.get("local_preflight"));
+    }
+
+    protected boolean validateAudience(String audience) {
+        if (audience == null) {
+            return true;
+        }
+        
+        boolean isValid = super.validateAudience(audience);
+        if (isValid && audienceIsEndpointAddress) {
+            String requestPath = (String)PhaseInterceptorChain.getCurrentMessage().get(Message.REQUEST_URL);
+            isValid = requestPath.startsWith(audience);
+        }
+        return isValid;
+    }
+    
+    public boolean isAudienceIsEndpointAddress() {
+        return audienceIsEndpointAddress;
+    }
+
+    public void setAudienceIsEndpointAddress(boolean audienceIsEndpointAddress) {
+        this.audienceIsEndpointAddress = audienceIsEndpointAddress;
     }
     
 }

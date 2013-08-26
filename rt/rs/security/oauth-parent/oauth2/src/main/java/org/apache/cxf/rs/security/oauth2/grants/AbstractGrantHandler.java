@@ -134,6 +134,10 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                        partialMatchScopeValidation)) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));     
         }
+        if (!OAuthUtils.validateAudience(audience, client.getRegisteredAudiences())) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_GRANT));
+        }
+        
         // Check if a pre-authorized  token available
         ServerAccessToken token = dataProvider.getPreauthorizedToken(
                                      client, requestedScope, subject, requestedGrant);

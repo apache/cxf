@@ -50,7 +50,7 @@ public class OAuthAuthorizationData implements Serializable {
     private List<Property> extraApplicationProperties = new LinkedList<Property>();
     
     private List<? extends Permission> permissions;
-    
+    private String audience;
     
     public OAuthAuthorizationData() {
     }
@@ -251,6 +251,14 @@ public class OAuthAuthorizationData implements Serializable {
 
     public void setEndUserName(String endUserName) {
         this.endUserName = endUserName;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
 
 }

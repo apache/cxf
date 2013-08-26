@@ -68,6 +68,7 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             reg.setSubject(userSubject);
             reg.setRequestedScope(requestedScope);        
             reg.setApprovedScope(approvedScope);
+            reg.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
             token = getDataProvider().createAccessToken(reg);
         } else {
             token = preAuthorizedToken;
