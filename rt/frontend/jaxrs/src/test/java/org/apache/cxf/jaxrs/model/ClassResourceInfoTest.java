@@ -94,6 +94,24 @@ public class ClassResourceInfoTest extends Assert {
         }
     }
     
+    @Produces("test/foo")
+    static class TestClassWithProduces extends TestClass1 {
+        @GET
+        public void getIt() { 
+            
+        }
+      
+        @Path("/same")
+        public TestClassWithProduces getThis() { 
+            return this;
+        }
+        
+        @Path("sub")
+        public TestClass3 getTestClass3() { 
+            return new TestClass3();
+        }
+    }
+    
     static class TestClass3 {
         @Resource HttpServletRequest req;
         @Resource HttpServletResponse res;
@@ -217,6 +235,16 @@ public class ClassResourceInfoTest extends Assert {
         sub = c.getSubResource(TestClass2.class, TestClass2.class);
         assertNotNull(sub);
         assertEquals("test/bar", sub.getProduceMime().get(0).toString());
+    }
+    
+    @Test
+    public void testSubresourceWithProduces() {
+        ClassResourceInfo parent = ResourceUtils.createClassResourceInfo(
+                                  TestClass2.class, TestClass2.class, true, true);
+        ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
+                                  TestClassWithProduces.class, TestClassWithProduces.class, true, true);
+        c.setParent(parent);
+        assertEquals("test/foo", c.getProduceMime().get(0).toString());
     }
     
     @Test

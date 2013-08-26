@@ -240,24 +240,24 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public List<MediaType> getProduceMime() {
-        if (parent == null) {
-            if (producesTypes != null) {
-                return JAXRSUtils.parseMediaTypes(producesTypes);
-            }
-            return JAXRSUtils.getProduceTypes(
-                 AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class));
+        if (producesTypes != null) {
+            return JAXRSUtils.parseMediaTypes(producesTypes);
+        }
+        Produces produces = AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class);
+        if (produces != null || parent == null) {
+            return JAXRSUtils.getProduceTypes(produces);
         } else {
             return parent.getProduceMime();
         }
     }
     
     public List<MediaType> getConsumeMime() {
-        if (parent == null) {
-            if (consumesTypes != null) {
-                return JAXRSUtils.parseMediaTypes(consumesTypes);
-            }
-            return JAXRSUtils.getConsumeTypes(
-                 AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class));
+        if (consumesTypes != null) {
+            return JAXRSUtils.parseMediaTypes(consumesTypes);
+        }
+        Consumes consumes = AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class);
+        if (consumes != null || parent == null) {
+            return JAXRSUtils.getConsumeTypes(consumes);
         } else {
             return parent.getConsumeMime();
         }
