@@ -20,7 +20,6 @@
 package demo.wssec.server;
 
 import java.net.URL;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +28,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
@@ -41,16 +41,8 @@ public class Server {
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
-        Endpoint.publish(address, implementor);
-    }
-
-    public static void main(String args[]) throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Server.class.getResource("/wssec.xml");
-        Bus bus = bf.createBus(busFile.toString());
-
-
+        EndpointImpl impl = (EndpointImpl)Endpoint.publish(address, implementor);
+        
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "UsernameToken Timestamp");
 
@@ -58,14 +50,21 @@ public class Server {
         outProps.put("user", "Alice");
         outProps.put("passwordCallbackClass", "demo.wssec.server.UTPasswordCallback");
 
-        bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
+        impl.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
         Map<String, Object> inProps = new HashMap<String, Object>();
         inProps.put("action", "UsernameToken Timestamp");
         inProps.put("passwordType", "PasswordDigest");
         inProps.put("passwordCallbackClass", "demo.wssec.server.UTPasswordCallback");
 
-        bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
+        impl.getInInterceptors().add(new WSS4JInInterceptor(inProps));
+    }
+
+    public static void main(String args[]) throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = Server.class.getResource("/wssec.xml");
+        Bus bus = bf.createBus(busFile.toString());
 
         BusFactory.setDefaultBus(bus);
 
