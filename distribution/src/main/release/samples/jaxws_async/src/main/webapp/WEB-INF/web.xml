@@ -24,9 +24,9 @@
     <display-name>cxf</display-name>
 
     <servlet>
-        <servlet-name>cxf</servlet-name>
-        <display-name>cxf</display-name>
         <description>Apache CXF Endpoint</description>
+        <display-name>cxf</display-name>
+        <servlet-name>cxf</servlet-name>
         <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
         <async-supported>true</async-supported>
