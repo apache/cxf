@@ -53,6 +53,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${wsdl.file}</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>

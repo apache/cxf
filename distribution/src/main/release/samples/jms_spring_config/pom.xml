@@ -93,6 +93,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${wsdl.dir}/CustomerService.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
                                     <bindingFiles>
                                         <bindingFile>${wsdl.dir}/binding.xml</bindingFile>
                                     </bindingFiles>
