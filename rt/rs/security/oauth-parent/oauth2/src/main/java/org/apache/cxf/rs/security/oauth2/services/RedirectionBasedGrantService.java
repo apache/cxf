@@ -117,7 +117,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
         
         // Enforce the client confidentiality requirements
-        if (!OAuthUtils.isGrantSupportedForClient(client, !canSupportPublicClient(client), supportedGrantType)) {
+        if (!OAuthUtils.isGrantSupportedForClient(client, canSupportPublicClient(client), supportedGrantType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
         
