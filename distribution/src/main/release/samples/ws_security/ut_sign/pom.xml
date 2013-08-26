@@ -66,6 +66,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/wsdl/hello_world_wssec.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>

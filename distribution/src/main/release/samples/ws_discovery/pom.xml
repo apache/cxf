@@ -86,6 +86,7 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <frontEnd>jaxws21</frontEnd>
                                     <wsdl>src/main/resources/org/apache/cxf/hello_world/discovery/hello_world.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>

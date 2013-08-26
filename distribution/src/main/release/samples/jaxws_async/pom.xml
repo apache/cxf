@@ -56,6 +56,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/wsdl/hello_world_async.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
                                     <extraargs>
                                         <extraarg>-b</extraarg>
                                         <extraarg>${basedir}/wsdl/async_binding.xml</extraarg>
