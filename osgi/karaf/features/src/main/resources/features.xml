@@ -81,6 +81,7 @@
         <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-ws-security-dom/${cxf.wss4j.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-policy/${cxf.wss4j.version}</bundle>
         <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-ws-security-stax/${cxf.wss4j.version}</bundle>
+        <bundle start-level='30'>mvn:org.apache.wss4j/wss4j-ws-security-policy-stax/${cxf.wss4j.version}</bundle>
     </feature>
 
     <feature name="cxf-core" version="${project.version}" resolver='(obr)'>
@@ -359,7 +360,7 @@
 
 
         <feature version="${project.version}">cxf-xjc-runtime</feature>
-        <!--feature version="${project.version}">cxf-ws-security</feature-->
+        <feature version="${project.version}">cxf-ws-security</feature>
         <feature version="${project.version}">cxf-ws-rm</feature>
         <feature version="${project.version}">cxf-ws-mex</feature>
         <feature version="${project.version}">cxf-javascript</feature>
