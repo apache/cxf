@@ -45,8 +45,9 @@
 
 
 	<servlet>
+        <description>Apache CXF Endpoint</description>
+        <display-name>cxf</display-name>
 		<servlet-name>CXFServlet</servlet-name>
-		<display-name>CXF Servlet</display-name>
 		<servlet-class>
 			org.apache.cxf.transport.servlet.CXFServlet
 		</servlet-class>
