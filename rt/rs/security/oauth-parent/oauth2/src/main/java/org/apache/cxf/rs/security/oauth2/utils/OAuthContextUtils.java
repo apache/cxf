@@ -35,6 +35,16 @@ public final class OAuthContextUtils {
     
     /**
      * @param mc the {@link MessageContext}
+     * @return the id of the UserSubject of the logged in user or resource owner
+     * @throws WebApplicationException with Status 401 if not authenticated
+     */
+    public static String resolveUserId(final MessageContext mc) {
+        final OAuthContext oauth = getContext(mc);
+        return oauth.getSubject().getId();
+    }
+
+    /**
+     * @param mc the {@link MessageContext}
      * @return the name of the UserSubject of the logged in user or resource owner
      * @throws WebApplicationException with Status 401 if not authenticated
      */
