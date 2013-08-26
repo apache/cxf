@@ -28,9 +28,9 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
-
 import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
@@ -68,7 +68,6 @@ public final class Client {
                          + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
             outProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
-            bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
             Map<String, Object> inProps = new HashMap<String, Object>();
 
@@ -80,14 +79,16 @@ public final class Client {
             inProps.put("signatureKeyIdentifier", "DirectReference");
             inProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
-            bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
 
             // Check to make sure that the SOAP Body and Timestamp were signed
             DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
-            bus.getInInterceptors().add(coverageChecker);
 
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
+            org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
+            client.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
+            client.getInInterceptors().add(new WSS4JInInterceptor(inProps));
+            client.getInInterceptors().add(coverageChecker);
 
             String[] names = new String[] {"Anne", "Bill", "Chris", "Scott"};
             // make a sequence of 4 invocations
