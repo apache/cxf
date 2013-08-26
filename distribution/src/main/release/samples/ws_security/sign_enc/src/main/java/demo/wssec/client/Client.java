@@ -20,7 +20,6 @@
 package demo.wssec.client;
 
 import java.io.Closeable;
-
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,9 +28,9 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
-
 import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
@@ -81,7 +80,6 @@ public final class Client {
                          "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
             outProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
-            bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
             Map<String, Object> inProps = new HashMap<String, Object>();
 
@@ -99,7 +97,6 @@ public final class Client {
                          "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
             inProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
-            bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
 
             // Check to make sure that the SOAP Body and Timestamp were signed,
             // and that the SOAP Body was encrypted
@@ -107,10 +104,14 @@ public final class Client {
             coverageChecker.setSignBody(true);
             coverageChecker.setSignTimestamp(true);
             coverageChecker.setEncryptBody(true);
-            bus.getInInterceptors().add(coverageChecker);
 
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
+            org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
+            client.getInInterceptors().add(new WSS4JInInterceptor(inProps));
+            client.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
+            client.getInInterceptors().add(coverageChecker);
+            
 
             String[] names = new String[] {"Anne", "Bill", "Chris", "Sachin Tendulkar"};
             // make a sequence of 4 invocations
@@ -121,7 +122,7 @@ public final class Client {
             }
 
             // allow asynchronous resends to occur
-            Thread.sleep(30 * 1000);
+            Thread.sleep(10 * 1000);
 
             if (port instanceof Closeable) {
                 ((Closeable)port).close();
