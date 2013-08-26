@@ -239,7 +239,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
                 XPathConstants.STRING);
         List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
         if (!StringUtils.isEmpty(ss)) {
-            StringTokenizer st = new StringTokenizer(ss, "\n");
+            StringTokenizer st = new StringTokenizer(ss, Message.EXCEPTION_CAUSE_SUFFIX);
             while (st.hasMoreTokens()) {
                 String oneLine = st.nextToken();
                 if (oneLine.startsWith("Caused by:")) {
