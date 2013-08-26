@@ -50,7 +50,7 @@ public class SimpleBPNamespaceHandler implements NamespaceHandler {
         if ("server".equals(s)) {
             return new ServerFactoryBeanDefinitionParser().parse(element, context);
         } else if ("client".equals(s)) {
-            //TODO
+            return new ClientProxyFactoryBeanDefinitionParser().parse(element, context);
         }
         return null;
     }

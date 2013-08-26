@@ -19,7 +19,6 @@
 package org.apache.cxf.frontend;
 
 import java.io.Closeable;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.databinding.DataBinding;
@@ -122,9 +122,10 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
      */
     public synchronized Object create() {
         ClassLoaderHolder orig = null;
+        ClassLoader loader = null;
         try {
             if (getBus() != null) {
-                ClassLoader loader = getBus().getExtension(ClassLoader.class);
+                loader = getBus().getExtension(ClassLoader.class);
                 if (loader != null) {
                     orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
@@ -171,7 +172,9 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     
             Class<?> classes[] = getImplementingClasses();
             
-            Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(),
+            Object obj = ProxyHelper.getProxy(loader == null 
+                    ? clientFactoryBean.getServiceClass().getClassLoader()
+                        : loader,
                                                 classes,
                                                 handler);
     
