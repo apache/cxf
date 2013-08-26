@@ -75,39 +75,13 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             for (Object o : map.values()) {
                 Service service = (Service)o;
                 Map<?, ?> ports = service.getPorts();
+                adjustExtensibilityElements(service.getExtensibilityElements(), url, encodedUrl);
+                
                 for (Object p : ports.values()) {
                     Port port = (Port)p;
-                    List<?> l = port.getExtensibilityElements();
-                    for (Object e : l) {
-                        if (e instanceof SOAPAddress) {
-                            String add = ((SOAPAddress)e).getLocationURI();
-                            int idx = add.indexOf("jndiURL=");
-                            if (idx != -1) {
-                                int idx2 = add.indexOf("&", idx);
-                                add = add.substring(0, idx)
-                                    + "jndiURL=" + url
-                                    + (idx2 == -1 ? "" : add.substring(idx2));
-                                ((SOAPAddress)e).setLocationURI(add);
-                            }
-                        } else {
-                            try {
-                                Field f = e.getClass().getDeclaredField("jmsNamingProperty");
-                                f.setAccessible(true);
-                                List<?> props = (List<?>)f.get(e);
-                                for (Object prop : props) {
-                                    f = prop.getClass().getDeclaredField("name");
-                                    f.setAccessible(true);
-                                    if ("java.naming.provider.url".equals(f.get(prop))) {
-                                        f = prop.getClass().getDeclaredField("value");
-                                        f.setAccessible(true);
-                                        f.set(prop, url);
-                                    }
-                                }
-                            } catch (Exception ex) {
-                                //ignore
-                            }
-                        }
-                    }                    
+
+                    adjustExtensibilityElements(port.getExtensibilityElements(), url, encodedUrl);
+                    adjustExtensibilityElements(port.getBinding().getExtensibilityElements(), url, encodedUrl);
                 }
             }
         } catch (Exception e) {
@@ -115,6 +89,49 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
         }
     }
     
+    private static void adjustExtensibilityElements(List<?> l,
+                                                    String url,
+                                                    String encodedUrl) {
+        for (Object e : l) {
+            if (e instanceof SOAPAddress) {
+                String add = ((SOAPAddress)e).getLocationURI();
+                int idx = add.indexOf("jndiURL=");
+                if (idx != -1) {
+                    int idx2 = add.indexOf("&", idx);
+                    add = add.substring(0, idx)
+                        + "jndiURL=" + encodedUrl
+                        + (idx2 == -1 ? "" : add.substring(idx2));
+                    ((SOAPAddress)e).setLocationURI(add);
+                }
+            } else if (e.getClass().getSimpleName().startsWith("JndiURLType")) {
+                try {
+                    e.getClass().getMethod("setValue", String.class).invoke(e, url);
+                } catch (Exception ex) {
+                    //ignore
+                }                
+            } else {
+                try {
+                    Field f = e.getClass().getDeclaredField("jmsNamingProperty");
+                    ReflectionUtil.setAccessible(f);
+                    List<?> props = (List<?>)f.get(e);
+                    for (Object prop : props) {
+                        f = prop.getClass().getDeclaredField("name");
+                        ReflectionUtil.setAccessible(f);
+                        if ("java.naming.provider.url".equals(f.get(prop))) {
+                            f = prop.getClass().getDeclaredField("value");
+                            ReflectionUtil.setAccessible(f);
+                            String value = (String)f.get(prop);
+                            if (value == null || !value.startsWith("classpath")) {
+                                f.set(prop, url);
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    //ignore
+                }
+            }
+        }        
+    }
     public void stop() throws Exception {
         tearDown();
     }
