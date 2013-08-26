@@ -53,7 +53,7 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
 
     @Override
     public void handleMessage(Message message) {
-        if (isGET(message) || checkContextProperty(message)) {
+        if (!isRequestor(message) && isGET(message) || checkContextProperty(message)) {
             return;
         }
 
