@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,7 +35,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -107,28 +108,25 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
-        CountDownLatch doneSignal = new CountDownLatch(5);
-        
-        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/1", 
-                                        "1", 
-                                        "CXF in Action1", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/2", 
-                                        "2", 
-                                        "CXF in Action2", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/3", 
-                                        "3", 
-                                        "CXF in Action3", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/4", 
-                                        "4", 
-                                        "CXF in Action4", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/5", 
-                                        "5", 
-                                        "CXF in Action5", startSignal, doneSignal));
+
+        CountDownLatch doneSignal = new CountDownLatch(1);
+        List<BookWorker> workers = new ArrayList<BookWorker>(5);
+        for (int x = 1; x < 6; x++) {
+            workers.add(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/" + x, 
+                                       Integer.toString(x), 
+                                       "CXF in Action" + x, startSignal, doneSignal));
+        }
+        for (BookWorker w : workers) {
+            executor.execute(w);
+        }
         
         startSignal.countDown();
         doneSignal.await(60, TimeUnit.SECONDS);
-        executor.shutdownNow();
+        executor.shutdownNow();       
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
+        for (BookWorker w : workers) {
+            w.checkError();
+        }
     }
     
     private void checkBook(String address, String id, String expected) throws Exception {
@@ -153,6 +151,7 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         private String expected;
         private CountDownLatch startSignal;
         private CountDownLatch doneSignal;
+        private Exception error;
         public BookWorker(String address,
                           String id,
                           String expected,
@@ -165,6 +164,12 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
             this.doneSignal = doneSignal;
         }
         
+        public void checkError() throws Exception {
+            if (error != null) {
+                throw error;
+            }
+        }
+
         public void run() {
             
             try {
@@ -174,8 +179,8 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
             } catch (InterruptedException ex) {
                 // ignore
             } catch (Exception ex) {
-                ex.printStackTrace();
-                Assert.fail("Book thread failed for : " + id);
+                ex.fillInStackTrace();
+                error = ex;
             } 
             
         }
