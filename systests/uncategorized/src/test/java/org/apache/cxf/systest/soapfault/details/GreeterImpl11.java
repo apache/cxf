@@ -53,6 +53,11 @@ public class GreeterImpl11 {
             throw new Fault("greetMeFault", LOG, new IllegalArgumentException("Get a wrong name greetMe"));
         } else if (me.startsWith("E")) {
             throw new Fault("invalid", LOG);
+        } else if (me.startsWith("newline")) {
+            Exception cause = new IllegalArgumentException("Get a wrong name <greetMe>"
+                                                           , new NullPointerException("Test \n cause."));
+            cause.fillInStackTrace();
+            throw new Fault("greetMeFault", LOG, cause);
         } else {
             return "Hello " + me;
         }
