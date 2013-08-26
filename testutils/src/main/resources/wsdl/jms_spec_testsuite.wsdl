@@ -232,6 +232,30 @@
             <soap:address location="jms:jndi:dynamicQueues/testqueue0001?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
         </wsdl:port>
     </wsdl:service>
+	
+	<wsdl:service name="JMSSimpleService002X">
+	    <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
+        <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
+        <soapjms:jndiURL>tcp://localhost:9001</soapjms:jndiURL>
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortQueueRequest">
+            <soap:address location="jms:queue:my.test.queue.request21"/>
+        </wsdl:port>
+		<wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortQueueRequestQueueResponse">
+            <soap:address location="jms:queue:my.test.queue.request22?replyToName=my.test.queue.response22"/>
+        </wsdl:port>
+		<wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortQueueRequestTopicResponse">
+            <soap:address location="jms:queue:my.test.queue.request23?topicReplyToName=my.test.topic.response23"/>
+        </wsdl:port>
+		<wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortTopicRequest">
+            <soap:address location="jms:topic:my.test.topic.request24"/>
+        </wsdl:port>
+		<wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortTopicRequestQueueResponse">
+            <soap:address location="jms:topic:my.test.topic.request25?replyToName=my.test.queue.response25"/>
+        </wsdl:port>
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortTopicRequestTopicResponse">
+            <soap:address location="jms:topic:my.test.topic.request26?topicReplyToName=my.test.topic.response26"/>
+        </wsdl:port>
+    </wsdl:service>
     
     <wsdl:service name="JMSSimpleService0101">
         <wsdl:port binding="tns:JMSSimpleSOAP12PortBinding" name="SimplePort">
