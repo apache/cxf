@@ -281,15 +281,7 @@ public class JMSDestination extends AbstractMultiplexDestination
         }
         Message inMessage = exchange.getInMessage();
         final Message outMessage = exchange.getOutMessage();
-        if (jmsConfig.isPubSubDomain()) {
-            // we will never receive a non-oneway invocation in pub-sub
-            // domain from CXF client - however a mis-behaving pure JMS
-            // client could conceivably make suce an invocation, in which
-            // case we silently discard the reply
-            getLogger().log(Level.WARNING, "discarding reply for non-oneway invocation ",
-                            "with 'topic' destinationStyle");
-            return;
-        }
+
         try {
             final JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)outMessage
                 .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
