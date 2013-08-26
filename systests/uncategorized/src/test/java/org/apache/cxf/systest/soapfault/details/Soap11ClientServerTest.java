@@ -95,6 +95,26 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             assertEquals("invalid", ex.getMessage());
         } 
     }
+    
+    
+    @Test
+    public void testNewLineInExceptionMessage() throws Exception {
+        Greeter greeter = getGreeter();
+        
+        try {
+            greeter.greetMe("newline");
+            fail("Should throw Exception!");
+        } catch (SOAPFaultException ex) {
+            assertEquals("greetMeFault Caused by: Get a wrong name <greetMe>", ex.getMessage());
+            StackTraceElement[] elements = ex.getCause().getStackTrace();
+            assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
+                         elements[0].getClassName());
+            assertTrue(ex.getCause().getMessage().endsWith("Test \n cause."));
+        } 
+
+        
+    }
+
 
     @Test
     public void testPingMeFault() throws Exception {

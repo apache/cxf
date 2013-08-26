@@ -117,6 +117,13 @@ public interface Message extends StringMap {
      * the Java stack trace is returned.
      */
     String EXCEPTION_MESSAGE_CAUSE_ENABLED = "exceptionMessageCauseEnabled";
+    
+    /**
+     * A very unique delimiter used for exception with FAULT_STACKTRACE_ENABLED enable, 
+     * which is easy for client to differentiate the cause and stacktrace when unmarsall 
+     * a fault message 
+     */
+    String EXCEPTION_CAUSE_SUFFIX = "#*#";
 
     String CONTENT_TYPE = "Content-Type";    
     String ACCEPT_CONTENT_TYPE = "Accept";

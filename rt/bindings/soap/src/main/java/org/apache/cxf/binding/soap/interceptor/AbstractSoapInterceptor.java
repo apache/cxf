@@ -82,12 +82,12 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             while (throwable != null) {
                 for (StackTraceElement ste : throwable.getStackTrace()) {
                     sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
-                          + ste.getLineNumber() + "\n");
+                          + ste.getLineNumber() + Message.EXCEPTION_CAUSE_SUFFIX);
                 }
                 throwable = throwable.getCause();
                 if (throwable != null) {
                     sb.append("Caused by: " +  throwable.getClass().getCanonicalName() 
-                              + " : " + throwable.getMessage() + "\n");
+                              + " : " + throwable.getMessage() + Message.EXCEPTION_CAUSE_SUFFIX);
                 }
             }
             Element detail = fault.getDetail();
