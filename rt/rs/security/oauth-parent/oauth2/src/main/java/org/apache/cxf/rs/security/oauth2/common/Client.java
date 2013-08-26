@@ -40,6 +40,7 @@ public class Client {
     private boolean isConfidential;
     private List<String> allowedGrantTypes = new LinkedList<String>();
     private List<String> registeredScopes = new LinkedList<String>();
+    private List<String> registeredAudiences = new LinkedList<String>();
     
     private List<Property> properties = new LinkedList<Property>();
     private UserSubject subject;
@@ -252,5 +253,13 @@ public class Client {
      */
     public void setRegisteredScopes(List<String> registeredScopes) {
         this.registeredScopes = registeredScopes;
+    }
+
+    public List<String> getRegisteredAudiences() {
+        return registeredAudiences;
+    }
+
+    public void setRegisteredAudiences(List<String> registeredAudiences) {
+        this.registeredAudiences = registeredAudiences;
     }
 }

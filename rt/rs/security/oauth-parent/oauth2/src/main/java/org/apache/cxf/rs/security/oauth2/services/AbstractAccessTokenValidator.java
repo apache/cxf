@@ -140,15 +140,17 @@ public abstract class AbstractAccessTokenValidator {
         }
         
         // Check audiences
-        if (accessTokenV.getAudience() != null 
-            && !audiences.isEmpty()
-            && !audiences.contains(accessTokenV.getAudience())) {
+        if (!validateAudience(accessTokenV.getAudience())) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         
         return accessTokenV;
     }
 
+    protected boolean validateAudience(String audience) {
+        return OAuthUtils.validateAudience(audience, audiences);
+    }
+    
     public void setRealm(String realm) {
         this.realm = realm;
     }

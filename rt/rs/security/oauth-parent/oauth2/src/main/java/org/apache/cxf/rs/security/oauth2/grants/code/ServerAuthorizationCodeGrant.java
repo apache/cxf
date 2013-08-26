@@ -35,6 +35,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private Client client;
     private List<String> approvedScopes = Collections.emptyList();
     private UserSubject subject;
+    private String audience;
     
     public ServerAuthorizationCodeGrant(Client client, 
                                         long lifetime) {
@@ -110,5 +111,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
      */
     public UserSubject getSubject() {
         return subject;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
 }
