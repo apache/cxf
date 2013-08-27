@@ -179,14 +179,8 @@ public class HttpsURLConnectionFactory {
         }
         
         
-        HostnameVerifier verifier;
-        if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
-            verifier = HttpsURLConnection.getDefaultHostnameVerifier();
-        } else if (tlsClientParameters.isDisableCNCheck()) {
-            verifier = CertificateHostnameVerifier.ALLOW_ALL;
-        } else {
-            verifier = CertificateHostnameVerifier.DEFAULT;
-        }
+        HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
+            .getHostnameVerifier(tlsClientParameters);
         
         if (connection instanceof HttpsURLConnection) {
             // handle the expected case (javax.net.ssl)

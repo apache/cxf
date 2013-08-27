@@ -20,6 +20,7 @@ package org.apache.cxf.configuration.jsse;
 
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -33,7 +34,23 @@ public class TLSClientParameters extends TLSParameterBase {
     private int sslCacheTimeout = 86400;
     private boolean useHttpsURLConnectionDefaultSslSocketFactory;
     private boolean useHttpsURLConnectionDefaultHostnameVerifier;
-
+    private HostnameVerifier hostnameVerifier;
+    
+    /**
+     * Set custom HostnameVerifier
+     * @param verifier hostname verifier
+     */
+    public void setHostnameVerifier(HostnameVerifier verifier) {
+        hostnameVerifier = verifier;    
+    }
+    
+    /**
+     * Get custom HostnameVerifier
+     * @return hostname verifier
+     */
+    public HostnameVerifier getHostnameVerifier() {
+        return hostnameVerifier; 
+    }
     /**
      * Set whether or not JSEE should omit checking if the host name
      * specified in the URL matches that of the Common Name

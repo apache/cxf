@@ -22,7 +22,10 @@ import java.security.KeyStore;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -95,25 +98,44 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     @Override
     public ClientBuilder hostnameVerifier(HostnameVerifier verifier) {
-        secConfig.setVerifier(verifier);
+        secConfig.getTlsClientParams().setHostnameVerifier(verifier);
         return this;
     }
 
     @Override
     public ClientBuilder sslContext(SSLContext sslContext) {
+        secConfig.getTlsClientParams().setKeyManagers(null);
+        secConfig.getTlsClientParams().setTrustManagers(null);
         secConfig.setSslContext(sslContext);
         return this;
     }
 
     @Override
     public ClientBuilder keyStore(KeyStore store, char[] password) {
-        // TODO Auto-generated method stub
+        secConfig.setSslContext(null);
+        try {
+            KeyManagerFactory tmf = 
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            tmf.init(store, password);
+            secConfig.getTlsClientParams().setKeyManagers(tmf.getKeyManagers());
+        } catch (Exception ex) {
+            throw new ProcessingException(ex);
+        }
         return this;
     }
     
     @Override
     public ClientBuilder trustStore(KeyStore store) {
-        secConfig.setTrustStore(store);
+        secConfig.setSslContext(null);
+        try {
+            TrustManagerFactory tmf = 
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(store);
+            secConfig.getTlsClientParams().setTrustManagers(tmf.getTrustManagers());
+        } catch (Exception ex) {
+            throw new ProcessingException(ex);
+        }
+        
         return this;
     }
 

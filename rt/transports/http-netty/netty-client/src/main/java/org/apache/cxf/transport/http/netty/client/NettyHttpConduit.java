@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http.netty.client;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
@@ -49,7 +49,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
-import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -69,6 +68,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.ssl.SslHandler;
+
 
 public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLifeCycleListener {
     public static final String USE_ASYNC = "use.async.http.conduit";
@@ -328,14 +328,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             }
             connect(true);
            
-            HostnameVerifier verifier;
-            if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
-                verifier = HttpsURLConnection.getDefaultHostnameVerifier();
-            } else if (tlsClientParameters.isDisableCNCheck()) {
-                verifier = CertificateHostnameVerifier.ALLOW_ALL;
-            } else {
-                verifier = CertificateHostnameVerifier.DEFAULT;
-            }
+            HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
+                .getHostnameVerifier(tlsClientParameters);
             
             if (!verifier.verify(url.getHost(), session)) {
                 throw new IOException("Could not verify host " + url.getHost());

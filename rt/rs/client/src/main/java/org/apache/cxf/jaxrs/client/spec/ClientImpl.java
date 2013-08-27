@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -37,10 +38,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
+import org.apache.cxf.transport.https.SSLUtils;
 
 public class ClientImpl implements Client {
     private Configurable<Client> configImpl;
@@ -97,13 +100,23 @@ public class ClientImpl implements Client {
     @Override
     public HostnameVerifier getHostnameVerifier() {
         checkClosed();
-        return secConfig.getVerifier();
+        return secConfig.getTlsClientParams().getHostnameVerifier();
     }
 
     @Override
     public SSLContext getSslContext() {
         checkClosed();
-        return secConfig.getSslContext();
+        if (secConfig.getSslContext() != null) {
+            return secConfig.getSslContext();
+        } else if (secConfig.getTlsClientParams().getTrustManagers() != null) {
+            try {
+                return SSLUtils.getSSLContext(secConfig.getTlsClientParams());
+            } catch (Exception ex) {
+                throw new ProcessingException(ex);
+            }
+        } else {
+            return null;
+        }
     }
     
     private void checkClosed() {
@@ -204,6 +217,13 @@ public class ClientImpl implements Client {
             pf.setUserProviders(providers);
             pf.setDynamicConfiguration(getConfiguration());
             WebClient.getConfig(targetClient).getRequestContext().putAll(getConfiguration().getProperties());
+            
+            // TLS
+            TLSClientParameters tlsParams = secConfig.getTlsClientParams();
+            if (tlsParams.getSSLSocketFactory() != null 
+                || tlsParams.getTrustManagers() != null) {
+                WebClient.getConfig(targetClient).getHttpConduit().setTlsClientParameters(tlsParams);
+            }
             
             // start building the invocation
             return new InvocationBuilderImpl(WebClient.fromClient(targetClient));

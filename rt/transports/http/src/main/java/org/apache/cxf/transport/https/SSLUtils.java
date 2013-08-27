@@ -20,6 +20,8 @@ package org.apache.cxf.transport.https;
 
 import java.security.GeneralSecurityException;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -32,6 +34,21 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 public final class SSLUtils {
     private SSLUtils() {
         //Helper class
+    }
+    
+    public static HostnameVerifier getHostnameVerifier(TLSClientParameters tlsClientParameters) {
+        HostnameVerifier verifier;
+        
+        if (tlsClientParameters.getHostnameVerifier() != null) {
+            verifier = tlsClientParameters.getHostnameVerifier();
+        } else if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
+            verifier = HttpsURLConnection.getDefaultHostnameVerifier();
+        } else if (tlsClientParameters.isDisableCNCheck()) {
+            verifier = CertificateHostnameVerifier.ALLOW_ALL;
+        } else {
+            verifier = CertificateHostnameVerifier.DEFAULT;
+        }
+        return verifier;
     }
     
     public static SSLContext getSSLContext(TLSParameterBase parameters) throws Exception {

@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -65,7 +64,6 @@ import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory.UseAsyncPolicy;
 import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
-import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -620,14 +618,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                     throw new IOException("No SSLSession detected");
                 }
             }
-            HostnameVerifier verifier;
-            if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
-                verifier = HttpsURLConnection.getDefaultHostnameVerifier();
-            } else if (tlsClientParameters.isDisableCNCheck()) {
-                verifier = CertificateHostnameVerifier.ALLOW_ALL;
-            } else {
-                verifier = CertificateHostnameVerifier.DEFAULT;
-            }
+            HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
+                .getHostnameVerifier(tlsClientParameters);
             if (!verifier.verify(url.getHost(), session)) {
                 throw new IOException("Could not verify host " + url.getHost());
             }

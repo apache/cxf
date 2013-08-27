@@ -18,32 +18,31 @@
  */
 package org.apache.cxf.jaxrs.client.spec;
 
-import java.security.KeyStore;
-
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 
 
 public class TLSConfiguration {
     private SSLContext sslContext;
-    private HostnameVerifier verifier;
-    private KeyStore trustStore;
+    private TLSClientParameters tlsClientParams = new TLSClientParameters();
+    
     public SSLContext getSslContext() {
         return sslContext;
     }
     public void setSslContext(SSLContext sslContext) {
         this.sslContext = sslContext;
+        if (sslContext == null) {
+            tlsClientParams.setSSLSocketFactory(null);
+        } else {
+            tlsClientParams.setSSLSocketFactory(sslContext.getSocketFactory());
+        }
     }
-    public HostnameVerifier getVerifier() {
-        return verifier;
+    public TLSClientParameters getTlsClientParams() {
+        return tlsClientParams;
     }
-    public void setVerifier(HostnameVerifier verifier) {
-        this.verifier = verifier;
+    public void setTlsClientParams(TLSClientParameters tlsClientParams) {
+        this.tlsClientParams = tlsClientParams;
     }
-    public KeyStore getTrustStore() {
-        return trustStore;
-    }
-    public void setTrustStore(KeyStore trustStore) {
-        this.trustStore = trustStore;
-    }
+    
 }
