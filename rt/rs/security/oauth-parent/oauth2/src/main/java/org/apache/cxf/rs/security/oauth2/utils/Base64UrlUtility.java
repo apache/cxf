@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.oauth2.saml;
+package org.apache.cxf.rs.security.oauth2.utils;
 
 /**
  * Base64 URL Encoding/Decoding utility (character 62 is '-', 63 - '_')

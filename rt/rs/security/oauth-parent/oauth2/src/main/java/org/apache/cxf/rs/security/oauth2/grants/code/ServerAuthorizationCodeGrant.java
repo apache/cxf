@@ -39,6 +39,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant impleme
     private List<String> approvedScopes = Collections.emptyList();
     private UserSubject subject;
     private String audience;
+    private String tempClientSecretHash;
     
     public ServerAuthorizationCodeGrant(Client client, 
                                         long lifetime) {
@@ -122,5 +123,13 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant impleme
 
     public void setAudience(String audience) {
         this.audience = audience;
+    }
+
+    public String getTempClientSecretHash() {
+        return tempClientSecretHash;
+    }
+
+    public void setTempClientSecretHash(String tempClientSecretHash) {
+        this.tempClientSecretHash = tempClientSecretHash;
     }
 }

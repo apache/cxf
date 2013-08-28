@@ -35,6 +35,7 @@ public class AuthorizationCodeRegistration {
     private String redirectUri;
     private UserSubject subject;
     private String audience;
+    private String tempClientSecretHash;
     
     /**
      * Sets the {@link Client} reference
@@ -118,5 +119,11 @@ public class AuthorizationCodeRegistration {
     }
     public void setAudience(String audience) {
         this.audience = audience;
+    }
+    public String getTempClientSecretHash() {
+        return tempClientSecretHash;
+    }
+    public void setTempClientSecretHash(String tempClientSecretHash) {
+        this.tempClientSecretHash = tempClientSecretHash;
     }
 }
