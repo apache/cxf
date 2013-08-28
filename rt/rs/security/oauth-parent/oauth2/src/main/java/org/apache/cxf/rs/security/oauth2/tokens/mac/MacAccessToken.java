@@ -26,6 +26,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 //See http://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-01
 public class MacAccessToken extends ServerAccessToken {
     
+    private static final long serialVersionUID = -4331703769692080818L;
+
     public MacAccessToken(Client client, 
                           long lifetime) {
         this(client, HmacAlgorithm.HmacSHA256, lifetime);
