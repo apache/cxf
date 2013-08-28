@@ -125,13 +125,12 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     @Override
     protected boolean canSupportPublicClient(Client c) {
-        return canSupportPublicClients && !c.isConfidential()
-            && c.getClientSecret() == null && c.getRedirectUris().isEmpty();
+        return canSupportPublicClients && !c.isConfidential() && c.getClientSecret() == null;
     }
 
     @Override
     protected boolean canRedirectUriBeEmpty(Client c) {
-        return canSupportPublicClient(c);
+        return canSupportPublicClient(c) && c.getRedirectUris().isEmpty();
     }
     
     public void setCanSupportPublicClients(boolean support) {

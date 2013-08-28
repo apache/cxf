@@ -89,7 +89,6 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (canSupportPublicClients 
             && !client.isConfidential() 
             && client.getClientSecret() == null 
-            && client.getRedirectUris().isEmpty()
             && clientSecret == null) {
             return client;
         }
