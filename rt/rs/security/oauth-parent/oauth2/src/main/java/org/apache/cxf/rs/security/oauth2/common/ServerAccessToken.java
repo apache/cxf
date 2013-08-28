@@ -25,6 +25,8 @@ import java.util.List;
  * Server Access Token representation
  */
 public abstract class ServerAccessToken extends AccessToken {
+    private static final long serialVersionUID = 638776204861456064L;
+    
     private String grantType;
     private Client client;
     private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();

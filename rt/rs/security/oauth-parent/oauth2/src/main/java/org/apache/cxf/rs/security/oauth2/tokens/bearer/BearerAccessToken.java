@@ -27,6 +27,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * Simple Bearer Access Token implementations
  */
 public class BearerAccessToken extends ServerAccessToken {
+    private static final long serialVersionUID = -3614732043728799245L;
+    
     public BearerAccessToken(Client client, 
                              long lifetime) {
         super(client, 
