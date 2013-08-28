@@ -37,6 +37,7 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.xml.sax.SAXException;
 
@@ -44,6 +45,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataReader;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
@@ -214,13 +216,30 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
 
     private Element validate(XMLStreamReader input) 
         throws XMLStreamException, SAXException, IOException {
-        DOMSource ds = read(input);
-        schema.newValidator().validate(ds);
-        Node nd = ds.getNode();
-        if (nd instanceof Document) {
-            return ((Document)nd).getDocumentElement();
+        DOMSource ds = read(input);    
+        Element rootElement = null;
+        if (ds.getNode() instanceof Document) {
+            rootElement = ((Document)ds.getNode()).getDocumentElement();
+        } else {
+            rootElement = (Element)ds.getNode();
         }
-        return (Element)ds.getNode();
+        NodeList includeList = rootElement.getElementsByTagNameNS("http://www.w3.org/2004/08/xop/include", "Include");
+        if (includeList.getLength() > 0) {
+            Element newElement = (Element)rootElement.cloneNode(true);
+            NodeList nodeList = newElement.getElementsByTagNameNS("http://www.w3.org/2004/08/xop/include", "Include");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element include = (Element)nodeList.item(i);
+                Node parentNode = include.getParentNode();
+                parentNode.removeChild(include);
+                String cid = DOMUtils.getAttribute(include, "href");
+                //set the fake base64Binary to validate instead of reading the attachment from message
+                parentNode.setTextContent(javax.xml.bind.DatatypeConverter.printBase64Binary(cid.getBytes()));
+            }
+            schema.newValidator().validate(new DOMSource(newElement));
+        } else {
+            schema.newValidator().validate(ds);
+        }
+        return rootElement;
     }
 
     private InputStream getInputStream(XMLStreamReader input) 

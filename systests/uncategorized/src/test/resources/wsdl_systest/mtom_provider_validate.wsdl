@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWS" targetNamespace="http://cxf.apache.org/">
+  <wsdl:types>
+    <xs:schema xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/">
+      <xs:element name="helloRequest" type="tns:hello"/>
+      <xs:element name="helloResponse" type="tns:helloResponse"/>
+      <xs:complexType name="hello">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+          <xs:element name="file" type="xsd:base64Binary"
+					xmime:expectedContentTypes="application/octet-stream" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="helloResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="ExceptionType" type="tns:ExceptionType"/>
+      <xs:complexType name="ExceptionType">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="message" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="helloResponse">
+    <wsdl:part element="tns:helloResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="hello">
+    <wsdl:part element="tns:helloRequest" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ExceptionType">
+    <wsdl:part element="tns:ExceptionType" name="ExceptionType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HelloWSImpl">
+    <wsdl:operation name="hello">
+      <wsdl:input message="tns:hello" name="hello">
+      </wsdl:input>
+      <wsdl:output message="tns:helloResponse" name="helloResponse">
+      </wsdl:output>
+      <wsdl:fault message="tns:ExceptionType" name="ExceptionType">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HelloWSSoapBinding" type="tns:HelloWSImpl">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="hello">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="hello">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="helloResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ExceptionType">
+        <soap:fault name="ExceptionType" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HelloWS">
+    <wsdl:port binding="tns:HelloWSSoapBinding" name="hello">
+      <soap:address location="http://localhost:9003/mtom/provider"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
