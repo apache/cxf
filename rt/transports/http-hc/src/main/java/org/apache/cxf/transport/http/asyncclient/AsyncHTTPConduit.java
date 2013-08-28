@@ -250,12 +250,16 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                                         int chunkThreshold, 
                                         String conduitName,
                                         URI uri) {
-            super(message, needToCacheRequest, isChunking,
-                  chunkThreshold, conduitName,
+            super(message, 
+                  needToCacheRequest,
+                  isChunking,
+                  chunkThreshold, 
+                  conduitName,
                   uri);
             csPolicy = getClient(message);
             entity = message.get(CXFHttpRequest.class);
             basicEntity = (BasicHttpEntity)entity.getEntity();
+            basicEntity.setChunked(isChunking);
             HeapByteBufferAllocator allocator = new HeapByteBufferAllocator();
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
             inbuf = new SharedInputBuffer(bufSize, allocator);
@@ -304,7 +308,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             basicEntity.setContentLength(i);
         }
         public void thresholdReached() throws IOException {
-            basicEntity.setChunked(true);
+            basicEntity.setChunked(chunking);
         }
 
         protected void handleNoOutput() throws IOException {
@@ -367,8 +371,25 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         @Override
         public void close() throws IOException {
+            if (!chunking) {
+                CachedOutputStream out = (CachedOutputStream)wrappedStream;
+                this.basicEntity.setContentLength(out.size());
+                wrappedStream = null;
+                handleHeadersTrustCaching();
+                out.writeCacheTo(wrappedStream);
+            }
             super.close();
         }
+        
+        @Override
+        protected void onFirstWrite() throws IOException {
+            if (chunking) {
+                super.onFirstWrite();
+            } else {
+                wrappedStream = new CachedOutputStream();
+            }
+        }
+        
         protected void setupWrappedStream() throws IOException {
             connect(true);
             wrappedStream = new OutputStream() {
