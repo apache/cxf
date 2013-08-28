@@ -84,7 +84,7 @@
 
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
-        <cxf.activemq.version>5.7.0</cxf.activemq.version>
+        <cxf.activemq.version>5.8.0</cxf.activemq.version>
         <cxf.axiom.version>1.2.14</cxf.axiom.version>
         <cxf.bcprov.version>1.49</cxf.bcprov.version>
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
@@ -1275,26 +1275,22 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-core</artifactId>
+                <artifactId>activemq-broker</artifactId>
                 <version>${cxf.activemq.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-jms_1.1_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.fusesource.fuse-extra</groupId>
-                        <artifactId>fusemq-leveldb</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.fusesource.mqtt-client</groupId>
-                        <artifactId>mqtt-client</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-client</artifactId>
+                <version>${cxf.activemq.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-pool</artifactId>
+                <version>${cxf.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-kahadb-store</artifactId>
                 <version>${cxf.activemq.version}</version>
             </dependency>
             <dependency>
