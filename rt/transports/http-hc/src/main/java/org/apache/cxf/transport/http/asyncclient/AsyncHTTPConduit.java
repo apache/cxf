@@ -377,7 +377,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         @Override
         public void close() throws IOException {
-            if (!chunking) {
+            if (!chunking && wrappedStream != null) {
                 CachedOutputStream out = (CachedOutputStream)wrappedStream;
                 this.basicEntity.setContentLength(out.size());
                 wrappedStream = null;
