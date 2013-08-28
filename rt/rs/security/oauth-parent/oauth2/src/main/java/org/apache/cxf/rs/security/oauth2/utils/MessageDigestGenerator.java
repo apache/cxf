@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -36,10 +37,7 @@ public class MessageDigestGenerator {
         }
 
         try {
-            MessageDigest md = MessageDigest.getInstance(algorithm);
-            md.reset();
-            md.update(input);
-            byte[] messageDigest = md.digest();
+            byte[] messageDigest = createDigest(input, algorithm);
             StringBuffer hexString = new StringBuffer();
             for (int i = 0; i < messageDigest.length; i++) {
                 hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
@@ -51,6 +49,23 @@ public class MessageDigestGenerator {
         }
     }
 
+    public byte[] createDigest(String input, String algo) {
+        try {
+            return createDigest(input.getBytes("UTF-8"), algo);
+        } catch (UnsupportedEncodingException e) {
+            throw new OAuthServiceException("server_error", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new OAuthServiceException("server_error", e);
+        }   
+    }
+    
+    public byte[] createDigest(byte[] input, String algo) throws NoSuchAlgorithmException { 
+        MessageDigest md = MessageDigest.getInstance(algo);
+        md.reset();
+        md.update(input);
+        return md.digest();
+    }
+    
     public void setAlgorithm(String algo) {
         this.algorithm = algo;
     }

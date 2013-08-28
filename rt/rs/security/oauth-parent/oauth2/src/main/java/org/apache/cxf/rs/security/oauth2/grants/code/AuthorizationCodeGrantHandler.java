@@ -19,12 +19,17 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.io.StringWriter;
+
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
+import org.apache.cxf.rs.security.oauth2.utils.MessageDigestGenerator;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -68,11 +73,37 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                 || !client.getRedirectUris().contains(expectedRedirectUri))) {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
+        
+        String tempClientSecretHash = grant.getTempClientSecretHash();
+        if (tempClientSecretHash != null) {
+            String tempClientSecret = params.getFirst(OAuthConstants.TEMP_CLIENT_SECRET);
+            if (!compareTcshWithTch(tempClientSecretHash, tempClientSecret)) {
+                throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+            }
+        }
+        
         return doCreateAccessToken(client, 
                                    grant.getSubject(), 
                                    grant.getApprovedScopes(),
                                    grant.getAudience());
     }
     
-    
+    private boolean compareTcshWithTch(String tempClientSecretHash, String tempClientSecret) {
+        if (tempClientSecret == null) {
+            return false;
+        }
+        MessageDigestGenerator mdg = new MessageDigestGenerator();
+        byte[] digest = mdg.createDigest(tempClientSecret, "SHA-256");
+        int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
+        
+        StringWriter stringWriter = new StringWriter();
+        try {
+            Base64UrlUtility.encode(digest, 0, length, stringWriter);
+        } catch (Base64Exception e) {
+            throw new OAuthServiceException("server_error", e);
+        }
+        String expectedHash = stringWriter.toString();
+        return tempClientSecretHash.equals(expectedHash);
+        
+    }
 }

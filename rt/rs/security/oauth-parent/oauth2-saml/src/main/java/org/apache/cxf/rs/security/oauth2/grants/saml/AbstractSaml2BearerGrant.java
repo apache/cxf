@@ -23,7 +23,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.saml.Base64UrlUtility;
+import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public abstract class AbstractSaml2BearerGrant implements AccessTokenGrant {
