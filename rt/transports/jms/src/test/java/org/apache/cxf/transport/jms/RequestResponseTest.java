@@ -213,7 +213,7 @@ public class RequestResponseTest extends AbstractJMSTester {
                     // setup the message for
                     Conduit backConduit;
                     try {
-                        backConduit = destination.getBackChannel(m);
+                        backConduit = destination.getBackChannel(m, null, null);
                         // wait for the message to be got from the conduit
                         Message replyMessage = new MessageImpl();
                         sendoutMessage(backConduit, replyMessage, true);
