@@ -28,6 +28,7 @@ package org.apache.cxf.rs.security.oauth2.common;
  */
 public class ClientAccessToken extends AccessToken {
 
+    private static final long serialVersionUID = 831870452726298523L;
     private String scope;
         
     public ClientAccessToken(String tokenType, String tokenKey) {

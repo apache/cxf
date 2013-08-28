@@ -18,13 +18,16 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Represents a registered third-party Client application
  */
-public class Client {
+public class Client implements Serializable {
+    
+    private static final long serialVersionUID = -5550840247125850922L;
     
     private String clientId;
     // TODO: Consider introducing ClientCredentials instead

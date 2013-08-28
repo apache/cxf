@@ -18,14 +18,17 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Base Access Token representation
  */
-public abstract class AccessToken {
+public abstract class AccessToken implements Serializable {
 
+    private static final long serialVersionUID = -5750544301887053480L;
+    
     private String tokenKey;
     private String tokenType;
     private String refreshToken;

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +29,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  * may capture after the end user approved a given third party request
  */
 @XmlRootElement
-public class UserSubject {
+public class UserSubject implements Serializable {
+    
+    private static final long serialVersionUID = -1469694589163385689L;
     
     private String login;
     private String id;
