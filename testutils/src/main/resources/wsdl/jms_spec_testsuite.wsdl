@@ -237,6 +237,7 @@
 	    <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
         <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
         <soapjms:jndiURL>tcp://localhost:9001</soapjms:jndiURL>
+        <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
         <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePortQueueRequest">
             <soap:address location="jms:queue:my.test.queue.request21"/>
         </wsdl:port>

@@ -104,7 +104,7 @@ public abstract class AbstractJMSTester extends Assert {
         try {
             conduit.prepare(message);
         } catch (IOException ex) {
-            assertFalse("JMSConduit can't perpare to send out message", false);
+            assertFalse("JMSConduit can't prepare to send out message", false);
             ex.printStackTrace();
         }
         OutputStream os = message.getContent(OutputStream.class);
@@ -146,6 +146,9 @@ public abstract class AbstractJMSTester extends Assert {
 
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, true);
+        if (jmsConfig != null && jmsConfig.getReceiveTimeout() == null) {
+            jmsConfig.setReceiveTimeout(5000L);
+        }
         JMSConduit jmsConduit = new JMSConduit(endpointInfo, target, jmsConfig, bus);
         if (send) {
             // setMessageObserver

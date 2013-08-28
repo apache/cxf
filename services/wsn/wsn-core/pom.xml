@@ -58,8 +58,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>${cxf.activemq.version}</version>
+            <artifactId>activemq-broker</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
