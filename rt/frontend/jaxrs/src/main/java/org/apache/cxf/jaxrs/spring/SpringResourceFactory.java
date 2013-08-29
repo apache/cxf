@@ -43,6 +43,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     private Method postConstructMethod;
     private Method preDestroyMethod;
     private boolean isSingleton;
+    private boolean callLifecycleMethods = true;
     
     public SpringResourceFactory() {
         
@@ -73,12 +74,18 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     public Object getInstance(Message m) {
         Object[] values = ResourceUtils.createConstructorArguments(c, m);
         Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
-        if (!isSingleton || m == null) {
-            InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
-        }
+        initInstance(m, instance);
         return instance;
     }
 
+    protected void initInstance(Message m, Object instance) {
+        if (callLifecycleMethods && (!isSingleton() || m == null)) {
+            InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
+        }
+    }
+
+    
+    
     /**
      * {@inheritDoc}
      */
@@ -90,7 +97,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public void releaseInstance(Message m, Object o) {
-        if (!isSingleton) {
+        if (callLifecycleMethods && !isSingleton()) {
             InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
         }
     }
@@ -119,4 +126,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         return c.getDeclaringClass();
     }
 
+    public void setCallLifecycleMethods(boolean callLifecycleMethods) {
+        this.callLifecycleMethods = callLifecycleMethods;
+    }
 }
