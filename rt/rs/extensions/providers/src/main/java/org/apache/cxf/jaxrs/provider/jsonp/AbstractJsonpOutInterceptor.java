@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.provider.jsonp;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,12 +41,20 @@ public abstract class AbstractJsonpOutInterceptor extends AbstractPhaseIntercept
     }
     
     protected void writeValue(Message message, String value) throws Fault {
-        HttpServletResponse response = (HttpServletResponse) message.get("HTTP.RESPONSE");
         try {
-            response.getOutputStream().write(value.getBytes("UTF-8"));
+            getOutputStream(message).write(value.getBytes("UTF-8"));
         } catch (IOException e) {
             throw new Fault(e);
         }
+    }
+    
+    private OutputStream getOutputStream(Message message) throws IOException {
+        OutputStream os = message.getContent(OutputStream.class);
+        if (os == null) {
+            HttpServletResponse response = (HttpServletResponse) message.get("HTTP.RESPONSE");
+            os = response.getOutputStream();
+        }
+        return os;
     }
 
 }
