@@ -33,7 +33,7 @@ import org.apache.cxf.wsdl.TExtensibilityElementImpl;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "UsingAddressing")
+@XmlRootElement(name = "UsingAddressing", namespace = "http://www.w3.org/2006/05/addressing/wsdl")
 public class UsingAddressing extends TExtensibilityElementImpl {
 
     @XmlAnyAttribute

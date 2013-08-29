@@ -494,7 +494,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     @Test
     public void testWSA() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/add_numbers.wsdl");
-        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.AddNumbersImpl");
+        env.put(ToolConstants.CFG_CLASSNAME, org.apache.cxf.tools.fortest.AddNumbersImpl.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         try {
             processor.setEnvironment(env);
