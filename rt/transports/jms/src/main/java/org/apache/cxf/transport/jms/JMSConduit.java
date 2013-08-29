@@ -189,7 +189,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         Destination replyToDestination = null;
         if (!exchange.isOneWay() || !jmsConfig.isEnforceSpec() && isSetReplyTo(outMessage)
             && replyTo != null) {
-            if (exchange.isSynchronous() || exchange.isOneWay()) {
+            if (!jmsConfig.isReplyPubSubDomain()
+                && (exchange.isSynchronous() 
+                    || exchange.isOneWay())) {
                 replyToDestination = JMSFactory.resolveOrCreateDestination(jmsTemplate, replyTo,
                                                                            jmsConfig.isReplyPubSubDomain());
             } else {
@@ -210,14 +212,14 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 String messageType = jmsConfig.getMessageType();
                 Destination destination = rtd;
                 String replyToAddress = jmsConfig.getReplyToDestination();
-                if (replyToAddress != null) {
+                if (rtd == null && replyToAddress != null) {
                     destination = JMSFactory.resolveOrCreateDestination(jmsTemplate, replyToAddress,
                                                                         jmsConfig.isPubSubDomain());
                 }
                 jmsMessage = JMSUtils.buildJMSMessageFromCXFMessage(jmsConfig, outMessage, request,
                                                                     messageType, session, destination,
                                                                     cid);
-                if (!exchange.isSynchronous() && !exchange.isOneWay()) {
+                if ((jmsConfig.isReplyPubSubDomain() || !exchange.isSynchronous()) && !exchange.isOneWay()) {
                     correlationMap.put(cid, exchange);
                 }
                 LOG.log(Level.FINE, "client sending request: ", jmsMessage);
@@ -249,7 +251,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 headers.setJMSMessageID(messageCreator.getMessageID());
 
                 final String messageSelector = "JMSCorrelationID = '" + correlationId + "'";
-                if (exchange.isSynchronous()) {
+                if (exchange.isSynchronous() && !jmsConfig.isReplyPubSubDomain()) {
                     javax.jms.Message replyMessage = jmsTemplate.receiveSelected(replyToDestination,
                                                                                  messageSelector);
                     if (replyMessage == null) {
@@ -283,6 +285,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             if (userCID != null) {
                 correlationId = userCID;
             } else if (!jmsConfig.isSetConduitSelectorPrefix()
+                       && !jmsConfig.isReplyPubSubDomain()
                        && (exchange.isSynchronous() || exchange.isOneWay())
                        && (!jmsConfig.isSetUseConduitIdSelector() 
                            || !jmsConfig.isUseConduitIdSelector())) {
