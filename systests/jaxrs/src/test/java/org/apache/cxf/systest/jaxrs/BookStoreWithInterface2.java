@@ -38,6 +38,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 
@@ -56,6 +57,11 @@ public class BookStoreWithInterface2 extends BookStoreStorage implements BookInt
     public BookStoreWithInterface2(@Context ServletContext scontext) {
         this();
         this.servletContext = scontext;
+    }
+    
+    @PreDestroy
+    public void preDestroy() {
+        System.out.println("PreDestroy called");
     }
     
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {

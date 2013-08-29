@@ -117,22 +117,28 @@ public final class ResourceUtils {
     private ResourceUtils() {
         
     }
-    
     public static Method findPostConstructMethod(Class<?> c) {
+        return findPostConstructMethod(c, null);
+    }
+    public static Method findPostConstructMethod(Class<?> c, String name) {
         if (Object.class == c || null == c) {
             return null;
         }
         for (Method m : c.getDeclaredMethods()) {
-            if (m.getAnnotation(PostConstruct.class) != null) {
+            if (name != null) {
+                if (m.getName().equals(name)) {
+                    return m;
+                }
+            } else if (m.getAnnotation(PostConstruct.class) != null) {
                 return m;
             }
         }
-        Method m = findPostConstructMethod(c.getSuperclass());
+        Method m = findPostConstructMethod(c.getSuperclass(), name);
         if (m != null) {
             return m;
         }
         for (Class<?> i : c.getInterfaces()) {
-            m = findPostConstructMethod(i);
+            m = findPostConstructMethod(i, name);
             if (m != null) {
                 return m;
             }
@@ -141,20 +147,28 @@ public final class ResourceUtils {
     }
     
     public static Method findPreDestroyMethod(Class<?> c) {
+        return findPreDestroyMethod(c, null);
+    }
+    
+    public static Method findPreDestroyMethod(Class<?> c, String name) {
         if (Object.class == c || null == c) {
             return null;
         }
         for (Method m : c.getDeclaredMethods()) {
-            if (m.getAnnotation(PreDestroy.class) != null) {
+            if (name != null) {
+                if (m.getName().equals(name)) {
+                    return m;
+                }
+            } else if (m.getAnnotation(PreDestroy.class) != null) {
                 return m;
             }
         }
-        Method m = findPreDestroyMethod(c.getSuperclass());
+        Method m = findPreDestroyMethod(c.getSuperclass(), name);
         if (m != null) {
             return m;
         }
         for (Class<?> i : c.getInterfaces()) {
-            m = findPreDestroyMethod(i);
+            m = findPreDestroyMethod(i, name);
             if (m != null) {
                 return m;
             }

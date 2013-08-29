@@ -18,12 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 public interface LifecycleInterface {
-    @PostConstruct
     void postConstruct();
-    @PreDestroy
     void preDestroy();
 }

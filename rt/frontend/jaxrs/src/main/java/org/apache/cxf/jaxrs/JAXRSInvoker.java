@@ -115,8 +115,9 @@ public class JAXRSInvoker extends AbstractInvoker {
                 }
             } else {
                 exchange.put(REQUEST_WAS_SUSPENDED, true);
+            } else {
+                persistRoots(exchange, rootInstance, provider);
             }
-            persistRoots(exchange, rootInstance, provider);
         }
     }
 
