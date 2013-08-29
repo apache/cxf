@@ -55,7 +55,7 @@ public class StaxSchemaValidationOutInterceptor extends AbstractPhaseInterceptor
         if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
             try {
                 WoodstoxValidationImpl mgr = new WoodstoxValidationImpl();
-                if (mgr != null) {
+                if (mgr.canValidate()) {
                     mgr.setupValidation(writer, message.getExchange().getService().getServiceInfos().get(0));
                 }
             } catch (Throwable t) {
