@@ -32,6 +32,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.wsdl.WSDLManager;
 
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
@@ -75,13 +76,13 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             for (Object o : map.values()) {
                 Service service = (Service)o;
                 Map<?, ?> ports = service.getPorts();
-                adjustExtensibilityElements(service.getExtensibilityElements(), url, encodedUrl);
+                adjustExtensibilityElements(service.getExtensibilityElements(), url);
                 
                 for (Object p : ports.values()) {
                     Port port = (Port)p;
 
-                    adjustExtensibilityElements(port.getExtensibilityElements(), url, encodedUrl);
-                    adjustExtensibilityElements(port.getBinding().getExtensibilityElements(), url, encodedUrl);
+                    adjustExtensibilityElements(port.getExtensibilityElements(), url);
+                    adjustExtensibilityElements(port.getBinding().getExtensibilityElements(), url);
                 }
             }
         } catch (Exception e) {
@@ -90,8 +91,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     }
     
     private static void adjustExtensibilityElements(List<?> l,
-                                                    String url,
-                                                    String encodedUrl) {
+                                                    String url) {
         for (Object e : l) {
             if (e instanceof SOAPAddress) {
                 String add = ((SOAPAddress)e).getLocationURI();
@@ -99,7 +99,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 if (idx != -1) {
                     int idx2 = add.indexOf("&", idx);
                     add = add.substring(0, idx)
-                        + "jndiURL=" + encodedUrl
+                        + "jndiURL=" + url
                         + (idx2 == -1 ? "" : add.substring(idx2));
                     ((SOAPAddress)e).setLocationURI(add);
                 }
