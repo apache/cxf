@@ -175,14 +175,18 @@ public final class StaxUtils {
         }
         SAFE_INPUT_FACTORY = xif;
         
-        XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        String xofClassName = xof.getClass().getName();
-        if (xofClassName.contains("ctc.wstx") || xofClassName.contains("xml.xlxp")
-                || xofClassName.contains("xml.xlxp2") || xofClassName.contains("bea.core")) {
-            SAFE_OUTPUT_FACTORY = xof;
-        } else {
-            SAFE_OUTPUT_FACTORY = null;
+        XMLOutputFactory xof = null;
+        try {
+            xof = XMLOutputFactory.newInstance();
+            String xofClassName = xof.getClass().getName();
+            if (!xofClassName.contains("ctc.wstx") && !xofClassName.contains("xml.xlxp")
+                && !xofClassName.contains("xml.xlxp2") && !xofClassName.contains("bea.core")) {
+                xof = null;
+            }
+        } catch (Throwable t) {
+            //ignore, can always drop down to the pooled factories
         }
+        SAFE_OUTPUT_FACTORY = xof;
         
     }
     
@@ -288,8 +292,13 @@ public final class StaxUtils {
      * @throws XMLStreamException
      */
     public static XMLInputFactory createXMLInputFactory(boolean nsAware) {
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-        if (!setRestrictionProperties(factory)) {
+        XMLInputFactory factory = null;
+        try {
+            factory = XMLInputFactory.newInstance();
+        } catch (Throwable t) {
+            factory = null;
+        }
+        if (factory == null || !setRestrictionProperties(factory)) {
             try {
                 factory = createWoodstoxFactory();
             } catch (Throwable t) {
