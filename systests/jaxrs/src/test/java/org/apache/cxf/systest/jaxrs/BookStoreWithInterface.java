@@ -42,24 +42,13 @@ package org.apache.cxf.systest.jaxrs;
 
 
 
-public class BookStoreWithInterface extends BookStoreStorage 
-    implements BookInterface, LifecycleInterface {
+public class BookStoreWithInterface extends BookStoreStorage implements BookInterface {
 
-    private boolean postConstructCalled;
-    
     public BookStoreWithInterface() {
         Book book = new Book();
         book.setId(bookId);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
-    }
-    
-    public void postConstruct() {
-        postConstructCalled = true;
-    }
-    
-    public void preDestroy() {
-        //System.out.println("PreDestroy called");
     }
     
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {

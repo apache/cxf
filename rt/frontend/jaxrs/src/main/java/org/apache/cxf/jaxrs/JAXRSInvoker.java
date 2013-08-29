@@ -108,8 +108,9 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             if (!suspended && !isServiceObjectRequestScope(exchange.getInMessage())) {
                 provider.releaseInstance(exchange.getInMessage(), rootInstance);
+            } else {
+                persistRoots(exchange, rootInstance, provider);
             }
-            persistRoots(exchange, rootInstance, provider);
         }
     }
 

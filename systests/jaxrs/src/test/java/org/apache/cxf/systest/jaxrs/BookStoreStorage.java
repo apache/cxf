@@ -22,10 +22,25 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 
 @Path("/bookstorestorage/")
-public abstract class BookStoreStorage {
+public abstract class BookStoreStorage implements LifecycleInterface {
     protected Map<Long, Book> books = new HashMap<Long, Book>();
     protected long bookId = 123;
+    protected boolean postConstructCalled;
+    
+    @PostConstruct
+    public void postConstruct() {
+        if (postConstructCalled) {
+            throw new RuntimeException();
+        }
+        postConstructCalled = true;
+    }
+    @PreDestroy
+    public void preDestroy() {
+        // System.out.println("PreDestroy called");
+    }
 }

@@ -49,7 +49,11 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     private Method postConstructMethod;
     private Method preDestroyMethod;
     private boolean isSingleton;
-    private boolean callLifecycleMethods = true;
+    private boolean isPrototype;
+    private boolean callPostConstruct;
+    private boolean callPreDestroy = true;
+    private String postConstructMethodName;
+    private String preDestroyMethodName;
     
     public SpringResourceFactory() {
         
@@ -69,9 +73,12 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
             throw new RuntimeException("Resource class " + type
                                        + " has no valid constructor");
         }
-        postConstructMethod = ResourceUtils.findPostConstructMethod(type);
-        preDestroyMethod = ResourceUtils.findPreDestroyMethod(type);
+        postConstructMethod = ResourceUtils.findPostConstructMethod(type, postConstructMethodName);
+        preDestroyMethod = ResourceUtils.findPreDestroyMethod(type, preDestroyMethodName);
         isSingleton = ac.isSingleton(beanId);
+        if (!isSingleton) {
+            isPrototype = ac.isPrototype(beanId);
+        }
     }
     
     /**
@@ -89,8 +96,8 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     }
 
     protected void initInstance(Message m, Object instance) {
-        if (callLifecycleMethods && (!isSingleton() || m == null)) {
-            InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
+        if (callPostConstruct) {
+            InjectionUtils.invokeLifeCycleMethod(ClassHelper.getRealObject(instance), postConstructMethod);
         }
     }
 
@@ -107,7 +114,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public void releaseInstance(Message m, Object o) {
-        if (callLifecycleMethods && !isSingleton()) {
+        if (callPreDestroy && isPrototype) {
             InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
         }
     }
@@ -136,7 +143,19 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
         return c.getDeclaringClass();
     }
 
-    public void setCallLifecycleMethods(boolean callLifecycleMethods) {
-        this.callLifecycleMethods = callLifecycleMethods;
+    public void setCallPostConstruct(boolean callPostConstruct) {
+        this.callPostConstruct = callPostConstruct;
+    }
+
+    public void setCallPreDestroy(boolean callPreDestroy) {
+        this.callPreDestroy = callPreDestroy;
+    }
+
+    public void setPreDestroyMethodName(String preDestroyMethodName) {
+        this.preDestroyMethodName = preDestroyMethodName;
+    }
+
+    public void setPostConstructMethodName(String postConstructMethodName) {
+        this.postConstructMethodName = postConstructMethodName;
     }
 }
