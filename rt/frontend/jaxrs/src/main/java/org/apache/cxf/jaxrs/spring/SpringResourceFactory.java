@@ -96,7 +96,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     }
 
     protected void initInstance(Message m, Object instance) {
-        if (callPostConstruct) {
+        if (isCallPostConstruct()) {
             InjectionUtils.invokeLifeCycleMethod(ClassHelper.getRealObject(instance), postConstructMethod);
         }
     }
@@ -114,9 +114,13 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public void releaseInstance(Message m, Object o) {
-        if (callPreDestroy && isPrototype) {
+        if (doCallPreDestroy()) {
             InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
         }
+    }
+    
+    protected boolean doCallPreDestroy() {
+        return isCallPreDestroy() && isPrototype;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -146,11 +150,19 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     public void setCallPostConstruct(boolean callPostConstruct) {
         this.callPostConstruct = callPostConstruct;
     }
+    
+    public boolean isCallPostConstruct() {
+        return this.callPostConstruct;
+    }
 
     public void setCallPreDestroy(boolean callPreDestroy) {
         this.callPreDestroy = callPreDestroy;
     }
 
+    public boolean isCallPreDestroy() {
+        return this.callPreDestroy;
+    }
+    
     public void setPreDestroyMethodName(String preDestroyMethodName) {
         this.preDestroyMethodName = preDestroyMethodName;
     }
