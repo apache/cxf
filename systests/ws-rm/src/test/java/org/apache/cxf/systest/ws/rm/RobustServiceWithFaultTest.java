@@ -36,6 +36,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.rm.RMManager;
+import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,7 +64,12 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/atmostonce.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            bus.getExtension(RMManager.class).getConfiguration().setAcknowledgementInterval(new Long(0));
+            
+            AcknowledgementInterval ai
+                = new org.apache.cxf.ws.rmp.v200502.ObjectFactory()
+                    .createRMAssertionAcknowledgementInterval();
+            ai.setMilliseconds(new Long(0));
+            bus.getExtension(RMManager.class).getRMAssertion().setAcknowledgementInterval(ai);
 
             serverGreeter = new GreeterCounterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
@@ -96,8 +102,13 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/seqlength1.xml");
         // set the client retry interval much shorter than the slow processing delay
-        RMManager manager = bus.getExtension(RMManager.class); 
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(5000));
+        RMManager manager = bus.getExtension(RMManager.class);
+        
+        AcknowledgementInterval ai
+            = new org.apache.cxf.ws.rmp.v200502.ObjectFactory()
+                .createRMAssertionAcknowledgementInterval();
+        ai.setMilliseconds(new Long(5000));
+        manager.getRMAssertion().setAcknowledgementInterval(ai);
 
         BusFactory.setDefaultBus(bus);
         GreeterService gs = new GreeterService();
