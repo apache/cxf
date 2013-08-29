@@ -55,18 +55,36 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public String getBrokerURL() {
         return brokerUrl1;
     }
+    public String getEncodedBrokerURL() {
+        StringBuilder b = new StringBuilder(brokerUrl1.length());
+        for (int x = 0; x < brokerUrl1.length(); x++) {
+            char c = brokerUrl1.charAt(x);
+            switch (c) {
+            case '?':
+                b.append("%3F");
+                break;
+            default:
+                b.append(c);
+            }               
+        }
+        return b.toString();
+    }
     public void updateWsdl(Bus b, String wsdlLocation) { 
-        updateWsdlExtensors(b, wsdlLocation, brokerUrl1);
+        updateWsdlExtensors(b, wsdlLocation, brokerUrl1, getEncodedBrokerURL());
     }
     
     public static void updateWsdlExtensors(Bus bus, 
                                            String wsdlLocation) {
-        updateWsdlExtensors(bus, wsdlLocation, "tcp://localhost:" + PORT);
+        updateWsdlExtensors(bus, wsdlLocation, "tcp://localhost:" + PORT, null);
     }
     public static void updateWsdlExtensors(Bus bus, 
                                            String wsdlLocation,
-                                           String url) {
+                                           String url,
+                                           String encodedUrl) {
         try {
+            if (encodedUrl == null) {
+                encodedUrl = url;
+            }
             if (bus == null) {
                 bus = BusFactory.getThreadDefaultBus();
             }
@@ -76,13 +94,12 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             for (Object o : map.values()) {
                 Service service = (Service)o;
                 Map<?, ?> ports = service.getPorts();
-                adjustExtensibilityElements(service.getExtensibilityElements(), url);
+                adjustExtensibilityElements(service.getExtensibilityElements(), url, encodedUrl);
                 
                 for (Object p : ports.values()) {
                     Port port = (Port)p;
-
-                    adjustExtensibilityElements(port.getExtensibilityElements(), url);
-                    adjustExtensibilityElements(port.getBinding().getExtensibilityElements(), url);
+                    adjustExtensibilityElements(port.getExtensibilityElements(), url, encodedUrl);
+                    adjustExtensibilityElements(port.getBinding().getExtensibilityElements(), url, encodedUrl);
                 }
             }
         } catch (Exception e) {
@@ -91,7 +108,8 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     }
     
     private static void adjustExtensibilityElements(List<?> l,
-                                                    String url) {
+                                                    String url,
+                                                    String encodedUrl) {
         for (Object e : l) {
             if (e instanceof SOAPAddress) {
                 String add = ((SOAPAddress)e).getLocationURI();
@@ -99,7 +117,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 if (idx != -1) {
                     int idx2 = add.indexOf("&", idx);
                     add = add.substring(0, idx)
-                        + "jndiURL=" + url
+                        + "jndiURL=" + encodedUrl
                         + (idx2 == -1 ? "" : add.substring(idx2));
                     ((SOAPAddress)e).setLocationURI(add);
                 }
