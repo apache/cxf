@@ -114,8 +114,10 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testGetBookSpec() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
-        Book book = ClientBuilder.newClient().target(address)
-            .request("application/xml").get(Book.class);
+        Client client = ClientBuilder.newClient();
+        client.register(new ClientFilterClientAndConfigCheck());
+        client.property("clientproperty", "somevalue");
+        Book book = client.target(address).request("application/xml").get(Book.class);
         assertEquals(124L, book.getId());
     }
     
@@ -572,6 +574,19 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         @Override
         public void filter(ClientRequestContext context) throws IOException {
             context.getHeaders().putSingle("Simple", "simple");
+        }
+    }
+    
+    private static class ClientFilterClientAndConfigCheck implements ClientRequestFilter {
+
+        @Override
+        public void filter(ClientRequestContext context) throws IOException {
+            String prop = context.getClient().getConfiguration().getProperty("clientproperty").toString();
+            String prop2 = context.getConfiguration().getProperty("clientproperty").toString();
+            if (!prop2.equals(prop) || !"somevalue".equals(prop2)) {
+                throw new RuntimeException();
+            }
+            
         }
     }
     
