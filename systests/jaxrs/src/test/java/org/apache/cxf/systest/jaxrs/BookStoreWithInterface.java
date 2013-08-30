@@ -52,9 +52,7 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
     }
     
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {
-        if (!postConstructCalled) {
-            throw new RuntimeException();
-        }
+        checkPostConstruct();
         if (!id.toString().equals(s)) {
             throw new RuntimeException();
         }
@@ -62,9 +60,7 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
     }
     
     public Book getThatBook(Long id) throws BookNotFoundFault {
-        if (!postConstructCalled) {
-            throw new RuntimeException();
-        }
+        checkPostConstruct();
         return doGetBook(id);
     }
     

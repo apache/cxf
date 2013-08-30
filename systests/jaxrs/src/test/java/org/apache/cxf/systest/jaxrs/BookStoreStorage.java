@@ -30,17 +30,26 @@ import javax.ws.rs.Path;
 public abstract class BookStoreStorage implements LifecycleInterface {
     protected Map<Long, Book> books = new HashMap<Long, Book>();
     protected long bookId = 123;
-    protected boolean postConstructCalled;
+    protected int postConstructCalls;
+    protected int preDestroyCalls;
     
     @PostConstruct
     public void postConstruct() {
-        if (postConstructCalled) {
+        if (postConstructCalls++ == 1) {
             throw new RuntimeException();
         }
-        postConstructCalled = true;
     }
+    
     @PreDestroy
     public void preDestroy() {
-        // System.out.println("PreDestroy called");
+        if (preDestroyCalls++ == 1) {
+            throw new RuntimeException();
+        }
+    }
+    
+    protected void checkPostConstruct() {
+        if (postConstructCalls != 1) {
+            throw new RuntimeException();
+        }
     }
 }
