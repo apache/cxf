@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.activation.DataSource;
@@ -44,6 +45,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -53,7 +55,6 @@ import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxStreamFilter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
-import org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl;
 
 public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
@@ -210,18 +211,20 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         } else {
             rootElement = (Element)ds.getNode();
         }
-
-        //filter xop node
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
-        XMLStreamReader filteredReader = 
-            StaxUtils.createFilteredReader(reader, 
-                                           new StaxStreamFilter(new QName[] {XOP}));
-        
-        XMLStreamWriter nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
-        //TODO: expensive to create WoodstoxValidationImpl ?
-        WoodstoxValidationImpl impl = new WoodstoxValidationImpl(message.getExchange().getBus());
-        impl.setupValidation(nullWriter, message.getExchange().getService().getServiceInfos().get(0));
-        StaxUtils.copy(filteredReader, nullWriter);
+        StaxValidationManager svm = message.getExchange().getBus().getExtension(StaxValidationManager.class);
+        if (svm != null) {
+            //filter xop node
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
+            XMLStreamReader filteredReader = 
+                StaxUtils.createFilteredReader(reader, 
+                                               new StaxStreamFilter(new QName[] {XOP}));
+            
+            XMLStreamWriter nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());        
+            svm.setupValidation(nullWriter, message.getExchange().getService().getServiceInfos().get(0));
+            StaxUtils.copy(filteredReader, nullWriter);
+        } else {
+            LOG.log(Level.WARNING, "COULD_NOT_VALIDATE_XML_STREAM");
+        }
         return rootElement;        
     }
 
