@@ -71,12 +71,12 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
     
     @Override
     public OutputStream getEntityStream() {
-        return m.get(OutputStream.class);
+        return m.getContent(OutputStream.class);
     }
 
     @Override
     public void setEntityStream(OutputStream os) {
-        m.put(OutputStream.class, os);
+        m.setContent(OutputStream.class, os);
 
     }
 }
