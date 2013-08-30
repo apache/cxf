@@ -74,7 +74,7 @@ public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
     @Override
     public void setInputStream(InputStream stream) {
         is = stream;
-        m.put(InputStream.class, stream);
+        m.setContent(InputStream.class, stream);
 
     }
 
