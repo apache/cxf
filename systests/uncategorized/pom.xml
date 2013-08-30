@@ -416,5 +416,16 @@
             <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>net.java.dev.msv</groupId>
+            <artifactId>msv-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.java.dev.msv</groupId>
+                    <artifactId>msv-testharness</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

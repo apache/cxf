@@ -28,6 +28,7 @@ import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -36,9 +37,6 @@ import javax.xml.validation.Schema;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -52,13 +50,14 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.FragmentStreamReader;
 import org.apache.cxf.staxutils.StaxSource;
+import org.apache.cxf.staxutils.StaxStreamFilter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
-
-
+import org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl;
 
 public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
+    private static final QName XOP = new QName("http://www.w3.org/2004/08/xop/include", "Include");
 
     private final Class<?> preferred;
     private Schema schema;
@@ -153,9 +152,6 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
                             e.getClass().getCanonicalName(), e.getMessage());
-        } catch (SAXException e) {
-            throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
-                            e.getClass().getCanonicalName(), e.getMessage());
         }
     }
     
@@ -206,15 +202,27 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         return input;
     }
 
-    private Element validate(XMLStreamReader input) 
-        throws XMLStreamException, SAXException, IOException {
+    private Element validate(XMLStreamReader input) throws XMLStreamException {
         DOMSource ds = read(input);
-        schema.newValidator().validate(ds);
-        Node nd = ds.getNode();
-        if (nd instanceof Document) {
-            return ((Document)nd).getDocumentElement();
+        Element rootElement = null;
+        if (ds.getNode() instanceof Document) {
+            rootElement = ((Document)ds.getNode()).getDocumentElement();
+        } else {
+            rootElement = (Element)ds.getNode();
         }
-        return (Element)ds.getNode();
+
+        //filter xop node
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
+        XMLStreamReader filteredReader = 
+            StaxUtils.createFilteredReader(reader, 
+                                           new StaxStreamFilter(new QName[] {XOP}));
+        
+        XMLStreamWriter nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
+        //TODO: expensive to create WoodstoxValidationImpl ?
+        WoodstoxValidationImpl impl = new WoodstoxValidationImpl(message.getExchange().getBus());
+        impl.setupValidation(nullWriter, message.getExchange().getService().getServiceInfos().get(0));
+        StaxUtils.copy(filteredReader, nullWriter);
+        return rootElement;        
     }
 
     private InputStream getInputStream(XMLStreamReader input) 
@@ -265,6 +273,15 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     public void setProperty(String prop, Object value) {
         if (Message.class.getName().equals(prop)) {
             message = (Message)value;
+        }
+    }
+    class NUllOutputStream extends OutputStream {
+        public void write(byte[] b, int off, int len) {
+        }
+        public void write(int b) {
+        }
+
+        public void write(byte[] b) throws IOException {
         }
     }
 }
