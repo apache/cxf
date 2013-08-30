@@ -93,7 +93,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     
     @Override
     public OutputStream getEntityStream() {
-        return m.get(OutputStream.class);
+        return m.getContent(OutputStream.class);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public void setEntityStream(OutputStream os) {
-        m.put(OutputStream.class, os);
+        m.setContent(OutputStream.class, os);
 
     }
 
