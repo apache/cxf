@@ -150,7 +150,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
                 fail("Should have thrown an exception");
             } catch (Exception ex) {
                 //expected 
-                assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
+                assertTrue(ex.getMessage().contains("the length of the value is 96, but the required maximum is 30"));
             }
             
             try {

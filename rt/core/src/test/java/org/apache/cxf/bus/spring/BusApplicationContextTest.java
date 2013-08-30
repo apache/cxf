@@ -21,7 +21,6 @@ package org.apache.cxf.bus.spring;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.springframework.beans.BeansException;
 
 public class BusApplicationContextTest extends Assert {
@@ -41,6 +40,6 @@ public class BusApplicationContextTest extends Assert {
         ctx = new BusApplicationContext(cfgFile, false);
         assertEquals("Unexpected number of resources", 1, ctx.getConfigResources().length);
         ctx = new BusApplicationContext(cfgFile, true);
-        assertEquals("Unexpected number of resources", 2, ctx.getConfigResources().length);
+        assertEquals("Unexpected number of resources", 3, ctx.getConfigResources().length);
     }
 }
