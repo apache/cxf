@@ -57,6 +57,7 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -136,6 +137,15 @@ public class BookServer20 extends AbstractBusTestServerBase {
                     Response.status(500).type("text/plain")
                         .entity("Prematch filter error").build());
             }
+            
+            MediaType mt = context.getMediaType();
+            if (mt != null && mt.toString().equals("text/xml")) {
+                context.getHeaders().putSingle("Content-Type", "application/xml");
+            }
+            List<MediaType> acceptTypes = context.getAcceptableMediaTypes();
+            if (acceptTypes.size() == 1 && acceptTypes.get(0).toString().equals("text/mistypedxml")) {
+                context.getHeaders().putSingle("Accept", "text/xml");
+            }
         }
         
     }
@@ -168,6 +178,12 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (path.endsWith("books/checkN")) {
                 URI requestURI = URI.create(path.replace("N", "2"));
                 context.setRequestUri(requestURI);
+                
+                String body = IOUtils.readStringFromStream(context.getEntityStream());
+                if (!"s".equals(body)) {
+                    throw new RuntimeException();
+                }
+                
                 replaceStream(context);
             } else if (path.endsWith("books/check2")) {
                 replaceStream(context);

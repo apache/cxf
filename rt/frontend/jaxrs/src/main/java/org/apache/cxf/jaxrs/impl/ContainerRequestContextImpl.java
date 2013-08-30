@@ -45,7 +45,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public InputStream getEntityStream() {
-        return m.get(InputStream.class);
+        return m.getContent(InputStream.class);
     }
 
 
