@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
@@ -117,23 +118,44 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null, false)) {
             return;
         }
+        // HTTP method
         String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, 
                                                         HttpMethod.POST, true);
         
-        String requestContentType = (String)message.get(Message.CONTENT_TYPE);
-        if (requestContentType == null) {
-            requestContentType = MediaType.WILDCARD;
-        }
-        
+        // Path to match
         String rawPath = HttpUtils.getPathToMatch(message, true);
         
-        //1. Matching target resource class
-        List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(message);
-
-        String acceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, null);
-        if (acceptTypes == null) {
-            acceptTypes = "*/*";
+        Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        
+        // Content-Type
+        String requestContentType = null;
+        List<String> ctHeaderValues = protocolHeaders.get(Message.CONTENT_TYPE);
+        if (ctHeaderValues != null) {
+            requestContentType = ctHeaderValues.get(0);
+            message.put(Message.CONTENT_TYPE, requestContentType);
+        }
+        if (requestContentType == null) {
+            requestContentType = (String)message.get(Message.CONTENT_TYPE);
+        
+            if (requestContentType == null) {
+                requestContentType = MediaType.WILDCARD;
+            }
+        }
+        
+        // Accept
+        String acceptTypes = null;
+        List<String> acceptHeaderValues = protocolHeaders.get(Message.ACCEPT_CONTENT_TYPE);
+        if (acceptHeaderValues != null) {
+            acceptTypes = acceptHeaderValues.get(0);
             message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
+        }
+        
+        if (acceptTypes == null) {
+            acceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, null);
+            if (acceptTypes == null) {
+                acceptTypes = "*/*";
+                message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
+            }
         }
         List<MediaType> acceptContentTypes = null;
         try {
@@ -143,6 +165,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
+        //1. Matching target resource class
+        List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(message);
         Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources = 
             JAXRSUtils.selectResourceClass(resources, rawPath, message);
         if (matchedResources == null) {
@@ -158,8 +182,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         MultivaluedMap<String, String> matchedValues = new MetadataMap<String, String>();
-        
-        
+                
         OperationResourceInfo ori = null;     
         
         try {                
