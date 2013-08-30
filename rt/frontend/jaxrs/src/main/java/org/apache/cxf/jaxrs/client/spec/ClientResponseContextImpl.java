@@ -39,7 +39,7 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     }
     
     public InputStream getEntityStream() {
-        return m.get(InputStream.class);
+        return m.getContent(InputStream.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -55,7 +55,7 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     
     @Override
     public void setEntityStream(InputStream is) {
-        m.put(InputStream.class, is);
+        m.setContent(InputStream.class, is);
 
     }
 }
