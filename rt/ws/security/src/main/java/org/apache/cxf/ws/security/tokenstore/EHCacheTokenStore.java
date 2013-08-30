@@ -61,7 +61,6 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
         cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
-        @SuppressWarnings("deprecation")
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)
             .overflowToDisk(false); //tokens not writable
         

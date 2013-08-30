@@ -672,11 +672,7 @@ public class JAXRSUtilsTest extends Assert {
     private static List<MediaType> sortMediaTypes(String mediaTypes) {
         return JAXRSUtils.sortMediaTypes(mediaTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
     }
-    
-    private static List<MediaType> sortMediaTypes(List<MediaType> mediaTypes) {
-        return JAXRSUtils.sortMediaTypes(mediaTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
-    }
-    
+        
     private static int compareSortedMediaTypes(List<MediaType> mt1, List<MediaType> mt2) {
         return JAXRSUtils.compareSortedMediaTypes(mt1, mt2, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
     }

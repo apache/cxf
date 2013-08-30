@@ -24,6 +24,8 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.saml.assertion.Claims;
 
 public class SamlUserSubject extends UserSubject {
+    private static final long serialVersionUID = 1L;
+    
     private Claims claims;
     public SamlUserSubject(String user, 
                            List<String> roles,
