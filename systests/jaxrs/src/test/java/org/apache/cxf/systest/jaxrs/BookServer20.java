@@ -143,6 +143,10 @@ public class BookServer20 extends AbstractBusTestServerBase {
             
             MediaType mt = context.getMediaType();
             if (mt != null && mt.toString().equals("text/xml")) {
+                String method = context.getMethod();
+                if ("PUT".equals(method)) {
+                    context.setMethod("POST");
+                }
                 context.getHeaders().putSingle("Content-Type", "application/xml");
             }
             List<MediaType> acceptTypes = context.getAcceptableMediaTypes();
