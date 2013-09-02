@@ -236,11 +236,11 @@ public class BookStore {
     }
     
     @GET
-    @Path("/beanparam")
+    @Path("/beanparam/{id}")
     @Produces("application/xml")
     public Book getBeanParamBook(@BeanParam BookBean bean) {
         
-        long id = bean.getId() + bean.getId1(); 
+        long id = bean.getId() + bean.getId2() + bean.getId3(); 
         
         return books.get(id);
     }
@@ -252,7 +252,7 @@ public class BookStore {
     }
     
     @GET
-    @Path("/beanparam2")
+    @Path("/beanparam2/{id}")
     @Produces("application/xml")
     public Book getBeanParamBook2() {
         return getBeanParamBook(theBookBean);
@@ -1485,28 +1485,40 @@ public class BookStore {
     
     public static class BookBean {
         private long id;
-        private long id1;
+        private long id2;
+        private long id3;
 
         public long getId() {
             return id;
         }
 
-        @QueryParam("id")
+        @PathParam("id")
         public void setId(long id) {
             this.id = id;
         }
         
+        public long getId2() {
+            return id2;
+        }
+
+        @QueryParam("id2")
+        public void setId2(long id2) {
+            this.id2 = id2;
+        }
+        
         @Context
         public void setUriInfo(UriInfo ui) {
-            String id1Value = ui.getQueryParameters().getFirst("id1");
-            if (id1Value != null) {
-                this.id1 = Long.valueOf(id1Value);
+            String id3Value = ui.getQueryParameters().getFirst("id3");
+            if (id3Value != null) {
+                this.id3 = Long.valueOf(id3Value);
             }
         }
 
-        public long getId1() {
-            return id1;
+        public long getId3() {
+            return id3;
         }
+
+        
     }
     
     public static class BookNotReturnedException extends RuntimeException {
