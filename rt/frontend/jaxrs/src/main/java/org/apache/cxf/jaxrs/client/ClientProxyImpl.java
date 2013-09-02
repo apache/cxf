@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -37,6 +38,12 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientException;
 import javax.ws.rs.container.AsyncResponse;
@@ -149,7 +156,9 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         
         MultivaluedMap<ParameterType, Parameter> types = getParametersInfo(params, ori);
-        List<Object> pathParams = getPathParamValues(types, params, ori);
+        List<Parameter> beanParamsList =  getParameters(types, ParameterType.BEAN);
+        
+        List<Object> pathParams = getPathParamValues(types, beanParamsList, params, ori);
         
         int bodyIndex = getBodyIndex(types, ori);
         
@@ -159,15 +168,15 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         addNonEmptyPath(builder, ori.getURITemplate().getValue());
         
-        handleMatrixes(types, params, builder);
-        handleQueries(types, params, builder);
+        handleMatrixes(types, beanParamsList, params, builder);
+        handleQueries(types, beanParamsList, params, builder);
         
         URI uri = builder.buildFromEncoded(pathParams.toArray()).normalize();
         
         MultivaluedMap<String, String> headers = getHeaders();
         MultivaluedMap<String, String> paramHeaders = new MetadataMap<String, String>();
-        handleHeaders(paramHeaders, types, params);
-        handleCookies(paramHeaders, types, params);
+        handleHeaders(paramHeaders, beanParamsList, types, params);
+        handleCookies(paramHeaders, beanParamsList, types, params);
                 
         if (ori.isSubResourceLocator()) {
             ClassResourceInfo subCri = cri.getSubResource(m.getReturnType(), m.getReturnType());
@@ -198,7 +207,7 @@ public class ClientProxyImpl extends AbstractClient implements
         if (bodyIndex != -1) {
             body = params[bodyIndex];
         } else if (types.containsKey(ParameterType.FORM))  {
-            body = handleForm(types, params);
+            body = handleForm(types, beanParamsList, params);
         } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
             body = handleMultipart(types, ori, params);
         }
@@ -370,6 +379,7 @@ public class ClientProxyImpl extends AbstractClient implements
     }
     
     private List<Object> getPathParamValues(MultivaluedMap<ParameterType, Parameter> map,
+                                            List<Parameter> beanParams,   
                                             Object[] params,
                                             OperationResourceInfo ori) {
         List<Object> list = new LinkedList<Object>();
@@ -392,10 +402,17 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         
+        Map<String, Object> beanParamValues = new HashMap<String, Object>(beanParams.size());
+        for (Parameter p : beanParams) {
+            beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
+        }
+        
         for (String varName : methodVars) {
             Parameter p = paramsMap.remove(varName);
             if (p != null) {
                 list.add(convertParamValue(params[p.getIndex()]));
+            } else if (beanParamValues.containsKey(varName)) {
+                list.add(convertParamValue(beanParamValues.get(varName)));
             }
         }
         
@@ -421,18 +438,47 @@ public class ClientProxyImpl extends AbstractClient implements
         return  map.get(key) == null ? Collections.EMPTY_LIST : map.get(key);
     }
     
-    private void handleQueries(MultivaluedMap<ParameterType, Parameter> map, 
-                                      Object[] params,
-                                      UriBuilder ub) {
+    private void handleQueries(MultivaluedMap<ParameterType, Parameter> map,
+                               List<Parameter> beanParams,
+                               Object[] params,
+                               UriBuilder ub) {
         List<Parameter> qs = getParameters(map, ParameterType.QUERY);
         for (Parameter p : qs) {
             if (params[p.getIndex()] != null) {
                 addMatrixQueryParamsToBuilder(ub, p.getName(), ParameterType.QUERY, params[p.getIndex()]);
             }
         }
+        for (Parameter p : beanParams) {
+            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], QueryParam.class);
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                if (entry.getValue() != null) {
+                    addMatrixQueryParamsToBuilder(ub, entry.getKey(), ParameterType.QUERY, entry.getValue());
+                }
+            }
+        }
     }
     
-    private void handleMatrixes(MultivaluedMap<ParameterType, Parameter> map, Object[] params,
+    private Map<String, Object> getValuesFromBeanParam(Object bean, Class<? extends Annotation> annClass) {
+        Map<String, Object> values = new HashMap<String, Object>();
+        
+        for (Method m : bean.getClass().getMethods()) {
+            if (m.getAnnotation(annClass) != null) {
+                try {
+                    String propertyName = m.getName().substring(3);
+                    Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
+                    Object value = getter.invoke(bean, new Object[]{});
+                    values.put(propertyName.toLowerCase(), value);
+                } catch (Throwable t) {
+                    // ignore
+                }
+            }
+        }
+        return values;
+    }
+    
+    private void handleMatrixes(MultivaluedMap<ParameterType, Parameter> map,
+                                List<Parameter> beanParams,
+                                Object[] params,
                                 UriBuilder ub) {
         List<Parameter> mx = getParameters(map, ParameterType.MATRIX);
         for (Parameter p : mx) {
@@ -440,33 +486,53 @@ public class ClientProxyImpl extends AbstractClient implements
                 addMatrixQueryParamsToBuilder(ub, p.getName(), ParameterType.MATRIX, params[p.getIndex()]);
             }
         }
+        for (Parameter p : beanParams) {
+            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], MatrixParam.class);
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                if (entry.getValue() != null) {
+                    addMatrixQueryParamsToBuilder(ub, entry.getKey(), ParameterType.MATRIX, entry.getValue());
+                }
+            }
+        }
     }
 
     private MultivaluedMap<String, String> handleForm(MultivaluedMap<ParameterType, Parameter> map, 
+                                                      List<Parameter> beanParams,
                                                       Object[] params) {
         
         MultivaluedMap<String, String> form = new MetadataMap<String, String>();
         
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
-            Object pValue = params[p.getIndex()];
-            if (pValue != null) {
-                if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
-                    Collection<?> c = pValue.getClass().isArray() 
-                        ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
-                    for (Iterator<?> it = c.iterator(); it.hasNext();) {
-                        FormUtils.addPropertyToForm(form, p.getName(), convertParamValue(it.next()));
-                    }
-                } else { 
-                    String name = p.getName();
-                    FormUtils.addPropertyToForm(form, name, name.isEmpty() ? pValue : convertParamValue(pValue)); 
-                }
-                
+            addFormValue(form, p.getName(), params[p.getIndex()]);
+        }
+        for (Parameter p : beanParams) {
+            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], FormParam.class);
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                addFormValue(form, entry.getKey(), entry.getValue());
             }
         }
         
         return form;
     }
+    
+    private void addFormValue(MultivaluedMap<String, String> form, String name, Object pValue) {
+        if (pValue != null) {
+            if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
+                Collection<?> c = pValue.getClass().isArray() 
+                    ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
+                for (Iterator<?> it = c.iterator(); it.hasNext();) {
+                    FormUtils.addPropertyToForm(form, name, convertParamValue(it.next()));
+                }
+            } else { 
+                FormUtils.addPropertyToForm(form, name, name.isEmpty() ? pValue : convertParamValue(pValue)); 
+            }
+            
+        }
+        
+    }
+    
+    
     
     private List<Attachment> handleMultipart(MultivaluedMap<ParameterType, Parameter> map,
                                              OperationResourceInfo ori,
@@ -484,11 +550,21 @@ public class ClientProxyImpl extends AbstractClient implements
     }
     
     private void handleHeaders(MultivaluedMap<String, String> headers,
-                               MultivaluedMap<ParameterType, Parameter> map, Object[] params) {
+                               List<Parameter> beanParams,
+                               MultivaluedMap<ParameterType, Parameter> map, 
+                               Object[] params) {
         List<Parameter> hs = getParameters(map, ParameterType.HEADER);
         for (Parameter p : hs) {
             if (params[p.getIndex()] != null) {
                 headers.add(p.getName(), convertParamValue(params[p.getIndex()]));
+            }
+        }
+        for (Parameter p : beanParams) {
+            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], HeaderParam.class);
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                if (entry.getValue() != null) {
+                    headers.add(entry.getKey(), convertParamValue(entry.getValue()));
+                }
             }
         }
     }
@@ -500,13 +576,24 @@ public class ClientProxyImpl extends AbstractClient implements
     }
     
     private void handleCookies(MultivaluedMap<String, String> headers,
-                               MultivaluedMap<ParameterType, Parameter> map, Object[] params) {
+                               List<Parameter> beanParams,
+                               MultivaluedMap<ParameterType, Parameter> map, 
+                               Object[] params) {
         List<Parameter> cs = getParameters(map, ParameterType.COOKIE);
         for (Parameter p : cs) {
             if (params[p.getIndex()] != null) {
                 headers.add(HttpHeaders.COOKIE, p.getName() 
                             + '=' 
                             + convertParamValue(params[p.getIndex()].toString()));
+            }
+        }
+        for (Parameter p : beanParams) {
+            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], CookieParam.class);
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                if (entry.getValue() != null) {
+                    headers.add(HttpHeaders.COOKIE, 
+                                entry.getKey() + "=" +  convertParamValue(entry.getValue()));
+                }
             }
         }
     }

@@ -239,8 +239,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     private void doTestUseParamBeanWebClient(String address) {
         WebClient wc = WebClient.create(address);
-        wc.query("id", "120");
-        wc.query("id1", "3");
+        wc.path("100");
+        wc.query("id2", "20");
+        wc.query("id3", "3");
         Book book = wc.get(Book.class);
         assertEquals(123L, book.getId());
     }
@@ -301,6 +302,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         } catch (ClientException ex) {
             // expected
         }
+    }
+    
+    @Test
+    public void testProxyBeanParam() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        BookStore.BookBean bean = new BookStore.BookBean();
+        bean.setId(100L);
+        bean.setId2(23L);
+                
+        Book book = store.getBeanParamBook(bean);
+        assertEquals(123L, book.getId());
+        
     }
     
     @Test
