@@ -250,6 +250,18 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testReplaceBookMistypedCTAndHttpVerb() throws Exception {
+        
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2"; 
+        WebClient wc = WebClient.create(endpointAddress,
+                                        Collections.singletonList(new ReplaceBodyFilter()));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        wc.accept("text/mistypedxml").type("text/xml");
+        Book book = wc.put(new Book("book", 555L), Book.class);
+        assertEquals(561L, book.getId());
+    }
+    
+    @Test
     public void testPostGetCollectionGenericEntityAndType() throws Exception {
         
         String endpointAddress =
