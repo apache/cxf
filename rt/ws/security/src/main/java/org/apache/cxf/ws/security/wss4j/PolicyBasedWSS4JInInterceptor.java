@@ -83,8 +83,8 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSConstants;
@@ -449,7 +449,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         CallbackHandler callbackHandler = requestData.getCallbackHandler();
         if (callbackHandler != null) {
-            return new StrongJasyptPasswordEncryptor(callbackHandler);
+            return new JasyptPasswordEncryptor(callbackHandler);
         }
         
         return null;
