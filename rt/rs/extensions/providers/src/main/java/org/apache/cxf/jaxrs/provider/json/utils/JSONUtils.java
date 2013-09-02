@@ -152,7 +152,9 @@ public final class JSONUtils {
             conf.setPrimitiveArrayKeys(
                 new HashSet<String>(primitiveArrayKeys));
         }
-        conf.setReadNullAsEmptyString(readNullAsString);
+        if (!readNullAsString) {
+            conf.setReadNullAsEmptyString(readNullAsString);
+        }
         XMLInputFactory factory = depthProps != null 
             ? new JettisonMappedReaderFactory(conf, depthProps) 
             : new MappedXMLInputFactory(conf);
