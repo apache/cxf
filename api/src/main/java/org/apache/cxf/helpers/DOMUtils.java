@@ -754,6 +754,20 @@ public final class DOMUtils {
             elem = getNextElement(elem);
         }
     }
+    public static boolean hasElementWithName(Element el, String nameSpaceURI, String localName) {
+        if (el.getNamespaceURI() != null && localName.equals(el.getLocalName())
+            && nameSpaceURI.contains(el.getNamespaceURI())) {
+            return true;
+        }
+        Element elem = getFirstElement(el);
+        while (elem != null) {
+            if (hasElementWithName(elem, nameSpaceURI, localName)) {
+                return true;
+            }
+            elem = getNextElement(elem);
+        }
+        return false;
+    }
     public static boolean hasElementInNS(Element el, String namespace) {
 
         if (namespace.equals(el.getNamespaceURI())) {
