@@ -429,10 +429,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
         throws ServletException {
-        Map<String, List<String>> props = new HashMap<String, List<String>>();
-        cName = getClassNameAndProperties(cName, props);
-        Class<?> appClass = loadApplicationClass(cName);
-        Application app = (Application)createSingletonInstance(appClass, props, servletConfig);
+        Application app = createApplicationInstance(cName, servletConfig);
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
@@ -447,6 +444,14 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
         bean.setBus(getBus());
         bean.create();
+    }
+    
+    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) 
+        throws ServletException {
+        Map<String, List<String>> props = new HashMap<String, List<String>>();
+        appClassName = getClassNameAndProperties(appClassName, props);
+        Class<?> appClass = loadApplicationClass(appClassName);
+        return (Application)createSingletonInstance(appClass, props, servletConfig);
     }
     
     protected Class<?> loadApplicationClass(String appClassName) throws ServletException {
