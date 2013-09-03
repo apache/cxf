@@ -58,6 +58,7 @@ import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.validate.Validator;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
@@ -156,6 +157,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             // processing in the WS-Stack.
         } catch (WSSecurityException e) {
             throw createSoapFault(soapMessage.getVersion(), e);
+        } catch (XMLSecurityException e) {
+            throw new SoapFault(new Message("STAX_EX", LOG), e, soapMessage.getVersion().getSender());
         } catch (WSSPolicyException e) {
             throw new SoapFault(e.getMessage(), e, soapMessage.getVersion().getSender());
         } catch (XMLStreamException e) {
@@ -179,7 +182,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         return Collections.singletonList(securityEventListener);
     }
     
-    protected void configureProperties(SoapMessage msg) throws WSSecurityException {
+    protected void configureProperties(SoapMessage msg) throws XMLSecurityException {
         WSSSecurityProperties securityProperties = getSecurityProperties();
         Map<String, Object> config = getProperties();
         

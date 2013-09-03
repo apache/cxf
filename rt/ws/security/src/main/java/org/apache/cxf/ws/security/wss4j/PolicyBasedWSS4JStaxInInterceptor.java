@@ -200,17 +200,16 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     
     private void checkTransportBinding(
         AssertionInfoMap aim, SoapMessage message
-    ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (ais.isEmpty()) {
+    ) throws XMLSecurityException {
+        boolean transportPolicyInEffect = 
+            !getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING).isEmpty();
+        if (!transportPolicyInEffect && !(getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING).isEmpty()
+            && getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING).isEmpty())) {
             return;
         }
         
         // Add a HttpsSecurityEvent so the policy verification code knows TLS is in use
         if (isRequestor(message)) {
-            List<SecurityEvent> securityEvents = getSecurityEventList(message);
-            
             HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
             httpsTokenSecurityEvent.setAuthenticationType(
                 HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
@@ -222,6 +221,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 LOG.fine(e.getMessage());
             }
             httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+
+            List<SecurityEvent> securityEvents = getSecurityEventList(message);
             securityEvents.add(httpsTokenSecurityEvent);
         }
         
@@ -233,7 +234,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         if (e == null) {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
-        
+
         Crypto encrCrypto = getEncryptionCrypto(e, message);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
@@ -241,12 +242,12 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         } else {
             signCrypto = getSignatureCrypto(s, message);
         }
-        
+
         if (signCrypto != null) {
             message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), signCrypto);
         }
-        
+
         if (encrCrypto != null) {
             message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
             message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
@@ -255,7 +256,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
     }
-    
+
     private List<SecurityEvent> getSecurityEventList(Message message) {
         @SuppressWarnings("unchecked")
         List<SecurityEvent> securityEvents = 
@@ -384,7 +385,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     }
     
     @Override
-    protected void configureProperties(SoapMessage msg) throws WSSecurityException {
+    protected void configureProperties(SoapMessage msg) throws XMLSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         checkAsymmetricBinding(aim, msg);
         checkSymmetricBinding(aim, msg);

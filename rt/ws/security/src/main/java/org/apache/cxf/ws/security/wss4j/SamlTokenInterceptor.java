@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.Principal;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +33,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -45,6 +45,7 @@ import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -64,6 +65,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.validate.Validator;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -126,6 +128,20 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                                 if (!checkVersion(aim, samlToken, assertionWrapper)) {
                                     ai.setNotAsserted("Wrong SAML Version");
                                 }
+                                
+                                TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+                                Certificate[] tlsCerts = null;
+                                if (tlsInfo != null) {
+                                    tlsCerts = tlsInfo.getPeerCertificates();
+                                }
+                                if (!DOMSAMLUtil.checkHolderOfKey(assertionWrapper, null, tlsCerts)) {
+                                    ai.setNotAsserted("Assertion fails holder-of-key requirements");
+                                    continue;
+                                }
+                                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, null, null)) {
+                                    ai.setNotAsserted("Assertion fails sender-vouches requirements");
+                                    continue;
+                                }
                             }
                         }
                         
@@ -183,6 +199,9 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             }
         };
         data.setWssConfig(WSSConfig.getNewInstance());
+        
+        data.setSigVerCrypto(getCrypto(null, SecurityConstants.SIGNATURE_CRYPTO,
+                                     SecurityConstants.SIGNATURE_PROPERTIES, message));
         
         SAMLTokenProcessor p = new SAMLTokenProcessor();
         List<WSSecurityEngineResult> results = 

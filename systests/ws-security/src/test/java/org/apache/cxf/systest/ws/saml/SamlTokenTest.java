@@ -32,6 +32,7 @@ import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlElementCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -207,6 +208,54 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        
+        // DOM
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(saml1Port);
+        saml1Port.doubleIt(25);
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    // Self-signing (see CXF-5248)
+    @org.junit.Test
+    public void testSaml1SupportingSelfSigned() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SupportingPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            SecurityConstants.SELF_SIGN_SAML_ASSERTION, true
+        );
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            SecurityConstants.SIGNATURE_USERNAME, "alice"
+        );
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties"
+        );
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            SecurityConstants.CALLBACK_HANDLER, 
+            "org.apache.cxf.systest.ws.common.KeystorePasswordCallback"
         );
         
         // DOM

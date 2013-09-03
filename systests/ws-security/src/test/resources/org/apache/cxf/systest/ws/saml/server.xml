@@ -116,6 +116,10 @@
        depends-on="tls-settings">
         
        <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" value="bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
