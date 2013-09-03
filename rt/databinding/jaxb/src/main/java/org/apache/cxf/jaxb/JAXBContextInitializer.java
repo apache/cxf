@@ -379,8 +379,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
      * Checks if the field is accepted as a JAXB property.
      */
     static boolean isFieldAccepted(Field field, XmlAccessType accessType) {
-        // We only accept non static fields which are not marked @XmlTransient
-        if (Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(XmlTransient.class)) {
+        // We only accept non static fields which are not marked @XmlTransient or has transient modifier
+        if (Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(XmlTransient.class)
+            || Modifier.isTransient(field.getModifiers())) {
             return false;
         }
         if (accessType == XmlAccessType.PUBLIC_MEMBER 
