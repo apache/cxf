@@ -88,14 +88,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
         
-        String splitChar = getParameterSplitChar(servletConfig);
-                
         String applicationClass = servletConfig.getInitParameter(JAXRS_APPLICATION_PARAM);
         if (applicationClass != null) {
-            createServerFromApplication(applicationClass, servletConfig, splitChar);
+            createServerFromApplication(applicationClass, servletConfig);
             return;
         }
         
+        String splitChar = getParameterSplitChar(servletConfig);
         JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
         bean.setBus(getBus());
         
@@ -428,18 +427,18 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
     }
     
-    protected void createServerFromApplication(String cName, ServletConfig servletConfig,
-                                               String splitChar) 
+    protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
         throws ServletException {
         Map<String, List<String>> props = new HashMap<String, List<String>>();
         cName = getClassNameAndProperties(cName, props);
-        Class<?> appClass = loadClass(cName, "Application");
+        Class<?> appClass = loadApplicationClass(cName);
         Application app = (Application)createSingletonInstance(appClass, props, servletConfig);
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
                                             MessageUtils.isTrue(ignoreParam),
                                             getStaticSubResolutionValue(servletConfig));
+        String splitChar = getParameterSplitChar(servletConfig);
         setAllInterceptors(bean, servletConfig, splitChar);
         setInvoker(bean, servletConfig);
         setExtensions(bean, servletConfig);
@@ -448,6 +447,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
         bean.setBus(getBus());
         bean.create();
+    }
+    
+    protected Class<?> loadApplicationClass(String appClassName) throws ServletException {
+        return loadClass(appClassName, "Application");
     }
     
     protected Class<?> loadClass(String cName) throws ServletException {
