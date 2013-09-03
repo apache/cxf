@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.w3c.dom.Document;
 
-
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebRequest;
@@ -33,7 +32,7 @@ import com.meterware.servletunit.ServletUnitClient;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Test;
 
@@ -94,7 +93,7 @@ public class ExternalServicesServletTest extends AbstractServletTest {
         assertEquals("text/xml", response.getContentType());
         assertEquals("UTF-8", response.getCharacterSet());
 
-        Document doc = DOMUtils.readXml(response.getInputStream());
+        Document doc = StaxUtils.read(response.getInputStream());
         assertNotNull(doc);
         
         addNamespace("h", "http://apache.org/hello_world_soap_http/types");

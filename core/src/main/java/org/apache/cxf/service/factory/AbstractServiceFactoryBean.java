@@ -37,13 +37,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataBinding;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public abstract class AbstractServiceFactoryBean {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractServiceFactoryBean.class);
@@ -146,7 +146,7 @@ public abstract class AbstractServiceFactoryBean {
             }
             Document d;
             try {
-                d = DOMUtils.readXml(url.openStream());
+                d = StaxUtils.read(url.openStream());
             } catch (Exception e) {
                 throw new ServiceConstructionException(new Message("ERROR_READING_SCHEMA", LOG, l), e);
             }

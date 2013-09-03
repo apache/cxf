@@ -31,7 +31,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.attachment.AttachmentDeserializer;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Attachment;
@@ -39,6 +38,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -104,11 +104,11 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
         WSPolicyFeature policyFeature = new WSPolicyFeature();
         List<Element> policyElements = new ArrayList<Element>();
         if (mtomRequired) {
-            policyElements.add(DOMUtils.readXml(
+            policyElements.add(StaxUtils.read(
                 getClass().getResourceAsStream("mtom-policy.xml"))
                            .getDocumentElement());
         } else {
-            policyElements.add(DOMUtils.readXml(
+            policyElements.add(StaxUtils.read(
                 getClass().getResourceAsStream("mtom-policy-optional.xml"))
                            .getDocumentElement());
         } 

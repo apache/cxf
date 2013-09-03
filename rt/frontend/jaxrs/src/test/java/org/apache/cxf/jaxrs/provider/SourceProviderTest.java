@@ -40,7 +40,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -110,7 +109,7 @@ public class SourceProviderTest extends Assert {
     public void testWriteToDocument() throws Exception {
         SourceProvider<Document> p = new SourceProvider<Document>();
         
-        Document doc = DOMUtils.readXml(new StringReader("<test/>"));
+        Document doc = StaxUtils.read(new StringReader("<test/>"));
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         

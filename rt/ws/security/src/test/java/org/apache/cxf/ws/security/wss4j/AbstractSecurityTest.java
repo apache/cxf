@@ -38,10 +38,10 @@ import org.xml.sax.SAXException;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.wss4j.dom.WSConstants;
 
@@ -64,10 +64,10 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
      * Reads a classpath resource into a Document.
      * @param name the name of the classpath resource
      */
-    protected Document readDocument(String name) throws SAXException, IOException,
+    protected Document readDocument(String name) throws Exception,
         ParserConfigurationException {
         InputStream inStream = getClass().getResourceAsStream(name);
-        return DOMUtils.readXml(inStream);
+        return StaxUtils.read(inStream);
     }
 
     /**

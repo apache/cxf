@@ -46,7 +46,6 @@ import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11F
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12FaultOutInterceptorInternal;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor.SAAJPreInInterceptor;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
@@ -96,7 +95,7 @@ public class SoapFaultSerializerTest extends Assert {
         writer.writeEndDocument();
         writer.close();
 
-        Document faultDoc = DOMUtils.readXml(new ByteArrayInputStream(out.toByteArray()));
+        Document faultDoc = StaxUtils.read(new ByteArrayInputStream(out.toByteArray()));
         assertValid("//s:Fault/faultcode[text()='ns1:Client']", faultDoc);
         assertValid("//s:Fault/faultstring[text()='" + faultString + "']", faultDoc);
 
@@ -140,7 +139,7 @@ public class SoapFaultSerializerTest extends Assert {
         writer.writeEndDocument();
         writer.close();
 
-        Document faultDoc = DOMUtils.readXml(new ByteArrayInputStream(out.toByteArray()));
+        Document faultDoc = StaxUtils.read(new ByteArrayInputStream(out.toByteArray()));
         
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
                     faultDoc);
@@ -193,7 +192,7 @@ public class SoapFaultSerializerTest extends Assert {
         writer.writeEndDocument();
         writer.close();
 
-        Document faultDoc = DOMUtils.readXml(new ByteArrayInputStream(out.toByteArray()));
+        Document faultDoc = StaxUtils.read(new ByteArrayInputStream(out.toByteArray()));
         
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
                     faultDoc);

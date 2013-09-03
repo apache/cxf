@@ -28,7 +28,6 @@ import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -39,6 +38,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.policy.PolicyException;
 
 /**
@@ -145,7 +145,7 @@ public class Wsdl11XPointerDomainExpression implements DomainExpression {
         }
         Document doc = null;
         try {
-            doc = DOMUtils.readXml(is.getByteStream());
+            doc = StaxUtils.read(is.getByteStream());
         } catch (Exception ex) {
             throw new PolicyException(ex);
         }

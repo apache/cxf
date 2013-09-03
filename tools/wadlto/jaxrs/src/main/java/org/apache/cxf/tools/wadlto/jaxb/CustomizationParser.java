@@ -39,7 +39,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -108,7 +107,7 @@ public final class CustomizationParser {
         Element root = null;
         try {
             URIResolver resolver = new URIResolver(bindingFile);
-            root = DOMUtils.readXml(resolver.getInputStream()).getDocumentElement();
+            root = StaxUtils.read(resolver.getInputStream()).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
             throw new ToolException(msg, e1);

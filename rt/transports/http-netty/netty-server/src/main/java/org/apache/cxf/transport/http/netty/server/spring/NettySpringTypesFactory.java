@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
 import org.apache.cxf.transports.http_netty_server.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersIdentifiedType;
@@ -86,7 +86,7 @@ public final class NettySpringTypesFactory {
     public Map<String, TLSServerParameters> createTLSServerParametersMap(String s,
                                                                          JAXBContext ctx) 
         throws Exception {
-        Document doc = DOMUtils.readXml(new StringReader(s));
+        Document doc = StaxUtils.read(new StringReader(s));
         
         List <TLSServerParametersIdentifiedType> tlsServerParameters =
             NettySpringTypesFactory
@@ -103,7 +103,7 @@ public final class NettySpringTypesFactory {
     public Map<String, ThreadingParameters> createThreadingParametersMap(String s,
                                                                          JAXBContext ctx) 
         throws Exception {
-        Document doc = DOMUtils.readXml(new StringReader(s));
+        Document doc = StaxUtils.read(new StringReader(s));
         List <ThreadingParametersIdentifiedType> threadingParametersIdentifiedTypes = 
             NettySpringTypesFactory
                 .parseListElement(doc.getDocumentElement(), 

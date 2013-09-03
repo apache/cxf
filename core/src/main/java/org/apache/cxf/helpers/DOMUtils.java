@@ -20,8 +20,6 @@
 package org.apache.cxf.helpers;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +35,6 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -525,74 +522,7 @@ public final class DOMUtils {
             return new InputSource(new StringReader(""));
         }
     }
-
-    /**
-     * Read XML as DOM.
-     */
-    public static Document readXml(InputStream is) throws SAXException, IOException,
-        ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-        // dbf.setCoalescing(true);
-        // dbf.setExpandEntityReferences(true);
-
-        DocumentBuilder db = null;
-        db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-
-        // db.setErrorHandler( new MyErrorHandler());
-
-        return db.parse(is);
-    }
-
-    public static Document readXml(Reader is) throws SAXException, IOException, ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-        // dbf.setCoalescing(true);
-        // dbf.setExpandEntityReferences(true);
-
-        DocumentBuilder db = null;
-        db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-
-        // db.setErrorHandler( new MyErrorHandler());
-        InputSource ips = new InputSource(is);
-        return db.parse(ips);
-    }
-
-    public static Document readXml(StreamSource is) throws SAXException, IOException,
-        ParserConfigurationException {
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-        // dbf.setCoalescing(true);
-        // dbf.setExpandEntityReferences(true);
-
-        DocumentBuilder db = null;
-        db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-
-        // db.setErrorHandler( new MyErrorHandler());
-        InputSource is2 = new InputSource();
-        is2.setSystemId(is.getSystemId());
-        is2.setByteStream(is.getInputStream());
-        is2.setCharacterStream(is.getReader());
-
-        return db.parse(is2);
-    }
-
+    
     public static String getPrefixRecursive(Element el, String ns) {
         String prefix = getPrefix(el, ns);
         if (prefix == null && el.getParentNode() instanceof Element) {

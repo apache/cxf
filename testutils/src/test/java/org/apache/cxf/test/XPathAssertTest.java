@@ -23,9 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.w3c.dom.Document;
+
 import junit.framework.AssertionFailedError;
 
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,7 +35,7 @@ public class XPathAssertTest extends Assert {
     
     @Test
     public void testAssert() throws Exception {
-        Document document = DOMUtils.readXml(getClass().getResourceAsStream("test.xml"));
+        Document document = StaxUtils.read(getClass().getResourceAsStream("test.xml"));
 
         XPathAssert.assertValid("//a", document, null);
         XPathAssert.assertInvalid("//aasd", document, null);
@@ -57,7 +59,7 @@ public class XPathAssertTest extends Assert {
 
     @Test
     public void testAssertNamespace() throws Exception {
-        Document document = DOMUtils.readXml(getClass().getResourceAsStream("test2.xml"));
+        Document document = StaxUtils.read(getClass().getResourceAsStream("test2.xml"));
 
         Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("a", "urn:foo");

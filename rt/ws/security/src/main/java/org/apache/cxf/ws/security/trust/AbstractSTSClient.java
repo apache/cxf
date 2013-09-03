@@ -786,7 +786,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             if (isString || isElement || isCallbackHandler) {
                 if (isString) {
                     final Document doc =
-                        DOMUtils.readXml(new StringReader((String) delegationObject));
+                        StaxUtils.read(new StringReader((String) delegationObject));
                     return doc.getDocumentElement();
                 } else if (isElement) {
                     return (Element) delegationObject;

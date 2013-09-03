@@ -23,9 +23,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 
 /**
@@ -36,7 +39,7 @@ public abstract class AbstractSpringConfiguredAutoRewriteSoapAddressTest extends
     private Document retrieveWsdlDocument(String hostname, String port) throws Exception {
         URL wsdlUrlLocalhost = new URL("http://" + hostname + ":" + port + "/SpringEndpoint?wsdl");
         URLConnection urlConnection = wsdlUrlLocalhost.openConnection();
-        return DOMUtils.readXml(urlConnection.getInputStream());
+        return StaxUtils.read(urlConnection.getInputStream());
     }
 
     protected List<String> findAllServiceUrlsFromWsdl(String hostname, String port) throws Exception {

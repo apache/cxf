@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
 import org.apache.neethi.Assertion;
 
@@ -67,7 +68,7 @@ public class JaxbAssertionBuilderTest extends Assert {
         JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
         assertNotNull(ab);
         InputStream is = JaxbAssertionBuilderTest.class.getResourceAsStream("foo.xml");
-        Document doc = DOMUtils.readXml(is);        
+        Document doc = StaxUtils.read(is);        
         Element elem =  DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
                                                           "http://cxf.apache.org/test/assertions/foo", 
                                                           "foo").get(0);

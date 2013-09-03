@@ -37,7 +37,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -49,10 +48,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.Destination;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.SayHi;
 import org.apache.hello_world_soap_http.types.SayHiResponse;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -103,7 +104,7 @@ public class DispatchTest extends AbstractJaxWsTest {
 
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));
 
-        Document doc = DOMUtils.readXml(getResourceAsStream("/org/apache/cxf/jaxws/sayHi2.xml"));
+        Document doc = StaxUtils.read(getResourceAsStream("/org/apache/cxf/jaxws/sayHi2.xml"));
         DOMSource source = new DOMSource(doc);
         Source res = disp.invoke(source);
         assertNotNull(res);
@@ -183,7 +184,7 @@ public class DispatchTest extends AbstractJaxWsTest {
         BindingOperationVerifier bov = new BindingOperationVerifier();
         ((DispatchImpl<?>)disp).getClient().getOutInterceptors().add(bov);
 
-        Document doc = DOMUtils.readXml(getResourceAsStream("/org/apache/cxf/jaxws/sayHi2.xml"));
+        Document doc = StaxUtils.read(getResourceAsStream("/org/apache/cxf/jaxws/sayHi2.xml"));
         DOMSource source = new DOMSource(doc);
         Source res = disp.invoke(source);
         assertNotNull(res);

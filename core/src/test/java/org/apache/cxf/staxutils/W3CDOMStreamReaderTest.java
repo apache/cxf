@@ -33,7 +33,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.helpers.DOMUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,7 +75,7 @@ public class W3CDOMStreamReaderTest extends Assert {
         ByteArrayInputStream is = new ByteArrayInputStream(
                "<t:Test xmlns:t=\"http://example.org/types\">gorilla</t:Test>"
                .getBytes("utf-8"));
-        Document doc = DOMUtils.readXml(is);
+        Document doc = StaxUtils.read(is);
         Element e = doc.getDocumentElement();
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(e);
         String value = reader.getElementText();

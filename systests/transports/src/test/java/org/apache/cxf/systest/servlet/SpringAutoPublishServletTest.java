@@ -27,7 +27,7 @@ import com.meterware.servletunit.ServletUnitClient;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Test;
 
@@ -64,7 +64,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertEquals("text/xml", response.getContentType());
         assertTrue("utf-8".equalsIgnoreCase(response.getCharacterSet()));
 
-        Document doc = DOMUtils.readXml(response.getInputStream());
+        Document doc = StaxUtils.read(response.getInputStream());
         assertNotNull(doc);
 
         addNamespace("h", "http://apache.org/hello_world_soap_http/types");
@@ -85,7 +85,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertEquals(200, res.getResponseCode());
         assertEquals("text/xml", res.getContentType());
         
-        Document doc = DOMUtils.readXml(res.getInputStream());
+        Document doc = StaxUtils.read(res.getInputStream());
         assertNotNull(doc);
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);
@@ -97,7 +97,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertEquals(200, res.getResponseCode());
         assertEquals("text/xml", res.getContentType());
         
-        doc = DOMUtils.readXml(res.getInputStream());
+        doc = StaxUtils.read(res.getInputStream());
         assertNotNull(doc);
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);

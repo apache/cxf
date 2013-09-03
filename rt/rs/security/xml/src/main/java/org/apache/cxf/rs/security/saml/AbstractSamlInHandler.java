@@ -38,7 +38,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -47,6 +46,7 @@ import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -95,7 +95,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     protected Element readToken(Message message, InputStream tokenStream) {
         
         try {
-            Document doc = DOMUtils.readXml(new InputStreamReader(tokenStream, "UTF-8"));
+            Document doc = StaxUtils.read(new InputStreamReader(tokenStream, "UTF-8"));
             return doc.getDocumentElement();
         } catch (Exception ex) {
             throwFault("Assertion can not be read as XML document", ex);
