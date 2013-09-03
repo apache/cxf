@@ -36,6 +36,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.MessageInfo.Type;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService;
 import org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService;
@@ -486,7 +487,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         String wsdlContents = IOUtils.toString(is);
 
         // System.out.println(wsdlContents);
-        return DOMUtils.readXml(new StringReader(wsdlContents));
+        return StaxUtils.read(new StringReader(wsdlContents));
     }
 
     private String getPolicyId(Element element) {

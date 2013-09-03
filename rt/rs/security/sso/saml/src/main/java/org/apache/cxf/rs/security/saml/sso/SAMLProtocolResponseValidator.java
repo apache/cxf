@@ -36,9 +36,9 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.xml.EncryptionUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -430,7 +430,7 @@ public class SAMLProtocolResponseValidator {
         
         Document payloadDoc = null;
         try {
-            payloadDoc = DOMUtils.readXml(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
+            payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                "UTF-8"));
             return payloadDoc.getDocumentElement();
         } catch (Exception ex) {

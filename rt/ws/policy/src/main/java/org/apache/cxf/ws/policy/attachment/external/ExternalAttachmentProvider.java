@@ -34,12 +34,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.attachment.AbstractPolicyProvider;
@@ -166,7 +166,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
             if (null == is) {
                 throw new PolicyException(new Message("COULD_NOT_OPEN_ATTACHMENT_DOC_EXC", BUNDLE, location));
             }
-            doc = DOMUtils.readXml(is);
+            doc = StaxUtils.read(is);
         } catch (Exception ex) {
             throw new PolicyException(ex);
         }

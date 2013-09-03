@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class CertConstraintsTest extends org.junit.Assert {
 
@@ -168,7 +168,7 @@ public class CertConstraintsTest extends org.junit.Assert {
     ) throws Exception {
         final java.io.InputStream inStream = 
             CertConstraintsTest.class.getResourceAsStream(name);
-        return DOMUtils.readXml(inStream);
+        return StaxUtils.read(inStream);
     }
 
     private static <T> T

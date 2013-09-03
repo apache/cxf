@@ -55,6 +55,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -163,7 +164,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                               String refAttrName) throws Exception {
         WebClient client = WebClient.create(address + schemaSegment);
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
         assertEquals(XmlSchemaConstants.XSD_NAMESPACE_URI, root.getNamespaceURI());
         assertEquals("schema", root.getLocalName());
@@ -181,7 +182,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         WebClient client = WebClient.create(requestTypeURI);
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
         
-        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
@@ -204,7 +205,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     private List<Element> checkWadlResourcesInfo(String baseURI, String requestURI, 
                                         String schemaRef, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
-        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());

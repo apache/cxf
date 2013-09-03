@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
@@ -56,7 +57,7 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             try {
-                doc = DOMUtils.readXml(new InputStreamReader(is, "UTF-8"));
+                doc = StaxUtils.read(new InputStreamReader(is, "UTF-8"));
             } catch (Exception ex) {
                 throwFault("Invalid XML payload", ex);
             }

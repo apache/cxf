@@ -52,11 +52,11 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
@@ -254,7 +254,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         
         Document responseDoc = null;
         try {
-            responseDoc = DOMUtils.readXml(new InputStreamReader(tokenStream, "UTF-8"));
+            responseDoc = StaxUtils.read(new InputStreamReader(tokenStream, "UTF-8"));
         } catch (Exception ex) {
             throw new WebApplicationException(400);
         }

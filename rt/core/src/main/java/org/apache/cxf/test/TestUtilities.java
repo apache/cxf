@@ -44,17 +44,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -260,21 +259,13 @@ public class TestUtilities {
         byte[] bs = invokeBytes(address, transport, message);
 
         ByteArrayInputStream input = new ByteArrayInputStream(bs);
-        try {
-            return DOMUtils.readXml(input);
-        } catch (SAXParseException e) {
-            throw new IllegalStateException("Could not parse message:\n" + new String(bs), e);
-        }
+        return StaxUtils.read(input);
     }
     public Node invoke(String address, String transport, byte[] message) throws Exception {
         byte[] bs = invokeBytes(address, transport, message);
 
         ByteArrayInputStream input = new ByteArrayInputStream(bs);
-        try {
-            return DOMUtils.readXml(input);
-        } catch (SAXParseException e) {
-            throw new IllegalStateException("Could not parse message:\n" + new String(bs), e);
-        }
+        return StaxUtils.read(input);
     }
 
     public InputStream getResourceAsStream(String resource) {

@@ -24,7 +24,7 @@ import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class JsFrontEndServletTest extends AbstractServletTest {
         assertEquals("text/xml", response.getContentType());
         //assertEquals("UTF-8", response.getCharacterSet());
 
-        Document doc = DOMUtils.readXml(response.getInputStream());
+        Document doc = StaxUtils.read(response.getInputStream());
         assertNotNull(doc);
         
         addNamespace("h", "http://apache.org/hello_world_soap_http/types");

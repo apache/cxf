@@ -43,7 +43,6 @@ import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
@@ -251,7 +250,7 @@ public class BeanTest extends AbstractAegisTest {
 
         bos.close();
 
-        Document doc = DOMUtils.readXml(new ByteArrayInputStream(bos.toByteArray()));
+        Document doc = StaxUtils.read(new ByteArrayInputStream(bos.toByteArray()));
         Element element = doc.getDocumentElement();
 
         addNamespace("b2", "urn:Bean2");

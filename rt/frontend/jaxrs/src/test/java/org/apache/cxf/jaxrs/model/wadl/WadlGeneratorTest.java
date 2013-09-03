@@ -53,6 +53,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -88,7 +89,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
@@ -105,7 +106,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         List<Element> grammarEls = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
             WadlGenerator.WADL_NS, "grammars");
         assertEquals(1, grammarEls.size());
@@ -141,7 +142,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkGrammarsWithLinks(doc.getDocumentElement(), Collections.singletonList("http://books.xsd"));
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
@@ -158,7 +159,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkGrammarsWithLinks(doc.getDocumentElement(), 
                                Collections.singletonList("http://localhost:8080/baz/books.xsd"));
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
@@ -177,7 +178,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkGrammarsWithLinks(doc.getDocumentElement(), 
                                Collections.singletonList("http://books"));
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
@@ -196,7 +197,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:book", "prefix1:book2", "prefix1:chapter");
@@ -213,7 +214,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
         checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
@@ -235,7 +236,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
         List<Element> grammarEls = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
                                                                 WadlGenerator.WADL_NS, 
@@ -263,7 +264,7 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         List<Element> rootEls = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         assertEquals(1, rootEls.size());
         Element resource = rootEls.get(0);
@@ -308,7 +309,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         String wadl = r.getEntity().toString();
-        Document doc = DOMUtils.readXml(new StringReader(wadl));
+        Document doc = StaxUtils.read(new StringReader(wadl));
         checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");

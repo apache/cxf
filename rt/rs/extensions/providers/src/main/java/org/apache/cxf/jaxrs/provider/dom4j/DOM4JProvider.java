@@ -35,7 +35,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @javax.ws.rs.Produces({"application/xml", "text/xml", "application/json" })
 @javax.ws.rs.Consumes({"application/xml", "text/xml", "application/json" })
@@ -104,7 +104,7 @@ public class DOM4JProvider implements MessageBodyReader<org.dom4j.Document>,
     private org.w3c.dom.Document convertToDOM(org.dom4j.Document doc) {
         String xml = doc.asXML();
         try {
-            return DOMUtils.readXml(new StringReader(xml));
+            return StaxUtils.read(new StringReader(xml));
         } catch (Exception ex) {
             throw new javax.ws.rs.InternalServerErrorException(ex);
         }

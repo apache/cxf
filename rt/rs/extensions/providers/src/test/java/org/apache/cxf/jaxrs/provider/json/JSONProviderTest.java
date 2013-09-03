@@ -62,7 +62,6 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -509,7 +508,7 @@ public class JSONProviderTest extends Assert {
         new JAXBElementProvider<TagVO>().writeTo(tag, TagVO.class, TagVO.class, 
                   TagVO.class.getAnnotations(), MediaType.APPLICATION_XML_TYPE, 
                   new MetadataMap<String, Object>(), os);
-        Document doc = DOMUtils.readXml(new StringReader(os.toString()));
+        Document doc = StaxUtils.read(new StringReader(os.toString()));
          
         
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
@@ -610,7 +609,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testDropRootElementFromDocument() throws Exception {
         JSONProvider<Document> p = new JSONProvider<Document>();
-        Document doc = DOMUtils.readXml(new StringReader("<a><b>2</b></a>"));
+        Document doc = StaxUtils.read(new StringReader("<a><b>2</b></a>"));
         p.setDropRootElement(true);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         

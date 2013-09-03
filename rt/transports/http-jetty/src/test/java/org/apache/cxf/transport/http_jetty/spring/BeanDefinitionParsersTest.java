@@ -21,14 +21,15 @@ package org.apache.cxf.transport.http_jetty.spring;
 
 import org.w3c.dom.Document;
 
-
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.spring.HttpConduitBeanDefinitionParser;
 import org.apache.cxf.transport.http.spring.HttpDestinationBeanDefinitionParser;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
@@ -41,7 +42,7 @@ public class BeanDefinitionParsersTest extends Assert {
         
         HttpDestinationBeanDefinitionParser parser = new HttpDestinationBeanDefinitionParser();
 
-        Document d = DOMUtils.readXml(getClass().getResourceAsStream("destination.xml"));
+        Document d = StaxUtils.read(getClass().getResourceAsStream("destination.xml"));
         parser.doParse(d.getDocumentElement(), null, bd);
         
         PropertyValue[] pvs = bd.getRawBeanDefinition().getPropertyValues().getPropertyValues();
@@ -56,7 +57,7 @@ public class BeanDefinitionParsersTest extends Assert {
         
         HttpConduitBeanDefinitionParser parser = new HttpConduitBeanDefinitionParser();
 
-        Document d = DOMUtils.readXml(getClass().getResourceAsStream("conduit.xml"));
+        Document d = StaxUtils.read(getClass().getResourceAsStream("conduit.xml"));
         parser.doParse(d.getDocumentElement(), null, bd);
         
         PropertyValue[] pvs = bd.getRawBeanDefinition().getPropertyValues().getPropertyValues();

@@ -30,6 +30,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 
@@ -100,8 +101,8 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
             // TODO: this is not critical now - but figure out if we can avoid copying
             // DOMs
             CachedOutputStream bos = new CachedOutputStream();
-            DOMUtils.writeXml(newDoc, bos);
-            return DOMUtils.readXml(bos.getInputStream());
+            StaxUtils.writeTo(newDoc, bos);
+            return StaxUtils.read(bos.getInputStream());
         } else {
             return newDoc;
         }

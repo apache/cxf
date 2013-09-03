@@ -91,6 +91,7 @@ import org.apache.cxf.jaxrs.model.wadl.XMLName;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public final class ResourceUtils {
     
@@ -506,7 +507,7 @@ public final class ResourceUtils {
     }
     
     public static List<UserResource> getUserResources(InputStream is) throws Exception {
-        Document doc = DOMUtils.readXml(new InputStreamReader(is, "UTF-8"));
+        Document doc = StaxUtils.read(new InputStreamReader(is, "UTF-8"));
         return getResourcesFromElement(doc.getDocumentElement());
     }
     

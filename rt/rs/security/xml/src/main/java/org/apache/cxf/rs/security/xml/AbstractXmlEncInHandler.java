@@ -35,11 +35,11 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSConstants;
@@ -84,7 +84,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         
         Document payloadDoc = null;
         try {
-            payloadDoc = DOMUtils.readXml(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
+            payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                "UTF-8"));
         } catch (Exception ex) {
             throwFault("Payload document can not be created", ex);

@@ -24,8 +24,8 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
@@ -55,7 +55,7 @@ public class RemoteReferenceResolver implements ReferenceResolver {
         }
         Document doc = null;
         try {
-            doc = DOMUtils.readXml(is.getByteStream());
+            doc = StaxUtils.read(is.getByteStream());
         } catch (Exception ex) {
             throw new PolicyException(ex);
         } finally {

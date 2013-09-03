@@ -35,7 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -57,6 +56,7 @@ import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.handler.RequestData;
@@ -158,7 +158,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     protected Element readToken(InputStream tokenStream) {
         
         try {
-            Document doc = DOMUtils.readXml(new InputStreamReader(tokenStream, "UTF-8"));
+            Document doc = StaxUtils.read(new InputStreamReader(tokenStream, "UTF-8"));
             return doc.getDocumentElement();
         } catch (Exception ex) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);

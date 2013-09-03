@@ -51,6 +51,7 @@ import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.saml2.core.AuthnRequest;
@@ -163,9 +164,9 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         }
         try {
             String assertion = responseState.getAssertion();
-            AssertionWrapper assertionWrapper = 
+            AssertionWrapper assertionWrapper =
                 new AssertionWrapper(
-                    DOMUtils.readXml(new StringReader(assertion)).getDocumentElement());
+                    StaxUtils.read(new StringReader(assertion)).getDocumentElement());
             setSecurityContext(m, assertionWrapper);
         } catch (Exception ex) {
             reportError("INVALID_RESPONSE_STATE");
