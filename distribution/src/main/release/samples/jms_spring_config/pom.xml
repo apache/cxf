@@ -165,8 +165,8 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.activemq.tooling</groupId>
-                        <artifactId>maven-activemq-plugin</artifactId>
-                        <version>5.4.2</version>
+                        <artifactId>activemq-maven-plugin</artifactId>
+                        <version>5.8.0</version>
                         <executions>
                             <execution>
                                 <phase>test</phase>
