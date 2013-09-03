@@ -49,6 +49,23 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSaml1SupportingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSaml1SupportingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItSaml1SelfSignedTransportBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItSaml1SelfSignedTransportPolicy" />
         <soap:binding style="document"
@@ -298,6 +315,9 @@
         <wsdl:port name="DoubleItSaml1TransportPort" binding="tns:DoubleItSaml1TransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml1Transport" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSaml1SupportingPort" binding="tns:DoubleItSaml1SupportingBinding">
+            <soap:address location="https://localhost:9009/DoubleItSaml1Supporting" />
+        </wsdl:port>
         <wsdl:port name="DoubleItSaml1TransportPort2" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml1Transport2" />
         </wsdl:port>
@@ -380,6 +400,22 @@
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
                 </sp:TransportBinding>
+                <sp:SupportingTokens>
+                    <wsp:Policy>
+                        <sp:SamlToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:WssSamlV11Token11/>
+                            </wsp:Policy>
+                        </sp:SamlToken>
+                    </wsp:Policy>
+                </sp:SupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItSaml1SupportingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
                 <sp:SupportingTokens>
                     <wsp:Policy>
                         <sp:SamlToken
