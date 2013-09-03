@@ -76,10 +76,16 @@ public class XKMSInvoker {
         this.xkmsConsumer = xkmsConsumer;
     }
     
+    public XKMSInvoker(String endpointAddress) {
+        this(endpointAddress, null);
+    }
+    
     public XKMSInvoker(String endpointAddress, Bus bus) {
         
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        if (bus != null) {
+            SpringBusFactory.setDefaultBus(bus);
+            SpringBusFactory.setThreadDefaultBus(bus);
+        }
         
         XKMSService xkmsService = new XKMSService();
         xkmsConsumer = xkmsService.getPort(XKMSPortType.class);

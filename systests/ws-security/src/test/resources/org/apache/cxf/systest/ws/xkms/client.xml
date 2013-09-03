@@ -45,20 +45,16 @@
     
     <!-- Begin Symmetric -->
     <!--
+    <bean id="additionalClasses"
+        class="org.apache.cxf.xkms.model.extensions.AdditionalClassesFactory" />
+    
     <jaxws:client id="xkmsClient"
         serviceClass="org.w3._2002._03.xkms_wsdl.XKMSPortType"
         name="{http://www.w3.org/2002/03/xkms#wsdl}XKMSPort" 
         address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">
-                <bean
-                    class="org.apache.cxf.xkms.model.extensions.ClassArrayFactoryBean">
-                    <property name="classNames">
-                        <list>
-                            <value>org.apache.cxf.xkms.model.extensions.ResultDetails</value>
-                        </list>
-                    </property>
-                </bean>
+                 <bean factory-bean="additionalClasses" factory-method="create" />
             </entry>
         </jaxws:properties>
     </jaxws:client>
