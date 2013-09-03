@@ -19,7 +19,9 @@
 
 package minimalosgi;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.ws.rs.core.Application;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 
 public class SampleServlet extends CXFNonSpringJaxrsServlet {
@@ -27,8 +29,8 @@ public class SampleServlet extends CXFNonSpringJaxrsServlet {
     private static final long serialVersionUID = -1531317723099896635L;
 
     @Override
-    protected Class<?> loadApplicationClass(String cName) throws ServletException {
-        return SampleApplication.class;
+    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) {
+        return new SampleApplication();
     }
 
 }
