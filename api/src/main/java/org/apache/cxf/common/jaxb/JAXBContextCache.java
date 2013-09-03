@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -120,8 +121,8 @@ public final class JAXBContextCache {
         }
     }   
     
-    private static final Map<Set<Class<?>>, CachedContextAndSchemasInternal> JAXBCONTEXT_CACHE
-        = new CacheMap<Set<Class<?>>, CachedContextAndSchemasInternal>();
+    private static final Map<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>> JAXBCONTEXT_CACHE
+        = new CacheMap<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>>();
 
     private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
         = new CacheMap<Package, CachedClass>(); 
@@ -186,15 +187,27 @@ public final class JAXBContextCache {
         }
         CachedContextAndSchemasInternal cachedContextAndSchemasInternal = null;
         JAXBContext context = null;
+        Map<String, CachedContextAndSchemasInternal> cachedContextAndSchemasInternalMap = null;
         if (typeRefs == null || typeRefs.isEmpty()) {
             synchronized (JAXBCONTEXT_CACHE) {
+                
                 if (exact) {
-                    cachedContextAndSchemasInternal = JAXBCONTEXT_CACHE.get(classes);
+                    cachedContextAndSchemasInternalMap
+                        = JAXBCONTEXT_CACHE.get(classes);
+                    if (cachedContextAndSchemasInternalMap != null && defaultNs != null) {
+                        cachedContextAndSchemasInternal = cachedContextAndSchemasInternalMap.get(defaultNs);
+                    }
                 } else {
-                    for (Map.Entry<Set<Class<?>>, CachedContextAndSchemasInternal> k : JAXBCONTEXT_CACHE.entrySet()) {
+                    for (Entry<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>> k 
+                            : JAXBCONTEXT_CACHE.entrySet()) {
                         Set<Class<?>> key = k.getKey();
                         if (key != null && key.containsAll(classes)) {
-                            cachedContextAndSchemasInternal = k.getValue();
+                            cachedContextAndSchemasInternalMap = k.getValue();
+                            if (defaultNs != null) {
+                                cachedContextAndSchemasInternal = cachedContextAndSchemasInternalMap.get(defaultNs);
+                            } else {
+                                cachedContextAndSchemasInternal = cachedContextAndSchemasInternalMap.get("");
+                            }
                             break;
                         }
                     }
@@ -236,7 +249,13 @@ public final class JAXBContextCache {
         cachedContextAndSchemasInternal = new CachedContextAndSchemasInternal(context, classes);
         synchronized (JAXBCONTEXT_CACHE) {
             if (typeRefs == null || typeRefs.isEmpty()) {
-                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemasInternal);
+                if (cachedContextAndSchemasInternalMap == null) {
+                    cachedContextAndSchemasInternalMap 
+                        = new CacheMap<String, CachedContextAndSchemasInternal>();
+                } 
+                cachedContextAndSchemasInternalMap.put((defaultNs != null) ? defaultNs : "", 
+                    cachedContextAndSchemasInternal);
+                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemasInternalMap);
             }
         }
 
