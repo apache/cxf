@@ -29,7 +29,8 @@ public class SampleServlet extends CXFNonSpringJaxrsServlet {
     private static final long serialVersionUID = -1531317723099896635L;
 
     @Override
-    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) {
+    protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig) 
+        throws ServletException {
         return new SampleApplication();
     }
 
