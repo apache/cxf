@@ -45,9 +45,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-           <groupId>net.sf.ehcache</groupId>
-           <artifactId>ehcache-core</artifactId>
-    	   <version>${cxf.ehcache.version}</version>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>${cxf.ehcache.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
