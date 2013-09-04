@@ -472,6 +472,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         assertTrue(b < c);
         assertTrue(c < d);
         assertTrue(d < e);
+        assertTrue(bout.toString().indexOf("transientValue") < 0);
     }
     
     @Test
