@@ -814,6 +814,7 @@ public class ClientImpl
         Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
+        message.putAll(getRequestContext());
         setExchangeProperties(exchange, getEndpoint(), null);
         return getConduitSelector().selectConduit(message);
     }
