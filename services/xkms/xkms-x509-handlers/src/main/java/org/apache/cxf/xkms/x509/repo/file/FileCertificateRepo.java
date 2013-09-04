@@ -215,7 +215,10 @@ public class FileCertificateRepo implements CertificateRepo {
             }
 
         }
-        return result.get(0);
+        if (!result.isEmpty()) {
+            return result.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -239,6 +242,9 @@ public class FileCertificateRepo implements CertificateRepo {
             }
 
         }
-        return result.get(0);
+        if (!result.isEmpty()) {
+            return result.get(0);
+        }
+        return null;
     }
 }

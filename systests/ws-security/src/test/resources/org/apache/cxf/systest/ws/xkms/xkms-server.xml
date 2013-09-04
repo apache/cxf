@@ -99,10 +99,18 @@
         </property>
     </bean>
  
+    <bean id="additionalClasses"
+          class="org.apache.cxf.xkms.model.extensions.AdditionalClassesFactory" />
+        
     <jaxws:endpoint id="XKMSService"
         xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
         serviceName="serviceNamespace:XKMSService" endpointName="serviceNamespace:XKMSPort"
         implementor="#xkmsProviderBean" address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
+        <jaxws:properties>
+            <entry key="jaxb.additionalContextClasses">
+                 <bean factory-bean="additionalClasses" factory-method="create" />
+            </entry>
+        </jaxws:properties>
     </jaxws:endpoint>
     
 </beans>
