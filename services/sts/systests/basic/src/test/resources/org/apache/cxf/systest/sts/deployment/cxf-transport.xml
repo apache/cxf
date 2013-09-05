@@ -47,11 +47,42 @@
         </cxf:features>
     </cxf:bus>
 
+    <bean id="hokDelegationHandler"
+          class="org.apache.cxf.systest.sts.common.HOKDelegationHandler" />
+
     <bean id="transportSTSProviderBean"
-	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
-	    <property name="services" ref="transportService" />
-		<property name="stsProperties" ref="transportSTSProperties" />
+        class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+        <property name="issueOperation" ref="transportIssueDelegate" />
+        <property name="validateOperation" ref="transportValidateDelegate" />
     </bean>
+
+    <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+        <property name="tokenProviders" ref="transportTokenProviders" />
+        <property name="tokenValidators" ref="transportTokenValidators" />
+        <property name="services" ref="transportService" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+        <property name="delegationHandler" ref="hokDelegationHandler" />
+    </bean>
+
+    <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+        <property name="tokenValidators" ref="transportTokenValidators" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+    </bean>
+
+    <util:list id="transportTokenValidators">
+        <ref bean="transportSamlTokenValidator" />
+    </util:list>
+
+    <util:list id="transportTokenProviders">
+        <ref bean="transportSamlTokenProvider" />
+    </util:list>
+
+    <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+    </bean>
+    
+    <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+    </bean>
+
 
 	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
 		<property name="endpoints" ref="transportEndpoints" />
