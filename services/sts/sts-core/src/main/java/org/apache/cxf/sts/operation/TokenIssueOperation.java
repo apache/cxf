@@ -105,13 +105,14 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();
 
-        if (delegationHandler != null) {
-            String appliesToAddress = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
-            if (!delegationHandler.isDelegationAllowed(context, tokenRequirements, appliesToAddress)) {
-                LOG.fine("Token Delegation (OnBehalfOf/ActAs) is not allowed for this particular token");
-                throw new STSException("Token Delegation (OnBehalfOf/ActAs) is not allowed", 
-                                       STSException.REQUEST_FAILED);
-            }
+        // See whether OnBehalfOf/ActAs is allowed or not
+        if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
+            performDelegationHandling(requestParser, context,
+                                providerParameters.getTokenRequirements().getOnBehalfOf());
+        }
+        if (providerParameters.getTokenRequirements().getActAs() != null) {
+            performDelegationHandling(requestParser, context,
+                                providerParameters.getTokenRequirements().getActAs());
         }
 
         // Validate OnBehalfOf token if present

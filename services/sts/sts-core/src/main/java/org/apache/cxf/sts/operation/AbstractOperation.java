@@ -36,6 +36,7 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.IdentityMapper;
@@ -46,8 +47,6 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
-import org.apache.cxf.sts.request.DefaultDelegationHandler;
-import org.apache.cxf.sts.request.DelegationHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -55,6 +54,9 @@ import org.apache.cxf.sts.request.RequestParser;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
+import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
+import org.apache.cxf.sts.token.delegation.TokenDelegationParameters;
+import org.apache.cxf.sts.token.delegation.TokenDelegationResponse;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenReference;
@@ -104,16 +106,8 @@ public abstract class AbstractOperation {
     protected boolean returnReferences = true;
     protected TokenStore tokenStore;
     protected ClaimsManager claimsManager = new ClaimsManager();
-    protected DelegationHandler delegationHandler = new DefaultDelegationHandler();
+    protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<TokenDelegationHandler>();
     
-    public DelegationHandler getDelegationHandler() {
-        return delegationHandler;
-    }
-
-    public void setDelegationHandler(DelegationHandler delegationHandler) {
-        this.delegationHandler = delegationHandler;
-    }
-
     public boolean isReturnReferences() {
         return returnReferences;
     }
@@ -146,6 +140,14 @@ public abstract class AbstractOperation {
         this.tokenProviders = tokenProviders;
     }
     
+    public List<TokenDelegationHandler> getDelegationHandlers() {
+        return delegationHandlers;
+    }
+
+    public void setDelegationHandlers(List<TokenDelegationHandler> delegationHandlers) {
+        this.delegationHandlers = delegationHandlers;
+    }
+
     public List<TokenProvider> getTokenProviders() {
         return tokenProviders;
     }
@@ -576,6 +578,48 @@ public abstract class AbstractOperation {
             }
         }
         return tokenResponse;
+    }
+    
+    protected void performDelegationHandling(
+        RequestParser requestParser, WebServiceContext context, ReceivedToken token
+    ) {
+        TokenDelegationParameters delegationParameters = new TokenDelegationParameters();
+        delegationParameters.setStsProperties(stsProperties);
+        delegationParameters.setPrincipal(context.getUserPrincipal());
+        delegationParameters.setWebServiceContext(context);
+        delegationParameters.setTokenStore(getTokenStore());
+        
+        KeyRequirements keyRequirements = requestParser.getKeyRequirements();
+        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+        delegationParameters.setKeyRequirements(keyRequirements);
+        delegationParameters.setTokenRequirements(tokenRequirements);
+        
+        // Extract AppliesTo
+        String address = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
+        delegationParameters.setAppliesToAddress(address);
+        
+        delegationParameters.setToken(token);
+
+        TokenDelegationResponse tokenResponse = null;
+        for (TokenDelegationHandler delegationHandler : delegationHandlers) {
+            if (delegationHandler.canHandleToken(token)) {
+                try {
+                    tokenResponse = delegationHandler.isDelegationAllowed(delegationParameters);
+                } catch (RuntimeException ex) {
+                    LOG.log(Level.WARNING, "", ex);
+                    throw new STSException("Error in delegation handling", ex, STSException.REQUEST_FAILED);
+                }
+                break;
+            }
+        }
+        
+        if (tokenResponse == null || !tokenResponse.isDelegationAllowed()) {
+            LOG.log(Level.WARNING, "No matching token delegation handler found");
+            throw new STSException(
+                "No matching token delegation handler found", 
+                STSException.REQUEST_FAILED
+            );
+        }
     }
     
     protected void checkClaimsSupport(RequestClaimCollection requestedClaims) {

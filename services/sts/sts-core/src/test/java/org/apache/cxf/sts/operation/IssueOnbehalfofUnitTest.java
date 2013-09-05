@@ -48,14 +48,16 @@ import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.common.CustomUserClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
-import org.apache.cxf.sts.request.HOKDelegationHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedKey;
 import org.apache.cxf.sts.request.TokenRequirements;
-import org.apache.cxf.sts.request.UsernameTokenDelegationHandler;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
+import org.apache.cxf.sts.token.delegation.HOKDelegationHandler;
+import org.apache.cxf.sts.token.delegation.SAMLDelegationHandler;
+import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
+import org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
@@ -126,6 +128,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -149,7 +154,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
         request.getAny().add(onbehalfofType);
-
+        
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
@@ -195,6 +200,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -304,7 +312,8 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
         
-        issueOperation.setDelegationHandler(new HOKDelegationHandler());
+        TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         RequestSecurityTokenResponseCollectionType response = 
             issueOperation.issue(request, webServiceContext);
@@ -385,7 +394,8 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
         
-        issueOperation.setDelegationHandler(new HOKDelegationHandler());
+        TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         RequestSecurityTokenResponseCollectionType response = 
             issueOperation.issue(request, webServiceContext);
@@ -466,7 +476,8 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
         
-        issueOperation.setDelegationHandler(new HOKDelegationHandler());
+        TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         RequestSecurityTokenResponseCollectionType response = 
             issueOperation.issue(request, webServiceContext);
@@ -547,7 +558,8 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
         
-        issueOperation.setDelegationHandler(new HOKDelegationHandler());
+        TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         RequestSecurityTokenResponseCollectionType response = 
             issueOperation.issue(request, webServiceContext);
@@ -590,6 +602,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -650,6 +665,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
         validatorList.add(new SAMLTokenValidator());
         issueOperation.setTokenValidators(validatorList);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -777,7 +795,8 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
         
-        issueOperation.setDelegationHandler(new UsernameTokenDelegationHandler());
+        TokenDelegationHandler delegationHandler = new UsernameTokenDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         RequestSecurityTokenResponseCollectionType response = 
             issueOperation.issue(request, webServiceContext);
@@ -845,7 +864,8 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
-        issueOperation.setDelegationHandler(new UsernameTokenDelegationHandler());
+        TokenDelegationHandler delegationHandler = new UsernameTokenDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Issue a token - this will fail as the UsernameToken validation fails
         try {
@@ -870,6 +890,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         providerList.add(samlTokenProvider);
         issueOperation.setTokenProviders(providerList);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
@@ -998,6 +1021,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -1097,6 +1123,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();

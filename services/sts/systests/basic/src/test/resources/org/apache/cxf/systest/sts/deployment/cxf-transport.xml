@@ -61,7 +61,7 @@
         <property name="tokenValidators" ref="transportTokenValidators" />
         <property name="services" ref="transportService" />
         <property name="stsProperties" ref="transportSTSProperties" />
-        <property name="delegationHandler" ref="hokDelegationHandler" />
+        <property name="delegationHandlers" ref="hokDelegationHandler" />
     </bean>
 
     <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
