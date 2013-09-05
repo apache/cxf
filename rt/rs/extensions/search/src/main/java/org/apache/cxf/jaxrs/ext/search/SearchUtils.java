@@ -52,6 +52,20 @@ public final class SearchUtils {
         return visitor.getQuery();
     }
     
+    public static String toSqlWildcardString(String value, boolean alwaysWildcard) {
+        if (!value.contains("*")) {
+            return alwaysWildcard ? "%" + value + "%" : value;
+        }
+        
+        if (value.startsWith("*")) { 
+            value = "%" + value.substring(1);
+        }
+        if (value.endsWith("*")) { 
+            value = value.substring(0, value.length() - 1) + "%";
+        }
+        return value;
+    }
+    
     public static void startSqlQuery(StringBuilder sb, 
                                      String table,
                                      String tableAlias,
