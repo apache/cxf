@@ -46,11 +46,43 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="hokDelegationHandler"
+          class="org.apache.cxf.systest.sts.common.HOKDelegationHandler" />
 
     <bean id="transportSTSProviderBean2"
         class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-        <property name="issueOperation" ref="transportIssueDelegate" />
-        <property name="validateOperation" ref="transportValidateDelegate" />
+        <property name="issueOperation" ref="transportIssueDelegate2" />
+        <property name="validateOperation" ref="transportValidateDelegate2" />
+    </bean>
+
+    <bean id="transportIssueDelegate2" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+        <property name="tokenProviders" ref="transportTokenProviders2" />
+        <property name="tokenValidators" ref="transportTokenValidators" />
+        <property name="services" ref="transportService" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+        <property name="delegationHandler" ref="hokDelegationHandler" />
+    </bean>
+
+    <bean id="transportValidateDelegate2" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+        <property name="tokenValidators" ref="transportTokenValidators2" />
+        <property name="stsProperties" ref="transportSTSProperties" />
+    </bean>
+
+    <util:list id="transportTokenValidators2">
+        <ref bean="transportSamlTokenValidator2" />
+    </util:list>
+
+    <util:list id="transportTokenProviders2">
+        <ref bean="transportSamlTokenProvider2" />
+    </util:list>
+    
+     <bean id="transportSamlTokenValidator2" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+        <property name="samlRealmCodec" ref="samlRealmCodec" />
+    </bean>
+    
+    <bean id="transportSamlTokenProvider2" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+        <property name="realmMap" ref="realms"/>
     </bean>
 
     <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
@@ -58,13 +90,14 @@
         <property name="tokenValidators" ref="transportTokenValidators" />
         <property name="services" ref="transportService" />
         <property name="stsProperties" ref="transportSTSProperties" />
+        <property name="delegationHandler" ref="hokDelegationHandler" />
     </bean>
 
     <bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
         <property name="tokenValidators" ref="transportTokenValidators" />
         <property name="stsProperties" ref="transportSTSProperties" />
     </bean>
-
+    
     <util:list id="transportTokenValidators">
         <ref bean="transportSamlTokenValidator" />
     </util:list>
@@ -72,14 +105,18 @@
     <util:list id="transportTokenProviders">
         <ref bean="transportSamlTokenProvider" />
     </util:list>
-
-
-    <bean id="transportSTSProviderBean"
-        class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
-        <property name="services" ref="transportService" />
-        <property name="stsProperties" ref="transportSTSProperties" />
+    
+    <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+    </bean>
+    
+    <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
     </bean>
 
+    <bean id="transportSTSProviderBean"
+        class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+        <property name="issueOperation" ref="transportIssueDelegate" />
+        <property name="validateOperation" ref="transportValidateDelegate" />
+    </bean>
  
     <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
         <property name="endpoints" ref="transportEndpoints" />
@@ -89,14 +126,6 @@
         <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
         </value>
     </util:list>
-    
-    <bean id="transportSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-        <property name="samlRealmCodec" ref="samlRealmCodec" />
-    </bean>
-    
-    <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-        <property name="realmMap" ref="realms"/>
-    </bean>
     
     <bean id="realmA"
         class="org.apache.cxf.sts.token.realm.SAMLRealm">

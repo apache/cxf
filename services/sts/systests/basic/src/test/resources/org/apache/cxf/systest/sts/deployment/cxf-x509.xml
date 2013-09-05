@@ -46,12 +46,16 @@
 	    <property name="issueOperation" ref="x509IssueDelegate" />
 	    <property name="validateOperation" ref="x509ValidateDelegate" />
     </bean>
+    
+    <bean id="utDelegationHandler"
+          class="org.apache.cxf.sts.request.UsernameTokenDelegationHandler" />
 
 	<bean id="x509IssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
 		<property name="tokenProviders" ref="x509SamlTokenProvider" />
 		<property name="tokenValidators" ref="x509TokenValidatorsOBO" />
 		<property name="services" ref="x509Service" />
 		<property name="stsProperties" ref="x509STSProperties" />
+		<property name="delegationHandler" ref="utDelegationHandler" />
 	</bean>
 
 	<bean id="x509ValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">

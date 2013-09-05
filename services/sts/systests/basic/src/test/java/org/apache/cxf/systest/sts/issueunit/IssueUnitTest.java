@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.sts.issueunit;
 
 import java.net.URL;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +26,7 @@ import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -57,7 +53,6 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
@@ -67,7 +62,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.junit.BeforeClass;
@@ -245,21 +239,10 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.newDocument();
-        
-        X509Security bst = new X509Security(doc);
-        Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties");
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("myclientkey");
-        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        bst.setX509Certificate(certs[0]);
-        
         // Get a token
         SecurityToken token = 
             requestSecurityToken(
-                SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bst.getElement(), bus, DEFAULT_ADDRESS, null, null, null, null
+                SAML2_TOKEN_TYPE, BEARER_KEYTYPE, null, bus, DEFAULT_ADDRESS, null, null, null, null
             );
         assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
         assertTrue(token.getToken() != null);

@@ -36,7 +36,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.IdentityMapper;
@@ -49,6 +48,8 @@ import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.event.AbstractSTSEvent;
 import org.apache.cxf.sts.event.STSEventListener;
+import org.apache.cxf.sts.request.DefaultDelegationHandler;
+import org.apache.cxf.sts.request.DelegationHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -102,7 +103,16 @@ public abstract class AbstractOperation {
     protected TokenStore tokenStore;
     protected ClaimsManager claimsManager = new ClaimsManager();
     protected STSEventListener eventPublisher;
+    protected DelegationHandler delegationHandler = new DefaultDelegationHandler();
     
+    public DelegationHandler getDelegationHandler() {
+        return delegationHandler;
+    }
+
+    public void setDelegationHandler(DelegationHandler delegationHandler) {
+        this.delegationHandler = delegationHandler;
+    }
+
     public boolean isReturnReferences() {
         return returnReferences;
     }
@@ -609,7 +619,6 @@ public abstract class AbstractOperation {
                                 Relationship.class.getName(), relationship);
                     }
                 }
-    
                 if (relationship == null || relationship.getType().equals(Relationship.FED_TYPE_IDENTITY)) {
                     // federate identity
                     IdentityMapper identityMapper = null;
