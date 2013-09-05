@@ -143,8 +143,16 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                     providerParameters.setPrincipal(wssecToken.getPrincipal());
                 }
             }
-    
-    
+            
+            if (delegationHandler != null) {
+                String appliesToAddress = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
+                if (!delegationHandler.isDelegationAllowed(context, tokenRequirements, appliesToAddress)) {
+                    LOG.fine("Token Delegation (OnBehalfOf/ActAs) is not allowed for this particular token");
+                    throw new STSException("Token Delegation (OnBehalfOf/ActAs) is not allowed", 
+                                           STSException.REQUEST_FAILED);
+                }
+            }
+
             // Validate OnBehalfOf token if present
             if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
                 ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
