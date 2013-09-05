@@ -82,7 +82,7 @@ public class FileCertificateRepo implements CertificateRepo {
         }
         try {
             File certFile = new File(storageDir + "/" + category,
-                                     getRelativePathForSubjectDn(id.getIdentifier(), cert));
+                                     getRelativePathForSubjectDn(cert));
             certFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(certFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -107,12 +107,11 @@ public class FileCertificateRepo implements CertificateRepo {
         return result;
     }
 
-    public String getRelativePathForSubjectDn(String subjectDn, X509Certificate cert)
+    public String getRelativePathForSubjectDn(X509Certificate cert)
         throws URISyntaxException {
         BigInteger serialNumber = cert.getSerialNumber();
         String issuer = cert.getIssuerX500Principal().getName();
-        String path = convertDnForFileSystem(subjectDn) + "-" + serialNumber.toString() + "-"
-                      + convertDnForFileSystem(issuer) + ".cer";
+        String path = convertDnForFileSystem(issuer) + "-" + serialNumber.toString() + ".cer";
         Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
         if (p.matcher(path).find()) {
             return path;
