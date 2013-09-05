@@ -18,37 +18,36 @@
  */
 package org.apache.cxf.systest.sts.common;
 
-import javax.xml.ws.WebServiceContext;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.sts.request.DefaultDelegationHandler;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.token.delegation.SAMLDelegationHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 
 /**
- * This DelegationHandler implementation extends the Default implementation to allow SAML
+ * This TokenDelegationHandler implementation extends the Default implementation to allow SAML
  * Tokens with HolderOfKey Subject Confirmation. It also doesn't require that the AppliesTo
  * address matches an AudienceRestriction condition in the SAML Token.
  */
-public class HOKDelegationHandler extends DefaultDelegationHandler {
+public class HOKDelegationHandler extends SAMLDelegationHandler {
+    
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(HOKDelegationHandler.class);
     
     /**
      * Is Delegation allowed for a particular token
      */
     @Override
     protected boolean isDelegationAllowed(
-        WebServiceContext context,
-        ReceivedToken receivedToken, 
-        String appliesToAddress
+        ReceivedToken receivedToken, String appliesToAddress
     ) {
-        // It must be a SAML Token
-        if (!isSAMLToken(receivedToken)) {
-            return false;
-        }
-
         Element validateTargetElement = (Element)receivedToken.getToken();
         try {
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(validateTargetElement);
@@ -62,6 +61,7 @@ public class HOKDelegationHandler extends DefaultDelegationHandler {
                 }
             }
         } catch (WSSecurityException ex) {
+            LOG.log(Level.WARNING, "Error in ascertaining whether delegation is allowed", ex);
             return false;
         }
 

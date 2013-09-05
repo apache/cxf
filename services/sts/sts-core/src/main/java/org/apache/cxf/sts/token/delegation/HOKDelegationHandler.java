@@ -16,27 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.request;
+package org.apache.cxf.sts.token.delegation;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 
 /**
- * This DelegationHandler implementation extends the Default implementation to allow SAML
+ * This TokenDelegationHandler implementation extends the Default implementation to allow SAML
  * Tokens with HolderOfKey Subject Confirmation.
  */
-public class HOKDelegationHandler extends DefaultDelegationHandler {
+public class HOKDelegationHandler extends SAMLDelegationHandler {
     
     private static final Logger LOG = 
         LogUtils.getL7dLogger(HOKDelegationHandler.class);
@@ -46,15 +45,8 @@ public class HOKDelegationHandler extends DefaultDelegationHandler {
      */
     @Override
     protected boolean isDelegationAllowed(
-        WebServiceContext context,
-        ReceivedToken receivedToken, 
-        String appliesToAddress
+        ReceivedToken receivedToken, String appliesToAddress
     ) {
-        // It must be a SAML Token
-        if (!isSAMLToken(receivedToken)) {
-            return false;
-        }
-
         Element validateTargetElement = (Element)receivedToken.getToken();
         try {
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(validateTargetElement);

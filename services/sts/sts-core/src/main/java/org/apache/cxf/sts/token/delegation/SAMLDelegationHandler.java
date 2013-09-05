@@ -16,17 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.request;
+package org.apache.cxf.sts.token.delegation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
@@ -34,57 +34,52 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.saml1.core.AudienceRestrictionCondition;
 
-
 /**
- * The Default DelegationHandler implementation. It disallows ActAs or OnBehalfOf for
+ * The SAML TokenDelegationHandler implementation. It disallows ActAs or OnBehalfOf for
  * all cases apart from the case of a Bearer SAML Token. In addition, the AppliesTo
  * address (if supplied) must match an AudienceRestriction address (if in token)
  */
-public class DefaultDelegationHandler implements DelegationHandler {
+public class SAMLDelegationHandler implements TokenDelegationHandler {
     
     private static final Logger LOG = 
-        LogUtils.getL7dLogger(DefaultDelegationHandler.class);
+        LogUtils.getL7dLogger(SAMLDelegationHandler.class);
     
-    /**
-     * Returns true if delegation is allowed.
-     * @param context WebServiceContext
-     * @param tokenRequirements The parameters extracted from the request
-     * @param appliesToAddress The AppliesTo address (if any)
-     * @param onBehalfOf whether the token was received OnBehalfOf or ActAs
-     * @return true if delegation is allowed.
-     */
-    public boolean isDelegationAllowed(
-        WebServiceContext context,
-        TokenRequirements tokenRequirements, 
-        String appliesToAddress
-    ) {
-        if (tokenRequirements.getOnBehalfOf() != null 
-            && !isDelegationAllowed(context, tokenRequirements.getOnBehalfOf(), appliesToAddress)) {
-            return false;
+    public boolean canHandleToken(ReceivedToken delegateTarget) {
+        Object token = delegateTarget.getToken();
+        if (token instanceof Element) {
+            Element tokenElement = (Element)token;
+            String namespace = tokenElement.getNamespaceURI();
+            String localname = tokenElement.getLocalName();
+            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
+                && "Assertion".equals(localname)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public TokenDelegationResponse isDelegationAllowed(TokenDelegationParameters tokenParameters) {
+        TokenDelegationResponse response = new TokenDelegationResponse();
+        ReceivedToken delegateTarget = tokenParameters.getToken();
+        response.setToken(delegateTarget);
+        
+        if (!delegateTarget.isDOMElement()) {
+            return response;
         }
         
-        if (tokenRequirements.getActAs() != null 
-            && !isDelegationAllowed(context, tokenRequirements.getActAs(), appliesToAddress)) {
-            return false;
+        if (isDelegationAllowed(delegateTarget, tokenParameters.getAppliesToAddress())) {
+            response.setDelegationAllowed(true);
         }
         
-        return true;
+        return response;
     }
     
     /**
      * Is Delegation allowed for a particular token
      */
     protected boolean isDelegationAllowed(
-        WebServiceContext context,
-        ReceivedToken receivedToken, 
-        String appliesToAddress
+        ReceivedToken receivedToken, String appliesToAddress
     ) {
-        // It must be a SAML Token
-        if (!isSAMLToken(receivedToken)) {
-            LOG.fine("Received token is not a SAML Token");
-            return false;
-        }
-
         Element validateTargetElement = (Element)receivedToken.getToken();
         try {
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(validateTargetElement);
@@ -111,20 +106,6 @@ public class DefaultDelegationHandler implements DelegationHandler {
         }
 
         return true;
-    }
-    
-    protected boolean isSAMLToken(ReceivedToken target) {
-        Object token = target.getToken();
-        if (token instanceof Element) {
-            Element tokenElement = (Element)token;
-            String namespace = tokenElement.getNamespaceURI();
-            String localname = tokenElement.getLocalName();
-            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
-                && "Assertion".equals(localname)) {
-                return true;
-            }
-        }
-        return false;
     }
     
     protected List<String> getAudienceRestrictions(SamlAssertionWrapper assertion) {
