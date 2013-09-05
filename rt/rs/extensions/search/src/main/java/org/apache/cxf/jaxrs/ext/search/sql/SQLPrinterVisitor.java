@@ -70,16 +70,16 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                 String name = getRealPropertyName(statement.getProperty());
                 String value = getPropertyValue(name, statement.getValue());
                 validatePropertyValue(name, value);
-                String rvalStr = value.replaceAll("\\*", "%");
                 
+                value = SearchUtils.toSqlWildcardString(value, isWildcardStringMatch());
                                 
                 if (tableAlias != null) {
                     name = tableAlias + "." + name;
                 }
                 
                 sb.append(name).append(" ").append(
-                            SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), rvalStr))
-                            .append(" ").append("'").append(rvalStr).append("'");
+                            SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value))
+                            .append(" ").append("'").append(value).append("'");
             }
         } else {
             boolean first = true;

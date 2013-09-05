@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 
@@ -196,11 +197,12 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             break;
         case EQUALS:
             if (clazz.equals(String.class)) {
-                String theValue = value.toString();
-                if (theValue.contains("*")) {
-                    theValue = ((String)value).replaceAll("\\*", "");
+                String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
+                if (theValue.contains("%")) {
+                    pred = builder.like((Expression<String>)exp, theValue);
+                } else {
+                    pred = builder.equal(exp, clazz.cast(value));
                 }
-                pred = builder.like((Expression<String>)exp, "%" + theValue + "%");
             } else {
                 pred = builder.equal(exp, clazz.cast(value));
             }

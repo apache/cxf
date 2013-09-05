@@ -140,18 +140,18 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         Query query = null;
         if (cls == String.class) {
             String strValue = value.toString();
-            int wildCardIndex = strValue.indexOf('*'); 
+            boolean isWildCard = strValue.contains("*") || super.isWildcardStringMatch(); 
             
             String theContentsFieldName = getContentsFieldName(name);
             if (theContentsFieldName == null) {
                 Term term = new Term(name, strValue);
                 
-                if (wildCardIndex == -1) {
+                if (!isWildCard) {
                     query = new TermQuery(term);
                 } else {
                     query = new WildcardQuery(term);
                 } 
-            } else if (wildCardIndex == -1) {
+            } else if (!isWildCard) {
                 PhraseQuery pquery = new PhraseQuery();
                 pquery.add(new Term(theContentsFieldName, name));
                 pquery.add(new Term(theContentsFieldName, strValue));

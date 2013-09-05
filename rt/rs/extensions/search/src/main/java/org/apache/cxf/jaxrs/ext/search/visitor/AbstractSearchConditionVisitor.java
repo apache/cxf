@@ -37,6 +37,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     private Map<String, String> fieldMap;
     private Map<String, Class<?>> primitiveFieldTypeMap;
     private PropertyValidator<Object> validator;
+    private boolean wildcardStringMatch;
     
     protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
         this.fieldMap = fieldMap;
@@ -168,5 +169,13 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     
     public void setValidator(PropertyValidator<Object> validator) {
         this.validator = validator;
+    }
+
+    public boolean isWildcardStringMatch() {
+        return wildcardStringMatch;
+    }
+
+    public void setWildcardStringMatch(boolean wildcardStringMatch) {
+        this.wildcardStringMatch = wildcardStringMatch;
     }
 }
