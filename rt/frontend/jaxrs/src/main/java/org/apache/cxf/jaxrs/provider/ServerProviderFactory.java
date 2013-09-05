@@ -138,7 +138,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     public List<ProviderInfo<ContainerRequestFilter>> getPostMatchContainerRequestFilters(Set<String> names) {
-        return getPostMatchContainerFilters(postMatchContainerRequestFilters, names);
+        return getBoundFilters(postMatchContainerRequestFilters, names);
         
     }
     
@@ -165,7 +165,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     public List<ProviderInfo<ContainerResponseFilter>> getContainerResponseFilters(Set<String> names) {
-        return getPostMatchContainerFilters(postMatchContainerResponseFilters, 
+        return getBoundFilters(postMatchContainerResponseFilters, 
                                             names);
     }
     

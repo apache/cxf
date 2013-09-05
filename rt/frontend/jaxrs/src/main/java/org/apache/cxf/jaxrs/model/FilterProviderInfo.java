@@ -24,11 +24,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 
 public class FilterProviderInfo<T> extends ProviderInfo<T> {
 
     private Set<String> nameBinding;
     private Map<Class<?>, Integer> supportedContracts;
+    
+    public FilterProviderInfo(T provider,
+                              Bus bus,
+                              Map<Class<?>, Integer> supportedContracts) {
+        this(provider, bus, ProviderFactory.DEFAULT_FILTER_NAME_BINDING, supportedContracts);        
+    }
     
     public FilterProviderInfo(T provider,
                               Bus bus,

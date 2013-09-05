@@ -77,7 +77,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public abstract class ProviderFactory {
-    protected static final String DEFAULT_FILTER_NAME_BINDING = "org.apache.cxf.filter.binding";
+    public static final String DEFAULT_FILTER_NAME_BINDING = "org.apache.cxf.filter.binding";
     protected static final String SERVER_FACTORY_NAME = "org.apache.cxf.jaxrs.provider.ServerProviderFactory";
     protected static final String CLIENT_FACTORY_NAME = "org.apache.cxf.jaxrs.client.ClientProviderFactory";
     protected static final String IGNORE_TYPE_VARIABLES = "org.apache.cxf.jaxrs.providers.ignore.typevars";
@@ -362,7 +362,7 @@ public abstract class ProviderFactory {
             if (size > 0) {
                 interceptors = new ArrayList<ReaderInterceptor>(size + 1);
                 List<ProviderInfo<ReaderInterceptor>> readers =
-                    getPostMatchContainerFilters(readerInterceptors, names);
+                    getBoundFilters(readerInterceptors, names);
                 for (ProviderInfo<ReaderInterceptor> p : readers) {
                     InjectionUtils.injectContexts(p.getProvider(), p, m);
                     interceptors.add(p.getProvider());
@@ -401,7 +401,7 @@ public abstract class ProviderFactory {
             if (size > 0) {
                 interceptors = new ArrayList<WriterInterceptor>(size + 1);
                 List<ProviderInfo<WriterInterceptor>> writers =
-                    getPostMatchContainerFilters(writerInterceptors, names);
+                    getBoundFilters(writerInterceptors, names);
                 for (ProviderInfo<WriterInterceptor> p : writers) {
                     InjectionUtils.injectContexts(p.getProvider(), p, m);
                     interceptors.add(p.getProvider());
@@ -884,7 +884,7 @@ public abstract class ProviderFactory {
         }
     }
 
-    protected static <T> List<ProviderInfo<T>> getPostMatchContainerFilters(Map<NameKey, ProviderInfo<T>> boundFilters,
+    protected static <T> List<ProviderInfo<T>> getBoundFilters(Map<NameKey, ProviderInfo<T>> boundFilters,
                                                                           Set<String> names) {
         if (boundFilters.isEmpty()) {
             return Collections.emptyList();

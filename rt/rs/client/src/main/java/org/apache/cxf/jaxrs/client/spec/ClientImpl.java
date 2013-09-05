@@ -210,7 +210,7 @@ public class ClientImpl implements Client {
                     providers.add(p);
                 } else {
                     providers.add(
-                        new FilterProviderInfo<Object>(p, pf.getBus(), null, contracts));
+                        new FilterProviderInfo<Object>(p, pf.getBus(), contracts));
                 }
             }
             
