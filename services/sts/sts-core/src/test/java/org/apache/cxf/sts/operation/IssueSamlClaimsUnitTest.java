@@ -33,7 +33,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -60,6 +59,8 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
+import org.apache.cxf.sts.token.delegation.SAMLDelegationHandler;
+import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
@@ -433,6 +434,9 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         providerList.add(samlTokenProvider);
         issueOperation.setTokenProviders(providerList);
         
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
+        
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
@@ -577,6 +581,9 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
         issueOperation.setTokenProviders(providerList);
+        
+        TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
+        issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
         
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();

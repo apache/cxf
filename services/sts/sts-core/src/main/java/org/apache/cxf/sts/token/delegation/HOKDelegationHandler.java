@@ -16,49 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.request;
+package org.apache.cxf.sts.token.delegation;
 
 import java.util.List;
-
-import javax.xml.ws.WebServiceContext;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
 /**
- * This DelegationHandler implementation extends the Default implementation to allow UsernameTokens
- * for OnBehalfOf/ActAs
+ * This TokenDelegationHandler implementation extends the Default implementation to allow SAML
+ * Tokens with HolderOfKey Subject Confirmation.
  */
-public class UsernameTokenDelegationHandler extends DefaultDelegationHandler {
+public class HOKDelegationHandler extends SAMLDelegationHandler {
+    
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(HOKDelegationHandler.class);
     
     /**
      * Is Delegation allowed for a particular token
      */
+    @Override
     protected boolean isDelegationAllowed(
-        WebServiceContext context,
-        ReceivedToken receivedToken, 
-        String appliesToAddress
+        ReceivedToken receivedToken, String appliesToAddress
     ) {
-        if (receivedToken.isUsernameToken()) {
-            return true;
-        }
-        
-        // It must be a SAML Token
-        if (!isSAMLToken(receivedToken)) {
-            return false;
-        }
-
         Element validateTargetElement = (Element)receivedToken.getToken();
         try {
             AssertionWrapper assertion = new AssertionWrapper(validateTargetElement);
 
             for (String confirmationMethod : assertion.getConfirmationMethods()) {
                 if (!(SAML1Constants.CONF_BEARER.equals(confirmationMethod)
-                    || SAML2Constants.CONF_BEARER.equals(confirmationMethod))) {
+                    || SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)
+                    || SAML2Constants.CONF_BEARER.equals(confirmationMethod)
+                    || SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod))) {
                     return false;
                 }
             }
@@ -70,6 +67,7 @@ public class UsernameTokenDelegationHandler extends DefaultDelegationHandler {
                 }
             }
         } catch (WSSecurityException ex) {
+            LOG.log(Level.WARNING, "Error in ascertaining whether delegation is allowed", ex);
             return false;
         }
 

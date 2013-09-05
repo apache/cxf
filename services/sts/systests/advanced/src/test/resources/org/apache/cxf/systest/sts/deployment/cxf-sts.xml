@@ -55,7 +55,7 @@
 	</bean>
 
     <bean id="utDelegationHandler"
-          class="org.apache.cxf.sts.request.UsernameTokenDelegationHandler" />
+          class="org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler" />
           
 	<bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
 		<property name="tokenProviders" ref="transportTokenProviders" />
@@ -63,7 +63,7 @@
 		<property name="stsProperties" ref="transportSTSProperties" />
 		<property name="claimsManager" ref="claimsManager" />
 		<property name="tokenStore" ref="defaultTokenStore" />
-		<property name="delegationHandler" ref="utDelegationHandler" />
+		<property name="delegationHandlers" ref="utDelegationHandler" />
 	</bean>
 
 	<bean id="transportValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">

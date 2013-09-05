@@ -16,29 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.request;
+package org.apache.cxf.sts.token.delegation;
 
-import javax.xml.ws.WebServiceContext;
+import org.apache.cxf.sts.request.ReceivedToken;
 
 
 /**
  * This interface controls whether the STS allows an authenticated user to get a token
- * OnBehalfOf or ActAs another token. The tokens should be taken from the TokenRequirements
- * object passed as a parameter.
+ * OnBehalfOf or ActAs another token.
  */
-public interface DelegationHandler {
+public interface TokenDelegationHandler {
     
     /**
-     * Returns true if delegation is allowed.
-     * @param context WebServiceContext
-     * @param tokenRequirements The parameters extracted from the request
-     * @param appliesToAddress The AppliesTo address (if any)
-     * @return true if delegation is allowed.
+     * Return true if this TokenDelegationHandler implementation is capable of handling the
+     * ReceivedToken argument.
      */
-    boolean isDelegationAllowed(
-        WebServiceContext context,
-        TokenRequirements tokenRequirements, 
-        String appliesToAddress
-    );
+    boolean canHandleToken(ReceivedToken delegateTarget);
+    
+    /**
+     * See if delegation is allowed for a Token using the given TokenDelegationParameters.
+     */
+    TokenDelegationResponse isDelegationAllowed(TokenDelegationParameters tokenParameters);
     
 }
