@@ -208,7 +208,16 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             }
             break;
         case NOT_EQUALS:
-            pred = builder.notEqual(exp, clazz.cast(value));
+            if (clazz.equals(String.class)) {
+                String theValue = SearchUtils.toSqlWildcardString(value.toString(), isWildcardStringMatch());
+                if (theValue.contains("%")) {
+                    pred = builder.notLike((Expression<String>)exp, theValue);
+                } else {
+                    pred = builder.notEqual(exp, clazz.cast(value));
+                }
+            } else {
+                pred = builder.notEqual(exp, clazz.cast(value));
+            }
             break;
         case LESS_THAN:
             pred = builder.lessThan(exp, clazz.cast(value));
