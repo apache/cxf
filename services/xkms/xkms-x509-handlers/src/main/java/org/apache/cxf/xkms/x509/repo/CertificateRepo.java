@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.xkms.x509.repo;
 
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 public interface CertificateRepo {
     List<X509Certificate> getTrustedCaCerts();
     List<X509Certificate> getCaCerts();
+    List<X509CRL> getCRLs();
     void saveCertificate(X509Certificate cert, UseKeyWithType key);
     X509Certificate findBySubjectDn(String dn);
     X509Certificate findByServiceName(String serviceName);
