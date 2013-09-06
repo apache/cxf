@@ -33,6 +33,7 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -71,7 +72,12 @@ public class ClientImpl implements Client {
     @Override
     public Builder invocation(Link link) {
         checkClosed();
-        return target(link.getUriBuilder()).request();
+        Builder builder = target(link.getUriBuilder()).request();
+        String type = link.getType();
+        if (type != null) {
+            builder.accept(type);
+        }
+        return builder;
     }
 
     @Override
@@ -205,12 +211,14 @@ public class ClientImpl implements Client {
             List<Object> providers = new LinkedList<Object>();
             Configuration cfg = configImpl.getConfiguration();
             for (Object p : cfg.getInstances()) {
-                Map<Class<?>, Integer> contracts = cfg.getContracts(p.getClass());
-                if (contracts == null || contracts.isEmpty()) {
-                    providers.add(p);
-                } else {
-                    providers.add(
-                        new FilterProviderInfo<Object>(p, pf.getBus(), contracts));
+                if (!(p instanceof Feature)) {
+                    Map<Class<?>, Integer> contracts = cfg.getContracts(p.getClass());
+                    if (contracts == null || contracts.isEmpty()) {
+                        providers.add(p);
+                    } else {
+                        providers.add(
+                            new FilterProviderInfo<Object>(p, pf.getBus(), contracts));
+                    }
                 }
             }
             

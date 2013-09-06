@@ -1443,8 +1443,8 @@ public class WebClient extends AbstractClient {
         public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
             WebClient.this.setEntityHeaders(entity);
             return doInvokeAsyncCallback(name, 
-                                         entity.getEntity(), 
-                                         entity.getEntity().getClass(), 
+                                         entity == null ? null : entity.getEntity(), 
+                                         entity == null ? null : entity.getEntity().getClass(),
                                          null, 
                                          callback);
         }
