@@ -366,9 +366,12 @@ public final class ResponseImpl extends Response {
                 } catch (Exception ex) {
                     throw new ResponseProcessingException(this, ex.getMessage(), ex);    
                 }
+            } else {
+                throw new ResponseProcessingException(this, "No message body reader for class: " + cls, null);
             }
         }
-        throw new IllegalStateException("The entity is not backed by an input stream");
+        throw new IllegalStateException("The entity is not backed by an input stream, entity class is : "
+            + entity.getClass().getName());
         
     }
     
