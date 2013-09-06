@@ -26,6 +26,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 
 /**
  * Keeps the client state such as the baseURI, currentURI, requestHeaders, current response
@@ -47,15 +48,15 @@ public class LocalClientState implements ClientState {
     public LocalClientState(URI baseURI) {
         this.baseURI = baseURI;
         if (isHttpScheme(baseURI)) {
-            this.currentBuilder = UriBuilder.fromUri(baseURI);
+            this.currentBuilder = new UriBuilderImpl().uri(baseURI);
         } else {
-            this.currentBuilder = UriBuilder.fromUri("/");
+            this.currentBuilder = new UriBuilderImpl().uri("/");
         }
     }
     
     public LocalClientState(URI baseURI, URI currentURI) {
         this.baseURI = baseURI;
-        this.currentBuilder = UriBuilder.fromUri(currentURI);
+        this.currentBuilder = new UriBuilderImpl().uri(currentURI);
     }
     
     public LocalClientState(LocalClientState cs) {
@@ -118,7 +119,7 @@ public class LocalClientState implements ClientState {
     public void reset() {
         requestHeaders.clear();
         response = null;
-        currentBuilder = UriBuilder.fromUri(baseURI);
+        currentBuilder = new UriBuilderImpl().uri(baseURI);
         templates = null;
     }
     
