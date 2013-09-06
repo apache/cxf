@@ -49,7 +49,11 @@ public class ConfigurationImpl implements Configuration {
             
             Set<Class<?>> providerClasses = new HashSet<Class<?>>(parent.getClasses());
             for (Object o : parent.getInstances()) {
-                registerParentProvider(o, parent, defaultContracts);
+                if (!(o instanceof Feature)) {
+                    registerParentProvider(o, parent, defaultContracts);
+                } else {
+                    features.add((Feature)o);
+                }
                 providerClasses.remove(o.getClass());
             }
             for (Class<?> cls : providerClasses) {
@@ -89,7 +93,10 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public Set<Object> getInstances() {
-        return providers.keySet();
+        Set<Object> allInstances = new HashSet<Object>();
+        allInstances.addAll(providers.keySet());
+        allInstances.addAll(features);
+        return Collections.unmodifiableSet(allInstances);
     }
 
     @Override
