@@ -338,7 +338,7 @@ public final class ResponseImpl extends Response {
                     throw new MessageProcessingException(ex);
                 }
             } else {
-                throw new ResponseProcessingException(this, "No message body reader for class: " + cls, null);
+                throw new MessageProcessingException("No message body reader for class: " + cls);
             }
         }
         throw new IllegalStateException("The entity is not backed by an input stream, entity class is : "

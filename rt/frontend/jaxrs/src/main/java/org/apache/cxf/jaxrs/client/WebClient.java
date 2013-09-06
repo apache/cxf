@@ -1423,22 +1423,30 @@ public class WebClient extends AbstractClient {
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, Class<T> responseType) {
             WebClient.this.setEntityHeaders(entity);
-            return doInvokeAsync(name, entity.getEntity(), entity.getEntity().getClass(), null, 
+            return doInvokeAsync(name, 
+                                 entity == null ? null : entity.getEntity(), 
+                                 entity == null ? null : entity.getEntity().getClass(), 
+                                 null, 
                                  responseType, responseType, null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
             WebClient.this.setEntityHeaders(entity);
-            return doInvokeAsync(name, entity.getEntity(), entity.getEntity().getClass(), null, 
+            return doInvokeAsync(name, 
+                                 entity == null ? null : entity.getEntity(), 
+                                 entity == null ? null : entity.getEntity().getClass(),  
+                                 null, 
                                  responseType.getRawType(), responseType.getType(), null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
             WebClient.this.setEntityHeaders(entity);
-            return doInvokeAsyncCallback(name, entity.getEntity(), entity.getEntity().getClass(), null, 
-                callback);
+            return doInvokeAsyncCallback(name, 
+                                         entity == null ? null : entity.getEntity(), 
+                                         entity == null ? null : entity.getEntity().getClass(),  
+                                         null, callback);
         }
     }
 
