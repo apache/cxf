@@ -25,8 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +47,7 @@ public class FileCertificateRepo implements CertificateRepo {
     private static final Logger LOG = LoggerFactory.getLogger(FileCertificateRepo.class);
     private static final String CN_PREFIX = "cn=";
     private static final String TRUSTED_CAS_PATH = "trusted_cas";
+    private static final String CRLS_PATH = "crls";
     private static final String CAS_PATH = "cas";
     private final File storageDir;
     private final CertificateFactory certFactory;
@@ -68,6 +71,27 @@ public class FileCertificateRepo implements CertificateRepo {
 
     public void saveCACertificate(X509Certificate cert, UseKeyWithType id) {
         saveCategorizedCertificate(cert, id, false, true);
+    }
+    
+    public void saveCRL(X509CRL crl, UseKeyWithType id) {
+        String name = crl.getIssuerX500Principal().getName();
+        try {
+            String path = convertDnForFileSystem(name) + ".cer";
+            Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
+            if (!p.matcher(path).find()) {
+                throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
+            }
+            
+            File certFile = new File(storageDir + "/" + CRLS_PATH, path);
+            certFile.getParentFile().mkdirs();
+            FileOutputStream fos = new FileOutputStream(certFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            bos.write(crl.getEncoded());
+            bos.close();
+            fos.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving CRL " + name + ": " + e.getMessage(), e);
+        }
     }
 
     private boolean saveCategorizedCertificate(X509Certificate cert, UseKeyWithType id, boolean isTrustedCA,
@@ -94,7 +118,7 @@ public class FileCertificateRepo implements CertificateRepo {
         }
         return true;
     }
-
+    
     public String convertDnForFileSystem(String dn) {
         String result = dn.replace("=", "-");
         result = result.replace(", ", "_");
@@ -126,6 +150,7 @@ public class FileCertificateRepo implements CertificateRepo {
             certificateFiles.addAll(Arrays.asList(storageDir.listFiles()));
             certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + TRUSTED_CAS_PATH).listFiles()));
             certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + CAS_PATH).listFiles()));
+            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + CRLS_PATH).listFiles()));
         } catch (NullPointerException e) {
             //
         }
@@ -141,6 +166,11 @@ public class FileCertificateRepo implements CertificateRepo {
     public X509Certificate readCertificate(File certFile) throws CertificateException, FileNotFoundException {
         FileInputStream fis = new FileInputStream(certFile);
         return (X509Certificate)certFactory.generateCertificate(fis);
+    }
+    
+    public X509CRL readCRL(File crlFile) throws FileNotFoundException, CRLException {
+        FileInputStream fis = new FileInputStream(crlFile);
+        return (X509CRL)certFactory.generateCRL(fis);
     }
 
     @Override
@@ -184,6 +214,29 @@ public class FileCertificateRepo implements CertificateRepo {
             }
 
         }
+        return results;
+    }
+    
+    @Override
+    public List<X509CRL> getCRLs() {
+        List<X509CRL> results = new ArrayList<X509CRL>();
+        File[] list = getX509Files();
+        for (File crlFile : list) {
+            try {
+                if (crlFile.isDirectory()) {
+                    continue;
+                }
+                if (crlFile.getParent().endsWith(CRLS_PATH)) {
+                    X509CRL crl = readCRL(crlFile);
+                    results.add(crl);
+                }
+            } catch (Exception e) {
+                LOG.warn(String.format("Cannot load CRL from file: %s. Error: %s", crlFile,
+                                       e.getMessage()));
+            }
+
+        }
+        
         return results;
     }
 

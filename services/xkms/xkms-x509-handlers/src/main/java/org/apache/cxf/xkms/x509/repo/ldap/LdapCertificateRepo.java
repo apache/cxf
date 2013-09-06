@@ -21,8 +21,10 @@ package org.apache.cxf.xkms.x509.repo.ldap;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,6 +85,12 @@ public class LdapCertificateRepo implements CertificateRepo {
     @Override
     public List<X509Certificate> getCaCerts() {
         return getCertificatesFromLdap(rootDN, ldapConfig.getIntermediateFilter(), ldapConfig.getAttrCrtBinary());
+    }
+    
+    @Override
+    public List<X509CRL> getCRLs() {
+        // TODO
+        return Collections.emptyList();
     }
 
     private List<X509Certificate> getCertificatesFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {

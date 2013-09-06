@@ -28,6 +28,7 @@ import java.security.cert.CertStoreParameters;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.TrustAnchor;
+import java.security.cert.X509CRL;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
@@ -67,13 +68,18 @@ public class TrustedAuthorityValidator implements Validator {
         try {
             List<X509Certificate> intermediateCerts = certRepo.getCaCerts();
             List<X509Certificate> trustedAuthorityCerts = certRepo.getTrustedCaCerts();
+            List<X509CRL> crls = certRepo.getCRLs();
             Set<TrustAnchor> trustAnchors = asTrustAnchors(trustedAuthorityCerts);
             CertStoreParameters intermediateParams = new CollectionCertStoreParameters(intermediateCerts);
             CertStoreParameters certificateParams = new CollectionCertStoreParameters(certificates);
+            CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
             PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustAnchors, selector);
             pkixParams.addCertStore(CertStore.getInstance("Collection", intermediateParams));
             pkixParams.addCertStore(CertStore.getInstance("Collection", certificateParams));
-            pkixParams.setRevocationEnabled(false);
+            pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
+            if (crls.isEmpty()) {
+                pkixParams.setRevocationEnabled(false);
+            }
             CertPathBuilder builder = CertPathBuilder.getInstance("PKIX");
             builder.build(pkixParams);
         } catch (InvalidAlgorithmParameterException e) {
