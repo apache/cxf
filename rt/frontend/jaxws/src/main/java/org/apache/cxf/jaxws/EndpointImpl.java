@@ -336,8 +336,10 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 if (!endpointInfo.getAddress().contains(addr)) {
                     endpointInfo.setAddress(addr);
                 }
-                if (publishedEndpointUrl != null && wsdlLocation != null) {
+                if (publishedEndpointUrl != null) {
                     endpointInfo.setProperty(WSDLGetUtils.PUBLISHED_ENDPOINT_URL, publishedEndpointUrl);
+                }
+                if (publishedEndpointUrl != null && wsdlLocation != null) {
                     //early update the publishedEndpointUrl so that endpoints in the same app sharing the same wsdl
                     //do not require all of them to be queried for wsdl before the wsdl is finally fully updated
                     Definition def = endpointInfo.getService()
