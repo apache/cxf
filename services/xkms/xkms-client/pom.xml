@@ -49,6 +49,24 @@
                 </includes>
             </testResource>
         </testResources>
+        <plugins>
+           <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Import-Package>
+                            javax.xml.ws, <!-- To workaround issue with BindingProvider interface not visible -->
+                            *
+                        </Import-Package>
+                        <Export-Package>
+                            !*
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>
