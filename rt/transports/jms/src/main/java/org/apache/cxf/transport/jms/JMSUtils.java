@@ -505,9 +505,9 @@ public final class JMSUtils {
         if (messageProperties.isSetJMSDeliveryMode()) {
             jmsMessage.setJMSDeliveryMode(messageProperties.getJMSDeliveryMode());
         }
-        // if (messageProperties.isSetTimeToLive()) {
-        // jmsMessage.setJMSExpiration(expiration);
-        // }
+        if (messageProperties.isSetJMSExpiration()) {
+            jmsMessage.setJMSExpiration(messageProperties.getJMSExpiration());
+        }
         if (messageProperties.isSetJMSPriority()) {
             jmsMessage.setJMSPriority(messageProperties.getJMSPriority());
         }
