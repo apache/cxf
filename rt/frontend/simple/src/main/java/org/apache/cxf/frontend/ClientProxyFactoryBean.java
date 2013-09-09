@@ -190,15 +190,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
 
     protected Class<?>[] getImplementingClasses() {
         Class<?> cls = clientFactoryBean.getServiceClass();
-        try {
-            if (cls.getMethod("close") != null) {
-                return new Class[] {cls};
-            }
-        } catch (Exception e) {
-            //ignore - doesn't have a close method so we
-            //can implement Closeable
-        }
-        return new Class[] {cls, Closeable.class};
+        return new Class[] {Closeable.class, cls};
     }
 
     protected ClientProxy clientClientProxy(Client c) {
