@@ -17,12 +17,14 @@
  * under the License.
  */
 
-package org.apache.cxf.xkms.crypto;
+package org.apache.cxf.xkms.crypto.impl;
 
 import java.util.Properties;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.xkms.crypto.CryptoProviderException;
+import org.apache.cxf.xkms.crypto.CryptoProviderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
