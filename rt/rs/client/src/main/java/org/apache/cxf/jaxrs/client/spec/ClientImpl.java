@@ -89,6 +89,9 @@ public class ClientImpl implements Client {
     
     @Override
     public WebTarget target(String address) {
+        if (address != null && address.isEmpty()) {
+            address = "/";
+        }
         return target(UriBuilder.fromUri(address));
     }
     
