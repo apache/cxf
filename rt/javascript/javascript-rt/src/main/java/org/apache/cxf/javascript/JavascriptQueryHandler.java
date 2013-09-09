@@ -70,10 +70,14 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
     }
     
     public String getResponseContentType(String fullQueryString, String ctx) {
-        URI uri = URI.create(fullQueryString);
-        Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
-        if (map.containsKey(CODE_QUERY_KEY)) {
-            return "application/javascript;charset=UTF-8";
+        try {
+            URI uri = URI.create(fullQueryString);
+            Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
+            if (map.containsKey(CODE_QUERY_KEY)) {
+                return "application/javascript;charset=UTF-8";
+            }
+        } catch (IllegalArgumentException iae) {
+            //invalid URI string, ignore and continue
         }
         return null;
     }
@@ -83,10 +87,14 @@ public class JavascriptQueryHandler implements StemMatchingQueryHandler {
         if (baseUri == null) {
             return false;
         }
-        URI uri = URI.create(baseUri);
-        Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
-        if (map.containsKey(CODE_QUERY_KEY)) {
-            return endpointInfo.getAddress().contains(UrlUtils.getStem(uri.getSchemeSpecificPart()));
+        try {
+            URI uri = URI.create(baseUri);
+            Map<String, String> map = UrlUtils.parseQueryString(uri.getQuery());
+            if (map.containsKey(CODE_QUERY_KEY)) {
+                return endpointInfo.getAddress().contains(UrlUtils.getStem(uri.getSchemeSpecificPart()));
+            }
+        } catch (IllegalArgumentException iae) {
+            //invalid URI string, ignore and continue
         }
         return false;
     }
