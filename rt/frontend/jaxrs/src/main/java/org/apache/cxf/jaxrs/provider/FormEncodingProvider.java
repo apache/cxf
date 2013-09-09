@@ -169,12 +169,22 @@ public class FormEncodingProvider<T> implements
                                                decode);
         } else {
             String enc = HttpUtils.getEncoding(mt, "UTF-8");
-            FormUtils.populateMapFromString(params,
-                                            PhaseInterceptorChain.getCurrentMessage(),
-                                            FormUtils.readBody(is, enc),
-                                            enc,
-                                            decode,
-                                            mc != null ? mc.getHttpServletRequest() : null);
+            
+            Object servletRequest = mc != null ? mc.getHttpServletRequest() : null;
+            if (servletRequest == null) {
+                FormUtils.populateMapFromString(params,
+                                                PhaseInterceptorChain.getCurrentMessage(),
+                                                FormUtils.readBody(is, enc),
+                                                enc,
+                                                decode);
+            } else {
+                FormUtils.populateMapFromString(params,
+                                                PhaseInterceptorChain.getCurrentMessage(),
+                                                FormUtils.readBody(is, enc),
+                                                enc,
+                                                decode,
+                                                (javax.servlet.http.HttpServletRequest)servletRequest);
+            }
         }
     }
     
