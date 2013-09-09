@@ -21,8 +21,11 @@ package org.apache.cxf.xkms.x509.validator;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertPath;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.CertPathBuilderException;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreParameters;
 import java.security.cert.CollectionCertStoreParameters;
@@ -72,21 +75,30 @@ public class TrustedAuthorityValidator implements Validator {
             Set<TrustAnchor> trustAnchors = asTrustAnchors(trustedAuthorityCerts);
             CertStoreParameters intermediateParams = new CollectionCertStoreParameters(intermediateCerts);
             CertStoreParameters certificateParams = new CollectionCertStoreParameters(certificates);
-            CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
             PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustAnchors, selector);
             pkixParams.addCertStore(CertStore.getInstance("Collection", intermediateParams));
             pkixParams.addCertStore(CertStore.getInstance("Collection", certificateParams));
-            pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
-            if (crls.isEmpty()) {
-                pkixParams.setRevocationEnabled(false);
-            }
+            pkixParams.setRevocationEnabled(false);
+            
             CertPathBuilder builder = CertPathBuilder.getInstance("PKIX");
-            builder.build(pkixParams);
+            CertPath certPath = builder.build(pkixParams).getCertPath();
+            
+            // Now validate the CertPath including CRL checking
+            if (!crls.isEmpty()) {
+                pkixParams.setRevocationEnabled(true);
+                CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
+                pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
+                CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+                validator.validate(certPath, pkixParams);
+            }
         } catch (InvalidAlgorithmParameterException e) {
             throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (CertPathBuilderException e) {
+            LOG.log(Level.INFO, e.getMessage(), e);
+            return false;
+        } catch (CertPathValidatorException e) {
             LOG.log(Level.INFO, e.getMessage(), e);
             return false;
         }
