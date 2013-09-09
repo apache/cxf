@@ -39,6 +39,7 @@ import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMUtils;
 
@@ -51,8 +52,13 @@ import org.junit.Test;
  * 
  */
 public class ManagedEndpointsTest extends AbstractClientServerTestBase {
+
     public static final String PORT = allocatePort(ManagedEndpointsTest.class);
 
+    private static final String[] EMPTY_SIGNATURE = new String[0];
+    private static final String[] ONESTRING_SIGNATURE = new String[]{"java.lang.String"};
+    private static final String[] ONEBOOLEAN_SIGNATURE = new String[]{"boolean"};
+    
     private static final String SERVER_CFG = "/org/apache/cxf/systest/ws/rm/managed-server.xml"; 
     private static final String CLIENT_CFG = "/org/apache/cxf/systest/ws/rm/managed-client.xml"; 
         
@@ -107,14 +113,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
     
     @Test
     public void testManagedEndpointsOneway() throws Exception {
-        checkServerReady(30000);
-        
-        SpringBusFactory bf = new SpringBusFactory();
-        clientBus = bf.createBus(CLIENT_CFG);
-        MessageLossSimulator mls = new MessageLossSimulator();
-        clientBus.getOutInterceptors().add(mls);
-        
-        BusFactory.setDefaultBus(clientBus);
+        prepareClient();
         
         RMManager clientManager = clientBus.getExtension(RMManager.class);
         RMManager serverManager = serverBus.getExtension(RMManager.class);
@@ -147,7 +146,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         ObjectName serverEndpointName = getEndpointName(mbs, serverManager);
         
         o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("One sequence expected", o instanceof String[] && 1 == ((String[])o).length);
         String sseqId = ((String[])o)[0];
         
@@ -162,11 +161,11 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         String dseqId = ((String[])o)[0];
 
         o = mbs.invoke(serverEndpointName, "getSourceSequenceIds", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         verifyArray("Expected sequence identifier", o, new String[]{dseqId}, false); 
         
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageCount",
@@ -177,31 +176,31 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         verifySourceSequence(o, sseqId, 1, 0);
 
         o = mbs.invoke(clientEndpointName, "getSourceSequences", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("One sequence message", o instanceof CompositeData[] && 1 == ((CompositeData[])o).length);
         verifySourceSequence(((CompositeData[])o)[0], sseqId, 1, 0);
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         verifyArray("Expected range", o, new Long[]{1L, 1L}, true);
         
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
         
         greeter.greetMeOneWay("two"); // getting lost
         greeter.greetMeOneWay("three"); // sent
         
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
         
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         assertTrue("One unacknowledged message", o instanceof Long[] && 1 == ((Long[])o).length);
                 
         o = mbs.invoke(clientEndpointName, "getRetransmissionStatus", 
@@ -209,7 +208,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         verifyRetransmissionStatus(o, 2L, 0);
 
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceAcknowledgedRange", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
 
         // 7 sec retry interval + 5 sec
@@ -217,33 +216,36 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         Thread.sleep(12000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         verifyArray("Expected range", o, new Long[]{1L, 3L}, true);
         
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceAcknowledgedRange", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         verifyArray("Expected range", o, new Long[]{1L, 3L}, true);
 
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
-
+        
+        mbs.invoke(clientEndpointName, "closeSourceSequence", new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
+            new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        assertTrue("Source sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+        
+        mbs.invoke(clientEndpointName, "terminateDestinationSequence", new Object[]{dseqId}, ONESTRING_SIGNATURE);
+        o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", 
+            new Object[]{}, EMPTY_SIGNATURE);
+        assertTrue("Destination sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+        
     }
     
     @Test
     public void testSuspendAndResumeSourceSequence() throws Exception {
-        checkServerReady(30000);
-        
-        SpringBusFactory bf = new SpringBusFactory();
-        clientBus = bf.createBus(CLIENT_CFG);
-        MessageLossSimulator mls = new MessageLossSimulator();
-        clientBus.getOutInterceptors().add(mls);
-        
-        BusFactory.setDefaultBus(clientBus);
+        prepareClient();
         
         RMManager clientManager = clientBus.getExtension(RMManager.class);
         
@@ -268,18 +270,18 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         String sseqId = (String)o;
 
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
         assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
 
         greeter.greetMeOneWay("two"); // sent but suspended
         greeter.greetMeOneWay("three"); // sent but suspended
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
 
         mbs.invoke(clientEndpointName, "suspendSourceQueue", 
-                   new Object[]{sseqId}, new String[]{"java.lang.String"});
+                   new Object[]{sseqId}, ONESTRING_SIGNATURE);
         LOG.info("suspended the source queue: " + sseqId);
         
 
@@ -288,21 +290,166 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         Thread.sleep(10000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
 
         mbs.invoke(clientEndpointName, "resumeSourceQueue", 
-                   new Object[]{sseqId}, new String[]{"java.lang.String"});
+                   new Object[]{sseqId}, ONESTRING_SIGNATURE);
         LOG.info("resumed the source queue: " + sseqId);
         
         LOG.info("waiting for 15 secs for the retry (resumed)...");
         Thread.sleep(15000);
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
-                       new Object[]{true}, new String[]{"boolean"});
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
         assertTrue("No queued messages", o instanceof Integer && 0 == ((Integer)o).intValue());
     }
+    
+    @Test
+    public void testManagedEndpointsOneway12() throws Exception {
+        prepareClient();
+        
+        RMManager clientManager = clientBus.getExtension(RMManager.class);
+        RMManager serverManager = serverBus.getExtension(RMManager.class);
+        
+        InstrumentationManager serverIM = serverBus.getExtension(InstrumentationManager.class);
+        MBeanServer mbs = serverIM.getMBeanServer();
+        assertNotNull("MBeanServer must be available.", mbs);
 
+        ObjectName clientManagerName = RMUtils.getManagedObjectName(clientManager);
+        ObjectName serverManagerName = RMUtils.getManagedObjectName(serverManager);
+
+        Object o;
+        GreeterService gs = new GreeterService();
+        final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, ManagedEndpointsTest.PORT);
+        LOG.fine("Created greeter client.");
+
+        ClientProxy.getClient(greeter).getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY,
+            RM11Constants.NAMESPACE_URI);
+
+        org.apache.cxf.endpoint.Endpoint ep = ClientProxy.getClient(greeter).getEndpoint();
+        String epId = RMUtils.getEndpointIdentifier(ep, clientBus);
+        greeter.greetMeOneWay("one"); // sent
+
+        o = mbs.invoke(clientManagerName, "getEndpointIdentifiers", null, null);
+        verifyArray("Expected endpoint identifier", o, new String[]{epId}, true);
+
+        o = mbs.invoke(serverManagerName, "getEndpointIdentifiers", null, null);
+        verifyArray("Expected endpoint identifier", o, new String[]{epId}, true);
+        
+        ObjectName clientEndpointName = RMUtils.getManagedObjectName(clientManager, ep);
+        // we need to find out serverEndpointName by using the query name
+        ObjectName serverEndpointName = getEndpointName(mbs, serverManager);
+        
+        o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        assertTrue("One sequence expected", o instanceof String[] && 1 == ((String[])o).length);
+        String sseqId = ((String[])o)[0];
+        
+        o = mbs.invoke(clientEndpointName, "getCurrentSourceSequenceId", null, null);
+        assertTrue("Expected sequence identifier", o instanceof String && sseqId.equals(o));
+        
+        o = mbs.invoke(serverEndpointName, "getDestinationSequenceIds", null, null);
+        verifyArray("Expected sequence identifier", o, new String[]{sseqId}, false); 
+        
+        o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", null, null);
+        assertTrue("One sequence expected", o instanceof String[] && 1 == ((String[])o).length);
+        String dseqId = ((String[])o)[0];
+
+        o = mbs.invoke(serverEndpointName, "getSourceSequenceIds", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        verifyArray("Expected sequence identifier", o, new String[]{dseqId}, false); 
+        
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
+
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageCount",
+                       new Object[]{sseqId, true}, new String[]{"java.lang.String", "boolean"});
+        assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
+
+        o = mbs.invoke(clientEndpointName, "getCurrentSourceSequence", null, null);
+        verifySourceSequence(o, sseqId, 1, 0);
+
+        o = mbs.invoke(clientEndpointName, "getSourceSequences", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        assertTrue("One sequence message", o instanceof CompositeData[] && 1 == ((CompositeData[])o).length);
+        verifySourceSequence(((CompositeData[])o)[0], sseqId, 1, 0);
+
+        o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        verifyArray("Expected range", o, new Long[]{1L, 1L}, true);
+        
+        o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
+        
+        greeter.greetMeOneWay("two"); // getting lost
+        greeter.greetMeOneWay("three"); // sent
+        
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
+
+        o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
+        
+        o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        assertTrue("One unacknowledged message", o instanceof Long[] && 1 == ((Long[])o).length);
+                
+        o = mbs.invoke(clientEndpointName, "getRetransmissionStatus", 
+                       new Object[]{sseqId, 2}, new String[]{"java.lang.String", "long"});
+        verifyRetransmissionStatus(o, 2L, 0);
+
+        o = mbs.invoke(serverEndpointName, "getDestinationSequenceAcknowledgedRange", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
+
+        // 7 sec retry interval + 5 sec
+        LOG.info("waiting for 12 secs for the retry to complete ...");
+        Thread.sleep(12000);
+
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
+
+        o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        verifyArray("Expected range", o, new Long[]{1L, 3L}, true);
+        
+        o = mbs.invoke(serverEndpointName, "getDestinationSequenceAcknowledgedRange", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        verifyArray("Expected range", o, new Long[]{1L, 3L}, true);
+
+        o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
+                       new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        assertTrue("No unacknowledged message", o instanceof Long[] && 0 == ((Long[])o).length);
+        
+        mbs.invoke(clientEndpointName, "closeSourceSequence", new Object[]{sseqId}, ONESTRING_SIGNATURE);
+        o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
+            new Object[]{true}, ONEBOOLEAN_SIGNATURE);
+        
+        mbs.invoke(clientEndpointName, "terminateDestinationSequence", new Object[]{dseqId}, ONESTRING_SIGNATURE);
+        o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", 
+            new Object[]{}, EMPTY_SIGNATURE);
+        assertTrue("Destination sequence terminated", o instanceof String[] && 0 == ((String[])o).length);
+        
+    }
+    
+    private void prepareClient() {
+        checkServerReady(30000);
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        clientBus = bf.createBus(CLIENT_CFG);
+        MessageLossSimulator mls = new MessageLossSimulator();
+        clientBus.getOutInterceptors().add(mls);
+        
+        BusFactory.setDefaultBus(clientBus);
+    }
+    
     private void checkServerReady(long max) {
         long waited = 0;
         while (waited < max) {

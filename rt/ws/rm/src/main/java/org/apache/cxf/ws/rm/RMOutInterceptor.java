@@ -101,17 +101,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isLastMessage = constants.getCloseSequenceAction().equals(action);
         
         if (isApplicationMessage && !isPartialResponse) {
-            RetransmissionInterceptor ri = new RetransmissionInterceptor();
-            ri.setManager(getManager());
-            // TODO:
-            // On the server side: If a fault occurs after this interceptor we will switch 
-            // interceptor chains (if this is not already a fault message) and therefore need to 
-            // make sure the retransmission interceptor is added to the fault chain
-            // 
-            msg.getInterceptorChain().add(ri);
-            LOG.fine("Added RetransmissionInterceptor to chain.");
-            
-            getManager().getRetransmissionQueue().start();
+            addRetransmissionInterceptor(msg);
         }
         
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
@@ -139,8 +129,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             ContextUtils.storeDeferUncorrelatedMessageAbort(msg);
         }
         
-        if ((isApplicationMessage || isLastMessage)
-            && !isPartialResponse) {
+        Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
+        if ((isApplicationMessage || (isLastMessage && invocationContext != null)) && !isPartialResponse) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("inbound sequence: " + (null == inSeqId ? "null" : inSeqId.getValue()));
             }
@@ -150,7 +140,6 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             synchronized (source) {
                 SourceSequence seq = null;
                 if (isLastMessage) {
-                    Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
                     seq = (SourceSequence)invocationContext.get(SourceSequence.class.getName());
                 } else {
                     seq = getManager().getSequence(inSeqId, msg, maps);
@@ -210,6 +199,20 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         assertReliability(msg);
+    }
+
+    private void addRetransmissionInterceptor(Message msg) {
+        RetransmissionInterceptor ri = new RetransmissionInterceptor();
+        ri.setManager(getManager());
+        // TODO:
+        // On the server side: If a fault occurs after this interceptor we will switch 
+        // interceptor chains (if this is not already a fault message) and therefore need to 
+        // make sure the retransmission interceptor is added to the fault chain
+        // 
+        msg.getInterceptorChain().add(ri);
+        LOG.fine("Added RetransmissionInterceptor to chain.");
+        
+        getManager().getRetransmissionQueue().start();
     }
 
     private String getAddressingNamespace(AddressingProperties maps) {

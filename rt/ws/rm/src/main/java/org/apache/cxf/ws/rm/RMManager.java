@@ -63,6 +63,7 @@ import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
+import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -293,12 +294,11 @@ public class RMManager {
      * @param sp The sourcePolicy to set.
      */
     public void setSourcePolicy(SourcePolicyType sp) {
-        org.apache.cxf.ws.rm.manager.ObjectFactory factory = new org.apache.cxf.ws.rm.manager.ObjectFactory();
         if (null == sp) {
-            sp = factory.createSourcePolicyType();
+            sp = new SourcePolicyType();
         }
         if (sp.getSequenceTerminationPolicy() == null) {
-            sp.setSequenceTerminationPolicy(factory.createSequenceTerminationPolicyType());
+            sp.setSequenceTerminationPolicy(new SequenceTerminationPolicyType());
         }
         sourcePolicy = sp;
     }

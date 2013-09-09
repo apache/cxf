@@ -24,7 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.AttributeChangeNotification;
 import javax.management.JMException;
+import javax.management.MBeanNotificationInfo;
+import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -50,7 +53,7 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange
  */
 @ManagedResource(componentName = "RMEndpoint", 
                  description = "Responsible for Sources and Destinations.")
-public class ManagedRMEndpoint implements ManagedComponent {
+public class ManagedRMEndpoint extends NotificationBroadcasterSupport implements ManagedComponent {
 
     private static final String[] SOURCE_SEQUENCE_NAMES = 
     {"sequenceId", "currentMessageNumber", "expires", "lastMessage", "queuedMessageCount", 
@@ -487,6 +490,44 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return destination.getSequence(identifier);
     }
 
+    @ManagedOperation(description = "Close Source Sequence")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public void closeSourceSequence(String sid) throws JMException {
+        SourceSequence ss = getSourceSeq(sid);
+        if (null == ss) {
+            throw new JMException("no source sequence");
+        }
+        RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
+        rq.stop(ss);
+        Proxy proxy = endpoint.getProxy();
+        try {
+            proxy.lastMessage(ss);
+        } catch (RMException e) {
+            e.printStackTrace();
+            throw new JMException("Error closing sequence: " + e.getMessage());
+        }
+    }
+
+    @ManagedOperation(description = "Terminate Destination Sequence")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The destination identifier") 
+    })
+    public void terminateDestinationSequence(String sid) throws JMException {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new JMException("no destination sequence");
+        }
+        Proxy proxy = endpoint.getProxy();
+        try {
+            proxy.terminate(ds);
+            ds.getDestination().removeSequence(ds);
+        } catch (RMException e) {
+            throw new JMException("Error terminating sequence: " + e.getMessage());
+        }
+    }
+
     @ManagedOperation(description = "Remove Source Sequence")
     @ManagedOperationParameters({
         @ManagedOperationParameter(name = "sequenceId", description = "The destination identifier") 
@@ -530,7 +571,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
         rq.purgeAll(ss);
     }
-
+    
     private static String getAddressValue(EndpointReferenceType epr) {
         if (null != epr && null != epr.getAddress()) {
             return epr.getAddress().getValue();
@@ -642,5 +683,16 @@ public class ManagedRMEndpoint implements ManagedComponent {
     @ManagedAttribute(description = "Number of Completed Destination Sequences", currencyTimeLimit = 10)
     public int getCompletedDestinationSequenceCount() {
         return endpoint.getCompletedDestinationSequenceCount();
+    }
+    
+    @Override
+    public MBeanNotificationInfo[] getNotificationInfo() {
+        String[] types = new String[] {
+            AttributeChangeNotification.ATTRIBUTE_CHANGE
+        };
+        String name = AttributeChangeNotification.class.getName();
+        String description = "Message acknowledged";
+        MBeanNotificationInfo info =  new MBeanNotificationInfo(types, name, description);
+        return new MBeanNotificationInfo[] {info};
     }
 }

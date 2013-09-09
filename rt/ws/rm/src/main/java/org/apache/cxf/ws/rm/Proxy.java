@@ -47,6 +47,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Expires;
@@ -88,7 +89,7 @@ public class Proxy {
     }
     
     void terminate(SourceSequence ss) throws RMException {
-        final ProtocolVariation protocol = ss.getProtocol(); 
+        ProtocolVariation protocol = ss.getProtocol(); 
         RMConstants constants = protocol.getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
             .getService().getInterface().getOperation(constants.getTerminateSequenceOperationName());
@@ -96,6 +97,19 @@ public class Proxy {
         TerminateSequenceType ts = new TerminateSequenceType();
         ts.setIdentifier(ss.getIdentifier());
         ts.setLastMsgNumber(ss.getCurrentMessageNr());
+        EncoderDecoder codec = protocol.getCodec();
+        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, null);
+    }
+    
+    void terminate(DestinationSequence ds) throws RMException {
+        ProtocolVariation protocol = ds.getProtocol(); 
+        RMConstants constants = protocol.getConstants();
+        OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
+            .getService().getInterface().getOperation(constants.getTerminateSequenceOperationName());
+        
+        TerminateSequenceType ts = new TerminateSequenceType();
+        ts.setIdentifier(ds.getIdentifier());
+        ts.setLastMsgNumber(ds.getLastMessageNumber());
         EncoderDecoder codec = protocol.getCodec();
         invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, null);
     }
@@ -145,6 +159,7 @@ public class Proxy {
                 offer.setExpires(expires);
             }
             offer.setIdentifier(reliableEndpoint.getSource().generateSequenceIdentifier());
+            offer.setEndpoint(acksTo);
             create.setOffer(offer);
             setOfferedIdentifier(offer);
         }
@@ -214,7 +229,14 @@ public class Proxy {
                 Collections.singletonMap(SourceSequence.class.getName(), 
                                          (Object)s));
 
-        invoke(oi, protocol, new Object[] {}, context);
+        if (constants instanceof RM11Constants) {
+            CloseSequenceType csr = new CloseSequenceType();
+            csr.setIdentifier(s.getIdentifier());
+            csr.setLastMsgNumber(s.getCurrentMessageNr());
+            invoke(oi, protocol, new Object[] {csr}, context);
+        } else {
+            invoke(oi, protocol, new Object[] {}, context);
+        }
     }
     
     void ackRequested(SourceSequence s) throws RMException {
