@@ -67,6 +67,7 @@ public final class ResponseImpl extends Response {
     private Message responseMessage;
     private boolean entityClosed;    
     private boolean entityBufferred;
+    private Object lastEntity;
     
     ResponseImpl(int s) {
         this.status = s;
@@ -131,7 +132,7 @@ public final class ResponseImpl extends Response {
     
     public Object getActualEntity() {
         checkEntityIsClosed();
-        return entity;
+        return lastEntity != null ? lastEntity : entity;
     }
     
     public Object getEntity() {
@@ -325,19 +326,12 @@ public final class ResponseImpl extends Response {
         
         checkEntityIsClosed();
         
-        if (!hasEntity()) {
-            throw new ProcessingException("Null entity");
-        }
+        if (lastEntity != null && cls.isAssignableFrom(lastEntity.getClass())
+            && !(lastEntity instanceof InputStream)) {
+            return cls.cast(lastEntity);
+        } 
         
-        if (cls.isAssignableFrom(entity.getClass())) {
-            return cls.cast(entity);
-        }
         if (entity instanceof InputStream) {
-            
-            if (responseMessage == null) {
-                // won't happen, just in case
-                throw new RuntimeException();    
-            }
             
             MediaType mediaType = getMediaType();
             if (mediaType == null) {
@@ -351,27 +345,34 @@ public final class ResponseImpl extends Response {
             if (readers != null) {
                 try {
                     responseMessage.put(Message.PROTOCOL_HEADERS, this.getMetadata());
-                    Object newEntity = JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
+                    lastEntity = JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
                                                                            anns, 
                                                                            InputStream.class.cast(entity), 
                                                                            mediaType, 
                                                                            responseMessage);
-                    if (responseStreamCanBeClosed(cls)) {
-                        InputStream.class.cast(entity).close();
+                    if (!entityBufferred) {
+                        if (responseStreamCanBeClosed(cls)) {
+                            InputStream.class.cast(entity).close();
+                            entity = null;
+                        }
+                    } else {
+                        InputStream.class.cast(entity).reset();
                     }
-                    entity = newEntity;
-                    entityBufferred = true;
                     
-                    return cls.cast(entity);
+                    return cls.cast(lastEntity);
                 } catch (Exception ex) {
                     throw new ResponseProcessingException(this, ex.getMessage(), ex);    
                 }
             } else {
                 throw new ResponseProcessingException(this, "No message body reader for class: " + cls, null);
             }
+        } else if (entity != null && cls.isAssignableFrom(entity.getClass())) {
+            lastEntity = entity;
+            return cls.cast(lastEntity);
         }
+        
         throw new IllegalStateException("The entity is not backed by an input stream, entity class is : "
-            + entity.getClass().getName());
+            + entity != null ? entity.getClass().getName() : null);
         
     }
     
