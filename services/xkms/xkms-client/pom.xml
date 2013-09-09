@@ -109,6 +109,13 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>
+                        	javax.xml.ws, <!-- To fix issue with BindingProvider interface not visible -->
+                        	*
+                        </Import-Package>
+                        <Export-Package>
+                        	!*
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
