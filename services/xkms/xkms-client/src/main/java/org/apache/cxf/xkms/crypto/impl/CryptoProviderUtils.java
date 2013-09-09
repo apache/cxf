@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.xkms.crypto;
+package org.apache.cxf.xkms.crypto.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +31,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.components.crypto.Merlin;
 
