@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
@@ -115,28 +114,37 @@ public final class FormUtils {
                                              Message m,
                                              String postBody, 
                                              String enc,
-                                             boolean decode,
-                                             HttpServletRequest request) {
-        if (!StringUtils.isEmpty(postBody)) {
-            List<String> parts = Arrays.asList(StringUtils.split(postBody, "&"));
-            checkNumberOfParts(m, parts.size());
-            for (String part : parts) {
-                String[] keyValue = new String[2];
-                int index = part.indexOf("=");
-                if (index != -1) {
-                    keyValue[0] = part.substring(0, index);
-                    keyValue[1] = index + 1 < part.length() ? part.substring(index + 1) : "";
-                } else {
-                    keyValue[0] = part;
-                    keyValue[1] = "";
-                }
-                String name = HttpUtils.urlDecode(keyValue[0], enc);
-                if (decode) {
-                    params.add(name, HttpUtils.urlDecode(keyValue[1], enc));
-                } else {
-                    params.add(name, keyValue[1]);
-                }
+                                             boolean decode) {
+        List<String> parts = Arrays.asList(StringUtils.split(postBody, "&"));
+        checkNumberOfParts(m, parts.size());
+        for (String part : parts) {
+            String[] keyValue = new String[2];
+            int index = part.indexOf("=");
+            if (index != -1) {
+                keyValue[0] = part.substring(0, index);
+                keyValue[1] = index + 1 < part.length() ? part.substring(index + 1) : "";
+            } else {
+                keyValue[0] = part;
+                keyValue[1] = "";
             }
+            String name = HttpUtils.urlDecode(keyValue[0], enc);
+            if (decode) {
+                params.add(name, HttpUtils.urlDecode(keyValue[1], enc));
+            } else {
+                params.add(name, keyValue[1]);
+            }
+        }
+        
+    }
+    
+    public static void populateMapFromString(MultivaluedMap<String, String> params,
+                                             Message m,
+                                             String postBody, 
+                                             String enc,
+                                             boolean decode,
+                                             javax.servlet.http.HttpServletRequest request) {
+        if (!StringUtils.isEmpty(postBody)) {
+            populateMapFromString(params, m, postBody, enc, decode);
         } else if (request != null) {
             for (Enumeration<String> en = request.getParameterNames(); en.hasMoreElements();) {
                 String paramName = en.nextElement();

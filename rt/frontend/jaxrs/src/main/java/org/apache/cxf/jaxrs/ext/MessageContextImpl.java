@@ -153,7 +153,11 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public HttpServletRequest getHttpServletRequest() {
-        return getContext(HttpServletRequest.class);
+        try {
+            return getContext(HttpServletRequest.class);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     public HttpServletResponse getHttpServletResponse() {
