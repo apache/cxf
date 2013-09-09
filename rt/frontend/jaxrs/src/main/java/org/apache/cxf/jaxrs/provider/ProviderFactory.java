@@ -92,8 +92,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ProviderFactory {
+    public static final String PROVIDER_SELECTION_PROPERTY_CHANGED = "provider.selection.property.changed";
     static final String IGNORE_TYPE_VARIABLES = "org.apache.cxf.jaxrs.providers.ignore.typevars";
-
+    
     private static final Class<?>[] FILTER_INTERCEPTOR_CLASSES = 
         new Class<?>[] {ContainerRequestFilter.class,
                         ContainerResponseFilter.class,

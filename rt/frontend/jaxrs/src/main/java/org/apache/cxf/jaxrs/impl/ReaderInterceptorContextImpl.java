@@ -85,6 +85,9 @@ public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
 
     @Override
     public void setMediaType(MediaType mt) {
+        if (!getMediaType().isCompatible(mt)) {
+            providerSelectionPropertyChanged();
+        }
         getHeaders().putSingle(HttpHeaders.CONTENT_TYPE, JAXRSUtils.mediaTypeToString(mt));
         
     }
