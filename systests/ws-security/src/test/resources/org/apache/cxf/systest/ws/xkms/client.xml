@@ -67,7 +67,7 @@
         <constructor-arg ref="cxf"/>
     </bean>
     
-    <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.XkmsCryptoProvider">
+    <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
         <constructor-arg>
             <!-- <ref bean="xkmsClient" /> -->
             <ref bean="xkmsInvoker" />
@@ -92,7 +92,7 @@
         </constructor-arg>
     </bean>
     
-    <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.XkmsCryptoProvider">
+    <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
         <constructor-arg>
             <!-- <ref bean="xkmsClient" /> -->
             <ref bean="xkmsInvoker" />
