@@ -17,9 +17,8 @@
  * under the License.
  */
 
-package org.apache.cxf.xkms.crypto.impl;
+package org.apache.cxf.xkms.crypto;
 
-import org.apache.cxf.xkms.crypto.CryptoProviderException;
 
 public class MissingPrincipalException extends CryptoProviderException {
 
