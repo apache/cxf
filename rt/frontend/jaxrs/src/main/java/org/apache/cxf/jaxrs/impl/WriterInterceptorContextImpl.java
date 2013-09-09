@@ -89,7 +89,7 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
     @Override
     public void setEntity(Object object) {
         entity = object;
-
+        super.setType(entity != null ? entity.getClass() : null);   
     }
 
     @Override
@@ -109,6 +109,9 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
 
     @Override
     public void setMediaType(MediaType mt) {
+        if (!getMediaType().isCompatible(mt)) {
+            providerSelectionPropertyChanged();
+        }
         getHeaders().putSingle(HttpHeaders.CONTENT_TYPE, mt);
     }
 

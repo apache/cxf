@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -50,16 +53,32 @@ public class WriterInterceptorMBW implements WriterInterceptor {
         return writer;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void aroundWriteTo(WriterInterceptorContext c) throws IOException, WebApplicationException {
         
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
         }
+        
         MultivaluedMap<String, Object> headers = c.getHeaders();
         Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
-        MediaType mt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
+        MediaType entityMt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
         m.put(Message.CONTENT_TYPE, mtObject.toString());
+        
+        Class<?> entityCls = c.getType();
+        Type entityType = c.getGenericType();
+        Annotation[] entityAnns = c.getAnnotations();
+        
+        if (m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
+            && !writer.isWriteable(entityCls, entityType, entityAnns, entityMt)) {
+            
+            writer = (MessageBodyWriter<Object>)ProviderFactory.getInstance(m)
+                .createMessageBodyWriter(entityCls, entityType, entityAnns, entityMt, m);
+            if (writer == null) {
+                throw new RuntimeException("No writer available");
+            }
+        }
         
         HttpUtils.convertHeaderValuesToStringIfNeeded(headers);
         
@@ -67,7 +86,7 @@ public class WriterInterceptorMBW implements WriterInterceptor {
                        c.getType(), 
                        c.getGenericType(), 
                        c.getAnnotations(), 
-                       mt, 
+                       entityMt, 
                        headers, 
                        c.getOutputStream());
     }

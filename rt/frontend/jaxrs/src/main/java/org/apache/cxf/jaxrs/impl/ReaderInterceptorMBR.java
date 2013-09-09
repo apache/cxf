@@ -19,12 +19,16 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
 public class ReaderInterceptorMBR implements ReaderInterceptor {
@@ -47,8 +51,22 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
     })
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext c) throws IOException, WebApplicationException {
-        return reader.readFrom((Class)c.getType(), c.getGenericType(),
-                               c.getAnnotations(), c.getMediaType(),
+        Class entityCls = (Class)c.getType();
+        Type entityType = c.getGenericType();
+        MediaType entityMt = c.getMediaType();
+        Annotation[] entityAnns = c.getAnnotations();
+        
+        if (m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
+            && !reader.isReadable(entityCls, entityType, entityAnns, entityMt)) {
+            reader = ProviderFactory.getInstance(m)
+                .createMessageBodyReader(entityCls, entityType, entityAnns, entityMt, m);
+            if (reader == null) {
+                throw new RuntimeException("No reader available");
+            }
+        }
+        
+        
+        return reader.readFrom(entityCls, entityType, entityAnns, entityMt, 
                                new HttpHeadersImpl(m).getRequestHeaders(),
                                c.getInputStream());
     }

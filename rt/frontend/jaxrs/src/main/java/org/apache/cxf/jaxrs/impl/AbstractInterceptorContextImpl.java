@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
 public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
@@ -63,6 +64,13 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
     }
 
     public void setType(Class<?> ctype) {
+        if (cls != null && !cls.isAssignableFrom(ctype)) {
+            providerSelectionPropertyChanged();
+        }
         cls = ctype;
+    }
+    
+    protected void providerSelectionPropertyChanged() {
+        m.put(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED, Boolean.TRUE);
     }
 }
