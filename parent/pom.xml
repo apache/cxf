@@ -350,7 +350,6 @@
                     <configuration>
                         <rulesets>
                             <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
-                            <ruleset>${cxf.resources.base.path}cxf-pmd-custom.xml</ruleset>
                         </rulesets>
                         <sourceEncoding>UTF-8</sourceEncoding>
                         <targetJdk>1.6</targetJdk>
@@ -1830,47 +1829,6 @@
             </pluginRepositories>
             <build>
                 <defaultGoal>clean</defaultGoal>
-            </build>
-        </profile>
-        <profile>
-            <id>m2eclipse</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.0.1</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.cxf.build-utils</groupId>
-                                <artifactId>cxf-buildtools</artifactId>
-                                <version>${cxf.build-utils.version}</version>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
-                            <rulesets>
-                                <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
-                            </rulesets>
-                            <sourceEncoding>UTF-8</sourceEncoding>
-                            <targetJdk>1.6</targetJdk>
-                            <linkXRef>false</linkXRef>
-                            <includeTests>true</includeTests>
-                            <verbose>true</verbose>
-                            <excludeRoots>
-                                <excludeRoot>${basedir}/src/main/generated</excludeRoot>
-                            </excludeRoots>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>validate</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
             </build>
         </profile>
     </profiles>
