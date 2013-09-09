@@ -68,7 +68,14 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             return;
         }
         String baseUri = (String)message.get(Message.REQUEST_URL);
-        URI uri = URI.create(baseUri);
+        URI uri = null;
+        
+        try {
+            uri = URI.create(baseUri);
+        } catch (IllegalArgumentException iae) {
+            //invalid URI, ignore and continue
+            return;
+        }
         Map<String, String> map = UrlUtils.parseQueryString(query);
         if (isRecognizedQuery(map, uri, message.getExchange().getEndpoint().getEndpointInfo())) {
             try {
@@ -83,7 +90,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             } catch (IOException ioe) {
                 throw new Fault(ioe);
             }
-        }        
+        }
     }
     
     private boolean isRecognizedQuery(Map<String, String> map, URI uri, EndpointInfo endpointInfo) {
