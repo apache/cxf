@@ -31,7 +31,9 @@ public class ProxyClassLoader extends ClassLoader {
     private Set<ClassLoader> loaders = new HashSet<ClassLoader>();
 
     public void addLoader(ClassLoader loader) {
-        loaders.add(loader);
+        if (loader != null) {
+            loaders.add(loader);
+        }
     }
 
     public Class<?> findClass(String name) throws ClassNotFoundException {
