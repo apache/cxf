@@ -337,7 +337,7 @@ public final class JAXRSClientFactory {
     static <T> T createProxy(Class<T> cls, ClassLoader loader, InvocationHandler handler) {
         
         return cls.cast(ProxyHelper.getProxy(loader == null ? cls.getClassLoader() : loader, 
-                                             new Class[]{cls, Client.class}, 
+                                             new Class[]{Client.class, cls}, 
                                              handler));
     }
     
