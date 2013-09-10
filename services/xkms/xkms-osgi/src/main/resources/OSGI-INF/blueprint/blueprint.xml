@@ -30,6 +30,7 @@
 			<cm:property name="xkms.ldap.pwd" value=""/>
 			<cm:property name="xkms.ldap.retry" value="2"/>
 			<cm:property name="xkms.ldap.rootDN" value=""/>
+			<cm:property name="xkms.enableRevocation" value="true"/>
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -46,6 +47,7 @@
         <property name="attrIssuerID" value="${xkms.ldap.schema.attrIssuerID}" />
         <property name="attrSerialNumber" value="${xkms.ldap.schema.attrSerialNumber}" />
         <property name="attrCrtBinary" value="${xkms.ldap.schema.attrCrtBinary}" />
+        <property name="attrCrlBinary" value="${xkms.ldap.schema.attrCrlBinary}" />
         <property name="constAttrNamesCSV" value="${xkms.ldap.schema.constAttrNamesCSV}" />
         <property name="constAttrValuesCSV" value="${xkms.ldap.schema.constAttrValuesCSV}" />
         <property name="serviceCertRDNTemplate"
@@ -53,6 +55,7 @@
         <property name="serviceCertUIDTemplate"
             value="${xkms.ldap.schema.serviceCertUIDTemplate}" />
         <property name="trustedAuthorityFilter" value="${xkms.ldap.schema.trustedAuthorities}" />
+        <property name="crlFilter" value="${xkms.ldap.schema.crls}" />
         <property name="intermediateFilter" value="${xkms.ldap.schema.intermediates}" />
     </bean>
 
@@ -69,6 +72,7 @@
     <bean id="trustedAuthorityValidator"
         class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
         <argument ref="certificateRepo" />
+        <property name="enableRevocation" value="${xkms.enableRevocation}" />
     </bean>
 
     <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">

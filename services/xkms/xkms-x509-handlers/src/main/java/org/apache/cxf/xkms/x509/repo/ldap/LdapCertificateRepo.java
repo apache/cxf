@@ -19,12 +19,12 @@
 package org.apache.cxf.xkms.x509.repo.ldap;
 
 import java.io.ByteArrayInputStream;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,8 +89,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     
     @Override
     public List<X509CRL> getCRLs() {
-        // TODO
-        return Collections.emptyList();
+        return getCRLsFromLdap(rootDN, ldapConfig.getAttrCrlBinary(), ldapConfig.getAttrCrlBinary());
     }
 
     private List<X509Certificate> getCertificatesFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {
@@ -112,6 +111,31 @@ public class LdapCertificateRepo implements CertificateRepo {
         } catch (CertificateException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (NamingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+    
+    private List<X509CRL> getCRLsFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {
+        try {
+            List<X509CRL> crls = new ArrayList<X509CRL>();
+            NamingEnumeration<SearchResult> answer = ldapSearch.searchSubTree(tmpRootDN, tmpFilter);
+            while (answer.hasMore()) {
+                SearchResult sr = answer.next();
+                Attributes attrs = sr.getAttributes();
+                Attribute attribute = attrs.get(tmpAttrName);
+                if (attribute != null) {
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    X509CRL crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(
+                            (byte[]) attribute.get()));
+                    crls.add(crl);
+                }
+            }
+            return crls;
+        } catch (CertificateException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (NamingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (CRLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
