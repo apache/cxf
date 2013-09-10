@@ -53,7 +53,7 @@
     <service ref="xkmsClient" interface="org.w3._2002._03.xkms_wsdl.XKMSPortType" />
 
     <bean id="xkmsCryptoProviderFactory"
-        class="org.apache.cxf.xkms.crypto.XkmsCryptoProviderFactory">
+        class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProviderFactory">
         <argument ref="xkmsClient" />
     </bean>        
 
