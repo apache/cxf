@@ -53,11 +53,12 @@ public class TrustedAuthorityValidator implements Validator {
     private static final Logger LOG = LogUtils.getL7dLogger(TrustedAuthorityValidator.class);
 
     CertificateRepo certRepo;
+    boolean enableRevocation = true;
     
     public TrustedAuthorityValidator(CertificateRepo certRepo) {
         this.certRepo = certRepo;
     }
-
+    
     /**
      * Checks if a certificate is signed by a trusted authority.
      * 
@@ -71,7 +72,6 @@ public class TrustedAuthorityValidator implements Validator {
         try {
             List<X509Certificate> intermediateCerts = certRepo.getCaCerts();
             List<X509Certificate> trustedAuthorityCerts = certRepo.getTrustedCaCerts();
-            List<X509CRL> crls = certRepo.getCRLs();
             Set<TrustAnchor> trustAnchors = asTrustAnchors(trustedAuthorityCerts);
             CertStoreParameters intermediateParams = new CollectionCertStoreParameters(intermediateCerts);
             CertStoreParameters certificateParams = new CollectionCertStoreParameters(certificates);
@@ -84,12 +84,15 @@ public class TrustedAuthorityValidator implements Validator {
             CertPath certPath = builder.build(pkixParams).getCertPath();
             
             // Now validate the CertPath (including CRL checking)
-            if (!crls.isEmpty()) {
-                pkixParams.setRevocationEnabled(true);
-                CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
-                pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
+            if (enableRevocation) {
+                List<X509CRL> crls = certRepo.getCRLs();
+                if (!crls.isEmpty()) {
+                    pkixParams.setRevocationEnabled(true);
+                    CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
+                    pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
+                }
             }
-            
+                
             CertPathValidator validator = CertPathValidator.getInstance("PKIX");
             validator.validate(certPath, pkixParams);
         } catch (InvalidAlgorithmParameterException e) {
@@ -132,4 +135,12 @@ public class TrustedAuthorityValidator implements Validator {
         return status;
     }
 
+    public boolean isEnableRevocation() {
+        return enableRevocation;
+    }
+
+    public void setEnableRevocation(boolean enableRevocation) {
+        this.enableRevocation = enableRevocation;
+    }
+    
 }

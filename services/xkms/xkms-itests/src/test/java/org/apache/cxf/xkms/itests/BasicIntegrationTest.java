@@ -76,10 +76,14 @@ public class BasicIntegrationTest {
 
             replaceConfigurationFile("data/xkms/certificates/trusted_cas/root.cer",
                                      new File("src/test/resources/data/xkms/certificates/trusted_cas/root.cer")),
+            replaceConfigurationFile("data/xkms/certificates/trusted_cas/wss40CA.cer",
+                                     new File("src/test/resources/data/xkms/certificates/trusted_cas/wss40CA.cer")),
             replaceConfigurationFile("data/xkms/certificates/cas/alice.cer",
                                      new File("src/test/resources/data/xkms/certificates/cas/alice.cer")),
             replaceConfigurationFile("data/xkms/certificates/dave.cer",
                                      new File("src/test/resources/data/xkms/certificates/dave.cer")),
+            replaceConfigurationFile("data/xkms/certificates/crls/wss40CACRL.cer",
+                                     new File("src/test/resources/data/xkms/certificates/crls/wss40CACRL.cer")),
             replaceConfigurationFile("etc/org.apache.cxf.xkms.cfg", getConfigFile()),
 
             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS), 

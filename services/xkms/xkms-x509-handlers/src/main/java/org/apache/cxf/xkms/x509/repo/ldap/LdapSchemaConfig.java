@@ -24,12 +24,14 @@ public class LdapSchemaConfig {
     private String attrIssuerID = "manager";
     private String attrSerialNumber = "employeeNumber";
     private String attrCrtBinary = "userCertificate;binary";
+    private String attrCrlBinary = "certificateRevocationList;binary";
     private String constAttrNamesCSV = "sn";
     private String constAttrValuesCSV = "X509 certificate";
     private String serviceCertRDNTemplate = "cn=%s,ou=services";
     private String serviceCertUIDTemplate = "cn=%s";
     private String trustedAuthorityFilter = "(&(objectClass=inetOrgPerson)(ou:dn:=CAs))";
     private String intermediateFilter = "(objectClass=*)";
+    private String crlFilter = "(&(objectClass=inetOrgPerson)(ou:dn:=CAs))";
 
     public String getCertObjectClass() {
         return certObjectClass;
@@ -117,6 +119,22 @@ public class LdapSchemaConfig {
 
     public void setIntermediateFilter(String intermediateFilter) {
         this.intermediateFilter = intermediateFilter;
+    }
+
+    public String getCrlFilter() {
+        return crlFilter;
+    }
+
+    public void setCrlFilter(String crlFilter) {
+        this.crlFilter = crlFilter;
+    }
+
+    public String getAttrCrlBinary() {
+        return attrCrlBinary;
+    }
+
+    public void setAttrCrlBinary(String attrCrlBinary) {
+        this.attrCrlBinary = attrCrlBinary;
     }
 
 }
