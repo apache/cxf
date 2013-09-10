@@ -49,13 +49,13 @@ public class DOM4JProviderTest extends Assert {
         assertTrue(str.contains("<a/>") || str.contains("<a></a>"));
     }
     private org.dom4j.Document readXML() throws Exception {
-        return readXML("<a/>");
+        return readXML(MediaType.APPLICATION_XML_TYPE, "<a/>");
     }
-    private org.dom4j.Document readXML(final String xml) throws Exception {
+    private org.dom4j.Document readXML(MediaType ct, final String xml) throws Exception {
         DOM4JProvider p = new DOM4JProvider();
         p.setProviders(new ProvidersImpl(createMessage()));
         org.dom4j.Document dom = p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class, 
-            new Annotation[] {}, MediaType.APPLICATION_XML_TYPE, new MetadataMap<String, String>(),
+            new Annotation[] {}, ct, new MetadataMap<String, String>(),
             new ByteArrayInputStream(xml.getBytes("UTF-8")));
         return dom;
     }
@@ -75,14 +75,22 @@ public class DOM4JProviderTest extends Assert {
 
     @Test
     public void testWriteXML() throws Exception {
-        org.dom4j.Document dom = readXML();
+        doTestWriteXML(MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    @Test
+    public void testWriteXMLCustomCt() throws Exception {
+        doTestWriteXML(MediaType.valueOf("application/custom+xml"));
+    }
+    
+    private void doTestWriteXML(MediaType ct) throws Exception {
+        org.dom4j.Document dom = readXML(ct, "<a/>");
         DOM4JProvider p = new DOM4JProvider();
         p.setProviders(new ProvidersImpl(createMessage()));
         
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         p.writeTo(dom, org.dom4j.Document.class, org.dom4j.Document.class, 
-            new Annotation[]{}, MediaType.APPLICATION_XML_TYPE, new MetadataMap<String, Object>(),
-            bos);
+            new Annotation[]{}, ct, new MetadataMap<String, Object>(), bos);
         String str = bos.toString();
         // starts with the xml PI
         assertTrue(str.contains("<a/>") || str.contains("<a></a>"));
@@ -105,7 +113,7 @@ public class DOM4JProviderTest extends Assert {
     
     @Test
     public void testWriteJSONDropRoot() throws Exception {
-        org.dom4j.Document dom = readXML("<root><a/></root>");
+        org.dom4j.Document dom = readXML(MediaType.APPLICATION_XML_TYPE, "<root><a/></root>");
         DOM4JProvider p = new DOM4JProvider();
         p.setProviders(new ProvidersImpl(createMessageWithJSONProvider()));
         

@@ -35,12 +35,13 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.staxutils.StaxUtils;
 
-@javax.ws.rs.Produces({"application/xml", "text/xml", "application/json" })
-@javax.ws.rs.Consumes({"application/xml", "text/xml", "application/json" })
-public class DOM4JProvider implements MessageBodyReader<org.dom4j.Document>,
-                MessageBodyWriter<org.dom4j.Document> {
+@javax.ws.rs.Produces({"application/xml", "application/*+xml", "text/xml", "application/json" })
+@javax.ws.rs.Consumes({"application/xml", "application/*+xml", "text/xml", "application/json" })
+public class DOM4JProvider extends AbstractConfigurableProvider 
+    implements MessageBodyReader<org.dom4j.Document>, MessageBodyWriter<org.dom4j.Document> {
 
     private static final Class<org.w3c.dom.Document> DOM_DOC_CLS = 
         org.w3c.dom.Document.class;

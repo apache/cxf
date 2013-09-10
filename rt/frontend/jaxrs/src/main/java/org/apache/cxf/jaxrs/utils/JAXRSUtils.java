@@ -205,26 +205,25 @@ public final class JAXRSUtils {
         return theList;
     }
 
-    @SuppressWarnings("unchecked")
-    private static String[] getUserMediaTypes(Object provider, String methodName) {
+    private static String[] getUserMediaTypes(Object provider, boolean consumes) {
         String[] values = null;
         if (AbstractConfigurableProvider.class.isAssignableFrom(provider.getClass())) {
-            try {
-                Method m = provider.getClass().getMethod(methodName, new Class[]{});
-                List<String> types = (List<String>)m.invoke(provider, new Object[]{});
-                if (types != null) {
-                    values = types.size() > 0 ? types.toArray(new String[types.size()])
-                                               : new String[]{"*/*"};
-                }
-            } catch (Exception ex) {
-                // ignore
+            List<String> types = null;
+            if (consumes) {
+                types = ((AbstractConfigurableProvider)provider).getConsumeMediaTypes();
+            } else {
+                types = ((AbstractConfigurableProvider)provider).getProduceMediaTypes();
+            }
+            if (types != null) {
+                values = types.size() > 0 ? types.toArray(new String[types.size()])
+                                           : new String[]{"*/*"};
             }
         }
         return values;
     }
     
     public static List<MediaType> getProviderConsumeTypes(MessageBodyReader<?> provider) {
-        String[] values = getUserMediaTypes(provider, "getConsumeMediaTypes");
+        String[] values = getUserMediaTypes(provider, true);
         
         if (values == null) {
             return getConsumeTypes(provider.getClass().getAnnotation(Consumes.class));
@@ -234,7 +233,7 @@ public final class JAXRSUtils {
     }
     
     public static List<MediaType> getProviderProduceTypes(MessageBodyWriter<?> provider) {
-        String[] values = getUserMediaTypes(provider, "getProduceMediaTypes");
+        String[] values = getUserMediaTypes(provider, false);
         if (values == null) {
             return getProduceTypes(provider.getClass().getAnnotation(Produces.class));
         } else {
