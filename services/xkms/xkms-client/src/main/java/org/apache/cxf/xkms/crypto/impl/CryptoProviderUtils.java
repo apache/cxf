@@ -36,7 +36,7 @@ import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSPasswordCallback.Usage;
 
-public final class CryptoProviderUtils {
+final class CryptoProviderUtils {
 
     private CryptoProviderUtils() {
     }

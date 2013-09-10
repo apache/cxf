@@ -60,7 +60,7 @@
     </jaxws:client>
     -->
     
-    <bean id="xkmsInvoker" class="org.apache.cxf.xkms.client.XKMSInvoker">
+    <bean id="xkmsClient" class="org.apache.cxf.xkms.client.XKMSClientFactory" factory-method="create">
         <constructor-arg>
             <value>https://localhost:${testutil.ports.XKMSServer}/XKMS</value>
         </constructor-arg>
@@ -69,8 +69,7 @@
     
     <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
         <constructor-arg>
-            <!-- <ref bean="xkmsClient" /> -->
-            <ref bean="xkmsInvoker" />
+            <ref bean="xkmsClient" />
         </constructor-arg>
     </bean>
     
@@ -94,8 +93,7 @@
     
     <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
         <constructor-arg>
-            <!-- <ref bean="xkmsClient" /> -->
-            <ref bean="xkmsInvoker" />
+            <ref bean="xkmsClient" />
         </constructor-arg>
         <constructor-arg>
              <ref bean="crypto" />

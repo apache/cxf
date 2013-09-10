@@ -32,7 +32,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.cache.EHCacheXKMSClientCache;
 import org.apache.cxf.xkms.cache.XKMSCacheToken;
 import org.apache.cxf.xkms.cache.XKMSClientCache;
-import org.apache.cxf.xkms.client.XKMSInvoker;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -42,7 +41,7 @@ import org.apache.wss4j.common.crypto.CryptoType.TYPE;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
-public class XkmsCryptoProvider extends CryptoBase {
+class XkmsCryptoProvider extends CryptoBase {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XkmsCryptoProvider.class);
 
@@ -63,23 +62,6 @@ public class XkmsCryptoProvider extends CryptoBase {
             throw new IllegalArgumentException("xkmsConsumer may not be null");
         }
         this.xkmsInvoker = new XKMSInvoker(xkmsConsumer);
-        this.defaultCrypto = defaultCrypto;
-        this.xkmsClientCache = xkmsClientCache;
-    }
-    
-    public XkmsCryptoProvider(XKMSInvoker xkmsInvoker) {
-        this(xkmsInvoker, null);
-    }
-    
-    public XkmsCryptoProvider(XKMSInvoker xkmsInvoker, Crypto defaultCrypto) {
-        this(xkmsInvoker, defaultCrypto, new EHCacheXKMSClientCache());
-    }
-    
-    public XkmsCryptoProvider(XKMSInvoker xkmsInvoker, Crypto defaultCrypto, XKMSClientCache xkmsClientCache) {
-        if (xkmsInvoker == null) {
-            throw new IllegalArgumentException("xkmsInvoker may not be null");
-        }
-        this.xkmsInvoker = xkmsInvoker;
         this.defaultCrypto = defaultCrypto;
         this.xkmsClientCache = xkmsClientCache;
     }
