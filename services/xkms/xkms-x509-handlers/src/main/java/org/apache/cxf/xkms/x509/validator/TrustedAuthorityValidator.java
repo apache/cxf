@@ -83,14 +83,15 @@ public class TrustedAuthorityValidator implements Validator {
             CertPathBuilder builder = CertPathBuilder.getInstance("PKIX");
             CertPath certPath = builder.build(pkixParams).getCertPath();
             
-            // Now validate the CertPath including CRL checking
+            // Now validate the CertPath (including CRL checking)
             if (!crls.isEmpty()) {
                 pkixParams.setRevocationEnabled(true);
                 CertStoreParameters crlParams = new CollectionCertStoreParameters(crls);
                 pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
-                CertPathValidator validator = CertPathValidator.getInstance("PKIX");
-                validator.validate(certPath, pkixParams);
             }
+            
+            CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+            validator.validate(certPath, pkixParams);
         } catch (InvalidAlgorithmParameterException e) {
             throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
