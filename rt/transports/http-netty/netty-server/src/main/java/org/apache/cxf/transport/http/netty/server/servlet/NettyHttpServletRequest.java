@@ -83,6 +83,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         this.originalRequest = request;
         this.contextPath = contextPath;
         this.uriParser = new URIParser(contextPath);
+        uriParser.parse(request.getUri());
         this.inputStream = new NettyServletInputStream((HttpContent)request);
         this.reader = new BufferedReader(new InputStreamReader(inputStream));
         this.queryStringDecoder = new QueryStringDecoder(request.getUri());

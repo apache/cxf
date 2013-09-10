@@ -19,10 +19,13 @@
 package org.apache.cxf.transport.http.netty.server.integration;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -71,6 +74,17 @@ public class NettyServerTest extends AbstractBusClientServerTestBase {
         updateAddressPort(g, PORT);
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
+    }
+    
+    @Test
+    public void testGetWsdl() throws Exception {
+        URL url = new URL("http://localhost:" + PORT + "/SoapContext/SoapPort?wsdl");
+
+        InputStream in = url.openStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtils.copyAndCloseInput(in, bos);
+        String result = bos.toString();
+        assertTrue("Expect the SOAPService", result.indexOf("<service name=\"SOAPService\">") > 0);
     }
 
 }

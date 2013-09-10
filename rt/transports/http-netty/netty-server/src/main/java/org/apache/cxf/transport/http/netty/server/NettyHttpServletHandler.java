@@ -130,7 +130,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
         NettyHttpServletRequest nettyServletRequest = 
             buildHttpServletRequest(request, nettyHttpContextHandler.getContextPath(), ctx);
 
-        nettyHttpContextHandler.handle(request.getUri(), nettyServletRequest, nettyServletResponse);
+        nettyHttpContextHandler.handle(nettyServletRequest.getRequestURI(), nettyServletRequest, nettyServletResponse);
         interceptOnRequestSuccessed(ctx, response);
 
         nettyServletResponse.getWriter().flush();
