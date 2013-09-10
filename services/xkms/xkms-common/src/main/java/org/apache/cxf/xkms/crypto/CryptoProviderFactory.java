@@ -24,6 +24,18 @@ import org.apache.ws.security.components.crypto.Crypto;
 
 public interface CryptoProviderFactory {
 
+    /**
+     * Create with merlin fallback settings retrieved from cxf message
+     * @param message
+     * @return
+     */
     Crypto create(Message message);
 
+    /**
+     * Create without fallback crypto 
+     * 
+     * @param cryptoProperties
+     * @return xkms crypto
+     */
+    Crypto create();
 }

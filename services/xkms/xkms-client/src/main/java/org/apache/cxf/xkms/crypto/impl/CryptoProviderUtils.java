@@ -35,7 +35,7 @@ import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.components.crypto.Merlin;
 
-public final class CryptoProviderUtils {
+final class CryptoProviderUtils {
 
     private CryptoProviderUtils() {
     }

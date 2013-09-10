@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.xkms.client;
+package org.apache.cxf.xkms.crypto.impl;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
@@ -26,17 +26,13 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.xkms.client.X509AppId;
 import org.apache.cxf.xkms.exception.ExceptionMapper;
 import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.exception.XKMSLocateException;
@@ -44,7 +40,6 @@ import org.apache.cxf.xkms.exception.XKMSNotFoundException;
 import org.apache.cxf.xkms.exception.XKMSValidateException;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
-import org.apache.cxf.xkms.model.extensions.ResultDetails;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
@@ -60,7 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
-public class XKMSInvoker {
+class XKMSInvoker {
     private static final Logger LOG = LoggerFactory.getLogger(XKMSInvoker.class);
 
     private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF =
@@ -76,29 +71,6 @@ public class XKMSInvoker {
 
     public XKMSInvoker(XKMSPortType xkmsConsumer) {
         this.xkmsConsumer = xkmsConsumer;
-    }
-    
-    public XKMSInvoker(String endpointAddress) {
-        this(endpointAddress, null);
-    }
-    
-    public XKMSInvoker(String endpointAddress, Bus bus) {
-
-        if (bus != null) {
-            SpringBusFactory.setDefaultBus(bus);
-            SpringBusFactory.setThreadDefaultBus(bus);
-        }
-        
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setServiceClass(XKMSPortType.class);
-        factory.setAddress(endpointAddress);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("jaxb.additionalContextClasses", 
-                       new Class[] {ResultDetails.class});
-        factory.setProperties(properties);
-        
-        xkmsConsumer = (XKMSPortType)factory.create();
     }
     
     public X509Certificate getServiceCertificate(QName serviceName) {
