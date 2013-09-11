@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +37,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.IdentityMapper;
@@ -581,13 +581,16 @@ public abstract class AbstractOperation {
     }
     
     protected void performDelegationHandling(
-        RequestParser requestParser, WebServiceContext context, ReceivedToken token
+        RequestParser requestParser, WebServiceContext context, ReceivedToken token,
+        Principal tokenPrincipal, Set<Principal> tokenRoles
     ) {
         TokenDelegationParameters delegationParameters = new TokenDelegationParameters();
         delegationParameters.setStsProperties(stsProperties);
         delegationParameters.setPrincipal(context.getUserPrincipal());
         delegationParameters.setWebServiceContext(context);
         delegationParameters.setTokenStore(getTokenStore());
+        delegationParameters.setTokenPrincipal(tokenPrincipal);
+        delegationParameters.setTokenRoles(tokenRoles);
         
         KeyRequirements keyRequirements = requestParser.getKeyRequirements();
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();

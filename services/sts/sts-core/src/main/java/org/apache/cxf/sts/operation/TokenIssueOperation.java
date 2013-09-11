@@ -105,16 +105,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();
 
-        // See whether OnBehalfOf/ActAs is allowed or not
-        if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
-            performDelegationHandling(requestParser, context,
-                                providerParameters.getTokenRequirements().getOnBehalfOf());
-        }
-        if (providerParameters.getTokenRequirements().getActAs() != null) {
-            performDelegationHandling(requestParser, context,
-                                providerParameters.getTokenRequirements().getActAs());
-        }
-
         // Validate OnBehalfOf token if present
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
             ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
@@ -133,13 +123,33 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 // If the requestor is in the possession of a certificate (mutual ssl handshake)
                 // the STS trusts the token sent in OnBehalfOf element
             }
+
+            Principal tokenPrincipal = null;
+            Set<Principal> tokenRoles = null;
+                
             if (tokenResponse != null) {
                 Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
                 if (additionalProperties != null) {
                     providerParameters.setAdditionalProperties(additionalProperties);
                 }
+                tokenPrincipal = tokenResponse.getPrincipal();
+                tokenRoles = tokenResponse.getRoles();
             }
+                
+            // See whether OnBehalfOf is allowed or not
+            performDelegationHandling(requestParser, context,
+                                providerParameters.getTokenRequirements().getOnBehalfOf(),
+                                tokenPrincipal, tokenRoles);
         }
+
+        // See whether ActAs is allowed or not
+        // TODO Validate ActAs
+        if (providerParameters.getTokenRequirements().getActAs() != null) {
+            performDelegationHandling(requestParser, context,
+                                providerParameters.getTokenRequirements().getActAs(),
+                                null, null);
+        }
+
 
         // create token
         TokenProviderResponse tokenResponse = null;
