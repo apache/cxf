@@ -69,10 +69,12 @@ public class ProxyHelper {
         for (Class<?> currentInterface : interfaces) {
             String ifName = currentInterface.getName();
             try {
-                Class<?> ifClass = Class.forName(ifName, false, loader);
+                Class<?> ifClass = Class.forName(ifName, true, loader);
                 if (ifClass != currentInterface) {
                     return false;
                 }
+            } catch (NoClassDefFoundError e) {
+                return false;
             } catch (ClassNotFoundException e) {
                 return false;
             }
