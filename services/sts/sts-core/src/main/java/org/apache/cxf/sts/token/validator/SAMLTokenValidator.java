@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,8 +69,6 @@ public class SAMLTokenValidator implements TokenValidator {
     private CertConstraintsParser certConstraints = new CertConstraintsParser();
     
     private SAMLRealmCodec samlRealmCodec;
-    
-    private SAMLRoleParser samlRoleParser = new DefaultSAMLRoleParser();
     
     /**
      * Set a list of Strings corresponding to regular expression constraints on the subject DN
@@ -203,13 +200,6 @@ public class SAMLTokenValidator implements TokenValidator {
                 
             }
             
-            // Parse roles from the validated token
-            if (samlRoleParser != null) {
-                Set<Principal> roles = 
-                    samlRoleParser.parseRolesFromAssertion(samlPrincipal, null, assertion);
-                response.setRoles(roles);
-            }
-           
             // Get the realm of the SAML token
             String tokenRealm = null;
             if (samlRealmCodec != null) {
@@ -338,11 +328,4 @@ public class SAMLTokenValidator implements TokenValidator {
         }
     }
 
-    public SAMLRoleParser getSamlRoleParser() {
-        return samlRoleParser;
-    }
-
-    public void setSamlRoleParser(SAMLRoleParser samlRoleParser) {
-        this.samlRoleParser = samlRoleParser;
-    }
 }

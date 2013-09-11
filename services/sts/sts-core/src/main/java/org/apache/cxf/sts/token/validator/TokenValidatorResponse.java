@@ -20,7 +20,6 @@ package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.cxf.sts.request.ReceivedToken;
 
@@ -33,7 +32,6 @@ public class TokenValidatorResponse {
     private Map<String, Object> additionalProperties;
     private String realm;
     private ReceivedToken token;
-    private Set<Principal> roles;
     
     public ReceivedToken getToken() {
         return token;
@@ -67,12 +65,4 @@ public class TokenValidatorResponse {
         return realm;
     }
 
-    public Set<Principal> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Principal> roles) {
-        this.roles = roles;
-    }
-    
 }

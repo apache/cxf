@@ -19,14 +19,12 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.io.IOException;
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -34,6 +32,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -41,11 +40,6 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
-import org.apache.cxf.sts.claims.ClaimsHandler;
-import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
-import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.Lifetime;
@@ -354,77 +348,6 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
     
-    @org.junit.Test
-    public void testSAML2AssertionWithRolesNoCaching() throws Exception {
-        TokenValidator samlTokenValidator = new SAMLTokenValidator();
-        TokenValidatorParameters validatorParameters = createValidatorParameters();
-        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
-        // Create a ValidateTarget consisting of a SAML Assertion
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertionWithRoles(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", 
-                                         callbackHandler, "manager");
-        Document doc = samlToken.getOwnerDocument();
-        samlToken = (Element)doc.appendChild(samlToken);
-        
-        ReceivedToken validateTarget = new ReceivedToken(samlToken);
-        tokenRequirements.setValidateTarget(validateTarget);
-        validatorParameters.setToken(validateTarget);
-        
-        // Disable caching
-        validatorParameters.setTokenStore(null);
-        
-        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
-            samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
-        Principal principal = validatorResponse.getPrincipal();
-        assertTrue(principal != null && principal.getName() != null);
-        Set<Principal> roles = validatorResponse.getRoles();
-        assertTrue(roles != null && !roles.isEmpty());
-        assertTrue(roles.iterator().next().getName().equals("manager"));
-    }
-    
-    @org.junit.Test
-    public void testSAML2AssertionWithRolesCaching() throws Exception {
-        TokenValidator samlTokenValidator = new SAMLTokenValidator();
-        TokenValidatorParameters validatorParameters = createValidatorParameters();
-        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
-        // Create a ValidateTarget consisting of a SAML Assertion
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertionWithRoles(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", 
-                                         callbackHandler, "employee");
-        Document doc = samlToken.getOwnerDocument();
-        samlToken = (Element)doc.appendChild(samlToken);
-        
-        ReceivedToken validateTarget = new ReceivedToken(samlToken);
-        tokenRequirements.setValidateTarget(validateTarget);
-        validatorParameters.setToken(validateTarget);
-        
-        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
-            samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
-        Principal principal = validatorResponse.getPrincipal();
-        assertTrue(principal != null && principal.getName() != null);
-        Set<Principal> roles = validatorResponse.getRoles();
-        assertTrue(roles != null && !roles.isEmpty());
-        assertTrue(roles.iterator().next().getName().equals("employee"));
-    }
-    
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
         
@@ -469,36 +392,6 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
-        return providerResponse.getToken();
-    }
-    
-    private Element createSAMLAssertionWithRoles(
-        String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler,
-        String role
-    ) throws WSSecurityException {
-        TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        TokenProviderParameters providerParameters = 
-            createProviderParameters(
-                tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
-            );
-        
-        ClaimsManager claimsManager = new ClaimsManager();
-        ClaimsHandler claimsHandler = new CustomClaimsHandler();
-        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
-        providerParameters.setClaimsManager(claimsManager);
-        
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
-        claim.setClaimType(URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"));
-        claim.setClaimValue(role);
-        claims.add(claim);
-        
-        providerParameters.setRequestedPrimaryClaims(claims);
-        
-        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
-        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-
         return providerResponse.getToken();
     }
     

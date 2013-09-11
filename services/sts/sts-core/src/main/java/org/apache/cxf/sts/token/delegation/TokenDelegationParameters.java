@@ -20,7 +20,6 @@
 package org.apache.cxf.sts.token.delegation;
 
 import java.security.Principal;
-import java.util.Set;
 
 import javax.xml.ws.WebServiceContext;
 
@@ -45,8 +44,6 @@ public class TokenDelegationParameters {
     private TokenStore tokenStore;
     private ReceivedToken token;
     private String appliesToAddress;
-    private Principal tokenPrincipal;
-    private Set<Principal> tokenRoles;
     
     public ReceivedToken getToken() {
         return token;
@@ -112,20 +109,4 @@ public class TokenDelegationParameters {
         this.appliesToAddress = appliesToAddress;
     }
 
-    public Principal getTokenPrincipal() {
-        return tokenPrincipal;
-    }
-
-    public void setTokenPrincipal(Principal tokenPrincipal) {
-        this.tokenPrincipal = tokenPrincipal;
-    }
-
-    public Set<Principal> getTokenRoles() {
-        return tokenRoles;
-    }
-
-    public void setTokenRoles(Set<Principal> tokenRoles) {
-        this.tokenRoles = tokenRoles;
-    }
-    
 }

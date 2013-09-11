@@ -124,30 +124,23 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 // the STS trusts the token sent in OnBehalfOf element
             }
 
-            Principal tokenPrincipal = null;
-            Set<Principal> tokenRoles = null;
-                
             if (tokenResponse != null) {
                 Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
                 if (additionalProperties != null) {
                     providerParameters.setAdditionalProperties(additionalProperties);
                 }
-                tokenPrincipal = tokenResponse.getPrincipal();
-                tokenRoles = tokenResponse.getRoles();
             }
                 
             // See whether OnBehalfOf is allowed or not
             performDelegationHandling(requestParser, context,
-                                providerParameters.getTokenRequirements().getOnBehalfOf(),
-                                tokenPrincipal, tokenRoles);
+                                providerParameters.getTokenRequirements().getOnBehalfOf());
         }
 
         // See whether ActAs is allowed or not
         // TODO Validate ActAs
         if (providerParameters.getTokenRequirements().getActAs() != null) {
             performDelegationHandling(requestParser, context,
-                                providerParameters.getTokenRequirements().getActAs(),
-                                null, null);
+                                providerParameters.getTokenRequirements().getActAs());
         }
 
 
