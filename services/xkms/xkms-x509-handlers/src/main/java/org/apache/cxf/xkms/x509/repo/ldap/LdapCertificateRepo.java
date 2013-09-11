@@ -89,7 +89,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     
     @Override
     public List<X509CRL> getCRLs() {
-        return getCRLsFromLdap(rootDN, ldapConfig.getAttrCrlBinary(), ldapConfig.getAttrCrlBinary());
+        return getCRLsFromLdap(rootDN, ldapConfig.getCrlFilter(), ldapConfig.getAttrCrlBinary());
     }
 
     private List<X509Certificate> getCertificatesFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {
