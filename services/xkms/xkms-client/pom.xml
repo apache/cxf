@@ -61,7 +61,12 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            !*
+                        	org.apache.cxf.xkms.crypto.impl,
+                        	org.apache.cxf.xkms.cache,
+                        	org.apache.cxf.xkms.client
+                        	<!-- To avoid problems with existing users.
+                        		 We should try to remove the exports again in the future.
+                        	 -->
                         </Export-Package>
                     </instructions>
                 </configuration>
