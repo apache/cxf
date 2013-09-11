@@ -162,8 +162,14 @@ public class XkmsCryptoProvider extends CryptoBase {
         } else if (type == TYPE.ALIAS) {
             return getX509CertificatesFromXKMS(cryptoType);
         } else if (type == TYPE.ISSUER_SERIAL) {
+            // Try local Crypto first
+            X509Certificate[] localCerts = getCertificateLocally(cryptoType);
+            if (localCerts != null) {
+                return localCerts;
+            }
+            
             String key = getKeyForIssuerSerial(cryptoType.getIssuer(), cryptoType.getSerial());
-            // Try local cache first
+            // Try local cache next
             if (xkmsClientCache != null) {
                 XKMSCacheToken cachedToken = xkmsClientCache.get(key);
                 if (cachedToken != null && cachedToken.getX509Certificate() != null) {
