@@ -33,6 +33,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf.services.xkms</groupId>
@@ -102,23 +103,28 @@
             </testResource>
         </testResources>
         <plugins>
-            <plugin>
+           <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
-                        	javax.xml.ws, <!-- To fix issue with BindingProvider interface not visible -->
-                        	*
+                            javax.xml.ws, <!-- To workaround issue with BindingProvider interface not visible -->
+                            *
                         </Import-Package>
                         <Export-Package>
-                        	!*
+                        	org.apache.cxf.xkms.crypto.impl,
+                        	org.apache.cxf.xkms.cache,
+                        	org.apache.cxf.xkms.client
+                        	<!-- To avoid problems with existing users.
+                        		 We should try to remove the exports again in the future.
+                        	 -->
                         </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>

@@ -21,6 +21,7 @@ package org.apache.cxf.xkms.crypto;
 
 import org.apache.cxf.message.Message;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 public interface CryptoProviderFactory {
 
@@ -38,4 +39,21 @@ public interface CryptoProviderFactory {
      * @return xkms crypto
      */
     Crypto create();
+    
+    /**
+     * Create with fallback crypto
+     * 
+     * @param fallbackCrypto
+     * @return
+     */
+    Crypto create(Crypto fallbackCrypto);
+    
+    /**
+     * Create with overridden XKMSPortType and fallbackCrypto
+     * 
+     * @param xkmsClient
+     * @param fallbackCrypto
+     * @return
+     */
+    Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto);
 }

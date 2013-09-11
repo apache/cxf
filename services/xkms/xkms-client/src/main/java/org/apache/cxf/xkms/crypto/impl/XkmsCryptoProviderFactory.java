@@ -42,6 +42,7 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
         this.xkmsConsumer = xkmsConsumer;
     }
 
+    @Override
     public Crypto create(Message message) {
         Properties keystoreProps = CryptoProviderUtils
             .loadKeystoreProperties(message,
@@ -55,7 +56,18 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
         }
     }
 
+    @Override
     public Crypto create() {
         return new XkmsCryptoProvider(xkmsConsumer);
+    }
+
+    @Override
+    public Crypto create(Crypto fallbackCrypto) {
+        return new XkmsCryptoProvider(xkmsConsumer, fallbackCrypto);
+    }
+
+    @Override
+    public Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto) {
+        return new XkmsCryptoProvider(xkmsClient, fallbackCrypto);
     }
 }

@@ -41,7 +41,7 @@ import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.components.crypto.CryptoType.TYPE;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
-class XkmsCryptoProvider extends CryptoBase {
+public class XkmsCryptoProvider extends CryptoBase {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XkmsCryptoProvider.class);
 
