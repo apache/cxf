@@ -30,14 +30,86 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 
+import org.w3c.dom.Document;
+
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 
 public class ResponseImplTest extends Assert {
+    
+    @Test
+    public void testReadBufferedStaxUtils() throws Exception {
+        ResponseImpl r = new ResponseImpl(200);
+        Source responseSource = readResponseSource(r);
+        Document doc = StaxUtils.read(responseSource);
+        assertEquals("Response", doc.getDocumentElement().getLocalName());
+    }
+    
+    @Test
+    public void testReadBufferedStaxSource() throws Exception {
+        ResponseImpl r = new ResponseImpl(200);
+        Source responseSource = readResponseSource(r);
+        Transformer trans = TransformerFactory.newInstance().newTransformer();
+        DOMResult res = new DOMResult();
+        trans.transform(responseSource, res);
+        Document doc = (Document)res.getNode();
+        assertEquals("Response", doc.getDocumentElement().getLocalName());
+    }
+    
+    private Source readResponseSource(ResponseImpl r) {
+        String content = "<Response " 
+            + " xmlns=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\"" 
+            + " xmlns:ns2=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\">"
+            + "<Result><Decision>Permit</Decision><Status><StatusCode" 
+            + " Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>";
+        
+        
+        MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+        headers.putSingle("Content-Type", "text/xml");
+        r.addMetadata(headers);
+        r.setEntity(new ByteArrayInputStream(content.getBytes()), null);
+        r.setMessage(createMessage());
+        r.bufferEntity();
+        return r.readEntity(Source.class);
+    }
+    
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        e.setOutMessage(new MessageImpl());
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
+    }
     
     @Test
     public void testResourceImpl() {

@@ -315,20 +315,20 @@ public final class ResponseImpl extends Response {
                                                     responseMessage.getExchange().getOutMessage());
             if (readers != null) {
                 try {
+                    if (entityBufferred) {
+                        InputStream.class.cast(entity).reset();
+                    }
+                    
                     responseMessage.put(Message.PROTOCOL_HEADERS, this.getMetadata());
                     lastEntity = JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
                                                                            anns, 
                                                                            InputStream.class.cast(entity), 
                                                                            mediaType, 
                                                                            responseMessage);
-                    if (!entityBufferred) {
-                        if (responseStreamCanBeClosed(cls)) {
-                            InputStream.class.cast(entity).close();
-                            entity = null;
-                        }
-                    } else {
-                        InputStream.class.cast(entity).reset();
-                    }
+                    if (!entityBufferred && responseStreamCanBeClosed(cls)) {
+                        InputStream.class.cast(entity).close();
+                        entity = null;
+                    } 
                     
                     return cls.cast(lastEntity);
                 } catch (Exception ex) {
