@@ -369,18 +369,14 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 if (payloadElementName != null) {
                     QName dispatchedOpName = payloadOPMap.get(payloadElementName);
                     if (null != dispatchedOpName) {
-                        BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
-                          .getOperation(opName);
                         BindingOperationInfo dbop = client.getEndpoint().getBinding().getBindingInfo()
-                          .getOperation(dispatchedOpName);
-                        if (bop != null) {
-                            // set the actual binding operation object to this dispatch operation
-                            bop.setProperty("dispatchToOperation", dbop);
+                            .getOperation(dispatchedOpName);
+                        if (dbop != null) {
+                            opName = dispatchedOpName;
                         }
                     }
                 }
             } 
-            
             
             Object ret[] = client.invokeWrapped(opName,
                                                 createdSource == null ? obj : createdSource);

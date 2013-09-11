@@ -732,14 +732,6 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (op.isUnwrapped()) {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
-        //CXF-2836:To correct the wsa:action header value for dispatch client
-        BindingOperationInfo dbop = (BindingOperationInfo)bop.getProperty("dispatchToOperation");
-        if (null != dbop) {
-            //modifies the bop and bp to the value of dispatch client really invokes, 
-            //This helps corrct the wsa:action header value
-            bop = dbop;
-            op = dbop.getOperationInfo();
-        }
         
         String actionUri = null;
         if (checkMessage) {
