@@ -71,31 +71,6 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
         assertEquals("\"http://foo/bar/SEI/opReq\"", soapaction.get(0));
     }
 
-    @Test
-    public void testRequestorOutboundDispatchedSoapAction() throws Exception {
-        SoapMessage message = setUpMessage();
-        BindingOperationInfo dbop = setUpBindingOperationInfo("http://foo/bar/d",
-                                                              "opDReq",
-                                                              "opDResp",
-                                                              SEI.class.getMethod("op", new Class[0]));
-        SoapOperationInfo soi = new SoapOperationInfo();
-        soi.setAction("http://foo/bar/d/SEI/opDReq");
-        dbop.addExtensor(soi);
-
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
-        bop.setProperty("dispatchToOperation", dbop);
-
-        interceptor.handleMessage(message);
-        control.verify();
-
-        Map<String, List<String>> reqHeaders 
-            = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        assertNotNull(reqHeaders);
-        List<String> soapaction = reqHeaders.get("soapaction");
-        assertTrue(null != soapaction && soapaction.size() == 1);
-        assertEquals("\"http://foo/bar/d/SEI/opDReq\"", soapaction.get(0));
-    }
-
     private SoapMessage setUpMessage() throws Exception {
         
         SoapMessage message = new SoapMessage(new MessageImpl());

@@ -448,23 +448,6 @@ public class MAPAggregatorTest extends Assert {
         assertEquals("http://foo/bar/SEI/opRequest", action);
     }
     
-    @Test
-    public void testGetActionUriForDispatchOp() throws Exception {
-        Message message = setUpMessage(true, true, false, true, true);
-        BindingOperationInfo dbop = setUpBindingOperationInfo("http://foo/bar/d",
-                                                              "opDRequest",
-                                                              "opDResponse",
-                                                              "opDFault", 
-                                                              DSEI.class.getMethod("op", new Class[0]));
-
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
-        bop.setProperty("dispatchToOperation", dbop);
-
-        String action = aggregator.getActionUri(message, false);
-        control.verify();
-        assertEquals("http://foo/bar/d/DSEI/opDRequest", action);
-    }
-
     private Message setUpMessage(boolean requestor, 
                                  boolean outbound,
                                  boolean oneway) 

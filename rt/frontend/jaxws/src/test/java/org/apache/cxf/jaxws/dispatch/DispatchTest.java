@@ -191,10 +191,8 @@ public class DispatchTest extends AbstractJaxWsTest {
 
         BindingOperationInfo boi = bov.getBindingOperationInfo();
         assertNotNull(boi);
-        BindingOperationInfo dboi = (BindingOperationInfo)boi.getProperty("dispatchToOperation");
-        assertNotNull(dboi);
 
-        assertEquals(new QName("http://apache.org/hello_world_soap_http", "sayHi"), dboi.getName());
+        assertEquals(new QName("http://apache.org/hello_world_soap_http", "sayHi"), boi.getName());
     }
     
     private static class BindingOperationVerifier extends AbstractSoapInterceptor {
