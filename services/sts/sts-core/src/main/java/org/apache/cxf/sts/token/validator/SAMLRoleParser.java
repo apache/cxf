@@ -23,7 +23,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 
 /**
@@ -39,6 +39,6 @@ public interface SAMLRoleParser {
      * @return the set of User/Principal roles from the Assertion.
      */
     Set<Principal> parseRolesFromAssertion(
-        Principal principal, Subject subject, SamlAssertionWrapper assertion
+        Principal principal, Subject subject, AssertionWrapper assertion
     );
 }

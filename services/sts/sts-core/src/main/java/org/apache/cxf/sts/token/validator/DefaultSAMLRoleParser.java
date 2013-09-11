@@ -30,7 +30,7 @@ import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 
 /**
  * A default implementation to extract roles from a SAML Assertion
@@ -57,7 +57,7 @@ public class DefaultSAMLRoleParser implements SAMLRoleParser {
      * @return the set of User/Principal roles from the Assertion.
      */
     public Set<Principal> parseRolesFromAssertion(
-        Principal principal, Subject subject, SamlAssertionWrapper assertion
+        Principal principal, Subject subject, AssertionWrapper assertion
     ) {
         if (subject != null && useJaasSubject) {
             if (roleClassifier != null && !"".equals(roleClassifier)) {
