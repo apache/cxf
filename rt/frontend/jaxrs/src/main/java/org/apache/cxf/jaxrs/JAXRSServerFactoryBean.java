@@ -182,14 +182,13 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
             checkPrivateEndpoint(ep);
             
+            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
+            applyFeatures();
+
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED,
                                           server, 
                                           null,
                                           null);
-            
-            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
-            applyFeatures();
-            
             
             
             if (start) {
