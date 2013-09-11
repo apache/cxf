@@ -26,7 +26,6 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -79,10 +78,6 @@ public final class HttpUtils {
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
-    
-    private static final String CURRENT_PATH_SEGMENT = ".";
-    private static final String PARENT_PATH_SEGMENT = "..";
-    
     
     private HttpUtils() {
     }
@@ -509,26 +504,7 @@ public final class HttpUtils {
     
     public static URI resolve(UriBuilder baseBuilder, URI uri) {
         if (!uri.isAbsolute()) {
-            String uriValue = uri.toString();
-            boolean parentPathSegmentAvail = uriValue.contains(PARENT_PATH_SEGMENT)
-                || uriValue.contains(CURRENT_PATH_SEGMENT); 
-            uri = baseBuilder.path(uriValue).build();
-            if (parentPathSegmentAvail) {
-                List<PathSegment> segments = JAXRSUtils.getPathSegments(uri.getRawPath(), false);
-                List<PathSegment> actualSegments = new LinkedList<PathSegment>();
-                UriBuilder ub = UriBuilder.fromUri(uri).replacePath(null);
-                for (PathSegment ps : segments) {
-                    if (PARENT_PATH_SEGMENT.equals(ps.getPath()) && !actualSegments.isEmpty()) {
-                        actualSegments.remove(actualSegments.size() - 1);
-                    } else if (!CURRENT_PATH_SEGMENT.equals(ps.getPath())) {
-                        actualSegments.add(ps);
-                    }
-                }
-                for (PathSegment ps : actualSegments) {
-                    ub.segment(ps.toString());
-                }
-                uri = ub.build();
-            }
+            return baseBuilder.build().resolve(uri);
         }
         return uri;
     }

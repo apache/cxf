@@ -52,8 +52,8 @@ public class UriInfoImplTest extends Assert {
     
     @Test
     public void testResolve() {
-        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", null), null);
-        assertEquals("Wrong base path", "http://localhost:8080/baz", 
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", null), null);
+        assertEquals("Wrong base path", "http://localhost:8080/baz/", 
                      u.getBaseUri().toString());
         URI resolved = u.resolve(URI.create("a"));
         assertEquals("http://localhost:8080/baz/a", resolved.toString());
@@ -65,7 +65,7 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong base path", "http://localhost:8080/baz", 
                      u.getBaseUri().toString());
         URI resolved = u.resolve(URI.create("./a"));
-        assertEquals("http://localhost:8080/baz/a", resolved.toString());
+        assertEquals("http://localhost:8080/a", resolved.toString());
     }
     
     @Test

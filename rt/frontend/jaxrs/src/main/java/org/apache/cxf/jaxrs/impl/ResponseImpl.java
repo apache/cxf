@@ -256,7 +256,16 @@ public final class ResponseImpl extends Response {
     }
     
     public boolean hasLink(String relation) {
-        return getLink(relation) != null;
+        List<Object> linkValues = metadata.get(HttpHeaders.LINK);
+        if (linkValues != null) {
+            for (Object o : linkValues) {
+                Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
+                if (relation.equals(link.getRel())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public Link getLink(String relation) {
@@ -275,15 +284,7 @@ public final class ResponseImpl extends Response {
     }
 
     public Set<Link> getLinks() {
-        List<Object> linkValues = metadata.get(HttpHeaders.LINK);
-        Set<Link> links = new HashSet<Link>();
-        if (linkValues != null) {
-            for (Object o : linkValues) {
-                Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
-                links.add(link);
-            }
-        }
-        return links;
+        return new HashSet<Link>(getAllLinks().values());
     }
 
     private Map<String, Link> getAllLinks() {
@@ -294,6 +295,11 @@ public final class ResponseImpl extends Response {
             Map<String, Link> links = new LinkedHashMap<String, Link>();
             for (Object o : linkValues) {
                 Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
+                if (!link.getUri().isAbsolute()) {
+                    URI requestURI = URI.create((String)responseMessage.getExchange().getOutMessage()
+                        .get(Message.REQUEST_URI));
+                    link = Link.fromLink(link).baseUri(requestURI).build();
+                }
                 links.put(link.getRel(), link);
             }
             return links;

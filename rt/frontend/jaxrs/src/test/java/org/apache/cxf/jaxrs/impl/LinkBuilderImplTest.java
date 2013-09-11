@@ -66,13 +66,30 @@ public class LinkBuilderImplTest extends Assert {
     }
 
     @Test
-    public void testRelativeBuild() throws Exception {
+    public void testBuildRelativized() throws Exception {
+        
         Link.Builder linkBuilder = new LinkBuilderImpl();
         URI base = URI.create("http://example.com/page2");
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").buildRelativized(base);
         assertEquals("<page1>;rel=\"previous\"", prevLink.toString());
     }
-
+    
+    @Test
+    public void testRelativeLink() throws Exception {
+        Link.Builder linkBuilder = Link.fromUri("relative");
+        linkBuilder.baseUri("http://localhost:8080/base/path");
+        Link link = linkBuilder.rel("next").build();
+        assertEquals("<http://localhost:8080/base/relative>;rel=\"next\"", link.toString());
+    }
+    
+    @Test
+    public void testRelativeLink2() throws Exception {
+        Link.Builder linkBuilder = Link.fromUri("/relative");
+        linkBuilder.baseUri("http://localhost:8080/base/path");
+        Link link = linkBuilder.rel("next").build();
+        assertEquals("<http://localhost:8080/relative>;rel=\"next\"", link.toString());
+    }
+    
     @Test
     public void testSeveralAttributes() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
