@@ -109,6 +109,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                    	<Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
                         <Import-Package>
                             javax.xml.ws, <!-- To workaround issue with BindingProvider interface not visible -->
                             *
