@@ -44,6 +44,8 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
     private static final Logger LOG = 
         LogUtils.getL7dLogger(SAMLDelegationHandler.class);
     
+    private boolean checkAudienceRestriction = true;
+    
     public boolean canHandleToken(ReceivedToken delegateTarget) {
         Object token = delegateTarget.getToken();
         if (token instanceof Element) {
@@ -92,7 +94,7 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
                 }
             }
 
-            if (appliesToAddress != null) {
+            if (checkAudienceRestriction && appliesToAddress != null) {
                 List<String> addresses = getAudienceRestrictions(assertion);
                 if (!(addresses.isEmpty() || addresses.contains(appliesToAddress))) {
                     LOG.fine("The AppliesTo address " + appliesToAddress + " is not contained"
@@ -129,4 +131,16 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
         return addresses;
     }
     
+    public boolean isCheckAudienceRestriction() {
+        return checkAudienceRestriction;
+    }
+
+    /**
+     * Set whether to perform a check that the received AppliesTo address is contained in the
+     * token as one of the AudienceRestriction URIs. The default is true.
+     * @param checkAudienceRestriction whether to perform an audience restriction check or not
+     */
+    public void setCheckAudienceRestriction(boolean checkAudienceRestriction) {
+        this.checkAudienceRestriction = checkAudienceRestriction;
+    }
 }

@@ -60,7 +60,7 @@ public class HOKDelegationHandler extends SAMLDelegationHandler {
                 }
             }
 
-            if (appliesToAddress != null) {
+            if (isCheckAudienceRestriction() && appliesToAddress != null) {
                 List<String> addresses = getAudienceRestrictions(assertion);
                 if (!(addresses.isEmpty() || addresses.contains(appliesToAddress))) {
                     return false;
