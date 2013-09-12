@@ -40,6 +40,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final WSDLGetInterceptor INSTANCE = new WSDLGetInterceptor();
     public static final String DOCUMENT_HOLDER = WSDLGetInterceptor.class.getName() + ".documentHolder";
+    private static final String TRANSFORM_SKIP = "transform.skip";
     private Interceptor<Message> wsdlGetOutInterceptor = WSDLGetOutInterceptor.INSTANCE;
     
     public WSDLGetInterceptor() {
@@ -98,6 +99,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
             // notice this is being added after the purge above, don't swap the order!
             mout.getInterceptorChain().add(wsdlGetOutInterceptor);
 
+            message.getExchange().put(TRANSFORM_SKIP, Boolean.TRUE);
             // skip the service executor and goto the end of the chain.
             message.getInterceptorChain().doInterceptStartingAt(
                     message,

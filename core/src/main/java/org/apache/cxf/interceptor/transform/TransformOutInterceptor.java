@@ -44,6 +44,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private static final String OUTPUT_STREAM_HOLDER = 
         TransformOutInterceptor.class.getName() + ".outputstream";
+    private static final String TRANSFORM_SKIP = "transform.skip";
     private static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER);
     
     private Map<String, String> outElementsMap;
@@ -85,7 +86,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
-        if (skipOnFault && null != message.getContent(Exception.class)) {
+        if (skipOnFault && null != message.getContent(Exception.class)
+            || MessageUtils.isTrue(message.getContextualProperty(TRANSFORM_SKIP))) {
             return;
         }
         
