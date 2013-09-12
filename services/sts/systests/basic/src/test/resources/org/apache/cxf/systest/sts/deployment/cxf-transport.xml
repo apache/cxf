@@ -48,7 +48,9 @@
     </cxf:bus>
     
     <bean id="hokDelegationHandler"
-          class="org.apache.cxf.systest.sts.common.HOKDelegationHandler" />
+          class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler">
+        <property name="checkAudienceRestriction" value="false"/>
+    </bean>
 
     <bean id="transportSTSProviderBean2"
         class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
