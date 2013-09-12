@@ -175,14 +175,14 @@
         <cxf.servicemix.specs.version.jaxrs>2.3-SNAPSHOT</cxf.servicemix.specs.version.jaxrs>
         <cxf.javax.mail.version>1.4.4</cxf.javax.mail.version>
         <cxf.jaxb.bundle.version>2.2.1.1_2</cxf.jaxb.bundle.version>
-        <cxf.saaj-impl.bundle.version>1.3.20_1</cxf.saaj-impl.bundle.version>
-        <cxf.wsdl4j.bundle.version>1.6.2_6</cxf.wsdl4j.bundle.version>
+        <cxf.saaj-impl.bundle.version>1.3.21_1</cxf.saaj-impl.bundle.version>
+        <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
         <cxf.xmlsec.bundle.version>2.0.0-SNAPSHOT</cxf.xmlsec.bundle.version>
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xerces.bundle.version>2.11.0_1</cxf.xerces.bundle.version>
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
-        <cxf.xalan.bundle.version>2.7.1_6</cxf.xalan.bundle.version>
+        <cxf.xalan.bundle.version>2.7.1_7</cxf.xalan.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
