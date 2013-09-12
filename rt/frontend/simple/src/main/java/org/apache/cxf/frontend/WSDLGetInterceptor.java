@@ -30,25 +30,29 @@ import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 
 public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final WSDLGetInterceptor INSTANCE = new WSDLGetInterceptor();
     public static final String DOCUMENT_HOLDER = WSDLGetInterceptor.class.getName() + ".documentHolder";
-
+    private Interceptor<Message> wsdlGetOutInterceptor = WSDLGetOutInterceptor.INSTANCE;
+    
     public WSDLGetInterceptor() {
         super(Phase.READ);
         getAfter().add(EndpointSelectionInterceptor.class.getName());
     }
-
+    
+    public WSDLGetInterceptor(Interceptor<Message> outInterceptor) {
+        this();
+        // Let people override the wsdlGetOutInterceptor 
+        wsdlGetOutInterceptor = outInterceptor;
+    }
+    
     public void handleMessage(Message message) throws Fault {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String query = (String)message.get(Message.QUERY_STRING);
@@ -79,15 +83,20 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
             Iterator<Interceptor<? extends Message>> iterator = mout.getInterceptorChain().iterator();
             while (iterator.hasNext()) {
                 Interceptor<? extends Message> inInterceptor = iterator.next();
-                if (!inInterceptor.getClass().equals(StaxOutInterceptor.class)
-                    && !inInterceptor.getClass().equals(GZIPOutInterceptor.class)
-                    && !inInterceptor.getClass().equals(MessageSenderInterceptor.class)) {
+                if (inInterceptor instanceof AbstractPhaseInterceptor) {
+                    AbstractPhaseInterceptor<?> interceptor = (AbstractPhaseInterceptor<?>)inInterceptor;
+                    if (interceptor.getPhase().equals(Phase.PREPARE_SEND)
+                        || interceptor.getPhase().equals(Phase.PRE_STREAM)) {
+                        // just make sure we keep the right interceptors 
+                        // like stax, gzip and sendingInterceptor here
+                        continue;
+                    }
                     mout.getInterceptorChain().remove(inInterceptor);
                 }
             }
 
             // notice this is being added after the purge above, don't swap the order!
-            mout.getInterceptorChain().add(WSDLGetOutInterceptor.INSTANCE);
+            mout.getInterceptorChain().add(wsdlGetOutInterceptor);
 
             // skip the service executor and goto the end of the chain.
             message.getInterceptorChain().doInterceptStartingAt(
