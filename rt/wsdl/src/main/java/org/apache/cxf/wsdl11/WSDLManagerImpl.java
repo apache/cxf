@@ -30,6 +30,7 @@ import javax.wsdl.BindingInput;
 import javax.wsdl.Definition;
 import javax.wsdl.Types;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.AttributeExtensible;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.mime.MIMEPart;
@@ -97,6 +98,8 @@ public class WSDLManagerImpl implements WSDLManager {
             Class<? extends ExtensibilityElement> clazz = 
                 registry.createExtension(BindingInput.class, header).getClass();
             registry.mapExtensionTypes(MIMEPart.class, header, clazz);
+            // register some known extension attribute types that are not recognized by the default registry
+            addExtensionAttributeTypes(registry);
         } catch (WSDLException e) {
             throw new BusException(e);
         }
@@ -250,6 +253,22 @@ public class WSDLManagerImpl implements WSDLManager {
             definitionsMap.put(url, def);
         }
         return def;
+    }
+
+    private void addExtensionAttributeTypes(ExtensionRegistry extreg) {
+        // register types that are not of wsdl4j's default attribute type QName
+        QName qn = new QName("http://www.w3.org/2006/05/addressing/wsdl", "Action");
+        extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
+        qn = new QName("http://www.w3.org/2007/05/addressing/metadata", "Action"); 
+        extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
+        qn = new QName("http://www.w3.org/2005/02/addressing/wsdl", "Action");
+        extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
+        extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
     }
 
     public ServiceSchemaInfo getSchemasForDefinition(Definition wsdl) {
