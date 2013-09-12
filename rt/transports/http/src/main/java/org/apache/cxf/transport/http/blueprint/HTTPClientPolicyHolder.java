@@ -70,7 +70,10 @@ public class HTTPClientPolicyHolder extends HTTPClientPolicy {
             this.setMaxRetransmits(clientPolicy.getMaxRetransmits());
             this.setNonProxyHosts(clientPolicy.getNonProxyHosts());
             this.setProxyServer(clientPolicy.getProxyServer());
-            this.setProxyServerPort(clientPolicy.getProxyServerPort());
+            // need to check if the property is set to avoid NPE
+            if (clientPolicy.isSetProxyServerPort()) {
+                this.setProxyServerPort(clientPolicy.getProxyServerPort());
+            }
             this.setProxyServerType(clientPolicy.getProxyServerType());
             this.setReceiveTimeout(clientPolicy.getReceiveTimeout());
             this.setReferer(clientPolicy.getReferer());
