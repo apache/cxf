@@ -24,10 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.AttributeChangeNotification;
 import javax.management.JMException;
-import javax.management.MBeanNotificationInfo;
-import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -38,6 +35,8 @@ import javax.management.openmbean.SimpleType;
 
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.annotation.ManagedAttribute;
+import org.apache.cxf.management.annotation.ManagedNotification;
+import org.apache.cxf.management.annotation.ManagedNotifications;
 import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedOperationParameter;
 import org.apache.cxf.management.annotation.ManagedOperationParameters;
@@ -52,8 +51,12 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange
  *
  */
 @ManagedResource(componentName = "RMEndpoint", 
-                 description = "Responsible for Sources and Destinations.")
-public class ManagedRMEndpoint extends NotificationBroadcasterSupport implements ManagedComponent {
+    description = "Responsible for Sources and Destinations.")
+@ManagedNotifications({@ManagedNotification(name = "org.apache.ws.rm.acknowledgement",
+    notificationTypes = {"org.apache.cxf.ws.rm.AcknowledgementNotification" }) })
+public class ManagedRMEndpoint implements ManagedComponent {
+
+    public static final String ACKNOWLEDGEMENT_NOTIFICATION = "org.apache.ws.rm.acknowledgement";
 
     private static final String[] SOURCE_SEQUENCE_NAMES = 
     {"sequenceId", "currentMessageNumber", "expires", "lastMessage", "queuedMessageCount", 
@@ -88,7 +91,6 @@ public class ManagedRMEndpoint extends NotificationBroadcasterSupport implements
     private static CompositeType retryStatusType;
 
     private RMEndpoint endpoint;
-    
 
     static {
         try {
@@ -510,9 +512,27 @@ public class ManagedRMEndpoint extends NotificationBroadcasterSupport implements
         }
     }
 
+    @ManagedOperation(description = "Terminate Source Sequence")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public void terminateSourceSequence(String sid) throws JMException {
+        SourceSequence ss = getSourceSeq(sid);
+        if (null == ss) {
+            throw new JMException("no source sequence");
+        }
+        Proxy proxy = endpoint.getProxy();
+        try {
+            proxy.terminate(ss);
+            ss.getSource().removeSequence(ss);
+        } catch (RMException e) {
+            throw new JMException("Error terminating sequence: " + e.getMessage());
+        }
+    }
+
     @ManagedOperation(description = "Terminate Destination Sequence")
     @ManagedOperationParameters({
-        @ManagedOperationParameter(name = "sequenceId", description = "The destination identifier") 
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
     })
     public void terminateDestinationSequence(String sid) throws JMException {
         DestinationSequence ds = getDestinationSeq(sid);
@@ -683,16 +703,5 @@ public class ManagedRMEndpoint extends NotificationBroadcasterSupport implements
     @ManagedAttribute(description = "Number of Completed Destination Sequences", currencyTimeLimit = 10)
     public int getCompletedDestinationSequenceCount() {
         return endpoint.getCompletedDestinationSequenceCount();
-    }
-    
-    @Override
-    public MBeanNotificationInfo[] getNotificationInfo() {
-        String[] types = new String[] {
-            AttributeChangeNotification.ATTRIBUTE_CHANGE
-        };
-        String name = AttributeChangeNotification.class.getName();
-        String description = "Message acknowledged";
-        MBeanNotificationInfo info =  new MBeanNotificationInfo(types, name, description);
-        return new MBeanNotificationInfo[] {info};
     }
 }

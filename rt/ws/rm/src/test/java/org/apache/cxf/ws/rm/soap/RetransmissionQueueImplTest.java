@@ -27,9 +27,11 @@ import java.util.concurrent.Executor;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.rm.RMConfiguration;
+import org.apache.cxf.ws.rm.RMEndpoint;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
+import org.apache.cxf.ws.rm.Source;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
@@ -421,10 +423,16 @@ public class RetransmissionQueueImplTest extends Assert {
         SourceSequence sequence = createMock(SourceSequence.class);
         Identifier id = createMock(Identifier.class);
         sequence.getIdentifier();
-        EasyMock.expectLastCall().andReturn(id);
+        EasyMock.expectLastCall().andReturn(id).anyTimes();
         id.getValue();
-        EasyMock.expectLastCall().andReturn(sid);
+        EasyMock.expectLastCall().andReturn(sid).anyTimes();
         identifiers.add(id);
+        Source source = createMock(Source.class);
+        sequence.getSource();
+        EasyMock.expectLastCall().andReturn(source).anyTimes();
+        RMEndpoint rme = createMock(RMEndpoint.class);
+        source.getReliableEndpoint();
+        EasyMock.expectLastCall().andReturn(rme).anyTimes();
         boolean includesAcked = false;
         for (int i = 0; isAcked != null && i < isAcked.length; i++) {
             sequence.isAcknowledged(messageNumbers[i]);
@@ -434,16 +442,6 @@ public class RetransmissionQueueImplTest extends Assert {
             }
         }
         if (includesAcked) {
-            // Will be called once or twice depending on whether any more
-            // unacknowledged messages are left for this sequence
-            sequence.getIdentifier();
-            EasyMock.expectLastCall().andReturn(id).times(1, 2);
-
-            // Would be called only when there are no more
-            // unacknowledged messages left for this sequence
-            id.getValue();
-            EasyMock.expectLastCall().andReturn(sid).times(0, 1);
-
             RMStore store = createMock(RMStore.class);
             manager.getStore();
             EasyMock.expectLastCall().andReturn(store);

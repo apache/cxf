@@ -58,6 +58,7 @@ import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMContextUtils;
+import org.apache.cxf.ws.rm.RMEndpoint;
 import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
@@ -171,6 +172,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             RMStore store = manager.getStore();
             if (null != store) {
                 store.removeMessages(seq.getIdentifier(), purged, true);
+            }
+            for (Long number : purged) {
+                RMEndpoint rmEndpoint = seq.getSource().getReliableEndpoint();
+                rmEndpoint.handleAcknowledgement(seq.getIdentifier().getValue(), number);
             }
         }
     }

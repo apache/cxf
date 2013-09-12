@@ -28,6 +28,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.management.JMException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.RuntimeOperationsException;
+import javax.management.modelmbean.InvalidTargetObjectTypeException;
+import javax.management.modelmbean.ModelMBeanInfo;
+import javax.management.modelmbean.RequiredModelMBean;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -47,6 +54,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -106,8 +114,10 @@ public class RMEndpoint {
     private AtomicInteger applicationMessageCount;
     private AtomicInteger controlMessageCount;
     private InstrumentationManager instrumentationManager;
-    private ManagedRMEndpoint managedEndpoint;
     private RMConfiguration configuration;
+    private ManagedRMEndpoint managedEndpoint;
+    private RequiredModelMBean modelMBean;
+    private AtomicInteger acknowledgementSequence;
     
     /**
      * Constructor.
@@ -127,6 +137,7 @@ public class RMEndpoint {
         endpoints = new HashMap<ProtocolVariation, Endpoint>();
         applicationMessageCount = new AtomicInteger();
         controlMessageCount = new AtomicInteger();
+        acknowledgementSequence = new AtomicInteger();
     }
 
     /**
@@ -277,6 +288,28 @@ public class RMEndpoint {
     EndpointReferenceType getReplyTo() {
         return replyTo;
     }
+    
+    /**
+     * Handle message acknowledgement for source sequence. This generates a notification of the acknowledgement if JMX
+     * is being used.
+     * 
+     * @param ssid
+     * @param number
+     */
+    public void handleAcknowledgement(String ssid, long number) {
+        if (modelMBean != null) {
+            int seq = acknowledgementSequence.incrementAndGet();
+            try {
+                modelMBean.sendNotification(new AcknowledgementNotification(this, seq, ssid, number));
+            } catch (RuntimeOperationsException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (MBeanException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 
     void initialise(RMConfiguration config, Conduit c, EndpointReferenceType r,
         org.apache.cxf.transport.Destination d) {
@@ -290,10 +323,27 @@ public class RMEndpoint {
             managedEndpoint = new ManagedRMEndpoint(this);
             instrumentationManager = manager.getBus().getExtension(InstrumentationManager.class);        
             if (instrumentationManager != null) {   
-                try {
-                    instrumentationManager.register(managedEndpoint);
-                } catch (JMException jmex) {
-                    LOG.log(Level.WARNING, "Registering ManagedRMEndpoint failed.", jmex);
+                ModelMBeanAssembler assembler = new ModelMBeanAssembler();
+                ModelMBeanInfo mbi = assembler.getModelMbeanInfo(managedEndpoint.getClass());
+                MBeanServer mbs = instrumentationManager.getMBeanServer();
+                if (mbs == null) {
+                    LOG.log(Level.WARNING, "MBeanServer not available.");
+                } else {
+                    try {
+                        RequiredModelMBean rtMBean = 
+                            (RequiredModelMBean)mbs.instantiate("javax.management.modelmbean.RequiredModelMBean");
+                        rtMBean.setModelMBeanInfo(mbi);
+                        try {
+                            rtMBean.setManagedResource(managedEndpoint, "ObjectReference");
+                        } catch (InvalidTargetObjectTypeException itotex) {
+                            throw new JMException(itotex.getMessage());
+                        }
+                        ObjectName name = managedEndpoint.getObjectName();
+                        instrumentationManager.register(rtMBean, name);
+                        modelMBean = rtMBean;
+                    } catch (JMException jmex) {
+                        LOG.log(Level.WARNING, "Registering ManagedRMEndpoint failed.", jmex);
+                    }
                 }
             }
         }
