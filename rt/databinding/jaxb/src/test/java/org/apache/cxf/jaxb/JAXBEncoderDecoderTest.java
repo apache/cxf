@@ -473,6 +473,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         assertTrue(c < d);
         assertTrue(d < e);
         assertTrue(bout.toString().indexOf("transientValue") < 0);
+        assertTrue(bout.toString(), bout.toString().indexOf("mappedField=\"MappedField\"") > 0);
     }
     
     @Test
