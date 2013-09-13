@@ -275,18 +275,29 @@ public abstract class AbstractOperation {
     }
     
     /**
-     * Create a LifetimeType object given a lifetime in seconds
+     * Create a LifetimeType object given a created + expires Dates
      */
-    protected static LifetimeType createLifetime(long lifetime) {
+    protected static LifetimeType createLifetime(
+        Date tokenCreated, 
+        Date tokenExpires,
+        long lifetime
+    ) {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        if (lifetime <= 0) {
-            lifetime = 300L;
+        Date creationTime = tokenCreated;
+        if (creationTime == null) {
+            creationTime = new Date();
         }
-        expirationTime.setTime(creationTime.getTime() + (lifetime * 1000L));
+        Date expirationTime = tokenExpires;
+        if (expirationTime == null) {
+            expirationTime = new Date();
+            long lifeTimeOfToken = lifetime;
+            if (lifeTimeOfToken <= 0) {
+                lifeTimeOfToken = 300L;
+            }
+            expirationTime.setTime(creationTime.getTime() + (lifeTimeOfToken * 1000L));
+        }
 
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         created.setValue(fmt.format(creationTime));

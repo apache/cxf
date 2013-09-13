@@ -253,7 +253,9 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         response.getAny().add(tokenRequirements.getAppliesTo());
 
         // Lifetime
-        LifetimeType lifetime = createLifetime(tokenRenewerResponse.getLifetime());
+        LifetimeType lifetime = 
+            createLifetime(tokenRenewerResponse.getCreated(), tokenRenewerResponse.getExpires(),
+                           tokenRenewerResponse.getLifetime());
         JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
         response.getAny().add(lifetimeType);
 
