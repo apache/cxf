@@ -23,7 +23,6 @@ import org.apache.cxf.systest.jaxb.shareclasses.service.bar.BarService;
 
 public class BarServiceImpl implements BarService {
 
-    @Override
     public String getName(final NameElement nameElement) {
         return nameElement.getName();
     }
