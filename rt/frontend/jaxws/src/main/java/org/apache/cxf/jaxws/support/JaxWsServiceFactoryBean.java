@@ -332,6 +332,11 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 for (BindingInfo bind : si.getBindings()) {
                     for (BindingOperationInfo bop : bind.getOperations()) {
                         OperationInfo o = bop.getOperationInfo();
+                        if (bop.isUnwrappedCapable()) {
+                            //force to bare, no unwrapping
+                            bop.getOperationInfo().setUnwrappedOperation(null);
+                            bop.setUnwrappedOperation(null);
+                        }
                         if (o.getInput() != null) {
                             if (o.getInput().getMessageParts().isEmpty()) {
                                 MessagePartInfo inf = o.getInput().addMessagePart(o.getName());
