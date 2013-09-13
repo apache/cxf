@@ -616,7 +616,7 @@ public abstract class AbstractClient implements Client, Retryable {
         String baseURIPath = newBaseURI.getRawPath();
         String reqURIPath = requestURI.getRawPath();
         
-        UriBuilder builder = UriBuilder.fromUri(newBaseURI);
+        UriBuilder builder = new UriBuilderImpl().uri(newBaseURI);
         String basePath = reqURIPath.startsWith(baseURIPath) ? baseURIPath : getBaseURI().getRawPath(); 
         builder.path(reqURIPath.equals(basePath) ? "" : reqURIPath.substring(basePath.length()));
         URI newRequestURI = builder.replaceQuery(requestURI.getRawQuery()).build();
