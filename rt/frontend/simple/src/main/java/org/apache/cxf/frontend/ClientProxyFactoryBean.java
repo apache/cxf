@@ -32,7 +32,6 @@ import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -173,18 +172,9 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     
             Class<?> classes[] = getImplementingClasses();
             
-            if (loader != null && loader != clientFactoryBean.getServiceClass().getClassLoader()) {
-                ProxyClassLoader pcl = new ProxyClassLoader();
-                pcl.addLoader(clientFactoryBean.getServiceClass().getClassLoader());
-                pcl.addLoader(loader);
-                loader = pcl;
-            }
-            
-            Object obj = ProxyHelper.getProxy(loader == null 
-                    ? clientFactoryBean.getServiceClass().getClassLoader()
-                        : loader,
-                                                classes,
-                                                handler);
+            Object obj = ProxyHelper.getProxy(clientFactoryBean.getServiceClass().getClassLoader(),
+                                              classes,
+                                              handler);
     
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PROXY_CREATED,
                                                classes, handler, obj);
