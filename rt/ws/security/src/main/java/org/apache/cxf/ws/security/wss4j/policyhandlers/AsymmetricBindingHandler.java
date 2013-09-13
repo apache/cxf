@@ -192,6 +192,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         } catch (Exception e) {
             String reason = e.getMessage();
             LOG.log(Level.WARNING, "Sign before encryption failed due to : " + reason);
+            LOG.log(Level.FINE, e.getMessage(), e);
             throw new Fault(e);
         }
     }
@@ -246,6 +247,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } catch (Exception e) {
                     String reason = e.getMessage();
                     LOG.log(Level.WARNING, "Encrypt before sign failed due to : " + reason);
+                    LOG.log(Level.FINE, e.getMessage(), e);
                     throw new Fault(e);
                 }
             }
@@ -259,6 +261,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             //will not be included otherwise
             sigParts = getSignedParts();
         } catch (SOAPException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }
         
@@ -278,6 +281,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             try {
                 addSupportingTokens(sigParts);
             } catch (WSSecurityException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
                 policyNotAsserted(encryptionToken, ex);
             }
         } else {
@@ -299,8 +303,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }
         } catch (WSSecurityException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         } catch (SOAPException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }
 
@@ -348,6 +354,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
                 ((WSSecDKEncrypt)encrBase).addExternalRefElement(secondRefList, secHeader);
             } catch (WSSecurityException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
                 throw new Fault(ex);
             }
         } else if (encrBase instanceof WSSecEncrypt) {
@@ -364,6 +371,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 ((WSSecEncrypt)encrBase).encryptForRef(secondRefList, secondEncrParts);
 
             } catch (WSSecurityException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
                 throw new Fault(ex);
             }
         }
@@ -399,6 +407,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     insertBeforeBottomUp(refList);
                     return dkEncr;
                 } catch (Exception e) {
+                    LOG.log(Level.FINE, e.getMessage(), e);
                     policyNotAsserted(recToken, e);
                 }
             } else {
@@ -448,6 +457,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     this.addEncryptedKeyElement(encryptedKeyElement);
                     return encr;
                 } catch (WSSecurityException e) {
+                    LOG.log(Level.FINE, e.getMessage(), e);
                     policyNotAsserted(recToken, e);
                 }    
             }
@@ -550,6 +560,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 
                 mainSigId = dkSign.getSignatureId();
             } catch (Exception ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
                 throw new Fault(ex);
             }
         } else {
