@@ -53,20 +53,14 @@ public final class WSActionAnnotator implements Annotator {
     }
     
     private String getAction(AbstractMessageContainer mi) {
-        QName action = (QName)mi.getExtensionAttribute(WSAW_ACTION_QNAME);
+        String action = (String)mi.getExtensionAttribute(WSAW_ACTION_QNAME);
         if (action == null) {
-            action = (QName)mi.getExtensionAttribute(WSAM_ACTION_QNAME);
+            action = (String)mi.getExtensionAttribute(WSAM_ACTION_QNAME);
         }
         if (action == null) {
-            action = (QName)mi.getExtensionAttribute(WSAW_OLD_ACTION_QNAME);
+            action = (String)mi.getExtensionAttribute(WSAW_OLD_ACTION_QNAME);
         }
-        if (action != null) {
-            String s = action.getLocalPart();
-            if (!StringUtils.isEmpty(s)) {
-                return s;
-            }
-        } 
-        return null;
+        return StringUtils.isEmpty(action) ? null : action;
     }
     
     public void annotate(JavaAnnotatable ja) {

@@ -32,6 +32,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Action;
 import javax.xml.ws.WebFault;
 import javax.xml.ws.WebServiceClient;
 
@@ -45,7 +46,6 @@ import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
 import org.apache.cxf.wsdl11.WSDLRuntimeException;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
@@ -1193,5 +1193,24 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         } catch (Exception e) {
             fail("shouldn't get exception");
         }
+    }
+
+    @Test
+    public void testCXF5280() throws Exception {
+        env.put(ToolConstants.CFG_ALL, "all");
+        env.put(ToolConstants.CFG_COMPILE, "compile");
+        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf5280/hello_world.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+
+        Class<?> pcls = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter");
+        Class<?> acls = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.types.GreetMe");
+        Method m = pcls.getMethod("greetMe", new Class[] {acls});
+
+        Action actionAnn = AnnotationUtil.getPrivMethodAnnotation(m, Action.class);
+        assertNotNull(actionAnn);
+        assertEquals("http://cxf.apache.org/w2j/hello_world_soap_http/greetMe", actionAnn.input());
     }
 }
