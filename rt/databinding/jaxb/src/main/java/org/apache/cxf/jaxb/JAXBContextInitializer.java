@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -380,9 +381,12 @@ class JAXBContextInitializer extends ServiceModelVisitor {
      */
     static boolean isFieldAccepted(Field field, XmlAccessType accessType) {
         // We only accept non static fields which are not marked @XmlTransient or has transient modifier
-        if (Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(XmlTransient.class)
+        if (field.isAnnotationPresent(XmlTransient.class)
             || Modifier.isTransient(field.getModifiers())) {
             return false;
+        }
+        if (Modifier.isStatic(field.getModifiers())) {
+            return field.isAnnotationPresent(XmlAttribute.class);
         }
         if (accessType == XmlAccessType.PUBLIC_MEMBER 
             && !Modifier.isPublic(field.getModifiers())) {
