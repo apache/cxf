@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -275,8 +275,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }
         } catch (RuntimeException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
             throw ex;
         } catch (Exception ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }
     }
@@ -398,6 +400,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                          enc,
                          false);
         } catch (Exception e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             throw new Fault(e);
         }
     }
@@ -500,6 +503,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             return dkEncr;
         } catch (Exception e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             policyNotAsserted(recToken, e);
         }
         return null;
@@ -609,6 +613,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     return encr;
                 } catch (WSSecurityException e) {
+                    LOG.log(Level.FINE, e.getMessage(), e);
                     policyNotAsserted(recToken, e);
                 }    
             }
@@ -704,6 +709,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         try {
             dkSign.prepare(doc, secHeader);
         } catch (ConversationException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         
@@ -974,6 +980,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             byte[] digestBytes = WSSecurityUtil.generateDigest(input);
             return Base64.encode(digestBytes);
         } catch (WSSecurityException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             //REVISIT
         }
         return null;
