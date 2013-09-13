@@ -37,14 +37,15 @@ import org.opensaml.saml1.core.AudienceRestrictionCondition;
 /**
  * The SAML TokenDelegationHandler implementation. It disallows ActAs or OnBehalfOf for
  * all cases apart from the case of a Bearer SAML Token. In addition, the AppliesTo
- * address (if supplied) must match an AudienceRestriction address (if in token)
+ * address (if supplied) must match an AudienceRestriction address (if in token), if the
+ * "checkAudienceRestriction" property is set to "true".
  */
 public class SAMLDelegationHandler implements TokenDelegationHandler {
     
     private static final Logger LOG = 
         LogUtils.getL7dLogger(SAMLDelegationHandler.class);
     
-    private boolean checkAudienceRestriction = true;
+    private boolean checkAudienceRestriction;
     
     public boolean canHandleToken(ReceivedToken delegateTarget) {
         Object token = delegateTarget.getToken();
@@ -137,7 +138,7 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
 
     /**
      * Set whether to perform a check that the received AppliesTo address is contained in the
-     * token as one of the AudienceRestriction URIs. The default is true.
+     * token as one of the AudienceRestriction URIs. The default is false.
      * @param checkAudienceRestriction whether to perform an audience restriction check or not
      */
     public void setCheckAudienceRestriction(boolean checkAudienceRestriction) {
