@@ -49,7 +49,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -611,7 +610,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient path(String path, Object... values) {
-        URI u = UriBuilder.fromUri(URI.create("http://tempuri")).path(path).buildFromEncoded(values);
+        URI u = new UriBuilderImpl().uri(URI.create("http://tempuri")).path(path).buildFromEncoded(values);
         getState().setTemplates(getTemplateParametersMap(new URITemplate(path), Arrays.asList(values)));
         return path(u.getRawPath());
     }
