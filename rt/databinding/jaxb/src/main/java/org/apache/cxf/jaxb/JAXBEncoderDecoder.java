@@ -72,6 +72,7 @@ import javax.xml.stream.util.StreamReaderDelegate;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -82,6 +83,7 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -351,26 +353,62 @@ public final class JAXBEncoderDecoder {
             Class<?> cls = part.getTypeClass();
             XmlAccessType accessType = Utils.getXmlAccessType(cls);
             String namespace = part.getElementQName().getNamespaceURI();
+            String attNs = namespace;
             
             SchemaInfo sch = part.getMessageInfo().getOperation().getInterface()
                 .getService().getSchema(namespace);
             if (sch == null) {
                 LOG.warning("Schema associated with " + namespace + " is null");
                 namespace = null;
-            } else if (!sch.isElementFormQualified()) {
-                namespace = null;
+                attNs = null;
+            } else {
+                if (!sch.isElementFormQualified()) {
+                    namespace = null;
+                }
+                if (!sch.isAttributeFormQualified()) {
+                    attNs = null;
+                }
             }
             List<Member> combinedMembers = new ArrayList<Member>();
-
 
             for (Field f : Utils.getFields(cls, accessType)) {
                 XmlAttribute at = f.getAnnotation(XmlAttribute.class);
                 if (at == null) {
                     combinedMembers.add(f);
+                } else {
+                    QName fname = new QName(attNs, StringUtils.isEmpty(at.name()) ? f.getName() : at.name());
+                    ReflectionUtil.setAccessible(f);
+                    Object o = Utils.getFieldValue(f, elValue);
+                    Document doc = DOMUtils.newDocument();
+                    writeObject(marshaller, doc, newJAXBElement(fname, String.class, o));
+                    
+                    if (attNs != null) {
+                        writer.writeAttribute(attNs, fname.getLocalPart(),
+                                              DOMUtils.getAllContent(doc.getDocumentElement()));
+                    } else {
+                        writer.writeAttribute(fname.getLocalPart(), DOMUtils.getAllContent(doc.getDocumentElement()));
+                    }
                 }
             }
             for (Method m : Utils.getGetters(cls, accessType)) {
-                combinedMembers.add(m);
+                if (!m.isAnnotationPresent(XmlAttribute.class)) {
+                    combinedMembers.add(m);
+                } else {
+                    int idx = m.getName().startsWith("get") ? 3 : 2;
+                    String name = m.getName().substring(idx);
+                    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+                    XmlAttribute at = m.getAnnotation(XmlAttribute.class);
+                    QName mname = new QName(namespace, StringUtils.isEmpty(at.name()) ? name : at.name());
+                    Document doc = DOMUtils.newDocument();
+                    Object o = Utils.getMethodValue(m, elValue); 
+                    writeObject(marshaller, doc, newJAXBElement(mname, String.class, o));
+                    if (attNs != null) {
+                        writer.writeAttribute(attNs, mname.getLocalPart(),
+                                              DOMUtils.getAllContent(doc.getDocumentElement()));
+                    } else {
+                        writer.writeAttribute(mname.getLocalPart(), DOMUtils.getAllContent(doc.getDocumentElement()));
+                    }
+                }
             }
 
             XmlAccessorOrder xmlAccessorOrder = cls.getAnnotation(XmlAccessorOrder.class);
