@@ -201,7 +201,12 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                                               : getServiceClass());
             
             if (start) {
-                server.start();
+                try {
+                    server.start();
+                } catch (RuntimeException re) {
+                    server.destroy(); // prevent resource leak
+                    throw re;
+                }
             }
             return server;
         } finally {
