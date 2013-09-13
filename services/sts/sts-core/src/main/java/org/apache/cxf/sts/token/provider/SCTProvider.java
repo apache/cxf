@@ -132,14 +132,17 @@ public class SCTProvider implements TokenProvider {
             response.setComputedKey(keyHandler.isComputedKey());
             
             // putting the secret key into the cache
+            Date currentDate = new Date();
+            response.setCreated(currentDate);
             Date expires = null;
             if (lifetime > 0) {
                 expires = new Date();
-                long currentTime = expires.getTime();
+                long currentTime = currentDate.getTime();
                 expires.setTime(currentTime + (lifetime * 1000L));
             }
+            response.setExpires(expires);
             
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), null, expires);
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), currentDate, expires);
             token.setSecret(keyHandler.getSecret());
             token.setPrincipal(tokenParameters.getPrincipal());
             
@@ -182,8 +185,6 @@ public class SCTProvider implements TokenProvider {
             unAttachedReference.setUseDirectReference(true);
             unAttachedReference.setWsseValueType(tokenRequirements.getTokenType());
             response.setUnattachedReference(unAttachedReference);
-            
-            response.setLifetime(lifetime);
             
             return response;
         } catch (Exception e) {

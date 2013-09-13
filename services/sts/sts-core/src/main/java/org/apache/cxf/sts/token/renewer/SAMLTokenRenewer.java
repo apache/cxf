@@ -219,17 +219,15 @@ public class SAMLTokenRenewer implements TokenRenewer {
             
             DateTime validFrom = null;
             DateTime validTill = null;
-            long lifetime = 0;
             if (renewedAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 validFrom = renewedAssertion.getSaml2().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml2().getConditions().getNotOnOrAfter();
-                lifetime = validTill.getMillis() - validFrom.getMillis();
             } else {
                 validFrom = renewedAssertion.getSaml1().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml1().getConditions().getNotOnOrAfter();
-                lifetime = validTill.getMillis() - validFrom.getMillis();
             }
-            response.setLifetime(lifetime / 1000);
+            response.setCreated(validFrom.toDate());
+            response.setExpires(validTill.toDate());
 
             return response;
             
