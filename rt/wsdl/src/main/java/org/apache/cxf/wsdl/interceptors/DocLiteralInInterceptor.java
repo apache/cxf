@@ -87,9 +87,13 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
         Service service = ServiceModelUtil.getService(message.getExchange());
         bop = getBindingOperationInfo(xmlReader, exchange, bop, client);
-
+        boolean forceDocLitBare = false;
+        if (bop != null && bop.getBinding() != null) {
+            forceDocLitBare = Boolean.TRUE.equals(bop.getBinding().getService().getProperty("soap.force.doclit.bare"));
+        }
+        
         try {
-            if (bop != null && bop.isUnwrappedCapable()) {
+            if (!forceDocLitBare && bop != null && bop.isUnwrappedCapable()) {
                 ServiceInfo si = bop.getBinding().getService();
                 // Wrapped case
                 MessageInfo msgInfo = setMessage(message, bop, client, si);
@@ -181,15 +185,14 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                         p = findMessagePart(exchange, operations, elName, client, paramNum, message);
                     }
                     
-                    boolean dlb = Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare"));
-                    if (!dlb) {
+                    if (!forceDocLitBare) {
                         //Make sure the elName found on the wire is actually OK for 
                         //the purpose we need it
                         validatePart(p, elName, message);
                     }
              
                     o = dr.read(p, xmlReader);
-                    if (dlb && parameters.isEmpty()) {
+                    if (forceDocLitBare && parameters.isEmpty()) {
                         // webservice provider does not need to ensure size
                         parameters.add(o);
                     } else {

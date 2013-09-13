@@ -90,6 +90,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
@@ -307,6 +308,16 @@ public class ServiceImpl extends ServiceDelegate {
             if (null == wsdlURL) {
                 for (EndpointInfo ei : si.getEndpoints()) {
                     ei.setProperty("soap.no.validate.parts", Boolean.TRUE);
+                }
+            }
+            
+            for (BindingInfo bind : si.getBindings()) {
+                for (BindingOperationInfo bop : bind.getOperations()) {
+                    //force to bare, no unwrapping
+                    if (bop.isUnwrappedCapable()) {
+                        bop.getOperationInfo().setUnwrappedOperation(null);
+                        bop.setUnwrappedOperation(null);
+                    }
                 }
             }
         }

@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.jws.WebService;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
@@ -46,6 +47,8 @@ import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.soap.Addressing;
+import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
@@ -69,7 +72,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
-import org.apache.hello_world_soap_http.GreeterImpl;
+import org.apache.hello_world_soap_http.BaseGreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeLater;
@@ -88,6 +91,16 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
     private static String greeterPort = TestUtil.getPortNumber(DispatchClientServerTest.class); 
     
+    
+    @WebService(serviceName = "SOAPService",
+        portName = "SoapPort",
+        endpointInterface = "org.apache.hello_world_soap_http.Greeter",
+        targetNamespace = "http://apache.org/hello_world_soap_http",
+        wsdlLocation = "testutils/hello_world.wsdl")
+    @Addressing
+    public static class GreeterImpl extends BaseGreeterImpl {
+    }    
+    
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
         
@@ -98,7 +111,6 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                 + TestUtil.getPortNumber(DispatchClientServerTest.class)
                 + "/SOAPDispatchService/SoapDispatchPort";
             ep = Endpoint.create(SOAPBinding.SOAP11HTTP_BINDING, implementor);
-            
             Map<String, Object> properties = new HashMap<String, Object>();
             Map<String, String> nsMap = new HashMap<String, String>();
             nsMap.put("gmns", "http://apache.org/hello_world_soap_http/types");
@@ -511,6 +523,28 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_soap_http.types");
         Dispatch<Object> disp = service.createDispatch(PORT_NAME, jc, Service.Mode.PAYLOAD);
+        doJAXBPayload(disp);
+    }
+    @Test
+    public void testJAXBObjectPAYLOADFromEPR() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
+        assertNotNull(service);
+
+        W3CEndpointReferenceBuilder builder = new  W3CEndpointReferenceBuilder();
+        builder.address("http://localhost:" 
+                        + greeterPort 
+                        + "/SOAPDispatchService/SoapDispatchPort");
+        builder.serviceName(SERVICE_NAME);
+        builder.endpointName(PORT_NAME);
+        W3CEndpointReference w3cEpr = builder.build();
+        JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_soap_http.types");
+        Dispatch<Object> disp = service.createDispatch(w3cEpr, jc, Service.Mode.PAYLOAD, new AddressingFeature());
+        doJAXBPayload(disp);
+    }
+    private void doJAXBPayload(Dispatch<Object> disp) throws Exception {
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                      "http://localhost:" 
                                      + greeterPort
