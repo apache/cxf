@@ -167,7 +167,6 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             return count;
         }
 
-        @Override
         public void setThrowAlways(boolean t) {
             throwAlways = t;
             super.setThrowAlways(t);
@@ -185,7 +184,6 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             this.robust = robust;
         }
         
-        @Override
         public void handleMessage(Message message) throws Fault {
             message.setContextualProperty(Message.ROBUST_ONEWAY, robust);
         }
