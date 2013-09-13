@@ -23,7 +23,6 @@ import org.apache.cxf.systest.jaxb.shareclasses.service.foo.FooService;
 
 public class FooServiceImpl implements FooService {
 
-    @Override
     public String getName(final NameElement nameElement) {
         return nameElement.getName();
     }
