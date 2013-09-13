@@ -24,13 +24,16 @@ import java.util.Set;
 
 /**
  * Utility class loader that can be used to create proxies in cases where
- * the the JAX-RS client classes are not visible to the loader of the
+ * the the client classes are not visible to the loader of the
  * service class.    
  */
 public class ProxyClassLoader extends ClassLoader {
     private Set<ClassLoader> loaders = new HashSet<ClassLoader>();
 
     public void addLoader(ClassLoader loader) {
+        if (loader == null) {
+            loader = getSystemClassLoader();
+        }
         loaders.add(loader);
     }
 
@@ -39,6 +42,8 @@ public class ProxyClassLoader extends ClassLoader {
             try {
                 return loader.loadClass(name);
             } catch (ClassNotFoundException cnfe) {
+                // Try next
+            } catch (NoClassDefFoundError cnfe) {
                 // Try next
             }
         }
