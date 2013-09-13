@@ -47,6 +47,7 @@ import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.token.provider.ConditionsProvider;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
+import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -507,10 +508,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     
     private void createNewConditions(AssertionWrapper assertion, TokenRenewerParameters tokenParameters) {
         ConditionsBean conditions = 
-            conditionsProvider.getConditions(
-                tokenParameters.getAppliesToAddress(),
-                tokenParameters.getTokenRequirements().getLifetime()
-            );
+            conditionsProvider.getConditions(convertToProviderParameters(tokenParameters));
         
         if (assertion.getSaml1() != null) {
             org.opensaml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
@@ -529,6 +527,32 @@ public class SAMLTokenRenewer implements TokenRenewer {
             
             saml2Assertion.setConditions(saml2Conditions);
         }
+    }
+    
+    private TokenProviderParameters convertToProviderParameters(
+        TokenRenewerParameters renewerParameters
+    ) {
+        TokenProviderParameters providerParameters = new TokenProviderParameters();
+        providerParameters.setAppliesToAddress(renewerParameters.getAppliesToAddress());
+        providerParameters.setEncryptionProperties(renewerParameters.getEncryptionProperties());
+        providerParameters.setKeyRequirements(renewerParameters.getKeyRequirements());
+        providerParameters.setPrincipal(renewerParameters.getPrincipal());
+        providerParameters.setRealm(renewerParameters.getRealm());
+        providerParameters.setStsProperties(renewerParameters.getStsProperties());
+        providerParameters.setTokenRequirements(renewerParameters.getTokenRequirements());
+        providerParameters.setTokenStore(renewerParameters.getTokenStore());
+        providerParameters.setWebServiceContext(renewerParameters.getWebServiceContext());
+        
+        // Store token to renew in the additional properties in case you want to base some
+        // Conditions on the token
+        Map<String, Object> additionalProperties = renewerParameters.getAdditionalProperties();
+        if (additionalProperties == null) {
+            additionalProperties = new HashMap<String, Object>();
+        }
+        additionalProperties.put(ReceivedToken.class.getName(), renewerParameters.getToken());
+        providerParameters.setAdditionalProperties(additionalProperties);
+        
+        return providerParameters;
     }
     
     private String createNewId(AssertionWrapper assertion) {
