@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.sts.token.renewer;
 
+import java.util.Date;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.sts.token.provider.TokenReference;
 
@@ -29,9 +31,11 @@ public class TokenRenewerResponse {
 
     private Element token;
     private String tokenId;
-    private long lifetime;
     private TokenReference attachedReference;
     private TokenReference unAttachedReference;
+    private Date created;
+    private Date expires;
+    private long lifetime;
     
     /**
      * Set the token
@@ -66,22 +70,6 @@ public class TokenRenewerResponse {
     }
     
     /**
-     * Set the lifetime of the Token to be returned in seconds
-     * @param lifetime the lifetime of the Token to be returned in seconds
-     */
-    public void setLifetime(long lifetime) {
-        this.lifetime = lifetime;
-    }
-    
-    /**
-     * Get the lifetime of the Token to be returned in seconds
-     * @return the lifetime of the Token to be returned in seconds
-     */
-    public long getLifetime() {
-        return lifetime;
-    }
-    
-    /**
      * Set the attached TokenReference
      * @param attachtedReference the attached TokenReference
      */
@@ -113,5 +101,54 @@ public class TokenRenewerResponse {
         return unAttachedReference;
     }
 
+    /**
+     * Get the Date that this Token was Created 
+     * @return the Date that this Token was Created 
+     */
+    public Date getCreated() {
+        return created;
+    }
+
+    /**
+     * Set the Date that this Token was Created 
+     * @param created the Date that this Token was Created
+     */
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    /**
+     * Get the Date that this Token expires
+     * @return the Date that this Token expires
+     */
+    public Date getExpires() {
+        return expires;
+    }
+
+    /**
+     * Set the Date that this Token expires
+     * @param expires the Date that this Token expires
+     */
+    public void setExpires(Date expires) {
+        this.expires = expires;
+    }
+    
+    /**
+     * Set the lifetime of the Token to be returned in seconds.
+     * @deprecated use setCreated/setExpires instead
+     * @param lifetime the lifetime of the Token to be returned in seconds
+     */
+    public void setLifetime(long lifetime) {
+        this.lifetime = lifetime;
+    }
+
+    /**
+     * Get the lifetime of the Token to be returned in seconds
+     * @deprecated use getCreated/getExpires instead
+     * @return the lifetime of the Token to be returned in seconds
+     */
+    public long getLifetime() {
+        return lifetime;
+    }
     
 }

@@ -178,17 +178,15 @@ public class SAMLTokenProvider implements TokenProvider {
             
             DateTime validFrom = null;
             DateTime validTill = null;
-            long lifetime = 0;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 validFrom = assertion.getSaml2().getConditions().getNotBefore();
                 validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-                lifetime = validTill.getMillis() - validFrom.getMillis();
             } else {
                 validFrom = assertion.getSaml1().getConditions().getNotBefore();
                 validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-                lifetime = validTill.getMillis() - validFrom.getMillis();
             }
-            response.setLifetime(lifetime / 1000);
+            response.setCreated(validFrom.toDate());
+            response.setExpires(validTill.toDate());
             
             response.setEntropy(entropyBytes);
             if (keySize > 0) {
