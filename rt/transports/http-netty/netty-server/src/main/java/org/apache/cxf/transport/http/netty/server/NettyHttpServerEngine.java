@@ -30,6 +30,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.HttpUriMapper;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -135,7 +136,9 @@ public class NettyHttpServerEngine implements ServerEngine {
     protected Channel startServer() {
           
         final ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class);
+        bootstrap.group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .option(ChannelOption.SO_REUSEADDR, true);
                 
         // Set up the idle handler
         IdleStateHandler idleStateHandler = 
