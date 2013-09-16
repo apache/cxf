@@ -38,6 +38,8 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 public final class Client {
 
+    private static final String WSSE_NS 
+        = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     private static final String WSU_NS
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
 
@@ -66,7 +68,7 @@ public final class Client {
             outProps.put("encryptionPropFile", "etc/Client_Encrypt.properties");
             outProps.put("encryptionKeyIdentifier", "IssuerSerial");
             outProps.put("encryptionParts",
-                         "{Element}{" + WSU_NS + "}Timestamp;"
+                         "{Element}{" + WSSE_NS + "}UsernameToken;"
                          + "{Content}{http://schemas.xmlsoap.org/soap/envelope/}Body");
 
             outProps.put("signaturePropFile", "etc/Client_Sign.properties");
