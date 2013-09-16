@@ -95,13 +95,10 @@
         </fileSet>
         <fileSet>
             <directory>target/additional-libs</directory>
-            <outputDirectory>apache-cxf-${cxf.version}/modules/integration</outputDirectory>
+            <outputDirectory>apache-cxf-${cxf.version}/lib/integration</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
-            <excludes>
-                <exclude>cxf-bundle*.jar</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>target/libs/endorsed</directory>
@@ -113,13 +110,6 @@
         <fileSet>
             <directory>manifest/target</directory>
             <outputDirectory>apache-cxf-${cxf.version}/lib</outputDirectory>
-            <includes>
-                <include>**/cxf-manifest.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>manifest/target</directory>
-            <outputDirectory>apache-cxf-${cxf.version}/modules</outputDirectory>
             <includes>
                 <include>**/cxf-manifest.jar</include>
             </includes>
@@ -152,34 +142,8 @@
         <dependencySet>
             <outputDirectory>apache-cxf-${cxf.version}/lib</outputDirectory>
             <unpack>false</unpack>
-            <excludes>
-                <exclude>org.apache.cxf:*</exclude>
-            </excludes>
             <scope>runtime</scope>
         </dependencySet>
-        <dependencySet>
-            <outputDirectory>apache-cxf-${cxf.version}/modules</outputDirectory>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.apache.cxf:*</include>
-                <include>org.apache.cxf.xjcplugins:*</include>
-                <include>org.apache.cxf.services.*:*</include>
-            </includes>
-            <excludes>
-                <exclude>org.apache.cxf:cxf-bundle*</exclude>
-            </excludes>
-            <scope>runtime</scope>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>apache-cxf-${cxf.version}/lib</outputDirectory>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.apache.cxf:cxf-bundle</include>
-            </includes>
-            <scope>runtime</scope>
-            <outputFileNameMapping>cxf-${version}.jar</outputFileNameMapping>
-        </dependencySet>
-
     </dependencySets>
 
 </assembly>

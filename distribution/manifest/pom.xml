@@ -318,11 +318,6 @@
             <artifactId>cxf-rt-javascript</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-bundle</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- services jars -->
         <dependency>
