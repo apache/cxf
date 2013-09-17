@@ -197,6 +197,9 @@ public class WrappedMessageContext implements MessageContext {
     public Object get(Object key) {
         String mappedkey = mapKey((String)key);
         Object ret = message.get(mappedkey);
+        if (MessageContext.HTTP_REQUEST_METHOD.equals(key) && isRequestor()) {
+            return null;
+        }
         if (ret == null) {
             if (Message.class.getName().equals(mappedkey)) {
                 return message;
@@ -298,6 +301,7 @@ public class WrappedMessageContext implements MessageContext {
                 ret = reqMessage.get(mappedkey);
             }
         }
+        System.out.println(key + ": " + ret);
         return ret;
     }
     
