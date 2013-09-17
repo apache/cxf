@@ -188,7 +188,7 @@ public class LoggerListener implements STSEventListener {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
             }
             writeLog(map);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.log(Level.WARNING, "Failed to capture or write logging details", ex);
         }
     }
@@ -229,7 +229,7 @@ public class LoggerListener implements STSEventListener {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
             }
             writeLog(map);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.log(Level.WARNING, "Failed to capture or write logging details", ex);
         }        
     }
@@ -270,7 +270,7 @@ public class LoggerListener implements STSEventListener {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
             }
             writeLog(map);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.log(Level.WARNING, "Failed to capture or write logging details", ex);
         }        
     }
@@ -311,7 +311,7 @@ public class LoggerListener implements STSEventListener {
                 map.put(KEYS.STATUS.name(), "SUCCESS");
             }
             writeLog(map);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.log(Level.WARNING, "Failed to capture or write logging details", ex);
         }        
     }
@@ -357,8 +357,8 @@ public class LoggerListener implements STSEventListener {
         this.dateFormat = new SimpleDateFormat(format);
     }
 
-    public Level getLogLevel() {
-        return logLevel;
+    public String getLogLevel() {
+        return logLevel.getName();
     }
 
     public void setLogLevel(String logLevel) {
