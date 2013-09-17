@@ -271,6 +271,12 @@ public final class JAXBEncoderDecoder {
     }
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static JAXBElement<?> newJAXBElement(QName elName, Class<?> cls, Object mObj) {
+        if (mObj instanceof JAXBElement) {
+            return (JAXBElement)mObj;
+        }
+        if (cls == null && mObj != null) {
+            cls = mObj.getClass();
+        }
         return new JAXBElement(elName, cls, mObj);
     }
 
