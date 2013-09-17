@@ -144,6 +144,7 @@
                             org.apache.cxf.sts.*;version=${project.version}
                         </Export-Package>
                         <Import-Package>
+                        	javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
                             org.apache.cxf.sts.provider.*;version=${project.version},
                             !org.apache.cxf.sts.*,
                             org.apache.cxf.*;version=${project.version},
