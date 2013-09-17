@@ -1456,11 +1456,12 @@ public class WadlGenerator implements ContainerRequestFilter {
                                                     UriInfo ui) {
             Map<String, String> nsMap = Collections.singletonMap("xs", Constants.URI_2001_SCHEMA_XSD);
             String[] locations = source.getValues("/*/xs:" + elementName + "/@schemaLocation", nsMap);
+            
+            Map<String, String> locs = new HashMap<String, String>();
             if (locations == null) {
-                return Collections.emptyMap();
+                return locs;
             }
 
-            Map<String, String> locs = new HashMap<String, String>();
             for (String loc : locations) {
                 try {
                     URI uri = URI.create(loc);
