@@ -301,7 +301,6 @@ public class WrappedMessageContext implements MessageContext {
                 ret = reqMessage.get(mappedkey);
             }
         }
-        System.out.println(key + ": " + ret);
         return ret;
     }
     
