@@ -1399,11 +1399,12 @@ public class WadlGenerator implements RequestHandler {
                                                     UriInfo ui) {
             Map<String, String> nsMap = Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
             String[] locations = source.getValues("/*/xs:" + elementName + "/@schemaLocation", nsMap);
-            if (locations == null) {
-                return Collections.emptyMap();
-            }
 
             Map<String, String> locs = new HashMap<String, String>();
+            if (locations == null) {
+                return locs;
+            }
+
             for (String loc : locations) {
                 try {
                     URI uri = URI.create(loc);
