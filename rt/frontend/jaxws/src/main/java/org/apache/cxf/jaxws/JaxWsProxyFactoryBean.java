@@ -119,7 +119,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     @Override
     protected Class<?>[] getImplementingClasses() {
         Class<?> cls = getClientFactoryBean().getServiceClass();
-        return new Class[] {BindingProvider.class, Closeable.class, cls};
+        return new Class[] {cls, BindingProvider.class, Closeable.class, Client.class};
     }
     
     /**
