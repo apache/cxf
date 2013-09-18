@@ -58,7 +58,7 @@ public class ProxyHelper {
         if (canSeeAllInterfaces(loader, interfaces)) {
             return loader;
         }
-        ProxyClassLoader combined = new ProxyClassLoader();
+        ProxyClassLoader combined = new ProxyClassLoader(interfaces);
         for (Class<?> currentInterface : interfaces) {
             combined.addLoader(currentInterface.getClassLoader());
         }
