@@ -22,8 +22,10 @@ package org.apache.cxf.jaxb.io;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +39,7 @@ import javax.xml.bind.attachment.AttachmentMarshaller;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
@@ -108,8 +111,13 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             }
             
             final Map<String, String> nspref = databinding.getDeclaredNamespaceMappings();
-            if (nspref != null) {
-                JAXBUtils.setNamespaceMapper(nspref, marshaller);
+            final Map<String, String> nsctxt = databinding.getContextualNamespaceMap();
+            // set the prefix mapper if either of the prefix map is configured
+            if (nspref != null || nsctxt != null) {
+                Object mapper = JAXBUtils.setNamespaceMapper(nspref != null ? nspref : nsctxt, marshaller);
+                if (nsctxt != null) {
+                    setContextualNamespaceDecls(mapper, nsctxt);
+                }
             }
             if (databinding.getMarshallerProperties() != null) {
                 for (Map.Entry<String, Object> propEntry 
@@ -145,6 +153,25 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         return marshaller;
     }
     
+    //REVISIT should this go into JAXBUtils?
+    private static void setContextualNamespaceDecls(Object mapper, Map<String, String> nsctxt) {
+        try {
+            Method m = ReflectionUtil.getDeclaredMethod(mapper.getClass(), 
+                                                        "setContextualNamespaceDecls", new Class<?>[]{String[].class});
+            String[] args = new String[nsctxt.size() * 2];
+            int ai = 0;
+            for (Entry<String, String> nsp : nsctxt.entrySet()) {
+                args[ai++] = nsp.getValue();
+                args[ai++] = nsp.getKey();
+            }
+            m.invoke(mapper, new Object[]{args});
+        } catch (Exception e) {
+            // ignore
+            LOG.log(Level.WARNING, "Failed to set the contextual namespace map", e);
+        }
+        
+    }
+
     public void write(Object obj, MessagePartInfo part, T output) {
         boolean honorJaxbAnnotation = honorJAXBAnnotations(part);
         if (part != null && !part.isElement() && part.getTypeClass() != null) {
