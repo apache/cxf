@@ -108,7 +108,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     }
     
     public void shutdown() {
-        allChannels.close().awaitUninterruptibly();
+        allChannels.close();
         watchdog.stopWatching();
         
     }

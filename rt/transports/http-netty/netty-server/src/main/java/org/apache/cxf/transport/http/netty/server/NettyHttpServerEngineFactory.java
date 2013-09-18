@@ -131,6 +131,9 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
         for (NettyHttpServerEngine engine : engines) {
             engine.shutdown();
         }
+        // The engine which is in shutdown status cannot be started anymore
+        portMap.clear();
+        threadingParametersMap.clear();
         tlsServerParametersMap.clear();
     }
 
