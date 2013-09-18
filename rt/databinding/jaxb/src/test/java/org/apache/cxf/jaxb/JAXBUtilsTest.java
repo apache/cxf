@@ -20,7 +20,16 @@
 package org.apache.cxf.jaxb;
 
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
 import org.apache.cxf.common.jaxb.JAXBUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.hello_world_soap_http.types.GreetMe;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -148,5 +157,32 @@ public class JAXBUtilsTest extends Assert {
         urn = "urn:cxf.apache.org:test.v4.6.4";
         pkg = JAXBUtils.namespaceURIToPackage(urn);
         assertEquals("org.apache.cxf.test_v4_6_4", pkg);       
+    }
+    
+    @Test
+    public void testSetNamespaceMapper() throws Exception {
+        JAXBContext ctx = JAXBContext.newInstance(GreetMe.class);
+        Marshaller marshaller = ctx.createMarshaller();
+        Map<String, String> nspref = new HashMap<String, String>();
+        nspref.put("http://cxf.apache.org/hello_world_soap_http/types", "x");
+        JAXBUtils.setNamespaceMapper(nspref, marshaller);
+        String mapperkey = null;
+        if (marshaller.getClass().getName().contains(".internal.")) {
+            mapperkey = "com.sun.xml.internal.bind.namespacePrefixMapper";
+        } else if (marshaller.getClass().getName().contains("com.sun")) {
+            mapperkey = "com.sun.xml.bind.namespacePrefixMapper";
+        } else if (marshaller.getClass().getName().contains("eclipse")) {
+            mapperkey = "eclipselink.namespace-prefix-mapper";
+        }
+        if (mapperkey != null) {
+            Object mapper = marshaller.getProperty(mapperkey);
+            assertNotNull(mapper);
+            
+            // also verify this mapper has setContextualNamespaceDecls
+            Method m = ReflectionUtil.getDeclaredMethod(mapper.getClass(), 
+                                                        "setContextualNamespaceDecls", new Class<?>[]{String[].class});
+            assertNotNull(m);
+        }
+        
     }
 }
