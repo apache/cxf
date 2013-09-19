@@ -217,8 +217,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * username is available and then get a passowrd.
                  */
                 if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0
-                        && (reqData.getUsername() == null
-                        || reqData.getUsername().equals(""))) {
+                        && (reqData.getUsername() == null || reqData.getUsername().equals(""))
+                        && (String)getOption(WSHandlerConstants.SIGNATURE_USER) == null) {
                     /*
                      * We need a username - if none throw an SoapFault. For
                      * encryption there is a specific parameter to get a username.

@@ -117,7 +117,7 @@
                <constructor-arg>
                    <map>
                         <entry key="action" value="Signature Timestamp"/> 
-                        <entry key="user" value="alice"/>
+                        <entry key="signatureUser" value="alice"/>
                         <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
                         <entry key="signatureKeyIdentifier" value="DirectReference"/>
                         <entry key="signatureParts"

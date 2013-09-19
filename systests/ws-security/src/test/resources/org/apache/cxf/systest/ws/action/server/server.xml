@@ -135,7 +135,7 @@
                <constructor-arg>
                    <map>
                         <entry key="action" value="Signature"/> 
-                        <entry key="user" value="bob"/> 
+                        <entry key="signatureUser" value="bob"/> 
                         <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
                         <entry key="signatureKeyIdentifier" value="DirectReference"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
