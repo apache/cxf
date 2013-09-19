@@ -157,4 +157,38 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="SignedTimestamp"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSignedTimestamp" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSignedTimestampPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Signature"/> 
+                        <entry key="user" value="bob"/> 
+                        <entry key="signaturePropFile" value="bob.properties"/>
+                        <entry key="signatureKeyIdentifier" value="DirectReference"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Signature Timestamp"/> 
+                        <entry key="signatureVerificationPropFile" value="bob.properties"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
+     
+    </jaxws:endpoint> 
+    
 </beans>

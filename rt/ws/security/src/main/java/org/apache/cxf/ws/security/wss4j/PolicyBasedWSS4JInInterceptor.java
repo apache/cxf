@@ -322,6 +322,42 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return action;
     }
     
+    /**
+     * Is a Nonce Cache required, i.e. are we expecting a UsernameToken
+     */
+    @Override
+    protected boolean isNonceCacheRequired(int doAction, SoapMessage msg) {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+            
+            if (!ais.isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
+     */
+    @Override
+    protected boolean isTimestampCacheRequired(int doAction, SoapMessage msg) {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
+            
+            if (!ais.isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     private void checkUsernameToken(
         AssertionInfoMap aim, SoapMessage message
     ) throws WSSecurityException {
