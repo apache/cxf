@@ -26,8 +26,11 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.action.server.Server;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -117,4 +120,76 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testUsernameTokenReplay() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        Client cxfClient = ClientProxy.getClient(port);
+        SecurityHeaderCacheInterceptor cacheInterceptor =
+            new SecurityHeaderCacheInterceptor();
+        cxfClient.getOutInterceptors().add(cacheInterceptor);
+        
+        // Make two invocations with the same UsernameToken
+        port.doubleIt(25);
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on a replayed UsernameToken");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "A replay attack has been detected";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSignedTimestampReplay() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedTimestampPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        Client cxfClient = ClientProxy.getClient(port);
+        SecurityHeaderCacheInterceptor cacheInterceptor =
+            new SecurityHeaderCacheInterceptor();
+        cxfClient.getOutInterceptors().add(cacheInterceptor);
+        
+        // Make two invocations with the same SecurityHeader
+        port.doubleIt(25);
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on a replayed Timestamp");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "A replay attack has been detected";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
 }

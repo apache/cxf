@@ -249,17 +249,22 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
             
             // Configure replay caching
-            ReplayCache nonceCache = 
-                getReplayCache(
-                    msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
-                );
-            reqData.setNonceReplayCache(nonceCache);
-            ReplayCache timestampCache = 
-                getReplayCache(
-                    msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
-                );
-            reqData.setTimestampReplayCache(timestampCache);
-
+            if (isNonceCacheRequired(doAction, msg)) {
+                ReplayCache nonceCache = 
+                    getReplayCache(
+                        msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
+                    );
+                reqData.setNonceReplayCache(nonceCache);
+            }
+            
+            if (isTimestampCacheRequired(doAction, msg)) {
+                ReplayCache timestampCache = 
+                    getReplayCache(
+                        msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
+                    );
+                reqData.setTimestampReplayCache(timestampCache);
+            }
+            
             /*
              * Get and check the Signature specific parameters first because
              * they may be used for encryption too.
@@ -430,6 +435,27 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         if (sigCrypto != null) {
             reqData.setSigCrypto(sigCrypto);
         }
+    }
+    
+    /**
+     * Is a Nonce Cache required, i.e. are we expecting a UsernameToken 
+     */
+    protected boolean isNonceCacheRequired(int doAction, SoapMessage msg) {
+        if ((doAction & WSConstants.UT) == WSConstants.UT
+            || (doAction & WSConstants.UT_NOPASSWORD) == WSConstants.UT_NOPASSWORD) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
+     */
+    protected boolean isTimestampCacheRequired(int doAction, SoapMessage msg) {
+        if ((doAction & WSConstants.TS) == WSConstants.TS) {
+            return true;
+        }
+        return false;
     }
     
     /**

@@ -81,4 +81,62 @@
        </jaxws:outInterceptors>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedPasswordPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Encrypt"/> 
+                        <entry key="passwordCallbackClass" 
+                               value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="encryptionPropFile" value="bob-enc.properties"/>
+                        <entry key="encryptionUser" value="bob"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Encrypt"/> 
+                        <entry key="passwordCallbackClass" 
+                               value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                        <entry key="decryptionPropFile" value="alice-enc.properties"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignedTimestampPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Signature Timestamp"/> 
+                        <entry key="user" value="alice"/>
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+                        <entry key="signatureKeyIdentifier" value="DirectReference"/>
+                        <entry key="signatureParts"
+                               value="{}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{}{http://schemas.xmlsoap.org/soap/envelope/}Body;" />
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="Signature"/> 
+                        <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
+    </jaxws:client>
+    
 </beans>
