@@ -408,6 +408,42 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         super.configureProperties(msg);
     }
     
+    /**
+     * Is a Nonce Cache required, i.e. are we expecting a UsernameToken 
+     */
+    @Override
+    protected boolean isNonceCacheRequired(SoapMessage msg) {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+            
+            if (!ais.isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
+     */
+    @Override
+    protected boolean isTimestampCacheRequired(SoapMessage msg) {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.INCLUDE_TIMESTAMP);
+            
+            if (!ais.isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     @Override
     protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
