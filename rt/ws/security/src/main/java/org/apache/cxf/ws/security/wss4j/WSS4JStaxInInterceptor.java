@@ -235,6 +235,31 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             }
         }
         
+        ReplayCache samlCache = null;
+        if (isSamlCacheRequired(msg)) {
+            samlCache = WSS4JUtils.getReplayCache(
+                msg, SecurityConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, 
+                SecurityConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE
+            );
+        }
+        if (samlCache == null) {
+            if (config != null) {
+                config.put(ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, "false");
+                config.remove(ConfigurationConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE);
+            } else {
+                securityProperties.setEnableSamlOneTimeUseReplayCache(false);
+                securityProperties.setSamlOneTimeUseReplayCache(null);
+            }
+        } else {
+            if (config != null) {
+                config.put(ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, "true");
+                config.put(ConfigurationConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE, samlCache);
+            } else {
+                securityProperties.setEnableSamlOneTimeUseReplayCache(true);
+                securityProperties.setSamlOneTimeUseReplayCache(samlCache);
+            }
+        }
+        
         boolean enableRevocation = 
             MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
         if (securityProperties != null) {
@@ -312,6 +337,27 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         } else if (actions != null && actions.contains(ConfigurationConstants.TIMESTAMP)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Is a SAML Cache required, i.e. are we expecting a SAML Token 
+     */
+    protected boolean isSamlCacheRequired(SoapMessage msg) {
+        WSSSecurityProperties securityProperties = getSecurityProperties();
+        
+        if (securityProperties != null && securityProperties.getOutAction() != null) {
+            for (WSSConstants.Action action : securityProperties.getOutAction()) {
+                if (action == WSSConstants.SAML_TOKEN_UNSIGNED 
+                    || action == WSSConstants.SAML_TOKEN_SIGNED) {
+                    return true;
+                }
+            }
+        } else if (actions != null && (actions.contains(ConfigurationConstants.SAML_TOKEN_UNSIGNED)
+            || actions.contains(ConfigurationConstants.SAML_TOKEN_SIGNED))) {
             return true;
         }
         

@@ -444,6 +444,24 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         return false;
     }
     
+    /**
+     * Is a SAML Cache required, i.e. are we expecting a SAML Token 
+     */
+    @Override
+    protected boolean isSamlCacheRequired(SoapMessage msg) {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+            
+            if (!ais.isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     @Override
     protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
