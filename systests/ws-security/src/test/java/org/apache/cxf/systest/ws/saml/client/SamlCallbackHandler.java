@@ -33,6 +33,7 @@ import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.saml.ext.SAMLCallback;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
+import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
@@ -47,6 +48,7 @@ public class SamlCallbackHandler implements CallbackHandler {
     private boolean saml2 = true;
     private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     private CERT_IDENTIFIER keyInfoIdentifier = CERT_IDENTIFIER.X509_CERT;
+    private ConditionsBean conditions;
     
     public SamlCallbackHandler() {
         //
@@ -73,6 +75,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 } else {
                     callback.setSamlVersion(SAMLVersion.VERSION_11);
                 }
+                if (conditions != null) {
+                    callback.setConditions(conditions);
+                }
+
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
                 String subjectQualifier = "www.mock-sts.com";
@@ -127,6 +133,14 @@ public class SamlCallbackHandler implements CallbackHandler {
         }
         
         return keyInfo;
+    }
+
+    public ConditionsBean getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(ConditionsBean conditions) {
+        this.conditions = conditions;
     }
     
 }

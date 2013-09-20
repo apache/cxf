@@ -27,13 +27,17 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlElementCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
+import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -752,5 +756,66 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
-    
+   
+    @org.junit.Test
+    public void testSaml2Replay() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT2);
+
+        // Create a SAML Token with no "OneTimeUse" Condition
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        );
+        
+        Client cxfClient = ClientProxy.getClient(saml2Port);
+        SecurityHeaderCacheInterceptor cacheInterceptor =
+            new SecurityHeaderCacheInterceptor();
+        cxfClient.getOutInterceptors().add(cacheInterceptor);
+        
+        // Make two invocations...should succeed
+        saml2Port.doubleIt(25);
+        saml2Port.doubleIt(25);
+        
+        // Now create a SAML Token with a "OneTimeUse" Condition
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        conditions.setOneTimeUse(true);
+            
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConditions(conditions);
+        
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
+        );
+        
+        cxfClient.getOutInterceptors().remove(cacheInterceptor);
+        cacheInterceptor = new SecurityHeaderCacheInterceptor();
+        cxfClient.getOutInterceptors().add(cacheInterceptor);
+        
+        // Make two invocations...should fail on the second one
+        saml2Port.doubleIt(25);
+        
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected on a replayed SAML Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "A replay attack has been detected";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
 }
