@@ -53,6 +53,7 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -167,7 +168,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         boolean cacheIssuedToken = 
                             MessageUtils.getContextualBoolean(
                                 message, SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true
-                            );
+                            ) && !isOneTimeUse(tok);
                         if (cacheIssuedToken) {
                             message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN, tok);
                             message.getExchange().put(SecurityConstants.TOKEN, tok);
@@ -203,6 +204,27 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 return null;
             }
             return (Trust13)ais.iterator().next().getAssertion();
+        }
+        
+        // Check to see if the received token is a SAML2 Token with "OneTimeUse" set. If so,
+        // it should not be cached on the endpoint, but only on the message.
+        private boolean isOneTimeUse(SecurityToken issuedToken) {
+            Element token = issuedToken.getToken();
+            if (token != null && "Assertion".equals(token.getLocalName())
+                && WSConstants.SAML2_NS.equals(token.getNamespaceURI())) {
+                try {
+                    SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
+                    
+                    if (assertion.getSaml2().getConditions() != null
+                        && assertion.getSaml2().getConditions().getOneTimeUse() != null) {
+                        return true;
+                    }
+                } catch (WSSecurityException ex) {
+                    throw new Fault(ex);
+                }
+            }
+            
+            return false;
         }
         
         private SecurityToken retrieveCachedToken(Message message) {

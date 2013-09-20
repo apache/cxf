@@ -358,6 +358,24 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return false;
     }
     
+    /**
+     * Is a SAML Cache required, i.e. are we expecting a SAML Token 
+     */
+    @Override
+    protected boolean isSamlCacheRequired(int doAction, SoapMessage msg) {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+            
+            if (!ais.isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     private void checkUsernameToken(
         AssertionInfoMap aim, SoapMessage message
     ) throws WSSecurityException {

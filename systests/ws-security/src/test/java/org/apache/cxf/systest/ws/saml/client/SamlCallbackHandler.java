@@ -34,6 +34,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
@@ -49,6 +50,7 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     private CERT_IDENTIFIER keyInfoIdentifier = CERT_IDENTIFIER.X509_CERT;
     private boolean signAssertion;
+    private ConditionsBean conditions;
     
     public SamlCallbackHandler() {
         //
@@ -80,6 +82,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                 } else {
                     callback.setSamlVersion(SAMLVersion.VERSION_11);
                 }
+                if (conditions != null) {
+                    callback.setConditions(conditions);
+                }
+
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
                 String subjectQualifier = "www.mock-sts.com";
@@ -153,6 +159,14 @@ public class SamlCallbackHandler implements CallbackHandler {
 
     public void setSignAssertion(boolean signAssertion) {
         this.signAssertion = signAssertion;
+    }
+
+    public ConditionsBean getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(ConditionsBean conditions) {
+        this.conditions = conditions;
     }
     
 }
