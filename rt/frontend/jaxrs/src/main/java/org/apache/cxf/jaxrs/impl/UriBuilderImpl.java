@@ -425,11 +425,16 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         builder.schemeSpecificPart = schemeSpecificPart;
         builder.leadingSlash = leadingSlash;
         builder.originalPathEmpty = originalPathEmpty;
+        builder.resolvedEncodedTemplates = 
+            resolvedEncodedTemplates == null ? null : new HashMap<String, Object>(resolvedEncodedTemplates);
+        builder.resolvedTemplates = 
+            resolvedTemplates == null ? null : new HashMap<String, Object>(resolvedTemplates);
+        builder.resolvedTemplatesPathEnc = 
+            resolvedTemplatesPathEnc == null ? null : new HashMap<String, Object>(resolvedTemplatesPathEnc);
         return builder;
     }
-
     // CHECKSTYLE:ON
-
+    
     @Override
     public UriBuilder fragment(String theFragment) throws IllegalArgumentException {
         this.fragment = theFragment;
@@ -469,15 +474,24 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         if (method == null) {
             throw new IllegalArgumentException("method is null");
         }
+        Path foundAnn = null;
         for (Method meth : resource.getMethods()) {
             if (meth.getName().equals(method)) {
                 Path ann = meth.getAnnotation(Path.class);
-                String path = ann == null ? "" : ann.value();
-                return path(resource).path(path);
+                if (foundAnn != null && ann != null) {
+                    throw new IllegalArgumentException("Multiple Path annotations for '" + method
+                        + "' overloaded method");
+                }
+                foundAnn = ann;
             }
         }
-        throw new IllegalArgumentException("No Path annotation for '" + method + "' method");
+        if (foundAnn == null) {
+            throw new IllegalArgumentException("No Path annotation for '" + method + "' method");
+        }
+        // path(String) decomposes multi-segment path when necessary
+        return path(foundAnn.value());
     }
+    
 
     @Override
     public UriBuilder path(Method method) throws IllegalArgumentException {

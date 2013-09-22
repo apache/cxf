@@ -25,7 +25,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.resources.Book;
@@ -784,7 +788,8 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testAddPathClassMethod() throws Exception {
         URI uri = new URI("http://foo/");
-        URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class, "updateBook").path("bar").build();
+        URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class)
+            .path(BookStore.class, "updateBook").path("bar").build();
         assertEquals("URI is not built correctly", new URI("http://foo/bookstore/books/bar"), newUri);
     }
 
@@ -1562,5 +1567,34 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(expected, uri.toString());
     }
     
+    @Test
+    public void testFromMethod() {
+        URI uri = UriBuilder.fromMethod(TestPath.class, "headSub").build();
+        assertEquals(uri.toString(), "/sub");
+    }
     
+    @Path(value = "/TestPath")
+    public static class TestPath {
+
+        @GET
+        public Response getPlain() {
+            return Response.ok().build();
+        }
+
+        @Path(value = "/sub")
+        public Response headSub() {
+            return Response.ok().build();
+        }
+
+        @Path(value = "sub1")
+        public Response test1() {
+            return Response.ok().build();
+        }
+
+        @Path(value = "/sub2")
+        public Response test1(@QueryParam("testName") String test) {
+            return Response.ok(test).build();
+        }
+        
+    }
 }
