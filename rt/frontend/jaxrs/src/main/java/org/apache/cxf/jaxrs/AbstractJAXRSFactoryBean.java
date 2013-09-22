@@ -130,6 +130,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             if (df == null) {
                 DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);
                 df = dfm.getDestinationFactoryForUri(getAddress());
+                super.setDestinationFactory(df);
             }
 
             if (df != null) {
