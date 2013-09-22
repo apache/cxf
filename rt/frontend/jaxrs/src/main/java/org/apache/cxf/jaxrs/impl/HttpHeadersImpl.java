@@ -90,7 +90,10 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (lValues == null || lValues.isEmpty() || lValues.get(0) == null) {
             return Collections.singletonList(MediaType.WILDCARD_TYPE);
         }
-        List<MediaType> mediaTypes = JAXRSUtils.parseMediaTypes(lValues.get(0));
+        List<MediaType> mediaTypes = new LinkedList<MediaType>();
+        for (String value : lValues) {
+            mediaTypes.addAll(JAXRSUtils.parseMediaTypes(value));
+        }
         sortMediaTypesUsingQualityFactor(mediaTypes); 
         return mediaTypes;
     }
@@ -216,7 +219,11 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (HttpUtils.isDateRelatedHeader(headerName)) {
             return values;
         }
-        return getHeaderValues(headerName, values.get(0));
+        List<String> actualValues = new LinkedList<String>();
+        for (String v : values) {
+            actualValues.addAll(getHeaderValues(headerName, v));
+        }
+        return actualValues;
     }
     
     private List<String> getHeaderValues(String headerName, String originalValue) {

@@ -243,6 +243,19 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
+    public void testGetHeader2() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        HttpHeaders h = new HttpHeadersImpl(m);
+        
+        List<String> values = h.getRequestHeader("a");
+        assertEquals(2, values.size());
+        assertEquals("1", values.get(0));
+        assertEquals("2", values.get(1));
+    }
+    
+    @Test
     public void testGetMediaTypes() throws Exception {
         
         Message m = control.createMock(Message.class);
@@ -416,7 +429,8 @@ public class HttpHeadersImplTest extends Assert {
         
     private MetadataMap<String, String> createHeaders() {
         MetadataMap<String, String> hs = new MetadataMap<String, String>();
-        hs.putSingle("Accept", "text/bar;q=0.6,text/*;q=1,application/xml");
+        hs.add("Accept", "text/bar;q=0.6");
+        hs.add("Accept", "text/*;q=1,application/xml");
         hs.putSingle("Content-Type", "*/*");
         hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
         hs.putSingle("Content-Length", "10");
