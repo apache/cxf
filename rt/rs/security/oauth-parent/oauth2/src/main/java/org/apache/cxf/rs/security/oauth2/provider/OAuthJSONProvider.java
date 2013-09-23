@@ -169,12 +169,12 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             if (pair.length() == 0) {
                 continue;
             }
-            String[] entry = pair.split(":");
-            String key = entry[0].trim();
+            int index = pair.indexOf(":");
+            String key = pair.substring(0, index).trim();
             if (key.startsWith("\"") && key.endsWith("\"")) {
                 key = key.substring(1, key.length() - 1);
             }
-            String value = entry[1].trim();
+            String value = pair.substring(index + 1);
             if (value.startsWith("\"") && value.endsWith("\"")) {
                 value = value.substring(1, value.length() - 1);
             }
