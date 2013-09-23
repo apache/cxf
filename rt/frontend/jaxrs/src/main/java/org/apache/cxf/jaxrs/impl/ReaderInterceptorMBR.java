@@ -19,16 +19,21 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class ReaderInterceptorMBR implements ReaderInterceptor {
@@ -56,13 +61,15 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
         MediaType entityMt = c.getMediaType();
         Annotation[] entityAnns = c.getAnnotations();
         
-        if (m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
-            && !reader.isReadable(entityCls, entityType, entityAnns, entityMt)) {
+        if ((reader == null || m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
+            && !reader.isReadable(entityCls, entityType, entityAnns, entityMt)) 
+            && entityStreamAvailable(c.getInputStream())) {
             reader = ProviderFactory.getInstance(m)
                 .createMessageBodyReader(entityCls, entityType, entityAnns, entityMt, m);
-            if (reader == null) {
-                throw new RuntimeException("No reader available");
-            }
+        }
+        if (reader == null) {
+            String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_READER", entityCls, entityMt);
+            throw new ProcessingException(errorMessage);
         }
         
         
@@ -71,4 +78,8 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
                                c.getInputStream());
     }
 
+    private boolean entityStreamAvailable(InputStream entity) {
+        return entity != null || m.getContent(XMLStreamReader.class) != null
+            || m.getContent(Reader.class) != null;
+    }
 }

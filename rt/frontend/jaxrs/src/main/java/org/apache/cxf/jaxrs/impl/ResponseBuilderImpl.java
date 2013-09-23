@@ -237,9 +237,11 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     
     private ResponseBuilder addHeader(String name, Object... values) {
         if (values != null && values.length >= 1 && values[0] != null) {
+            boolean isAllowHeader = HttpHeaders.ALLOW.equals(name);
             for (Object value : values) {
-                if (!valueExists(name, value)) {
-                    metadata.add(name, value);
+                Object thevalue = isAllowHeader ? value.toString().toUpperCase() : value; 
+                if (!valueExists(name, thevalue)) {
+                    metadata.add(name, thevalue);
                 }
             }
         } else {

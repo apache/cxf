@@ -1282,6 +1282,7 @@ public final class JAXRSUtils {
                                          parameterAnnotations,
                                          type,
                                          m,
+                                         true,
                                          ori.getNameBindings());
             if (readers != null) {
                 try {
@@ -1304,11 +1305,7 @@ public final class JAXRSUtils {
             }
         }
 
-        String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
-                                                                     BUNDLE,
-                                                                     targetTypeClass.getSimpleName(),
-                                                                     mediaTypeToString(contentType)).toString();
-        LOG.warning(errorMessage);
+        logMessageHandlerProblem("NO_MSG_READER", targetTypeClass, contentType);
         throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
     }
     
@@ -1373,7 +1370,7 @@ public final class JAXRSUtils {
                     httpHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
                 }
             }
-            HttpUtils.convertHeaderValuesToStringIfNeeded(httpHeaders);
+            HttpUtils.convertHeaderValuesToString(httpHeaders, true);
             writer.writeTo(entity, type, genericType, annotations, mediaType,
                            httpHeaders, 
                            entityStream);
@@ -1837,4 +1834,13 @@ public final class JAXRSUtils {
         Class<?> realClass = ori.getClassResourceInfo().getServiceClass();
         stack.push(new MethodInvocationInfo(ori, realClass, values));
     }
+    
+    public static String logMessageHandlerProblem(String name, Class<?> cls, MediaType ct) {
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message(name, BUNDLE, cls.getName(), mediaTypeToString(ct));
+        String errorMessage = errorMsg.toString();
+        LOG.severe(errorMessage);
+        return errorMessage;
+    }
+    
 }

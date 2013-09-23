@@ -606,7 +606,9 @@ public class ClientProxyImpl extends AbstractClient implements
         
         Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
                                            exchange, invocationContext, true);
-        
+        if (bodyIndex != -1) {
+            outMessage.put(Type.class, ori.getMethodToInvoke().getGenericParameterTypes()[bodyIndex]);
+        }
         outMessage.getExchange().setOneWay(ori.isOneway());
         outMessage.setContent(OperationResourceInfo.class, ori);
         setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
@@ -664,12 +666,12 @@ public class ClientProxyImpl extends AbstractClient implements
         throws Throwable {
         try {
             Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
-            ((ResponseImpl)r).setMessage(outMessage);
+            ((ResponseImpl)r).setOutMessage(outMessage);
             getState().setResponse(r);
             
             Method method = outMessage.getExchange().get(Method.class);
             checkResponse(method, r, outMessage);
-            if (method.getReturnType() == Void.class) { 
+            if (method.getReturnType() == Void.class || method.getReturnType() == void.class) { 
                 return null;
             }
             if (method.getReturnType() == Response.class

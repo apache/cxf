@@ -224,7 +224,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 responseHeaders.remove(HttpHeaders.CONTENT_TYPE);
                 message.remove(Message.CONTENT_TYPE);
             }
-            HttpUtils.convertHeaderValuesToStringIfNeeded(responseHeaders);
+            HttpUtils.convertHeaderValuesToString(responseHeaders, true);
             return;
         }
         
@@ -253,7 +253,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (writers == null || writers.isEmpty()) {
             message.put(Message.CONTENT_TYPE, "text/plain");
             message.put(Message.RESPONSE_CODE, 500);
-            writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType.getSimpleName());
+            writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType, responseMediaType);
             return;
         }
         responseMediaType = checkFinalContentType(responseMediaType, writers);
@@ -289,8 +289,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
         } catch (IOException ex) {
+            logWriteError(firstTry, targetType, responseMediaType);
             handleWriteException(providerFactory, message, ex, firstTry);
         } catch (Throwable ex) {
+            logWriteError(firstTry, targetType, responseMediaType);
             handleWriteException(providerFactory, message, ex, firstTry);
         }
     }
@@ -372,6 +374,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
+    private void logWriteError(boolean firstTry, Class<?> cls, MediaType ct) {
+        if (firstTry) {
+            JAXRSUtils.logMessageHandlerProblem("MSG_WRITER_PROBLEM", cls, ct);    
+        }
+    }
     
     private void handleWriteException(ServerProviderFactory pf,
                                       Message message, 
@@ -391,16 +398,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     
-    private void writeResponseErrorMessage(OutputStream out, String errorString, 
-                                           String parameter) {
+    private void writeResponseErrorMessage(OutputStream out, String name, Class<?> cls, MediaType ct) {
         try {
-            org.apache.cxf.common.i18n.Message message = 
-                new org.apache.cxf.common.i18n.Message(errorString,
-                                                   BUNDLE,
-                                                   parameter);
-            LOG.warning(message.toString());
+            String errorMessage = JAXRSUtils.logMessageHandlerProblem(name, cls, ct);
             if (out != null) {
-                out.write(message.toString().getBytes("UTF-8"));
+                out.write(errorMessage.getBytes("UTF-8"));
             }
         } catch (IOException another) {
             // ignore

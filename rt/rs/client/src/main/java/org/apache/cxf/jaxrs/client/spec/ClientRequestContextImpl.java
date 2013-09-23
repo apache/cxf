@@ -23,7 +23,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientRequestContext;
@@ -35,8 +34,9 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.impl.AbstractRequestContextImpl;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 
@@ -47,6 +47,15 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     public ClientRequestContextImpl(Message m,
                                     boolean responseContext) {
         super(m, responseContext);
+    }
+    
+    @Override
+    public MediaType getMediaType() {
+        if (!hasEntity()) {
+            return null;
+        }
+        Object mt = HttpUtils.getModifiableHeaders(m).getFirst(HttpHeaders.CONTENT_TYPE);
+        return mt instanceof MediaType ? (MediaType)mt : JAXRSUtils.toMediaType(mt.toString());
     }
     
     @Override
@@ -155,18 +164,16 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public MultivaluedMap<String, Object> getHeaders() {
         h = null;
-        return new MetadataMap<String, Object>(
-            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);    
-
+        return HttpUtils.getModifiableHeaders(m);
     }
 
     @Override
     public MultivaluedMap<String, String> getStringHeaders() {
-        return h.getRequestHeaders();
+        h = null;
+        return HttpUtils.getModifiableStringHeaders(m);
     }
 
 }

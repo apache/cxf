@@ -19,15 +19,13 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.AbstractResponseContextImpl;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public class ClientResponseContextImpl extends AbstractResponseContextImpl 
@@ -39,23 +37,28 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     }
     
     public InputStream getEntityStream() {
-        return m.getContent(InputStream.class);
+        InputStream is = m.getContent(InputStream.class);
+        if (is == null) {
+            is = ((ResponseImpl)r).convertEntityToStreamIfPossible();
+        }
+        return is;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public MultivaluedMap<String, String> getHeaders() {
-        Object headers = m.get(Message.PROTOCOL_HEADERS);
-        if (headers != null) {
-            return new MetadataMap<String, String>((Map<String, List<String>>)headers, false, false, true);
-        }
-        return (MultivaluedMap<String, String>)(MultivaluedMap<?, ?>)r.getHeaders();
+        return HttpUtils.getModifiableStringHeaders(m);
     }
 
     
     @Override
     public void setEntityStream(InputStream is) {
         m.setContent(InputStream.class, is);
+        r.setEntity(is, r.getEntityAnnotations());
 
+    }
+    
+    @Override
+    public boolean hasEntity() { 
+        return getEntityStream() != null;
     }
 }

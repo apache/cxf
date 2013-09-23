@@ -98,7 +98,7 @@ public class ResponseImplTest extends Assert {
         headers.putSingle("Content-Type", "text/xml");
         r.addMetadata(headers);
         r.setEntity(new ByteArrayInputStream(content.getBytes()), null);
-        r.setMessage(createMessage());
+        r.setOutMessage(createMessage());
         r.bufferEntity();
         return r.readEntity(Source.class);
     }

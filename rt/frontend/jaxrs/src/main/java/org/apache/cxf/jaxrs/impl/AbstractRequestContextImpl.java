@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl {
@@ -43,7 +44,7 @@ public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl 
     
     public void abortWith(Response response) {
         checkContext();
-        m.getExchange().put(Response.class, response);
+        m.getExchange().put(Response.class, JAXRSUtils.copyResponseIfNeeded(response));
     }
 
     public List<Locale> getAcceptableLanguages() {

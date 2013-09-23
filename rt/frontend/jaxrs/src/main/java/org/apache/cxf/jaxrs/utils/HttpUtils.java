@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -48,7 +49,9 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -192,23 +195,68 @@ public final class HttpUtils {
         return Headers.toHttpDate(date);
     }
     
-    public static void convertHeaderValuesToStringIfNeeded(Map<String, List<Object>> headers) {
-        // In theory there could be custom RuntimeDelegates with custom header handlers
-        RuntimeDelegate rd = RuntimeDelegate.getInstance();
-        if (rd instanceof RuntimeDelegateImpl || rd == null) {
+    public static RuntimeDelegate getOtherRuntimeDelegate() {
+        try {
+            RuntimeDelegate rd = RuntimeDelegate.getInstance();
+            return rd instanceof RuntimeDelegateImpl ? null : rd;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+    
+    public static HeaderDelegate<Object> getHeaderDelegate(Object o) {
+        return getHeaderDelegate(getOtherRuntimeDelegate(), o);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static HeaderDelegate<Object> getHeaderDelegate(RuntimeDelegate rd, Object o) {
+        return rd == null ? null : (HeaderDelegate<Object>)rd.createHeaderDelegate(o.getClass());
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> MultivaluedMap<String, T> getModifiableStringHeaders(Message m) {
+        MultivaluedMap<String, Object> headers = getModifiableHeaders(m);
+        convertHeaderValuesToString(headers, false);
+        return (MultivaluedMap<String, T>)headers;
+    }
+    
+    public static MultivaluedMap<String, Object> getModifiableHeaders(Message m) {
+        Map<String, List<Object>> headers = CastUtils.cast((Map<?, ?>)m.get(Message.PROTOCOL_HEADERS));
+        return new MetadataMap<String, Object>(headers, false, false, true);
+    }
+    
+    public static void convertHeaderValuesToString(Map<String, List<Object>> headers, boolean delegateOnly) {
+        RuntimeDelegate rd = getOtherRuntimeDelegate();
+        if (rd == null && delegateOnly) {
             return;
         }
         for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
             List<Object> values = entry.getValue();
-            if (!values.isEmpty()) {
-                @SuppressWarnings("unchecked")
-                HeaderDelegate<Object> hd = 
-                    (HeaderDelegate<Object>)rd.createHeaderDelegate(values.get(0).getClass());
-                if (hd != null) {
-                    for (int i = 0; i < values.size(); i++) {
-                        values.set(i, hd.toString(values.get(i)));
+            for (int i = 0; i < values.size(); i++) {
+                Object value = values.get(i);
+                
+                if (value != null && !(value instanceof String)) {
+                
+                    HeaderDelegate<Object> hd = getHeaderDelegate(rd, value);
+                    
+                    if (hd != null) {
+                        value = hd.toString(value); 
+                    } else if (!delegateOnly) {
+                        value = value.toString();
                     }
+                    
+                    try {
+                        values.set(i, value);
+                    } catch (UnsupportedOperationException ex) {
+                        // this may happen if an unmodifiable List was set via Map put
+                        List<Object> newList = new ArrayList<Object>(values);
+                        newList.set(i, value);
+                        // Won't help if the map is unmodifiable in which case it is a bug anyway 
+                        headers.put(entry.getKey(), newList);
+                    }
+                
                 }
+                
             }
         }
         

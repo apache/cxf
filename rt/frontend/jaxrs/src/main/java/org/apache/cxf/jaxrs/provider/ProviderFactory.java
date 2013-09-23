@@ -350,16 +350,17 @@ public abstract class ProviderFactory {
                                                             Annotation[] parameterAnnotations,
                                                             MediaType mediaType,
                                                             Message m,
+                                                            boolean checkMbrNow,
                                                             Set<String> names) {
-        MessageBodyReader<T> mr = createMessageBodyReader(bodyType,
+        MessageBodyReader<T> mr = !checkMbrNow ? null : createMessageBodyReader(bodyType,
                                                       parameterType,
                                                       parameterAnnotations,
                                                       mediaType,
                                                       m);
-        if (mr != null) {
+        int size = readerInterceptors.size();
+        if (mr != null || size > 0) {
             ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, m.getExchange().getInMessage());
             
-            int size = readerInterceptors.size();
             List<ReaderInterceptor> interceptors = null;
             if (size > 0) {
                 interceptors = new ArrayList<ReaderInterceptor>(size + 1);
@@ -391,14 +392,14 @@ public abstract class ProviderFactory {
                                                       parameterAnnotations,
                                                       mediaType,
                                                       m);
-        if (mw != null) {
+        int size = writerInterceptors.size();
+        if (mw != null || size > 0) {
             
             @SuppressWarnings({
                 "unchecked", "rawtypes"
             })
             WriterInterceptor mbwWriter = new WriterInterceptorMBW((MessageBodyWriter)mw, m);
               
-            int size = writerInterceptors.size();
             List<WriterInterceptor> interceptors = null;
             if (size > 0) {
                 interceptors = new ArrayList<WriterInterceptor>(size + 1);

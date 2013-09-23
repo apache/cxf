@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -31,6 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -50,11 +50,9 @@ public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
         this.readers = readers;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public MultivaluedMap<String, String> getHeaders() {
-        return new MetadataMap<String, String>(
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);
+        return HttpUtils.getModifiableStringHeaders(m);
     }
 
     @Override

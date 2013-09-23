@@ -76,6 +76,7 @@ import org.apache.cxf.phase.Phase;
 public class WebClient extends AbstractClient {
     private static final String REQUEST_CLASS = "request.class";
     private static final String REQUEST_TYPE = "request.type";
+    private static final String REQUEST_ANNS = "request.annotations";
     private static final String RESPONSE_CLASS = "response.class";
     private static final String RESPONSE_TYPE = "response.type";
     
@@ -831,12 +832,7 @@ public class WebClient extends AbstractClient {
             responseClass, outGenericType);
     }
     
-    private static Type getGenericEntityType(GenericEntity<?> genericEntity, Type inGenericType) {
-        if (inGenericType != null && genericEntity.getType() != inGenericType) {
-            throw new IllegalArgumentException("Illegal type");    
-        }
-        return genericEntity.getType();
-    }
+    
     
     protected Response doInvoke(String httpMethod, 
                                 Object body, 
@@ -844,16 +840,25 @@ public class WebClient extends AbstractClient {
                                 Type inGenericType,
                                 Class<?> responseClass, 
                                 Type outGenericType) {
+        Annotation[] inAnns = null;
+        if (body instanceof Entity) {
+            Entity<?> entity = (Entity<?>)body;
+            setEntityHeaders(entity);
+            body = entity.getEntity();
+            requestClass = body.getClass();
+            inGenericType = body.getClass();
+            inAnns = entity.getAnnotations();
+        }
         if (body instanceof GenericEntity) {
             GenericEntity<?> genericEntity = (GenericEntity<?>)body;
             body = genericEntity.getEntity();
             requestClass = genericEntity.getRawType();
-            inGenericType = getGenericEntityType(genericEntity, inGenericType);
+            inGenericType = genericEntity.getType();
         }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
         Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
-                                         responseClass, outGenericType, null, null);
+                                         inAnns, responseClass, outGenericType, null, null);
         if (r.getStatus() >= 300 && responseClass != Response.class) {
             throw convertToWebApplicationException(r);
         }
@@ -911,19 +916,28 @@ public class WebClient extends AbstractClient {
                                           Class<?> respClass,
                                           Type outType,
                                           InvocationCallback<T> callback) {
+        Annotation[] inAnns = null;
+        if (body instanceof Entity) {
+            Entity<?> entity = (Entity<?>)body;
+            setEntityHeaders(entity);
+            body = entity.getEntity();
+            requestClass = body.getClass();
+            inType = body.getClass();
+            inAnns = entity.getAnnotations();
+        }
         
         if (body instanceof GenericEntity) {
             GenericEntity<?> genericEntity = (GenericEntity<?>)body;
             body = genericEntity.getEntity();
             requestClass = genericEntity.getRawType();
-            inType = getGenericEntityType(genericEntity, inType);
+            inType = genericEntity.getType();
         }
         
         MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
         resetResponse();
 
         Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
-                                    respClass, outType, null, null);
+                                    inAnns, respClass, outType, null, null);
         
         m.getExchange().setSynchronous(false);
         JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, respClass, outType);
@@ -1020,10 +1034,11 @@ public class WebClient extends AbstractClient {
         String httpMethod = (String)reqContext.get(Message.HTTP_REQUEST_METHOD);
         Class<?> requestClass = (Class<?>)reqContext.get(REQUEST_CLASS);
         Type inType = (Type)reqContext.get(REQUEST_TYPE);
+        Annotation[] inAnns = (Annotation[])reqContext.get(REQUEST_ANNS);
         Class<?> respClass = (Class<?>)reqContext.get(RESPONSE_CLASS);
         Type outType = (Type)reqContext.get(RESPONSE_TYPE);
         return doChainedInvocation(httpMethod, headers, body, requestClass, inType, 
-                                   respClass, outType, exchange, invContext);
+                                   inAnns, respClass, outType, exchange, invContext);
     }
     //CHECKSTYLE:OFF
     protected Response doChainedInvocation(String httpMethod, 
@@ -1031,13 +1046,14 @@ public class WebClient extends AbstractClient {
                                            Object body, 
                                            Class<?> requestClass,
                                            Type inType,
+                                           Annotation[] inAnns,
                                            Class<?> respClass, 
                                            Type outType,
                                            Exchange exchange,
                                            Map<String, Object> invContext) {
     //CHECKSTYLE:ON    
         Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
-                                    respClass, outType, exchange, invContext);
+                                    inAnns, respClass, outType, exchange, invContext);
         doRunInterceptorChain(m);
         return doResponse(m, respClass, outType);
     }
@@ -1048,6 +1064,7 @@ public class WebClient extends AbstractClient {
                                    Object body, 
                                    Class<?> requestClass,
                                    Type inGenericType,
+                                   Annotation[] inAnns,
                                    Class<?> responseClass, 
                                    Type outGenericType,
                                    Exchange exchange,
@@ -1056,15 +1073,19 @@ public class WebClient extends AbstractClient {
         URI uri = getCurrentURI();
         Message m = createMessage(body, httpMethod, headers, uri, exchange, 
                 invContext, false);
-        
+        if (inAnns != null) {
+            m.put(Annotation.class.getName(), inAnns);
+        }
         Map<String, Object> reqContext = getRequestContext(m);
         reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         reqContext.put(REQUEST_CLASS, requestClass);
         reqContext.put(REQUEST_TYPE, inGenericType);
+        reqContext.put(REQUEST_ANNS, inAnns);
         reqContext.put(RESPONSE_CLASS, responseClass);
         reqContext.put(RESPONSE_TYPE, outGenericType);
         
         if (body != null) {
+            m.put(Type.class, inGenericType);
             m.getInterceptorChain().add(new BodyWriter());
         }
         setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
@@ -1104,6 +1125,7 @@ public class WebClient extends AbstractClient {
         try {
             ResponseBuilder rb = setResponseBuilder(outMessage, outMessage.getExchange());
             Response currentResponse = rb.clone().build();
+            ((ResponseImpl)currentResponse).setOutMessage(outMessage);
             
             Object entity = readBody(currentResponse, outMessage, responseClass, genericType,
                                      new Annotation[]{});
@@ -1120,10 +1142,8 @@ public class WebClient extends AbstractClient {
                       ? ((Response)entity).getEntity() : entity);
             
             Response r = rb.build();
-            ((ResponseImpl)r).setMessage(outMessage);
-            
             getState().setResponse(r);
-            
+            ((ResponseImpl)r).setOutMessage(outMessage);
             return r;
         } catch (Throwable ex) {
             throw (ex instanceof ProcessingException) ? (ProcessingException)ex
@@ -1251,14 +1271,12 @@ public class WebClient extends AbstractClient {
     }
     
     private void setEntityHeaders(Entity<?> entity) {
-        if (entity != null) {
-            type(entity.getMediaType());
-            if (entity.getLanguage() != null) {
-                language(entity.getLanguage().toString());
-            }
-            if (entity.getEncoding() != null) {
-                encoding(entity.getEncoding());
-            }
+        type(entity.getMediaType());
+        if (entity.getLanguage() != null) {
+            language(entity.getLanguage().toString());
+        }
+        if (entity.getEncoding() != null) {
+            encoding(entity.getEncoding());
         }
     }
     
@@ -1422,28 +1440,25 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, Class<T> responseType) {
-            WebClient.this.setEntityHeaders(entity);
             return doInvokeAsync(name, 
-                                 entity == null ? null : entity.getEntity(), 
-                                 entity == null ? null : entity.getEntity().getClass(), 
+                                 entity, 
+                                 null, 
                                  null, responseType, responseType, null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-            WebClient.this.setEntityHeaders(entity);
             return doInvokeAsync(name, 
-                                 entity == null ? null : entity.getEntity(), 
-                                 entity == null ? null : entity.getEntity().getClass(), 
+                                 entity, 
+                                 null, 
                                  null, responseType.getRawType(), responseType.getType(), null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
-            WebClient.this.setEntityHeaders(entity);
             return doInvokeAsyncCallback(name, 
-                                         entity == null ? null : entity.getEntity(), 
-                                         entity == null ? null : entity.getEntity().getClass(),
+                                         entity, 
+                                         null,
                                          null, 
                                          callback);
         }
@@ -1570,18 +1585,12 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> T method(String method, Entity<?> entity, Class<T> cls) {
-            WebClient.this.setEntityHeaders(entity);
-            return invoke(method, 
-                          entity == null ? null : entity.getEntity(), 
-                          cls);
+            return invoke(method, entity, cls);
         }
 
         @Override
         public <T> T method(String method, Entity<?> entity, GenericType<T> genericType) {
-            WebClient.this.setEntityHeaders(entity);
-            return invoke(method, 
-                          entity == null ? null : entity.getEntity(), 
-                          genericType);
+            return invoke(method, entity, genericType);
         }
     }
 }

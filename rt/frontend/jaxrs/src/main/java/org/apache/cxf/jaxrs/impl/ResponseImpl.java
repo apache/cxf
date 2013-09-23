@@ -19,8 +19,10 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -47,8 +49,8 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -59,12 +61,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ResponseImpl extends Response {
+    
     private int status;
     private Object entity;
     private Annotation[] entityAnnotations; 
     private MultivaluedMap<String, Object> metadata;
     
-    private Message responseMessage;
+    private Message outMessage;
     private boolean entityClosed;    
     private boolean entityBufferred;
     private Object lastEntity;
@@ -78,7 +81,7 @@ public final class ResponseImpl extends Response {
         this.entity = e;
     }
     
-    void addMetadata(MultivaluedMap<String, Object> meta) { 
+    public void addMetadata(MultivaluedMap<String, Object> meta) { 
         this.metadata = meta;
     }
     
@@ -99,12 +102,12 @@ public final class ResponseImpl extends Response {
         return entityAnnotations;
     }
 
-    //TODO: This method is needed because on the client side the
-    // Response processing is done after the chain completes, thus
-    // PhaseInterceptorChain.getCurrentMessage() returns null.
-    // The refactoring will be required
-    public void setMessage(Message message) {
-        this.responseMessage = message;
+    public void setOutMessage(Message message) {
+        this.outMessage = message;
+    }
+    
+    public Message getOutMessage() {
+        return this.outMessage;
     }
     
     public int getStatus() {
@@ -171,10 +174,7 @@ public final class ResponseImpl extends Response {
             return null; 
         } else {
             List<String> stringValues = new ArrayList<String>(values.size());
-            RuntimeDelegate rd = RuntimeDelegate.getInstance();
-            @SuppressWarnings("unchecked")
-            HeaderDelegate<Object> hd = rd == null || values.isEmpty() 
-                ? null : (HeaderDelegate<Object>)rd.createHeaderDelegate(values.get(0).getClass());
+            HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
             for (Object value : values) {
                 String actualValue = hd == null ? value.toString() : hd.toString(value); 
                 stringValues.add(actualValue);
@@ -296,8 +296,7 @@ public final class ResponseImpl extends Response {
             for (Object o : linkValues) {
                 Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
                 if (!link.getUri().isAbsolute()) {
-                    URI requestURI = URI.create((String)responseMessage.getExchange().getOutMessage()
-                        .get(Message.REQUEST_URI));
+                    URI requestURI = URI.create((String)outMessage.get(Message.REQUEST_URI));
                     link = Link.fromLink(link).baseUri(requestURI).build();
                 }
                 links.put(link.getRel(), link);
@@ -337,54 +336,105 @@ public final class ResponseImpl extends Response {
             return cls.cast(lastEntity);
         } 
         
-        if (entity instanceof InputStream) {
-            
-            MediaType mediaType = getMediaType();
-            if (mediaType == null) {
-                mediaType = MediaType.WILDCARD_TYPE;
-            }
-            
-            List<ReaderInterceptor> readers = ProviderFactory.getInstance(responseMessage)
-                .createMessageBodyReaderInterceptor(cls, t, anns, mediaType, 
-                                                    responseMessage.getExchange().getOutMessage(), 
-                                                    null);
-            if (readers != null) {
-                try {
-                    if (entityBufferred) {
-                        InputStream.class.cast(entity).reset();
-                    }
-                    
-                    responseMessage.put(Message.PROTOCOL_HEADERS, this.getMetadata());
-                    lastEntity = JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
-                                                                           anns, 
-                                                                           InputStream.class.cast(entity), 
-                                                                           mediaType, 
-                                                                           responseMessage);
-                    if (!entityBufferred && responseStreamCanBeClosed(cls)) {
-                        InputStream.class.cast(entity).close();
-                        entity = null;
-                    } 
-                    
-                    return cls.cast(lastEntity);
-                } catch (Exception ex) {
-                    throw new ResponseProcessingException(this, ex.getMessage(), ex);    
+        MediaType mediaType = getMediaType();
+        if (mediaType == null) {
+            mediaType = MediaType.WILDCARD_TYPE;
+        }
+        
+        // the stream is available if entity is IS or 
+        // message contains XMLStreamReader or Reader
+        boolean entityStreamAvailable = entityStreamAvailable();
+        InputStream entityStream = null;
+        if (!entityStreamAvailable) {
+            // try create a stream if the entity is String or Number
+            entityStream = convertEntityToStreamIfPossible();
+            entityStreamAvailable = entityStream != null;
+        } else if (entity instanceof InputStream) {
+            entityStream = InputStream.class.cast(entity);
+        }
+        
+        // we need to check for readers even if no IS is set - the readers may still do it
+        List<ReaderInterceptor> readers = ProviderFactory.getInstance(outMessage)
+            .createMessageBodyReaderInterceptor(cls, t, anns, mediaType, outMessage, entityStreamAvailable, null);
+        
+        if (readers != null) {
+            try {
+                if (entityBufferred) {
+                    InputStream.class.cast(entity).reset();
                 }
-            } else {
-                throw new ResponseProcessingException(this, "No message body reader for class: " + cls, null);
+                
+                Message responseMessage = getResponseMessage();
+                responseMessage.put(Message.PROTOCOL_HEADERS, getHeaders());
+                
+                lastEntity = JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
+                                                                       anns, 
+                                                                       entityStream, 
+                                                                       mediaType, 
+                                                                       responseMessage);
+                if (!entityBufferred && responseStreamCanBeClosed(cls)) {
+                    InputStream.class.cast(entity).close();
+                    entity = null;
+                } 
+                
+                return cls.cast(lastEntity);
+            } catch (Exception ex) {
+                reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, mediaType, ex);
             }
         } else if (entity != null && cls.isAssignableFrom(entity.getClass())) {
             lastEntity = entity;
             return cls.cast(lastEntity);
-        }
+        } else if (entityStreamAvailable) {
+            reportMessageHandlerProblem("NO_MSG_READER", cls, mediaType, null);
+        } 
         
         throw new IllegalStateException("The entity is not backed by an input stream, entity class is : "
             + entity != null ? entity.getClass().getName() : null);
         
     }
     
+    public InputStream convertEntityToStreamIfPossible() {
+        String stringEntity = null;
+        if (entity instanceof String || entity instanceof Number) {
+            stringEntity = entity.toString();
+        }
+        if (stringEntity != null) {
+            try {
+                return new ByteArrayInputStream(stringEntity.getBytes("UTF-8"));
+            } catch (Exception ex) {
+                throw new ProcessingException(ex);
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    private boolean entityStreamAvailable() {
+        if (entity == null) {
+            Message inMessage = getResponseMessage();    
+            return inMessage != null && (inMessage.getContent(XMLStreamReader.class) != null
+                || inMessage.getContent(Reader.class) != null);
+        } else {
+            return entity instanceof InputStream;
+        }
+    }
+    
+    private Message getResponseMessage() {
+        Message responseMessage = outMessage.getExchange().getInMessage();
+        if (responseMessage == null) {
+            responseMessage = outMessage.getExchange().getInFaultMessage();    
+        }
+        return responseMessage;
+    }
+    
+    private void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable cause) {
+        String errorMessage = JAXRSUtils.logMessageHandlerProblem(name, cls, ct);
+        throw new ResponseProcessingException(this, errorMessage, cause);
+    }
+    
     protected boolean responseStreamCanBeClosed(Class<?> cls) {
         return cls != InputStream.class
-            && MessageUtils.isTrue(responseMessage.getContextualProperty("response.stream.auto.close"));
+            && entity instanceof InputStream
+            && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
     }
     
     public boolean bufferEntity() throws ProcessingException {

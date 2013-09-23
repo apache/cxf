@@ -100,7 +100,6 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public MediaType getMediaType() {
-        //return r.getEntity() != null ? r.getMediaType() : null;
         return r.getMediaType();
     }
 
@@ -133,7 +132,7 @@ public abstract class AbstractResponseContextImpl {
     }
     
     public void setEntity(Object entity) {
-        ((ResponseImpl)r).setEntity(entity, null);
+        ((ResponseImpl)r).setEntity(entity, getResponseEntityAnnotations());
     }
     
     protected Annotation[] getResponseEntityAnnotations() {
