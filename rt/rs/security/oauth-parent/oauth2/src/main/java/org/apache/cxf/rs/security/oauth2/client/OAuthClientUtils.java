@@ -206,6 +206,32 @@ public final class OAuthClientUtils {
                                                    Map<String, String> extraParams,
                                                    boolean setAuthorizationHeader) 
         throws OAuthServiceException {
+        return getAccessToken(accessTokenService, consumer, grant, extraParams, 
+                              null, setAuthorizationHeader);
+    }
+        
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * using the initialized web client 
+     * @param accessTokenService the AccessToken client
+     * @param consumer {@link Consumer} representing the registered client.
+     * @param grant {@link AccessTokenGrant} grant
+     * @param extraParams extra parameters
+     * @param defaultTokenType default expected token type - some early
+     *        well-known OAuth2 services do not return a required token_type parameter
+     * @param setAuthorizationHeader if set to true then HTTP Basic scheme
+     *           will be used to pass client id and secret, otherwise they will
+     *           be passed in the form payload  
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
+    public static ClientAccessToken getAccessToken(WebClient accessTokenService,
+                                                   Consumer consumer,
+                                                   AccessTokenGrant grant,
+                                                   Map<String, String> extraParams,
+                                                   String defaultTokenType,
+                                                   boolean setAuthorizationHeader) 
+        throws OAuthServiceException {    
         
         Form form = new Form(grant.toMap());
         if (extraParams != null) {
@@ -242,7 +268,7 @@ public final class OAuthClientUtils {
             throw new ResponseProcessingException(response, ex);
         }
         if (200 == response.getStatus()) {
-            ClientAccessToken token = fromMapToClientToken(map);
+            ClientAccessToken token = fromMapToClientToken(map, defaultTokenType);
             if (token == null) {
                 throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
             } else {
@@ -258,33 +284,44 @@ public final class OAuthClientUtils {
     }
     
     public static ClientAccessToken fromMapToClientToken(Map<String, String> map) {
-        if (map.containsKey(OAuthConstants.ACCESS_TOKEN)
-            && map.containsKey(OAuthConstants.ACCESS_TOKEN_TYPE)) {
-            ClientAccessToken token = new ClientAccessToken(
-                                          map.remove(OAuthConstants.ACCESS_TOKEN_TYPE),
-                                          map.remove(OAuthConstants.ACCESS_TOKEN));
+        return fromMapToClientToken(map, null);
+    }
+    
+    public static ClientAccessToken fromMapToClientToken(Map<String, String> map,
+                                                         String defaultTokenType) {
+        if (map.containsKey(OAuthConstants.ACCESS_TOKEN)) {
             
-            String refreshToken = map.remove(OAuthConstants.REFRESH_TOKEN);
-            if (refreshToken != null) {
-                token.setRefreshToken(refreshToken);
+            String tokenType = map.remove(OAuthConstants.ACCESS_TOKEN_TYPE);
+            if (tokenType == null) {
+                tokenType = defaultTokenType;
             }
-            String expiresInStr = map.remove(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN);
-            if (expiresInStr != null) {
-                token.setExpiresIn(Long.valueOf(expiresInStr));
+            if (tokenType != null) {
+                ClientAccessToken token = new ClientAccessToken(
+                                              tokenType,
+                                              map.remove(OAuthConstants.ACCESS_TOKEN));
+                
+                String refreshToken = map.remove(OAuthConstants.REFRESH_TOKEN);
+                if (refreshToken != null) {
+                    token.setRefreshToken(refreshToken);
+                }
+                String expiresInStr = map.remove(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN);
+                if (expiresInStr != null) {
+                    token.setExpiresIn(Long.valueOf(expiresInStr));
+                }
+                String issuedAtStr = map.remove(OAuthConstants.ACCESS_TOKEN_ISSUED_AT);
+                token.setIssuedAt(issuedAtStr != null ? Long.valueOf(issuedAtStr)
+                                                      : System.currentTimeMillis() / 1000);
+                String scope = map.remove(OAuthConstants.SCOPE);
+                if (scope != null) {
+                    token.setApprovedScope(scope);
+                }
+                
+                token.setParameters(map);
+                return token;
             }
-            String issuedAtStr = map.remove(OAuthConstants.ACCESS_TOKEN_ISSUED_AT);
-            token.setIssuedAt(issuedAtStr != null ? Long.valueOf(issuedAtStr)
-                                                  : System.currentTimeMillis() / 1000);
-            String scope = map.remove(OAuthConstants.SCOPE);
-            if (scope != null) {
-                token.setApprovedScope(scope);
-            }
-            
-            token.setParameters(map);
-            return token;
-        } else {
-            return null;
-        }
+        } 
+        
+        return null;
     }
     
     
