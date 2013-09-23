@@ -359,6 +359,45 @@ public class SAMLClaimsTest extends org.junit.Assert {
         }        
     }
     
+    /**
+     * Test the creation of a SAML2 Assertion with various Attributes set by a ClaimsHandler.
+     */
+    @org.junit.Test
+    public void testSaml2ClaimsInteger() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+        
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        providerParameters.setClaimsManager(claimsManager);
+        
+        RequestClaimCollection claims = new RequestClaimCollection();
+        RequestClaim claim = new RequestClaim();
+        claim.setClaimType(ClaimTypes.MOBILEPHONE);
+        claims.add(claim);
+        providerParameters.setRequestedPrimaryClaims(claims);
+        
+        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        customProviderList.add(new CustomAttributeProvider());
+        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.contains(ClaimTypes.MOBILEPHONE.toString()));
+    }
+    
+    
     private TokenProviderParameters createProviderParameters(
         String tokenType, String keyType, String appliesTo
     ) throws WSSecurityException {

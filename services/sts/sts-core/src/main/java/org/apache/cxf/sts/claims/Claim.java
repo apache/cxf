@@ -39,6 +39,7 @@ public class Claim implements Serializable {
     private String originalIssuer;
     private transient Principal principal;
     private List<String> values = new ArrayList<String>(1);
+    private List<?> customValues;
 
     public String getIssuer() {
         return issuer;
@@ -85,21 +86,12 @@ public class Claim implements Serializable {
         return values;
     }
 
-    @Deprecated
-    public void setValue(String value) {
-        this.values.clear();
-        if (value != null) {
-            this.values.add(value);
-        }
+    public List<?> getCustomValues() {
+        return customValues;
     }
-    @Deprecated
-    public String getValue() {
-        if (this.values.size() == 0) {
-            return null;
-        } else if (this.values.size() == 1) {
-            return this.values.get(0);
-        }
-        throw new IllegalStateException("Claim has multiple values");
+
+    public void setCustomValues(List<?> customValues) {
+        this.customValues = customValues;
     }
 
 }

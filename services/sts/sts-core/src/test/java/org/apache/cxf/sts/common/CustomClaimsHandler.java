@@ -21,6 +21,7 @@ package org.apache.cxf.sts.common;
 import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.sts.claims.Claim;
@@ -31,6 +32,11 @@ import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.common.CustomClaimParser.CustomRequestClaim;
+import org.opensaml.Configuration;
+import org.opensaml.saml2.core.AttributeValue;
+import org.opensaml.xml.XMLObjectBuilder;
+import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.schema.XSInteger;
 
 /**
  * A custom ClaimsHandler implementation for use in the tests.
@@ -46,6 +52,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
         knownURIs.add(ClaimTypes.LASTNAME);
         knownURIs.add(ClaimTypes.EMAILADDRESS);
         knownURIs.add(ClaimTypes.STREETADDRESS);
+        knownURIs.add(ClaimTypes.MOBILEPHONE);
         knownURIs.add(ROLE_CLAIM);
     }
 
@@ -75,6 +82,19 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     claim.addValue("alice@cxf.apache.org");
                 } else if (ClaimTypes.STREETADDRESS.equals(requestClaim.getClaimType())) {
                     claim.addValue("1234 1st Street");
+                } else if (ClaimTypes.MOBILEPHONE.equals(requestClaim.getClaimType())) {
+                    // Test custom (Integer) attribute value
+                    XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+                    
+                    @SuppressWarnings("unchecked")
+                    XMLObjectBuilder<XSInteger> xsIntegerBuilder = 
+                        (XMLObjectBuilder<XSInteger>)builderFactory.getBuilder(XSInteger.TYPE_NAME);
+                    XSInteger attributeValue = 
+                        xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
+                    attributeValue.setValue(185912592);
+                    
+                    claim.setCustomValues(Collections.singletonList(attributeValue));
+
                 } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
                     String requestedRole = requestClaim.getClaimValue();
                     if (isUserInRole(parameters.getPrincipal(), requestedRole)) {

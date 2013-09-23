@@ -183,6 +183,10 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             attributeBean.setSimpleName(claim.getClaimType().toString());
         }
         attributeBean.setAttributeValues(claim.getValues());
+        
+        if (claim.getCustomValues() != null) {
+            attributeBean.setCustomAttributeValues(claim.getCustomValues());
+        }
 
         return attributeBean;
     }
