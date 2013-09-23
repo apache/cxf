@@ -36,7 +36,7 @@ public class ConfigurationImpl implements Configuration {
     private RuntimeType runtimeType;
     private Map<Object, Map<Class<?>, Integer>> providers = 
         new HashMap<Object, Map<Class<?>, Integer>>(); 
-    private Set<Feature> features = new HashSet<Feature>();
+    private Map<Feature, Boolean> features = new HashMap<Feature, Boolean>();
     
     public ConfigurationImpl(RuntimeType rt) {
         this.runtimeType = rt;
@@ -52,7 +52,8 @@ public class ConfigurationImpl implements Configuration {
                 if (!(o instanceof Feature)) {
                     registerParentProvider(o, parent, defaultContracts);
                 } else {
-                    features.add((Feature)o);
+                    Feature f = (Feature)o;
+                    features.put(f, parent.isEnabled(f));
                 }
                 providerClasses.remove(o.getClass());
             }
@@ -95,7 +96,7 @@ public class ConfigurationImpl implements Configuration {
     public Set<Object> getInstances() {
         Set<Object> allInstances = new HashSet<Object>();
         allInstances.addAll(providers.keySet());
-        allInstances.addAll(features);
+        allInstances.addAll(features.keySet());
         return Collections.unmodifiableSet(allInstances);
     }
 
@@ -111,7 +112,7 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public Collection<String> getPropertyNames() {
-        return props.keySet();
+        return Collections.unmodifiableSet(props.keySet());
     }
 
     @Override
@@ -121,12 +122,12 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public boolean isEnabled(Feature f) {
-        return features.contains(f);
+        return features.containsKey(f);
     }
 
     @Override
     public boolean isEnabled(Class<? extends Feature> f) {
-        for (Feature feature : features) {
+        for (Feature feature : features.keySet()) {
             if (feature.getClass().isAssignableFrom(f)) {
                 return true;
             }
@@ -157,8 +158,8 @@ public class ConfigurationImpl implements Configuration {
         }
     }
     
-    public void setFeature(Feature f) {
-        features.add(f);
+    public void setFeature(Feature f, boolean enabled) {
+        features.put(f, enabled);
     }
     
     
@@ -166,7 +167,10 @@ public class ConfigurationImpl implements Configuration {
         register(provider, initContractsMap(bindingPriority, contracts));
     }
     
-    public void register(Object provider, Map<Class<?>, Integer> contracts) {    
+    public void register(Object provider, Map<Class<?>, Integer> contracts) {
+        if (provider.getClass() == Class.class) {
+            provider = createProvider((Class<?>)provider);
+        }
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
             metadata = new HashMap<Class<?>, Integer>();

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.client.spec;
 
+import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.Configurable;
@@ -42,7 +43,9 @@ public class ClientConfigurableImpl<C extends Configurable<C>> extends Configura
     }
     
     public ClientConfigurableImpl(C configurable, Configuration config) {
-        super(configurable, CLIENT_FILTER_INTERCEPTOR_CLASSES, 
-              new ConfigurationImpl(config, CLIENT_FILTER_INTERCEPTOR_CLASSES));
+        super(configurable,
+              CLIENT_FILTER_INTERCEPTOR_CLASSES, 
+              config == null ? new ConfigurationImpl(RuntimeType.CLIENT)
+                  : new ConfigurationImpl(config, CLIENT_FILTER_INTERCEPTOR_CLASSES));
     }
 }

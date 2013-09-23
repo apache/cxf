@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -64,23 +65,25 @@ public class WriterInterceptorMBW implements WriterInterceptor {
         MultivaluedMap<String, Object> headers = c.getHeaders();
         Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
         MediaType entityMt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
-        m.put(Message.CONTENT_TYPE, mtObject.toString());
+        m.put(Message.CONTENT_TYPE, entityMt.toString());
         
         Class<?> entityCls = c.getType();
         Type entityType = c.getGenericType();
         Annotation[] entityAnns = c.getAnnotations();
         
-        if (m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
+        if (writer == null
+            || m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
             && !writer.isWriteable(entityCls, entityType, entityAnns, entityMt)) {
             
             writer = (MessageBodyWriter<Object>)ProviderFactory.getInstance(m)
                 .createMessageBodyWriter(entityCls, entityType, entityAnns, entityMt, m);
             if (writer == null) {
-                throw new RuntimeException("No writer available");
+                String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_WRITER", entityCls, entityMt);
+                throw new ProcessingException(errorMessage);
             }
         }
         
-        HttpUtils.convertHeaderValuesToStringIfNeeded(headers);
+        HttpUtils.convertHeaderValuesToString(headers, true);
         
         writer.writeTo(c.getEntity(), 
                        c.getType(), 

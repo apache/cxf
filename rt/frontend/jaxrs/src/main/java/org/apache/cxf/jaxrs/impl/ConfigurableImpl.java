@@ -83,9 +83,9 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     public C register(Object provider, Map<Class<?>, Integer> contracts) {
         if (provider instanceof Feature) {
             Feature feature = (Feature)provider;
-            if (feature.configure(new FeatureContextImpl(this))) {
-                config.setFeature(feature);
-            }
+            boolean enabled = feature.configure(new FeatureContextImpl(this));
+            config.setFeature(feature, enabled);
+            
             return configurable;
         }
         config.register(provider, contracts);

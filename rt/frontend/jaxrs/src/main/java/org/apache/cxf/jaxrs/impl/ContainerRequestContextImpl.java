@@ -20,8 +20,6 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -78,11 +76,9 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
         m.setContent(InputStream.class, is);
     }
 
-    @SuppressWarnings("unchecked")
     public MultivaluedMap<String, String> getHeaders() {
         h = null;
-        return new MetadataMap<String, String>(
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);
+        return HttpUtils.getModifiableStringHeaders(m);
     }
 
 

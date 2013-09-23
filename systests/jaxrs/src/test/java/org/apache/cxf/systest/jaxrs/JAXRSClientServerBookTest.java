@@ -1193,8 +1193,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testNoMessageWriterFound() throws Exception {
-        String msg1 = "No message body writer has been found for response class GregorianCalendar.";
-        String msg2 = "No message body writer has been found for response class Calendar.";
+        String msg1 = 
+            "No message body writer has been found for class java.util.GregorianCalendar, ContentType: */*";
+        String msg2 = "No message body writer has been found for class java.util.Calendar, ContentType: */*";
         
         getAndCompareStrings("http://localhost:" + PORT + "/bookstore/timetable", 
                              new String[]{msg1, msg2}, "*/*", 500);

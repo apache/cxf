@@ -22,7 +22,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -37,12 +36,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Form;
@@ -53,13 +50,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -73,6 +67,7 @@ import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.jaxrs.client.spec.ClientRequestFilterInterceptor;
 import org.apache.cxf.jaxrs.client.spec.ClientResponseFilterInterceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -107,8 +102,7 @@ public abstract class AbstractClient implements Client {
     private static final String HEADER_SPLIT_PROPERTY =
         "org.apache.cxf.http.header.split";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
-    
+        
     protected ClientConfiguration cfg = new ClientConfiguration();
     private ClientState state;
     
@@ -353,6 +347,7 @@ public abstract class AbstractClient implements Client {
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
         Response response = exchange.get(Response.class);
         if (response != null) {
+            outMessage.getExchange().getInMessage().put(Message.PROTOCOL_HEADERS, response.getStringHeaders());
             return JAXRSUtils.fromResponse(JAXRSUtils.copyResponseIfNeeded(response));
         }
         
@@ -449,10 +444,10 @@ public abstract class AbstractClient implements Client {
                     realOs.flush();
                 }
             } catch (Exception ex) {
-                reportMessageHandlerProblem("MSG_WRITER_PROBLEM", cls, contentType, ex, null);
+                reportMessageHandlerProblem("MSG_WRITER_PROBLEM", cls, contentType, ex);
             }
         } else {
-            reportMessageHandlerProblem("NO_MSG_WRITER", cls, contentType, null, null);
+            reportMessageHandlerProblem("NO_MSG_WRITER", cls, contentType, null);
         }
                                                                                  
     }
@@ -468,7 +463,6 @@ public abstract class AbstractClient implements Client {
         }
     }
     
-    @SuppressWarnings("unchecked")
     protected <T> T readBody(Response r, Message outMessage, Class<T> cls, 
                              Type type, Annotation[] anns) {
         
@@ -476,55 +470,11 @@ public abstract class AbstractClient implements Client {
             return cls.cast(r);
         }
         
-        Message responseMessage = outMessage.getExchange().getInMessage();
-        
-        InputStream inputStream = (InputStream)r.getEntity();
-        if (inputStream == null) {
-            if (responseMessage == null) {
-                responseMessage = outMessage.getExchange().getInFaultMessage();    
-            }    
-            if (responseMessage == null
-                || responseMessage.getContent(XMLStreamReader.class) == null
-                    && responseMessage.getContent(Reader.class) == null) {
-            
-                return null;
-            }
-        }
-        
         int status = r.getStatus();
-        if (status < 200 || status == 204 || status >= 300) {
-            Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
-            if (length == null || Integer.parseInt(length.toString()) == 0 || status >= 300) {
-                return null;
-            }
+        if ((status < 200 || status == 204) && r.getLength() <= 0 || status >= 300) {
+            return null;
         }
-        
-        MediaType contentType = getResponseContentType(r);
-        
-        List<ReaderInterceptor> readers 
-            = ClientProviderFactory.getInstance(outMessage).createMessageBodyReaderInterceptor(
-                cls, type, anns, contentType, outMessage, null);
-        if (readers != null) {
-            try {
-                responseMessage.put(Message.PROTOCOL_HEADERS, r.getMetadata());
-                return (T)JAXRSUtils.readFromMessageBodyReader(readers, cls, type, 
-                                                            anns, inputStream, contentType, 
-                                                            responseMessage);
-            } catch (Exception ex) {
-                reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
-            } finally {
-                if (inputStream != null && responseStreamCanBeClosed(outMessage, cls)) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException ex) { 
-                        // ignore
-                    }
-                }
-            }
-        } else {
-            reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, r);
-        }
-        return null;                                                
+        return ((ResponseImpl)r).doReadEntity(cls, type, anns);                                                
     }
     
     protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
@@ -754,27 +704,9 @@ public abstract class AbstractClient implements Client {
         return pValue.toString();
     }
     
-    protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, 
-                                                      Throwable cause, Response response) {
-        org.apache.cxf.common.i18n.Message errorMsg = 
-            new org.apache.cxf.common.i18n.Message(name, 
-                                                   BUNDLE,
-                                                   cls,
-                                                   JAXRSUtils.mediaTypeToString(ct));
-        LOG.severe(errorMsg.toString());
-        if (response == null) {
-            throw new ProcessingException(errorMsg.toString(), cause);
-        } else {
-            throw new ResponseProcessingException(response, errorMsg.toString(), cause);
-        }
-    }
-    
-    private static MediaType getResponseContentType(Response r) {
-        MultivaluedMap<String, Object> map = r.getMetadata();
-        if (map.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            return JAXRSUtils.toMediaType(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
-        }
-        return MediaType.WILDCARD_TYPE;
+    protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable cause) {
+        String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_WRITER", cls, ct);
+        throw new ProcessingException(errorMessage, cause);
     }
     
     protected static void setAllHeaders(MultivaluedMap<String, String> headers, HttpURLConnection conn) {

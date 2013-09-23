@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -37,6 +38,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -231,16 +234,30 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public Builder header(String name, Object value) {
-        webClient.header(name, value);
+        RuntimeDelegate rd = HttpUtils.getOtherRuntimeDelegate();
+        doSetHeader(rd, name, value);
         return this;
     }
-
+    
     @Override
     public Builder headers(MultivaluedMap<String, Object> headers) {
-        
+        RuntimeDelegate rd = HttpUtils.getOtherRuntimeDelegate();
+        for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
+            for (Object value : entry.getValue()) {
+                doSetHeader(rd, entry.getKey(), value);
+            }
+        }
         return this;
     }
 
+    private void doSetHeader(RuntimeDelegate rd, String name, Object value) {
+        HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(rd, value); 
+        if (hd != null) {
+            value = hd.toString(value);
+        }
+        webClient.header(name, value);
+    }
+    
     @Override
     public Builder property(String name, Object value) {
         Map<String, Object> contextProps = WebClient.getConfig(webClient).getRequestContext();

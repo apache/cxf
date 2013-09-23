@@ -102,7 +102,7 @@ public class LinkBuilderImplTest extends Assert {
         Link.Builder linkBuilder = Link.fromMethod(TestResource.class, "consumesAppJson");
         Link link = linkBuilder.build();
         String resource = link.toString();
-        assertTrue(resource.contains("<resource/consumesappjson>"));
+        assertTrue(resource.contains("<consumesappjson>"));
     }
     
     @Path("resource")

@@ -115,7 +115,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     public void testGetBookSpec() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         Client client = ClientBuilder.newClient();
-        client.register(new ClientFilterClientAndConfigCheck());
+        client.register((Object)ClientFilterClientAndConfigCheck.class);
         client.property("clientproperty", "somevalue");
         Book book = client.target(address).request("application/xml").get(Book.class);
         assertEquals(124L, book.getId());
@@ -577,7 +577,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         @Override
         public void filter(ClientRequestContext context) throws IOException {
-            context.abortWith(Response.status(201).entity(context.getEntity()).build());
+            context.abortWith(Response.status(201).entity(context.getEntity()).type(MediaType.TEXT_XML_TYPE).build());
         }
     }
     
@@ -589,7 +589,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
     }
     
-    private static class ClientFilterClientAndConfigCheck implements ClientRequestFilter {
+    public static class ClientFilterClientAndConfigCheck implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext context) throws IOException {
@@ -618,7 +618,9 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         @Override
         public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException,
             WebApplicationException {
-            context.getHeaders().add("ClientReaderInterceptor", "clientRead");
+            if (context.getInputStream() != null) {
+                context.getHeaders().add("ClientReaderInterceptor", "clientRead");
+            }
             return context.proceed();
         }
         

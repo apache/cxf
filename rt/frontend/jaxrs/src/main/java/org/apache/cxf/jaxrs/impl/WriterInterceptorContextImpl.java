@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -31,6 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -61,11 +61,9 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
         return entity;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public MultivaluedMap<String, Object> getHeaders() {
-        return new MetadataMap<String, Object>(
-            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);
+        return HttpUtils.getModifiableHeaders(m);
     }
 
     @Override
