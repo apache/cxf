@@ -47,8 +47,7 @@ import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })
 @Produces({"application/xml", "application/json" })
-@Description(lang = "en-us", title = "book store \"resource\"", value = "super resource")
-public class BookStore {
+public class BookStore implements BookDescription {
 
     @Descriptions({ 
         @Description(value = "Attachments, max < 10", target = DocTarget.PARAM)
