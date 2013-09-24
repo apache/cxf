@@ -324,7 +324,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(valueType);
         Class<?> actualType = isCollection ? InjectionUtils.getActualType(typeInfo.getGenericType()) : valueType;
         
-        int index = setter.indexOf(".");
+        int index = getDotIndex(setter);
         if (index == -1) {
             Object castedValue = value;
             if (Date.class.isAssignableFrom(valueType)) {
@@ -478,8 +478,12 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         }
     }
     
+    private int getDotIndex(String setter) {
+        return this.conditionClass == SearchBean.class ? -1 : setter.indexOf(".");
+    }
+    
     private String getSetter(String setter) {
-        int index = setter.indexOf(".");
+        int index = getDotIndex(setter);
         if (index != -1) {
             return setter.substring(0, index).toLowerCase();
         } else {
