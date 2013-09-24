@@ -119,7 +119,7 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
                     attributeBean.setSimpleName(name);
                     attributeBean.setQualifiedName(namespace);
                 }
-                attributeBean.setAttributeValues(Collections.singletonList(roleName));
+                attributeBean.addAttributeValue(roleName);
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
             }

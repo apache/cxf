@@ -109,7 +109,8 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 } else {
                     attributeBean.setQualifiedName("role");
                 }
-                attributeBean.setAttributeValues(Arrays.asList("user", "admin"));
+                attributeBean.addAttributeValue("user");
+                attributeBean.addAttributeValue("admin");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             } else {
 //              <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
@@ -128,7 +129,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 } else {
                     attributeBean.setQualifiedName("role");
                 }
-                attributeBean.setAttributeValues(Collections.singletonList("user"));
+                attributeBean.addAttributeValue("user");
                 
                 AttributeBean attributeBean2 = new AttributeBean();
                 if (subjectBean != null) {
@@ -137,7 +138,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 } else {
                     attributeBean2.setQualifiedName("role");
                 }
-                attributeBean2.setAttributeValues(Collections.singletonList("admin"));
+                attributeBean2.addAttributeValue("admin");
                 attrBean.setSamlAttributes(Arrays.asList(attributeBean, attributeBean2));
             }
             

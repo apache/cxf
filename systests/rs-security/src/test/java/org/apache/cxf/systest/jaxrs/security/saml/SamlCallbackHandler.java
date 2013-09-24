@@ -150,7 +150,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 roleClaim.setSimpleName("subject-role");
                 roleClaim.setQualifiedName(Claim.DEFAULT_ROLE_NAME);
                 roleClaim.setNameFormat(Claim.DEFAULT_NAME_FORMAT);
-                roleClaim.setAttributeValues(roles);
+                roleClaim.setAttributeValues(new ArrayList<Object>(roles));
                 claims.add(roleClaim);
                 
                 List<String> authMethods = CastUtils.cast((List<?>)m.getContextualProperty("saml.auth"));
@@ -162,7 +162,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 authClaim.setSimpleName("http://claims/authentication");
                 authClaim.setQualifiedName("http://claims/authentication");
                 authClaim.setNameFormat("http://claims/authentication-format");
-                authClaim.setAttributeValues(authMethods);
+                authClaim.setAttributeValues(new ArrayList<Object>(authMethods));
                 claims.add(authClaim);
                 
                 attrBean.setSamlAttributes(claims);

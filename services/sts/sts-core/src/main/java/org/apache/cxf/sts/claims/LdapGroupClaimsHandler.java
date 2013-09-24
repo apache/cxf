@@ -307,7 +307,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         Claim c = new Claim();
         c.setClaimType(URI.create(this.groupURI));
         c.setPrincipal(principal);
-        c.setValues(filteredGroups);
+        c.setValues(new ArrayList<Object>(filteredGroups));
         // c.setIssuer(issuer);
         // c.setOriginalIssuer(originalIssuer);
         // c.setNamespace(namespace);

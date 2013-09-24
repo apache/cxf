@@ -117,7 +117,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                     attributeBean.setSimpleName("subject-role");
                     attributeBean.setQualifiedName("http://custom-ns");
                 }
-                attributeBean.setAttributeValues(Collections.singletonList("system-user"));
+                attributeBean.addAttributeValue("system-user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
                 

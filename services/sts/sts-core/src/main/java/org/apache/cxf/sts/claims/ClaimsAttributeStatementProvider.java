@@ -101,9 +101,6 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             }
             attributeBean.setAttributeValues(claim.getValues());
             
-            if (claim.getCustomValues() != null) {
-                attributeBean.setCustomAttributeValues(claim.getCustomValues());
-            }
             attributeList.add(attributeBean);
         }
         attrBean.setSamlAttributes(attributeList);

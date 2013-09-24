@@ -21,7 +21,6 @@ package org.apache.cxf.sts.common;
 import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.sts.claims.Claim;
@@ -93,7 +92,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
                         xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
                     attributeValue.setValue(185912592);
                     
-                    claim.setCustomValues(Collections.singletonList(attributeValue));
+                    claim.addValue(attributeValue);
 
                 } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
                     String requestedRole = requestClaim.getClaimValue();

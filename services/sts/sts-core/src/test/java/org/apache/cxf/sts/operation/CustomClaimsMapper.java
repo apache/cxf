@@ -44,8 +44,10 @@ public class CustomClaimsMapper implements ClaimsMapper {
             nc.setIssuer(c.getIssuer());
             nc.setOriginalIssuer(c.getOriginalIssuer());
             nc.setPrincipal(c.getPrincipal());
-            for (String s : c.getValues()) {
-                nc.addValue(s.toUpperCase());            
+            for (Object s : c.getValues()) {
+                if (s instanceof String) {
+                    nc.addValue(((String)s).toUpperCase());
+                }
             }
             targetClaims.add(nc);
         }

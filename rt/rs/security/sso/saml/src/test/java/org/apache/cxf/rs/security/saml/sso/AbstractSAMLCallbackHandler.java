@@ -67,7 +67,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectLocalityIpAddress;
     protected String subjectLocalityDnsAddress;
     protected String resource;
-    protected List<?> customAttributeValues;
+    protected List<Object> customAttributeValues;
     protected ConditionsBean conditions;
     protected SubjectConfirmationDataBean subjectConfirmationData;
     
@@ -116,7 +116,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.resource = resource;
     }
     
-    public void setCustomAttributeValues(List<?> customAttributeValues) {
+    public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
     }
     
@@ -148,9 +148,9 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 attributeBean.setQualifiedName("role");
             }
             if (customAttributeValues != null) {
-                attributeBean.setCustomAttributeValues(customAttributeValues);   
+                attributeBean.setAttributeValues(customAttributeValues);   
             } else {
-                attributeBean.setAttributeValues(Collections.singletonList("user"));
+                attributeBean.addAttributeValue("user");
             }
             attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             callback.setAttributeStatementData(Collections.singletonList(attrBean));

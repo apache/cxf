@@ -19,7 +19,6 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.w3c.dom.Element;
@@ -88,7 +87,7 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
             attributeBean.setQualifiedName("http://cxf.apache.org/sts");
         }
         
-        attributeBean.setAttributeValues(Collections.singletonList("authenticated"));
+        attributeBean.addAttributeValue("authenticated");
         
         return attributeBean;
     }
@@ -111,13 +110,13 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
             parameterBean.setQualifiedName("http://cxf.apache.org/sts");
         }
         if (parameter instanceof UsernameTokenType) {
-            parameterBean.setAttributeValues(
-                Collections.singletonList(((UsernameTokenType)parameter).getUsername().getValue())
+            parameterBean.addAttributeValue(
+                ((UsernameTokenType)parameter).getUsername().getValue()
             );
         } else if (parameter instanceof Element) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper((Element)parameter);
             SAMLTokenPrincipal principal = new SAMLTokenPrincipalImpl(wrapper);
-            parameterBean.setAttributeValues(Collections.singletonList(principal.getName()));
+            parameterBean.addAttributeValue(principal.getName());
         }
 
         return parameterBean;

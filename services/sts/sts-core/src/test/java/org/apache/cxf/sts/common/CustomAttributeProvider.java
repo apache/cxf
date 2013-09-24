@@ -19,7 +19,6 @@
 package org.apache.cxf.sts.common;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -135,7 +134,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             attributeBean.setQualifiedName("http://cxf.apache.org/sts/custom");
         }
         
-        attributeBean.setAttributeValues(Collections.singletonList("authenticated"));
+        attributeBean.addAttributeValue("authenticated");
         
         return attributeBean;
     }
@@ -159,13 +158,13 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             parameterBean.setQualifiedName("http://cxf.apache.org/sts/custom/" + claimType);
         }
         if (parameter instanceof UsernameTokenType) {
-            parameterBean.setAttributeValues(
-                Collections.singletonList(((UsernameTokenType)parameter).getUsername().getValue())
+            parameterBean.addAttributeValue(
+                ((UsernameTokenType)parameter).getUsername().getValue()
             );
         } else if (parameter instanceof Element) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper((Element)parameter);
             SAMLTokenPrincipal principal = new SAMLTokenPrincipalImpl(wrapper);
-            parameterBean.setAttributeValues(Collections.singletonList(principal.getName()));
+            parameterBean.addAttributeValue(principal.getName());
         }
 
         return parameterBean;
@@ -184,10 +183,6 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         }
         attributeBean.setAttributeValues(claim.getValues());
         
-        if (claim.getCustomValues() != null) {
-            attributeBean.setCustomAttributeValues(claim.getCustomValues());
-        }
-
         return attributeBean;
     }
 
