@@ -173,7 +173,7 @@ public class SearchContextImplTest extends Assert {
     }
     
     @Test
-    public void testPrimitiveStatement() {
+    public void testPrimitiveStatementSearchBean() {
         Message m = new MessageImpl();
         m.put(Message.QUERY_STRING, "_s=name==CXF");
         SearchContext context = new SearchContextImpl(m);
@@ -184,6 +184,23 @@ public class SearchContextImplTest extends Assert {
         assertNotNull(ps);
         
         assertEquals("name", ps.getProperty());
+        assertEquals("CXF", ps.getValue());
+        assertEquals(ConditionType.EQUALS, ps.getCondition());
+        assertEquals(String.class, ps.getValueType());
+    }
+    
+    @Test
+    public void testPrimitiveStatementSearchBeanComlexName() {
+        Message m = new MessageImpl();
+        m.put(Message.QUERY_STRING, "_s=complex.name==CXF");
+        SearchContext context = new SearchContextImpl(m);
+        SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
+        assertNotNull(sc);
+        
+        PrimitiveStatement ps = sc.getStatement();
+        assertNotNull(ps);
+        
+        assertEquals("complex.name", ps.getProperty());
         assertEquals("CXF", ps.getValue());
         assertEquals(ConditionType.EQUALS, ps.getCondition());
         assertEquals(String.class, ps.getValueType());
