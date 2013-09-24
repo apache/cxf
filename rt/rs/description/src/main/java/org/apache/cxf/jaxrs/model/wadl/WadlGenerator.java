@@ -235,16 +235,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         Set<ClassResourceInfo> visitedResources = new LinkedHashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
             startResourceTag(sbResources, cri.getServiceClass(), cri.getURITemplate().getValue());
-            Annotation[] anns = cri.getServiceClass().getAnnotations();
-            if (anns.length == 0) {
-                Annotation ann = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Description.class);
-                if (ann != null) {
-                    anns = new Annotation[] {
-                        ann
-                    };
-                }
+            
+            Annotation description = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Description.class);
+            if (description == null) {
+                description = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Descriptions.class);
             }
-            handleDocs(anns, sbResources, DocTarget.RESOURCE, true, isJson);
+            if (description != null) {
+                handleDocs(new Annotation[] {description}, sbResources, DocTarget.RESOURCE, true, isJson);
+            }
             handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources, isJson);
             sbResources.append("</resource>");
         }
