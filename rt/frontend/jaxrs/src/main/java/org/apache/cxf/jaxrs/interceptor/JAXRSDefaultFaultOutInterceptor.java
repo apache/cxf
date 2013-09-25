@@ -34,14 +34,14 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class JAXBDefaultFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
+public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
 
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXBDefaultFaultOutInterceptor.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSDefaultFaultOutInterceptor.class);
 
-    public JAXBDefaultFaultOutInterceptor() {
+    public JAXRSDefaultFaultOutInterceptor() {
         super(Phase.MARSHAL);
     }
-    public JAXBDefaultFaultOutInterceptor(String phase) {
+    public JAXRSDefaultFaultOutInterceptor(String phase) {
         super(phase);
     }
 

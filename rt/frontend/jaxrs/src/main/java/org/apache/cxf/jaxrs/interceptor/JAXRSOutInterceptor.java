@@ -77,11 +77,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     public JAXRSOutInterceptor() {
         super(Phase.MARSHAL);
     }
-
+    
     public void handleMessage(Message message) {
         ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
         try {
             processResponse(providerFactory, message);
+        } catch (Exception ex) {
+            message.put("jaxrs.out.fault", Boolean.TRUE);    
         } finally {
             Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
             Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
@@ -480,5 +482,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     // occurred: for now we will just use to ensure the correct status is set
     private boolean isResponseHeadersCopied(Message message) {
         return MessageUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED));
+    }
+    
+    public void handleFault(Message message) {
+        message.put("jaxrs.out.fault", Boolean.TRUE);
     }
 }
