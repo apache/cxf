@@ -120,18 +120,22 @@ public class ClassLoaderSwitcher {
      * Restore the old classloader
      */
     public void restoreClassLoader() {
-        Thread.currentThread().setContextClassLoader(origContextClassloader);
+        if (origContextClassloader != null) {
+            Thread.currentThread().setContextClassLoader(origContextClassloader);
+            origContextClassloader = null; // don't hold a reference.
+        }
         if (origClassPath != null) {
             System.setProperty("java.class.path", origClassPath);
         }
 
-        Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
-        for (Object o : newProps.keySet()) {
-            if (!origProps.containsKey(o)) {
-                System.clearProperty(o.toString());
+        if (origProps != null) {
+            Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
+            for (Object o : newProps.keySet()) {
+                if (!origProps.containsKey(o)) {
+                    System.clearProperty(o.toString());
+                }
             }
+            System.getProperties().putAll(origProps);
         }
-        System.getProperties().putAll(origProps);
-        origContextClassloader = null; // don't hold a reference.
     }
 }
