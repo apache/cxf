@@ -23,12 +23,12 @@ import java.util.ResourceBundle;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.xml.XMLConstants;
 import org.apache.cxf.binding.xml.XMLFault;
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -74,10 +74,15 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
             // call StaxUtils to write Fault detail.
             
             if (xmlFault.getDetail() != null) {
+                Element detail = xmlFault.getDetail();
                 StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_DETAIL,
                         XMLConstants.NS_XML_FORMAT);
-                StaxUtils.writeNode(DOMUtils.getChild(xmlFault.getDetail(), Node.ELEMENT_NODE), 
-                                    writer, false);
+                
+                Node node = detail.getFirstChild();
+                while (node != null) {
+                    StaxUtils.writeNode(node, writer, false);
+                    node = node.getNextSibling();
+                }
                 writer.writeEndElement();
             }
             // fault root
