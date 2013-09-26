@@ -223,10 +223,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             reqData.setCallbackHandler(getCallback(reqData, utWithCallbacks));
             
             computeAction(msg, reqData);
-            List<Integer> actions = new ArrayList<Integer>();
             String action = getAction(msg, version);
 
-            int doAction = WSSecurityUtil.decodeAction(action, actions);
+            List<Integer> actions = WSSecurityUtil.decodeAction(action);
 
             String actor = (String)getOption(WSHandlerConstants.ACTOR);
             if (actor == null) {
@@ -234,7 +233,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
 
             // Configure replay caching
-            configureReplayCaches(reqData, doAction, msg);
+            configureReplayCaches(reqData, actions, msg);
             
             TLSSessionInfo tlsInfo = msg.get(TLSSessionInfo.class);
             if (tlsInfo != null) {
@@ -246,7 +245,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
              * Get and check the Signature specific parameters first because
              * they may be used for encryption too.
              */
-            doReceiverAction(doAction, reqData);
+            doReceiverAction(actions, reqData);
             
             /*get chance to check msg context enableRevocation setting
              *when use policy based ws-security where the WSHandler configuration
@@ -394,19 +393,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         //
         Crypto encCrypto = (Crypto)msg.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
         if (encCrypto != null) {
-            reqData.setEncCrypto(encCrypto);
             reqData.setDecCrypto(encCrypto);
         }
         Crypto sigCrypto = (Crypto)msg.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (sigCrypto != null) {
-            reqData.setSigCrypto(sigCrypto);
+            reqData.setSigVerCrypto(sigCrypto);
         }
     }
     
-    protected void configureReplayCaches(RequestData reqData, int doAction, SoapMessage msg) 
+    protected void configureReplayCaches(RequestData reqData, List<Integer> actions, SoapMessage msg) 
         throws WSSecurityException {
         reqData.setEnableNonceReplayCache(false);
-        if (isNonceCacheRequired(doAction, msg)) {
+        if (isNonceCacheRequired(actions, msg)) {
             ReplayCache nonceCache = 
                 getReplayCache(
                     msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
@@ -418,7 +416,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         
         reqData.setEnableTimestampReplayCache(false);
-        if (isTimestampCacheRequired(doAction, msg)) {
+        if (isTimestampCacheRequired(actions, msg)) {
             ReplayCache timestampCache = 
                 getReplayCache(
                     msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
@@ -430,7 +428,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         
         reqData.setEnableSamlOneTimeUseReplayCache(false);
-        if (isSamlCacheRequired(doAction, msg)) {
+        if (isSamlCacheRequired(actions, msg)) {
             ReplayCache samlCache = 
                 getReplayCache(
                     msg, SecurityConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, 
@@ -446,9 +444,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     /**
      * Is a Nonce Cache required, i.e. are we expecting a UsernameToken 
      */
-    protected boolean isNonceCacheRequired(int doAction, SoapMessage msg) {
-        if ((doAction & WSConstants.UT) == WSConstants.UT
-            || (doAction & WSConstants.UT_NOPASSWORD) == WSConstants.UT_NOPASSWORD) {
+    protected boolean isNonceCacheRequired(List<Integer> actions, SoapMessage msg) {
+        if (actions.contains(WSConstants.UT) || actions.contains(WSConstants.UT_NOPASSWORD)) {
             return true;
         }
         return false;
@@ -457,8 +454,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     /**
      * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
      */
-    protected boolean isTimestampCacheRequired(int doAction, SoapMessage msg) {
-        if ((doAction & WSConstants.TS) == WSConstants.TS) {
+    protected boolean isTimestampCacheRequired(List<Integer> actions, SoapMessage msg) {
+        if (actions.contains(WSConstants.TS)) {
             return true;
         }
         return false;
@@ -467,9 +464,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     /**
      * Is a SAML Cache required, i.e. are we expecting a SAML Token 
      */
-    protected boolean isSamlCacheRequired(int doAction, SoapMessage msg) {
-        if ((doAction & WSConstants.ST_UNSIGNED) == WSConstants.ST_UNSIGNED
-            || (doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
+    protected boolean isSamlCacheRequired(List<Integer> actions, SoapMessage msg) {
+        if (actions.contains(WSConstants.ST_UNSIGNED) || actions.contains(WSConstants.ST_SIGNED)) {
             return true;
         }
         return false;

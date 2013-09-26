@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.logging.Logger;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -45,6 +43,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.action.Action;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -185,15 +184,14 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 /*
                  * Get the action first.
                  */
-                List<Integer> actions = new ArrayList<Integer>();
                 String action = getString(WSHandlerConstants.ACTION, mc);
                 if (action == null) {
                     throw new SoapFault(new Message("NO_ACTION", LOG), version
                             .getReceiver());
                 }
     
-                int doAction = WSSecurityUtil.decodeAction(action, actions, config);
-                if (doAction == WSConstants.NO_SECURITY && actions.isEmpty()) {
+                List<HandlerAction> actions = WSSecurityUtil.decodeHandlerAction(action, config);
+                if (actions.isEmpty()) {
                     return;
                 }
     
@@ -216,8 +214,16 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * functions. No need to do it for encryption only. Check if
                  * username is available and then get a passowrd.
                  */
-                if ((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0
-                        && (reqData.getUsername() == null || reqData.getUsername().equals(""))
+                boolean userNameRequired = false;
+                for (HandlerAction handlerAction : actions) {
+                    if (handlerAction.getAction() == WSConstants.SIGN
+                        || handlerAction.getAction() == WSConstants.UT
+                        || handlerAction.getAction() == WSConstants.UT_SIGN) {
+                        userNameRequired = true;
+                        break;
+                    }
+                }
+                if (userNameRequired && (reqData.getUsername() == null || reqData.getUsername().equals(""))
                         && (String)getOption(WSHandlerConstants.SIGNATURE_USER) == null) {
                     /*
                      * We need a username - if none throw an SoapFault. For
@@ -227,7 +233,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                             .getReceiver());
                 }
                 if (doDebug) {
-                    LOG.fine("Action: " + doAction);
                     LOG.fine("Actor: " + reqData.getActor());
                 }
                 /*
@@ -257,7 +262,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                     t1 = System.currentTimeMillis();
                 }
     
-                doSenderAction(doAction, doc, reqData, actions, Boolean.TRUE
+                doSenderAction(doc, reqData, actions, Boolean.TRUE
                         .equals(getProperty(mc, org.apache.cxf.message.Message.REQUESTOR_ROLE)));
     
                 if (doTimeDebug) {

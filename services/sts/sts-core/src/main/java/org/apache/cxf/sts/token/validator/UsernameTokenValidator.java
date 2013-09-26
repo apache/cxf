@@ -118,7 +118,7 @@ public class UsernameTokenValidator implements TokenValidator {
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
 
         RequestData requestData = new RequestData();
-        requestData.setSigCrypto(sigCrypto);
+        requestData.setSigVerCrypto(sigCrypto);
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);

@@ -25,13 +25,13 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.action.UsernameTokenAction;
@@ -262,12 +262,12 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         private int executions;
         
         @Override
-        public void execute(WSHandler handler, int actionToDo, Document doc,
+        public void execute(WSHandler handler, SecurityActionToken actionToken, Document doc,
                 RequestData reqData) throws WSSecurityException {
             
             this.executions++;
             reqData.setPwType(WSConstants.PW_TEXT);
-            super.execute(handler, actionToDo, doc, reqData);
+            super.execute(handler, actionToken, doc, reqData);
         }
 
         public int getExecutions() {

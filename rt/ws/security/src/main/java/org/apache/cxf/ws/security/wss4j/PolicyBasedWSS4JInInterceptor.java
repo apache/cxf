@@ -44,7 +44,6 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -326,7 +325,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
      * Is a Nonce Cache required, i.e. are we expecting a UsernameToken
      */
     @Override
-    protected boolean isNonceCacheRequired(int doAction, SoapMessage msg) {
+    protected boolean isNonceCacheRequired(List<Integer> actions, SoapMessage msg) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
@@ -344,7 +343,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
      * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
      */
     @Override
-    protected boolean isTimestampCacheRequired(int doAction, SoapMessage msg) {
+    protected boolean isTimestampCacheRequired(List<Integer> actions, SoapMessage msg) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
@@ -362,7 +361,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
      * Is a SAML Cache required, i.e. are we expecting a SAML Token 
      */
     @Override
-    protected boolean isSamlCacheRequired(int doAction, SoapMessage msg) {
+    protected boolean isSamlCacheRequired(List<Integer> actions, SoapMessage msg) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
