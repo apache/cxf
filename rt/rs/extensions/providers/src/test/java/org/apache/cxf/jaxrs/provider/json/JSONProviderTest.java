@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -245,6 +246,30 @@ public class JSONProviderTest extends Assert {
                          new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                          new MetadataMap<String, Object>(), bos);
         assertTrue(bos.toString().startsWith("[{\"parameterList\":"));
+    }
+    
+    @Test
+    public void testWriteCollectionAsPureArray3() throws Exception {
+        
+        JSONProvider<ReportDefinition> provider 
+            = new JSONProvider<ReportDefinition>();
+        provider.setIgnoreNamespaces(true);
+        provider.setSerializeAsArray(true);
+        provider.setArrayKeys(Arrays.asList("parameterList".split(" ")));
+        provider.setDropRootElement(true);
+        provider.setDropElementsInXmlStream(false);
+        ReportDefinition r = new ReportDefinition();
+        r.setReportName("report");
+        ParameterDefinition paramDef = new ParameterDefinition("param");
+        r.addParameterDefinition(paramDef);
+        
+        Method m = ReportService.class.getMethod("findReport", new Class<?>[]{});
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(r, m.getReturnType(), m.getGenericReturnType(),
+                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        assertTrue(bos.toString().startsWith("[{\"parameterList\":["));
+        
     }
     
     @Test
