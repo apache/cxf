@@ -26,6 +26,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -609,17 +610,27 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     protected File getDoneFile(URI basedir, URI wsdlURI, String mojo) {
         String doneFileName = wsdlURI.toString();
 
-        // Strip the basedir from the doneFileName
-        if (doneFileName.startsWith(basedir.toString())) {
-            doneFileName = doneFileName.substring(basedir.toString().length());
+
+        try {
+            MessageDigest cript = MessageDigest.getInstance("SHA-1");
+            cript.reset();
+            cript.update(doneFileName.getBytes("utf8"));
+            doneFileName = new javax.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
+        } catch (Exception e) {
+            //ignore,we'll try and fake it based on the wsdl
+            
+            // Strip the basedir from the doneFileName
+            if (doneFileName.startsWith(basedir.toString())) {
+                doneFileName = doneFileName.substring(basedir.toString().length());
+            }
+            // If URL to WSDL, replace ? and & since they're invalid chars for file names
+            // Not to mention slashes.
+            doneFileName = doneFileName.replace('?', '_').replace('&', '_').replace('/', '_').replace('\\', '_')
+                .replace(':', '_');
+            doneFileName += ".DONE";
         }
-
-        // If URL to WSDL, replace ? and & since they're invalid chars for file names
-        // Not to mention slashes.
-        doneFileName = doneFileName.replace('?', '_').replace('&', '_').replace('/', '_').replace('\\', '_')
-            .replace(':', '_');
-
-        return new File(markerDirectory, "." + doneFileName + "." + mojo + ".DONE");
+        
+        return new File(markerDirectory, "." + doneFileName);
     }
 
     protected abstract File getGeneratedSourceRoot();
