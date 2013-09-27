@@ -957,6 +957,18 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         StaxUtils.copy(tok.getToken(), writer);
         writer.writeEndElement();
         
+        // Write out renewal semantics
+        if (sendRenewing) {
+            writer.writeStartElement("wst", "Renewing", namespace);
+            if (!allowRenewing) {
+                writer.writeAttribute(null, "Allow", "false");
+            }
+            if (allowRenewing && allowRenewingAfterExpiry) {
+                writer.writeAttribute(null, "OK", "true");
+            }
+            writer.writeEndElement();
+        }
+        
         writer.writeEndElement();
 
         Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
