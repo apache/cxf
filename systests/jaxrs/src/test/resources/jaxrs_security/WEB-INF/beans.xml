@@ -46,6 +46,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 		        address="/">
     <jaxrs:serviceBeans>
       <ref bean="bookstore"/>
+      <ref bean="bookstoreGenerics"/>
     </jaxrs:serviceBeans>
     <jaxrs:providers>
         <bean class="org.apache.cxf.systest.jaxrs.security.SecurityExceptionMapper"/>
@@ -70,6 +71,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <security:http auto-config='true'>
     <security:http-basic />
   </security:http>
+
+  <bean id="bookstoreGenerics" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreGenerics"/>
   
   <security:authentication-provider>
     <security:user-service>

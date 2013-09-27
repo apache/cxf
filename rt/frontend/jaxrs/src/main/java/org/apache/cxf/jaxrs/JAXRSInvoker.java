@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -167,9 +168,18 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         
         
-
-        Method methodToInvoke = InjectionUtils.checkProxy(
-            cri.getMethodDispatcher().getMethod(ori), resourceObject);
+        Method resourceMethod = cri.getMethodDispatcher().getMethod(ori);
+        
+        Method methodToInvoke = null;
+        if (Proxy.class.isInstance(resourceObject)) {
+            methodToInvoke = cri.getMethodDispatcher().getProxyMethod(resourceMethod);
+            if (methodToInvoke == null) {
+                methodToInvoke = InjectionUtils.checkProxy(resourceMethod, resourceObject);
+                cri.getMethodDispatcher().addProxyMethod(resourceMethod, methodToInvoke);
+            }
+        } else {
+            methodToInvoke = resourceMethod;
+        }
         
         List<Object> params = null;
         if (request instanceof List) {
