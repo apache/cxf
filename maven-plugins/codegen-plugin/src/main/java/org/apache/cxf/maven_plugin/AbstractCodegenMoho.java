@@ -357,7 +357,6 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             Resource r2 = scanForResources(genroot, sourceRoot);
             if (r2 != sourceRoot) {
                 r2.setDirectory(getGeneratedSourceRoot().getAbsolutePath());
-                r2.setTargetPath(project.getBuild().getOutputDirectory());
                 project.addResource(r2);
             }
         }
@@ -373,7 +372,6 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             Resource r2 = scanForResources(genroot, testRoot);
             if (r2 != testRoot) {
                 r2.setDirectory(getGeneratedTestRoot().getAbsolutePath());
-                r2.setTargetPath(project.getBuild().getTestOutputDirectory());
                 project.addTestResource(r2);
             }
         }
