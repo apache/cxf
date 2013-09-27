@@ -155,19 +155,35 @@ public final class InjectionUtils {
     
     public static Method checkProxy(Method methodToInvoke, Object resourceObject) {
         if (Proxy.class.isInstance(resourceObject)) {
+            String methodToInvokeName = methodToInvoke.getName();
+            Class<?>[] methodToInvokeTypes = methodToInvoke.getParameterTypes();
+            
             for (Class<?> c : resourceObject.getClass().getInterfaces()) {
                 try {
-                    Method m = c.getMethod(
-                        methodToInvoke.getName(), methodToInvoke.getParameterTypes());
-                    if (m != null) {
-                        return m;
-                    }
+                    return c.getMethod(methodToInvokeName, methodToInvokeTypes);
                 } catch (NoSuchMethodException ex) {
                     //ignore
                 }
+                if (methodToInvokeTypes.length > 0) {
+                    for (Method m : c.getMethods()) {    
+                        if (m.getName().equals(methodToInvokeName)
+                            && m.getParameterTypes().length == methodToInvokeTypes.length) {
+                            Class<?>[] methodTypes = m.getParameterTypes();
+                            for (int i = 0; i < methodTypes.length; i++) {
+                                if (!methodTypes[i].isAssignableFrom(methodToInvokeTypes[i])) {
+                                    break;
+                                }
+                            }
+                            return m;    
+                        }
+                        
+                    }
+                }
+                
             }
         }
-        return methodToInvoke; 
+        return methodToInvoke;
+        
     }
  
     public static void injectFieldValue(final Field f, 

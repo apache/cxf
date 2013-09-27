@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MethodDispatcher {
@@ -29,7 +30,8 @@ public class MethodDispatcher {
         new LinkedHashMap<OperationResourceInfo, Method>();
     private Map<Method, OperationResourceInfo> methodToOri = 
         new LinkedHashMap<Method, OperationResourceInfo>();
-
+    private ConcurrentHashMap<Method, Method> proxyMethodMap = new ConcurrentHashMap<Method, Method>();
+    
     public MethodDispatcher() {
         
     }
@@ -62,5 +64,13 @@ public class MethodDispatcher {
 
     public Method getMethod(OperationResourceInfo op) {
         return oriToMethod.get(op);
+    }
+    
+    public Method getProxyMethod(Method m) {
+        return proxyMethodMap.get(m);
+    }
+    
+    public void addProxyMethod(Method m, Method proxyM) {
+        proxyMethodMap.putIfAbsent(m, proxyM);
     }
 }
