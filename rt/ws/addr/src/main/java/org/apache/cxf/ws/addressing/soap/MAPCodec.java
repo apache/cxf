@@ -153,7 +153,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     }
                 }
             }
-        } else if (MessageUtils.getContextualBoolean(message, DECOUPLED_FAULT_SUPPORT, false)) {
+        } 
+        if (MessageUtils.getContextualBoolean(message, DECOUPLED_FAULT_SUPPORT, false)) {
             new DecoupledFaultHandler().handleFault(message);
         }
     }
