@@ -21,9 +21,6 @@ package org.apache.cxf.jaxb.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
@@ -41,7 +38,6 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -226,66 +222,6 @@ public class XMLStreamDataWriterTest extends Assert {
         StaxUtils.nextEvent(reader);
         StaxUtils.toNextText(reader);
         assertEquals("TESTOUTPUTMESSAGE", reader.getText());
-    }
-
-    @Test
-    public void testWriteWithNamespacePrefixMapping() throws Exception {
-        JAXBDataBinding db = getTestWriterFactory(GreetMe.class);
-        Map<String, String> nspref = new HashMap<String, String>();
-        nspref.put("http://apache.org/hello_world_soap_http/types", "x");
-        db.setNamespaceMap(nspref);
-        
-        // use the output stream instead of XMLStreamWriter to test
-        DataWriter<OutputStream> dw = db.createWriter(OutputStream.class);
-        assertNotNull(dw);
-
-        GreetMe val = new GreetMe();
-        val.setRequestType("Hello");
-        dw.write(val, baos);
-        
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        XMLStreamReader xr = inFactory.createXMLStreamReader(bais);
-        DepthXMLStreamReader reader = new DepthXMLStreamReader(xr);
-        StaxUtils.toNextElement(reader);
-        QName qname = reader.getName(); 
-        assertEquals(new QName("http://apache.org/hello_world_soap_http/types", "greetMe"), qname);
-        assertEquals("x", qname.getPrefix());
-        
-        assertEquals(1, reader.getNamespaceCount());
-        assertEquals("http://apache.org/hello_world_soap_http/types", reader.getNamespaceURI(0));
-        assertEquals("x", reader.getNamespacePrefix(0));
-        
-        StaxUtils.nextEvent(reader);
-        StaxUtils.toNextElement(reader);
-        qname = reader.getName();
-        assertEquals(new QName("http://apache.org/hello_world_soap_http/types", "requestType"), qname);
-        assertEquals("x", qname.getPrefix());
-        
-        StaxUtils.nextEvent(reader);
-        StaxUtils.toNextText(reader);
-        assertEquals("Hello", reader.getText());
-    }
-
-    @Test
-    public void testWriteWithContextualNamespaceDecls() throws Exception {
-        JAXBDataBinding db = getTestWriterFactory(GreetMe.class);
-        Map<String, String> nspref = new HashMap<String, String>();
-        nspref.put("http://apache.org/hello_world_soap_http/types", "x");
-        db.setNamespaceMap(nspref);
-        db.setContextualNamespaceMap(nspref);
-        
-        // use the output stream instead of XMLStreamWriter to test
-        DataWriter<OutputStream> dw = db.createWriter(OutputStream.class);
-        assertNotNull(dw);
-
-        GreetMe val = new GreetMe();
-        val.setRequestType("Hello");
-        dw.write(val, baos);
-        
-        String xstr = new String(baos.toByteArray());
-        
-        // there should be no namespace decls
-        assertEquals("<x:greetMe><x:requestType>Hello</x:requestType></x:greetMe>", xstr);
     }
 
     private JAXBDataBinding getTestWriterFactory(Class<?>... clz) throws Exception {

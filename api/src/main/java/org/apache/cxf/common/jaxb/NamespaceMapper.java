@@ -25,10 +25,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 
 public final class NamespaceMapper extends NamespacePrefixMapper {
-    private static final String[] EMPTY_STRING = new String[0];
-
     private final Map<String, String> nspref;
-    private String[] nsctxt = EMPTY_STRING;
 
     public NamespaceMapper(Map<String, String> nspref) {
         this.nspref = nspref;
@@ -43,14 +40,4 @@ public final class NamespaceMapper extends NamespacePrefixMapper {
         }
         return suggestion;
     }
-
-    public void setContextualNamespace(String[] contextualNamespaceDecls) {
-        this.nsctxt = contextualNamespaceDecls;
-    }
-
-    public String[] getContextualNamespaceDecls() {
-        return nsctxt;
-    }
-    
-    
 }

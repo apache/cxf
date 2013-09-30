@@ -119,7 +119,6 @@ public class ASMHelper {
         public static int ILOAD = 0;
         public static int IRETURN = 0;
         public static int NEW = 0;
-        public static int ANEWARRAY = 0;
         public static int DUP = 0;
         public static int ATHROW = 0;
         public static int INVOKEVIRTUAL = 0;

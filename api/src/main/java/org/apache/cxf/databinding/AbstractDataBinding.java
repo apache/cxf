@@ -62,7 +62,6 @@ public abstract class AbstractDataBinding implements DataBinding {
     private Bus bus;
     private Collection<DOMSource> schemas;
     private Map<String, String> namespaceMap;
-    private Map<String, String> contextualNamespaceMap;
     private boolean hackAroundEmptyNamespaceIssue;
 
     protected Bus getBus() {
@@ -266,14 +265,6 @@ public abstract class AbstractDataBinding implements DataBinding {
     public void setNamespaceMap(Map<String, String> namespaceMap) {
         checkNamespaceMap(namespaceMap);
         this.namespaceMap = namespaceMap;
-    }
-
-    public Map<String, String> getContextualNamespaceMap() {
-        return contextualNamespaceMap;
-    }
-
-    public void setContextualNamespaceMap(Map<String, String> contextualNamespaceMap) {
-        this.contextualNamespaceMap = contextualNamespaceMap;
     }
 
     /**
