@@ -146,7 +146,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (recipientSignatureToken == null) {
                     recipientSignatureToken = abinding.getRecipientToken();
                 }
-                if (recipientSignatureToken != null) {
+                if (recipientSignatureToken != null && sigs.size() > 0) {
                     doSignature(recipientSignatureToken, sigs);
                 }
             }
@@ -278,6 +278,9 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
                 
                 doEncryption(wrapper, encrParts, true);
+            }
+            
+            if (sigParts.size() > 0) {
                 if (timestampAdded) {
                     SecurePart part = 
                         new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
