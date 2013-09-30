@@ -184,13 +184,18 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 /*
                  * Get the action first.
                  */
-                String action = getString(WSHandlerConstants.ACTION, mc);
-                if (action == null) {
-                    throw new SoapFault(new Message("NO_ACTION", LOG), version
-                            .getReceiver());
-                }
+                List<HandlerAction> actions = 
+                    CastUtils.cast((List<?>)getProperty(mc, WSHandlerConstants.HANDLER_ACTIONS));
+                if (actions == null) {
+                    // If null then just fall back to the "action" String
+                    String action = getString(WSHandlerConstants.ACTION, mc);
+                    if (action == null) {
+                        throw new SoapFault(new Message("NO_ACTION", LOG), version
+                                .getReceiver());
+                    }
     
-                List<HandlerAction> actions = WSSecurityUtil.decodeHandlerAction(action, config);
+                    actions = WSSecurityUtil.decodeHandlerAction(action, config);
+                }
                 if (actions.isEmpty()) {
                     return;
                 }
@@ -200,8 +205,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * username defined in the deployment descriptor takes precedence.
                  */
                 reqData.setUsername((String) getOption(WSHandlerConstants.USER));
-                if (reqData.getUsername() == null
-                        || reqData.getUsername().equals("")) {
+                if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
                     String username = (String) getProperty(reqData.getMsgContext(),
                             WSHandlerConstants.USER);
                     if (username != null) {
@@ -216,9 +220,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  */
                 boolean userNameRequired = false;
                 for (HandlerAction handlerAction : actions) {
-                    if (handlerAction.getAction() == WSConstants.SIGN
+                    if ((handlerAction.getAction() == WSConstants.SIGN
                         || handlerAction.getAction() == WSConstants.UT
-                        || handlerAction.getAction() == WSConstants.UT_SIGN) {
+                        || handlerAction.getAction() == WSConstants.UT_SIGN)
+                        && (handlerAction.getActionToken() == null
+                            || handlerAction.getActionToken().getUser() == null)) {
                         userNameRequired = true;
                         break;
                     }
