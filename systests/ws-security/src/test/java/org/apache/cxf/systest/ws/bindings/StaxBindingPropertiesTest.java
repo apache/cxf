@@ -60,9 +60,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
     }
     
     // Child of Body is signed which conflicts with the OnlySignEntireHeadersAndBody property
-    // TODO Support for streaming XPath
     @org.junit.Test
-    @org.junit.Ignore
     public void testOnlySignEntireHeadersAndBody() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -83,9 +81,9 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
         // DOM
         port.doubleIt(25);
         
-        // TODO - XPath support Streaming
-        // SecurityTestUtil.enableStreaming(port);
-        // port.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
         
         // This should fail, as OnlySignEntireHeadersAndBody is specified
         portQName = new QName(NAMESPACE, "DoubleItOnlySignPort");
@@ -97,7 +95,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on OnlySignEntireHeadersAndBody property");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "OnlySignEntireHeadersAndBody does not match the requirements";
+            String error = "OnlySignEntireHeadersAndBody not fulfilled";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -107,7 +105,7 @@ public class StaxBindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on OnlySignEntireHeadersAndBody property");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "OnlySignEntireHeadersAndBody does not match the requirements";
+            // String error = "OnlySignEntireHeadersAndBody not fulfilled";
             // assertTrue(ex.getMessage().contains(error));
         }
         

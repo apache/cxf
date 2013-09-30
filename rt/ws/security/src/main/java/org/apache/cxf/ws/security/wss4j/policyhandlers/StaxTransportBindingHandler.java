@@ -20,10 +20,12 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -50,6 +52,8 @@ import org.apache.wss4j.policy.model.TransportBinding;
 import org.apache.wss4j.policy.model.TransportToken;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.policy.model.XPath;
+import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
@@ -345,22 +349,16 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 optionalParts += "{Element}{" +  head.getNamespace() + "}" + head.getName() + ";";
             }
         }
-        /*
-         * TODO
-        if (signedElements != null) {
-            // Handle SignedElements
-            try {
-                result.addAll(
-                    this.getElements(
-                        "Element", signedElements.getXPaths(), found, true
-                    )
-                );
-            } catch (XPathExpressionException e) {
-                LOG.log(Level.FINE, e.getMessage(), e);
-                // REVISIT
+        
+        // Handle SignedElements
+        if (signedElements != null && signedElements.getXPaths() != null) {
+            for (XPath xPath : signedElements.getXPaths()) {
+                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                if (!qnames.isEmpty()) {
+                    parts += "{Element}" + qnames.get(qnames.size() - 1) + ";";
+                }
             }
         }
-        */
         
         properties.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
         properties.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);

@@ -68,6 +68,8 @@ import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.ContentEncryptedElements;
+import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.IssuedToken;
@@ -77,6 +79,7 @@ import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
+import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.SymmetricBinding;
@@ -86,6 +89,8 @@ import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
+import org.apache.wss4j.policy.model.XPath;
+import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -902,7 +907,7 @@ public abstract class AbstractStaxBindingHandler {
      */
     protected List<SecurePart> getSignedParts() throws SOAPException {
         SignedParts parts = null;
-        // SignedElements elements = null;
+        SignedElements elements = null;
         
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
@@ -912,7 +917,7 @@ public abstract class AbstractStaxBindingHandler {
                 ai.setAsserted(true);
             }            
         }
-        /*
+        
         ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
@@ -920,7 +925,6 @@ public abstract class AbstractStaxBindingHandler {
                 ai.setAsserted(true);
             }            
         }
-        */
         
         List<SecurePart> signedParts = new ArrayList<SecurePart>();
         if (parts != null) {
@@ -941,7 +945,16 @@ public abstract class AbstractStaxBindingHandler {
             }
         }
         
-        // TODO Elements
+        if (elements != null && elements.getXPaths() != null) {
+            for (XPath xPath : elements.getXPaths()) {
+                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                if (!qnames.isEmpty()) {
+                    SecurePart securePart = 
+                        new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
+                    signedParts.add(securePart);
+                }
+            }
+        }
         
         return signedParts;
     }
@@ -951,7 +964,8 @@ public abstract class AbstractStaxBindingHandler {
      */
     protected List<SecurePart> getEncryptedParts() throws SOAPException {
         EncryptedParts parts = null;
-        // EncryptedElements elements = null;
+        EncryptedElements elements = null;
+        ContentEncryptedElements celements = null;
         
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
@@ -961,7 +975,7 @@ public abstract class AbstractStaxBindingHandler {
                 ai.setAsserted(true);
             }            
         }
-        /*
+        
         ais = getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
@@ -969,15 +983,14 @@ public abstract class AbstractStaxBindingHandler {
                 ai.setAsserted(true);
             }            
         }
-        */
         
-        /*ais = getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        ais = getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 celements = (ContentEncryptedElements)ai.getAssertion();
                 ai.setAsserted(true);
             }            
-        }*/
+        }
         
         List<SecurePart> encryptedParts = new ArrayList<SecurePart>();
         if (parts != null) {
@@ -998,7 +1011,27 @@ public abstract class AbstractStaxBindingHandler {
             }
         }
         
-        // TODO Elements
+        if (elements != null && elements.getXPaths() != null) {
+            for (XPath xPath : elements.getXPaths()) {
+                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                if (!qnames.isEmpty()) {
+                    SecurePart securePart = 
+                        new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
+                    encryptedParts.add(securePart);
+                }
+            }
+        }
+        
+        if (celements != null && celements.getXPaths() != null) {
+            for (XPath xPath : celements.getXPaths()) {
+                List<QName> qnames = PolicyUtils.getElementPath(xPath);
+                if (!qnames.isEmpty()) {
+                    SecurePart securePart = 
+                        new SecurePart(qnames.get(qnames.size() - 1), Modifier.Content);
+                    encryptedParts.add(securePart);
+                }
+            }
+        }
         
         return encryptedParts;
     }

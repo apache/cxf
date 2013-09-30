@@ -134,7 +134,9 @@
       <wsp:ExactlyOne>
          <wsp:All>
             <sp:SignedElements>
-               <sp:XPath>//*[local-name()='DoubleIt']</sp:XPath>
+               <sp:XPath xmlns:dns="http://www.example.org/schema/DoubleIt"
+                   xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                   >/soap:Envelope/soap:Body/dns:DoubleIt</sp:XPath>
             </sp:SignedElements>
          </wsp:All>
       </wsp:ExactlyOne>

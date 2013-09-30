@@ -81,9 +81,9 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         // DOM
         port.doubleIt(25);
         
-        // TODO - XPath support Streaming
-        // SecurityTestUtil.enableStreaming(port);
-        // port.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
         
         // This should fail, as OnlySignEntireHeadersAndBody is specified
         portQName = new QName(NAMESPACE, "DoubleItOnlySignPort");

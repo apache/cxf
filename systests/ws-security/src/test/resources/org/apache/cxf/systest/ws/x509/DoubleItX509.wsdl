@@ -1422,7 +1422,8 @@
                             <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing"/>
                         </sp:SignedParts>
                         <sp:SignedElements>
-                            <sp:XPath>//*[local-name()='ReplyTo']</sp:XPath>
+                             <sp:XPath xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                                 >/soap:Envelope/soap:Header/wsaws:ReplyTo</sp:XPath>
                         </sp:SignedElements>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
@@ -1486,7 +1487,8 @@
       <wsp:ExactlyOne>
          <wsp:All>
             <sp:ContentEncryptedElements>
-               <sp:XPath>//*[local-name()='Body']</sp:XPath>
+                <sp:XPath xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                   >/soap:Envelope/soap:Body</sp:XPath>
             </sp:ContentEncryptedElements>
             <sp:SignedParts>
                <sp:Body/>
@@ -1519,7 +1521,8 @@
       <wsp:ExactlyOne>
          <wsp:All>
             <sp:ContentEncryptedElements>
-               <sp:XPath>//*[local-name()='Body']</sp:XPath>
+               <sp:XPath xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                   >/soap:Envelope/soap:Body</sp:XPath>
             </sp:ContentEncryptedElements>
             <sp:SignedParts>
                <sp:Body/>

@@ -171,7 +171,8 @@
       <wsp:ExactlyOne>
          <wsp:All>
             <sp:ContentEncryptedElements>
-               <sp:XPath>//*[local-name()='Body']</sp:XPath>
+               <sp:XPath xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                   >/soap:Envelope/soap:Body</sp:XPath>
             </sp:ContentEncryptedElements>
             <sp:SignedParts>
                <sp:Body/>
@@ -195,7 +196,8 @@
       <wsp:ExactlyOne>
          <wsp:All>
             <sp:ContentEncryptedElements>
-               <sp:XPath>//*[local-name()='Body']</sp:XPath>
+                <sp:XPath xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                   >/soap:Envelope/soap:Body</sp:XPath>
             </sp:ContentEncryptedElements>
             <sp:SignedParts>
                <sp:Body/>
