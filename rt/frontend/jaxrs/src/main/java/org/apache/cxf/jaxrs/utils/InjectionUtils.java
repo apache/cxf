@@ -38,12 +38,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -109,7 +107,6 @@ public final class InjectionUtils {
     private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "javax.servlet.http.HttpServletRequest";
     private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
         
-    private static final String PARAM_HANDLERS_FIRST = "check.parameter.handlers.first";
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
     
     private InjectionUtils() {
@@ -352,6 +349,11 @@ public final class InjectionUtils {
         
         value = decodeValue(value, decoded, pType);
         
+        Object result = createFromParameterHandler(value, pClass, message);
+        if (result != null) {
+            return pClass.cast(result);
+        }
+        
         if (pClass.isPrimitive()) {
             try {
                 @SuppressWarnings("unchecked")
@@ -380,10 +382,8 @@ public final class InjectionUtils {
             cls = valueType;
             adapterHasToBeUsed = true;
         }
-        
-        Object result = instantiateFromParameterHandler(value, cls, message);
-        if (result != null) {
-            return pClass.cast(result);
+        if (pClass == String.class && !adapterHasToBeUsed) {
+            return pClass.cast(value);
         }
         // check constructors accepting a single String value
         try {
@@ -395,13 +395,10 @@ public final class InjectionUtils {
             throw ex;
         } catch (Exception ex) {
             Throwable t = getOrThrowActualException(ex);
-            result = createFromParameterHandler(value, cls, message);
-            if (result == null) {
-                LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
-                                                                   BUNDLE, 
-                                                                   pClass.getName()).toString());
-                throw new ClientErrorException(HttpUtils.getParameterFailureStatus(pType), t);
-            }
+            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
+                                                               BUNDLE, 
+                                                               pClass.getName()).toString());
+            throw new ClientErrorException(HttpUtils.getParameterFailureStatus(pType), t);
         }
         if (result == null) {
             // check for valueOf(String) static methods
@@ -414,10 +411,6 @@ public final class InjectionUtils {
                     break;
                 }
             }
-        }
-        
-        if (result == null) {
-            result = createFromParameterHandler(value, cls, message);
         }
         
         if (adapterHasToBeUsed) {
@@ -437,24 +430,14 @@ public final class InjectionUtils {
         return pClass.cast(result);
     }
 
-    private static <T> T instantiateFromParameterHandler(String value, 
-                                                     Class<T> pClass,
-                                                     Message m) {
-        if (Date.class == pClass || Locale.class == pClass 
-            || m != null && MessageUtils.isTrue(m.getContextualProperty(PARAM_HANDLERS_FIRST))) {
-            return createFromParameterHandler(value, pClass, m);
-        } else {
-            return null;
-        }
-    }
     
     private static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
                                                     Message message) {
         T result = null;
         if (message != null) {
-            ParamConverter<T> pm = ServerProviderFactory.getInstance(message)
-                .createParameterHandler(pClass);
+            ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
+            ParamConverter<T> pm = pf.createParameterHandler(pClass);
             if (pm != null) {
                 result = pm.fromString(value);
             }

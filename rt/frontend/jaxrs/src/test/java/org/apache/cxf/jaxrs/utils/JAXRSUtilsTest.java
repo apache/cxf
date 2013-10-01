@@ -132,7 +132,7 @@ public class JAXRSUtilsTest extends Assert {
     private void doTestFormParamsWithEncoding(String enc, boolean setEnc) throws Exception {
         Class<?>[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         String body = "p1=" + URLEncoder.encode("\u00E4\u00F6\u00FC", enc) + "&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -818,7 +818,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testQueryParameters() throws Exception {
         Class<?>[] argType = {String.class, Integer.TYPE, String.class, String.class};
         Method m = Customer.class.getMethod("testQuery", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         
         messageImpl.put(Message.QUERY_STRING, "query=24&query2");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
@@ -836,7 +836,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testQueryParametersIntegerArray() throws Exception {
         Class<?>[] argType = {Integer[].class};
         Method m = Customer.class.getMethod("testQueryIntegerArray", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         
         messageImpl.put(Message.QUERY_STRING, "query=1&query=2");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
@@ -853,7 +853,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testQueryParametersIntArray() throws Exception {
         Class<?>[] argType = {int[].class};
         Method m = Customer.class.getMethod("testQueryIntArray", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         
         messageImpl.put(Message.QUERY_STRING, "query=1&query=2");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
@@ -917,7 +917,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testCookieParameters() throws Exception {
         Class<?>[] argType = {String.class, Set.class, String.class, Set.class};
         Method m = Customer.class.getMethod("testCookieParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.add("Cookie", "c1=c1Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
@@ -941,7 +941,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testMultipleCookieParameters() throws Exception {
         Class<?>[] argType = {String.class, String.class, Cookie.class};
         Method m = Customer.class.getMethod("testMultipleCookieParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.add("Cookie", "c1=c1Value; c2=c2Value");
         headers.add("Cookie", "c3=c3Value");
@@ -992,7 +992,7 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testCustomerParameter() throws Exception {
         Message messageImpl = createMessage();
-        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+        ServerProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
         Class<?>[] argType = {Customer.class, Customer[].class, Customer2.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
@@ -1059,25 +1059,6 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
-    public void testConstructorFirstAndParameterHandler() throws Exception {
-        Message messageImpl = createMessage();
-        ProviderFactory.getInstance(messageImpl).registerUserProvider(
-            new CustomerParameterHandler());
-        Class<?>[] argType = {Customer.class, Customer[].class, Customer2.class};
-        Method m = Customer.class.getMethod("testCustomerParam", argType);
-        
-        messageImpl.put(Message.QUERY_STRING, "p3=jack");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
-                                                               new ClassResourceInfo(Customer.class)),
-                                                           null, 
-                                                           messageImpl);
-        assertEquals(3, params.size());
-        Customer2 c3 = (Customer2)params.get(2);
-        assertEquals("jack", c3.getName());
-    }
-    
-    
-    @Test
     public void testArrayParamNoProvider() throws Exception {
         Message messageImpl = createMessage();
         Class<?>[] argType = {String[].class};
@@ -1119,7 +1100,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testExceptionDuringConstruction() throws Exception {
         Class<?>[] argType = {CustomerGender.class};
         Method m = Customer.class.getMethod("testWrongType2", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=3");
         try {
             JAXRSUtils.processParameters(new OperationResourceInfo(m, 
@@ -1138,10 +1119,10 @@ public class JAXRSUtilsTest extends Assert {
     public void testQueryParametersBean() throws Exception {
         Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testQueryBean", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "a=aValue&b=123");
 
-        MessageImpl complexMessageImpl = new MessageImpl();
+        Message complexMessageImpl = createMessage();
         complexMessageImpl.put(Message.QUERY_STRING, "c=1&a=A&b=123&c=2&c=3&"
                                 + "d.c=4&d.a=B&d.b=456&d.c=5&d.c=6&"
                                 + "e.c=41&e.a=B1&e.b=457&e.c=51&e.c=61&"
@@ -1254,17 +1235,17 @@ public class JAXRSUtilsTest extends Assert {
         complexPathTemplates.add("d.e.c", "82");
         complexPathTemplates.add("d.e.c", "92");
 
-        verifyParametersBean(m, pathTemplates, new MessageImpl(), complexPathTemplates, new MessageImpl());
+        verifyParametersBean(m, pathTemplates, createMessage(), complexPathTemplates, createMessage());
     }
     
     @Test
     public void testMatrixParametersBean() throws Exception {
         Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testMatrixBean", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar;a=aValue/baz;b=123");
 
-        MessageImpl complexMessageImpl = new MessageImpl();
+        Message complexMessageImpl = createMessage();
         complexMessageImpl.put(Message.REQUEST_URI, "/bar;c=1/bar;a=A/bar;b=123/bar;c=2/bar;c=3"
                                 + "/bar;d.c=4/bar;d.a=B/bar;d.b=456/bar;d.c=5/bar;d.c=6"
                                 + "/bar;e.c=41/bar;e.a=B1/bar;e.b=457/bar;e.c=51/bar;e.c=61"
@@ -1280,7 +1261,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testFormParametersBeanWithBoolean() throws Exception {
         Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
@@ -1305,7 +1286,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testFormParametersBean() throws Exception {
         Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
@@ -1313,7 +1294,7 @@ public class JAXRSUtilsTest extends Assert {
         String body = "a=aValue&b=123&cb=true";
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
 
-        MessageImpl complexMessageImpl = new MessageImpl();
+        Message complexMessageImpl = createMessage();
         complexMessageImpl.put(Message.REQUEST_URI, "/bar");
         complexMessageImpl.put(Message.PROTOCOL_HEADERS, headers);
         body = "c=1&a=A&b=123&c=2&c=3&"
@@ -1356,9 +1337,9 @@ public class JAXRSUtilsTest extends Assert {
 
     private void verifyParametersBean(Method m,
                                       MultivaluedMap<String, String> simpleValues,
-                                      MessageImpl simpleMessageImpl,
+                                      Message simpleMessageImpl,
                                       MultivaluedMap<String, String> complexValues,
-                                      MessageImpl complexMessageImpl) throws Exception {
+                                      Message complexMessageImpl) throws Exception {
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
                                                                new ClassResourceInfo(Customer.class)),
                                                            simpleValues, 
@@ -1448,7 +1429,7 @@ public class JAXRSUtilsTest extends Assert {
         Class<?>[] argType = {String.class, String.class, Long.class, 
                               Boolean.TYPE, String.class};
         Method m = Customer.class.getMethod("testMultipleQuery", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         
         messageImpl.put(Message.QUERY_STRING, 
                         "query=first&query2=second&query3=3&query4=true&query5");
@@ -1473,7 +1454,7 @@ public class JAXRSUtilsTest extends Assert {
         Class<?>[] argType = {String.class, String.class, String.class, String.class, 
                               List.class, String.class};
         Method m = Customer.class.getMethod("testMatrixParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         
         messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2/baz;p4=4;p4=5;p5");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
@@ -1502,7 +1483,7 @@ public class JAXRSUtilsTest extends Assert {
     public void testMatrixAndPathSegmentParameters() throws Exception {
         Class<?>[] argType = {PathSegment.class, String.class};
         Method m = Customer.class.getMethod("testPathSegment", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar%20foo;p4=0%201");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
         values.add("ps", "bar%20foo;p4=0%201");
@@ -1533,7 +1514,7 @@ public class JAXRSUtilsTest extends Assert {
     private void doTestFormParameters(boolean useMediaType) throws Exception {
         Class<?>[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
+        Message messageImpl = createMessage();
         String body = "p1=1&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -1662,7 +1643,7 @@ public class JAXRSUtilsTest extends Assert {
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.add("Foo", "bar, baz");
         
-        Message m = new MessageImpl();
+        Message m = createMessage();
         m.put("org.apache.cxf.http.header.split", "true");
         m.put(Message.PROTOCOL_HEADERS, headers);
         

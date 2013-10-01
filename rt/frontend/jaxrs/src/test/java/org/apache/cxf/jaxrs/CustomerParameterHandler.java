@@ -31,7 +31,7 @@ public class CustomerParameterHandler implements ParamConverterProvider, ParamCo
     @SuppressWarnings("unchecked")
     @Override
     public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
-        if (Customer.class.isAssignableFrom(cls)) {
+        if (Customer.class == cls) {
             return (ParamConverter<T>)this;
         } else {
             return null;
@@ -39,10 +39,7 @@ public class CustomerParameterHandler implements ParamConverterProvider, ParamCo
     }
 
     public Customer fromString(String s) throws IllegalArgumentException {
-        if ("noName".equals(s)) {
-            throw new IllegalArgumentException();
-        }
-        Customer c = Character.isLowerCase(((CharSequence)s).charAt(0)) ? new Customer2() : new Customer();
+        Customer c = new Customer();
         c.setName(s);
         return c;
     }

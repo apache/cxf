@@ -228,7 +228,7 @@ public class InjectionUtilsTest extends Assert {
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         endpoint.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ProviderFactory.class.getName());
+        endpoint.get(ServerProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
