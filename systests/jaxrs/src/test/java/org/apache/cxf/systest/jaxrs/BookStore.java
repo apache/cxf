@@ -495,6 +495,18 @@ public class BookStore {
         return Response.status(401).entity("This is 401").build();
     }
     
+    @GET
+    @Path("infault")
+    public Response infault() throws Exception {
+        throw new RuntimeException();
+    }
+    
+    @GET
+    @Path("outfault")
+    public Response outfault() throws Exception {
+        return Response.ok().build();
+    }
+    
     @POST
     @Path("/collections")
     @Produces({"application/xml", "application/json" })

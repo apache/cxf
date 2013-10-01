@@ -426,6 +426,27 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(401, r.getStatus());
         assertEquals("This is 401", getStringFromInputStream((InputStream)r.getEntity()));
     }
+    
+    @Test
+    public void testCapturedServerInFault() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/infault"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        Response r = wc.get();
+        assertEquals(401, r.getStatus());
+    }
+    
+    @Test
+    public void testCapturedServerOutFault() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/outfault"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = wc.get();
+        assertEquals(403, r.getStatus());
+    }
 
     @Test
     public void testGetCollectionOfBooks() throws Exception {

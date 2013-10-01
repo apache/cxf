@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.interceptor;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -37,8 +38,11 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -53,7 +57,11 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.logging.FaultListener;
+import org.apache.cxf.logging.NoOpFaultListener;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -69,28 +77,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.UNMARSHAL);
     }
 
-    @Override
-    public void handleFault(Message message) {
-        super.handleFault(message);
-        
-        LOG.fine("Cleanup thread local variables");
-        
-        Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
-        Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
-        if (rootInstance != null && rootProvider != null) {
-            try {
-                ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
-            } catch (Throwable tex) {
-                LOG.warning("Exception occurred during releasing the service instance, " + tex.getMessage());
-            }
-        }
-        ProviderFactory.getInstance(message).clearThreadLocalProxies();
-        ClassResourceInfo cri = (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
-        if (cri != null) {
-            cri.clearThreadLocalProxies();
-        }
-    }
-    
+
     public void handleMessage(Message message) {
         
         if (message.getExchange().get(OperationResourceInfo.class) != null) {
@@ -296,5 +283,56 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         boolean oneway = ori.isOneway() 
             || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null));
         message.getExchange().setOneWay(oneway);
+    }
+    
+    @Override
+    public void handleFault(Message message) {
+        super.handleFault(message);
+        
+        Response r = JAXRSUtils.convertFaultToResponse(message.getContent(Exception.class), 
+                                                       message);
+        if (r != null) {
+            message.removeContent(Exception.class);
+            message.getInterceptorChain().setFaultObserver(null);
+            if (message.getContextualProperty(FaultListener.class.getName()) == null) {
+                message.put(FaultListener.class.getName(), new NoOpFaultListener());
+            }
+            
+            Endpoint e = message.getExchange().get(Endpoint.class);
+            Message mout = new MessageImpl();
+            mout.setContent(List.class, new MessageContentsList(r));
+            mout.setExchange(message.getExchange());
+            mout = e.getBinding().createMessage(mout);
+            mout.setInterceptorChain(OutgoingChainInterceptor.getOutInterceptorChain(message.getExchange()));
+            message.getExchange().setOutMessage(mout);
+            
+            
+            Iterator<Interceptor<? extends Message>> iterator = message.getInterceptorChain().iterator();
+            while (iterator.hasNext()) {
+                Interceptor<? extends Message> inInterceptor = iterator.next();
+                if (inInterceptor.getClass() == OutgoingChainInterceptor.class) {
+                    ((OutgoingChainInterceptor)inInterceptor).handleMessage(message);
+                    return;
+                }
+            }
+        }
+        
+        
+        LOG.fine("Cleanup thread local variables");
+        
+        Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
+        Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
+        if (rootInstance != null && rootProvider != null) {
+            try {
+                ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
+            } catch (Throwable tex) {
+                LOG.warning("Exception occurred during releasing the service instance, " + tex.getMessage());
+            }
+        }
+        ProviderFactory.getInstance(message).clearThreadLocalProxies();
+        ClassResourceInfo cri = (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+        if (cri != null) {
+            cri.clearThreadLocalProxies();
+        }
     }
 }
