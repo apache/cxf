@@ -87,7 +87,7 @@
         <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
-        <cxf.ehcache.version>2.7.2</cxf.ehcache.version>
+        <cxf.ehcache.version>2.7.4</cxf.ehcache.version>
         <cxf.fastinfoset.bundle.version>1.2.7_4</cxf.fastinfoset.bundle.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
         <cxf.httpcomponents.asyncclient.version>4.0-beta3</cxf.httpcomponents.asyncclient.version>
