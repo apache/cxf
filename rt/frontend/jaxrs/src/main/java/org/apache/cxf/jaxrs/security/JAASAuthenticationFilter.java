@@ -22,8 +22,10 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -43,6 +45,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 @PreMatching
+@Priority(Priorities.AUTHENTICATION)
 public class JAASAuthenticationFilter implements ContainerRequestFilter {
 
     private static final List<MediaType> HTML_MEDIA_TYPES = 
