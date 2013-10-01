@@ -354,6 +354,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         client.getConfiguration().getOutInterceptors().addAll(ep.getOutInterceptors());
         client.getConfiguration().getInInterceptors().addAll(getInInterceptors());
         client.getConfiguration().getInInterceptors().addAll(ep.getInInterceptors());
+        client.getConfiguration().getInFaultInterceptors().addAll(getInFaultInterceptors());
 
         applyFeatures(client);
         
