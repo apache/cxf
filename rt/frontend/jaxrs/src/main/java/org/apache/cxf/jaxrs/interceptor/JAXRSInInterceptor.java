@@ -289,30 +289,34 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleFault(Message message) {
         super.handleFault(message);
         
-        Response r = JAXRSUtils.convertFaultToResponse(message.getContent(Exception.class), 
-                                                       message);
-        if (r != null) {
-            message.removeContent(Exception.class);
-            message.getInterceptorChain().setFaultObserver(null);
-            if (message.getContextualProperty(FaultListener.class.getName()) == null) {
-                message.put(FaultListener.class.getName(), new NoOpFaultListener());
-            }
-            
-            Endpoint e = message.getExchange().get(Endpoint.class);
-            Message mout = new MessageImpl();
-            mout.setContent(List.class, new MessageContentsList(r));
-            mout.setExchange(message.getExchange());
-            mout = e.getBinding().createMessage(mout);
-            mout.setInterceptorChain(OutgoingChainInterceptor.getOutInterceptorChain(message.getExchange()));
-            message.getExchange().setOutMessage(mout);
-            
-            
-            Iterator<Interceptor<? extends Message>> iterator = message.getInterceptorChain().iterator();
-            while (iterator.hasNext()) {
-                Interceptor<? extends Message> inInterceptor = iterator.next();
-                if (inInterceptor.getClass() == OutgoingChainInterceptor.class) {
-                    ((OutgoingChainInterceptor)inInterceptor).handleMessage(message);
-                    return;
+        Object mapProp = message.getContextualProperty("map.cxf.interceptor.fault");
+        if (MessageUtils.isTrue(mapProp)) {
+        
+            Response r = JAXRSUtils.convertFaultToResponse(message.getContent(Exception.class), 
+                                                           message);
+            if (r != null) {
+                message.removeContent(Exception.class);
+                message.getInterceptorChain().setFaultObserver(null);
+                if (message.getContextualProperty(FaultListener.class.getName()) == null) {
+                    message.put(FaultListener.class.getName(), new NoOpFaultListener());
+                }
+                
+                Endpoint e = message.getExchange().get(Endpoint.class);
+                Message mout = new MessageImpl();
+                mout.setContent(List.class, new MessageContentsList(r));
+                mout.setExchange(message.getExchange());
+                mout = e.getBinding().createMessage(mout);
+                mout.setInterceptorChain(OutgoingChainInterceptor.getOutInterceptorChain(message.getExchange()));
+                message.getExchange().setOutMessage(mout);
+                
+                
+                Iterator<Interceptor<? extends Message>> iterator = message.getInterceptorChain().iterator();
+                while (iterator.hasNext()) {
+                    Interceptor<? extends Message> inInterceptor = iterator.next();
+                    if (inInterceptor.getClass() == OutgoingChainInterceptor.class) {
+                        ((OutgoingChainInterceptor)inInterceptor).handleMessage(message);
+                        return;
+                    }
                 }
             }
         }

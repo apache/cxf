@@ -35,6 +35,7 @@ public class CustomInFaultyInterceptor extends AbstractPhaseInterceptor<Message>
         
         String requestUri = (String)message.get(Message.REQUEST_URI);
         if (requestUri.endsWith("/infault")) {
+            message.put("map.cxf.interceptor.fault", true);
             throw new WebApplicationException(401);
         }
         
