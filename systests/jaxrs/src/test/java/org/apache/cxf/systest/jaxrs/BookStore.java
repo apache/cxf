@@ -497,13 +497,13 @@ public class BookStore {
     
     @GET
     @Path("infault")
-    public Response infault() throws Exception {
+    public Response infault() {
         throw new RuntimeException();
     }
     
     @GET
     @Path("outfault")
-    public Response outfault() throws Exception {
+    public Response outfault() {
         return Response.ok().build();
     }
     

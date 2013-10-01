@@ -94,7 +94,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class));
+                   launchServer(BookServerRestSoap.class, true));
     }
     
     @Test
@@ -897,7 +897,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             assertTrue("Wrong exception caught", 
                        "fault from bad interceptor".equals(e.getCause().getMessage()));
             assertTrue("Client In Fault In Interceptor was invoked", 
-                    !testFeature.faultInInterceptorCalled());
+                    testFeature.faultInInterceptorCalled());
         }
     }
     

@@ -66,6 +66,7 @@ import org.apache.cxf.endpoint.Retryable;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InFaultChainInitiatorObserver;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.jaxrs.client.spec.ClientRequestFilterInterceptor;
@@ -888,6 +889,18 @@ public abstract class AbstractClient implements Client, Retryable {
         return chain;
     }
     
+    protected static MessageObserver setupInFaultObserver(final ClientConfiguration cfg) { 
+        if (!cfg.getInFaultInterceptors().isEmpty()) {
+            return new InFaultChainInitiatorObserver(cfg.getBus()) {
+                protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
+                    chain.add(cfg.getInFaultInterceptors());
+                }
+            };
+        } else {
+            return null;
+        }
+    }
+    
     protected Message createMessage(Object body,
                                     String httpMethod, 
                                     MultivaluedMap<String, String> headers,
@@ -924,6 +937,7 @@ public abstract class AbstractClient implements Client, Retryable {
         m.put(URITemplate.TEMPLATE_PARAMETERS, getState().getTemplates());
         
         PhaseInterceptorChain chain = setupOutInterceptorChain(cfg);
+        chain.setFaultObserver(setupInFaultObserver(cfg));
         m.setInterceptorChain(chain);
         
         exchange = createExchange(m, exchange);
