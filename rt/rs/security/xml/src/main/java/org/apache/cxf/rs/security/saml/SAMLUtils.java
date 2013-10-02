@@ -30,7 +30,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.saml.assertion.Claim;
@@ -95,28 +94,18 @@ public final class SAMLUtils {
     public static SamlAssertionWrapper createAssertion(Message message) throws Fault {
         CallbackHandler handler = SecurityUtils.getCallbackHandler(
             message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
-        boolean selfSignAssertion = 
-            MessageUtils.getContextualBoolean(
-                message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
-            );
-        return createAssertion(message, handler, selfSignAssertion);
+        return createAssertion(message, handler);
     }
     
     public static SamlAssertionWrapper createAssertion(Message message,
-                                                   CallbackHandler handler) {
-        return createAssertion(message, handler, true);
-    }
-    
-    public static SamlAssertionWrapper createAssertion(Message message,
-                                                   CallbackHandler handler,
-                                                   boolean selfSignAssertion) throws Fault {
+                                                   CallbackHandler handler) throws Fault {
             
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         
         try {
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
-            if (selfSignAssertion) {
+            if (samlCallback.isSignAssertion()) {
                 //--- This code will be moved to a common utility class
                 Crypto crypto = new CryptoLoader().getCrypto(message, 
                                           SecurityConstants.SIGNATURE_CRYPTO,
