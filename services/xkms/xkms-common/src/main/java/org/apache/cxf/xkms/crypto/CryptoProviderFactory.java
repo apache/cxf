@@ -56,4 +56,14 @@ public interface CryptoProviderFactory {
      * @return
      */
     Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto);
+
+    /**
+     * Create with overridden XKMSPortType, fallbackCrypto and control of getting X509 from local keystore
+     * 
+     * @param xkmsClient
+     * @param fallbackCrypto
+     * @param allowX509FromJKS
+     * @return
+     */
+    Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto, boolean allowX509FromJKS);
 }

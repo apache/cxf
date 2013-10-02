@@ -70,4 +70,9 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
     public Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto) {
         return new XkmsCryptoProvider(xkmsClient, fallbackCrypto);
     }
+
+    @Override
+    public Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto, boolean allowX509FromJKS) {
+        return new XkmsCryptoProvider(xkmsClient, fallbackCrypto, allowX509FromJKS);
+    }
 }
