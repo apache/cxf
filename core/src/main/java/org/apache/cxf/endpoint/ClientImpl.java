@@ -478,7 +478,7 @@ public class ClientImpl
                     public void onMessage(Message message) {
                         Exception ex = message.getContent(Exception.class);
                         if (ex != null) {
-                            getConduitSelector().complete(message.getExchange());
+                            completeExchange(message.getExchange());
                             if (message.getContent(Exception.class) == null) {
                                 // handle the right response
                                 List<Object> resList = null;
@@ -520,6 +520,15 @@ public class ClientImpl
         }
     }
 
+    private void completeExchange(Exchange exchange) {
+        getConduitSelector().complete(exchange);
+        Message outMessage = exchange.getOutMessage();
+        if (outMessage != null && outMessage.get("transport.retransmit.url") != null) {
+            //FIXME: target address has been updated at the transport level, 
+            //       update the the current client accordingly
+        }
+    }
+    
     /**
      * TODO This is SOAP specific code and should not be in cxf core
      * @param fault
@@ -560,7 +569,7 @@ public class ClientImpl
         }
         boolean mepCompleteCalled = false;
         if (ex != null) {
-            getConduitSelector().complete(exchange);
+            completeExchange(exchange);
             mepCompleteCalled = true;
             if (message.getContent(Exception.class) != null) {
                 throw ex;
@@ -569,7 +578,7 @@ public class ClientImpl
         ex = message.getExchange().get(Exception.class);
         if (ex != null) {
             if (!mepCompleteCalled) {
-                getConduitSelector().complete(exchange);
+                completeExchange(exchange);
             }
             throw ex;
         }
@@ -596,7 +605,7 @@ public class ClientImpl
         // leave the input stream open for the caller
         Boolean keepConduitAlive = (Boolean)exchange.get(Client.KEEP_CONDUIT_ALIVE);
         if (keepConduitAlive == null || !keepConduitAlive) {
-            getConduitSelector().complete(exchange);
+            completeExchange(exchange);
         }
 
         // Grab the response objects if there are any
@@ -730,7 +739,7 @@ public class ClientImpl
         try {
             if (callback != null) {
                 if (callback.isCancelled()) {
-                    getConduitSelector().complete(message.getExchange());
+                    completeExchange(message.getExchange());
                     return;
                 }
                 callback.start(message);

@@ -497,6 +497,12 @@ public abstract class AbstractClient implements Client {
             // In some cases, such as the "upfront" load-balancing, etc, the retries
             // won't be executed so it is necessary to reset the base address 
             calculateNewRequestURI(URI.create(s), getCurrentURI(), proxy);
+            return;
+        } 
+        s = (String)exchange.getOutMessage().get("transport.retransmit.url");
+        if (s != null && !state.getBaseURI().toString().equals(s)) {
+            calculateNewRequestURI(URI.create(s), getCurrentURI(), proxy);
+            return;
         }
         
     }
@@ -574,7 +580,15 @@ public abstract class AbstractClient implements Client {
         UriBuilder builder = new UriBuilderImpl().uri(newBaseURI);
         String basePath = reqURIPath.startsWith(baseURIPath) ? baseURIPath : getBaseURI().getRawPath(); 
         builder.path(reqURIPath.equals(basePath) ? "" : reqURIPath.substring(basePath.length()));
-        URI newRequestURI = builder.replaceQuery(requestURI.getRawQuery()).build();
+        
+        String newQuery = newBaseURI.getRawQuery();
+        if (newQuery == null) {
+            builder.replaceQuery(requestURI.getRawQuery());
+        } else {
+            builder.replaceQuery(newQuery);
+        }
+        
+        URI newRequestURI = builder.build();
         
         resetBaseAddress(newBaseURI);
         URI current = proxy ? newBaseURI : newRequestURI; 
