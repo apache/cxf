@@ -37,11 +37,11 @@ import org.junit.BeforeClass;
  * A set of tests for Username Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
  * 
- * It tests both DOM + StAX clients against the DOM server
+ * It tests both DOM + StAX clients against the StAX server
  */
-public class UsernameTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
+public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxServer.class);
+    static final String PORT2 = allocatePort(StaxServer.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -52,7 +52,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
     }
     
@@ -69,13 +69,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintext() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
         DoubleItPortType utPort = 
@@ -100,13 +100,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testPlaintextNoPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextNoPasswordPort");
         DoubleItPortType utPort = 
@@ -131,13 +131,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testDigest() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItDigestPort");
         DoubleItPortType utPort = 
@@ -162,13 +162,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSupportingPort");
         DoubleItPortType utPort = 
@@ -193,13 +193,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSESupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSESupportingPort");
         DoubleItPortType utPort = 
@@ -224,13 +224,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncrSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncrSupportingPort");
         DoubleItPortType utPort = 
@@ -255,13 +255,13 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricSESupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("client.xml");
+        URL busFile = StaxUsernameTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        URL wsdl = StaxUsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSESupportingPort");
         DoubleItPortType utPort = 

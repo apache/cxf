@@ -84,7 +84,6 @@
        <jaxws:properties>
            <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
            <entry key="ws-security.signature.username" value="myservicekey"/>
-           <entry key="ws-security.self-sign-saml-assertion" value="true"/>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
        </jaxws:properties>

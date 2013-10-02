@@ -731,24 +731,18 @@ public abstract class AbstractBindingBuilder {
                 part = new WSEncryptionPart(bst.getID());
                 part.setElement(bst.getElement());
             } else if (tempTok instanceof SamlAssertionWrapper) {
-                boolean selfSignAssertion = 
-                    MessageUtils.getContextualBoolean(
-                        message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
-                    );
-                if (!selfSignAssertion) {
-                    SamlAssertionWrapper assertionWrapper = (SamlAssertionWrapper)tempTok;
-                    
-                    Document doc = assertionWrapper.getElement().getOwnerDocument();
-                    boolean saml1 = assertionWrapper.getSaml1() != null;
-                    // TODO We only support using a KeyIdentifier for the moment
-                    SecurityTokenReference secRef = 
-                        createSTRForSamlAssertion(doc, assertionWrapper.getId(), saml1, false);
-                    Element clone = cloneElement(secRef.getElement());
-                    addSupportingElement(clone);
-                    part = new WSEncryptionPart("STRTransform", null, "Element");
-                    part.setId(secRef.getID());
-                    part.setElement(clone);
-                }
+                SamlAssertionWrapper assertionWrapper = (SamlAssertionWrapper)tempTok;
+
+                Document doc = assertionWrapper.getElement().getOwnerDocument();
+                boolean saml1 = assertionWrapper.getSaml1() != null;
+                // TODO We only support using a KeyIdentifier for the moment
+                SecurityTokenReference secRef = 
+                    createSTRForSamlAssertion(doc, assertionWrapper.getId(), saml1, false);
+                Element clone = cloneElement(secRef.getElement());
+                addSupportingElement(clone);
+                part = new WSEncryptionPart("STRTransform", null, "Element");
+                part.setId(secRef.getID());
+                part.setElement(clone);
             } else if (tempTok instanceof WSSecurityTokenHolder) {
                 SecurityToken token = ((WSSecurityTokenHolder)tempTok).getToken();
                 String tokenType = token.getTokenType();
@@ -1005,11 +999,7 @@ public abstract class AbstractBindingBuilder {
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
-        boolean selfSignAssertion = 
-            MessageUtils.getContextualBoolean(
-                message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
-            );
-        if (selfSignAssertion || samlCallback.isSignAssertion()) {
+        if (samlCallback.isSignAssertion()) {
             String issuerName = samlCallback.getIssuerKeyName();
             if (issuerName == null) {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;

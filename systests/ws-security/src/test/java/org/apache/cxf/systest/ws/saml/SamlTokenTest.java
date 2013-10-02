@@ -245,12 +245,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml1Port, PORT2);
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
         );
         
-        ((BindingProvider)saml1Port).getRequestContext().put(
-            SecurityConstants.SELF_SIGN_SAML_ASSERTION, true
-        );
         ((BindingProvider)saml1Port).getRequestContext().put(
             SecurityConstants.SIGNATURE_USERNAME, "alice"
         );
@@ -635,7 +632,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml1Port, PORT2);
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -690,7 +687,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml1Port, PORT2);
         
         ((BindingProvider)saml1Port).getRequestContext().put(
-            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false, true)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -744,7 +741,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
@@ -800,7 +797,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
@@ -861,7 +858,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setKeyInfoIdentifier(CERT_IDENTIFIER.KEY_VALUE);
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -924,7 +921,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
@@ -1099,7 +1096,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
         
-        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler

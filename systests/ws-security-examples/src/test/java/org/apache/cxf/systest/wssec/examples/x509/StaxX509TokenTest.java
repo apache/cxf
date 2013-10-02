@@ -37,10 +37,10 @@ import org.junit.BeforeClass;
  * A set of tests for X509 Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
  * 
- * It tests both DOM + StAX clients against the DOM server
+ * It tests both DOM + StAX clients against the StAX server
  */
-public class X509TokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -51,7 +51,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
     }
     
@@ -68,13 +68,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignEncrypt() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = StaxX509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignEncryptPort");
         DoubleItPortType x509Port = 
@@ -99,13 +99,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = StaxX509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricProtectTokensPort");
         DoubleItPortType x509Port = 
@@ -125,18 +125,20 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.2.3 (WSS1.1) Anonymous with X.509 Certificate, Sign, Encrypt
+     * TODO Support streaming derived
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testSymmetricSignEncrypt() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = StaxX509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignEncryptPort");
         DoubleItPortType x509Port = 
@@ -156,18 +158,20 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.2.4 (WSS1.1) Mutual Authentication with X.509 Certificates, Sign, Encrypt
+     * TODO - Support streaming Endorsing
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testSymmetricEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = StaxX509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = StaxX509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingPort");
         DoubleItPortType x509Port = 

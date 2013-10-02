@@ -589,13 +589,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     } else if (encrToken instanceof KerberosToken && !isRequestor()) {
                         encr.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
                         encr.setEncKeyId(encrTok.getSHA1());
-                    } else if (!isRequestor()) {
-                        if (encrTok.getSHA1() != null) {
-                            encr.setCustomReferenceValue(encrTok.getSHA1());
-                            encr.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-                        } else {
-                            encr.setKeyIdentifierType(WSConstants.EMBED_SECURITY_TOKEN_REF);
-                        }
+                    } else if (!isRequestor() && encrTok.getSHA1() != null) {
+                        encr.setCustomReferenceValue(encrTok.getSHA1());
+                        encr.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
                     }
 
                     encr.prepare(saaj.getSOAPPart(), crypto);

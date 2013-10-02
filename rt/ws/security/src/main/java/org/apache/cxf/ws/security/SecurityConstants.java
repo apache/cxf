@@ -162,12 +162,6 @@ public final class SecurityConstants {
     public static final String IS_BSP_COMPLIANT = "ws-security.is-bsp-compliant";
     
     /**
-     * Whether to self-sign a SAML Assertion or not. If this is set to true, then an enveloped signature 
-     * will be generated when the SAML Assertion is constructed. The default is false.
-     */
-    public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
-    
-    /**
      * Whether to cache UsernameToken nonces. The default value is "true" for message recipients, and 
      * "false" for message initiators. Set it to true to cache for both cases. Set this to "false" to
      * not cache UsernameToken nonces. Note that caching only applies when either a UsernameToken
@@ -517,7 +511,7 @@ public final class SecurityConstants {
             CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES, 
             SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             VALIDATE_TOKEN, ENABLE_REVOCATION, ALWAYS_ENCRYPT_UT, IS_BSP_COMPLIANT, 
-            SELF_SIGN_SAML_ASSERTION, ENABLE_NONCE_CACHE, ENABLE_TIMESTAMP_CACHE,
+            ENABLE_NONCE_CACHE, ENABLE_TIMESTAMP_CACHE,
             TIMESTAMP_TTL, TIMESTAMP_FUTURE_TTL, SAML_ROLE_ATTRIBUTENAME,
             KERBEROS_CLIENT, SPNEGO_CLIENT_ACTION, KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, 
             NONCE_CACHE_INSTANCE, TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, 

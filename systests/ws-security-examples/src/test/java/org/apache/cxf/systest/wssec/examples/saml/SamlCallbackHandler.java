@@ -30,6 +30,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
@@ -46,6 +47,7 @@ import org.opensaml.common.SAMLVersion;
 public class SamlCallbackHandler implements CallbackHandler {
     private String confirmationMethod;
     private boolean saml2;
+    private boolean signed;
     
     public SamlCallbackHandler() {
         //
@@ -63,8 +65,8 @@ public class SamlCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                if (saml2) {
-                    callback.setSamlVersion(SAMLVersion.VERSION_20);
+                if (!saml2) {
+                    callback.setSamlVersion(SAMLVersion.VERSION_11);
                 }
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
@@ -106,6 +108,17 @@ public class SamlCallbackHandler implements CallbackHandler {
                 attributeBean.addAttributeValue("system-user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                
+                try {
+                    String file = "alice.properties";
+                    Crypto crypto = CryptoFactory.getInstance(file);
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("alice");
+                    callback.setIssuerKeyPassword("password");
+                    callback.setSignAssertion(signed);
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
             }
         }
     }
@@ -122,6 +135,14 @@ public class SamlCallbackHandler implements CallbackHandler {
         keyInfo.setCertIdentifer(CERT_IDENTIFIER.X509_CERT);
         
         return keyInfo;
+    }
+
+    public boolean isSigned() {
+        return signed;
+    }
+
+    public void setSigned(boolean signed) {
+        this.signed = signed;
     }
     
 }

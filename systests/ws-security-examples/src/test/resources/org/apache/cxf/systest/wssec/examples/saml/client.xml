@@ -62,7 +62,6 @@
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="alice.properties"/> 
            <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.self-sign-saml-assertion" value="true"/>
        </jaxws:properties>
     </jaxws:client>
     
@@ -83,7 +82,6 @@
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
-           <entry key="ws-security.self-sign-saml-assertion" value="true"/>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="alice.properties"/> 
@@ -121,7 +119,6 @@
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="alice.properties"/> 
            <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.self-sign-saml-assertion" value="true"/>
        </jaxws:properties>
     </jaxws:client>
     
@@ -184,12 +181,14 @@
     <bean id="saml1HOKHandler" 
           class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
           <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:holder-of-key"/>
+          <property name="signed" value="true"/>
     </bean>
     
     <bean id="saml2HOKHandler" 
           class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
           <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key"/>
           <property name="saml2" value="true"/>
+          <property name="signed" value="true"/>
     </bean>
     
     <bean id="saml2BearerHandler" 

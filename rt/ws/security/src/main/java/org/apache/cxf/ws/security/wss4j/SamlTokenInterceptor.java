@@ -42,7 +42,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
@@ -282,11 +281,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
 
-        boolean selfSignAssertion = 
-            MessageUtils.getContextualBoolean(
-                message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
-            );
-        if (selfSignAssertion || samlCallback.isSignAssertion()) {
+        if (samlCallback.isSignAssertion()) {
             String issuerName = samlCallback.getIssuerKeyName();
             if (issuerName == null) {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;

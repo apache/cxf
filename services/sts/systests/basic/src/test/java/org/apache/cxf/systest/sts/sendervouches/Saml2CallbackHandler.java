@@ -68,6 +68,7 @@ public class Saml2CallbackHandler implements CallbackHandler {
                 attributeBean.addAttributeValue("user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
+                callback.setSignAssertion(true);
             }
         }
     }

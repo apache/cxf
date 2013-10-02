@@ -40,6 +40,8 @@ import org.junit.BeforeClass;
 /**
  * A set of tests for SAML Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -91,6 +93,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -117,6 +124,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -143,6 +155,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -169,6 +186,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -195,7 +217,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         
+        // DOM
         samlPort.doubleIt(25);
+        
+        // TODO Investigate Streaming
+        // SecurityTestUtil.enableStreaming(samlPort);
+        // samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
@@ -222,6 +249,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -247,7 +279,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
+
+        // DOM
+        samlPort.doubleIt(25);
         
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -274,6 +311,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -300,7 +342,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         
+        // DOM
         samlPort.doubleIt(25);
+        
+        // TODO Investigate Streaming
+        // SecurityTestUtil.enableStreaming(samlPort);
+        // samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
@@ -327,7 +374,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         updateSTSPort((BindingProvider)samlPort, STS_PORT);
         
+        // DOM
         samlPort.doubleIt(25);
+        
+        // TODO Streaming
+        // SecurityTestUtil.enableStreaming(samlPort);
+        // samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
