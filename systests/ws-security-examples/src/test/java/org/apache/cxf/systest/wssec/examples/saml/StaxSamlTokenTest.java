@@ -41,11 +41,11 @@ import org.junit.BeforeClass;
  * A set of tests for SAML Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
  * 
- * It tests both DOM + StAX clients against the DOM server
+ * It tests both DOM + StAX clients against the StAX server
  */
-public class SamlTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
+public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(StaxServer.class);
+    static final String PORT2 = allocatePort(StaxServer.class, 2);
     static final String STS_PORT = allocatePort(STSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -57,7 +57,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(StaxServer.class, true)
         );
         assertTrue(
             "Server failed to launch",
@@ -80,13 +80,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testBearer() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBearerPort");
         DoubleItPortType samlPort = 
@@ -111,13 +111,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSSenderVouches() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesPort");
         DoubleItPortType samlPort = 
@@ -142,13 +142,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSHOKSignedEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingPort");
         DoubleItPortType samlPort = 
@@ -173,13 +173,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSigned() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignedPort");
         DoubleItPortType samlPort = 
@@ -204,13 +204,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricInitiator() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricInitiatorPort");
         DoubleItPortType samlPort = 
@@ -223,8 +223,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
-    
+
     /**
      * 2.3.2.1 (WSS1.1) SAML 2.0 Bearer
      */
@@ -232,13 +231,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSaml2Bearer() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSaml2BearerPort");
         DoubleItPortType samlPort = 
@@ -263,13 +262,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSSenderVouchesSaml2() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesSaml2Port");
         DoubleItPortType samlPort = 
@@ -294,13 +293,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testTLSHOKSignedEndorsingSaml2() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingSaml2Port");
         DoubleItPortType samlPort = 
@@ -320,18 +319,20 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.4 (WSS1.1) SAML1.1/2.0 Sender Vouches with X.509 Certificate, Sign, Encrypt
+     * TODO Endorsing support
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testSymmetricSV() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSVPort");
         DoubleItPortType samlPort = 
@@ -351,18 +352,20 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.5 (WSS1.1) SAML1.1/2.0 Holder of Key, Sign, Encrypt
+     * TODO Endorsing Support
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testSymmetricIssuedToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = StaxSamlTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = StaxSamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricIssuedTokenPort");
         DoubleItPortType samlPort = 

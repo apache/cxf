@@ -19,8 +19,10 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +32,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -65,6 +68,8 @@ import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.SamlToken;
+
+import org.opensaml.common.SAMLVersion;
 
 /**
  * 
@@ -127,7 +132,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             attached = true;
                         } 
                     }
-                } else if (initiatorToken instanceof SamlToken) {
+                } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null) {
                         if (includeToken(initiatorToken.getIncludeTokenType())) {
@@ -135,6 +140,12 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                             storeAssertionAsSecurityToken(assertionWrapper);
                         }
                         policyAsserted(initiatorToken);
+                    }
+                } else if (initiatorToken instanceof SamlToken) {
+                    String tokenId = getSAMLToken();
+                    if (tokenId == null) {
+                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                        return;
                     }
                 }
             }
@@ -224,6 +235,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             initiatorWrapper = abinding.getInitiatorToken();
         }
         boolean attached = false;
+        
         if (initiatorWrapper != null) {
             AbstractToken initiatorToken = initiatorWrapper.getToken();
             if (initiatorToken instanceof IssuedToken) {
@@ -240,7 +252,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         attached = true;
                     } 
                 }
-            } else if (initiatorToken instanceof SamlToken) {
+            } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                 try {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null) {
@@ -255,6 +267,12 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     LOG.log(Level.WARNING, "Encrypt before sign failed due to : " + reason);
                     LOG.log(Level.FINE, e.getMessage(), e);
                     throw new Fault(e);
+                }
+            } else if (initiatorToken instanceof SamlToken) {
+                String tokenId = getSAMLToken();
+                if (tokenId == null) {
+                    policyNotAsserted(initiatorToken, "Security token is not found or expired");
+                    return;
                 }
             }
         }
@@ -433,7 +451,25 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     Crypto crypto = getEncryptionCrypto(recToken);
                     
                     SecurityToken securityToken = getSecurityToken();
-                    setKeyIdentifierType(encr, recToken, encrToken);
+                    if (!isRequestor() && securityToken != null 
+                        && recToken.getToken() instanceof SamlToken) {
+                        String tokenType = securityToken.getTokenType();
+                        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                            || WSConstants.SAML_NS.equals(tokenType)) {
+                            encr.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                            encr.setCustomEKTokenId(securityToken.getId());
+                        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                            || WSConstants.SAML2_NS.equals(tokenType)) {
+                            encr.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                            encr.setCustomEKTokenId(securityToken.getId());
+                        } else {
+                            setKeyIdentifierType(encr, recToken, encrToken);
+                        }
+                    } else {
+                        setKeyIdentifierType(encr, recToken, encrToken);
+                    }
                     //
                     // Using a stored cert is only suitable for the Issued Token case, where
                     // we're extracting the cert from a SAML Assertion on the provider side
@@ -710,6 +746,43 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         message.put(WSSecEncryptedKey.class.getName(), encrKey);
     }
 
-
-
+    private String getSAMLToken() {
+        
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
+            .get(WSHandlerConstants.RECV_RESULTS));
+        
+        for (WSHandlerResult rResult : results) {
+            List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
+            
+            for (WSSecurityEngineResult wser : wsSecEngineResults) {
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
+                if (actInt.intValue() == WSConstants.ST_SIGNED 
+                    || actInt.intValue() == WSConstants.ST_UNSIGNED) {
+                    Date created = new Date();
+                    Date expires = new Date();
+                    expires.setTime(created.getTime() + 300000);
+                    SecurityToken tempTok = new SecurityToken(id, created, expires);
+                    tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
+                    tempTok.setX509Certificate(
+                        (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE), null
+                    );
+                    
+                    SamlAssertionWrapper samlAssertion = 
+                        (SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                    if (samlAssertion.getSamlVersion() == SAMLVersion.VERSION_20) {
+                        tempTok.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                    } else {
+                        tempTok.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    }
+                    
+                    getTokenStore().add(tempTok);
+                    message.setContextualProperty(SecurityConstants.TOKEN, tempTok);
+                    
+                    return id;
+                }
+            }
+        }
+        return null;
+    }
 }
