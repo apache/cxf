@@ -288,7 +288,7 @@ public abstract class AbstractBindingBuilder {
             }
         }
         if (!assertion.isOptional()) {
-            throw new PolicyException(new Message(reason.getMessage(), LOG));
+            throw new PolicyException(new Message(reason.getMessage(), LOG), reason);
         }
     }
     
