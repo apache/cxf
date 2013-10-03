@@ -508,25 +508,26 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 }
             }
             SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
-
-            String soapNS;
-            BindingInfo bindingInfo = bindingOperationInfo.getBinding();
-            if (bindingInfo instanceof SoapBindingInfo) {
-                soapNS = ((SoapBindingInfo)bindingInfo).getSoapVersion().getNamespace();
-            } else {
-                //no idea what todo here...
-                //most probably throw an exception:
-                throw new IllegalArgumentException("BindingInfo is not an instance of SoapBindingInfo");
+            if (soapOperationInfo != null) {
+                String soapNS;
+                BindingInfo bindingInfo = bindingOperationInfo.getBinding();
+                if (bindingInfo instanceof SoapBindingInfo) {
+                    soapNS = ((SoapBindingInfo)bindingInfo).getSoapVersion().getNamespace();
+                } else {
+                    //no idea what todo here...
+                    //most probably throw an exception:
+                    throw new IllegalArgumentException("BindingInfo is not an instance of SoapBindingInfo");
+                }
+                
+                //todo: I think its a bug that we handover only the localPart of the operation. 
+                // Needs to be fixed in ws-security-policy-stax
+                OperationPolicy operationPolicy = new OperationPolicy(localName);
+                operationPolicy.setPolicy(policy.getPolicy());
+                operationPolicy.setOperationAction(soapOperationInfo.getAction());
+                operationPolicy.setSoapMessageVersionNamespace(soapNS);
+                
+                operationPolicies.add(operationPolicy);
             }
-            
-            //todo: I think its a bug that we handover only the localPart of the operation. 
-            // Needs to be fixed in ws-security-policy-stax
-            OperationPolicy operationPolicy = new OperationPolicy(localName);
-            operationPolicy.setPolicy(policy.getPolicy());
-            operationPolicy.setOperationAction(soapOperationInfo.getAction());
-            operationPolicy.setSoapMessageVersionNamespace(soapNS);
-            
-            operationPolicies.add(operationPolicy);
         }
         
         String soapAction = SoapActionInInterceptor.getSoapAction(msg);
