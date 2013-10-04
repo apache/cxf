@@ -279,7 +279,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 // Create an empty result list to pass into the required validation
                 // methods.
                 wsResult = new ArrayList<WSSecurityEngineResult>();
-                if (doc.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                if (doc.getSOAPPart().getEnvelope().getBody().hasFault() && isRequestor(msg)) {
                     LOG.warning("Request does not contain Security header, " 
                                 + "but it's a fault.");
                     // We allow lax action matching here for backwards compatibility
@@ -860,4 +860,5 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             return super.getValidator(qName);
         }
     };
+    
 }
