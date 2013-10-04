@@ -291,8 +291,7 @@
                   </sp:AlgorithmSuite>
                   <sp:Layout>
                      <wsp:Policy>
-                        <!--<sp:Strict/>-->
-                        <sp:Lax/>
+                        <sp:Strict/>
                      </wsp:Policy>
                   </sp:Layout>
                   <sp:IncludeTimestamp/>
@@ -401,8 +400,7 @@
                         </sp:AlgorithmSuite>
                         <sp:Layout>
                             <wsp:Policy>
-                                <!--<sp:Strict/>-->
-                                <sp:Lax/>
+                                <sp:Strict/>
                             </wsp:Policy>
                         </sp:Layout>
                         <sp:IncludeTimestamp/>

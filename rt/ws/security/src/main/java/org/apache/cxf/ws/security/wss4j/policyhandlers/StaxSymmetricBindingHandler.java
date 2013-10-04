@@ -293,7 +293,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             sigs.addAll(this.getSignedParts());
 
             if (isRequestor()) {
-                addSupportingTokens();
                 if (!sigs.isEmpty()) {
                     doSignature(sigAbstractTokenWrapper, sigToken, sigTok, sigs);
                 }
@@ -303,6 +302,20 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (!sigs.isEmpty()) {
                     doSignature(sigAbstractTokenWrapper, sigToken, sigTok, sigs);
                 }
+            }
+            
+            if (isRequestor()) {
+                addSupportingTokens();
+                
+                Map<String, Object> config = getProperties();
+                if (config.containsKey(ConfigurationConstants.ACTION)) {
+                    String action = (String)config.get(ConfigurationConstants.ACTION);
+                    if (action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)
+                        && action.contains(ConfigurationConstants.SIGNATURE)) {
+                        String newAction = action.replaceFirst(ConfigurationConstants.SIGNATURE, "").trim();
+                        config.put(ConfigurationConstants.ACTION, newAction);
+                    }
+                } 
             }
 
             //Encryption
@@ -402,9 +415,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
-            if (!action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)) {
-                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-            }
+            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
         } else {
             config.put(ConfigurationConstants.ACTION, actionToPerform);
         }

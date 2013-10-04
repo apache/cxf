@@ -112,15 +112,6 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                             attached = true;
                         } 
                     }
-                } else if (initiatorToken instanceof SamlToken) {
-                    SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
-                    if (assertionWrapper != null) {
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
-                            addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
-                            storeAssertionAsSecurityToken(assertionWrapper);
-                        }
-                        policyAsserted(initiatorToken);
-                    }
                 }
             }
             */
@@ -133,7 +124,6 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 sigs.add(part);
             }
             sigs.addAll(this.getSignedParts());
-            addSupportingTokens();
             
             if (isRequestor() && initiatorWrapper != null) {
                 doSignature(initiatorWrapper, sigs);
@@ -150,6 +140,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     doSignature(recipientSignatureToken, sigs);
                 }
             }
+            
+            addSupportingTokens();
+            
+            Map<String, Object> config = getProperties();
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                if (action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)
+                    && action.contains(ConfigurationConstants.SIGNATURE)) {
+                    String newAction = action.replaceFirst(ConfigurationConstants.SIGNATURE, "").trim();
+                    config.put(ConfigurationConstants.ACTION, newAction);
+                }
+            } 
             
             List<SecurePart> enc = getEncryptedParts();
             
@@ -226,21 +228,6 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                             this.addEncryptedKeyElement(cloneElement(el));
                             attached = true;
                         } 
-                    }
-                } else if (initiatorToken instanceof SamlToken) {
-                    try {
-                        SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
-                        if (assertionWrapper != null) {
-                            if (includeToken(initiatorToken.getIncludeTokenType())) {
-                                addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
-                                storeAssertionAsSecurityToken(assertionWrapper);
-                            }
-                            policyAsserted(initiatorToken);
-                        }
-                    } catch (Exception e) {
-                        String reason = e.getMessage();
-                        LOG.log(Level.FINE, "Encrypt before sign failed due to : " + reason);
-                        throw new Fault(e);
                     }
                 }
             }
@@ -375,9 +362,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
-            if (!action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)) {
-                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-            }
+            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
         } else {
             config.put(ConfigurationConstants.ACTION, actionToPerform);
         }
