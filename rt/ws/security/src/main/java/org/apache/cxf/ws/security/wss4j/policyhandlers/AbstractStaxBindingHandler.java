@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -97,6 +98,8 @@ import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+
+import org.opensaml.common.SAMLVersion;
 
 /**
  * 
@@ -315,7 +318,7 @@ public abstract class AbstractStaxBindingHandler {
         return new SecurePart(qname, Modifier.Element);
     }
     
-    protected void addIssuedToken(IssuedToken token, SecurityToken secToken, 
+    protected SecurePart addIssuedToken(IssuedToken token, SecurityToken secToken, 
                                   boolean signed, boolean endorsing) {
         if (isTokenRequired(token.getIncludeTokenType())) {
             final Element el = secToken.getToken();
@@ -353,13 +356,28 @@ public abstract class AbstractStaxBindingHandler {
                             SAMLCallback samlCallback = (SAMLCallback)callback;
                             samlCallback.setAssertionElement(el);
                             samlCallback.setSubject(subjectBean);
+                            
+                            if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                                samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+                            } else {
+                                samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+                            }
                         }
                     }
                 }
                 
             };
             config.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
-        } 
+            
+            QName qname = WSSConstants.TAG_saml2_Assertion;
+            if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                qname = WSSConstants.TAG_saml_Assertion;
+            }
+            
+            return new SecurePart(qname, Modifier.Element);
+        }
+        
+        return null;
     }
     
     protected void policyNotAsserted(Assertion assertion, String reason) {
@@ -721,6 +739,15 @@ public abstract class AbstractStaxBindingHandler {
                 }
 
             } */
+            } else if (isRequestor() && token instanceof IssuedToken) {
+                SecurityToken sigTok = getSecurityToken();
+                SecurePart securePart = addIssuedToken((IssuedToken)token, sigTok, signed, endorse);
+                if (securePart != null) {
+                    ret.put(token, securePart);
+                    if (suppTokens.isEncryptedToken()) {
+                        encryptedTokensList.add(securePart);
+                    }
+                }
             } else if (isRequestor() && token instanceof KerberosToken) {
                 SecurePart securePart = addKerberosToken((KerberosToken)token, signed, endorse);
                 if (securePart != null) {

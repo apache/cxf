@@ -50,6 +50,8 @@ import org.junit.BeforeClass;
 
 /**
  * Test the Bearer TokenType over TLS.
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class BearerTest extends AbstractBusClientServerTestBase {
     
@@ -177,6 +179,57 @@ public class BearerTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSAML2UnsignedBearerStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BearerTest.class.getResource("cxf-unsigned-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BearerTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2BearerPort");
+        DoubleItPortType transportSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(transportSaml2Port);
+        
+        //
+        // Create a SAML2 Bearer Assertion and add it to the TokenStore so that the
+        // IssuedTokenInterceptorProvider does not invoke on the STS
+        //
+        Client client = ClientProxy.getClient(transportSaml2Port);
+        Endpoint ep = client.getEndpoint();
+        String id = "1234";
+        ep.getEndpointInfo().setProperty(TokenStore.class.getName(), new MemoryTokenStore());
+        ep.getEndpointInfo().setProperty(SecurityConstants.TOKEN_ID, id);
+        TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(new Saml2CallbackHandler(), samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Element assertionElement = assertion.toDOM(db.newDocument());
+        
+        SecurityToken tok = new SecurityToken(id);
+        tok.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+        tok.setToken(assertionElement);
+        store.add(tok);
+        
+        doubleIt(transportSaml2Port, 50);
+        
+        ((java.io.Closeable)transportSaml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSAML2BearerNoBinding() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -207,7 +260,7 @@ public class BearerTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
         }
         SecurityTestUtil.enableStreaming(transportSaml2Port);
-        // TODO See WSS-358 doubleIt(transportSaml2Port, 45);
+        doubleIt(transportSaml2Port, 45);
         
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);

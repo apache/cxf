@@ -45,6 +45,8 @@ import org.junit.BeforeClass;
  * Test the Asymmetric binding. The CXF client gets a token from the STS by authenticating via a
  * Username Token over the symmetric binding, and then sends it to the CXF endpoint using 
  * the asymmetric binding.
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     
@@ -104,6 +106,16 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1Port, STSPORT2);
         }
         
+        // DOM
+        doubleIt(asymmetricSaml1Port, 25);
+        
+        // Streaming
+        asymmetricSaml1Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(asymmetricSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1Port, STSPORT2);
+        }
+        SecurityTestUtil.enableStreaming(asymmetricSaml1Port);
         doubleIt(asymmetricSaml1Port, 25);
         
         ((java.io.Closeable)asymmetricSaml1Port).close();
@@ -130,9 +142,18 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, STSPORT2);
         }
         
+        // DOM
         doubleIt(asymmetricSaml2Port, 30);
-
         TokenTestUtils.verifyToken(asymmetricSaml2Port);
+        
+        // Streaming
+        asymmetricSaml2Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(asymmetricSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, STSPORT2);
+        }
+        SecurityTestUtil.enableStreaming(asymmetricSaml2Port);
+        doubleIt(asymmetricSaml2Port, 25);
         
         ((java.io.Closeable)asymmetricSaml2Port).close();
         bus.shutdown(true);

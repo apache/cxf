@@ -33,6 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
@@ -42,6 +43,7 @@ import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -95,26 +97,13 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (initiatorWrapper == null) {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
-            /*
             if (initiatorWrapper != null) {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
-                    SecurityToken secToken = getSecurityToken();
-                    if (secToken == null) {
-                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
-                        return;
-                    } else {
-                        policyAsserted(initiatorToken);
-                        
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
-                            Element el = secToken.getToken();
-                            this.addEncryptedKeyElement(cloneElement(el));
-                            attached = true;
-                        } 
-                    }
+                    SecurityToken sigTok = getSecurityToken();
+                    addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
                 }
             }
-            */
             
             // Add timestamp
             List<SecurePart> sigs = new ArrayList<SecurePart>();
@@ -212,26 +201,13 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
             
-            /*
             if (initiatorWrapper != null) {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
-                    SecurityToken secToken = getSecurityToken();
-                    if (secToken == null) {
-                        policyNotAsserted(initiatorToken, "Security token is not found or expired");
-                        return;
-                    } else {
-                        policyAsserted(initiatorToken);
-                        
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
-                            Element el = secToken.getToken();
-                            this.addEncryptedKeyElement(cloneElement(el));
-                            attached = true;
-                        } 
-                    }
+                    SecurityToken sigTok = getSecurityToken();
+                    addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
                 }
             }
-            */
             
             List<SecurePart> encrParts = null;
             List<SecurePart> sigParts = null;

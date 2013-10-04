@@ -39,6 +39,8 @@ import org.junit.BeforeClass;
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via a
  * Username Token over the symmetric binding, and then sends it to the CXF endpoint using 
  * the symmetric binding.
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     
@@ -97,9 +99,18 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
         }
 
+        // DOM
         doubleIt(symmetricSaml1Port, 25);
-
         TokenTestUtils.verifyToken(symmetricSaml1Port);
+        
+        // Streaming
+        symmetricSaml1Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(symmetricSaml1Port);
+        doubleIt(symmetricSaml1Port, 25);
         
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
@@ -125,9 +136,18 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
         }
         
+        // DOM
         doubleIt(symmetricSaml2Port, 30);
-
         TokenTestUtils.verifyToken(symmetricSaml2Port);
+        
+        // Streaming
+        symmetricSaml2Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        doubleIt(symmetricSaml2Port, 25);
         
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
@@ -152,7 +172,17 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
         }
 
+        // DOM
         doubleIt(symmetricSaml1Port, 25);
+        
+        // TODO Streaming - Problem with including encrypted SAML Token in header
+        symmetricSaml1Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml1Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT);
+        }
+        SecurityTestUtil.enableStreaming(symmetricSaml1Port);
+        // doubleIt(symmetricSaml1Port, 25);
 
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);

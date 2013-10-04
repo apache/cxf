@@ -156,7 +156,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 addKerberosToken((KerberosToken)encryptionToken, false, false);
             } else if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
-                addIssuedToken((IssuedToken)encryptionToken, tok, false, false);
+                addIssuedToken((IssuedToken)encryptionToken, tok, false, true);
             } else if (encryptionToken instanceof SecureConversationToken
                 || encryptionToken instanceof SecurityContextToken
                 || encryptionToken instanceof SpnegoContextToken) {
@@ -252,7 +252,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     addKerberosToken((KerberosToken)sigToken, false, false);
                 } else if (sigToken instanceof IssuedToken) {
                     sigTok = getSecurityToken();
-                    addIssuedToken((IssuedToken)sigToken, sigTok, false, false);
+                    addIssuedToken((IssuedToken)sigToken, sigTok, false, true);
                 } else if (sigToken instanceof SecureConversationToken
                     || sigToken instanceof SecurityContextToken
                     || sigToken instanceof SpnegoContextToken) {

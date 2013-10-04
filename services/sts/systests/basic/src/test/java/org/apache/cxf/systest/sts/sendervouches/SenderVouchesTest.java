@@ -27,7 +27,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -35,6 +34,8 @@ import org.junit.BeforeClass;
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a CXF intermediary.
  * The intermediary validates the UsernameToken, and then inserts the username into a SAML
  * Assertion which it signs and sends to a provider (via TLS).
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class SenderVouchesTest extends AbstractBusClientServerTestBase {
     
@@ -84,7 +85,15 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, PORT);
         
+        // DOM
         doubleIt(transportUTPort, 25);
+        
+        // Streaming
+        transportUTPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportUTPort, PORT);
+        SecurityTestUtil.enableStreaming(transportUTPort);
+        doubleIt(transportUTPort, 45);
         
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
