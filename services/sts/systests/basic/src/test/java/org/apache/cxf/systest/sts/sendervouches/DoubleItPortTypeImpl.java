@@ -19,8 +19,6 @@
 package org.apache.cxf.systest.sts.sendervouches;
 
 import java.net.URL;
-import java.security.Principal;
-import java.util.List;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -28,17 +26,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.feature.Features;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-
 import org.example.contract.doubleit.DoubleItPortType;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
@@ -53,6 +43,8 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
     @Resource
     WebServiceContext wsc;
     
+    private String port;
+    
     public int doubleIt(int numberToDouble) {
         // Delegate request to a provider
         URL wsdl = DoubleItPortTypeImpl.class.getResource("DoubleIt.wsdl");
@@ -61,7 +53,7 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
         DoubleItPortType transportSAML2SupportingPort = 
             service.getPort(portQName, DoubleItPortType.class);
         try {
-            updateAddressPort(transportSAML2SupportingPort, SenderVouchesTest.PORT2);
+            updateAddressPort(transportSAML2SupportingPort, getPort());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -69,20 +61,20 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
         //
         // Get the principal from the request context and construct a SAML Assertion
         //
-        MessageContext context = wsc.getMessageContext();
-        final List<WSHandlerResult> handlerResults = 
-            CastUtils.cast((List<?>)context.get(WSHandlerConstants.RECV_RESULTS));
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.UT);
-        Principal principal = 
-            (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        
-        Saml2CallbackHandler callbackHandler = new Saml2CallbackHandler(principal);
+        Saml2CallbackHandler callbackHandler = new Saml2CallbackHandler(wsc.getUserPrincipal());
         ((BindingProvider)transportSAML2SupportingPort).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );
         
         return transportSAML2SupportingPort.doubleIt(numberToDouble);
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
     
 }

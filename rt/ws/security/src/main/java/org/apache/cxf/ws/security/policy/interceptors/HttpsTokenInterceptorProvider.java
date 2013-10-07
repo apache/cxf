@@ -67,6 +67,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
 
     public HttpsTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.TRANSPORT_TOKEN, SP12Constants.TRANSPORT_TOKEN, 
+                            SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN, 
                             SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
         this.getOutInterceptors().add(new HttpsTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new HttpsTokenOutInterceptor());
@@ -181,8 +182,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
                 boolean requestor = isRequestor(message);
                 if (ais.isEmpty()) {
-                    if (!requestor 
-                        && !NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_TOKEN).isEmpty()) {
+                    if (!requestor) {
                         try {
                             assertNonHttpsTransportToken(message);
                         } catch (XMLSecurityException e) {

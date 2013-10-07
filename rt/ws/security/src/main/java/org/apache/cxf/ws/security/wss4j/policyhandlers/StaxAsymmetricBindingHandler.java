@@ -323,6 +323,14 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (encUser != null) {
                 config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
             }
+            
+            //
+            // Using a stored cert is only suitable for the Issued Token case, where
+            // we're extracting the cert from a SAML Assertion on the provider side
+            //
+            if (!isRequestor() && recToken.getToken() instanceof IssuedToken) {
+                config.put(ConfigurationConstants.ENCRYPTION_USER, ConfigurationConstants.USE_REQ_SIG_CERT);
+            }
         }
     }
     

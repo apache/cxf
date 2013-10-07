@@ -26,6 +26,9 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
@@ -68,7 +71,17 @@ public class Saml2CallbackHandler implements CallbackHandler {
                 attributeBean.addAttributeValue("user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
-                callback.setSignAssertion(true);
+                
+                try {
+                    String file = "serviceKeystore.properties";
+                    Crypto crypto = CryptoFactory.getInstance(file);
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("myservicekey");
+                    callback.setIssuerKeyPassword("skpass");
+                    callback.setSignAssertion(true);
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
             }
         }
     }
