@@ -70,9 +70,9 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
                                      boolean create) {
         if (!context.containsBean(name) && (create || Bus.DEFAULT_BUS_ID.equals(name))) {
             SpringBus b = new SpringBus();
-            b.setApplicationContext(context);
             ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)context;
             cctx.getBeanFactory().registerSingleton(name, b);
+            b.setApplicationContext(context);
         }
         return (Bus)context.getBean(name, Bus.class);
     }
