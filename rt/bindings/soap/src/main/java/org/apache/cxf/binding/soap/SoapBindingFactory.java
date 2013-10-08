@@ -531,7 +531,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         }
 
         if (minfo == null) {
-            minfo = new MessageInfo(null, type, msg.getQName());
+            minfo = new MessageInfo(bop.getOperationInfo(), type, msg.getQName());
         }
         buildMessage(minfo, msg, schemas, nextId, partName);
 
@@ -558,8 +558,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                 }
             }
         }
-        
-        
         
         if (isInput) {
             minfo = unwrapped.getInput();
@@ -589,7 +587,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                     throw new RuntimeException("Problem with WSDL: part element in message "
                                                + msg.getQName().getLocalPart() 
                                                + " does not specify a name.");
-                }
+                }                
                 QName pqname = new QName(minfo.getName().getNamespaceURI(), part.getName());
                 MessagePartInfo pi = minfo.getMessagePart(pqname);
                 if (pi != null
