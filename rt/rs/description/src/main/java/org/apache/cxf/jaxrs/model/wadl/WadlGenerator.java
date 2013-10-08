@@ -257,7 +257,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         sbMain.append(sbResources.toString());
         sbMain.append("</application>");
 
-        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, ignoreMessageWriters);
+        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, !isJson && ignoreMessageWriters);
         Response r = Response.ok().type(type).entity(createResponseEntity(sbMain.toString(), isJson)).build();
         context.abortWith(r);
     }
