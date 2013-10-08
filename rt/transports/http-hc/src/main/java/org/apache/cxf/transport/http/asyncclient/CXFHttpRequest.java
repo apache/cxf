@@ -28,24 +28,26 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.RequestLine;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.Configurable;
 import org.apache.http.message.AbstractHttpMessage;
 import org.apache.http.message.BasicRequestLine;
 import org.apache.http.protocol.HTTP;
 
-public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnclosingRequest {
+public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnclosingRequest, Configurable {
 
     private final String method;
     
     private URI uri;
     private HttpEntity entity;
     private AsyncWrappedOutputStream out;
+    private RequestConfig config;
 
     public CXFHttpRequest(final String method) {
         super();
         this.method = method;
     }
     
-
     public void setOutputStream(AsyncWrappedOutputStream o) {
         out = o;
     }
@@ -88,6 +90,15 @@ public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnc
     public boolean expectContinue() {
         Header expect = getFirstHeader(HTTP.EXPECT_DIRECTIVE);
         return expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue());
+    }
+
+    @Override
+    public RequestConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(RequestConfig config) {
+        this.config = config;
     }
 
 }

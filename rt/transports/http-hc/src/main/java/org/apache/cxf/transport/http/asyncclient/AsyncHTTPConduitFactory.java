@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.http.asyncclient;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -35,52 +34,33 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseFactory;
-import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.RequestAuthCache;
-import org.apache.http.client.protocol.RequestClientConnControl;
-import org.apache.http.client.protocol.RequestDefaultHeaders;
-import org.apache.http.client.protocol.RequestProxyAuthentication;
-import org.apache.http.client.protocol.RequestTargetAuthentication;
-import org.apache.http.impl.DefaultHttpResponseFactory;
-import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
-import org.apache.http.impl.client.ProxyAuthenticationStrategy;
-import org.apache.http.impl.client.TargetAuthenticationStrategy;
-import org.apache.http.impl.nio.DefaultHttpClientIODispatch;
-import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;
-import org.apache.http.impl.nio.conn.DefaultClientAsyncConnection;
-import org.apache.http.impl.nio.conn.PoolingClientAsyncConnectionManager;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.conn.DefaultSchemePortResolver;
+import org.apache.http.impl.conn.SystemDefaultDnsResolver;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.conn.ManagedNHttpClientConnectionFactory;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.conn.ClientAsyncConnection;
-import org.apache.http.nio.conn.ClientAsyncConnectionFactory;
-import org.apache.http.nio.conn.scheme.AsyncScheme;
-import org.apache.http.nio.conn.scheme.AsyncSchemeRegistry;
-import org.apache.http.nio.protocol.HttpAsyncRequestExecutor;
-import org.apache.http.nio.reactor.ConnectingIOReactor;
-import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.nio.conn.ManagedNHttpClientConnection;
+import org.apache.http.nio.conn.NoopIOSessionStrategy;
+import org.apache.http.nio.conn.SchemeIOSessionStrategy;
+import org.apache.http.nio.conn.ssl.SSLIOSessionStrategy;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOSession;
-import org.apache.http.nio.reactor.ssl.SSLIOSession;
-import org.apache.http.nio.util.ByteBufferAllocator;
-import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.params.SyncBasicHttpParams;
-import org.apache.http.protocol.BasicHttpProcessor;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.RequestContent;
-import org.apache.http.protocol.RequestExpectContinue;
-import org.apache.http.protocol.RequestTargetHost;
-import org.apache.http.protocol.RequestUserAgent;
 
 /**
  * 
@@ -114,57 +94,36 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         ALWAYS, ASYNC_ONLY, NEVER
     };
         
-    
-    final IOReactorConfig config = new IOReactorConfig();
-    volatile ConnectingIOReactor ioReactor;
-    volatile PoolingClientAsyncConnectionManager connectionManager;
-    
+    volatile PoolingNHttpClientConnectionManager connectionManager;
+    volatile CloseableHttpAsyncClient client;
+
     boolean isShutdown;
     UseAsyncPolicy policy;
     int maxConnections = 5000;
     int maxPerRoute = 1000;
     int connectionTTL = 60000;
 
-    
-    // these have per-instance Logger instances that have sync methods to setup.
-    private final TargetAuthenticationStrategy targetAuthenticationStrategy = new TargetAuthenticationStrategy();
-    private final ProxyAuthenticationStrategy proxyAuthenticationStrategy = new ProxyAuthenticationStrategy();
-    private final BasicHttpProcessor httpproc;
-    
+    int ioThreadCount = IOReactorConfig.DEFAULT.getIoThreadCount();
+    long selectInterval = IOReactorConfig.DEFAULT.getSelectInterval();
+    boolean interestOpQueued = IOReactorConfig.DEFAULT.isInterestOpQueued();
+    int soLinger = IOReactorConfig.DEFAULT.getSoLinger();
+    int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout();
+    boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepalive();
+    boolean tcpNoDelay = true;
+
     AsyncHTTPConduitFactory() {
         super();
-        httpproc = new BasicHttpProcessor();
-        httpproc.addInterceptor(new RequestDefaultHeaders());
-        // Required protocol interceptors
-        httpproc.addInterceptor(new RequestContent());
-        httpproc.addInterceptor(new RequestTargetHost());
-        // Recommended protocol interceptors
-        httpproc.addInterceptor(new RequestClientConnControl());
-        httpproc.addInterceptor(new RequestUserAgent());
-        httpproc.addInterceptor(new RequestExpectContinue());
-        // HTTP authentication interceptors
-        httpproc.addInterceptor(new RequestAuthCache());
-        httpproc.addInterceptor(new RequestTargetAuthentication());
-        httpproc.addInterceptor(new RequestProxyAuthentication());        
-
     }
+
     public AsyncHTTPConduitFactory(Map<String, Object> conf) {
         this();
-        config.setTcpNoDelay(true);
         setProperties(conf);
     }
-    
     
     public AsyncHTTPConduitFactory(Bus b) {
         this();
         addListener(b);
-        config.setTcpNoDelay(true);
         setProperties(b.getProperties());
-    }
-    
-    
-    public BasicHttpProcessor getDefaultHttpProcessor() {
-        return httpproc;
     }
     
     public UseAsyncPolicy getUseAsyncPolicy() {
@@ -172,18 +131,18 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     }
     
     public void update(Map<String, Object> props) {
-        if (setProperties(props) && ioReactor != null) {
+        if (setProperties(props) && client != null) {
             restartReactor(); 
         }
     }
+
     private void restartReactor() {
-        ConnectingIOReactor ioReactor2 = ioReactor;
-        PoolingClientAsyncConnectionManager connectionManager2 = connectionManager;
+        CloseableHttpAsyncClient client2 = client;
         resetVars();
-        shutdown(ioReactor2, connectionManager2);
+        shutdown(client2);
     }
     private synchronized void resetVars() {
-        ioReactor = null;
+        client = null;
         connectionManager = null;
     }
     
@@ -206,6 +165,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         maxConnections = getInt(s.get(MAX_CONNECTIONS), maxConnections);
         connectionTTL = getInt(s.get(CONNECTION_TTL), connectionTTL);
         maxPerRoute = getInt(s.get(MAX_PER_HOST_CONNECTIONS), maxPerRoute);
+
         if (connectionManager != null) {
             connectionManager.setMaxTotal(maxConnections);
             connectionManager.setDefaultMaxPerRoute(maxPerRoute);
@@ -214,33 +174,33 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         //properties that need a restart of the reactor
         boolean changed = false;
         
-        int i = config.getIoThreadCount();
-        config.setIoThreadCount(getInt(s.get(THREAD_COUNT), Runtime.getRuntime().availableProcessors()));
-        changed |= i != config.getIoThreadCount();
+        int i = ioThreadCount;
+        ioThreadCount = getInt(s.get(THREAD_COUNT), Runtime.getRuntime().availableProcessors());
+        changed |= i != ioThreadCount;
         
-        long l = config.getSelectInterval();
-        config.setSelectInterval(getInt(s.get(SELECT_INTERVAL), 1000));
-        changed |= l != config.getSelectInterval();
+        long l = selectInterval;
+        selectInterval = getInt(s.get(SELECT_INTERVAL), 1000);
+        changed |= l != selectInterval;
 
-        i = config.getSoLinger();
-        config.setSoLinger(getInt(s.get(SO_LINGER), -1));
-        changed |= i != config.getSoLinger();
+        i = soLinger;
+        soLinger = getInt(s.get(SO_LINGER), -1);
+        changed |= i != soLinger;
 
-        i = config.getSoTimeout();
-        config.setSoTimeout(getInt(s.get(SO_TIMEOUT), 0));
-        changed |= i != config.getSoTimeout();
+        i = soTimeout;
+        soTimeout = getInt(s.get(SO_TIMEOUT), 0);
+        changed |= i != soTimeout;
 
-        boolean b = config.isInterestOpQueued();
-        config.setInterestOpQueued(getBoolean(s.get(INTEREST_OP_QUEUED), false));
-        changed |= b != config.isInterestOpQueued();
+        boolean b = interestOpQueued;
+        interestOpQueued = getBoolean(s.get(INTEREST_OP_QUEUED), false);
+        changed |= b != interestOpQueued;
         
-        b = config.isTcpNoDelay();
-        config.setTcpNoDelay(getBoolean(s.get(TCP_NODELAY), true));
-        changed |= b != config.isTcpNoDelay();
+        b = tcpNoDelay;
+        tcpNoDelay = getBoolean(s.get(TCP_NODELAY), true);
+        changed |= b != tcpNoDelay;
 
-        b = config.isSoKeepalive();
-        config.setSoKeepalive(getBoolean(s.get(SO_KEEPALIVE), false));
-        changed |= b != config.isSoKeepalive();
+        b = soKeepalive;
+        soKeepalive = getBoolean(s.get(SO_KEEPALIVE), false);
+        changed |= b != soKeepalive;
                 
         return changed;
     }
@@ -292,34 +252,31 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     public void setBus(Bus b) {
         addListener(b);
     }
+
     public void initComplete() {
     }
+
     public synchronized void preShutdown() {
         shutdown();
     }
+
     public void postShutdown() {
     }    
     
     public void shutdown() {
-        if (ioReactor != null) {
-            shutdown(ioReactor, connectionManager);
+        if (client != null) {
+            shutdown(client);
             connectionManager = null;
-            ioReactor = null;
+            client = null;
         }
         isShutdown = true;
     }
-    private static void shutdown(ConnectingIOReactor ioReactor2,
-                          PoolingClientAsyncConnectionManager connectionManager2) {
-        
+
+    private static void shutdown(CloseableHttpAsyncClient client) {
         try {
-            connectionManager2.shutdown();
+            client.close();
         } catch (IOException e1) {
             e1.printStackTrace();
-        }
-        try {
-            ioReactor2.shutdown();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -327,101 +284,57 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     private void addListener(Bus b) {
         b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
     }
-    
-    
-    public synchronized void setupNIOClient() throws IOReactorException {
-        if (connectionManager != null) {
+
+    public synchronized void setupNIOClient(HTTPClientPolicy clientPolicy) throws IOReactorException {
+        if (client != null) {
             return;
         }
-        // Create client-side I/O reactor
-        final IOEventDispatch ioEventDispatch = new DefaultHttpClientIODispatch(new HttpAsyncRequestExecutor(),
-                                                                                new BasicHttpParams());
-        ioReactor = new DefaultConnectingIOReactor(config);
-        
 
-        // Run the I/O reactor in a separate thread
-        Thread t = new Thread(new Runnable() {
+        IOReactorConfig config = IOReactorConfig.custom()
+                .setIoThreadCount(ioThreadCount)
+                .setSelectInterval(selectInterval)
+                .setInterestOpQueued(interestOpQueued)
+                .setSoLinger(soLinger)
+                .setSoTimeout(soTimeout)
+                .setSoKeepAlive(soKeepalive)
+                .setTcpNoDelay(tcpNoDelay)
+                .build();
 
-            public void run() {
-                try {
-                    // Ready to go!
-                    ioReactor.execute(ioEventDispatch);
-                } catch (InterruptedIOException ex) {
-                    System.err.println("Interrupted");
-                } catch (IOException e) {
-                    System.err.println("I/O error: " + e.getMessage());
-                }
-            }
+        Registry<SchemeIOSessionStrategy> ioSessionFactoryRegistry = RegistryBuilder.<SchemeIOSessionStrategy>create()
+                    .register("http", NoopIOSessionStrategy.INSTANCE)
+                    .register("https", SSLIOSessionStrategy.getSystemDefaultStrategy())
+                    .build();
 
-        });
-        // Start the client thread
-        t.start();
-        
-        AsyncSchemeRegistry registry = new AsyncSchemeRegistry();
-        registry.register(new AsyncScheme("http", 80, null));
-        registry.register(new AsyncScheme("https", 443, null));
 
-        connectionManager = new PoolingClientAsyncConnectionManager(ioReactor, registry, 
-                                                                    connectionTTL, TimeUnit.MILLISECONDS) {
+        ManagedNHttpClientConnectionFactory connectionFactory = new ManagedNHttpClientConnectionFactory() {
+
             @Override
-            protected ClientAsyncConnectionFactory createClientAsyncConnectionFactory() {
-                final HttpResponseFactory responseFactory = new DefaultHttpResponseFactory();
-                final ByteBufferAllocator allocator = new HeapByteBufferAllocator();
-
-                return new ClientAsyncConnectionFactory() {
-                    @Override
-                    public ClientAsyncConnection create(String id, IOSession iosession, HttpParams params) {
-                        return new DefaultClientAsyncConnection(id, iosession, 
-                                                                responseFactory, 
-                                                                allocator, params) {
-                            @Override
-                            protected void onRequestSubmitted(HttpRequest request) {
-                                super.onRequestSubmitted(request);
-                                if (request instanceof EntityEnclosingRequestWrapper) {
-                                    request = ((EntityEnclosingRequestWrapper)request).getOriginal();
-                                }
-                                if (getIOSession() instanceof SSLIOSession) {
-                                    SSLIOSession sslio = (SSLIOSession)getIOSession();
-                                    getIOSession().setAttribute(CXFHttpRequest.class.getName(), request);
-                                    if (getIOSession().getAttribute("cxf.handshake.done") != null) {
-                                        ((CXFHttpRequest)request).getOutputStream()
-                                            .setSSLSession(sslio.getSSLSession());
-                                    }
-                                }
-                            }
-                        };
-                    }
-                };
+            public ManagedNHttpClientConnection create(final IOSession iosession, final ConnectionConfig config) {
+                ManagedNHttpClientConnection conn =  super.create(iosession, config);
+                return conn;
             }
-            
         };
+
+        DefaultConnectingIOReactor ioreactor = new DefaultConnectingIOReactor(config);
+        connectionManager = new PoolingNHttpClientConnectionManager(
+                ioreactor,
+                connectionFactory,
+                ioSessionFactoryRegistry,
+                DefaultSchemePortResolver.INSTANCE,
+                SystemDefaultDnsResolver.INSTANCE,
+                connectionTTL, TimeUnit.MILLISECONDS);
+
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         connectionManager.setMaxTotal(maxConnections);
-    }
-    
-    public DefaultHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
-        if (connectionManager == null) {
-            setupNIOClient();
-        }
-        
-        DefaultHttpAsyncClient dhac = new DefaultHttpAsyncClient(connectionManager) {
-            @Override
-            protected HttpParams createHttpParams() {
-                HttpParams params = new SyncBasicHttpParams();
-                HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-                HttpConnectionParams.setTcpNoDelay(params, true);
-                int bufSize = c.getClient().getChunkLength() > 0 ? c.getClient().getChunkLength() : 16332;
-                HttpConnectionParams.setSocketBufferSize(params, bufSize);
-                HttpConnectionParams.setConnectionTimeout(params, (int)c.getClient().getConnectionTimeout());
-                return params;
-            }
-            @Override
-            protected BasicHttpProcessor createHttpProcessor() {
-                return httpproc;
-            }            
-        };
-        //CXF handles redirects ourselves
-        dhac.setRedirectStrategy(new RedirectStrategy() {
+
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setBufferSize(clientPolicy.getChunkLength() > 0 ? clientPolicy.getChunkLength() : 16332)
+                .build();
+
+        connectionManager.setDefaultConnectionConfig(connectionConfig);
+
+        RedirectStrategy redirectStrategy = new RedirectStrategy() {
+
             public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)
                 throws ProtocolException {
                 return false;
@@ -430,12 +343,26 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
                 throws ProtocolException {
                 return null;
             }
-        });
-        dhac.setTargetAuthenticationStrategy(targetAuthenticationStrategy);
-        dhac.setProxyAuthenticationStrategy(proxyAuthenticationStrategy);
-        return dhac;
+        };
+
+        client = HttpAsyncClients.custom()
+            .setConnectionManager(connectionManager)
+            .setRedirectStrategy(redirectStrategy)
+            .setDefaultCookieStore(new BasicCookieStore() {
+                private static final long serialVersionUID = 1L;
+                public void addCookie(Cookie cookie) {
+                }
+            })
+            .build();
+        // Start the client thread
+        client.start();
     }
 
-
+    public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
+        if (connectionManager == null) {
+            setupNIOClient(c.getClient());
+        }
+        return client;
+    }
 
 }

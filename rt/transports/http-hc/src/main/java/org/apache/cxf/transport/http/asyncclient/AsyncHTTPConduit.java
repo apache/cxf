@@ -74,20 +74,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.conn.params.ConnRouteParams;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;
-import org.apache.http.nio.conn.scheme.AsyncScheme;
-import org.apache.http.nio.conn.scheme.AsyncSchemeRegistry;
-import org.apache.http.nio.conn.ssl.SSLLayeringStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.http.nio.conn.NoopIOSessionStrategy;
+import org.apache.http.nio.conn.SchemeIOSessionStrategy;
+import org.apache.http.nio.conn.ssl.SSLIOSessionStrategy;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.protocol.BasicHttpContext;
 
 /**
  * 
@@ -98,10 +98,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     final AsyncHTTPConduitFactory factory;
     volatile int lastTlsHash = -1;
     volatile Object sslState; 
+    volatile URI sslURL;
     volatile SSLContext sslContext;
-    volatile DefaultHttpAsyncClient client;
-    
-    public AsyncHTTPConduit(Bus b, 
+    volatile SSLSession session;
+    volatile CloseableHttpAsyncClient client;
+
+    public AsyncHTTPConduit(Bus b,
                             EndpointInfo ei, 
                             EndpointReferenceType t,
                             AsyncHTTPConduitFactory factory) throws IOException {
@@ -109,7 +111,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         this.factory = factory;
     }
 
-    public synchronized DefaultHttpAsyncClient getHttpAsyncClient() throws IOException {
+    public synchronized CloseableHttpAsyncClient getHttpAsyncClient() throws IOException {
         if (client == null) {
             client = factory.createClient(this);
         }
@@ -195,17 +197,18 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         e.setURI(uri);
         
         e.setEntity(entity);
-        
-        // Set socket timeout
-        e.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 
-                Integer.valueOf((int) csPolicy.getReceiveTimeout()));
-        
+
+        RequestConfig.Builder b = RequestConfig.custom()
+            .setSocketTimeout((int) csPolicy.getReceiveTimeout())
+            .setConnectTimeout((int) csPolicy.getConnectionTimeout());
         Proxy p = proxyFactory.createProxy(csPolicy , uri);
         if (p != null) {
             InetSocketAddress isa = (InetSocketAddress)p.address();
             HttpHost proxy = new HttpHost(isa.getHostName(), isa.getPort());
-            ConnRouteParams.setDefaultProxy(e.getParams(), proxy);
+            b.setProxy(proxy);
         }
+        e.setConfig(b.build());
+
         message.put(CXFHttpRequest.class, e);
     }
     
@@ -244,7 +247,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         // Objects for the response
         volatile HttpResponse httpResponse;
         volatile Exception exception;
-        volatile SSLSession session;
 
         private Future<Boolean> connectionFuture;
 
@@ -417,6 +419,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 wrappedStream = cachedStream;
             }
         }
+                
         protected void connect(boolean output) throws IOException {
             if (connectionFuture != null) {
                 return;
@@ -456,65 +459,81 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 tlsClientParameters = new TLSClientParameters();
             }
             
-            BasicHttpContext ctx = new BasicHttpContext();
-            if (AsyncHTTPConduit.this.proxyAuthorizationPolicy != null
-                && AsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName() != null) {
-                ctx.setAttribute(ClientContext.CREDS_PROVIDER, new CredentialsProvider() {
-                    public void setCredentials(AuthScope authscope, Credentials credentials) {
+            HttpClientContext ctx = HttpClientContext.create();
+
+            BasicCredentialsProvider credsProvider = new BasicCredentialsProvider() {
+
+                @Override
+                public Credentials getCredentials(final AuthScope authscope) {
+                    Credentials creds = super.getCredentials(authscope);
+                    if (creds != null) {
+                        return creds;
                     }
-                    public Credentials getCredentials(AuthScope authscope) {
+                    if (AsyncHTTPConduit.this.proxyAuthorizationPolicy != null
+                            && AsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName() != null) {
                         return new UsernamePasswordCredentials(AsyncHTTPConduit.this
-                                                               .proxyAuthorizationPolicy.getUserName(),
-                                               AsyncHTTPConduit.this.proxyAuthorizationPolicy.getPassword());
+                                .proxyAuthorizationPolicy.getUserName(),
+                                AsyncHTTPConduit.this.proxyAuthorizationPolicy.getPassword());
                     }
-                    public void clear() {
-                    }
-                });
-            }
-            if (tlsClientParameters != null && tlsClientParameters.hashCode() == lastTlsHash && sslState != null) {
-                ctx.setAttribute(ClientContext.USER_TOKEN , sslState);
-            }
+                    return null;
+                }
+
+            };
+
+            ctx.setCredentialsProvider(credsProvider);
             
-            final AsyncSchemeRegistry reg = new AsyncSchemeRegistry();
-            reg.register(new AsyncScheme("http", 80, null));
             if ("https".equals(url.getScheme())) {
                 try {
-                    final SSLContext sslcontext = getSSLContext();
-                    reg.register(new AsyncScheme("https", 443, new SSLLayeringStrategy(sslcontext) {
-                        @Override
-                        protected void initializeEngine(SSLEngine engine) {
-                            initializeSSLEngine(sslcontext, engine);
-                        }
-                        @Override
-                        protected void verifySession(final IOSession iosession,
-                                              final SSLSession sslsession) throws SSLException {
-                            super.verifySession(iosession, sslsession);
-                            iosession.setAttribute("cxf.handshake.done", Boolean.TRUE);
-                            CXFHttpRequest req = (CXFHttpRequest)iosession
-                                .removeAttribute(CXFHttpRequest.class.getName());
-                            if (req != null) {
-                                req.getOutputStream().setSSLSession(sslsession);
-                            }
-                        }
-                    }));
+                    RegistryBuilder<SchemeIOSessionStrategy> regBuilder 
+                        = RegistryBuilder.<SchemeIOSessionStrategy>create()
+                            .register("http", NoopIOSessionStrategy.INSTANCE);
+                    
+                   
+                    TLSClientParameters tlsClientParameters = getTlsClientParameters();
+                    if (tlsClientParameters == null) {
+                        tlsClientParameters = new TLSClientParameters();
+                    }
+                    final SSLContext sslcontext = getSSLContext(tlsClientParameters);
+                    regBuilder
+                        .register("https",
+                                  new SSLIOSessionStrategy(sslcontext) {
+                                @Override
+                                protected void initializeEngine(SSLEngine engine) {
+                                    initializeSSLEngine(sslcontext, engine);
+                                }
+                                @Override
+                                protected void verifySession(final HttpHost host,
+                                                             final IOSession iosession,
+                                                             final SSLSession sslsession) throws SSLException {
+                                    iosession.setAttribute("cxf.handshake.done", Boolean.TRUE);
+                                    setSSLSession(sslsession);
+                                }
+                            });
+                    ctx.setAttribute("http.iosession-factory-registry", regBuilder.build());
                 } catch (GeneralSecurityException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-            }
-            ctx.setAttribute(ClientContext.SCHEME_REGISTRY, reg);
-            connectionFuture = new BasicFuture<Boolean>(callback);
-            DefaultHttpAsyncClient c = getHttpAsyncClient();
-            CredentialsProvider credProvider = c.getCredentialsProvider();
-            Credentials creds = (Credentials)outMessage.getContextualProperty(Credentials.class.getName());
-            if (creds != null && credProvider != null) {
-                credProvider.setCredentials(AuthScope.ANY, creds);
-            }
-            if (credProvider != null && credProvider.getCredentials(AuthScope.ANY) != null) {
-                ctx.setAttribute(ClientContext.USER_TOKEN,
-                                 credProvider.getCredentials(AuthScope.ANY).getUserPrincipal());
-            }
+            } 
             
+
+            if (sslURL != null && !sslURL.equals(url)) {
+                sslURL = null;
+                sslState = null;
+                session = null;
+            }
+            if (tlsClientParameters != null && tlsClientParameters.hashCode() == lastTlsHash) {
+                ctx.setUserToken(sslState);
+            }
+
+            connectionFuture = new BasicFuture<Boolean>(callback);
+            HttpAsyncClient c = getHttpAsyncClient();
+            Credentials creds = (Credentials)outMessage.getContextualProperty(Credentials.class.getName());
+            if (creds != null) {
+                credsProvider.setCredentials(AuthScope.ANY, creds);
+                ctx.setUserToken(creds.getUserPrincipal());
+            }
+
             c.execute(new CXFHttpAsyncRequestProducer(entity, outbuf),
                       new CXFHttpAsyncResponseConsumer(this, inbuf, responseCallback),
                       ctx,
@@ -768,6 +787,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             exception = null;
             connectionFuture = null;
             session = null;
+            sslState = null;
+            sslURL = null;
             
             //reset the buffers
             HeapByteBufferAllocator allocator = new HeapByteBufferAllocator();
@@ -790,6 +811,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             session = sslsession;
             synchronized (sessionLock) {
                 sslState = sslsession.getLocalPrincipal();
+                sslURL = url;
                 sessionLock.notifyAll();
             }
         }
@@ -797,13 +819,11 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     }
 
 
-    public synchronized SSLContext getSSLContext() throws GeneralSecurityException {
-        TLSClientParameters tlsClientParameters = getTlsClientParameters();
-        if (tlsClientParameters == null) {
-            tlsClientParameters = new TLSClientParameters();
-        }
+    public synchronized SSLContext getSSLContext(TLSClientParameters tlsClientParameters)
+        throws GeneralSecurityException {
+        
         int hash = tlsClientParameters.hashCode();
-        if (hash == lastTlsHash) {
+        if (hash == lastTlsHash && sslContext != null) {
             return sslContext;
         }
         
@@ -825,6 +845,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         sslContext = ctx;
         lastTlsHash = hash;
         sslState = null;
+        sslURL = null;
+        session = null;
         return ctx;
     }
 

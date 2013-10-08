@@ -102,10 +102,10 @@ public class SharedInputBuffer extends ExpandableBuffer {
                 while ((bytesRead = decoder.read(this.waitingBuffer)) > 0) {
                     totalRead += bytesRead;
                 }
-            } else {
-                while ((bytesRead = decoder.read(this.buffer)) > 0) {
-                    totalRead += bytesRead;
-                }
+            }
+            //read more
+            while ((bytesRead = decoder.read(this.buffer)) > 0) {
+                totalRead += bytesRead;
             }
             if (bytesRead == -1 || decoder.isCompleted()) {
                 this.endOfStream = true;
