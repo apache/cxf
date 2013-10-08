@@ -249,7 +249,7 @@ public class WadlGenerator implements RequestHandler {
         sbMain.append(sbResources.toString());
         sbMain.append("</application>");
 
-        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, ignoreMessageWriters);
+        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, !isJson && ignoreMessageWriters);
         return Response.ok().type(type).entity(createResponseEntity(sbMain.toString(), isJson)).build();
     }
 
