@@ -578,13 +578,16 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             seq.getItems().add(exEle);
         }
         
-        if (propertyOrder != null && propertyOrder.length == seq.getItems().size()) {
-            sortItems(seq, propertyOrder);
-        } else if (propertyOrder != null && propertyOrder.length != seq.getItems().size()) {
-            LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" 
-                + Arrays.toString(propertyOrder));
+        if (propertyOrder != null) {
+            if (propertyOrder.length == seq.getItems().size()) {
+                sortItems(seq, propertyOrder);
+            } else if (propertyOrder.length > 1 
+                || (propertyOrder.length == 1 && !propertyOrder[0].isEmpty())) {
+                LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" 
+                    + Arrays.toString(propertyOrder));
+            }
         }
-        
+            
         if (xmlAccessorOrder != null && xmlAccessorOrder.value().equals(XmlAccessOrder.ALPHABETICAL)
             && propertyOrder == null) {
             sort(seq);
