@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.eventing.integration.notificationapi.assertions;
 
 import java.util.Set;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -29,8 +30,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.w3c.dom.Element;
 
-import com.ibm.wsdl.util.xml.DOMUtils;
-
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 
 public class ReferenceParametersAssertingHandler implements SOAPHandler<SOAPMessageContext> {
@@ -59,7 +59,7 @@ public class ReferenceParametersAssertingHandler implements SOAPHandler<SOAPMess
             for (Object exp : params.getAny()) {
                 JAXBElement<?> expectedElement = (JAXBElement<?>)exp;
                 boolean found = false;
-                Element actualHeaderelement = DOMUtils.getFirstChildElement(context.getMessage().getSOAPHeader());
+                Element actualHeaderelement = DOMUtils.getFirstElement(context.getMessage().getSOAPHeader());
                 while (actualHeaderelement != null) {
                     if (expectedElement.getName().getLocalPart().equals(actualHeaderelement.getLocalName())
                             && expectedElement.getName().getNamespaceURI()
@@ -67,7 +67,7 @@ public class ReferenceParametersAssertingHandler implements SOAPHandler<SOAPMess
                         found = true;
                         break;
                     }
-                    actualHeaderelement = DOMUtils.getNextSiblingElement(actualHeaderelement);
+                    actualHeaderelement = DOMUtils.getNextElement(actualHeaderelement);
                 }
                 if (!found) {
                     throw new RuntimeException("Event sink should have received Reference parameter: "

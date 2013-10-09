@@ -44,12 +44,11 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.ibm.wsdl.util.xml.DOMUtils;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -205,7 +204,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                 } else {
                     s = new DOMSource(SAAJUtils.getBody(m).getFirstChild());
                 }
-                W3CDOMStreamReader r = new W3CDOMStreamReader(DOMUtils.getFirstChildElement(SAAJUtils.getBody(m)));
+                W3CDOMStreamReader r = new W3CDOMStreamReader(DOMUtils.getFirstElement(SAAJUtils.getBody(m)));
                 message.setContent(XMLStreamReader.class, r);
             } catch (Exception e) {
                 throw new Fault(e);
