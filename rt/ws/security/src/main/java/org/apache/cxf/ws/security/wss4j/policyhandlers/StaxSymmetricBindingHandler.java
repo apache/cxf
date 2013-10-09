@@ -39,6 +39,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -153,7 +154,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             SecurityToken tok = null;
             if (encryptionToken instanceof KerberosToken) {
                 tok = getSecurityToken();
-                addKerberosToken((KerberosToken)encryptionToken, false, false);
+                if (MessageUtils.isRequestor(message)) {
+                    addKerberosToken((KerberosToken)encryptionToken, false, true, true);
+                }
             } else if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
                 addIssuedToken((IssuedToken)encryptionToken, tok, false, true);
@@ -181,7 +184,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             // Store key
-            storeSecurityToken(tok);
+            if (!(MessageUtils.isRequestor(message) && encryptionToken instanceof KerberosToken)) {
+                storeSecurityToken(tok);
+            }
             
             List<SecurePart> encrParts = null;
             List<SecurePart> sigParts = null;
@@ -249,7 +254,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (sigToken != null) {
                 if (sigToken instanceof KerberosToken) {
                     sigTok = getSecurityToken();
-                    addKerberosToken((KerberosToken)sigToken, false, false);
+                    if (MessageUtils.isRequestor(message)) {
+                        addKerberosToken((KerberosToken)sigToken, false, true, true);
+                    }
                 } else if (sigToken instanceof IssuedToken) {
                     sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)sigToken, sigTok, false, true);
@@ -281,7 +288,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             // Store key
-            storeSecurityToken(sigTok);
+            if (!(MessageUtils.isRequestor(message) && sigToken instanceof KerberosToken)) {
+                storeSecurityToken(sigTok);
+            }
 
             // Add timestamp
             List<SecurePart> sigs = new ArrayList<SecurePart>();
@@ -415,7 +424,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+            if (action.contains(ConfigurationConstants.KERBEROS_TOKEN)) {
+                config.put(ConfigurationConstants.ACTION, actionToPerform + " " + action);
+            } else {
+                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+            }
         } else {
             config.put(ConfigurationConstants.ACTION, actionToPerform);
         }

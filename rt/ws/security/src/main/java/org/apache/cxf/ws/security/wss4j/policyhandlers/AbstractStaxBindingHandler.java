@@ -204,7 +204,7 @@ public abstract class AbstractStaxBindingHandler {
     }
     
     protected SecurePart addKerberosToken(
-        KerberosToken token, boolean signed, boolean endorsing
+        KerberosToken token, boolean signed, boolean endorsing, boolean encrypting
     ) throws WSSecurityException {
         IncludeTokenType includeToken = token.getIncludeTokenType();
         if (!isTokenRequired(includeToken)) {
@@ -219,6 +219,7 @@ public abstract class AbstractStaxBindingHandler {
         // Convert to WSS4J token
         final KerberosClientSecurityToken wss4jToken = 
             new KerberosClientSecurityToken(secToken.getData(), secToken.getKey(), secToken.getId());
+        wss4jToken.setSha1Identifier(secToken.getSHA1());
         
         final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
             new SecurityTokenProvider<OutboundSecurityToken>() {
@@ -233,15 +234,21 @@ public abstract class AbstractStaxBindingHandler {
                     return wss4jToken.getId();
                 }
             };
-        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_BST, 
+        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS, 
                            kerberosSecurityTokenProvider);
+        
+        if (encrypting) {
+            outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
+                               kerberosSecurityTokenProvider);
+        }
+        if (endorsing) {
+            outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+                               kerberosSecurityTokenProvider);
+        }
         
         // Action
         Map<String, Object> config = getProperties();
         String actionToPerform = ConfigurationConstants.KERBEROS_TOKEN;
-        if (endorsing) {
-            actionToPerform = ConfigurationConstants.SIGNATURE_WITH_KERBEROS_TOKEN;
-        }
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
@@ -259,7 +266,10 @@ public abstract class AbstractStaxBindingHandler {
         }
         */
         
-        return new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
+        SecurePart securePart = new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
+        securePart.setIdToSign(wss4jToken.getId());
+        
+        return securePart;
     }
     
     protected SecurePart addSamlToken(
@@ -528,9 +538,10 @@ public abstract class AbstractStaxBindingHandler {
 
         // Find out do we also need to include the token as per the Inclusion requirement
         if (token instanceof X509Token 
-            && token.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER
+            && isTokenRequired(token.getIncludeTokenType())
             && ("IssuerSerial".equals(config.get(ConfigurationConstants.SIG_KEY_ID))
-                || "Thumbprint".equals(config.get(ConfigurationConstants.SIG_KEY_ID)))) {
+                || "Thumbprint".equals(config.get(ConfigurationConstants.SIG_KEY_ID))
+                || "DirectReference".equals(config.get(ConfigurationConstants.SIG_KEY_ID)))) {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
         } else {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
@@ -749,7 +760,7 @@ public abstract class AbstractStaxBindingHandler {
                     }
                 }
             } else if (isRequestor() && token instanceof KerberosToken) {
-                SecurePart securePart = addKerberosToken((KerberosToken)token, signed, endorse);
+                SecurePart securePart = addKerberosToken((KerberosToken)token, signed, endorse, false);
                 if (securePart != null) {
                     ret.put(token, securePart);
                     if (suppTokens.isEncryptedToken()) {

@@ -159,11 +159,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
-        properties.setSignatureUser("alice");
-        
-        Properties cryptoProperties = 
-            CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
-        properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
@@ -205,8 +200,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
         outConfig.put(ConfigurationConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
-        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
-        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
@@ -320,11 +313,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
-        properties.setSignatureUser("alice");
-        
-        Properties cryptoProperties = 
-            CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
-        properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
@@ -367,8 +355,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
         outConfig.put(ConfigurationConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler());
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
-        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
-        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 

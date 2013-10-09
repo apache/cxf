@@ -172,7 +172,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             } else if (token instanceof IssuedToken) {
                 addIssuedToken((IssuedToken)token, getSecurityToken(), false, false);
             } else if (token instanceof KerberosToken) {
-                addKerberosToken((KerberosToken)token, false, false);
+                addKerberosToken((KerberosToken)token, false, false, false);
             } else if (token instanceof SamlToken) {
                 addSamlToken((SamlToken)token, false, false);
             } else {
@@ -258,8 +258,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             || token instanceof SpnegoContextToken) {
             addSig(doIssuedTokenSignature(token, wrapper));
         */
-        } else if (token instanceof X509Token
-            || token instanceof KeyValueToken) {
+        } else if (token instanceof X509Token || token instanceof KeyValueToken) {
             doSignature(token, wrapper);
         } else if (token instanceof SamlToken) {
             addSamlToken((SamlToken)token, false, true);
@@ -273,10 +272,19 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         } else if (token instanceof UsernameToken) {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
         } else if (token instanceof KerberosToken) {
-            addKerberosToken((KerberosToken)token, false, true);
+            Map<String, Object> config = getProperties();
+            String signatureAction = ConfigurationConstants.SIGNATURE;
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, action + " " + signatureAction);
+            } else {
+                config.put(ConfigurationConstants.ACTION, signatureAction);
+            }
+            configureSignature(wrapper, token, false);
+            
+            addKerberosToken((KerberosToken)token, false, true, false);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
             
-            Map<String, Object> config = getProperties();
             config.put(ConfigurationConstants.SIG_ALGO, 
                        tbinding.getAlgorithmSuite().getSymmetricSignature());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
