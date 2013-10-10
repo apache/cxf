@@ -363,7 +363,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             String actionToPerform = ConfigurationConstants.ENCRYPT;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 actionToPerform = ConfigurationConstants.ENCRYPT_DERIVED;
-                if (MessageUtils.isRequestor(message)) {
+                if (MessageUtils.isRequestor(message) && recToken.getToken() instanceof X509Token) {
                     config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
                 } else {
                     config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
@@ -402,8 +402,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, 
                        getKeyIdentifierType(recToken, encrToken));
+                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
+                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
             } else {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
                 if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
@@ -438,7 +440,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         String actionToPerform = ConfigurationConstants.SIGNATURE;
         if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
-            if (MessageUtils.isRequestor(message)) {
+            if (MessageUtils.isRequestor(message) && policyToken instanceof X509Token) {
                 config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
             } else {
                 config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
@@ -508,8 +510,13 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
                 }
             }
-        } else if (policyToken instanceof KerberosToken && !isRequestor()) {
-            config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
+        } else if (policyToken instanceof KerberosToken) {
+            if (isRequestor()) {
+                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
+            } else {
+                config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
+                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
+            }
         } else if (policyToken instanceof IssuedToken) {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
         }

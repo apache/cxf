@@ -103,9 +103,9 @@ public class WSSecurity111Test extends WSSecurity11Common {
         String[] argv = new String[] {
             "A",
             "A-NoTimestamp",
-            // TODO Derived "AD",
+            "AD",
             // TODO See WSS-468 EncryptBeforeSigning not working "A-ES",
-            // TODO Derived "AD-ES",
+            // TODO See WSS-468 Derived "AD-ES",
             "UX",
             "UX-NoTimestamp",
             // TODO Derived "UXD",

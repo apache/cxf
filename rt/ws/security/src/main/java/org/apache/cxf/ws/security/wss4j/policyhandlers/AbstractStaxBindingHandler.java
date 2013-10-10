@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +39,6 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -94,11 +94,11 @@ import org.apache.wss4j.policy.model.XPath;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -211,14 +211,20 @@ public abstract class AbstractStaxBindingHandler {
             return null;
         }
 
-        SecurityToken secToken = getSecurityToken();
+        final SecurityToken secToken = getSecurityToken();
         if (secToken == null) {
             policyNotAsserted(token, "Could not find KerberosToken");
         }
         
         // Convert to WSS4J token
         final KerberosClientSecurityToken wss4jToken = 
-            new KerberosClientSecurityToken(secToken.getData(), secToken.getKey(), secToken.getId());
+            new KerberosClientSecurityToken(secToken.getData(), secToken.getKey(), secToken.getId()) {
+            
+                @Override
+                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    return secToken.getKey();
+                }
+            };
         wss4jToken.setSha1Identifier(secToken.getSHA1());
         
         final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
@@ -236,7 +242,6 @@ public abstract class AbstractStaxBindingHandler {
             };
         outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS, 
                            kerberosSecurityTokenProvider);
-        
         if (encrypting) {
             outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
                                kerberosSecurityTokenProvider);
