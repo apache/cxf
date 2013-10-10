@@ -36,6 +36,7 @@ import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaTypeMap;
 import org.apache.cxf.binding.corba.types.CorbaHandlerUtils;
 import org.apache.cxf.binding.corba.types.CorbaObjectHandler;
+import org.apache.cxf.binding.corba.types.CorbaStructListener;
 import org.apache.cxf.binding.corba.types.CorbaTypeListener;
 import org.apache.cxf.binding.corba.wsdl.ArgType;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -104,6 +105,11 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         } else {
             QName name = elements.pop();
             if ((name.equals(paramElement)) || (name.equals(wrapElementName))) {
+                // let the struct check if all members wer processed
+                // it is necessary for empty sequences with minOccurs=0 as last elements of struct
+                if (currentTypeListener instanceof CorbaStructListener) {
+                    currentTypeListener.processEndElement(name);
+                }
                 currentTypeListener = null;
             } else {
                 currentTypeListener.processEndElement(name);
