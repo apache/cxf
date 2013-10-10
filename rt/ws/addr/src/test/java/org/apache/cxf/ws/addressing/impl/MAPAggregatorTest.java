@@ -954,12 +954,6 @@ public class MAPAggregatorTest extends Assert {
         @ResponseWrapper(targetNamespace = "http://foo/bar", className = "SEI", localName = "opResponse")
         String op();
     }
-
-    private interface DSEI {
-        @RequestWrapper(targetNamespace = "http://foo/bar/d", className = "DSEI", localName = "opDRequest")
-        @ResponseWrapper(targetNamespace = "http://foo/bar/d", className = "DSEI", localName = "opDResponse")
-        String op();
-    }
     
     private static class TestBindingMessageInfo extends BindingMessageInfo {
     }
