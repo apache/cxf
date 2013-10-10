@@ -128,4 +128,32 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testSpnegoOverSymmetricEncryptBeforeSigning() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SpnegoTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSpnegoSymmetricEncryptBeforeSigningPort");
+        DoubleItPortType spnegoPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(spnegoPort, PORT);
+        
+        int result = spnegoPort.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)spnegoPort).close();
+        bus.shutdown(true);
+    }
+    
 }

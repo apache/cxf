@@ -74,4 +74,19 @@
      
     </jaxws:endpoint>  
     
+    <jaxws:endpoint 
+       id="SpnegoOverSymmetricEncryptBeforeSigning"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetricEncryptBeforeSigning" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSpnegoSymmetricEncryptBeforeSigningPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/spnego/DoubleItSpnego.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.kerberos.jaas.context" value="bob" />
+       </jaxws:properties> 
+     
+    </jaxws:endpoint>  
+    
 </beans>
