@@ -50,11 +50,13 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.SecureConversationToken;
@@ -361,6 +363,17 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             String actionToPerform = ConfigurationConstants.ENCRYPT;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 actionToPerform = ConfigurationConstants.ENCRYPT_DERIVED;
+                if (MessageUtils.isRequestor(message)) {
+                    config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
+                } else {
+                    config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
+                }
+                AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+                config.put(ConfigurationConstants.DERIVED_ENCRYPTION_KEY_LENGTH,
+                           "" + algSuiteType.getEncryptionDerivedKeyLength() / 8);
+                if (recToken.getVersion() == SPConstants.SPVersion.SP12) {
+                    config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
+                }
             }
 
             if (config.containsKey(ConfigurationConstants.ACTION)) {
@@ -393,6 +406,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
             } else {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
+                if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                    config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "EncryptedKeySHA1");
+                    config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
+                    config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
+                }
             }
 
             config.put(ConfigurationConstants.ENC_KEY_TRANSPORT, 
@@ -420,6 +438,17 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         String actionToPerform = ConfigurationConstants.SIGNATURE;
         if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
+            if (MessageUtils.isRequestor(message)) {
+                config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
+            } else {
+                config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
+            }
+            AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            config.put(ConfigurationConstants.DERIVED_SIGNATURE_KEY_LENGTH,
+                       "" + algSuiteType.getSignatureDerivedKeyLength() / 8);
+            if (policyToken.getVersion() == SPConstants.SPVersion.SP12) {
+                config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
+            }
         }
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
@@ -474,6 +503,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKey");
             } else {
                 config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKeySHA1");
+                if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                    config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "EncryptedKeySHA1");
+                    config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+                }
             }
         } else if (policyToken instanceof KerberosToken && !isRequestor()) {
             config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
@@ -545,7 +578,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
-                    if (token != null && token.getSecretKey() != null 
+                    if (token.getKeyWrappingToken() != null && token.getKeyWrappingToken().getSecretKey() != null 
+                        && token.getKeyWrappingToken().getSha1Identifier() != null) {
+                        return token.getKeyWrappingToken();
+                    } else if (token != null && token.getSecretKey() != null 
                         && token.getSha1Identifier() != null) {
                         return token;
                     }
