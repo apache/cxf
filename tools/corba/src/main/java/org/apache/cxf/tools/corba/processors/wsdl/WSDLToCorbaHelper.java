@@ -36,6 +36,8 @@ import javax.wsdl.Definition;
 import javax.wsdl.Part;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.corba.wsdl.Abstractanonsequence;
+import org.apache.cxf.binding.corba.wsdl.Abstractsequence;
 import org.apache.cxf.binding.corba.wsdl.CaseType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
@@ -153,6 +155,11 @@ public class WSDLToCorbaHelper {
                 throw new Exception("Couldn't convert schema " + stype.getQName() + " to corba type");
             }
         }
+
+        if (corbaTypeImpl != null && !isDuplicate(corbaTypeImpl)) {
+            typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
+        }
+
         return corbaTypeImpl;
     }
 
@@ -212,7 +219,7 @@ public class WSDLToCorbaHelper {
             } else if (container instanceof XmlSchemaElement) {
                 XmlSchemaElement element = (XmlSchemaElement)container;
 
-                CorbaTypeImpl corbatype = processLocalElement(element, schemaTypeName.getNamespaceURI());
+                CorbaTypeImpl corbatype = processLocalElement(defaultName, element, schemaTypeName.getNamespaceURI());
                 QName elName = element.getQName();
                 if (elName == null) {
                     elName = element.getRef().getTargetQName();
@@ -295,7 +302,8 @@ public class WSDLToCorbaHelper {
         return corbatype;
     }
 
-    private CorbaTypeImpl processLocalElement(XmlSchemaElement element, String uri) throws Exception {
+    private CorbaTypeImpl processLocalElement(QName containingTypeName,
+                                              XmlSchemaElement element, String uri) throws Exception {
         CorbaTypeImpl membertype = new CorbaTypeImpl();
 
         XmlSchemaType schemaType = element.getSchemaType();
@@ -341,7 +349,14 @@ public class WSDLToCorbaHelper {
         } else if (schemaType != null) {
             XmlSchemaType st = schemaType;
             boolean anonymous = WSDLTypes.isAnonymous(st.getName());
-            membertype = convertSchemaToCorbaType(st, elemName, st, null, anonymous);
+            QName typeName = null;
+            if (anonymous) {
+                typeName = new QName(elemName.getNamespaceURI(),
+                                     containingTypeName.getLocalPart() + "." + elemName.getLocalPart());
+            } else {
+                typeName = st.getQName();
+            }
+            membertype = convertSchemaToCorbaType(st, typeName, st, null, anonymous);
         } else if (element.getSchemaTypeName() != null) {
             QName name = checkPrefix(element.getSchemaTypeName());
             membertype = getLocalType(name);
@@ -355,21 +370,30 @@ public class WSDLToCorbaHelper {
                                                     + elemName.getLocalPart() + "Array");
             CorbaTypeImpl arraytype = null;
             if (memName != null) {
-                arraytype = createArray(name, schemaName, memName, elemName,
+                arraytype = createArray(name, /*schemaName*/name, memName, elemName,
                                         element.getMaxOccurs(), element.getMinOccurs(), false);
             } else {
-                arraytype = createArray(name, schemaName, membertype.getQName(), elemName,
+                arraytype = createArray(name, /*schemaName*/name, membertype.getQName(), elemName,
                                         element.getMaxOccurs(), element.getMinOccurs(), false);
             }
 
             if (arraytype != null) {
-                membertype.setName(arraytype.getName());
-                membertype.setQName(arraytype.getQName());
-                membertype.setType(arraytype.getType());
+                if (arraytype instanceof Abstractsequence) {
+                    ((Abstractsequence)arraytype).setWrapped(false);
+                }
+                if (arraytype instanceof Abstractanonsequence) {
+                    ((Abstractanonsequence)arraytype).setWrapped(false);
+                }
+                // we don't change a type which is already added to typeMappingType.getStructOrExceptionOrUnion()!
+//                membertype.setName(arraytype.getName());
+//                membertype.setQName(arraytype.getQName());
+//                membertype.setType(arraytype.getType());
 
                 if (!isDuplicate(arraytype)) {
                     typeMappingType.getStructOrExceptionOrUnion().add(arraytype);
                 }
+                // the local element with maxOccurs != 1 or minOccurs != 1 becomes the just created array
+                membertype = arraytype;
             }
         }
         membertype.setQualified(elementQualified);
@@ -1304,7 +1328,12 @@ public class WSDLToCorbaHelper {
                     if (elName.getNamespaceURI().equals("")) {
                         elName = new QName(uri, elName.getLocalPart());
                     }
-                    arrayType = convertSchemaToCorbaType(atype, elName, atype, null, true);
+                    QName arrayTypeName = elName;
+                    if (anonymous) {
+                        arrayTypeName = new QName(elName.getNamespaceURI(),
+                                                  defaultName.getLocalPart() + "." + elName.getLocalPart());
+                    }
+                    arrayType = convertSchemaToCorbaType(atype, arrayTypeName, atype, null, true);
                     boolean isQualified = getElementQualification(arrayEl, uri);
                     if (isQualified) {
                         arrayType.setQualified(isQualified);

@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.corba.processors;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.corba.CorbaTypeMap;
+import org.apache.cxf.binding.corba.utils.CorbaUtils;
+import org.apache.cxf.binding.corba.wsdl.Anonarray;
+import org.apache.cxf.binding.corba.wsdl.Anonsequence;
+import org.apache.cxf.binding.corba.wsdl.Array;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
@@ -44,12 +50,12 @@ import org.apache.cxf.binding.corba.wsdl.Fixed;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
+import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.WSDLCorbaFactory;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToCorbaBinding;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -739,7 +745,289 @@ public class WSDLToCorbaBindingTest extends Assert {
             new File("array.idl").deleteOnExit();
         }
     }
+
+    @Test
+    public void testMixedArraysMapping() throws Exception {
+        try {
+            String fileName = getClass().getResource("/wsdl/arrays-mixed.wsdl").toString();
+            generator.setWsdlFile(fileName);
+            generator.addInterfaceName("X");
+
+            Definition model = generator.generateCORBABinding();
+            QName bName = new QName("http://schemas.apache.org/idl/anon.idl",
+                "XCORBABinding", "tns");
+
+            Binding binding = model.getBinding(bName);
+            assertNotNull(binding);
+            assertEquals("XCORBABinding", binding.getQName().getLocalPart());
+            assertEquals("X", binding.getPortType().getQName().getLocalPart());
+            assertEquals(1, binding.getExtensibilityElements().size());
+            assertEquals(1, binding.getBindingOperations().size());
+
+            for (ExtensibilityElement extElement: getExtensibilityElements(binding)) {
+                if (extElement.getElementType().getLocalPart().equals("binding")) {
+                    BindingType bindingType = (BindingType)extElement;
+                    assertEquals(bindingType.getRepositoryID(), "IDL:X:1.0");
+                }
+            }
+
+            this.writer.writeWSDL(model, System.out);
+
+            Iterator<?> tm = model.getExtensibilityElements().iterator();
+            assertTrue(tm.hasNext());
+            TypeMappingType tmt = (TypeMappingType)tm.next();
+            CorbaTypeMap typeMap = CorbaUtils.createCorbaTypeMap(Arrays.asList(tmt));
+
+            assertNull("All nested anonymous types should have \"nested\" names", typeMap.getType("item"));
+
+            // Checkstyle forces me to split the method...
+            assertMixedArraysMappingEasyTypes(typeMap);
+
+            // elem types are no longer strings from now.
+            assertMixedArraysMappingDifficultSequences(typeMap);
+            assertMixedArraysMappingDifficultArrays(typeMap);
+
+            Iterator<?> j = binding.getBindingOperations().iterator();
+            while (j.hasNext()) {
+                BindingOperation bindingOperation = (BindingOperation)j.next();
+                assertEquals(1, bindingOperation.getExtensibilityElements().size());
+                assertEquals(bindingOperation.getBindingInput().getName(), "op_a");
+                assertEquals(bindingOperation.getBindingOutput().getName(), "op_aResponse");
+
+                for (ExtensibilityElement extElement: getExtensibilityElements(bindingOperation)) {
+                    if (extElement.getElementType().getLocalPart().equals("operation")) {
+                        OperationType corbaOpType = (OperationType)extElement;
+                        assertEquals(corbaOpType.getName(), "op_a");
+                        assertEquals(1, corbaOpType.getParam().size());
+                        assertNotNull(corbaOpType.getReturn());
+                        ParamType paramtype = corbaOpType.getParam().get(0);
+                        assertEquals(paramtype.getName(), "part1");
+                        QName idltype = new QName("http://schemas.apache.org/idl/anon.idl/corba/typemap/",
+                            "MixedArrayType", "ns1");
+                        assertEquals(paramtype.getIdltype(), idltype);
+                        assertEquals(paramtype.getMode().toString(), "IN");
+                    } else if (extElement.getElementType().getLocalPart().equals("typeMapping")) {
+                        System.out.println("x");
+                    }
+                }
+            }
+
+            // See if an IDL is able to produce from this CORBA Binding.
+            WSDLToIDLAction idlgen = new WSDLToIDLAction();
+            idlgen.setBindingName("XCORBABinding");
+            idlgen.setOutputFile("array.idl");
+            idlgen.generateIDL(model);
+
+            File f = new File("array.idl");
+            assertTrue("array.idl should be generated", f.exists());
+        } finally {
+            new File("array.idl").deleteOnExit();
+        }
+    }
         
+    /**
+     * @param typeMap
+     */
+    private void assertMixedArraysMappingEasyTypes(CorbaTypeMap typeMap) {
+        Sequence p1 = (Sequence)typeMap.getType("p1-unwrapped-sequenceArray");
+        assertEquals(new QName("", "p1-unwrapped-sequence"), p1.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p1.getElemtype());
+        Sequence p1q = (Sequence)typeMap.getType("p1-unwrapped-sequence-qArray");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "p1-unwrapped-sequence-q"),
+            p1q.getElemname());
+        assertFalse(p1.isWrapped());
+
+        Sequence p2 = (Sequence)typeMap.getType("UnboundedArray");
+        assertEquals(new QName("", "item"), p2.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p2.getElemtype());
+        assertTrue(p2.isWrapped());
+
+        Array p3 = (Array)typeMap.getType("p3-unwrapped-arrayArray");
+        assertEquals(new QName("", "p3-unwrapped-array"), p3.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p3.getElemtype());
+        Array p3q = (Array)typeMap.getType("p3-unwrapped-array-qArray");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "p3-unwrapped-array-q"),
+            p3q.getElemname());
+        assertFalse(p3.isWrapped());
+
+        Array p4 = (Array)typeMap.getType("FixedArray");
+        assertEquals(new QName("", "item"), p4.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p4.getElemtype());
+        assertTrue(p4.isWrapped());
+
+        Sequence p5 = (Sequence)typeMap.getType("p5-anonymous-unwrapped-sequenceArray");
+        assertEquals(new QName("", "p5-anonymous-unwrapped-sequence"), p5.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p5.getElemtype());
+        Sequence p5q = (Sequence)typeMap.getType("p5-anonymous-unwrapped-sequence-qArray");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "p5-anonymous-unwrapped-sequence-q"),
+            p5q.getElemname());
+        assertFalse(p5.isWrapped());
+
+        Anonsequence p6 = (Anonsequence)typeMap.getType("MixedArrayType.p6-anonymous-wrapped-sequenceType");
+        assertEquals(new QName("", "item"), p6.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p6.getElemtype());
+        assertFalse(p6.isQualified());
+        assertTrue(p6.isWrapped());
+        Anonsequence p6q = (Anonsequence)typeMap.getType("MixedArrayType.p6-anonymous-wrapped-sequence-qType");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "item"), p6q.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p6q.getElemtype());
+        assertTrue(p6q.isQualified());
+        assertTrue(p6q.isWrapped());
+
+        Array p7 = (Array)typeMap.getType("p7-anonymous-unwrapped-arrayArray");
+        assertEquals(new QName("", "p7-anonymous-unwrapped-array"), p7.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p7.getElemtype());
+        assertFalse(p7.isQualified());
+        assertFalse(p7.isWrapped());
+        Array p7q = (Array)typeMap.getType("p7-anonymous-unwrapped-array-qArray");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "p7-anonymous-unwrapped-array-q"),
+            p7q.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p7q.getElemtype());
+        assertTrue(p7q.isQualified());
+        assertFalse(p7q.isWrapped());
+
+        Anonarray p8 = (Anonarray)typeMap.getType("MixedArrayType.p8-anonymous-wrapped-arrayType");
+        assertEquals(new QName("", "item"), p8.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p8.getElemtype());
+        assertFalse(p8.isQualified());
+        assertTrue(p8.isWrapped());
+        Anonarray p8q = (Anonarray)typeMap.getType("MixedArrayType.p8-anonymous-wrapped-array-qType");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "item"), p8q.getElemname());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p8q.getElemtype());
+        assertTrue(p8q.isQualified());
+        assertTrue(p8q.isWrapped());
+    }
+
+    /**
+     * @param typeMap
+     */
+    private void assertMixedArraysMappingDifficultSequences(CorbaTypeMap typeMap) {
+        String corbaTm = "http://schemas.apache.org/idl/anon.idl/corba/typemap/";
+
+        // p9 is unwrapped, so there's "MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequenceArray" type
+        // registered and "MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequence" as type of the element
+        // which is Struct
+        Sequence p9 = (Sequence)typeMap.getType(
+            "MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequenceArray");
+        assertEquals(new QName("", "p9-anonymous-unwrapped-non-primitive-sequence"), p9.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequence"),
+            p9.getElemtype());
+        assertFalse(p9.isQualified());
+        assertFalse(p9.isWrapped());
+        Struct p9item = (Struct)typeMap.getType("MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequence");
+        assertEquals(1, p9item.getMember().size());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p9item.getMember().get(0).getIdltype());
+        assertEquals("item", p9item.getMember().get(0).getName());
+        Sequence p9q = (Sequence)typeMap.getType(
+            "MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequence-qArray");
+        assertEquals(
+            new QName("http://schemas.apache.org/idltypes/anon.idl",
+                      "p9-anonymous-unwrapped-non-primitive-sequence-q"),
+            p9q.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequence-q"),
+            p9q.getElemtype());
+        assertTrue(p9q.isQualified());
+        assertFalse(p9q.isWrapped());
+        Struct p9qitem = (Struct)typeMap.getType("MixedArrayType.p9-anonymous-unwrapped-non-primitive-sequence-q");
+        assertEquals(1, p9qitem.getMember().size());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p9qitem.getMember().get(0).getIdltype());
+        assertEquals("item", p9qitem.getMember().get(0).getName());
+
+        // p10 is wrapped, so there's no "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequenceArray"
+        Anonsequence p10 = (Anonsequence)typeMap.getType(
+            "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequenceType");
+        assertEquals(new QName("", "item"), p10.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequence.item"),
+            p10.getElemtype());
+        assertFalse(p10.isQualified());
+        assertTrue(p10.isWrapped());
+        Struct p10item = (Struct)typeMap.getType(
+            "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequence.item");
+        assertEquals(p10item.getMember().size(), 1);
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p10item.getMember().get(0).getIdltype());
+        assertEquals("item", p10item.getMember().get(0).getName());
+        assertFalse(p10item.getMember().get(0).isSetQualified());
+        Anonsequence p10q = (Anonsequence)typeMap.getType(
+            "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequence-qType");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "item"), p10q.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequence-q.item"),
+            p10q.getElemtype());
+        assertTrue(p10q.isQualified());
+        assertTrue(p10q.isWrapped());
+        Struct p10qitem = (Struct)typeMap.getType(
+            "MixedArrayType.p10-anonymous-wrapped-non-primitive-sequence-q.item");
+        assertEquals(p10qitem.getMember().size(), 1);
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p10qitem.getMember().get(0).getIdltype());
+        assertEquals("item", p10qitem.getMember().get(0).getName());
+        assertTrue(p10qitem.getMember().get(0).isQualified());
+    }
+
+    /**
+     * @param typeMap
+     */
+    private void assertMixedArraysMappingDifficultArrays(CorbaTypeMap typeMap) {
+        String corbaTm = "http://schemas.apache.org/idl/anon.idl/corba/typemap/";
+
+        // p11 is unwrapped, so the same case as p9
+        Array p11 = (Array)typeMap.getType("MixedArrayType.p11-anonymous-unwrapped-non-primitive-arrayArray");
+        assertEquals(new QName("", "p11-anonymous-unwrapped-non-primitive-array"), p11.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p11-anonymous-unwrapped-non-primitive-array"),
+            p11.getElemtype());
+        assertFalse(p11.isQualified());
+        assertFalse(p11.isWrapped());
+        Struct p11item = (Struct)typeMap.getType("MixedArrayType.p11-anonymous-unwrapped-non-primitive-array");
+        assertEquals(1, p11item.getMember().size());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p11item.getMember().get(0).getIdltype());
+        assertEquals("item", p11item.getMember().get(0).getName());
+        Array p11q = (Array)typeMap.getType("MixedArrayType.p11-anonymous-unwrapped-non-primitive-array-qArray");
+        assertEquals(
+            new QName("http://schemas.apache.org/idltypes/anon.idl",
+                      "p11-anonymous-unwrapped-non-primitive-array-q"),
+            p11q.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p11-anonymous-unwrapped-non-primitive-array-q"),
+            p11q.getElemtype());
+        assertTrue(p11q.isQualified());
+        assertFalse(p11q.isWrapped());
+        Struct p11qitem = (Struct)typeMap.getType("MixedArrayType.p11-anonymous-unwrapped-non-primitive-array-q");
+        assertEquals(1, p11qitem.getMember().size());
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p11qitem.getMember().get(0).getIdltype());
+        assertEquals("item", p11qitem.getMember().get(0).getName());
+
+        // p12 us wrapped - see p10
+        Anonarray p12 = (Anonarray)typeMap.getType("MixedArrayType.p12-anonymous-wrapped-non-primitive-arrayType");
+        assertEquals(new QName("", "item"), p12.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p12-anonymous-wrapped-non-primitive-array.item"),
+            p12.getElemtype());
+        assertFalse(p12.isQualified());
+        assertTrue(p12.isWrapped());
+        Struct p12item = (Struct)typeMap.getType("MixedArrayType.p12-anonymous-wrapped-non-primitive-array.item");
+        assertEquals(p12item.getMember().size(), 1);
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p12item.getMember().get(0).getIdltype());
+        assertEquals("item", p12item.getMember().get(0).getName());
+        assertFalse(p12item.getMember().get(0).isSetQualified());
+        Anonarray p12q = (Anonarray)typeMap.getType(
+            "MixedArrayType.p12-anonymous-wrapped-non-primitive-array-qType");
+        assertEquals(new QName("http://schemas.apache.org/idltypes/anon.idl", "item"), p12q.getElemname());
+        assertEquals(
+            new QName(corbaTm, "MixedArrayType.p12-anonymous-wrapped-non-primitive-array-q.item"),
+            p12q.getElemtype());
+        assertTrue(p12q.isQualified());
+        assertTrue(p12q.isWrapped());
+        Struct p12qitem = (Struct)typeMap.getType(
+            "MixedArrayType.p12-anonymous-wrapped-non-primitive-array-q.item");
+        assertEquals(p12qitem.getMember().size(), 1);
+        assertEquals(new QName(CorbaConstants.NU_WSDL_CORBA, "string"), p12qitem.getMember().get(0).getIdltype());
+        assertEquals("item", p12qitem.getMember().get(0).getName());
+        assertTrue(p12qitem.getMember().get(0).isQualified());
+    }
+
     private List<ExtensibilityElement> getExtensibilityElements(javax.wsdl.extensions.ElementExtensible e) {
         return CastUtils.cast(e.getExtensibilityElements());
     }
