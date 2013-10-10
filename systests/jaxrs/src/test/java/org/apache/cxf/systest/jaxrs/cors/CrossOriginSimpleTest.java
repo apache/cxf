@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.cors;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -88,7 +89,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
                                  boolean permitted) throws ClientProtocolException, IOException {
         configureAllowOrigins(allOrigins, originList);
 
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/simpleGet/HelloThere");
         if (requestOrigins != null) {
             StringBuffer ob = new StringBuffer();
@@ -105,6 +106,10 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(allOrigins, requestOrigins, permitted, response);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
 
     private void assertOriginResponse(boolean allOrigins, String[] requestOrigins, boolean permitted,
@@ -154,7 +159,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void preflightPostClassAnnotationFail() throws ClientProtocolException, IOException {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
         httpoptions.addHeader("Origin", "http://in.org");
         // nonsimple header
@@ -166,11 +171,15 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN).length);
         assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS).length);
         assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS).length);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
     public void preflightPostClassAnnotationFail2() throws ClientProtocolException, IOException {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
         httpoptions.addHeader("Origin", "http://area51.mil:31415");
         httpoptions.addHeader("Content-Type", "application/json");
@@ -181,11 +190,15 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN).length);
         assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS).length);
         assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS).length);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
     public void preflightPostClassAnnotationPass() throws ClientProtocolException, IOException {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
         httpoptions.addHeader("Origin", "http://area51.mil:31415");
         httpoptions.addHeader("Content-Type", "application/json");
@@ -202,11 +215,15 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         Header[] requestHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS);
         assertEquals(1, requestHeaders.length);
         assertEquals("X-custom-1", requestHeaders[0].getValue());
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
     public void preflightPostClassAnnotationPass2() throws ClientProtocolException, IOException {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
         httpoptions.addHeader("Origin", "http://area51.mil:31415");
         httpoptions.addHeader("Content-Type", "application/json");
@@ -224,11 +241,15 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals(1, requestHeaders.length);
         assertTrue(requestHeaders[0].getValue().contains("X-custom-1"));
         assertTrue(requestHeaders[0].getValue().contains("X-custom-2"));
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
     public void simplePostClassAnnotation() throws ClientProtocolException, IOException {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
         httpoptions.addHeader("Origin", "http://in.org");
         // nonsimple header
@@ -236,6 +257,10 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "POST");
         HttpResponse response = httpclient.execute(httpoptions);
         assertEquals(200, response.getStatusLine().getStatusCode());
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
@@ -301,13 +326,17 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
                 .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
         
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/simpleGet/HelloThere");
         httpget.addHeader("Origin", "http://localhost:" + PORT);
 
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertAllowCredentials(response, true);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
@@ -316,13 +345,17 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
                 .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
         
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/simpleGet/HelloThere");
         httpget.addHeader("Origin", "http://localhost:" + PORT);
 
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertAllowCredentials(response, false);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
@@ -332,7 +365,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
         
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpDelete httpdelete = new HttpDelete("http://localhost:" + PORT + "/untest/delete");
         httpdelete.addHeader("Origin", "http://localhost:" + PORT);
 
@@ -340,6 +373,9 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertAllowCredentials(response, false);
         assertOriginResponse(true, null, true, response);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
     }
 
     private void assertAllowCredentials(HttpResponse response, boolean correct) {
@@ -354,7 +390,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         String r = configClient.replacePath("/setAllowCredentials/false")
             .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/untest/annotatedGet/HelloThere");
         // this is the origin we expect to get.
         httpget.addHeader("Origin", "http://area51.mil:31415");
@@ -365,6 +401,10 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         List<String> exposeHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
         assertEquals(Arrays.asList(new String[] {"X-custom-3", "X-custom-4" }), exposeHeadersValues);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
@@ -373,7 +413,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         String r = configClient.replacePath("/setAllowCredentials/false")
             .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/untest/annotatedPut");
         // this is the origin we expect to get.
         http.addHeader("Origin", "http://area51.mil:31415");
@@ -390,11 +430,15 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         List<String> allowHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS));
         assertEquals(Arrays.asList(new String[] {"X-custom-1", "X-custom-2" }), allowHeadersValues);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+
     }
     
     @Test
     public void testAnnotatedClassCorrectOrigin() throws Exception {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest/simpleGet/HelloThere");
         httpget.addHeader("Origin", "http://area51.mil:31415");
 
@@ -405,11 +449,14 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
     }
     
     @Test
     public void testAnnotatedClassWrongOrigin() throws Exception {
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest/simpleGet/HelloThere");
         httpget.addHeader("Origin", "http://su.us:1001");
 
@@ -420,6 +467,9 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
 
         assertEquals("HelloThere", e);
         assertOriginResponse(false, null, false, response);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
     }
     
     @Test
@@ -429,7 +479,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
         
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/antest/delete");
         // this is the origin we expect to get.
         http.addHeader("Origin", "http://area51.mil:3333");
@@ -445,6 +495,9 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         List<String> allowedMethods     
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS));
         assertEquals(Arrays.asList("DELETE PUT"), allowedMethods);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
     }
     
     @Test
@@ -454,7 +507,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             .accept("text/plain").post(null, String.class);
         assertEquals("ok", r);
         
-        HttpClient httpclient = new DefaultHttpClient();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpOptions http = new HttpOptions("http://localhost:" + PORT + "/antest/delete");
         // this is the origin we expect to get.
         http.addHeader("Origin", "http://area51.mil:4444");
@@ -463,6 +516,9 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertOriginResponse(false, new String[]{"http://area51.mil:4444"}, false, response);
         // we could check that the others are also missing.
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
     }
 
     @Ignore
