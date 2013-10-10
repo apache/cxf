@@ -202,6 +202,71 @@
 		     type="string"/>
         </sequence>
     </complexType>
+    <complexType name="MixedArray">
+        <sequence>
+            <!-- unwrapped sequence -->
+            <element maxOccurs="unbounded" minOccurs="0" name="array1"
+		     type="string"/>
+            <!-- wrapped sequence -->
+            <element maxOccurs="1" minOccurs="1" name="array2"
+		     type="x1:UnboundedArray"/>
+            <!-- unwrapped array -->
+            <element maxOccurs="3" minOccurs="3" name="array3"
+		     type="string"/>
+            <!-- wrapped array -->
+            <element maxOccurs="1" minOccurs="1" name="array4"
+		     type="x1:FixedArray"/>
+            <!-- anonymous unwrapped sequence -->
+            <element maxOccurs="unbounded" minOccurs="0" name="array5">
+                <simpleType>
+                    <xsd:restriction base="string" />
+                </simpleType>
+            </element>
+            <!-- anonymous wrapped sequence -->
+            <element maxOccurs="1" minOccurs="1" name="array6">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="unbounded" minOccurs="0" name="item"
+                            type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- anonymous unwrapped array -->
+            <element maxOccurs="3" minOccurs="3" name="array7">
+                <simpleType>
+                    <xsd:restriction base="string" />
+                </simpleType>
+            </element>
+            <!-- anonymous wrapped array -->
+            <element maxOccurs="1" minOccurs="1" name="array8">
+                <complexType>
+                    <sequence>
+                        <element maxOccurs="3" minOccurs="3" name="item"
+                            type="int"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- anonymous unwrapped, non-primitive sequence -->
+            <element maxOccurs="unbounded" minOccurs="0" name="array9">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="string" />
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- anonymous unwrapped, non-primitive array -->
+            <element maxOccurs="3" minOccurs="3" name="array10">
+                <complexType>
+                    <sequence>
+                        <element name="item" type="string" />
+                    </sequence>
+                </complexType>
+            </element>
+            <!-- unwrapped sequence - last sequence in containing complexType, which might have
+                 0 occurences in XML instance -->
+            <element maxOccurs="unbounded" minOccurs="0" name="array11" type="string"/>
+        </sequence>
+    </complexType>
     <complexType name="NestedArray">
         <sequence>
             <element maxOccurs="unbounded" minOccurs="0" name="subarray"

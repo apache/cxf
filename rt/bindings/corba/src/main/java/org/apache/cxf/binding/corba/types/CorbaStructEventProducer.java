@@ -18,8 +18,9 @@
  */
 package org.apache.cxf.binding.corba.types;
 
+import org.apache.cxf.binding.corba.wsdl.Abstractanonsequence;
+import org.apache.cxf.binding.corba.wsdl.Abstractsequence;
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.omg.CORBA.ORB;
 
 public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
@@ -47,13 +48,31 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
             event = currentEventProducer.next();
         } else if (iterator.hasNext()) {
             CorbaObjectHandler obj = iterator.next();
-            //Special case for primitive sequence inside struct
-            if ((obj instanceof CorbaSequenceHandler)
-                && (CorbaHandlerUtils.isPrimitiveIDLTypeSequence(obj))
-                && (!((CorbaSequenceHandler)obj).getElements().isEmpty())
-                && (!CorbaHandlerUtils.isOctets(obj.getType()))) {
-                currentEventProducer =
-                    new CorbaPrimitiveSequenceEventProducer(obj, serviceInfo, orb);
+            //Special case for wrapped/unwrapped arrays or sequences
+            boolean primitiveSequence = obj instanceof CorbaSequenceHandler
+                        && (!CorbaHandlerUtils.isOctets(obj.getType()));
+            boolean primitivearray = obj instanceof CorbaArrayHandler
+                        && (!CorbaHandlerUtils.isOctets(obj.getType()));
+            if (primitiveSequence || primitivearray) {
+                boolean wrapped = true;
+                if (obj.getType() instanceof Abstractanonsequence) {
+                    wrapped = ((Abstractanonsequence)obj.getType()).isWrapped();
+                } else if (obj.getType() instanceof Abstractsequence) {
+                    wrapped = ((Abstractsequence)obj.getType()).isWrapped();
+                }
+                if (obj instanceof CorbaSequenceHandler) {
+                    if (wrapped) {
+                        currentEventProducer = new CorbaSequenceEventProducer(obj, serviceInfo, orb);
+                    } else {
+                        currentEventProducer = new CorbaPrimitiveSequenceEventProducer(obj, serviceInfo, orb);
+                    }
+                } else {
+                    if (wrapped) {
+                        currentEventProducer = new CorbaArrayEventProducer(obj, serviceInfo, orb);
+                    } else {
+                        currentEventProducer = new CorbaPrimitiveArrayEventProducer(obj, serviceInfo, orb);
+                    }
+                }
             } else if (obj.getSimpleName().equals(obj.getIdlType().getLocalPart() + "_f")) { 
                 //some "special cases" we need to make sure are mapped correctly
 

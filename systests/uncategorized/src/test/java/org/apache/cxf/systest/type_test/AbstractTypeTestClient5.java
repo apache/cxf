@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.systest.type_test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.ws.Holder;
 
 import org.apache.type_test.types1.ComplexRestriction;
@@ -25,6 +28,11 @@ import org.apache.type_test.types1.ComplexRestriction2;
 import org.apache.type_test.types1.ComplexRestriction3;
 import org.apache.type_test.types1.ComplexRestriction4;
 import org.apache.type_test.types1.ComplexRestriction5;
+import org.apache.type_test.types1.FixedArray;
+import org.apache.type_test.types1.MixedArray;
+import org.apache.type_test.types1.MixedArray.Array10;
+import org.apache.type_test.types1.MixedArray.Array9;
+import org.apache.type_test.types1.UnboundedArray;
 import org.junit.Test;
 
 public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
@@ -299,6 +307,205 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             } catch (Exception ex) {
                 //ex.printStackTrace();
             }
+        }
+    }
+
+    //org.apache.type_test.types1.MixedArray
+
+    protected boolean equals(MixedArray x, MixedArray y) {
+        boolean simpleArraysEqual = x.getArray1().equals(y.getArray1())
+            && x.getArray3().equals(y.getArray3())
+            && x.getArray5().equals(y.getArray5())
+            && x.getArray7().equals(y.getArray7());
+        boolean complexArraysEqual = x.getArray2().getItem().equals(y.getArray2().getItem())
+            && x.getArray4().getItem().equals(y.getArray4().getItem())
+            && x.getArray6().getItem().equals(y.getArray6().getItem())
+            && x.getArray8().getItem().equals(y.getArray8().getItem())
+            && listsOfArray9equal(x.getArray9(), y.getArray9())
+            && listsOfArray10equal(x.getArray10(), y.getArray10());
+        return simpleArraysEqual && complexArraysEqual;
+    }
+
+    protected boolean listsOfArray9equal(List<Array9> x, List<Array9> y) {
+        if ((x == null && y == null) || (x == y)) {
+            return true;
+        }
+        if (x == null || y == null || x.size() != y.size()) {
+            return false;
+        }
+        for (int i = 0; i < x.size(); i++) {
+            Array9 a1 = x.get(i);
+            Array9 a2 = y.get(i);
+            if (a1 == null && a2 == null) {
+                continue;
+            }
+            if (a1 == null || a2 == null) {
+                return false;
+            }
+            if (a1.getItem() == null && a2.getItem() == null) {
+                continue;
+            }
+            if (a1.getItem() == null || a2.getItem() == null) {
+                return false;
+            }
+            if (!a1.getItem().equals(a2.getItem())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    protected boolean listsOfArray10equal(List<Array10> x, List<Array10> y) {
+        if ((x == null && y == null) || (x == y)) {
+            return true;
+        }
+        if (x == null || y == null || x.size() != y.size()) {
+            return false;
+        }
+        for (int i = 0; i < x.size(); i++) {
+            Array10 a1 = x.get(i);
+            Array10 a2 = y.get(i);
+            if (a1 == null && a2 == null) {
+                continue;
+            }
+            if (a1 == null || a2 == null) {
+                return false;
+            }
+            if (a1.getItem() == null && a2.getItem() == null) {
+                continue;
+            }
+            if (a1.getItem() == null || a2.getItem() == null) {
+                return false;
+            }
+            if (!a1.getItem().equals(a2.getItem())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Test
+    public void testMixedArray() throws Exception {
+        if (!shouldRunTest("MixedArray")) {
+            return;
+        }
+        MixedArray x = new MixedArray();
+        x.getArray1().addAll(Arrays.asList("AAA", "BBB", "CCC"));
+        x.setArray2(new UnboundedArray());
+        x.getArray2().getItem().addAll(Arrays.asList("aaa", "bbb", "ccc"));
+        x.getArray3().addAll(Arrays.asList("DDD", "EEE", "FFF"));
+        x.setArray4(new FixedArray());
+        x.getArray4().getItem().addAll(Arrays.asList(1, 2, 3));
+        x.getArray5().addAll(Arrays.asList("GGG", "HHH", "III"));
+        x.setArray6(new MixedArray.Array6());
+        x.getArray6().getItem().addAll(Arrays.asList("ggg", "hhh", "iii"));
+        x.getArray7().addAll(Arrays.asList("JJJ", "KKK", "LLL"));
+        x.setArray8(new MixedArray.Array8());
+        x.getArray8().getItem().addAll(Arrays.asList(4, 5, 6));
+        Array9 array91 = new MixedArray.Array9();
+        Array9 array92 = new MixedArray.Array9();
+        Array9 array93 = new MixedArray.Array9();
+        array91.setItem("MMM");
+        array92.setItem("NNN");
+        array93.setItem("OOO");
+        x.getArray9().addAll(Arrays.asList(array91, array92, array93));
+        Array10 array101 = new MixedArray.Array10();
+        Array10 array102 = new MixedArray.Array10();
+        Array10 array103 = new MixedArray.Array10();
+        array101.setItem("PPP");
+        array102.setItem("QQQ");
+        array103.setItem("RRR");
+        x.getArray10().addAll(Arrays.asList(array101, array102, array103));
+        x.getArray11().addAll(Arrays.asList("AAA", "BBB", "CCC"));
+
+        MixedArray yOrig = new MixedArray();
+        yOrig.getArray1().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
+        yOrig.setArray2(new UnboundedArray());
+        yOrig.getArray2().getItem().addAll(Arrays.asList("xxx", "yyy", "zzz"));
+        yOrig.getArray3().addAll(Arrays.asList("DDD", "EEE", "FFF"));
+        yOrig.setArray4(new FixedArray());
+        yOrig.getArray4().getItem().addAll(Arrays.asList(1, 2, 3));
+        yOrig.getArray5().addAll(Arrays.asList("GGG", "HHH", "III"));
+        yOrig.setArray6(new MixedArray.Array6());
+        yOrig.getArray6().getItem().addAll(Arrays.asList("ggg", "hhh", "iii"));
+        yOrig.getArray7().addAll(Arrays.asList("JJJ", "KKK", "LLL"));
+        yOrig.setArray8(new MixedArray.Array8());
+        yOrig.getArray8().getItem().addAll(Arrays.asList(4, 5, 6));
+        array91 = new MixedArray.Array9();
+        array92 = new MixedArray.Array9();
+        array93 = new MixedArray.Array9();
+        array91.setItem("MMM");
+        array92.setItem("NNN");
+        array93.setItem("OOO");
+        yOrig.getArray9().addAll(Arrays.asList(array91, array92, array93));
+        array101 = new MixedArray.Array10();
+        array102 = new MixedArray.Array10();
+        array103 = new MixedArray.Array10();
+        array101.setItem("PPP");
+        array102.setItem("QQQ");
+        array103.setItem("RRR");
+        yOrig.getArray10().addAll(Arrays.asList(array101, array102, array103));
+        yOrig.getArray11().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
+
+        Holder<MixedArray> y = new Holder<MixedArray>(yOrig);
+        Holder<MixedArray> z = new Holder<MixedArray>();
+        MixedArray ret;
+        if (testDocLiteral) {
+            ret = docClient.testMixedArray(x, y, z);
+        } else if (testXMLBinding) {
+            ret = xmlClient.testMixedArray(x, y, z);
+        } else {
+            ret = rpcClient.testMixedArray(x, y, z);
+        }
+        if (!perfTestOnly) {
+            assertTrue("testMixedArray(): Incorrect value for inout param", equals(x, y.value));
+            assertTrue("testMixedArray(): Incorrect value for out param", equals(yOrig, z.value));
+            assertTrue("testMixedArray(): Incorrect return value", equals(x, ret));
+        }
+
+        // checkstyle complained otherwise...
+        assertEmptyCollectionsHandled(x, yOrig);
+    }
+
+    /**
+     * @param x
+     * @param yOrig
+     */
+    private void assertEmptyCollectionsHandled(MixedArray x, MixedArray yOrig) {
+        Holder<MixedArray> y;
+        Holder<MixedArray> z;
+        MixedArray ret;
+        // empty collections. may be tested only for sequences, i.e., for lists array1, array2, array5, array6,
+        // array9 and array11.
+        // array3, array4, array7, array8 and array10 must have 3 elements
+        // empty them
+        x.getArray1().clear();
+        x.setArray2(new UnboundedArray());
+        x.getArray5().clear();
+        x.setArray6(new MixedArray.Array6());
+        x.getArray9().clear();
+        x.getArray11().clear();
+
+        // empty them
+        yOrig.getArray1().clear();
+        yOrig.setArray2(new UnboundedArray());
+        yOrig.getArray5().clear();
+        yOrig.setArray6(new MixedArray.Array6());
+        yOrig.getArray9().clear();
+        yOrig.getArray11().clear();
+
+        y = new Holder<MixedArray>(yOrig);
+        z = new Holder<MixedArray>();
+        if (testDocLiteral) {
+            ret = docClient.testMixedArray(x, y, z);
+        } else if (testXMLBinding) {
+            ret = xmlClient.testMixedArray(x, y, z);
+        } else {
+            ret = rpcClient.testMixedArray(x, y, z);
+        }
+        if (!perfTestOnly) {
+            assertTrue("testMixedArray(): Incorrect value for inout param", equals(x, y.value));
+            assertTrue("testMixedArray(): Incorrect value for out param", equals(yOrig, z.value));
+            assertTrue("testMixedArray(): Incorrect return value", equals(x, ret));
         }
     }
 

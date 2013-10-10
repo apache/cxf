@@ -188,25 +188,43 @@
                         </xs:extension>
                 </xs:complexContent>
         </xs:complexType>
-        <xs:complexType name="anonsequence">
+        <xs:complexType name="abstractanonsequence" abstract="true">
                 <xs:annotation>
-                        <xs:documentation>Anonymous sequence type.</xs:documentation>
+                        <xs:documentation>abstract sequence of elements</xs:documentation>
                 </xs:annotation>
                 <xs:complexContent>
                         <xs:extension base="corba:corbaType">
                                 <xs:attribute name="elemtype" type="xs:QName" use="required"/>
                                 <xs:attribute name="bound" type="corba:ulong" use="required"/>
                                 <xs:attribute name="elemname" type="xs:QName" use="required"/>
+                                <xs:attribute name="wrapped" type="xs:boolean" default="true"/>
                         </xs:extension>
                 </xs:complexContent>
         </xs:complexType>
-        <xs:complexType name="sequence">
+        <xs:complexType name="abstractsequence" abstract="true">
+                <xs:annotation>
+                        <xs:documentation>abstract sequence of elements</xs:documentation>
+                </xs:annotation>
                 <xs:complexContent>
                         <xs:extension base="corba:namedType">
                                 <xs:attribute name="elemtype" type="xs:QName" use="required"/>
                                 <xs:attribute name="bound" type="corba:ulong" use="required"/>
                                 <xs:attribute name="elemname" type="xs:QName" use="required"/>
+                                <xs:attribute name="wrapped" type="xs:boolean" default="true"/>
                         </xs:extension>
+                </xs:complexContent>
+        </xs:complexType>
+        <xs:complexType name="anonsequence">
+                <xs:annotation>
+                        <xs:documentation>Anonymous sequence type.</xs:documentation>
+                </xs:annotation>
+                <xs:complexContent>
+                        <xs:extension base="corba:abstractanonsequence" />
+                </xs:complexContent>
+        </xs:complexType>
+        <xs:complexType name="sequence">
+                <xs:complexContent>
+                        <xs:extension base="corba:abstractsequence" />
                 </xs:complexContent>
         </xs:complexType>
         <xs:complexType name="anonarray">
@@ -214,20 +232,12 @@
                         <xs:documentation>Anonymous array type.</xs:documentation>
                 </xs:annotation>
                 <xs:complexContent>
-                        <xs:extension base="corba:corbaType">
-                                <xs:attribute name="elemtype" type="xs:QName" use="required"/>
-                                <xs:attribute name="bound" type="corba:ulong" use="required"/>
-                                <xs:attribute name="elemname" type="xs:QName" use="required"/>
-                        </xs:extension>
+                        <xs:extension base="corba:abstractanonsequence" />
                 </xs:complexContent>
         </xs:complexType>
         <xs:complexType name="array">
                 <xs:complexContent>
-                        <xs:extension base="corba:namedType">
-                                <xs:attribute name="elemtype" type="xs:QName" use="required"/>
-                                <xs:attribute name="bound" type="corba:ulong" use="required"/>
-                                <xs:attribute name="elemname" type="xs:QName" use="required"/>
-                        </xs:extension>
+                        <xs:extension base="corba:abstractsequence" />
                 </xs:complexContent>
         </xs:complexType>
         <xs:complexType name="enumerator">
