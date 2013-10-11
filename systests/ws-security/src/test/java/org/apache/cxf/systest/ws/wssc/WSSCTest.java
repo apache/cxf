@@ -33,7 +33,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- *
+ * SecureConversation tests.
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class WSSCTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -69,123 +71,160 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testSecureConversationMutualCertificate10SignEncryptIPingService() throws Exception {
-        runTest("SecureConversation_MutualCertificate10SignEncrypt_IPingService");
+        runTest(false, "SecureConversation_MutualCertificate10SignEncrypt_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "SecureConversation_MutualCertificate10SignEncrypt_IPingService");
     }
 
     @Test
     public void testACIPingService() throws Exception {
-        runTest("AC_IPingService");
+        runTest(false, "AC_IPingService");
+        runTest(true, "AC_IPingService");
     }
 
     @Test
     public void testADCIPingService() throws Exception {
-        runTest("ADC_IPingService");
+        runTest(false, "ADC_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "ADC_IPingService");
     }
 
     @Test
     public void testADCESIPingService() throws Exception {
-        runTest("ADC-ES_IPingService");
+        runTest(false, "ADC-ES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "ADC-ES_IPingService");
     }
 
     @Test
     public void testAIPingService() throws Exception {
-        runTest("_A_IPingService");
+        runTest(false, "_A_IPingService");
+        runTest(true, "_A_IPingService");
     }
 
     @Test
     public void testADIPingService() throws Exception {
-        runTest("_AD_IPingService");
+        runTest(false, "_AD_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_AD_IPingService");
     }
 
     @Test
     public void testADESIPingService() throws Exception {
-        runTest("_AD-ES_IPingService");
+        runTest(false, "_AD-ES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_AD-ES_IPingService");
     }
 
     @Test
     public void testUXCIPingService() throws Exception {
-        runTest("UXC_IPingService");
+        runTest(false, "UXC_IPingService");
+        runTest(true, "UXC_IPingService");
     }
 
     @Test
     public void testUXDCIPingService() throws Exception {
-        runTest("UXDC_IPingService");
+        runTest(false, "UXDC_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "UXDC_IPingService");
     }
 
     @Test
     public void testUXDCSEESIPingService() throws Exception {
-        runTest("UXDC-SEES_IPingService");
+        runTest(false, "UXDC-SEES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "UXDC-SEES_IPingService");
     }
 
     @Test
     public void testUXIPingService() throws Exception {
-        runTest("_UX_IPingService");
+        runTest(false, "_UX_IPingService");
+        runTest(true, "_UX_IPingService");
     }
 
     @Test
     public void testUXDIPingService() throws Exception {
-        runTest("_UXD_IPingService");
+        runTest(false, "_UXD_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_UXD_IPingService");
     }
 
     @Test
     public void testUXDSEESIPingService() throws Exception {
-        runTest("_UXD-SEES_IPingService");
+        runTest(false, "_UXD-SEES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_UXD-SEES_IPingService");
     }
 
     @Test
     public void testXCIPingService() throws Exception {
-        runTest("XC_IPingService");
+        runTest(false, "XC_IPingService");
+        runTest(true, "XC_IPingService");
     }
 
     @Test
     public void testXDCIPingService() throws Exception {
-        runTest("XDC_IPingService");
+        runTest(false, "XDC_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "XDC_IPingService");
     }
 
     @Test
     public void testXDCIPingService1() throws Exception {
-        runTest("XDC_IPingService1");
+        runTest(false, "XDC_IPingService1");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "XDC_IPingService1");
     }
 
     @Test
     public void testXDCESIPingService() throws Exception {
-        runTest("XDC-ES_IPingService");
+        runTest(false, "XDC-ES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "XDC-ES_IPingService");
     }
 
     @Test
     public void testXDCSEESIPingService() throws Exception {
-        runTest("XDC-SEES_IPingService");
+        runTest(false, "XDC-SEES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "XDC-SEES_IPingService");
     }
 
     @Test
     public void testXIPingService() throws Exception {
-        runTest("_X_IPingService");
+        runTest(false, "_X_IPingService");
+        runTest(true, "_X_IPingService");
     }
 
     @Test
     public void testX10IPingService() throws Exception {
-        runTest("_X10_IPingService");
+        runTest(false, "_X10_IPingService");
+        runTest(true, "_X10_IPingService");
     }
 
     @Test
     public void testXDIPingService() throws Exception {
-        runTest("_XD_IPingService");
+        runTest(false, "_XD_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_XD_IPingService");
     }
 
     @Test
     public void testXDSEESIPingService() throws Exception {
-        runTest("_XD-SEES_IPingService");
+        runTest(false, "_XD-SEES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_XD-SEES_IPingService");
     }
 
     @Test
     public void testXDESIPingService() throws Exception {
-        runTest("_XD-ES_IPingService");
+        runTest(false, "_XD-ES_IPingService");
+        // TODO Hanging due to Derived Keys...
+        // runTest(true, "_XD-ES_IPingService");
     }
 
 
-
-
-    private void runTest(String ... argv) throws Exception {
+    private void runTest(boolean streaming, String ... argv) throws Exception {
         for (String portPrefix : argv) {
             final wssec.wssc.IPingService port = 
                 svc.getPort(
@@ -203,6 +242,16 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                 ((BindingProvider)port).getRequestContext()
                     .put(SecurityConstants.STS_TOKEN_DO_CANCEL, Boolean.TRUE);
             }
+            
+            if (streaming) {
+                ((BindingProvider)port).getRequestContext().put(
+                    SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+                );
+                ((BindingProvider)port).getResponseContext().put(
+                    SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+                );
+            }
+            
             wssec.wssc.PingRequest params = new wssec.wssc.PingRequest();
             org.xmlsoap.ping.Ping ping = new org.xmlsoap.ping.Ping();
             ping.setOrigin("CXF");

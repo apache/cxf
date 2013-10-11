@@ -36,6 +36,8 @@ import org.junit.BeforeClass;
 /**
  * A set of tests for SecureConversation using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 public class SecureConversationTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -80,6 +82,11 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         
+        // DOM
+        samlPort.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
