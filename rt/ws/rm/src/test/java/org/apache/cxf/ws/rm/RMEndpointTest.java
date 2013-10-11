@@ -42,6 +42,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
@@ -248,7 +249,7 @@ public class RMEndpointTest extends Assert {
     public void testSetPoliciesNoEngine() {
         Bus bus = control.createMock(Bus.class);
         EasyMock.expect(manager.getBus()).andReturn(bus);
-        EasyMock.expect(bus.getExtension(PolicyEngineImpl.class)).andReturn(null);
+        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(null);
         control.replay();
         rme.setPolicies();
     }
@@ -258,7 +259,7 @@ public class RMEndpointTest extends Assert {
         Bus bus = control.createMock(Bus.class);
         EasyMock.expect(manager.getBus()).andReturn(bus);
         PolicyEngineImpl pe = control.createMock(PolicyEngineImpl.class);
-        EasyMock.expect(bus.getExtension(PolicyEngineImpl.class)).andReturn(pe);
+        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(pe);
         EasyMock.expect(pe.isEnabled()).andReturn(false);
         control.replay();
         rme.setPolicies();

@@ -90,7 +90,7 @@ public class EffectivePolicyImplTest extends Assert {
     @Test
     public void testInitialiseFromEndpointPolicy() throws NoSuchMethodException {
         Method m = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
-                                                          new Class[] {PolicyEngineImpl.class});
+                                                          new Class[] {PolicyEngine.class});
         EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
             .addMockedMethod(m).createMock(control);
         EndpointPolicyImpl endpointPolicy = control.createMock(EndpointPolicyImpl.class);
@@ -111,14 +111,14 @@ public class EffectivePolicyImplTest extends Assert {
         Method m1 = EffectivePolicyImpl.class.getDeclaredMethod("initialisePolicy",
             new Class[] {EndpointInfo.class, 
                          BindingOperationInfo.class, 
-                         PolicyEngineImpl.class,
+                         PolicyEngine.class,
                          boolean.class,
                          boolean.class,
                          Assertor.class});
         Method m2 = EffectivePolicyImpl.class.getDeclaredMethod("chooseAlternative",
-            new Class[] {PolicyEngineImpl.class, Assertor.class});
+            new Class[] {PolicyEngine.class, Assertor.class});
         Method m3 = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
-                                                          new Class[] {PolicyEngineImpl.class});
+                                                          new Class[] {PolicyEngine.class});
         EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
             .addMockedMethods(m1, m2, m3).createMock(control);        
         EndpointInfo ei = control.createMock(EndpointInfo.class);
@@ -143,11 +143,11 @@ public class EffectivePolicyImplTest extends Assert {
     public void testInitialiseFault() throws NoSuchMethodException {
         Method m1 = EffectivePolicyImpl.class.getDeclaredMethod("initialisePolicy",
             new Class[] {EndpointInfo.class, BindingOperationInfo.class,
-                         BindingFaultInfo.class, PolicyEngineImpl.class});
+                         BindingFaultInfo.class, PolicyEngine.class});
         Method m2 = EffectivePolicyImpl.class.getDeclaredMethod("chooseAlternative",
-            new Class[] {PolicyEngineImpl.class, Assertor.class});
+            new Class[] {PolicyEngine.class, Assertor.class});
         Method m3 = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
-                                                          new Class[] {PolicyEngineImpl.class});
+                                                          new Class[] {PolicyEngine.class});
         EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
             .addMockedMethods(m1, m2, m3).createMock(control);        
         EndpointInfo ei = control.createMock(EndpointInfo.class);

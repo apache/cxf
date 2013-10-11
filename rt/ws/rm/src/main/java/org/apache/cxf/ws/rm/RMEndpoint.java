@@ -70,8 +70,8 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.policy.EffectivePolicyImpl;
-import org.apache.cxf.ws.policy.EndpointPolicyImpl;
-import org.apache.cxf.ws.policy.PolicyEngineImpl;
+import org.apache.cxf.ws.policy.EndpointPolicy;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceResponseType;
@@ -443,16 +443,16 @@ public class RMEndpoint {
 
     void setPolicies() {
         // use same WS-policies as for application endpoint
-        PolicyEngineImpl engine = manager.getBus().getExtension(PolicyEngineImpl.class);
+        PolicyEngine engine = manager.getBus().getExtension(PolicyEngine.class);
         if (null == engine || !engine.isEnabled()) {
             return;
         }
 
         for (Endpoint endpoint : endpoints.values()) {
             EndpointInfo ei = endpoint.getEndpointInfo();
-            EndpointPolicyImpl epi = (EndpointPolicyImpl)(null == conduit
+            EndpointPolicy epi = null == conduit
                 ? engine.getServerEndpointPolicy(applicationEndpoint.getEndpointInfo(), null)
-                    : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(), conduit));
+                    : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(), conduit);
             
             if (conduit != null) {
                 engine.setClientEndpointPolicy(ei, epi);
