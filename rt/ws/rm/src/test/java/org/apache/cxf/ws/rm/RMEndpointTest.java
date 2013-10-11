@@ -21,7 +21,6 @@ package org.apache.cxf.ws.rm;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -32,8 +31,8 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.endpoint.EndpointException;
+import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -43,13 +42,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
-import org.apache.cxf.ws.policy.EffectivePolicy;
-import org.apache.cxf.ws.policy.EndpointPolicy;
-import org.apache.cxf.ws.policy.PolicyEngine;
-import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
+import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.Policy;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -70,7 +64,10 @@ public class RMEndpointTest extends Assert {
         control = EasyMock.createNiceControl();
         manager = control.createMock(RMManager.class);
         ae = control.createMock(Endpoint.class);
+        EasyMock.expect(ae.getEndpointInfo()).andReturn(new EndpointInfo()).anyTimes();
+        control.replay();
         rme = new RMEndpoint(manager, ae);
+        control.reset();
     }
 
     @After
@@ -168,25 +165,24 @@ public class RMEndpointTest extends Assert {
     }
 
     @Test
-    public void testCreateEndpoint() throws NoSuchMethodException {
+    public void testCreateEndpoint() throws NoSuchMethodException, EndpointException {
         Method m = RMEndpoint.class.getDeclaredMethod("getUsingAddressing", new Class[] {EndpointInfo.class});
+        Service as = control.createMock(Service.class);
+        EndpointInfo aei = new EndpointInfo();
+        ae = new EndpointImpl(null, as, aei);
         rme = EasyMock.createMockBuilder(RMEndpoint.class).withConstructor(manager, ae)
             .addMockedMethod(m).createMock(control);
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
-        Service as = control.createMock(Service.class);
-        EasyMock.expect(ae.getService()).andReturn(as);
-        EndpointInfo aei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(ae.getEndpointInfo()).andReturn(aei).anyTimes();
         SoapBindingInfo bi = control.createMock(SoapBindingInfo.class);
-        EasyMock.expect(aei.getBinding()).andReturn(bi).anyTimes(); 
+        aei.setBinding(bi);
         SoapVersion sv = Soap11.getInstance();
         EasyMock.expect(bi.getSoapVersion()).andReturn(sv);
         String ns = "http://schemas.xmlsoap.org/wsdl/soap/";
         EasyMock.expect(bi.getBindingId()).andReturn(ns);
-        EasyMock.expect(aei.getTransportId()).andReturn(ns);
+        aei.setTransportId(ns);
         String addr = "addr";
-        EasyMock.expect(aei.getAddress()).andReturn(addr);
+        aei.setAddress(addr);
         Object ua = new Object();
         EasyMock.expect(rme.getUsingAddressing(aei)).andReturn(ua);
         control.replay();
@@ -252,7 +248,7 @@ public class RMEndpointTest extends Assert {
     public void testSetPoliciesNoEngine() {
         Bus bus = control.createMock(Bus.class);
         EasyMock.expect(manager.getBus()).andReturn(bus);
-        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(null);
+        EasyMock.expect(bus.getExtension(PolicyEngineImpl.class)).andReturn(null);
         control.replay();
         rme.setPolicies();
     }
@@ -261,8 +257,8 @@ public class RMEndpointTest extends Assert {
     public void testSetPoliciesEngineDisabled() {
         Bus bus = control.createMock(Bus.class);
         EasyMock.expect(manager.getBus()).andReturn(bus);
-        PolicyEngine pe = control.createMock(PolicyEngine.class);
-        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(pe);
+        PolicyEngineImpl pe = control.createMock(PolicyEngineImpl.class);
+        EasyMock.expect(bus.getExtension(PolicyEngineImpl.class)).andReturn(pe);
         EasyMock.expect(pe.isEnabled()).andReturn(false);
         control.replay();
         rme.setPolicies();
@@ -294,23 +290,6 @@ public class RMEndpointTest extends Assert {
         rme.getDestination().addSequence(ds, false);
         rme.getSource().addSequence(ss, false);
         rme.shutdown();
-    }
-
-    @Test
-    public void testEffectivePolicyImpl() {
-        EndpointPolicy ep = control.createMock(EndpointPolicy.class);
-        Collection<Assertion> alt = new ArrayList<Assertion>();
-        EasyMock.expect(ep.getChosenAlternative()).andReturn(alt).times(2);
-        PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
-        List<Interceptor<? extends Message>> li = new ArrayList<Interceptor<? extends Message>>();
-        EasyMock.expect(reg.getInterceptorsForAlternative(alt, true, false)).andReturn(li);
-        Policy p = control.createMock(Policy.class);
-        EasyMock.expect(ep.getPolicy()).andReturn(p);
-        control.replay();
-        EffectivePolicy effective = rme.new EffectivePolicyImpl(ep, reg, true, false);
-        assertSame(alt, effective.getChosenAlternative());
-        assertSame(li, effective.getInterceptors());
-        assertSame(p, effective.getPolicy());
     }
 
     private void verifyService() {

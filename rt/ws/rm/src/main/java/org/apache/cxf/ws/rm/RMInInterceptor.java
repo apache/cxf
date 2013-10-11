@@ -32,6 +32,7 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.security.trust.STSUtils;
 
 /**
  * 
@@ -110,6 +111,12 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Action: " + action);
+        }
+        
+        // RM does not apply to WS-Trust messages, as used by WS-SecureConversation
+        if (action != null && action.contains("/RST/SCT")
+            && (action.startsWith(STSUtils.WST_NS_05_02) || action.startsWith(STSUtils.WST_NS_05_12))) {
+            return;
         }
         
         Object originalRequestor = message.get(RMMessageConstants.ORIGINAL_REQUESTOR_ROLE);

@@ -51,11 +51,9 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -71,16 +69,14 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
-import org.apache.cxf.ws.policy.EffectivePolicy;
-import org.apache.cxf.ws.policy.EndpointPolicy;
-import org.apache.cxf.ws.policy.PolicyEngine;
-import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
+import org.apache.cxf.ws.policy.EffectivePolicyImpl;
+import org.apache.cxf.ws.policy.EndpointPolicyImpl;
+import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.Policy;
+import org.apache.cxf.ws.security.SecurityConstants;
 
 public class RMEndpoint {
 
@@ -107,6 +103,7 @@ public class RMEndpoint {
     private Destination destination;
     private Map<ProtocolVariation, WrappedService> services;
     private Map<ProtocolVariation, Endpoint> endpoints;
+    private Object tokenStore;
     private Proxy proxy;
     private Servant servant;
     private long lastApplicationMessage;
@@ -138,6 +135,7 @@ public class RMEndpoint {
         applicationMessageCount = new AtomicInteger();
         controlMessageCount = new AtomicInteger();
         acknowledgementSequence = new AtomicInteger();
+        tokenStore = ae.getEndpointInfo().getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
     }
 
     /**
@@ -435,35 +433,36 @@ public class RMEndpoint {
             ei.addExtensor(ua);
         }
         si.addEndpoint(ei);
-
+        ei.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
+        
         Endpoint endpoint = new WrappedEndpoint(applicationEndpoint, ei, service);
+        
         service.setEndpoint(endpoint);
         endpoints.put(protocol, endpoint);
     }
 
     void setPolicies() {
         // use same WS-policies as for application endpoint
-        PolicyEngine engine = manager.getBus().getExtension(PolicyEngine.class);
+        PolicyEngineImpl engine = manager.getBus().getExtension(PolicyEngineImpl.class);
         if (null == engine || !engine.isEnabled()) {
             return;
         }
 
         for (Endpoint endpoint : endpoints.values()) {
             EndpointInfo ei = endpoint.getEndpointInfo();
-            PolicyInterceptorProviderRegistry reg = manager.getBus()
-                .getExtension(PolicyInterceptorProviderRegistry.class);
-            EndpointPolicy ep = null == conduit ? engine.getServerEndpointPolicy(applicationEndpoint
-                .getEndpointInfo(), null) : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(),
-                    conduit);
+            EndpointPolicyImpl epi = (EndpointPolicyImpl)(null == conduit
+                ? engine.getServerEndpointPolicy(applicationEndpoint.getEndpointInfo(), null)
+                    : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(), conduit));
             
             if (conduit != null) {
-                engine.setClientEndpointPolicy(ei, ep);
+                engine.setClientEndpointPolicy(ei, epi);
             } else {
-                engine.setServerEndpointPolicy(ei, ep);
+                engine.setServerEndpointPolicy(ei, epi);
             }
-            
-            EffectivePolicy effectiveOutbound = new EffectivePolicyImpl(ep, reg, true, false);
-            EffectivePolicy effectiveInbound = new EffectivePolicyImpl(ep, reg, false, false);
+            EffectivePolicyImpl effectiveOutbound = new EffectivePolicyImpl();
+            effectiveOutbound.initialise(epi, engine, false, false);
+            EffectivePolicyImpl effectiveInbound = new EffectivePolicyImpl();
+            effectiveInbound.initialise(epi, engine, true, false);
             
             BindingInfo bi = ei.getBinding();
             Collection<BindingOperationInfo> bois = bi.getOperations();
@@ -826,30 +825,5 @@ public class RMEndpoint {
 
     int getCompletedDestinationSequenceCount() {
         return destination != null ? destination.getCompletedSequenceCount() : 0;
-    }
-
-    class EffectivePolicyImpl implements EffectivePolicy {
-
-        private EndpointPolicy endpointPolicy;
-        private List<Interceptor<? extends Message>> interceptors;
-
-        EffectivePolicyImpl(EndpointPolicy ep, PolicyInterceptorProviderRegistry reg, boolean outbound,
-                            boolean fault) {
-            endpointPolicy = ep;
-            interceptors = reg.getInterceptorsForAlternative(endpointPolicy.getChosenAlternative(),
-                                                             outbound, fault);
-        }
-
-        public Collection<Assertion> getChosenAlternative() {
-            return endpointPolicy.getChosenAlternative();
-        }
-
-        public List<Interceptor<? extends Message>> getInterceptors() {
-            return interceptors;
-        }
-
-        public Policy getPolicy() {
-            return endpointPolicy.getPolicy();
-        }
     }
 }

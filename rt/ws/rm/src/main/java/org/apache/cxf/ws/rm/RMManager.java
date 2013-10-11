@@ -74,6 +74,7 @@ import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
+import org.apache.cxf.ws.security.SecurityConstants;
 
 /**
  * 
@@ -447,11 +448,19 @@ public class RMManager {
             }
             Proxy proxy = source.getReliableEndpoint().getProxy();
             ProtocolVariation protocol = config.getProtocolVariation();
+            Exchange exchange = new ExchangeImpl();
             CreateSequenceResponseType createResponse = 
-                proxy.createSequence(acksTo, relatesTo, isServer, protocol);
+                proxy.createSequence(acksTo, relatesTo, isServer, protocol, exchange);
             if (!isServer) {
                 Servant servant = source.getReliableEndpoint().getServant();
                 servant.createSequenceResponse(createResponse, protocol);
+                
+                // propagate security properties to application endpoint, in case we're using WS-SecureConversation
+                Exchange appex = message.getExchange();
+                if (appex.get(SecurityConstants.TOKEN) == null) {
+                    appex.put(SecurityConstants.TOKEN, exchange.get(SecurityConstants.TOKEN));
+                    appex.put(SecurityConstants.TOKEN_ID, exchange.get(SecurityConstants.TOKEN_ID));
+                }
             }
 
             seq = source.awaitCurrent(inSeqId);

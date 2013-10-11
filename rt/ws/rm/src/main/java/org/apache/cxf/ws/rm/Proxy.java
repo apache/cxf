@@ -35,6 +35,8 @@ import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.DeferredConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -85,7 +87,7 @@ public class Proxy {
         RMConstants constants = protocol.getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
             .getService().getInterface().getOperation(constants.getSequenceAckOperationName());
-        invoke(oi, protocol, new Object[] {ds}, null);
+        invoke(oi, protocol, new Object[] {ds});
     }
     
     void terminate(SourceSequence ss) throws RMException {
@@ -98,7 +100,7 @@ public class Proxy {
         ts.setIdentifier(ss.getIdentifier());
         ts.setLastMsgNumber(ss.getCurrentMessageNr());
         EncoderDecoder codec = protocol.getCodec();
-        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, null);
+        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)});
     }
     
     void terminate(DestinationSequence ds) throws RMException {
@@ -111,7 +113,7 @@ public class Proxy {
         ts.setIdentifier(ds.getIdentifier());
         ts.setLastMsgNumber(ds.getLastMessageNumber());
         EncoderDecoder codec = protocol.getCodec();
-        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, null);
+        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)});
     }
     
     void createSequenceResponse(final Object createResponse, ProtocolVariation protocol) throws RMException {
@@ -122,14 +124,12 @@ public class Proxy {
         
         // TODO: need to set relatesTo
 
-        invoke(oi, protocol, new Object[] {createResponse}, null);
+        invoke(oi, protocol, new Object[] {createResponse});
        
     }
 
-    public CreateSequenceResponseType createSequence(
-                        EndpointReferenceType defaultAcksTo,
-                        RelatesToType relatesTo,
-                        boolean isServer, final ProtocolVariation protocol) throws RMException {
+    public CreateSequenceResponseType createSequence(EndpointReferenceType defaultAcksTo, RelatesToType relatesTo, 
+             boolean isServer, final ProtocolVariation protocol, final Exchange exchange) throws RMException {
         
         SourcePolicyType sp = reliableEndpoint.getManager().getSourcePolicy();
         CreateSequenceType create = new CreateSequenceType();        
@@ -181,7 +181,7 @@ public class Proxy {
             Runnable r = new Runnable() {
                 public void run() {
                     try {
-                        invoke(oi, protocol, new Object[] {send}, null);
+                        invoke(oi, protocol, new Object[] {send}, null, exchange);
                     } catch (RMException ex) {
                         // already logged
                     }
@@ -196,7 +196,7 @@ public class Proxy {
         }
         
         
-        Object resp = invoke(oi, protocol, new Object[] {send}, null);
+        Object resp = invoke(oi, protocol, new Object[] {send}, null, exchange);
         return codec.convertReceivedCreateSequenceResponse(resp);
     }
     
@@ -264,7 +264,7 @@ public class Proxy {
         RMConstants constants = protocol.getConstants();
         OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo().getService()
             .getInterface().getOperation(constants.getAckRequestedOperationName());
-        invoke(oi, protocol, new Object[] {}, null);
+        invoke(oi, protocol, new Object[] {});
     }
         
     Identifier getOfferedIdentifier() {
@@ -278,7 +278,7 @@ public class Proxy {
     }
        
     Object invoke(OperationInfo oi, ProtocolVariation protocol, 
-                  Object[] params, Map<String, Object> context) throws RMException {
+                  Object[] params, Map<String, Object> context, Exchange exchange) throws RMException {
         
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "Sending out-of-band RM protocol message {0}.", 
@@ -307,7 +307,7 @@ public class Proxy {
         
         BindingOperationInfo boi = bi.getOperation(oi);
         try {
-            Object[] result = client.invoke(boi, params, context);
+            Object[] result = client.invoke(boi, params, context, exchange);
             if (result != null && result.length > 0) {
                 return result[0];
             }
@@ -320,6 +320,15 @@ public class Proxy {
             throw new RMException(msg, ex);
         }
         return null;
+    }
+    
+    Object invoke(OperationInfo oi, ProtocolVariation protocol, Object[] params, Map<String, Object> context)
+        throws RMException {
+        return invoke(oi, protocol, params, context, new ExchangeImpl());
+    }
+    
+    Object invoke(OperationInfo oi, ProtocolVariation protocol, Object[] params) throws RMException {
+        return invoke(oi, protocol, params, null);
     }
     
     protected Client createClient(Bus bus, Endpoint endpoint, final ProtocolVariation protocol, 

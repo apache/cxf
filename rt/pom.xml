@@ -53,8 +53,8 @@
         <module>transports/udp</module>
         <module>ws/policy</module>
         <module>ws/addr</module>
-        <module>ws/rm</module>
         <module>ws/security</module>
+        <module>ws/rm</module>
         <module>ws/mex</module>
         <module>ws/eventing</module>
         <module>rs/client</module>
