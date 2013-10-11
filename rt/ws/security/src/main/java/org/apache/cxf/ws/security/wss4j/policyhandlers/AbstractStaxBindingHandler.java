@@ -60,6 +60,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -222,6 +223,9 @@ public abstract class AbstractStaxBindingHandler {
             
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    if (secToken.getSecret() != null && algorithmURI != null && !"".equals(algorithmURI)) {
+                        return KeyUtils.prepareSecretKey(algorithmURI, secToken.getSecret());
+                    }
                     return secToken.getKey();
                 }
             };

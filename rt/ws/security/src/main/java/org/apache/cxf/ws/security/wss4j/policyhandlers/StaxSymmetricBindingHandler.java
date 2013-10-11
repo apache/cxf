@@ -47,6 +47,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -256,7 +257,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (sigToken != null) {
                 if (sigToken instanceof KerberosToken) {
                     sigTok = getSecurityToken();
-                    if (MessageUtils.isRequestor(message)) {
+                    if (isRequestor()) {
                         addKerberosToken((KerberosToken)sigToken, false, true, true);
                     }
                 } else if (sigToken instanceof IssuedToken) {
@@ -266,6 +267,16 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     || sigToken instanceof SecurityContextToken
                     || sigToken instanceof SpnegoContextToken) {
                     sigTok = getSecurityToken();
+                    if (sigTok != null && isRequestor()) {
+                        Map<String, Object> config = getProperties();
+                        String actionToPerform = ConfigurationConstants.CUSTOM_TOKEN;
+                        if (config.containsKey(ConfigurationConstants.ACTION)) {
+                            String action = (String)config.get(ConfigurationConstants.ACTION);
+                            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+                        } else {
+                            config.put(ConfigurationConstants.ACTION, actionToPerform);
+                        }
+                    }
                 } else if (sigToken instanceof X509Token) {
                     if (isRequestor()) {
                         sigTokId = setupEncryptedKey(sigAbstractTokenWrapper, sigToken);
@@ -425,7 +436,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
             }
             
-            if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken) {
+            if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken
+                || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken
+                || encrToken instanceof SecureConversationToken) {
                 config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
             }
         }
@@ -655,6 +668,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
           
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    if (secret != null && algorithmURI != null && !"".equals(algorithmURI)) {
+                        return KeyUtils.prepareSecretKey(algorithmURI, secret);
+                    }
                     if (key != null) {
                         return key;
                     }
@@ -685,6 +701,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                            encryptedKeySecurityTokenProvider);
         outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
                            encryptedKeySecurityTokenProvider);
+        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN, 
+                           encryptedKeySecurityTokenProvider);
     }
     
     private class TokenStoreCallbackHandler implements CallbackHandler {
@@ -699,15 +717,18 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             for (int i = 0; i < callbacks.length; i++) {
                 WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
                 
-                if (pc.getKey() != null) {
-                    String id = pc.getIdentifier();
-                    SecurityToken token = store.getToken(id);
-                    if (token != null && token.getSHA1() == null) {
+                String id = pc.getIdentifier();
+                SecurityToken token = store.getToken(id);
+                if (token != null) {
+                    if (token.getSHA1() == null && pc.getKey() != null) {
                         token.setSHA1(getSHA1(pc.getKey()));
                         // Create another cache entry with the SHA1 Identifier as the key 
                         // for easy retrieval
                         store.add(token.getSHA1(), token);
                     }
+                    pc.setKey(token.getSecret());
+                    pc.setCustomToken(token.getToken());
+                    return;
                 }
             }
             if (internal != null) {
