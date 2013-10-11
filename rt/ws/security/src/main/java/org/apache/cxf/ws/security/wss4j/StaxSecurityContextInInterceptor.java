@@ -120,11 +120,13 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                         
                         SamlTokenSecurityEvent samlEvent = (SamlTokenSecurityEvent)event;
                         receivedAssertion = samlEvent.getSamlAssertionWrapper();
-                        roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
-                        SAMLSecurityContext context = createSecurityContext(p, roles);
-                        context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
-                        context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
-                        msg.put(SecurityContext.class, context);
+                        if (receivedAssertion != null) {
+                            roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
+                            SAMLSecurityContext context = createSecurityContext(p, roles);
+                            context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
+                            context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
+                            msg.put(SecurityContext.class, context);
+                        }
                     } else {
                         msg.put(SecurityContext.class, createSecurityContext(p));
                     }

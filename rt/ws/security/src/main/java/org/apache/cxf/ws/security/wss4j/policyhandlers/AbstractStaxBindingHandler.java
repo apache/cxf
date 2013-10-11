@@ -342,58 +342,72 @@ public abstract class AbstractStaxBindingHandler {
         if (isTokenRequired(token.getIncludeTokenType())) {
             final Element el = secToken.getToken();
             
-            String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
-            if (signed || endorsing) {
-                samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
-            }
-            Map<String, Object> config = getProperties();
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, action + " " + samlAction);
-            } else {
-                config.put(ConfigurationConstants.ACTION, samlAction);
-            }
-            
-            // Mock up a Subject so that the SAMLTokenOutProcessor can get access to the certificate
-            final SubjectBean subjectBean;
-            if (signed || endorsing) {
-                KeyInfoBean keyInfo = new KeyInfoBean();
-                keyInfo.setCertificate(secToken.getX509Certificate());
-                keyInfo.setEphemeralKey(secToken.getSecret());
-                subjectBean = new SubjectBean("", "", "");
-                subjectBean.setKeyInfo(keyInfo);
-            } else {
-                subjectBean = null;
-            }
-            
-            CallbackHandler callbackHandler = new CallbackHandler() {
-
-                @Override
-                public void handle(Callback[] callbacks) {
-                    for (Callback callback : callbacks) {
-                        if (callback instanceof SAMLCallback) {
-                            SAMLCallback samlCallback = (SAMLCallback)callback;
-                            samlCallback.setAssertionElement(el);
-                            samlCallback.setSubject(subjectBean);
-                            
-                            if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
-                                samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
-                            } else {
-                                samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            if (el != null && "Assertion".equals(el.getLocalName())
+                && (WSSConstants.NS_SAML.equals(el.getNamespaceURI())
+                || WSSConstants.NS_SAML2.equals(el.getNamespaceURI()))) {
+                String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
+                if (signed || endorsing) {
+                    samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
+                }
+                Map<String, Object> config = getProperties();
+                if (config.containsKey(ConfigurationConstants.ACTION)) {
+                    String action = (String)config.get(ConfigurationConstants.ACTION);
+                    config.put(ConfigurationConstants.ACTION, action + " " + samlAction);
+                } else {
+                    config.put(ConfigurationConstants.ACTION, samlAction);
+                }
+                
+                // Mock up a Subject so that the SAMLTokenOutProcessor can get access to the certificate
+                final SubjectBean subjectBean;
+                if (signed || endorsing) {
+                    KeyInfoBean keyInfo = new KeyInfoBean();
+                    keyInfo.setCertificate(secToken.getX509Certificate());
+                    keyInfo.setEphemeralKey(secToken.getSecret());
+                    subjectBean = new SubjectBean("", "", "");
+                    subjectBean.setKeyInfo(keyInfo);
+                } else {
+                    subjectBean = null;
+                }
+                
+                CallbackHandler callbackHandler = new CallbackHandler() {
+    
+                    @Override
+                    public void handle(Callback[] callbacks) {
+                        for (Callback callback : callbacks) {
+                            if (callback instanceof SAMLCallback) {
+                                SAMLCallback samlCallback = (SAMLCallback)callback;
+                                samlCallback.setAssertionElement(el);
+                                samlCallback.setSubject(subjectBean);
+                                
+                                if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                                    samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+                                } else {
+                                    samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+                                }
                             }
                         }
                     }
+                    
+                };
+                config.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
+                
+                QName qname = WSSConstants.TAG_saml2_Assertion;
+                if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                    qname = WSSConstants.TAG_saml_Assertion;
                 }
                 
-            };
-            config.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
-            
-            QName qname = WSSConstants.TAG_saml2_Assertion;
-            if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
-                qname = WSSConstants.TAG_saml_Assertion;
+                return new SecurePart(qname, Modifier.Element);
+            } else if (isRequestor()) {
+                // An Encrypted Token...just include it as is
+                Map<String, Object> config = getProperties();
+                String actionToPerform = ConfigurationConstants.CUSTOM_TOKEN;
+                if (config.containsKey(ConfigurationConstants.ACTION)) {
+                    String action = (String)config.get(ConfigurationConstants.ACTION);
+                    config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+                } else {
+                    config.put(ConfigurationConstants.ACTION, actionToPerform);
+                }
             }
-            
-            return new SecurePart(qname, Modifier.Element);
         }
         
         return null;
