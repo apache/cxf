@@ -167,6 +167,16 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 || encryptionToken instanceof SecurityContextToken
                 || encryptionToken instanceof SpnegoContextToken) {
                 tok = getSecurityToken();
+                if (tok != null && isRequestor()) {
+                    Map<String, Object> config = getProperties();
+                    String actionToPerform = ConfigurationConstants.CUSTOM_TOKEN;
+                    if (config.containsKey(ConfigurationConstants.ACTION)) {
+                        String action = (String)config.get(ConfigurationConstants.ACTION);
+                        config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+                    } else {
+                        config.put(ConfigurationConstants.ACTION, actionToPerform);
+                    }
+                }
             } else if (encryptionToken instanceof X509Token) {
                 if (isRequestor()) {
                     tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
@@ -658,6 +668,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else if (tok.getTokenType().startsWith(WSSConstants.NS_SAML10_TOKEN_PROFILE)
                 || tok.getTokenType().startsWith(WSSConstants.NS_SAML11_TOKEN_PROFILE)) {
                 tokenType = WSSecurityTokenConstants.Saml11Token;
+            } else if (tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_02)
+                || tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_12)) {
+                tokenType = WSSecurityTokenConstants.SecureConversationToken;
             }
         }
         
@@ -675,7 +688,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         return key;
                     }
                     if (secret != null) {
-                        return new SecretKeySpec(secret, JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI));
+                        String jceAlg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                        if (jceAlg == null || "".equals(jceAlg)) {
+                            jceAlg = "HmacSHA1";
+                        }
+                        return new SecretKeySpec(secret, jceAlg);
                     }
                 
                     return super.getSecretKey(algorithmURI);
