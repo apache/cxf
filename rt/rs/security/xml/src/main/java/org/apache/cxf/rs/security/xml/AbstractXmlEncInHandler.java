@@ -44,8 +44,8 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
@@ -258,7 +258,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     protected byte[] decryptPayload(Element root, 
                                     byte[] secretKeyBytes,
                                     String symEncAlgo) throws WSSecurityException {
-        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKeyBytes);
+        SecretKey key = KeyUtils.prepareSecretKey(symEncAlgo, secretKeyBytes);
         try {
             XMLCipher xmlCipher = 
                 EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);

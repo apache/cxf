@@ -44,12 +44,12 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
@@ -507,7 +507,7 @@ public class SAMLProtocolResponseValidator {
     private byte[] decryptPayload(
         Element root, byte[] secretKeyBytes, String symEncAlgo
     ) throws WSSecurityException {
-        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKeyBytes);
+        SecretKey key = KeyUtils.prepareSecretKey(symEncAlgo, secretKeyBytes);
         try {
             XMLCipher xmlCipher = 
                 EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);
