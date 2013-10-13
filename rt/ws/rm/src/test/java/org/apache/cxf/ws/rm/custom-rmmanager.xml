@@ -39,17 +39,11 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
           <wsrm-policy:AcknowledgementInterval Milliseconds="10000"/>                                                        
       </wsrm-policy:RMAssertion>
       <wsrm-mgr:sourcePolicy>
-          <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="true"/>                    
+          <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>                    
       </wsrm-mgr:sourcePolicy>
       <wsrm-mgr:destinationPolicy>
           <wsrm-mgr:acksPolicy intraMessageThreshold="0"/>                    
       </wsrm-mgr:destinationPolicy>
-      <!--property name="store" ref="txStore"/-->  
-      <property name="store">
-          <bean class="org.apache.cxf.ws.rm.RMManagerConfigurationTest$TestStore">
-              <property name="location" value="here"/>
-          </bean>
-      </property>
     </wsrm-mgr:rmManager>
     
 </beans>

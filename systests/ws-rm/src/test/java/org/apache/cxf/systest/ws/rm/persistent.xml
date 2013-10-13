@@ -33,6 +33,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <cxf:features>
             <wsa:addressing/>
             <wsrm-mgr:reliableMessaging>
+                <wsrm-mgr:sourcePolicy>
+                    <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>                    
+                </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:store>
                    <ref bean="testStore"/>
                 </wsrm-mgr:store>

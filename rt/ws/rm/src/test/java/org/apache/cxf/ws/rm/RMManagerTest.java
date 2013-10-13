@@ -51,6 +51,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.RelatesToType;
+import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
@@ -125,8 +126,46 @@ public class RMManagerTest extends Assert {
         SequenceTerminationPolicyType stp = sp.getSequenceTerminationPolicy();
         assertEquals(0, stp.getMaxRanges());
         assertEquals(0, stp.getMaxUnacknowledged());
-        assertTrue(!stp.isTerminateOnShutdown());
+        assertTrue(stp.isTerminateOnShutdown());
         assertEquals(0, stp.getMaxLength());   
+        
+        DestinationPolicyType dp = manager.getDestinationPolicy();
+        assertNotNull(dp.getAcksPolicy());
+        assertEquals(dp.getAcksPolicy().getIntraMessageThreshold(), 10);
+    } 
+    
+    @Test
+    public void testCustom() {
+        Bus bus = new SpringBusFactory().createBus("org/apache/cxf/ws/rm/custom-rmmanager.xml", false);
+        manager = bus.getExtension(RMManager.class);        
+        assertNotNull("sourcePolicy is not set.", manager.getSourcePolicy());
+        assertNotNull("destinationPolicy is not set.", manager.getDestinationPolicy());
+        
+        manager.initialise();
+        
+        RMConfiguration cfg = manager.getConfiguration();
+        assertNotNull("RMConfiguration is not set.", cfg);
+        assertNotNull("deliveryAssurance is not set.", cfg.getDeliveryAssurance());
+        
+        assertFalse(cfg.isExponentialBackoff());
+        assertEquals(10000L, cfg.getBaseRetransmissionInterval().longValue());
+        assertEquals(10000L, cfg.getAcknowledgementIntervalTime());
+        assertNull(cfg.getInactivityTimeout());   
+        
+        SourcePolicyType sp = manager.getSourcePolicy();
+        assertEquals(0L, sp.getSequenceExpiration().getTimeInMillis(new Date()));
+        assertEquals(0L, sp.getOfferedSequenceExpiration().getTimeInMillis(new Date()));
+        assertNull(sp.getAcksTo());
+        assertTrue(sp.isIncludeOffer());
+        SequenceTerminationPolicyType stp = sp.getSequenceTerminationPolicy();
+        assertEquals(0, stp.getMaxRanges());
+        assertEquals(0, stp.getMaxUnacknowledged());
+        assertFalse(stp.isTerminateOnShutdown());
+        assertEquals(0, stp.getMaxLength());
+        
+        DestinationPolicyType dp = manager.getDestinationPolicy();
+        assertNotNull(dp.getAcksPolicy());
+        assertEquals(dp.getAcksPolicy().getIntraMessageThreshold(), 0);
     } 
     
     @Test

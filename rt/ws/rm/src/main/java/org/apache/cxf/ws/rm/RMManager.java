@@ -299,7 +299,9 @@ public class RMManager {
             sp = new SourcePolicyType();
         }
         if (sp.getSequenceTerminationPolicy() == null) {
-            sp.setSequenceTerminationPolicy(new SequenceTerminationPolicyType());
+            SequenceTerminationPolicyType term = new SequenceTerminationPolicyType();
+            term.setTerminateOnShutdown(true);
+            sp.setSequenceTerminationPolicy(term);
         }
         sourcePolicy = sp;
     }

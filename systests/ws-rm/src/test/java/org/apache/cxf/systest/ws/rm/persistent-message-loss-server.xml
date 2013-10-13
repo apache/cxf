@@ -43,6 +43,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <wsrm-policy:RMAssertion>
                     <wsrm-policy:BaseRetransmissionInterval Milliseconds="60000" />
                 </wsrm-policy:RMAssertion>
+                <wsrm-mgr:sourcePolicy>
+                    <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>                    
+                </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:store>
                    <wsrm-mgr:jdbcStore url="jdbc:derby:${db.name};create=true"/>
                 </wsrm-mgr:store>

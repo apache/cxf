@@ -158,16 +158,16 @@
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute>
-        <xs:attribute name="terminateOnShutdown" type="xs:boolean" use ="optional" default="false">
+        <xs:attribute name="terminateOnShutdown" type="xs:boolean" use ="optional" default="true">
         <xs:annotation>
                 <xs:documentation>
                     Specifies if sequences should be terminated when the bus is shutdown.
                     If set to true, and no last message had been sent for a sequence,
-                    an out of band LastMessage will be issued (in response to which 
+                    an out of band LastMessage or CloseSequence will be issued (in response to which 
                     a sequence acknowledgment will be sent). If a last message had already been
                     sent, an acknowledgment is requested instead. 
                     If, after processing these acknowledgement, all messages have been acknowledged,
-                    an attempt is then made to terminates these sequences.
+                    an attempt is then made to terminate these sequences.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
