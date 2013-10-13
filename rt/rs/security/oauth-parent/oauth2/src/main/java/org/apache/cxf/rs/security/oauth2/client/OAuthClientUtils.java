@@ -153,7 +153,7 @@ public final class OAuthClientUtils {
                                                    AccessTokenGrant grant,
                                                    boolean setAuthorizationHeader) 
         throws OAuthServiceException {
-        return getAccessToken(accessTokenService, consumer, grant, extraParams, 
+        return getAccessToken(accessTokenService, consumer, grant, null,
                               null, setAuthorizationHeader);
     }
         
