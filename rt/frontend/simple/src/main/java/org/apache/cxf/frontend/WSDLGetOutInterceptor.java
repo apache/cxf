@@ -50,7 +50,7 @@ public class WSDLGetOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (writer == null) {
             return;
         }
-
+        message.put(Message.CONTENT_TYPE, "text/xml");
         try {
             StaxUtils.writeNode(doc, writer, true);
         } catch (XMLStreamException e) {
