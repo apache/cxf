@@ -175,11 +175,12 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         // DOM
         doubleIt(symmetricSaml1Port, 25);
         
-        // TODO Streaming - Problem with including encrypted SAML Token in header
+        // TODO Streaming - The encrypted issued token is placed under the ReferenceList
+        // and hence an error is thrown on the receiving side
         symmetricSaml1Port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml1Port, PORT);
         if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT);
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
         }
         SecurityTestUtil.enableStreaming(symmetricSaml1Port);
         // doubleIt(symmetricSaml1Port, 25);
@@ -208,7 +209,17 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
         }
         
+        // DOM
         doubleIt(symmetricSaml2Port, 30);
+        
+        // Streaming
+        symmetricSaml2Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
+        }
+        SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        doubleIt(symmetricSaml2Port, 25);
         
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);

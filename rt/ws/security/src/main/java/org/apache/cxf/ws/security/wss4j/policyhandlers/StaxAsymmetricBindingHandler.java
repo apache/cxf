@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
@@ -44,6 +45,9 @@ import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -102,6 +106,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    if (sigTok != null) {
+                        storeSecurityToken(sigTok);
+                        outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
+                    }
+                    
+                    // Set up CallbackHandler which wraps the configured Handler
+                    Map<String, Object> config = getProperties();
+                    TokenStoreCallbackHandler callbackHandler = 
+                        new TokenStoreCallbackHandler(
+                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), getTokenStore()
+                        );
+                    config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
                 }
             }
             
@@ -206,6 +222,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    if (sigTok != null) {
+                        storeSecurityToken(sigTok);
+                        outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
+                    }
+                    
+                    // Set up CallbackHandler which wraps the configured Handler
+                    Map<String, Object> config = getProperties();
+                    TokenStoreCallbackHandler callbackHandler = 
+                        new TokenStoreCallbackHandler(
+                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), getTokenStore()
+                        );
+                    config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
                 }
             }
             
@@ -377,15 +405,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         AbstractToken sigToken = wrapper.getToken();
+        configureSignature(wrapper, sigToken, false);
+        
         if (abinding.isProtectTokens() && (sigToken instanceof X509Token)
             && sigToken.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             parts += "{Element}{" + WSSConstants.NS_WSSE10 + "}BinarySecurityToken;";
+        } else if (sigToken instanceof IssuedToken || sigToken instanceof SecurityContextToken
+            || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken) {
+            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
         config.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
-        
-        configureSignature(wrapper, sigToken, false);
         
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             config.put(ConfigurationConstants.SIG_ALGO, 

@@ -193,6 +193,21 @@ public class StaxAsymmetricBindingTest extends AbstractBusClientServerTestBase {
         
         doubleIt(asymmetricSaml1EncryptedPort, 40);
         
+        // TODO Streaming - The encrypted issued token is placed under the Signature
+        // and hence an error is thrown on the receiving side
+        asymmetricSaml1EncryptedPort = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(asymmetricSaml1EncryptedPort, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1EncryptedPort, STSPORT2);
+        }
+        bindingProvider = (BindingProvider)asymmetricSaml1EncryptedPort;
+        stsClient = 
+            (STSClient)bindingProvider.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        stsClient.setUseKeyCertificate(certs[0]);
+        
+        SecurityTestUtil.enableStreaming(asymmetricSaml1EncryptedPort);
+        // doubleIt(asymmetricSaml1EncryptedPort, 25);
+        
         ((java.io.Closeable)asymmetricSaml1EncryptedPort).close();
         bus.shutdown(true);
     }

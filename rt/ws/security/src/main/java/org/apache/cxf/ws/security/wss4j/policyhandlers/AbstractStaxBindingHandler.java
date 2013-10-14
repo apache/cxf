@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.io.IOException;
 import java.security.Key;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -62,6 +64,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -95,11 +98,16 @@ import org.apache.wss4j.policy.model.XPath;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.apache.xml.security.utils.Base64;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -411,6 +419,73 @@ public abstract class AbstractStaxBindingHandler {
         }
         
         return null;
+    }
+    
+    protected void storeSecurityToken(SecurityToken tok) {
+        SecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.EncryptedKeyToken;
+        if (tok.getTokenType() != null) {
+            if (tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
+                tokenType = WSSecurityTokenConstants.KerberosToken;
+            } else if (tok.getTokenType().startsWith(WSSConstants.NS_SAML10_TOKEN_PROFILE)
+                || tok.getTokenType().startsWith(WSSConstants.NS_SAML11_TOKEN_PROFILE)) {
+                tokenType = WSSecurityTokenConstants.Saml11Token;
+            } else if (tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_02)
+                || tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_12)) {
+                tokenType = WSSecurityTokenConstants.SecureConversationToken;
+            }
+        }
+        
+        final Key key = tok.getKey();
+        final byte[] secret = tok.getSecret();
+        final X509Certificate[] certs = new X509Certificate[1];
+        if (tok.getX509Certificate() != null) {
+            certs[0] = tok.getX509Certificate();
+        }
+        
+        final GenericOutboundSecurityToken encryptedKeySecurityToken = 
+            new GenericOutboundSecurityToken(tok.getId(), tokenType, key, certs) {
+          
+                @Override
+                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    if (secret != null && algorithmURI != null && !"".equals(algorithmURI)) {
+                        return KeyUtils.prepareSecretKey(algorithmURI, secret);
+                    }
+                    if (key != null) {
+                        return key;
+                    }
+                    if (secret != null) {
+                        String jceAlg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                        if (jceAlg == null || "".equals(jceAlg)) {
+                            jceAlg = "HmacSHA1";
+                        }
+                        return new SecretKeySpec(secret, jceAlg);
+                    }
+                
+                    return super.getSecretKey(algorithmURI);
+                }
+            };
+        
+        final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
+            new SecurityTokenProvider<OutboundSecurityToken>() {
+
+                @Override
+                public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
+                    return encryptedKeySecurityToken;
+                }
+
+                @Override
+                public String getId() {
+                    return encryptedKeySecurityToken.getId();
+                }
+                
+            };
+        encryptedKeySecurityToken.setSha1Identifier(tok.getSHA1());
+        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
+                           encryptedKeySecurityTokenProvider);
+        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+                           encryptedKeySecurityTokenProvider);
+        outboundTokens.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN, 
+                           encryptedKeySecurityTokenProvider);
     }
     
     protected void policyNotAsserted(Assertion assertion, String reason) {
@@ -1097,4 +1172,45 @@ public abstract class AbstractStaxBindingHandler {
         return encryptedParts;
     }
     
+    protected static class TokenStoreCallbackHandler implements CallbackHandler {
+        private CallbackHandler internal;
+        private TokenStore store;
+        public TokenStoreCallbackHandler(CallbackHandler in, TokenStore st) {
+            internal = in;
+            store = st;
+        }
+        
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (int i = 0; i < callbacks.length; i++) {
+                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+                
+                String id = pc.getIdentifier();
+                SecurityToken token = store.getToken(id);
+                if (token != null) {
+                    if (token.getSHA1() == null && pc.getKey() != null) {
+                        token.setSHA1(getSHA1(pc.getKey()));
+                        // Create another cache entry with the SHA1 Identifier as the key 
+                        // for easy retrieval
+                        store.add(token.getSHA1(), token);
+                    }
+                    pc.setKey(token.getSecret());
+                    pc.setCustomToken(token.getToken());
+                    return;
+                }
+            }
+            if (internal != null) {
+                internal.handle(callbacks);
+            }
+        }
+    }
+    
+    private static String getSHA1(byte[] input) {
+        try {
+            byte[] digestBytes = WSSecurityUtil.generateDigest(input);
+            return Base64.encode(digestBytes);
+        } catch (WSSecurityException e) {
+            //REVISIT
+        }
+        return null;
+    }
 }
