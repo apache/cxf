@@ -81,14 +81,14 @@ public class StaxWSSecurity111Test extends WSSecurity11Common {
         String[] argv = new String[] {
             "A",
             "A-NoTimestamp",
-            // TODO Derived - "AD",
+            // TODO Derived hanging - "AD",
             "A-ES",
-            // TODO Derived - "AD-ES",
+            // TODO Derived hanging - "AD-ES",
             "UX",
             "UX-NoTimestamp",
-            // TODO Derived - "UXD",
+            // TODO Derived hanging - "UXD",
             "UX-SEES",
-            // TODO Derived - "UXD-SEES",
+            // TODO Derived hanging - "UXD-SEES",
         };
         runClientServer(argv, unrestrictedPoliciesInstalled, false, true);
     }
@@ -103,14 +103,14 @@ public class StaxWSSecurity111Test extends WSSecurity11Common {
         String[] argv = new String[] {
             "A",
             "A-NoTimestamp",
-            // TODO Derived "AD",
+            // TODO Derived hanging "AD",
             // TODO See WSS-468 EncryptBeforeSigning not working "A-ES",
-            // TODO Derived "AD-ES",
+            // TODO Derived hanging "AD-ES",
             "UX",
             "UX-NoTimestamp",
-            // TODO Derived "UXD",
+            // TODO Derived hanging "UXD",
             "UX-SEES",
-            // TODO Derived "UXD-SEES",
+            // TODO Derived hanging "UXD-SEES",
         };
         runClientServerStreaming(argv, unrestrictedPoliciesInstalled, false, true);
     }

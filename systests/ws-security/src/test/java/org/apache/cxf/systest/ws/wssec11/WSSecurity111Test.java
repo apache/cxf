@@ -108,9 +108,9 @@ public class WSSecurity111Test extends WSSecurity11Common {
             // TODO See WSS-468 Derived "AD-ES",
             "UX",
             "UX-NoTimestamp",
-            // TODO Derived "UXD",
+            "UXD",
             "UX-SEES",
-            // TODO Derived "UXD-SEES",
+            "UXD-SEES",
         };
         runClientServerStreaming(argv, unrestrictedPoliciesInstalled, false, false);
     }
