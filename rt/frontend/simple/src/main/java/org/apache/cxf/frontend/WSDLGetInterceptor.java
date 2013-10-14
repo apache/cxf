@@ -80,6 +80,8 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
             message.getExchange().setOutMessage(mout);
 
             mout.put(DOCUMENT_HOLDER, doc);
+            mout.put(Message.CONTENT_TYPE, "text/xml");
+ 
             // just remove the interceptor which should not be used
             cleanUpOutInterceptors(mout);
             
