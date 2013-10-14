@@ -346,7 +346,7 @@ public abstract class AbstractStaxBindingHandler {
                 && (WSSConstants.NS_SAML.equals(el.getNamespaceURI())
                 || WSSConstants.NS_SAML2.equals(el.getNamespaceURI()))) {
                 String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
-                if (signed || endorsing) {
+                if (endorsing) {
                     samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
                 }
                 Map<String, Object> config = getProperties();

@@ -45,6 +45,8 @@ import org.junit.BeforeClass;
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
  * by parsing the "ws-security.username" property. The client then invokes on the service 
  * provider using the returned token from the STS. 
+ * 
+ * It tests both DOM + StAX clients against the DOM server.
  */
 public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
     
@@ -122,6 +124,62 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)port2, STSPORT2);
         }
+        ((BindingProvider)port2).getRequestContext().put(
+            "ws-security.username", "eve"
+        );
+        // This time we expect a failure as the server validator doesn't accept "eve".
+        try {
+            doubleIt(port2, 30);
+            fail("Failure expected on an unknown user");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((java.io.Closeable)port2).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testUsernameOnBehalfOfStreaming() throws Exception {
+        // Only run these tests for the standalone scenario.
+        if (!standalone) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameOnBehalfOfTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
+        DoubleItPortType port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT2);
+        }
+        SecurityTestUtil.enableStreaming(port);
+
+        // Transport port
+        ((BindingProvider)port).getRequestContext().put(
+            "ws-security.username", "alice"
+        );
+        doubleIt(port, 25);
+        
+        ((java.io.Closeable)port).close();
+        
+        DoubleItPortType port2 = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port2, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)port2, STSPORT2);
+        }
+        SecurityTestUtil.enableStreaming(port2);
+        
         ((BindingProvider)port2).getRequestContext().put(
             "ws-security.username", "eve"
         );
