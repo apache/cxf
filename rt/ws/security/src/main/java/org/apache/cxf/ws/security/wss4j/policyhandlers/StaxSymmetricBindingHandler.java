@@ -58,7 +58,9 @@ import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -150,6 +152,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
                 addIssuedToken((IssuedToken)encryptionToken, tok, false, true);
+                if (tok == null && !isRequestor()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                        findIssuedToken();
+                    tokenId = parseStreamingSecurityToken(securityToken);
+                }
             } else if (encryptionToken instanceof SecureConversationToken
                 || encryptionToken instanceof SecurityContextToken
                 || encryptionToken instanceof SpnegoContextToken) {
@@ -168,7 +175,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (isRequestor()) {
                     tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
                 } else {
-                    tokenId = getEncryptedKey();
+                    org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                        findEncryptedKeyToken();
+                    tokenId = parseStreamingSecurityToken(securityToken);
                 }
             } else if (encryptionToken instanceof UsernameToken) {
                 policyNotAsserted(sbinding, "UsernameTokens not supported with Symmetric binding");
@@ -260,6 +269,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 } else if (sigToken instanceof IssuedToken) {
                     sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)sigToken, sigTok, false, true);
+                    if (sigTok == null && !isRequestor()) {
+                        org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                            findIssuedToken();
+                        sigTokId = parseStreamingSecurityToken(securityToken);
+                    }
                 } else if (sigToken instanceof SecureConversationToken
                     || sigToken instanceof SecurityContextToken
                     || sigToken instanceof SpnegoContextToken) {
@@ -278,7 +292,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     if (isRequestor()) {
                         sigTokId = setupEncryptedKey(sigAbstractTokenWrapper, sigToken);
                     } else {
-                        sigTokId = getEncryptedKey();
+                        org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                            findEncryptedKeyToken();
+                        sigTokId = parseStreamingSecurityToken(securityToken);
                     }
                 } else if (sigToken instanceof UsernameToken) {
                     policyNotAsserted(sbinding, "UsernameTokens not supported with Symmetric binding");
@@ -414,6 +430,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
                 config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
+            } else if (recToken.getToken() instanceof IssuedToken && !isRequestor()) {
+                config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
             } else {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
                 if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
@@ -558,28 +576,39 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         return tempTok.getId();
     }
     
-    private String getEncryptedKey() throws XMLSecurityException {
-        org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-            findEncryptedKeyToken();
+    private String parseStreamingSecurityToken(
+        org.apache.xml.security.stax.securityToken.SecurityToken securityToken
+    ) throws XMLSecurityException {
         if (securityToken != null) {
             Date created = new Date();
             Date expires = new Date();
             expires.setTime(created.getTime() + 300000);
-
-            String encryptedKeyID = securityToken.getId();
-            SecurityToken tempTok = new SecurityToken(encryptedKeyID, created, expires);
-            tempTok.setSHA1(securityToken.getSha1Identifier());
+            
+            SecurityToken cachedTok = new SecurityToken(securityToken.getId(), created, expires);
+            cachedTok.setSHA1(securityToken.getSha1Identifier());
+            
+            if (securityToken.getTokenType() != null) {
+                if (securityToken.getTokenType() == WSSecurityTokenConstants.EncryptedKeyToken) {
+                    cachedTok.setTokenType(WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.KerberosToken) {
+                    cachedTok.setTokenType(WSSConstants.NS_GSS_Kerberos5_AP_REQ);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml11Token) {
+                    cachedTok.setTokenType(WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml20Token) {
+                    cachedTok.setTokenType(WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE);
+                }
+            }
             
             for (String key : securityToken.getSecretKey().keySet()) {
                 if (securityToken.getSecretKey().get(key) != null) {
-                    tempTok.setKey(securityToken.getSecretKey().get(key));
-                    tempTok.setSecret(securityToken.getSecretKey().get(key).getEncoded());
+                    cachedTok.setKey(securityToken.getSecretKey().get(key));
+                    cachedTok.setSecret(securityToken.getSecretKey().get(key).getEncoded());
                     break;
                 }
             }
-            getTokenStore().add(tempTok);
+            getTokenStore().add(cachedTok);
 
-            return encryptedKeyID;
+            return cachedTok.getId();
         }
         return null;
         
@@ -604,6 +633,23 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         && token.getSha1Identifier() != null) {
                         return token;
                     }
+                }
+            }
+        }
+        return null;
+    }
+    
+    private org.apache.xml.security.stax.securityToken.SecurityToken 
+    findIssuedToken() throws XMLSecurityException {
+        @SuppressWarnings("unchecked")
+        final List<SecurityEvent> incomingEventList = 
+            (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
+        if (incomingEventList != null) {
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (WSSecurityEventConstants.SamlToken == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((SamlTokenSecurityEvent)incomingEvent).getSecurityToken();
+                    return token;
                 }
             }
         }
