@@ -453,7 +453,7 @@ public abstract class AbstractBeanDefinitionParser
         }
         
         if (!StringUtils.isEmpty(val)) {
-            if (val.startsWith("#")) {
+            if (val.startsWith("#") && !val.startsWith("#{")) {
                 bean.addPropertyReference(propertyName, val.substring(1));
             } else {
                 bean.addPropertyValue(propertyName, val);

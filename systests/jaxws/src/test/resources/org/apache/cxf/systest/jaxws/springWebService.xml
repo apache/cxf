@@ -33,5 +33,10 @@
 			<bean class="org.apache.cxf.systest.jaxws.TestServiceImpl" />
 		</jaxws:serviceBean>
 	</jaxws:server>
-
+	<jaxws:server address="#{'http://localhost:${testutil.ports.org.apache.cxf.systest.jaxws.CXF5061Test}/cxf5061b' + T(java.lang.Math).random()}"
+		serviceClass="org.apache.cxf.systest.jaxws.TestService">
+		<jaxws:serviceBean>
+			<bean class="org.apache.cxf.systest.jaxws.TestServiceImpl" />
+		</jaxws:serviceBean>
+	</jaxws:server>
 </beans>
