@@ -125,6 +125,25 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricSP11Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItAsymmetricSP11Policy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItAsymmetricSHA256Binding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricSHA256Policy" />
         <soap:binding style="document"
@@ -441,6 +460,10 @@
                    binding="tns:DoubleItAsymmetricIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Asymmetric" />
         </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricSP11Port" 
+                   binding="tns:DoubleItAsymmetricSP11Binding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricSP11" />
+        </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricSHA256Port" 
                    binding="tns:DoubleItAsymmetricSHA256Binding">
             <soap:address location="http://localhost:9001/DoubleItX509AsymmetricSHA256" />
@@ -651,6 +674,51 @@
                      <wsp:Policy>
                         <sp:X509Token
                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                              <sp:RequireIssuerSerialReference />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                     </wsp:Policy>
+                  </sp:RecipientToken>
+                  <sp:Layout>
+                     <wsp:Policy>
+                        <sp:Lax/>
+                     </wsp:Policy>
+                  </sp:Layout>
+                  <sp:IncludeTimestamp/>
+                  <sp:OnlySignEntireHeadersAndBody/>
+                  <sp:AlgorithmSuite>
+                     <wsp:Policy>
+                        <sp:Basic128/>
+                     </wsp:Policy>
+                  </sp:AlgorithmSuite>
+               </wsp:Policy>
+            </sp:AsymmetricBinding>
+         </wsp:All>
+      </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItAsymmetricSP11Policy">
+      <wsp:ExactlyOne>
+         <wsp:All>
+            <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+               <wsp:Policy>
+                  <sp:InitiatorToken>
+                     <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                              <sp:RequireIssuerSerialReference />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                     </wsp:Policy>
+                  </sp:InitiatorToken>
+                  <sp:RecipientToken>
+                     <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToInitiator">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
                               <sp:RequireIssuerSerialReference />
