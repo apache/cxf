@@ -45,6 +45,7 @@ import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
@@ -118,6 +119,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                             (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), getTokenStore()
                         );
                     config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+                } else if (initiatorToken instanceof SamlToken) {
+                    addSamlToken((SamlToken)initiatorToken, false, true);
                 }
             }
             
@@ -234,6 +237,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                             (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), getTokenStore()
                         );
                     config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+                } else if (initiatorToken instanceof SamlToken) {
+                    addSamlToken((SamlToken)initiatorToken, false, true);
                 }
             }
             
@@ -411,7 +416,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             && sigToken.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             parts += "{Element}{" + WSSConstants.NS_WSSE10 + "}BinarySecurityToken;";
         } else if (sigToken instanceof IssuedToken || sigToken instanceof SecurityContextToken
-            || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken) {
+            || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken
+            || sigToken instanceof SamlToken) {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
         }
         
