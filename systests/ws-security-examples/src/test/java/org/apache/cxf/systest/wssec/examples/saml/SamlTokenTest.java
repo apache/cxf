@@ -220,6 +220,10 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         samlPort.doubleIt(25);
         
+        // Streaming
+        SecurityTestUtil.enableStreaming(samlPort);
+        samlPort.doubleIt(25);
+        
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }

@@ -45,16 +45,14 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -665,27 +663,6 @@ public abstract class AbstractStaxBindingHandler {
 
     }
     
-    protected final TokenStore getTokenStore() {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            TokenStore tokenStore = 
-                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            }
-            if (tokenStore == null) {
-                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
-                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-                if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString().hashCode();
-                }
-                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
-                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
-            }
-            return tokenStore;
-        }
-    }
-    
     protected String getKeyIdentifierType(AbstractTokenWrapper wrapper, AbstractToken token) {
 
         String identifier = null;
@@ -913,11 +890,11 @@ public abstract class AbstractStaxBindingHandler {
         if (st == null) {
             String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
             if (id != null) {
-                st = getTokenStore().getToken(id);
+                st = WSS4JUtils.getTokenStore(message).getToken(id);
             }
         }
         if (st != null) {
-            getTokenStore().add(st);
+            WSS4JUtils.getTokenStore(message).add(st);
             return st;
         }
         return null;

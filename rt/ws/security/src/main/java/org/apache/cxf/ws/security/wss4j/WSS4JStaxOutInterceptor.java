@@ -47,9 +47,12 @@ import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.OutboundSecurityContextImpl;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
@@ -183,13 +186,20 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     }
     
     protected SecurityEventListener configureSecurityEventListener(
-        SoapMessage msg, WSSSecurityProperties securityProperties
+        final SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> outgoingSecurityEventList = new LinkedList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
-            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                outgoingSecurityEventList.add(securityEvent);
+            public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SamlToken
+                    && securityEvent instanceof TokenSecurityEvent) {
+                    // Store SAML keys in case we need them on the inbound side
+                    TokenSecurityEvent<?> tokenSecurityEvent = (TokenSecurityEvent<?>)securityEvent;
+                    WSS4JUtils.parseAndStoreStreamingSecurityToken(tokenSecurityEvent.getSecurityToken(), msg);
+                } else {
+                    outgoingSecurityEventList.add(securityEvent);
+                }
             }
         };
         msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);

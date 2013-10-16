@@ -35,6 +35,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
@@ -116,7 +117,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     Map<String, Object> config = getProperties();
                     TokenStoreCallbackHandler callbackHandler = 
                         new TokenStoreCallbackHandler(
-                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), getTokenStore()
+                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
+                            WSS4JUtils.getTokenStore(message)
                         );
                     config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
                 } else if (initiatorToken instanceof SamlToken) {
@@ -234,7 +236,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     Map<String, Object> config = getProperties();
                     TokenStoreCallbackHandler callbackHandler = 
                         new TokenStoreCallbackHandler(
-                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), getTokenStore()
+                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
+                            WSS4JUtils.getTokenStore(message)
                         );
                     config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
                 } else if (initiatorToken instanceof SamlToken) {
