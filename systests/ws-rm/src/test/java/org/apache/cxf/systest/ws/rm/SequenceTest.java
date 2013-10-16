@@ -135,7 +135,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
         Thread.sleep(100);
     }
-
+    
     // --- tests ---
     @Test
     public void testOnewayAnonymousAcks() throws Exception {
@@ -728,6 +728,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         expected[5] = true;
         mf.verifyAcknowledgements(expected, false);
     }
+    
     
     @Test
     public void testTwowayAtMostOnce() throws Exception {
@@ -1595,8 +1596,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     private void stopControl() throws IOException {
         if (null != control) {
-            ((Closeable)control).close();
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
+            ((Closeable)control).close();
             controlBus.shutdown(true);
         }
     }
