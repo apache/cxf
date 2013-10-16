@@ -82,7 +82,23 @@ public class LocalConduit extends AbstractConduit {
                     ex.setInMessage(inMsg);
                     inMsg.setExchange(ex);
                     ex.put(IN_EXCHANGE, exchange);
-                    destination.getMessageObserver().onMessage(inMsg);
+                    try {
+                        destination.getMessageObserver().onMessage(inMsg);
+                    } catch (Throwable t) {
+                        Message m = inMsg.getExchange().getOutFaultMessage();
+                        if (m == null) {
+                            m = inMsg.getExchange().getOutMessage();
+                        }
+                        if (m != null) {
+                            try {
+                                m.put(Message.RESPONSE_CODE, 500);
+                                m.getExchange().put(Message.RESPONSE_CODE, 500);
+                                m.getContent(OutputStream.class).close();
+                            } catch (IOException e) {
+                                //ignore
+                            }
+                        }
+                    }
                 }
             };
             Executor ex = message.getExchange() != null
