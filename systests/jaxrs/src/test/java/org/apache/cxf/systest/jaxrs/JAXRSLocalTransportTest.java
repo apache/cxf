@@ -40,7 +40,6 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
@@ -58,6 +57,10 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
         sf.setOutInterceptors(outInts);
+        
+        List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
+        inInts.add(new CustomInFaultyInterceptor());
+        sf.setInInterceptors(inInts);
         
         sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         sf.setAddress("local://books");
@@ -80,10 +83,16 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
-    public void testProxyServerInFault() throws Exception {
+    public void testProxyServerInFaultMapped() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         Response r = localProxy.infault();
+        assertEquals(401, r.getStatus());
+    }
+    
+    @Test
+    public void testProxyServerInFaultEscaped() throws Exception {
+        BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
+        Response r = localProxy.infault2();
         assertEquals(500, r.getStatus());
     }
     
@@ -92,7 +101,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, "true");
         WebClient.getConfig(localProxy).getInFaultInterceptors().add(new TestFaultInInterceptor());
-        Response r = localProxy.infault();
+        Response r = localProxy.infault2();
         assertEquals(500, r.getStatus());
     }
     
