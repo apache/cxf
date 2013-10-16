@@ -97,7 +97,6 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore
     public void testProxyEmtpyResponse() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         assertNull(localProxy.getEmptyBook());

@@ -76,6 +76,63 @@ public class LocalDestination extends AbstractDestination {
     }
 
     class SynchronousConduit extends AbstractConduit {
+        private final class LocalDestinationOutputStream extends AbstractWrappedOutputStream {
+            private final Exchange exchange;
+            private final Message message;
+
+            private LocalDestinationOutputStream(Exchange exchange, Message message) {
+                this.exchange = exchange;
+                this.message = message;
+            }
+
+            public void close() throws IOException {
+                if (!written) {
+                    dispatchToClient(true);
+                }
+                super.close();
+            }
+
+            protected void onFirstWrite() throws IOException {
+                dispatchToClient(false);
+            }
+
+            protected void dispatchToClient(boolean empty) throws IOException {
+                final MessageImpl m = new MessageImpl();
+                localDestinationFactory.copy(message, m);
+                if (!empty) {
+                    final PipedInputStream stream = new PipedInputStream();
+                    wrappedStream = new PipedOutputStream(stream);
+                    m.setContent(InputStream.class, stream);
+                }
+
+                final Runnable receiver = new Runnable() {
+                    public void run() {                                    
+                        if (exchange != null) {
+                            exchange.setInMessage(m);
+                        }
+                        conduit.getMessageObserver().onMessage(m);
+                    }
+                };
+                Executor ex = message.getExchange() != null
+                    ? message.getExchange().get(Executor.class) : null;
+                // Need to avoid to get the SynchronousExecutor
+                if (ex == null || SynchronousExecutor.isA(ex)) {
+                    if (exchange == null) {
+                        ex = localDestinationFactory.getExecutor(bus);
+                    } else {
+                        ex = localDestinationFactory.getExecutor(exchange.getBus());
+                    }
+                    if (ex != null) {
+                        ex.execute(receiver);
+                    } else {
+                        new Thread(receiver).start();
+                    }
+                } else {
+                    ex.execute(receiver);
+                }
+            }
+        }
+
         private LocalConduit conduit;
 
         public SynchronousConduit(LocalConduit conduit) {
@@ -88,42 +145,7 @@ public class LocalDestination extends AbstractDestination {
                 final Exchange exchange = (Exchange)message.getExchange().get(LocalConduit.IN_EXCHANGE);
 
                 AbstractWrappedOutputStream cout 
-                    = new AbstractWrappedOutputStream() {
-                        protected void onFirstWrite() throws IOException {
-                            final PipedInputStream stream = new PipedInputStream();
-                            wrappedStream = new PipedOutputStream(stream);
-
-                            final MessageImpl m = new MessageImpl();
-                            localDestinationFactory.copy(message, m);
-                            m.setContent(InputStream.class, stream);
-
-                            final Runnable receiver = new Runnable() {
-                                public void run() {                                    
-                                    if (exchange != null) {
-                                        exchange.setInMessage(m);
-                                    }
-                                    conduit.getMessageObserver().onMessage(m);
-                                }
-                            };
-                            Executor ex = message.getExchange() != null
-                                ? message.getExchange().get(Executor.class) : null;
-                            // Need to avoid to get the SynchronousExecutor
-                            if (ex == null || SynchronousExecutor.isA(ex)) {
-                                if (exchange == null) {
-                                    ex = localDestinationFactory.getExecutor(bus);
-                                } else {
-                                    ex = localDestinationFactory.getExecutor(exchange.getBus());
-                                }
-                                if (ex != null) {
-                                    ex.execute(receiver);
-                                } else {
-                                    new Thread(receiver).start();
-                                }
-                            } else {
-                                ex.execute(receiver);
-                            }
-                        }
-                    };
+                    = new LocalDestinationOutputStream(exchange, message);
                 
                 message.setContent(OutputStream.class, cout);    
                 
