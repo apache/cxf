@@ -97,7 +97,7 @@ public class PolicyVerificationInFaultInterceptor extends AbstractPolicyIntercep
         }
         getTransportAssertions(message);
         
-        EffectivePolicy effectivePolicy = pe.getEffectiveClientFaultPolicy(ei, boi, bfi);
+        EffectivePolicy effectivePolicy = pe.getEffectiveClientFaultPolicy(ei, boi, bfi, message);
         if (effectivePolicy != null) {
             aim.checkEffectivePolicy(effectivePolicy.getPolicy());
             LOG.fine("Verified policies for inbound message.");

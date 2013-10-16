@@ -75,20 +75,19 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true);
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
             interceptors.addAll(effectivePolicy.getInterceptors());
             assertions.addAll(effectivePolicy.getChosenAlternative());
-            
         } else if (MessageUtils.isRequestor(msg)) {
             // 2. Process client policy
             BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
             if (boi == null) {
                 Conduit conduit = exchange.getConduit(msg);
-                EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
+                EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit, msg);
                 if (ep != null) {
                     interceptors.addAll(ep.getInterceptors());
                     assertions.addAll(ep.getVocabulary());
@@ -97,7 +96,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 // We do not know the underlying message type yet - so we pre-emptively add interceptors 
                 // that can deal with any resposes or faults returned to this client endpoint.
                 
-                EffectivePolicy ep = pe.getEffectiveClientResponsePolicy(ei, boi);
+                EffectivePolicy ep = pe.getEffectiveClientResponsePolicy(ei, boi, msg);
                 if (ep != null) {
                     interceptors.addAll(ep.getInterceptors());
                     // insert assertions of endpoint's vocabulary into message
@@ -114,7 +113,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             // We do not know the underlying message type yet - so we pre-emptively add interceptors 
             // that can deal with any messages to this endpoint
             
-            EndpointPolicy ep = pe.getServerEndpointPolicy(ei, destination);
+            EndpointPolicy ep = pe.getServerEndpointPolicy(ei, destination, msg);
             if (ep != null) {
                 interceptors.addAll(ep.getInterceptors());
                 assertions.addAll(ep.getVocabulary());

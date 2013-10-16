@@ -377,7 +377,7 @@ public class RMManager {
                     .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
                              org.apache.cxf.transport.Destination.class);
             config = RMPolicyUtilities.getRMConfiguration(config, message);
-            rme.initialise(config, message.getExchange().getConduit(message), replyTo, dest);
+            rme.initialise(config, message.getExchange().getConduit(message), replyTo, dest, message);
             reliableEndpoints.put(endpoint, rme);
             LOG.fine("Created new RMEndpoint.");
         }
@@ -533,7 +533,7 @@ public class RMManager {
         LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                 new Object[] {null == conduit ? "client" : "server", id});
         RMEndpoint rme = createReliableEndpoint(endpoint);
-        rme.initialise(getConfiguration(), conduit, null, null);
+        rme.initialise(getConfiguration(), conduit, null, null, null);
         reliableEndpoints.put(endpoint, rme);
         for (SourceSequence ss : sss) {            
             recoverSourceSequence(endpoint, conduit, rme.getSource(), ss);

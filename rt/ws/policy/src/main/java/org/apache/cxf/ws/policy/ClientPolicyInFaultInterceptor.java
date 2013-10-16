@@ -84,7 +84,7 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true, true);
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true, true, msg);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
@@ -95,7 +95,7 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
             // We do not know the underlying message type yet - so we pre-emptively add interceptors 
             // that can deal with all faults returned to this client endpoint.
             
-            EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);        
+            EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit, msg);        
             LOG.fine("ep: " + ep);
             if (ep != null) {
                 faultInterceptors.addAll(ep.getFaultInterceptors());

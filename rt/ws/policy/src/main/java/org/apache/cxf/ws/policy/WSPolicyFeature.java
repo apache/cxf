@@ -108,7 +108,7 @@ public class WSPolicyFeature extends AbstractFeature {
         Policy p = initializeEndpointPolicy(endpoint, bus);
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         EndpointInfo ei = endpoint.getEndpointInfo();
-        EndpointPolicy ep = pe.getClientEndpointPolicy(ei, null);
+        EndpointPolicy ep = pe.getClientEndpointPolicy(ei, null, null);
         pe.setClientEndpointPolicy(ei, ep.updatePolicy(p));
     }
 
@@ -118,7 +118,7 @@ public class WSPolicyFeature extends AbstractFeature {
         Policy p = initializeEndpointPolicy(endpoint, bus);
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         EndpointInfo ei = endpoint.getEndpointInfo();
-        EndpointPolicy ep = pe.getServerEndpointPolicy(ei, null);
+        EndpointPolicy ep = pe.getServerEndpointPolicy(ei, null, null);
         pe.setServerEndpointPolicy(ei, ep.updatePolicy(p));
 
         // Add policy to the service model (and consequently to the WSDL)

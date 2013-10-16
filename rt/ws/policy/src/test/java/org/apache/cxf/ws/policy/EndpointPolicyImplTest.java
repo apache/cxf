@@ -31,6 +31,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.All;
@@ -41,6 +42,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyOperator;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +61,7 @@ public class EndpointPolicyImplTest extends Assert {
         }
 
         @Override
-        void finalizeConfig() {
+        void finalizeConfig(Message m) {
         }
     };
 
@@ -107,11 +109,12 @@ public class EndpointPolicyImplTest extends Assert {
 
     @Test
     public void testInitialize() throws NoSuchMethodException {
+        Message m = new MessageImpl();
         Method m1 = EndpointPolicyImpl.class.getDeclaredMethod("initializePolicy", new Class[] {});
         Method m2 = EndpointPolicyImpl.class.getDeclaredMethod("checkExactlyOnes", new Class[] {});
-        Method m3 = EndpointPolicyImpl.class.getDeclaredMethod("chooseAlternative", new Class[] {});
-        Method m4 = EndpointPolicyImpl.class.getDeclaredMethod("initializeVocabulary", new Class[] {});
-        Method m5 = EndpointPolicyImpl.class.getDeclaredMethod("initializeInterceptors", new Class[] {});
+        Method m3 = EndpointPolicyImpl.class.getDeclaredMethod("chooseAlternative", new Class[] {Message.class});
+        Method m4 = EndpointPolicyImpl.class.getDeclaredMethod("initializeVocabulary", new Class[] {Message.class});
+        Method m5 = EndpointPolicyImpl.class.getDeclaredMethod("initializeInterceptors", new Class[] {Message.class});
         EndpointPolicyImpl epi = EasyMock.createMockBuilder(EndpointPolicyImpl.class)
             .addMockedMethods(m1, m2, m3, m4, m5).createMock(control);
 
@@ -119,11 +122,11 @@ public class EndpointPolicyImplTest extends Assert {
         EasyMock.expectLastCall();
         epi.checkExactlyOnes();
         EasyMock.expectLastCall();
-        epi.chooseAlternative();
+        epi.chooseAlternative(m);
         EasyMock.expectLastCall();
 
         control.replay();
-        epi.initialize();
+        epi.initialize(m);
         control.verify();
     }
 
@@ -156,15 +159,16 @@ public class EndpointPolicyImplTest extends Assert {
         Assertor assertor = control.createMock(Assertor.class);
         AlternativeSelector selector = control.createMock(AlternativeSelector.class);
 
+        Message m = new MessageImpl();
         EndpointPolicyImpl epi = new EndpointPolicyImpl(null, engine, true, assertor);
         epi.setPolicy(policy);
 
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null)).andReturn(null);
+        EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(null);
 
         control.replay();
         try {
-            epi.chooseAlternative();
+            epi.chooseAlternative(m);
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
@@ -174,9 +178,9 @@ public class EndpointPolicyImplTest extends Assert {
         control.reset();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
         Collection<Assertion> alternative = new ArrayList<Assertion>();
-        EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null)).andReturn(alternative);
+        EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(alternative);
         control.replay();
-        epi.chooseAlternative();
+        epi.chooseAlternative(m);
         Collection<Assertion> choice = epi.getChosenAlternative();
         assertSame(choice, alternative);
         control.verify();
@@ -319,7 +323,8 @@ public class EndpointPolicyImplTest extends Assert {
         }
 
         control.replay();
-        epi.initializeInterceptors();
+        Message m = new MessageImpl();
+        epi.initializeInterceptors(m);
         assertEquals(1, epi.getInterceptors().size());
         assertSame(api, epi.getInterceptors().get(0));
         if (requestor) {

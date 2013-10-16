@@ -56,9 +56,9 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
         return this.policyEngine;
     }
 
-    public <T> T getClientEndpointPolicy(EndpointInfo ei, Conduit c,
+    public <T> T getClientEndpointPolicy(Message m, EndpointInfo ei, Conduit c,
                                          PolicyCalculator<T> policyCalculator) {
-        Collection<Assertion> alternative = getPolicyEngine().getClientEndpointPolicy(ei, c)
+        Collection<Assertion> alternative = getPolicyEngine().getClientEndpointPolicy(ei, c, m)
             .getChosenAlternative();
         List<T> filteredPolicies = new ArrayList<T>();
         for (Assertion a : alternative) {
@@ -79,10 +79,10 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
         return getPolicy(policies, intersector);
     }
 
-    public <T> T getServerEndpointPolicy(EndpointInfo ei, Destination d, 
+    public <T> T getServerEndpointPolicy(Message m, EndpointInfo ei, Destination d, 
                                          PolicyCalculator<T> policyCalculator) {
         Collection<Assertion> alternative = getPolicyEngine()
-            .getServerEndpointPolicy(ei, d).getChosenAlternative();
+            .getServerEndpointPolicy(ei, d, m).getChosenAlternative();
         List<T> filteredPolicies = new ArrayList<T>();
         for (Assertion a : alternative) {
             if (policyCalculator.getDataClassName().equals(a.getName())) {

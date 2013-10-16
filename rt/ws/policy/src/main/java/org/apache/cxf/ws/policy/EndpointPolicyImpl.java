@@ -99,7 +99,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
         
         epi.checkExactlyOnes();
-        epi.finalizeConfig();
+        epi.finalizeConfig(null);
         return epi;
     }
     
@@ -109,40 +109,40 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     
     public synchronized Collection<Assertion> getVocabulary() {
         if (vocabulary == null) {
-            initializeVocabulary();
+            initializeVocabulary(null);
         }
         return vocabulary;
     }
     
     public synchronized Collection<Assertion> getFaultVocabulary() {
         if (vocabulary == null) {
-            initializeVocabulary();
+            initializeVocabulary(null);
         }
         return faultVocabulary;
     }    
     
     public synchronized List<Interceptor<? extends Message>> getInterceptors() {
         if (interceptors == null) {
-            initializeInterceptors();
+            initializeInterceptors(null);
         }
         return interceptors;
     }
     
     public synchronized List<Interceptor<? extends Message>> getFaultInterceptors() {
         if (interceptors == null) {
-            initializeInterceptors();
+            initializeInterceptors(null);
         }
         return faultInterceptors;
     }
     
-    public void initialize() {
+    public void initialize(Message m) {
         initializePolicy();
         checkExactlyOnes();
-        finalizeConfig();
+        finalizeConfig(m);
     }
     
-    void finalizeConfig() {
-        chooseAlternative();
+    void finalizeConfig(Message m) {
+        chooseAlternative(m);
     }
    
     void initializePolicy() {
@@ -155,10 +155,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
 
-    void chooseAlternative() {
+    void chooseAlternative(Message m) {
         Collection<Assertion> alternative = null;
         if (requestor) {
-            alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null);
+            alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null, m);
         } else {
             alternative = getSupportedAlternatives();
         }
@@ -189,7 +189,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
     
-    void initializeVocabulary() {
+    void initializeVocabulary(Message m) {
         vocabulary = new ArrayList<Assertion>();
         if (requestor) {
             faultVocabulary = new ArrayList<Assertion>();
@@ -213,13 +213,13 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
             EffectivePolicy p = null;
             if (!this.requestor) {
-                p = engine.getEffectiveServerRequestPolicy(ei, boi);
+                p = engine.getEffectiveServerRequestPolicy(ei, boi, m);
                 Collection<Assertion> c = engine.getAssertions(p, false);
                 if (c != null) {
                     addAll(vocabulary, c);
                 }
             } else {
-                p = engine.getEffectiveClientResponsePolicy(ei, boi);
+                p = engine.getEffectiveClientResponsePolicy(ei, boi, m);
                 Collection<Assertion> c = engine.getAssertions(p, false);
                 if (c != null) {
                     addAll(vocabulary, c);
@@ -229,7 +229,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 }
                 if (boi.getFaults() != null && null != faultVocabulary) {
                     for (BindingFaultInfo bfi : boi.getFaults()) {
-                        p = engine.getEffectiveClientFaultPolicy(ei, boi, bfi);
+                        p = engine.getEffectiveClientFaultPolicy(ei, boi, bfi, m);
                         c = engine.getAssertions(p, false);
                         if (c != null) {
                             addAll(faultVocabulary, c);
@@ -269,7 +269,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
 
-    void initializeInterceptors() {
+    void initializeInterceptors(Message m) {
         if (engine == null || engine.getBus() == null
             || engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class) == null) {
             return;
@@ -293,7 +293,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             faultInterceptors = new ArrayList<Interceptor<? extends Message>>(out);
         } else if (ei != null && ei.getBinding() != null) {
             for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
-                EffectivePolicy p = engine.getEffectiveServerRequestPolicy(ei, boi);
+                EffectivePolicy p = engine.getEffectiveServerRequestPolicy(ei, boi, m);
                 if (p == null || p.getPolicy() == null || p.getPolicy().isEmpty()) {
                     continue;
                 }

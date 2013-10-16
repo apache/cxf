@@ -84,7 +84,7 @@ public class RMPolicyWsdlTestBase extends AbstractBusClientServerTestBase {
         
         protected List<PolicyAssertion> getAssertions(PolicyEngine pe, org.apache.cxf.endpoint.Server s) {
             Policy p1 = pe.getServerEndpointPolicy(
-                             s.getEndpoint().getEndpointInfo(), null).getPolicy();
+                             s.getEndpoint().getEndpointInfo(), null, null).getPolicy();
             List<ExactlyOne> pops = 
                 CastUtils.cast(p1.getPolicyComponents(), ExactlyOne.class);
             assertEquals("New policy must have 1 top level policy operator", 1, pops.size());

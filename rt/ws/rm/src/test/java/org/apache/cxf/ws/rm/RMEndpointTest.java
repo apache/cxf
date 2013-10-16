@@ -33,6 +33,8 @@ import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -130,10 +132,11 @@ public class RMEndpointTest extends Assert {
 
     @Test
     public void testInitialise() throws NoSuchMethodException {
+        Message m = new MessageImpl();
         Method m1 = RMEndpoint.class.getDeclaredMethod("createServices", new Class[] {});
         Method m2 = RMEndpoint.class
             .getDeclaredMethod("createEndpoints", new Class[] {org.apache.cxf.transport.Destination.class});
-        Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {});
+        Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {Message.class});
 
         rme = EasyMock.createMockBuilder(RMEndpoint.class)
             .addMockedMethods(m1, m2 , m3).createMock(control);
@@ -141,12 +144,12 @@ public class RMEndpointTest extends Assert {
         EasyMock.expectLastCall();
         rme.createEndpoints(null);
         EasyMock.expectLastCall();
-        rme.setPolicies();
+        rme.setPolicies(m);
         EasyMock.expectLastCall();
         Conduit c = control.createMock(Conduit.class);
         EndpointReferenceType epr = control.createMock(EndpointReferenceType.class);
         control.replay();
-        rme.initialise(new RMConfiguration(), c, epr, null);
+        rme.initialise(new RMConfiguration(), c, epr, null, m);
         assertSame(c, rme.getConduit());
         assertSame(epr, rme.getReplyTo());
     }
@@ -247,22 +250,24 @@ public class RMEndpointTest extends Assert {
 
     @Test
     public void testSetPoliciesNoEngine() {
+        Message m = new MessageImpl();
         Bus bus = control.createMock(Bus.class);
         EasyMock.expect(manager.getBus()).andReturn(bus);
         EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(null);
         control.replay();
-        rme.setPolicies();
+        rme.setPolicies(m);
     }
 
     @Test
     public void testSetPoliciesEngineDisabled() {
+        Message m = new MessageImpl();
         Bus bus = control.createMock(Bus.class);
         EasyMock.expect(manager.getBus()).andReturn(bus);
         PolicyEngineImpl pe = control.createMock(PolicyEngineImpl.class);
         EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(pe);
         EasyMock.expect(pe.isEnabled()).andReturn(false);
         control.replay();
-        rme.setPolicies();
+        rme.setPolicies(m);
     }
 
     @Test

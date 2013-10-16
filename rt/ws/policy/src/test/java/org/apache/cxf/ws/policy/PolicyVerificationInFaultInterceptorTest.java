@@ -107,7 +107,7 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         interceptor.getTransportAssertions(message);
         EasyMock.expectLastCall();
         EffectivePolicyImpl effectivePolicy = control.createMock(EffectivePolicyImpl.class);        
-        EasyMock.expect(engine.getEffectiveClientFaultPolicy(ei, boi, bfi)).andReturn(effectivePolicy);
+        EasyMock.expect(engine.getEffectiveClientFaultPolicy(ei, boi, bfi, message)).andReturn(effectivePolicy);
         Policy policy = control.createMock(Policy.class);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(policy);
         aim.checkEffectivePolicy(policy);

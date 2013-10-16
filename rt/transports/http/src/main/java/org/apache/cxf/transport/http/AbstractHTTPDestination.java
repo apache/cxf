@@ -109,14 +109,16 @@ public abstract class AbstractHTTPDestination
     protected final String path;
 
     // Configuration values
-    protected HTTPServerPolicy server;
+    protected HTTPServerPolicy serverPolicy;
     protected String contextMatchStrategy = "stem";
     protected boolean fixedParameterOrder;
     protected boolean multiplexWithAddress;
     protected CertConstraints certConstraints;
     protected boolean isServlet3;
     protected ContinuationProviderFactory cproviderFactory;
-    
+
+    private volatile boolean serverPolicyCalced; 
+
     /**
      * Constructor
      * 
@@ -484,18 +486,24 @@ public abstract class AbstractHTTPDestination
     }
 
     private void initConfig() {
-        PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
-        if (pde != null) {
-            server = pde.getServerEndpointPolicy(endpointInfo, this, new ServerPolicyCalculator());
-        }
-        if (null == server) {
-            server = endpointInfo.getTraversedExtensor(
-                    new HTTPServerPolicy(), HTTPServerPolicy.class);
-        }
         
         cproviderFactory = bus.getExtension(ContinuationProviderFactory.class);
     }
 
+    private void calcServerPolicy(Message m) {
+        if (!serverPolicyCalced) {
+            PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
+            if (pde != null) {
+                serverPolicy = pde.getServerEndpointPolicy(m, endpointInfo, this, new ServerPolicyCalculator());
+            }
+            if (null == serverPolicy) {
+                serverPolicy = endpointInfo.getTraversedExtensor(
+                        new HTTPServerPolicy(), HTTPServerPolicy.class);
+            }
+        }
+        serverPolicyCalced = true;
+    }
+    
     /**
      * On first write, we need to make sure any attachments and such that are still on the incoming stream 
      * are read in.  Otherwise we can get into a deadlock where the client is still trying to send the 
@@ -538,8 +546,9 @@ public abstract class AbstractHTTPDestination
         }
 
         cacheInput(outMessage);
-        if (server != null) {
-            new Headers(outMessage).setFromServerPolicy(server);
+        calcServerPolicy(outMessage);
+        if (serverPolicy != null) {
+            new Headers(outMessage).setFromServerPolicy(serverPolicy);
         }
 
         OutputStream responseStream = null;
@@ -837,16 +846,20 @@ public abstract class AbstractHTTPDestination
     }
 
     public HTTPServerPolicy getServer() {
-        return server;
+        calcServerPolicy(null);
+        return serverPolicy;
     }
 
     public void setServer(HTTPServerPolicy server) {
-        this.server = server;
+        this.serverPolicy = server;
+        if (server != null) {
+            serverPolicyCalced = true;
+        }
     }
     
     public void assertMessage(Message message) {
         PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
-        pde.assertMessage(message, server, new ServerPolicyCalculator());
+        pde.assertMessage(message, serverPolicy, new ServerPolicyCalculator());
     }
 
     public boolean canAssert(QName type) {

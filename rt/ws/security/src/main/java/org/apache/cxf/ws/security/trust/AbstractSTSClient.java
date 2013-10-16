@@ -71,6 +71,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -604,8 +605,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 || (wsamAction != null && wsamAction.endsWith(suffix))) {
                 PolicyEngine pe = bus.getExtension(PolicyEngine.class);
                 Conduit conduit = client.getConduit();
-                EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(client.getEndpoint()
-                    .getEndpointInfo(), boi, conduit);
+                EffectivePolicy effectivePolicy 
+                    = pe.getEffectiveClientRequestPolicy(client.getEndpoint().getEndpointInfo(),
+                                                         boi, conduit,
+                                                         PhaseInterceptorChain.getCurrentMessage());
                 setPolicyInternal(effectivePolicy.getPolicy());
                 return boi;
             }

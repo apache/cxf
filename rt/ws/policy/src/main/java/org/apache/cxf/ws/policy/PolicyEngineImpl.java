@@ -33,6 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.FactoryBeanListenerManager;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -192,12 +193,12 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     // PolicyEngine interface
 
     public EffectivePolicy getEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, 
-                                                           Conduit c) {
+                                                           Conduit c, Message m) {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = PolicyUtils.createAsserter(c);
-            epi.initialise(ei, boi, this, assertor, true, true);
+            epi.initialise(ei, boi, this, assertor, true, true, m);
             boi.setProperty(POLICY_INFO_REQUEST_CLIENT, epi);
             effectivePolicy = epi;
         }
@@ -212,7 +213,8 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     public EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei,
                                                             BindingOperationInfo boi,
                                                             Destination d,
-                                                            List<List<Assertion>> incoming) {
+                                                            List<List<Assertion>> incoming, 
+                                                            Message m) {
         if (incoming == null) {
             EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_SERVER);
             if (null == effectivePolicy) {
@@ -226,7 +228,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         }
         EffectivePolicyImpl epi = createOutPolicyInfo();
         Assertor assertor = PolicyUtils.createAsserter(d);
-        epi.initialise(ei, boi, this, assertor, false, false, incoming);
+        epi.initialise(ei, boi, this, assertor, incoming, m);
         return epi;
     }
 
@@ -238,12 +240,13 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     public EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei,
                                                          BindingOperationInfo boi,
                                                          BindingFaultInfo bfi, 
-                                                         Destination d) {
+                                                         Destination d,
+                                                         Message m) {
 
         if (bfi == null) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = PolicyUtils.createAsserter(d);
-            epi.initialise(ei, boi, null, this, assertor);
+            epi.initialise(ei, boi, null, this, assertor, m);
             return epi;
         }
         bfi = mapToWrappedBindingFaultInfo(bfi);
@@ -251,7 +254,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = PolicyUtils.createAsserter(d);
-            epi.initialise(ei, boi, bfi, this, assertor);
+            epi.initialise(ei, boi, bfi, this, assertor, m);
             bfi.setProperty(POLICY_INFO_FAULT_SERVER, epi);
             effectivePolicy = epi;
         }
@@ -274,26 +277,27 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         bfi.setProperty(POLICY_INFO_FAULT_SERVER, ep);
     }
 
-    public EndpointPolicy getClientEndpointPolicy(EndpointInfo ei, Conduit conduit) {
+    public EndpointPolicy getClientEndpointPolicy(EndpointInfo ei, Conduit conduit, Message m) {
         Assertor assertor = PolicyUtils.createAsserter(conduit);
-        return getEndpointPolicy(ei, true, assertor);
+        return getEndpointPolicy(ei, true, assertor, m);
     }
    
-    public EndpointPolicy getServerEndpointPolicy(EndpointInfo ei, Destination destination) {
+    public EndpointPolicy getServerEndpointPolicy(EndpointInfo ei, Destination destination, Message m) {
         Assertor assertor = PolicyUtils.createAsserter(destination);
-        return getEndpointPolicy(ei, false, assertor);
+        return getEndpointPolicy(ei, false, assertor, m);
     }
 
     private EndpointPolicy getEndpointPolicy(
         EndpointInfo ei, 
         boolean isRequestor,
-        Assertor assertor) {
+        Assertor assertor,
+        Message m) {
         EndpointPolicy ep = (EndpointPolicy)ei.getProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT 
                             : POLICY_INFO_ENDPOINT_SERVER);
         if (null != ep) {
             return ep; 
         }
-        return createEndpointPolicyInfo(ei, isRequestor, assertor);
+        return createEndpointPolicyInfo(ei, isRequestor, assertor, m);
     }
 
     public void setClientEndpointPolicy(EndpointInfo ei, EndpointPolicy ep) {
@@ -305,11 +309,12 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }
 
     public EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, 
-                                                           BindingOperationInfo boi) {
+                                                           BindingOperationInfo boi, 
+                                                           Message m) {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialise(ei, boi, this, false, true);
+            epi.initialise(ei, boi, this, false, true, m);
             boi.setProperty(POLICY_INFO_REQUEST_SERVER, epi);
             effectivePolicy = epi;
         }
@@ -321,11 +326,13 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         boi.setProperty(POLICY_INFO_REQUEST_SERVER, ep);        
     }
 
-    public EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi) {
+    public EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei,
+                                                            BindingOperationInfo boi,
+                                                            Message m) {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialise(ei, boi, this, true, false);        
+            epi.initialise(ei, boi, this, true, false, m);        
             boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
             effectivePolicy = epi;
         }
@@ -337,15 +344,17 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, ep);
     }
 
-    public EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, BindingOperationInfo boi,
-                                                         BindingFaultInfo bfi) {
+    public EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei,
+                                                         BindingOperationInfo boi,
+                                                         BindingFaultInfo bfi,
+                                                         Message m) {
         EffectivePolicy effectivePolicy = null;
         if (bfi != null) {
             effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_CLIENT);
         }
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialisePolicy(ei, boi, bfi, this);
+            epi.initialisePolicy(ei, boi, bfi, this, m);
             if (bfi != null) {
                 bfi.setProperty(POLICY_INFO_FAULT_CLIENT, epi);
             }
@@ -545,9 +554,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     EndpointPolicyImpl createEndpointPolicyInfo(EndpointInfo ei, 
                                                 boolean isRequestor, 
-                                                Assertor assertor) {
+                                                Assertor assertor,
+                                                Message m) {
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, this, isRequestor, assertor);
-        epi.initialize();
+        epi.initialize(m);
         ei.setProperty(isRequestor ? POLICY_INFO_ENDPOINT_CLIENT : POLICY_INFO_ENDPOINT_SERVER, epi);
         return epi;
     }

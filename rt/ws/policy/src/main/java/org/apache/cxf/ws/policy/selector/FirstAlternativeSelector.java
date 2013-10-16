@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.neethi.Assertion;
@@ -33,8 +34,11 @@ import org.apache.neethi.Policy;
  */
 public class FirstAlternativeSelector extends BaseAlternativeSelector {
     
-    public Collection<Assertion> selectAlternative(Policy policy, PolicyEngine engine, Assertor assertor,
-                                                   List<List<Assertion>> request) {
+    public Collection<Assertion> selectAlternative(Policy policy,
+                                                   PolicyEngine engine,
+                                                   Assertor assertor,
+                                                   List<List<Assertion>> request,
+                                                   Message msg) {
 
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {

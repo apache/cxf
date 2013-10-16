@@ -60,7 +60,7 @@ public class PolicyLoggingInterceptor extends AbstractPhaseInterceptor<Message> 
         LOG.fine("Getting effective server request policy for endpoint " + ei
                  + " and binding operation " + boi);
         EffectivePolicy ep = 
-            bus.getExtension(PolicyEngine.class).getEffectiveServerRequestPolicy(ei, boi);                
+            bus.getExtension(PolicyEngine.class).getEffectiveServerRequestPolicy(ei, boi, message);                
         for (Iterator<List<Assertion>> it = ep.getPolicy().getAlternatives(); it.hasNext();) {
             Collection<Assertion> as = it.next();
             LOG.fine("Checking alternative with " + as.size() + " assertions.");

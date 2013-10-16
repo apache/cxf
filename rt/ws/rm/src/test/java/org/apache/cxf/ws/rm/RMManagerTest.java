@@ -269,7 +269,7 @@ public class RMManagerTest extends Assert {
         EndpointReferenceType replyTo = RMUtils.createAnonymousReference();
         EasyMock.expect(maps.getReplyTo()).andReturn(replyTo).anyTimes();
         EasyMock.expect(exchange.getConduit(message)).andReturn(null).anyTimes();
-        rme.initialise(manager.getConfiguration(), null, replyTo, null);
+        rme.initialise(manager.getConfiguration(), null, replyTo, null, message);
         EasyMock.expectLastCall();
 
         control.replay();
@@ -309,7 +309,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(exchange.getDestination()).andReturn(null);
         Conduit conduit = control.createMock(Conduit.class);
         EasyMock.expect(exchange.getConduit(message)).andReturn(conduit);
-        rme.initialise(manager.getConfiguration(), conduit, null, null);
+        rme.initialise(manager.getConfiguration(), conduit, null, null, message);
         EasyMock.expectLastCall();
 
         control.replay();

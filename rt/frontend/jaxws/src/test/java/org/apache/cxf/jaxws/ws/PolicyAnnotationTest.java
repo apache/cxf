@@ -109,7 +109,7 @@ public class PolicyAnnotationTest extends Assert {
             
             
             EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
-                .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null);
+                .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
             assertNotNull(policy);
             assertEquals(1, policy.getChosenAlternative().size());
         } finally {

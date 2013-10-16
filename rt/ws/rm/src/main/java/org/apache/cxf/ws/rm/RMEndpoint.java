@@ -54,6 +54,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -310,13 +311,14 @@ public class RMEndpoint {
     }
 
     void initialise(RMConfiguration config, Conduit c, EndpointReferenceType r,
-        org.apache.cxf.transport.Destination d) {
+        org.apache.cxf.transport.Destination d,
+        Message message) {
         configuration = config;
         conduit = c;
         replyTo = r;
         createServices();
         createEndpoints(d);
-        setPolicies();
+        setPolicies(message);
         if (manager != null && manager.getBus() != null) {
             managedEndpoint = new ManagedRMEndpoint(this);
             instrumentationManager = manager.getBus().getExtension(InstrumentationManager.class);        
@@ -441,7 +443,7 @@ public class RMEndpoint {
         endpoints.put(protocol, endpoint);
     }
 
-    void setPolicies() {
+    void setPolicies(Message message) {
         // use same WS-policies as for application endpoint
         PolicyEngine engine = manager.getBus().getExtension(PolicyEngine.class);
         if (null == engine || !engine.isEnabled()) {
@@ -451,8 +453,8 @@ public class RMEndpoint {
         for (Endpoint endpoint : endpoints.values()) {
             EndpointInfo ei = endpoint.getEndpointInfo();
             EndpointPolicy epi = null == conduit
-                ? engine.getServerEndpointPolicy(applicationEndpoint.getEndpointInfo(), null)
-                    : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(), conduit);
+                ? engine.getServerEndpointPolicy(applicationEndpoint.getEndpointInfo(), null, message)
+                    : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(), conduit, message);
             
             if (conduit != null) {
                 engine.setClientEndpointPolicy(ei, epi);
@@ -460,9 +462,9 @@ public class RMEndpoint {
                 engine.setServerEndpointPolicy(ei, epi);
             }
             EffectivePolicyImpl effectiveOutbound = new EffectivePolicyImpl();
-            effectiveOutbound.initialise(epi, engine, false, false);
+            effectiveOutbound.initialise(epi, engine, false, false, message);
             EffectivePolicyImpl effectiveInbound = new EffectivePolicyImpl();
-            effectiveInbound.initialise(epi, engine, true, false);
+            effectiveInbound.initialise(epi, engine, true, false, message);
             
             BindingInfo bi = ei.getBinding();
             Collection<BindingOperationInfo> bois = bi.getOperations();

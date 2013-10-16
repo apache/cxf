@@ -34,6 +34,7 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -52,6 +53,7 @@ import org.apache.neethi.PolicyReference;
 import org.apache.neethi.PolicyRegistry;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +65,7 @@ public class PolicyEngineTest extends Assert {
 
     private IMocksControl control;
     private PolicyEngineImpl engine;
+    private Message msg = new MessageImpl();
     
     @Before
     public void setUp() {
@@ -121,11 +124,11 @@ public class PolicyEngineTest extends Assert {
         AssertingConduit conduit = control.createMock(AssertingConduit.class);
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, conduit, true, true);
+        epi.initialise(ei, boi, engine, conduit, true, true, msg);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveClientRequestPolicy(ei, boi, conduit));
-        assertSame(epi, engine.getEffectiveClientRequestPolicy(ei, boi, conduit));
+        assertSame(epi, engine.getEffectiveClientRequestPolicy(ei, boi, conduit, msg));
+        assertSame(epi, engine.getEffectiveClientRequestPolicy(ei, boi, conduit, msg));
         control.verify();
     }
     
@@ -138,7 +141,7 @@ public class PolicyEngineTest extends Assert {
         control.replay();
         engine.setEffectiveClientRequestPolicy(ei, boi, effectivePolicy);
         assertSame(effectivePolicy, 
-                   engine.getEffectiveClientRequestPolicy(ei, boi, (Conduit)null)); 
+                   engine.getEffectiveClientRequestPolicy(ei, boi, (Conduit)null, msg)); 
         control.verify();
     }
     
@@ -156,8 +159,8 @@ public class PolicyEngineTest extends Assert {
         epi.initialise(ei, boi, engine, destination, false, false, null);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination, null));
-        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination, null));
+        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination, null, msg));
+        assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination, null, msg));
         control.verify();
     }
     
@@ -170,7 +173,7 @@ public class PolicyEngineTest extends Assert {
         control.replay();
         engine.setEffectiveServerResponsePolicy(ei, boi, effectivePolicy);
         assertSame(effectivePolicy, 
-                   engine.getEffectiveServerResponsePolicy(ei, boi, (Destination)null, null));
+                   engine.getEffectiveServerResponsePolicy(ei, boi, (Destination)null, null, msg));
         control.verify();
     }
    
@@ -185,11 +188,11 @@ public class PolicyEngineTest extends Assert {
         AssertingDestination destination = control.createMock(AssertingDestination.class);
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, null, bfi, engine, destination);
+        epi.initialise(ei, null, bfi, engine, destination, msg);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveServerFaultPolicy(ei, null, bfi, destination));
-        assertSame(epi, engine.getEffectiveServerFaultPolicy(ei, null, bfi, destination));
+        assertSame(epi, engine.getEffectiveServerFaultPolicy(ei, null, bfi, destination, msg));
+        assertSame(epi, engine.getEffectiveServerFaultPolicy(ei, null, bfi, destination, msg));
         control.verify();
     }
     
@@ -200,7 +203,7 @@ public class PolicyEngineTest extends Assert {
         BindingFaultInfo bfi = new BindingFaultInfo(null, null); 
         EffectivePolicy epi = control.createMock(EffectivePolicy.class);
         engine.setEffectiveServerFaultPolicy(ei, bfi, epi);
-        assertSame(epi, engine.getEffectiveServerFaultPolicy(ei, null, bfi, (Destination)null));   
+        assertSame(epi, engine.getEffectiveServerFaultPolicy(ei, null, bfi, (Destination)null, msg));   
     }
        
     @Test
@@ -213,11 +216,11 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, false, true);
+        epi.initialise(ei, boi, engine, false, true, msg);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveServerRequestPolicy(ei, boi));
-        assertSame(epi, engine.getEffectiveServerRequestPolicy(ei, boi));
+        assertSame(epi, engine.getEffectiveServerRequestPolicy(ei, boi, msg));
+        assertSame(epi, engine.getEffectiveServerRequestPolicy(ei, boi, msg));
         control.verify();
     }
     
@@ -229,7 +232,7 @@ public class PolicyEngineTest extends Assert {
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
         control.replay();
         engine.setEffectiveServerRequestPolicy(ei, boi, effectivePolicy);
-        assertSame(effectivePolicy, engine.getEffectiveServerRequestPolicy(ei, boi));   
+        assertSame(effectivePolicy, engine.getEffectiveServerRequestPolicy(ei, boi, msg));   
         control.verify();
     }
     
@@ -243,11 +246,11 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, true, false);
+        epi.initialise(ei, boi, engine, true, false, msg);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi));
-        assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi));
+        assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi, msg));
+        assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi, msg));
         control.verify();
     }
     
@@ -259,7 +262,7 @@ public class PolicyEngineTest extends Assert {
         EffectivePolicy epi = control.createMock(EffectivePolicy.class);
         control.replay();
         engine.setEffectiveClientResponsePolicy(ei, boi, epi);
-        assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi));   
+        assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi, msg));   
         control.verify();
     }
     
@@ -273,11 +276,11 @@ public class PolicyEngineTest extends Assert {
         BindingFaultInfo bfi = new BindingFaultInfo(null, null); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialisePolicy(ei, null, bfi, engine);
+        epi.initialisePolicy(ei, null, bfi, engine, msg);
         EasyMock.expectLastCall();
         control.replay();
-        assertSame(epi, engine.getEffectiveClientFaultPolicy(ei, null, bfi));
-        assertSame(epi, engine.getEffectiveClientFaultPolicy(ei, null, bfi));
+        assertSame(epi, engine.getEffectiveClientFaultPolicy(ei, null, bfi, msg));
+        assertSame(epi, engine.getEffectiveClientFaultPolicy(ei, null, bfi, msg));
         control.verify();
     }
     
@@ -288,54 +291,54 @@ public class PolicyEngineTest extends Assert {
         BindingFaultInfo bfi = new BindingFaultInfo(null, null); 
         EffectivePolicy epi = control.createMock(EffectivePolicy.class);
         engine.setEffectiveClientFaultPolicy(ei, bfi, epi);
-        assertSame(epi, engine.getEffectiveClientFaultPolicy(ei, null, bfi));        
+        assertSame(epi, engine.getEffectiveClientFaultPolicy(ei, null, bfi, msg));        
     }
     
     @Test
     public void testGetEndpointPolicyClientSide() throws Exception {
         Method m = PolicyEngineImpl.class.getDeclaredMethod("createEndpointPolicyInfo", 
-            new Class[] {EndpointInfo.class, boolean.class, Assertor.class});
+            new Class[] {EndpointInfo.class, boolean.class, Assertor.class, Message.class});
         engine = EasyMock.createMockBuilder(PolicyEngineImpl.class)
             .addMockedMethod(m).createMock(control);
         engine.init();
         EndpointInfo ei = createMockEndpointInfo();
         AssertingConduit conduit = control.createMock(AssertingConduit.class);
         EndpointPolicyImpl epi = control.createMock(EndpointPolicyImpl.class);
-        EasyMock.expect(engine.createEndpointPolicyInfo(ei, true, conduit)).andReturn(epi);
+        EasyMock.expect(engine.createEndpointPolicyInfo(ei, true, conduit, msg)).andReturn(epi);
         control.replay();
-        assertSame(epi, engine.getClientEndpointPolicy(ei, conduit));
+        assertSame(epi, engine.getClientEndpointPolicy(ei, conduit, msg));
         control.verify();        
     }
     
     @Test
     public void testGetEndpointPolicyServerSide() throws Exception {
         Method m = PolicyEngineImpl.class.getDeclaredMethod("createEndpointPolicyInfo", 
-            new Class[] {EndpointInfo.class, boolean.class, Assertor.class});
+            new Class[] {EndpointInfo.class, boolean.class, Assertor.class, Message.class});
         engine = EasyMock.createMockBuilder(PolicyEngineImpl.class)
             .addMockedMethod(m).createMock(control);
         engine.init();
         EndpointInfo ei = createMockEndpointInfo();
         AssertingDestination destination = control.createMock(AssertingDestination.class);
         EndpointPolicyImpl epi = control.createMock(EndpointPolicyImpl.class);
-        EasyMock.expect(engine.createEndpointPolicyInfo(ei, false, destination)).andReturn(epi);
+        EasyMock.expect(engine.createEndpointPolicyInfo(ei, false, destination, msg)).andReturn(epi);
         control.replay();
-        assertSame(epi, engine.getServerEndpointPolicy(ei, destination));
+        assertSame(epi, engine.getServerEndpointPolicy(ei, destination, msg));
         control.verify();        
     }
     
     @Test
     public void testCreateEndpointPolicyInfo() throws Exception {
         Method m1 = PolicyEngineImpl.class.getDeclaredMethod("createEndpointPolicyInfo", 
-            new Class[] {EndpointInfo.class, boolean.class, Assertor.class});
+            new Class[] {EndpointInfo.class, boolean.class, Assertor.class, Message.class});
         engine = EasyMock.createMockBuilder(PolicyEngineImpl.class)
             .addMockedMethod(m1).createMock(control);
         engine.init();
         EndpointInfo ei = createMockEndpointInfo();
         Assertor assertor = control.createMock(Assertor.class);
         EndpointPolicyImpl epi = control.createMock(EndpointPolicyImpl.class);
-        EasyMock.expect(engine.createEndpointPolicyInfo(ei, false, assertor)).andReturn(epi);
+        EasyMock.expect(engine.createEndpointPolicyInfo(ei, false, assertor, msg)).andReturn(epi);
         control.replay();
-        assertSame(epi, engine.createEndpointPolicyInfo(ei, false, assertor));
+        assertSame(epi, engine.createEndpointPolicyInfo(ei, false, assertor, msg));
         control.verify();
     }
     
@@ -352,8 +355,8 @@ public class PolicyEngineTest extends Assert {
         engine.setServerEndpointPolicy(ei, epi);
         engine.setClientEndpointPolicy(ei, epi);
         
-        assertSame(epi, engine.getClientEndpointPolicy(ei, (Conduit)null));
-        assertSame(epi, engine.getServerEndpointPolicy(ei, (Destination)null));
+        assertSame(epi, engine.getClientEndpointPolicy(ei, (Conduit)null, msg));
+        assertSame(epi, engine.getServerEndpointPolicy(ei, (Destination)null, msg));
         
         control.reset();
         ei.setService(si);
@@ -363,7 +366,7 @@ public class PolicyEngineTest extends Assert {
         epi.getPolicy();
         EasyMock.expectLastCall().andReturn(p).times(2);
         control.replay();
-        assertSame(epi, engine.getServerEndpointPolicy(ei, (Destination)null));
+        assertSame(epi, engine.getServerEndpointPolicy(ei, (Destination)null, msg));
     }
        
     

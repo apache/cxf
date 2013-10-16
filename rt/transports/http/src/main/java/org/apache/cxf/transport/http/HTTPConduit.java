@@ -258,6 +258,9 @@ public abstract class HTTPConduit
     protected Cookies cookies;
     
     protected CertConstraints certConstraints;
+    
+    private volatile boolean clientSidePolicyCalced;
+    
 
     /**
      * Constructor
@@ -293,7 +296,6 @@ public abstract class HTTPConduit
         }
         proxyFactory = new ProxyFactory();
         cookies = new Cookies();
-        updateClientPolicy();
     }
 
     /**
@@ -304,12 +306,21 @@ public abstract class HTTPConduit
      * wsdl extensors are superseded by policies which in 
      * turn are superseded by injection
      */
-    private void updateClientPolicy() {
-        PolicyDataEngine policyEngine = bus.getExtension(PolicyDataEngine.class);
-        if (policyEngine != null && endpointInfo.getService() != null) {
-            clientSidePolicy = policyEngine.getClientEndpointPolicy(endpointInfo, 
-                                                                    this, new ClientPolicyCalculator());
+    private void updateClientPolicy(Message m) {
+        if (!clientSidePolicyCalced) {
+            PolicyDataEngine policyEngine = bus.getExtension(PolicyDataEngine.class);
+            if (policyEngine != null && endpointInfo.getService() != null) {
+                clientSidePolicy = policyEngine.getClientEndpointPolicy(m,
+                                                                        endpointInfo, 
+                                                                        this,
+                                                                        new ClientPolicyCalculator());
+                if (clientSidePolicy != null) {
+                    clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
+                    clientSidePolicy.addPropertyChangeListener(this);
+                }
+            }
         }
+        clientSidePolicyCalced = true;
     }
 
     /**
@@ -416,10 +427,6 @@ public abstract class HTTPConduit
         if (getClient().getDecoupledEndpoint() != null) {
             this.endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto",
                                           getClient().getDecoupledEndpoint());
-        }
-        if (clientSidePolicy != null) {
-            clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
-            clientSidePolicy.addPropertyChangeListener(this);
         }
     }
     
@@ -815,6 +822,7 @@ public abstract class HTTPConduit
     public HTTPClientPolicy getClient(Message message) {
         ClientPolicyCalculator cpc = new ClientPolicyCalculator();
         HTTPClientPolicy pol = message.get(HTTPClientPolicy.class);
+        updateClientPolicy(message);
         if (pol != null) {
             pol = cpc.intersect(pol, clientSidePolicy);
         } else {
@@ -833,6 +841,7 @@ public abstract class HTTPConduit
      * HTTPConduit.
      */
     public HTTPClientPolicy getClient() {
+        updateClientPolicy(null);
         return clientSidePolicy;
     }
 
@@ -844,6 +853,7 @@ public abstract class HTTPConduit
         if (this.clientSidePolicy != null) {
             this.clientSidePolicy.removePropertyChangeListener(this);
         }
+        this.clientSidePolicyCalced = true;
         this.clientSidePolicy = client;
         clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
         clientSidePolicy.addPropertyChangeListener(this);

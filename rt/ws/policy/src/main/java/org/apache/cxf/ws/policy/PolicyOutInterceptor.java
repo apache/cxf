@@ -83,7 +83,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false);
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
@@ -95,7 +95,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             Conduit conduit = exchange.getConduit(msg);
             
             // add the required interceptors
-            EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(ei, boi, conduit);
+            EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(ei, boi, conduit, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
             if (effectivePolicy != null) {
                 PolicyUtils.logPolicy(
@@ -110,7 +110,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             List<List<Assertion>> incoming 
                 = CastUtils.cast((List<?>)exchange.get("ws-policy.validated.alternatives"));
             EffectivePolicy effectivePolicy 
-                = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming);
+                = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
             if (effectivePolicy != null) {
                 PolicyUtils.logPolicy(

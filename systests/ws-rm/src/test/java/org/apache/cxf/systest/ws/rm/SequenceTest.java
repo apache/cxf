@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.ws.rm;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -1567,7 +1569,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         LOG.fine("Using decoupled endpoint: " + cp.getDecoupledEndpoint());
     }
     
-    private void stopClient() {
+    private void stopClient() throws IOException {
         if (null != greeterBus) {
             
             //ensure we close the decoupled destination of the conduit,
@@ -1575,8 +1577,14 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             if (greeter != null) {
                 ClientProxy.getClient(greeter).getConduit().close();
             }
+            if (greeter instanceof Closeable) {
+                ((Closeable)greeter).close();
+            }
             if (dispatch != null) {
                 ((DispatchImpl<?>)dispatch).getClient().getConduit().close();
+            }
+            if (dispatch instanceof Closeable) {
+                ((Closeable)dispatch).close();
             }
             greeterBus.shutdown(true);
             greeter = null;
@@ -1585,8 +1593,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private void stopControl() {
-        if (null != control) {  
+    private void stopControl() throws IOException {
+        if (null != control) {
+            ((Closeable)control).close();
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
             controlBus.shutdown(true);
         }

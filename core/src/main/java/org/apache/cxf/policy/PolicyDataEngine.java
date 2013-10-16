@@ -26,9 +26,9 @@ import org.apache.cxf.transport.Destination;
 public interface PolicyDataEngine {
     <T> T getPolicy(Message message, T confPolicy, PolicyCalculator<T> intersector);
 
-    <T> T getClientEndpointPolicy(EndpointInfo ei, Conduit c, PolicyCalculator<T> policyCalculator);
+    <T> T getClientEndpointPolicy(Message m, EndpointInfo ei, Conduit c, PolicyCalculator<T> policyCalculator);
 
-    <T> T getServerEndpointPolicy(EndpointInfo ei, Destination d, PolicyCalculator<T> policyCalculator);
+    <T> T getServerEndpointPolicy(Message m, EndpointInfo ei, Destination d, PolicyCalculator<T> policyCalculator);
 
     <T> void assertMessage(Message message, T confPol, PolicyCalculator<T> policyCalculator);
 }

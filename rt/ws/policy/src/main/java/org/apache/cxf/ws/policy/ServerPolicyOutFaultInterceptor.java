@@ -93,7 +93,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false, true);
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false, true, msg);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
@@ -109,7 +109,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
                 return;
             }
             
-            EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination);
+            EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination, msg);
             if (effectivePolicy != null) {
                 faultInterceptors.addAll(effectivePolicy.getInterceptors());
                 assertions.addAll(effectivePolicy.getChosenAlternative());            

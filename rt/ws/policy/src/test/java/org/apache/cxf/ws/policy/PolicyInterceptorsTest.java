@@ -89,7 +89,7 @@ public class PolicyInterceptorsTest extends Assert {
         control.reset();
         setupMessage(true, true, true, true, true, true);        
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(pe.getEffectiveClientRequestPolicy(ei, boi, conduit))
+        EasyMock.expect(pe.getEffectiveClientRequestPolicy(ei, boi, conduit, message))
             .andReturn(effectivePolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(effectivePolicy.getInterceptors())
@@ -116,7 +116,7 @@ public class PolicyInterceptorsTest extends Assert {
         control.reset();
         setupMessage(true, true, true, true, true, true);
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(pe.getEffectiveClientResponsePolicy(ei, boi)).andReturn(effectivePolicy);
+        EasyMock.expect(pe.getEffectiveClientResponsePolicy(ei, boi, message)).andReturn(effectivePolicy);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(new Policy()).times(2);
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();
@@ -143,7 +143,7 @@ public class PolicyInterceptorsTest extends Assert {
         control.reset();
         setupMessage(true, true, false, false, true, true);
         EndpointPolicy endpointPolicy = control.createMock(EndpointPolicy.class);
-        EasyMock.expect(pe.getClientEndpointPolicy(ei, conduit)).andReturn(endpointPolicy);
+        EasyMock.expect(pe.getClientEndpointPolicy(ei, conduit, message)).andReturn(endpointPolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(endpointPolicy.getFaultInterceptors())
             .andReturn(li);
@@ -168,7 +168,7 @@ public class PolicyInterceptorsTest extends Assert {
         control.reset();
         setupMessage(false, false, false, false, true, true);
         EndpointPolicy endpointPolicy = control.createMock(EndpointPolicyImpl.class);
-        EasyMock.expect(pe.getServerEndpointPolicy(ei, destination)).andReturn(endpointPolicy);
+        EasyMock.expect(pe.getServerEndpointPolicy(ei, destination, message)).andReturn(endpointPolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(endpointPolicy.getInterceptors())
             .andReturn(li);
@@ -193,7 +193,7 @@ public class PolicyInterceptorsTest extends Assert {
         control.reset();
         setupMessage(false, false, true, true, true, true);
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(pe.getEffectiveServerResponsePolicy(ei, boi, destination, null))
+        EasyMock.expect(pe.getEffectiveServerResponsePolicy(ei, boi, destination, null, message))
             .andReturn(effectivePolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(effectivePolicy.getInterceptors())
@@ -237,7 +237,7 @@ public class PolicyInterceptorsTest extends Assert {
         BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
         EasyMock.expect(interceptor.getBindingFaultInfo(message, ex, boi)).andReturn(bfi);
         EffectivePolicy effectivePolicy = control.createMock(EffectivePolicyImpl.class);
-        EasyMock.expect(pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination))
+        EasyMock.expect(pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination, message))
             .andReturn(effectivePolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         EasyMock.expect(effectivePolicy.getInterceptors())
@@ -463,7 +463,7 @@ public class PolicyInterceptorsTest extends Assert {
         EasyMock.expect(message.getContextualProperty(PolicyConstants.POLICY_OVERRIDE))
             .andReturn(policyOverride);
         AlternativeSelector selector = control.createMock(AlternativeSelector.class);
-        EasyMock.expect(selector.selectAlternative(policyOverride, pe, null, null)).andReturn(assertions);
+        EasyMock.expect(selector.selectAlternative(policyOverride, pe, null, null, message)).andReturn(assertions);
         EasyMock.expect(pe.getAlternativeSelector()).andReturn(selector);
         EasyMock.expect(pe.getBus()).andReturn(bus).anyTimes();
         PolicyInterceptorProviderRegistry reg = control

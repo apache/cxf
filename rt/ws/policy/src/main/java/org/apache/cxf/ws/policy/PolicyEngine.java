@@ -22,6 +22,7 @@ package org.apache.cxf.ws.policy;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -56,41 +57,41 @@ public interface PolicyEngine {
     
     // available throughout the outbound path
     
-    EffectivePolicy getEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, Conduit c);
+    EffectivePolicy getEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, Conduit c, Message m);
     
     void setEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
     
     EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, 
-                                                     Destination d, List<List<Assertion>> incoming);
+                                                     Destination d, List<List<Assertion>> incoming, Message m);
     
     void setEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
     
     EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingOperationInfo boi,
-                                                  BindingFaultInfo bfi, Destination d);
+                                                  BindingFaultInfo bfi, Destination d, Message m);
     
     void setEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep); 
     
     // available throughout the inbound path
         
-    EndpointPolicy getClientEndpointPolicy(EndpointInfo ei, Conduit conduit);
-    EndpointPolicy getServerEndpointPolicy(EndpointInfo ei, Destination destination);
+    EndpointPolicy getClientEndpointPolicy(EndpointInfo ei, Conduit conduit, Message msg);
+    EndpointPolicy getServerEndpointPolicy(EndpointInfo ei, Destination destination, Message msg);
     
     void setServerEndpointPolicy(EndpointInfo ei, EndpointPolicy ep);
     void setClientEndpointPolicy(EndpointInfo ei, EndpointPolicy ep);
     
     // only available after message type has been determined
     
-    EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi);
+    EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, Message m);
     
     void setEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
     
-    EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi);
+    EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, Message m);
     
     void setEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
     
     EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, 
                                                   BindingOperationInfo boi,
-                                                  BindingFaultInfo bfi);
+                                                  BindingFaultInfo bfi, Message m);
     
     void setEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep);
     

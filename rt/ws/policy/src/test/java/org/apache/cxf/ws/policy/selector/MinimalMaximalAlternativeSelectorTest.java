@@ -22,6 +22,8 @@ package org.apache.cxf.ws.policy.selector;
 import java.util.Collection;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -33,6 +35,7 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +55,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
     
     @Test
     public void testChooseMinAlternative() {
+        Message m = new MessageImpl();
         AlternativeSelector selector = new MinimalAlternativeSelector();
         
         PolicyEngine engine = control.createMock(PolicyEngine.class);
@@ -75,7 +79,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         
         control.replay();        
         Collection<Assertion> choice = 
-            selector.selectAlternative(policy, engine, assertor, null); 
+            selector.selectAlternative(policy, engine, assertor, null, m); 
         assertEquals(0, choice.size());
         control.verify();
     }
@@ -104,7 +108,8 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(minAlternative, assertor)).andReturn(true);
         
         control.replay();        
-        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor, null); 
+        Message m = new MessageImpl();
+        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor, null, m); 
         assertEquals(1, choice.size());
         assertSame(a1, choice.iterator().next());
         control.verify();

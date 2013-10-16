@@ -22,6 +22,8 @@ package org.apache.cxf.ws.policy.selector;
 import java.util.Collection;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -33,6 +35,7 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,13 +72,14 @@ public class FirstAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(false);
         control.replay();
         
-        assertNull(selector.selectAlternative(policy, engine, assertor, null));  
+        Message m = new MessageImpl();
+        assertNull(selector.selectAlternative(policy, engine, assertor, null, m));  
         control.verify();
         
         control.reset();        
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(true);
         control.replay();         
-        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor, null); 
+        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor, null, m); 
         assertSame(1, chosen.size());
         assertSame(chosen.size(), firstAlternative.size());
         assertSame(chosen.iterator().next(), firstAlternative.iterator().next());
@@ -91,7 +95,7 @@ public class FirstAlternativeSelectorTest extends Assert {
         EasyMock.expect(engine.supportsAlternative(secondAlternative, assertor)).andReturn(true);
         control.replay();        
       
-        chosen = selector.selectAlternative(policy, engine, assertor, null); 
+        chosen = selector.selectAlternative(policy, engine, assertor, null, m); 
         assertSame(1, chosen.size());
         assertSame(chosen.size(), secondAlternative.size());
         assertSame(chosen.iterator().next(), secondAlternative.iterator().next());
