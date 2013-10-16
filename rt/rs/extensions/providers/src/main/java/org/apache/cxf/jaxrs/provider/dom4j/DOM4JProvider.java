@@ -25,8 +25,10 @@ import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotSupportedException;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -38,8 +40,8 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.staxutils.StaxUtils;
 
-@javax.ws.rs.Produces({"application/xml", "application/*+xml", "text/xml", "application/json" })
-@javax.ws.rs.Consumes({"application/xml", "application/*+xml", "text/xml", "application/json" })
+@Produces({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
+@Consumes({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
 public class DOM4JProvider extends AbstractConfigurableProvider 
     implements MessageBodyReader<org.dom4j.Document>, MessageBodyWriter<org.dom4j.Document> {
 
