@@ -120,6 +120,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testFormParametersUTF8Encoding() throws Exception {
+        JAXRSUtils.intersectMimeTypes("application/json", "application/json+v2");
         doTestFormParamsWithEncoding("UTF-8", true);
         doTestFormParamsWithEncoding("UTF-8", false);
     }

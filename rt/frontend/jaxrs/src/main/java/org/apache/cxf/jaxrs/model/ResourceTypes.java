@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 public class ResourceTypes {
     private Map<Class<?>, Type> allTypes = new HashMap<Class<?>, Type>();
     private Map<Class<?>, QName> collectionMap = new HashMap<Class<?>, QName>();
+    private Map<Class<?>, QName> xmlNameMap = new HashMap<Class<?>, QName>();
     public Map<Class<?>, Type> getAllTypes() {
         return allTypes;
     }
@@ -36,7 +37,7 @@ public class ResourceTypes {
     public Map<Class<?>, QName> getCollectionMap() {
         return collectionMap;
     }
-    public void setCollectionMap(Map<Class<?>, QName> collectionMap) {
-        this.collectionMap = collectionMap;
+    public Map<Class<?>, QName> getXmlNameMap() {
+        return xmlNameMap;
     }
 }

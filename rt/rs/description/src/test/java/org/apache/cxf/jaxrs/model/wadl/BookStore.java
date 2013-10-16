@@ -70,6 +70,16 @@ public class BookStore implements BookDescription {
         return Collections.emptyList();
     }
     
+    @GET
+    @Path("thebooks2")
+    @Produces("application/xml")
+    @Descriptions({ 
+        @Description(value = "Get Books2", target = DocTarget.METHOD)
+    })
+    public List<Book2> getBooks2(@PathParam("id") Long id) {
+        return Collections.emptyList();
+    }
+    
     @GET 
     @Produces("text/plain")
     public String getName(@PathParam("id") Long id, @QueryParam("") QueryBean query) {

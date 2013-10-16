@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -28,6 +31,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
 
 @Path("/")
 public class PetStore {
@@ -52,6 +59,30 @@ public class PetStore {
 
         return Response.ok(CLOSED).build();
     }
+    
+    @GET
+    @Path("/petstore/jaxb/status/")
+    @Produces("text/xml")
+    public PetStoreStatus getJaxbStatus() {
+
+        return new PetStoreStatus();
+    }
+    
+    @GET
+    @Path("/petstore/jaxb/status/elements")
+    @Produces({"text/xml", "application/json" })
+    @XMLName("{http://pets}statuses")
+    public List<PetStoreStatusElement> getJaxbStatusElements() {
+        return Collections.singletonList(new PetStoreStatusElement());
+    }
+    
+    @GET
+    @Path("/petstore/jaxb/status/element")
+    @Produces("text/xml")
+    public PetStoreStatusElement getJaxbStatusElement() {
+
+        return new PetStoreStatusElement();
+    }
 
     @POST
     @Path("/petstore/pets/")
@@ -59,5 +90,23 @@ public class PetStore {
     @Produces("text/xml")
     public Response updateStatus(MultivaluedMap<String, String> params) throws Exception {
         return Response.ok(params.getFirst("status")).build();
+    }
+    
+    @XmlType(name = "status", namespace = "http://pets")
+    public static class PetStoreStatus {
+        private String status = PetStore.CLOSED;
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+        
+    }
+    
+    @XmlRootElement(name = "elstatus", namespace = "http://pets")
+    public static class PetStoreStatusElement extends PetStoreStatus {
     }
 }

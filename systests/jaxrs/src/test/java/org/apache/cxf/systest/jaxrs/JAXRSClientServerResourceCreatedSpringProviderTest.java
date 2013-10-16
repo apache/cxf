@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -29,6 +30,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+
+import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,7 +62,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     @Test
     public void testBasePetStoreWithoutTrailingSlash() throws Exception {
         
-        String endpointAddress = "http://localhost:" + PORT + "/webapp/resources";
+        String endpointAddress = "http://localhost:" + PORT + "/webapp/pets";
         WebClient client = WebClient.create(endpointAddress);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);
@@ -71,7 +74,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     @Test
     public void testBasePetStore() throws Exception {
         
-        String endpointAddress = "http://localhost:" + PORT + "/webapp/resources/"; 
+        String endpointAddress = "http://localhost:" + PORT + "/webapp/pets/"; 
         WebClient client = WebClient.create(endpointAddress);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);
@@ -83,12 +86,12 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     @Test
     public void testMultipleRootsWadl() throws Exception {
         List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/resources",
-                                                         "http://localhost:" + PORT + "/webapp/resources", 3);
+                                                         "http://localhost:" + PORT + "/webapp/resources", 2);
         String path1 = resourceEls.get(0).getAttribute("path");
         int bookStoreInd = path1.contains("/bookstore") ? 0 : 1;
         int petStoreInd = bookStoreInd == 0 ? 1 : 0;
         checkBookStoreInfo(resourceEls.get(bookStoreInd));
-        checkPetStoreInfo(resourceEls.get(petStoreInd));
+        checkServletInfo(resourceEls.get(petStoreInd));
     }
     
     @Test
@@ -100,9 +103,20 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     
     @Test
     public void testPetStoreWadl() throws Exception {
-        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/resources",
-            "http://localhost:" + PORT + "/webapp/resources/", 1);
+        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/pets",
+            "http://localhost:" + PORT + "/webapp/pets/", 1);
         checkPetStoreInfo(resourceEls.get(0));
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(
+             (Element)resourceEls.get(0).getParentNode().getParentNode());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StaxUtils.copy(reader, bos);
+        String s = bos.toString();
+        assertTrue(s.contains("<xs:element name=\"elstatus\" type=\"petStoreStatusElement\"/>"));
+        assertTrue(s.contains("<xs:element name=\"status\" type=\"status\"/>"));
+        assertTrue(s.contains("<xs:element name=\"statuses\""));
+        assertTrue(s.contains("element=\"prefix1:status\""));
+        assertTrue(s.contains("element=\"prefix1:elstatus\""));
+        assertTrue(s.contains("element=\"prefix1:statuses\""));
     }
     
     @Test
@@ -124,6 +138,10 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     
     private void checkBookStoreInfo(Element resource) {
         assertEquals("/bookstore", resource.getAttribute("path"));
+    }
+    
+    private void checkServletInfo(Element resource) {
+        assertEquals("/servlet", resource.getAttribute("path"));
     }
     
     private void checkPetStoreInfo(Element resource) {
@@ -222,7 +240,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testPostPetStatus() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/resources/petstore/pets";
+            "http://localhost:" + PORT + "/webapp/pets/petstore/pets";
 
         URL url = new URL(endpointAddress);   
         HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();  

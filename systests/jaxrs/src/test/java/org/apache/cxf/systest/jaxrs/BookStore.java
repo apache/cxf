@@ -503,6 +503,12 @@ public class BookStore {
     }
     
     @GET
+    @Path("infault2")
+    public Response infault2() {
+        throw new RuntimeException();
+    }
+    
+    @GET
     @Path("outfault")
     public Response outfault() {
         return Response.ok().build();

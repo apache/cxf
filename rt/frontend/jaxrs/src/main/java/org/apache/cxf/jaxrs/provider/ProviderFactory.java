@@ -1217,4 +1217,13 @@ public abstract class ProviderFactory {
         }
         return theProviders;
     }
+    
+    public MessageBodyWriter<?> getRegisteredJaxbWriter() {
+        for (ProviderInfo<MessageBodyWriter<?>> pi : this.messageWriters) {    
+            if (pi.getProvider().getClass().getName().equals(JAXB_PROVIDER_NAME)) {
+                return pi.getProvider();
+            }
+        }
+        return null;
+    }
 }

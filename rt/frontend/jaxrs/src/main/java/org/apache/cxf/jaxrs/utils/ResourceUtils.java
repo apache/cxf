@@ -57,10 +57,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -525,9 +527,15 @@ public final class ResourceUtils {
 
     public static ResourceTypes getAllRequestResponseTypes(List<ClassResourceInfo> cris, 
                                                            boolean jaxbOnly) {
+        return getAllRequestResponseTypes(cris, jaxbOnly, null);
+    }
+    
+    public static ResourceTypes getAllRequestResponseTypes(List<ClassResourceInfo> cris, 
+                                                           boolean jaxbOnly,
+                                                           MessageBodyWriter<?> jaxbWriter) {
         ResourceTypes types = new ResourceTypes();
         for (ClassResourceInfo resource : cris) {
-            getAllTypesForResource(resource, types, jaxbOnly);
+            getAllTypesForResource(resource, types, jaxbOnly, jaxbWriter);
         }
         return types;
     }
@@ -545,7 +553,8 @@ public final class ResourceUtils {
     
     private static void getAllTypesForResource(ClassResourceInfo resource, 
                                                ResourceTypes types,
-                                               boolean jaxbOnly) {
+                                               boolean jaxbOnly,
+                                               MessageBodyWriter<?> jaxbWriter) {
         for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
             Method method = ori.getMethodToInvoke();
             Class<?> realReturnType = method.getReturnType();
@@ -556,7 +565,7 @@ public final class ResourceUtils {
             Type type = method.getGenericReturnType();
             if (jaxbOnly) {
                 checkJaxbType(cls, realReturnType == Response.class ? cls : type, types, 
-                    method.getAnnotations());
+                    method.getAnnotations(), jaxbWriter);
             } else {
                 types.getAllTypes().put(cls, type);
             }
@@ -567,7 +576,7 @@ public final class ResourceUtils {
                     Type paramType = method.getGenericParameterTypes()[pm.getIndex()];
                     if (jaxbOnly) {
                         checkJaxbType(inType, paramType, types, 
-                                      method.getParameterAnnotations()[pm.getIndex()]);
+                                      method.getParameterAnnotations()[pm.getIndex()], jaxbWriter);
                     } else {
                         types.getAllTypes().put(inType, paramType);
                     }
@@ -579,7 +588,7 @@ public final class ResourceUtils {
         
         for (ClassResourceInfo sub : resource.getSubResources()) {
             if (!isRecursiveSubResource(resource, sub)) {
-                getAllTypesForResource(sub, types, jaxbOnly);
+                getAllTypesForResource(sub, types, jaxbOnly, jaxbWriter);
             }
         }
     }
@@ -597,25 +606,39 @@ public final class ResourceUtils {
     private static void checkJaxbType(Class<?> type, 
                                       Type genericType, 
                                       ResourceTypes types,
-                                      Annotation[] anns) {
+                                      Annotation[] anns,
+                                      MessageBodyWriter<?> jaxbWriter) {
+        boolean isCollection = false;
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             type = InjectionUtils.getActualType(genericType);
-            XMLName name = AnnotationUtils.getAnnotation(anns, XMLName.class);
-            if (name != null) {
-                types.getCollectionMap().put(type, JAXRSUtils.convertStringToQName(name.value()));
-            }
+            isCollection = true;
         }
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        if (type != null 
-            && !InjectionUtils.isPrimitive(type) 
-            && !JAXBElement.class.isAssignableFrom(type)
-            && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
+        if (type == null
+            || InjectionUtils.isPrimitive(type)
+            || JAXBElement.class.isAssignableFrom(type)
+            || Response.class.isAssignableFrom(type)
+            || type.isInterface()) {
+            return;
+        }
+        
+        MessageBodyWriter<?> writer = jaxbWriter;
+        if (writer == null) {
+            writer = new JAXBElementProvider<Object>();
+        }
+        if (writer.isWriteable(type, type, anns, MediaType.APPLICATION_XML_TYPE)) {
             types.getAllTypes().put(type, type);
-            
             Class<?> genCls = InjectionUtils.getActualType(genericType);
             if (genCls != type && genCls != null && genCls != Object.class 
                 && !InjectionUtils.isSupportedCollectionOrArray(genCls)) {
                 types.getAllTypes().put(genCls, genCls);
+            }
+            
+            XMLName name = AnnotationUtils.getAnnotation(anns, XMLName.class);
+            QName qname = name != null ? JAXRSUtils.convertStringToQName(name.value()) : null;
+            if (isCollection) {
+                types.getCollectionMap().put(type, qname);
+            } else {
+                types.getXmlNameMap().put(type, qname);
             }
         }
     }

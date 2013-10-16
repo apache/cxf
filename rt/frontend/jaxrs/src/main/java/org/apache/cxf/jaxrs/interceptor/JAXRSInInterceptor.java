@@ -254,9 +254,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         Object mapProp = message.getContextualProperty("map.cxf.interceptor.fault");
         if (mapProp == null || MessageUtils.isTrue(mapProp)) {
-        
-            Response r = JAXRSUtils.convertFaultToResponse(message.getContent(Exception.class), 
-                                                           message);
+            Throwable ex = message.getContent(Exception.class);
+            if (ex instanceof Fault) {
+                ex = ((Fault)ex).getCause();
+            }
+            Response r = JAXRSUtils.convertFaultToResponse(ex, message);
             if (r != null) {
                 message.removeContent(Exception.class);
                 message.getInterceptorChain().setFaultObserver(null);
