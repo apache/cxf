@@ -22,15 +22,15 @@ package org.apache.cxf.systest.wssec.examples.secconv;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
 
 /**
@@ -87,6 +87,15 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         
         // Streaming
         SecurityTestUtil.enableStreaming(samlPort);
+        
+        // and for the Bootstrap request-response...
+        ((BindingProvider)samlPort).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY + ".sct", "true"
+        );
+        ((BindingProvider)samlPort).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY + ".sct", "true"
+        );
+        
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();

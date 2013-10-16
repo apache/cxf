@@ -508,7 +508,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 }
             }
             SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
-            if (soapOperationInfo != null) {
+            if (policy != null && soapOperationInfo != null) {
                 String soapNS;
                 BindingInfo bindingInfo = bindingOperationInfo.getBinding();
                 if (bindingInfo instanceof SoapBindingInfo) {
