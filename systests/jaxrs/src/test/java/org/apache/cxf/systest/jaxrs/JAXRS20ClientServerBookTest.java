@@ -256,7 +256,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient wc = WebClient.create(endpointAddress,
                                         Collections.singletonList(new ReplaceBodyFilter()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
-        wc.accept("text/mistypedxml").type("text/xml");
+        wc.accept("text/mistypedxml").type("text/xml").header("THEMETHOD", "PUT");
         Book book = wc.put(new Book("book", 555L), Book.class);
         assertEquals(561L, book.getId());
     }
@@ -527,6 +527,19 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         @Override
         public void filter(ClientRequestContext rc) throws IOException {
+            String method = rc.getMethod();
+            String expectedMethod = null; 
+            if (rc.getAcceptableMediaTypes().contains(MediaType.valueOf("text/mistypedxml"))
+                && rc.getHeaders().getFirst("THEMETHOD") != null) {
+                expectedMethod = "PUT";
+            } else {
+                expectedMethod = "POST";
+            }
+            
+                
+            if (!expectedMethod.equals(method)) {
+                throw new RuntimeException();
+            }
             rc.setEntity(new Book("book", ((Book)rc.getEntity()).getId() + 5), null, null);
         }
 
