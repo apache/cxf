@@ -54,8 +54,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -98,6 +100,7 @@ import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ResourceTypes;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -133,6 +136,7 @@ public class WadlGenerator implements RequestHandler {
     private boolean linkJsonToXmlSchema;
     private boolean useJaxbContextForQnames = true;
     private boolean supportCollections = true;
+    private boolean supportJaxbXmlType = true;
 
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
@@ -146,8 +150,14 @@ public class WadlGenerator implements RequestHandler {
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultMediaType = DEFAULT_MEDIA_TYPE;
 
+    private Bus bus; 
+
     public WadlGenerator() {
 
+    }
+
+    public WadlGenerator(Bus bus) {
+        this.bus = bus;
     }
 
     public WadlGenerator(WadlGenerator other) {
@@ -156,12 +166,21 @@ public class WadlGenerator implements RequestHandler {
         this.externalSchemaLinks = other.externalSchemaLinks;
         this.externalSchemasCache = other.externalSchemasCache;
         this.ignoreMessageWriters = other.ignoreMessageWriters;
+        this.ignoreForwardSlash = other.ignoreForwardSlash; 
+        this.ignoreRequests = other.ignoreRequests;
+        this.linkJsonToXmlSchema = other.linkJsonToXmlSchema;  
         this.privateAddresses = other.privateAddresses;
         this.resolver = other.resolver;
         this.addResourceAndMethodIds = other.addResourceAndMethodIds;
         this.singleResourceMultipleMethods = other.singleResourceMultipleMethods;
         this.useJaxbContextForQnames = other.useJaxbContextForQnames;
         this.useSingleSlashResource = other.useSingleSlashResource;
+        this.supportCollections = other.supportCollections;
+        this.supportJaxbXmlType = other.supportJaxbXmlType;
+        this.nsPrefix = other.nsPrefix;
+        this.applicationTitle = other.applicationTitle;
+        this.defaultMediaType = other.defaultMediaType;
+        this.bus = other.bus;     
     }
 
     public Response handleRequest(Message m, ClassResourceInfo resource) {
@@ -214,7 +233,11 @@ public class WadlGenerator implements RequestHandler {
 
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
 
-        ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames);
+        MessageBodyWriter<?> jaxbWriter = useJaxbContextForQnames 
+            ? ProviderFactory.getInstance(m).getRegisteredJaxbWriter() : null;
+        ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris, 
+                                                                               useJaxbContextForQnames,
+                                                                               jaxbWriter);
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
 
         JAXBContext jaxbContext = useJaxbContextForQnames ? ResourceUtils
@@ -728,19 +751,20 @@ public class WadlGenerator implements RequestHandler {
                 sb.append("</representation>");
             } else {
                 boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
+                Class<?> theActualType = null;
                 if (isCollection) {
-                    type = InjectionUtils.getActualType(!inbound ? opMethod.getGenericReturnType() : opMethod
+                    theActualType = InjectionUtils.getActualType(!inbound ? opMethod.getGenericReturnType() : opMethod
                         .getGenericParameterTypes()[getRequestBodyParam(ori).getIndex()]);
                 } else {
-                    type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
+                    theActualType = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
                 }
                 if (isJson) {
-                    sb.append(" element=\"").append(type.getSimpleName()).append("\"");
+                    sb.append(" element=\"").append(theActualType.getSimpleName()).append("\"");
                 } else if (qnameResolver != null
                            && (mt.getSubtype().contains("xml") || linkJsonToXmlSchema
                                                                   && mt.getSubtype().contains("json"))
-                           && jaxbTypes.contains(type)) {
-                    generateQName(sb, qnameResolver, clsMap, type, isCollection,
+                           && jaxbTypes.contains(theActualType)) {
+                    generateQName(sb, qnameResolver, clsMap, theActualType, isCollection,
                                   getBodyAnnotations(ori, inbound));
                 }
                 addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault, isJson);
@@ -953,13 +977,14 @@ public class WadlGenerator implements RequestHandler {
                 clsMap.put(type, qname);
             } else {
                 XMLName name = AnnotationUtils.getAnnotation(annotations, XMLName.class);
-                QName collectionName = null;
+                String localPart = null;
                 if (name != null) {
-                    QName tempQName = JAXRSUtils.convertStringToQName(name.value());
-                    collectionName = new QName(qname.getNamespaceURI(), tempQName.getLocalPart(),
-                                               qname.getPrefix());
-                    writeQName(sb, collectionName);
+                    localPart = JAXRSUtils.convertStringToQName(name.value()).getLocalPart();
+                } else {
+                    localPart = qname.getLocalPart() + "s";    
                 }
+                QName collectionName = new QName(qname.getNamespaceURI(), localPart, qname.getPrefix());
+                writeQName(sb, collectionName);
             }
         }
     }
@@ -981,17 +1006,58 @@ public class WadlGenerator implements RequestHandler {
                                                                                      String.class,
                                                                                      DOMResult.class))) {
                 Document doc = (Document)r.getNode();
+                ElementQNameResolver theResolver = createElementQNameResolver(context);
+                String tns = doc.getDocumentElement().getAttribute("targetNamespace");
+                
+                String tnsDecl = 
+                    doc.getDocumentElement().getAttribute("xmlns:tns");
+                String tnsPrefix = tnsDecl != null && tnsDecl.equals(tns) ? "tns:" : "";
+                
+                if (supportJaxbXmlType) {
+                    for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
+                        if (cls.getAnnotation(XmlRootElement.class) != null) {
+                            continue;
+                        }
+                        XmlType root = cls.getAnnotation(XmlType.class);
+                        if (root != null) {
+                            QName typeName = theResolver.resolve(cls, new Annotation[] {},
+                                                           Collections.<Class<?>, QName> emptyMap());
+                            if (typeName != null && tns.equals(typeName.getNamespaceURI())) {
+                                QName elementName = resourceTypes.getXmlNameMap().get(cls);
+                                if (elementName == null) {
+                                    elementName = typeName;
+                                }
+                                Element newElement = doc
+                                    .createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, "xs:element");
+                                newElement.setAttribute("name", elementName.getLocalPart());
+                                newElement.setAttribute("type", tnsPrefix + typeName.getLocalPart());
+                                doc.getDocumentElement().appendChild(newElement);
+                            }
+                        }
+                    }
+                }
                 if (supportCollections && !resourceTypes.getCollectionMap().isEmpty()) {
-                    ElementQNameResolver theResolver = createElementQNameResolver(context);
-                    String tns = doc.getDocumentElement().getAttribute("targetNamespace");
                     for (Map.Entry<Class<?>, QName> entry : resourceTypes.getCollectionMap().entrySet()) {
-                        if (tns.equals(entry.getValue().getNamespaceURI())) {
+                        QName colQName = entry.getValue();
+                        if (colQName == null) {
+                            colQName = theResolver.resolve(entry.getKey(), new Annotation[] {},
+                                                Collections.<Class<?>, QName> emptyMap());
+                            if (colQName != null) {
+                                colQName = new QName(colQName.getNamespaceURI(), 
+                                                     colQName.getLocalPart() + "s",
+                                                     colQName.getPrefix());
+                            }
+                        }
+                        if (colQName == null) {
+                            continue;
+                        }
+                        if (tns.equals(colQName.getNamespaceURI())) {
                             QName typeName = theResolver.resolve(entry.getKey(), new Annotation[] {},
-                                                                 Collections.<Class<?>, QName> emptyMap());
+                                                                  Collections.<Class<?>, QName> emptyMap());
                             if (typeName != null) {
                                 Element newElement = doc
                                     .createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, "xs:element");
-                                newElement.setAttribute("name", entry.getValue().getLocalPart());
+                                newElement.setAttribute("name", colQName.getLocalPart());
                                 Element ctElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI,
                                                                         "xs:complexType");
                                 newElement.appendChild(ctElement);
@@ -1001,7 +1067,7 @@ public class WadlGenerator implements RequestHandler {
                                 Element xsElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI,
                                                                         "xs:element");
                                 seqElement.appendChild(xsElement);
-                                xsElement.setAttribute("ref", "tns:" + typeName.getLocalPart());
+                                xsElement.setAttribute("ref", tnsPrefix + typeName.getLocalPart());
                                 xsElement.setAttribute("minOccurs", "0");
                                 xsElement.setAttribute("maxOccurs", "unbounded");
 
@@ -1012,8 +1078,6 @@ public class WadlGenerator implements RequestHandler {
                 }
                 DOMSource source = new DOMSource(doc, r.getSystemId());
                 schemas.add(source);
-                String tns = ((Document)source.getNode()).getDocumentElement()
-                    .getAttribute("targetNamespace");
                 if (!StringUtils.isEmpty(tns)) {
                     targetNamespaces.add(tns);
                 }
@@ -1032,20 +1096,26 @@ public class WadlGenerator implements RequestHandler {
         return xmlSchemaCollection;
     }
 
+    private QName getJaxbQName(String name, String namespace, Class<?> type, Map<Class<?>, QName> clsMap) {
+
+        QName qname = getQNameFromParts(name, namespace, type, clsMap);
+        if (qname != null) {
+            return qname;
+        }
+        String ns = JAXBUtils.getPackageNamespace(type);
+        if (ns != null) {
+            return getQNameFromParts(name, ns, type, clsMap);
+        } else {
+            return null;
+        }
+        
+    }
+
     private QName getJaxbQName(JAXBContextProxy jaxbProxy, Class<?> type, Map<Class<?>, QName> clsMap) {
 
         XmlRootElement root = type.getAnnotation(XmlRootElement.class);
         if (root != null) {
-            QName qname = getQNameFromParts(root.name(), root.namespace(), type, clsMap);
-            if (qname != null) {
-                return qname;
-            }
-            String ns = JAXBUtils.getPackageNamespace(type);
-            if (ns != null) {
-                return getQNameFromParts(root.name(), ns, type, clsMap);
-            } else {
-                return null;
-            }
+            return getJaxbQName(root.name(), root.namespace(), type, clsMap);
         }
 
         try {
@@ -1244,7 +1314,7 @@ public class WadlGenerator implements RequestHandler {
                     if (d.docuri().startsWith(CLASSPATH_PREFIX)) {
                         String path = d.docuri().substring(CLASSPATH_PREFIX.length());
                         is = ResourceUtils.getClasspathResourceStream(path, SchemaHandler.class,
-                                                                      BusFactory.getDefaultBus());
+                            bus == null ? BusFactory.getDefaultBus() : bus);
                         if (is != null) {
                             try {
                                 sb.append(IOUtils.toString(is));
@@ -1297,7 +1367,8 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private void loadSchemasIntoCache(String loc) throws Exception {
-        InputStream is = ResourceUtils.getResourceStream(loc, BusFactory.getDefaultBus());
+        InputStream is = ResourceUtils.getResourceStream(loc, 
+            bus == null ? BusFactory.getDefaultBus() : bus);
         if (is == null) {
             return;
         }
@@ -1504,7 +1575,22 @@ public class WadlGenerator implements RequestHandler {
         }
 
         public QName resolve(Class<?> type, Annotation[] annotations, Map<Class<?>, QName> clsMap) {
-            return getJaxbQName(proxy, type, clsMap);
+            QName qname = WadlGenerator.this.getJaxbQName(proxy, type, clsMap);
+            if (qname == null && supportJaxbXmlType) {
+                XmlType root = type.getAnnotation(XmlType.class);
+                if (root != null) {
+                    XMLName name = AnnotationUtils.getAnnotation(annotations, XMLName.class);
+                    if (name == null) {
+                        qname = getJaxbQName(root.name(), root.namespace(), type, clsMap);
+                    } else {
+                        QName tempQName = JAXRSUtils.convertStringToQName(name.value());
+                        qname = new QName(tempQName.getNamespaceURI(),
+                                          tempQName.getLocalPart(),
+                                          getPrefix(tempQName.getNamespaceURI(), clsMap));
+                    }
+                }
+            }
+            return qname;
         }
 
     }
@@ -1598,6 +1684,10 @@ public class WadlGenerator implements RequestHandler {
 
     public void setDefaultMediaType(String mt) {
         this.defaultMediaType = JAXRSUtils.toMediaType(mt);
+    }
+
+    public void setSupportJaxbXmlType(boolean supportJaxbXmlType) {
+        this.supportJaxbXmlType = supportJaxbXmlType;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {

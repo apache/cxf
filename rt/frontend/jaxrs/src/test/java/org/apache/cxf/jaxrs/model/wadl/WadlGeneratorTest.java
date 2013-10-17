@@ -45,6 +45,7 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -216,7 +217,7 @@ public class WadlGeneratorTest extends Assert {
         checkResponse(r);
         Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
-        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2s", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), 
                            "ns1:thebook", 
@@ -310,7 +311,7 @@ public class WadlGeneratorTest extends Assert {
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         String wadl = r.getEntity().toString();
         Document doc = StaxUtils.read(new StringReader(wadl));
-        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2s", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
         Element orderResource = els.get(1);
@@ -321,27 +322,30 @@ public class WadlGeneratorTest extends Assert {
                                String bookEl,
                                String book2El, 
                                String chapterEl) {
-        checkGrammars(appElement, bookEl, null, book2El, chapterEl);
+        checkGrammars(appElement, bookEl, null, null, book2El, chapterEl);
     }
     private void checkGrammars(Element appElement, 
                                String bookEl,
                                String booksEl,
+                               String booksEl2,
                                String book2El,
                                String chapterEl) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
         List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
-                                                          XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+                                                                XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                "schema");
         assertEquals(1, schemasEls.size());
         assertEquals("http://superbooks", schemasEls.get(0).getAttribute("targetNamespace"));
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-                            XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+                                                                XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                "element");
         
         int size = book2El == null ? 2 : 3;
         int elementSize = size;
         if (booksEl != null) {
-            elementSize++;
+            elementSize += 2;
         }
         
         assertEquals(elementSize, elementEls.size());
@@ -354,9 +358,13 @@ public class WadlGeneratorTest extends Assert {
         if (booksEl != null) {
             assertTrue(checkElement(elementEls, booksEl, "books"));
         }
+        if (booksEl2 != null) {
+            assertTrue(checkElement(elementEls, booksEl2, "thebook2s"));
+        }
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
-                                        XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
+                                                                     XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                     "complexType");
         assertEquals(size, complexTypesEls.size());
         
         assertTrue(checkComplexType(complexTypesEls, "book"));
@@ -402,7 +410,8 @@ public class WadlGeneratorTest extends Assert {
                     if (type.equals(expectedType1) || type.equals(expectedType2)) {
                         return true;
                     }
-                } else if ("books".equals(name)) {
+                } else if ("books".equals(name) || "thebook2s".equals(name)) {
+                    boolean thebooks2 = "thebook2s".equals(name);
                     Element ctElement = 
                         (Element)e.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
                                                           "complexType").item(0);
@@ -413,8 +422,8 @@ public class WadlGeneratorTest extends Assert {
                         (Element)seqElement.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
                                                           "element").item(0);
                     String ref = xsElement.getAttribute("ref");
-                    String expectedRef = "tns:thebook";
-                    String expectedRef2 = "os:thebook";
+                    String expectedRef = thebooks2 ? "tns:thebook2" : "tns:thebook";
+                    String expectedRef2 = thebooks2 ? "os:thebook2" : "os:thebook";
                     if (ref.equals(expectedRef) || ref.equals(expectedRef2)) {
                         return true;
                     }
@@ -440,16 +449,17 @@ public class WadlGeneratorTest extends Assert {
         
         checkDocs(resource, "book store \"resource\"", "super resource", "en-us");
         
-        List<Element> resourceEls = getElements(resource, "resource", 8);
+        List<Element> resourceEls = getElements(resource, "resource", 9);
         
         assertEquals("/book2", resourceEls.get(0).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
         assertEquals("/chapter2", resourceEls.get(3).getAttribute("path"));
-        assertEquals("/books/\"{bookid}\"", resourceEls.get(4).getAttribute("path"));
-        assertEquals("/booksubresource", resourceEls.get(5).getAttribute("path"));
-        assertEquals("/form", resourceEls.get(6).getAttribute("path"));
-        assertEquals("/itself", resourceEls.get(7).getAttribute("path"));
+        assertEquals("/thebooks2", resourceEls.get(4).getAttribute("path"));
+        assertEquals("/books/\"{bookid}\"", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(6).getAttribute("path"));
+        assertEquals("/form", resourceEls.get(7).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(8).getAttribute("path"));
         
         // verify root resource starting with "/"
         // must have a single template parameter
@@ -530,12 +540,12 @@ public class WadlGeneratorTest extends Assert {
         
         // verify resource starting from /booksubresource
         // should have 2 parameters
-        verifyParameters(resourceEls.get(5), 2, 
+        verifyParameters(resourceEls.get(6), 2, 
                          new Param("id", "template", "xs:int"),
                          new Param("mid", "matrix", "xs:int"));
-        checkDocs(resourceEls.get(5), "", "Book subresource", ""); 
+        checkDocs(resourceEls.get(6), "", "Book subresource", ""); 
         // should have 4 child resources
-        List<Element> subResourceEls = getElements(resourceEls.get(5), "resource", 6);
+        List<Element> subResourceEls = getElements(resourceEls.get(6), "resource", 6);
 
         assertEquals("/book", subResourceEls.get(0).getAttribute("path"));
         assertEquals("/form1", subResourceEls.get(1).getAttribute("path"));
@@ -770,6 +780,8 @@ public class WadlGeneratorTest extends Assert {
 
         Endpoint endpoint = new EndpointImpl(null, null, epr);
         e.put(Endpoint.class, endpoint);
+
+        endpoint.put(ProviderFactory.class.getName(), ProviderFactory.getInstance());
 
         e.setDestination(d);
         BindingInfo bi = control.createMock(BindingInfo.class);

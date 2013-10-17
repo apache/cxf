@@ -100,6 +100,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
     protected boolean unmarshalAsJaxbElement;
     protected boolean marshalAsJaxbElement;
+    protected boolean xmlTypeAsJaxbElementOnly;
     
     protected Map<String, String> outElementsMap;
     protected Map<String, String> outAppendMap;
@@ -217,6 +218,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         marshalAsJaxbElement = value;
     }
     
+    public void setXmlTypeAsJaxbElementOnly(boolean value) {
+        this.xmlTypeAsJaxbElementOnly = value;
+    }
+    
     public void setJaxbElementClassNames(List<String> names) {
         jaxbElementClassNames = names;
     }
@@ -239,8 +244,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return null;
     }
     
-    protected static boolean isXmlRoot(Class<?> cls) {
+    protected boolean isXmlRoot(Class<?> cls) {
         return cls.getAnnotation(XmlRootElement.class) != null;
+    }
+    
+    protected boolean isXmlType(Class<?> cls) {
+        return cls.getAnnotation(XmlType.class) != null;
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -298,7 +307,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
         }
         
-        return marshalAsJaxbElement || isSupported(type, genericType, anns);
+        return marshalAsJaxbElement && (!xmlTypeAsJaxbElementOnly || isXmlType(type)) 
+            || isSupported(type, genericType, anns);
     }
     public void writeTo(T t, Type genericType, Annotation annotations[], 
                  MediaType mediaType, 
@@ -351,7 +361,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
         if (root != null) {
             return getQNameFromNamespaceAndName(root.namespace(), root.name(), cls, pluralName);
-        } else if (cls.getAnnotation(XmlType.class) != null) {
+        } else if (isXmlType(cls)) {
             XmlType xmlType = cls.getAnnotation(XmlType.class);
             return getQNameFromNamespaceAndName(xmlType.namespace(), xmlType.name(), cls, pluralName);
         } else {

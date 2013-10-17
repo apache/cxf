@@ -1675,4 +1675,13 @@ public final class ProviderFactory {
             return handler;
         }
     }
+    
+    public MessageBodyWriter<?> getRegisteredJaxbWriter() {
+        for (ProviderInfo<MessageBodyWriter<?>> pi : this.messageWriters) {    
+            if (pi.getProvider().getClass().getName().equals(JAXB_PROVIDER_NAME)) {
+                return pi.getProvider();
+            }
+        }
+        return null;
+    }
 }
