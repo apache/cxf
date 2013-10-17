@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.io.Serializable;
 
-public class Property {
+public class Property implements Serializable {
 
+    private static final long serialVersionUID = 7497703188917013732L;
     private String name;
     private String value;
 
