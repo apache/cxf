@@ -30,7 +30,6 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -218,14 +217,6 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
         }
         SecurityTestUtil.enableStreaming(symmetricSaml2Port);
-        
-        // and for the Bootstrap request-response...
-        ((BindingProvider)symmetricSaml2Port).getRequestContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY + ".sct", "true"
-        );
-        ((BindingProvider)symmetricSaml2Port).getResponseContext().put(
-            SecurityConstants.ENABLE_STREAMING_SECURITY + ".sct", "true"
-        );
         
         doubleIt(symmetricSaml2Port, 25);
         

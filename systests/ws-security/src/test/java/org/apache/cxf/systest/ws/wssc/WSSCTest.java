@@ -249,13 +249,6 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                 ((BindingProvider)port).getResponseContext().put(
                     SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
                 );
-                // and for the Bootstrap request-response...
-                ((BindingProvider)port).getRequestContext().put(
-                    SecurityConstants.ENABLE_STREAMING_SECURITY + ".sct", "true"
-                );
-                ((BindingProvider)port).getResponseContext().put(
-                    SecurityConstants.ENABLE_STREAMING_SECURITY + ".sct", "true"
-                );
             }
             
             wssec.wssc.PingRequest params = new wssec.wssc.PingRequest();
