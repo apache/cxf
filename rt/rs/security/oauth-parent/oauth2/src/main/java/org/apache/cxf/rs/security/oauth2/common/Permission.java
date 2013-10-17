@@ -18,11 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.io.Serializable;
+
 /**
  * Base permission description
  * @see OAuthAuthorizationData
  */
-public class Permission {
+public class Permission implements Serializable {
+    private static final long serialVersionUID = 8988574955042726083L;
     private String permission;
     private String description;
     private boolean isDefault;
