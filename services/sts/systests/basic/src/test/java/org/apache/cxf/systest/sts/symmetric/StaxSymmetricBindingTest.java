@@ -191,9 +191,7 @@ public class StaxSymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO Analyse policy error
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenSAML2SecureConversation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

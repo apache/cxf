@@ -439,7 +439,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
                 config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
-            } else if (recToken.getToken() instanceof IssuedToken && !isRequestor()) {
+            } else if ((recToken.getToken() instanceof IssuedToken 
+                || recToken.getToken() instanceof SecureConversationToken) && !isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
             } else {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");

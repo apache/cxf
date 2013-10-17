@@ -65,9 +65,7 @@ public class StaxSecureConversationTest extends AbstractBusClientServerTestBase 
      * 2.4.1 (WSS 1.0) Secure Conversation bootstrapped by Mutual
      * Authentication with X.509 Certificates
      */
-    // TODO Support SecureConversation on the Stax Server side.
     @org.junit.Test
-    @org.junit.Ignore
     public void testSecureConversation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -87,7 +85,7 @@ public class StaxSecureConversationTest extends AbstractBusClientServerTestBase 
         // DOM
         samlPort.doubleIt(25);
         
-        // Streaming
+        // TODO Streaming investigate
         // SecurityTestUtil.enableStreaming(samlPort);
         // samlPort.doubleIt(25);
         
