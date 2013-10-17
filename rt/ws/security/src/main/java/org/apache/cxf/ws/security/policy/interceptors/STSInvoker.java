@@ -225,6 +225,7 @@ abstract class STSInvoker implements Invoker {
             ref.setValueType(refValueType);
         }
         SecurityTokenReference str = new SecurityTokenReference(writer.getDocument());
+        str.addWSSENamespace();
         str.setReference(ref);
 
         writer.getCurrentNode().appendChild(str.getElement());

@@ -558,7 +558,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setEncryptSymmKey(false);
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getAlgorithmSuiteType().getEncryption());
                     
-                    if (encrToken instanceof IssuedToken || encrToken instanceof SpnegoContextToken) {
+                    if (encrToken instanceof IssuedToken || encrToken instanceof SpnegoContextToken
+                        || encrToken instanceof SecureConversationToken) {
                         //Setting the AttachedReference or the UnattachedReference according to the flag
                         Element ref;
                         if (attached) {

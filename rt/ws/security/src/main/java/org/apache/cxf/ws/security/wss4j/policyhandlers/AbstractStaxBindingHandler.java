@@ -102,6 +102,9 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
@@ -1187,6 +1190,23 @@ public abstract class AbstractStaxBindingHandler {
             return Base64.encode(digestBytes);
         } catch (WSSecurityException e) {
             //REVISIT
+        }
+        return null;
+    }
+    
+    protected org.apache.xml.security.stax.securityToken.SecurityToken 
+    findInboundSecurityToken(SecurityEventConstants.Event event) throws XMLSecurityException {
+        @SuppressWarnings("unchecked")
+        final List<SecurityEvent> incomingEventList = 
+            (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
+        if (incomingEventList != null) {
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (event == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
+                    return token;
+                }
+            }
         }
         return null;
     }

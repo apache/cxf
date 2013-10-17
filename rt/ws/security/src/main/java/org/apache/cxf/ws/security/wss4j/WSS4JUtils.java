@@ -164,8 +164,11 @@ public final class WSS4JUtils {
         org.apache.xml.security.stax.securityToken.SecurityToken securityToken,
         Message message
     ) throws XMLSecurityException {
-        if (securityToken != null 
-            && getTokenStore(message).getToken(securityToken.getId()) == null) {
+        if (securityToken == null) {
+            return null;
+        }
+        SecurityToken existingToken = getTokenStore(message).getToken(securityToken.getId());
+        if (existingToken == null) {
             Date created = new Date();
             Date expires = new Date();
             expires.setTime(created.getTime() + 300000);
@@ -182,6 +185,9 @@ public final class WSS4JUtils {
                     cachedTok.setTokenType(WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE);
                 } else if (securityToken.getTokenType() == WSSecurityTokenConstants.Saml20Token) {
                     cachedTok.setTokenType(WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE);
+                } else if (securityToken.getTokenType() == WSSecurityTokenConstants.SecureConversationToken
+                    || securityToken.getTokenType() == WSSecurityTokenConstants.SecurityContextToken) {
+                    cachedTok.setTokenType(WSSConstants.NS_WSC_05_02);
                 }
             }
 
@@ -199,7 +205,7 @@ public final class WSS4JUtils {
 
             return cachedTok.getId();
         }
-        return null;
+        return existingToken.getId();
 
     }
 

@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
@@ -52,6 +52,7 @@ import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
@@ -73,8 +74,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
     
     public SecureConversationInInterceptor() {
-        super(Phase.PRE_PROTOCOL);
-        getBefore().add(WSS4JInInterceptor.class.getName());
+        super(Phase.PRE_STREAM);
+        getBefore().add(WSS4JStaxInInterceptor.class.getName());
     }
     private AbstractBinding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = 
@@ -116,6 +117,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 return;
             }
             String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+            if (s == null) {
+                s = SoapActionInInterceptor.getSoapAction(message);
+            }
             String addNs = null;
             AddressingProperties inProps = (AddressingProperties)message
                 .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);

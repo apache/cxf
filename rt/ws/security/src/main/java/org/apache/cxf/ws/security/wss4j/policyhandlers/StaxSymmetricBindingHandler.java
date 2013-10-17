@@ -59,7 +59,6 @@ import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -155,7 +154,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 addIssuedToken((IssuedToken)encryptionToken, tok, false, true);
                 if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                        findIssuedToken();
+                        findInboundSecurityToken(WSSecurityEventConstants.SamlToken);
                     tokenId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                 }
             } else if (encryptionToken instanceof SecureConversationToken
@@ -171,6 +170,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     } else {
                         config.put(ConfigurationConstants.ACTION, actionToPerform);
                     }
+                } else if (tok == null && !isRequestor()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                        findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
+                    tokenId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                 }
             } else if (encryptionToken instanceof X509Token) {
                 if (isRequestor()) {
@@ -272,7 +275,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     addIssuedToken((IssuedToken)sigToken, sigTok, false, true);
                     if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
-                            findIssuedToken();
+                            findInboundSecurityToken(WSSecurityEventConstants.SamlToken);
                         sigTokId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                     }
                 } else if (sigToken instanceof SecureConversationToken
@@ -288,6 +291,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         } else {
                             config.put(ConfigurationConstants.ACTION, actionToPerform);
                         }
+                    } else if (sigTok == null && !isRequestor()) {
+                        org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                            findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
+                        sigTokId = WSS4JUtils.parseAndStoreStreamingSecurityToken(securityToken, message);
                     }
                 } else if (sigToken instanceof X509Token) {
                     if (isRequestor()) {
@@ -396,11 +403,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
                 config.put(ConfigurationConstants.DERIVED_ENCRYPTION_KEY_LENGTH,
                            "" + algSuiteType.getEncryptionDerivedKeyLength() / 8);
-                if (recToken.getVersion() == SPConstants.SPVersion.SP12) {
-                    config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
-                }
             }
 
+            if (recToken.getVersion() == SPConstants.SPVersion.SP12) {
+                config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
+            }
+            
             if (config.containsKey(ConfigurationConstants.ACTION)) {
                 String action = (String)config.get(ConfigurationConstants.ACTION);
                 config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
@@ -477,9 +485,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             config.put(ConfigurationConstants.DERIVED_SIGNATURE_KEY_LENGTH,
                        "" + algSuiteType.getSignatureDerivedKeyLength() / 8);
-            if (policyToken.getVersion() == SPConstants.SPVersion.SP12) {
-                config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
-            }
+        }
+        
+        if (policyToken.getVersion() == SPConstants.SPVersion.SP12) {
+            config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
         }
         
         if (config.containsKey(ConfigurationConstants.ACTION)) {
@@ -596,23 +605,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         && token.getSha1Identifier() != null) {
                         return token;
                     }
-                }
-            }
-        }
-        return null;
-    }
-    
-    private org.apache.xml.security.stax.securityToken.SecurityToken 
-    findIssuedToken() throws XMLSecurityException {
-        @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingEventList = 
-            (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
-        if (incomingEventList != null) {
-            for (SecurityEvent incomingEvent : incomingEventList) {
-                if (WSSecurityEventConstants.SamlToken == incomingEvent.getSecurityEventType()) {
-                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
-                        ((SamlTokenSecurityEvent)incomingEvent).getSecurityToken();
-                    return token;
                 }
             }
         }
