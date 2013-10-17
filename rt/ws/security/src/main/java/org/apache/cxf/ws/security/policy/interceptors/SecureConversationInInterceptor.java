@@ -45,6 +45,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -58,6 +59,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.SPVersion;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -156,7 +158,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                             null,
                             null,
                             null,
-                            null
+                            new Policy()
                         );
                     secureConversationToken.setOptional(true);
                     
@@ -167,34 +169,29 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         }
                     }
                     
+                    Policy bindingPolicy = new Policy();
+                    ExactlyOne bindingPolicyEa = new ExactlyOne();
+                    bindingPolicy.addPolicyComponent(bindingPolicyEa);
+                    All bindingPolicyAll = new All();
+                    
+                    AbstractBinding origBinding = getBinding(aim);
+                    bindingPolicyAll.addPolicyComponent(origBinding.getAlgorithmSuite());
+                    bindingPolicyAll.addAssertion(
+                        new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+                    bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
+                    
                     DefaultSymmetricBinding binding = 
-                        new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, new Policy());
+                        new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
                     binding.setProtectionToken(
                         new InternalProtectionToken(SPConstants.SPVersion.SP12, new Policy())
                     );
-                    binding.setIncludeTimestamp(true);
                     binding.setOnlySignEntireHeadersAndBody(true);
                     binding.setProtectTokens(false);
                     
-                    AbstractBinding origBinding = getBinding(aim);
-                    binding.setAlgorithmSuite(origBinding.getAlgorithmSuite());
                     all.addPolicyComponent(binding);
                     
-                    List<Header> headers = null;
-                    if (addNs != null) {
-                        headers = new ArrayList<Header>();
-                        headers.add(new Header("To", addNs));
-                        headers.add(new Header("From", addNs));
-                        headers.add(new Header("FaultTo", addNs));
-                        headers.add(new Header("ReplyTo", addNs));
-                        headers.add(new Header("Action", addNs));
-                        headers.add(new Header("MessageID", addNs));
-                        headers.add(new Header("RelatesTo", addNs));
-                    }
-                    
-                    SignedParts parts = 
-                        new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
-                    all.addPolicyComponent(parts);
+                    SignedParts signedParts = getSignedParts(aim, addNs);
+                    all.addPolicyComponent(signedParts);
                     pol = p;
                     message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
                 } else {
@@ -223,6 +220,31 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             
             assertPolicies(aim);
         }
+    }
+    
+    private SignedParts getSignedParts(AssertionInfoMap aim, String addNs) {
+        Collection<AssertionInfo> signedPartsAis = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+        SignedParts signedParts = null;
+        if (!signedPartsAis.isEmpty()) {
+            signedParts = (SignedParts)signedPartsAis.iterator().next().getAssertion();
+        }
+        if (signedParts == null) {
+            List<Header> headers = new ArrayList<Header>();
+            if (addNs != null) {
+                headers.add(new Header("To", addNs));
+                headers.add(new Header("From", addNs));
+                headers.add(new Header("FaultTo", addNs));
+                headers.add(new Header("ReplyTo", addNs));
+                headers.add(new Header("Action", addNs));
+                headers.add(new Header("MessageID", addNs));
+                headers.add(new Header("RelatesTo", addNs));
+            }
+            
+            signedParts = 
+                new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
+        }
+        return signedParts;
     }
     
     private void assertPolicies(AssertionInfoMap aim) {
