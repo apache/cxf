@@ -1576,13 +1576,13 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             //ensure we close the decoupled destination of the conduit,
             //so that release the port if the destination reference count hit zero
             if (greeter != null) {
-                ClientProxy.getClient(greeter).getConduit().close();
+                //ClientProxy.getClient(greeter).getConduit().close();
             }
             if (greeter instanceof Closeable) {
                 ((Closeable)greeter).close();
             }
             if (dispatch != null) {
-                ((DispatchImpl<?>)dispatch).getClient().getConduit().close();
+                //((DispatchImpl<?>)dispatch).getClient().getConduit().close();
             }
             if (dispatch instanceof Closeable) {
                 ((Closeable)dispatch).close();
