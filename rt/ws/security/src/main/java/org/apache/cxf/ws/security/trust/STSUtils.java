@@ -198,7 +198,7 @@ public final class STSUtils {
             soi = new SoapOperationInfo();
             boi.addExtensor(soi);
         }
-        soi.setAction(namespace + "/RST/Cancel");
+        soi.setAction(namespace + (sc ? "/RST/SCT/Cancel" : "/RST/Cancel"));
         service.setDataBinding(new SourceDataBinding());
         return new EndpointImpl(bus, service, ei);
     }
@@ -234,14 +234,14 @@ public final class STSUtils {
                                            MessageInfo.Type.INPUT);
         oi.setInput("CancelSecurityTokenMsg", mii);
         MessagePartInfo mpi = mii.addMessagePart("request");
-        mpi.setElementQName(new QName(namespace, "CancelSecurityToken"));
+        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
         
         MessageInfo mio = oi.createMessage(new QName(servNamespace, 
                                                      "CancelSecurityTokenResponseMsg"), 
                                            MessageInfo.Type.OUTPUT);
         oi.setOutput("CancelSecurityTokenResponseMsg", mio);
         mpi = mio.addMessagePart("response");
-        mpi.setElementQName(new QName(namespace, "CancelSecurityTokenResponse"));
+        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
         return oi;
     }
 }
