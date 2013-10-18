@@ -771,8 +771,6 @@ public class WSDLToCorbaBindingTest extends Assert {
                 }
             }
 
-            this.writer.writeWSDL(model, System.out);
-
             Iterator<?> tm = model.getExtensibilityElements().iterator();
             assertTrue(tm.hasNext());
             TypeMappingType tmt = (TypeMappingType)tm.next();
