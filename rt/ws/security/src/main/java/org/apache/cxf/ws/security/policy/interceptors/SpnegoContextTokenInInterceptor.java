@@ -26,9 +26,9 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
@@ -47,6 +47,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
@@ -63,7 +64,8 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     static final Logger LOG = LogUtils.getL7dLogger(SpnegoContextTokenInInterceptor.class);
     
     public SpnegoContextTokenInInterceptor() {
-        super(Phase.PRE_PROTOCOL);
+        super(Phase.PRE_STREAM);
+        getBefore().add(WSS4JStaxInInterceptor.class.getName());
     }
     
     public void handleMessage(SoapMessage message) throws Fault {
@@ -83,6 +85,9 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 return;
             }
             String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
+            if (s == null) {
+                s = SoapActionInInterceptor.getSoapAction(message);
+            }
             AddressingProperties inProps = (AddressingProperties)message
                 .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
             if (inProps != null && s == null) {

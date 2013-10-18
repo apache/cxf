@@ -313,9 +313,9 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         // DOM
         kerberosPort.doubleIt(25);
         
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(kerberosPort);
+        kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -411,7 +411,7 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    /*
+    
     @org.junit.Test
     public void testKerberosOverSymmetricEndorsingEncrypted() throws Exception {
         
@@ -469,5 +469,5 @@ public class StaxKerberosTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    */
+    
 }
