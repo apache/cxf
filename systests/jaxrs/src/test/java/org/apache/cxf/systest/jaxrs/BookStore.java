@@ -215,6 +215,14 @@ public class BookStore {
         return book;
     }
     
+    @DELETE
+    @Path("/deletebody")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book deleteBodyBook(Book book) {
+        return book;
+    }
+    
     @POST
     @Path("/emptyform")
     @Produces("text/plain")

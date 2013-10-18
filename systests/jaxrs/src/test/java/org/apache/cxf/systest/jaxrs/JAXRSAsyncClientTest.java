@@ -70,6 +70,16 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testDeleteWithBody() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/deletebody";
+        WebClient wc = WebClient.create(address);
+        wc.type("application/xml").accept("application/xml");
+        WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
+        Book book = wc.invoke("DELETE", new Book("Delete", 123L), Book.class);
+        assertEquals("Delete", book.getName());
+    }
+    
+    @Test
     public void testRetrieveBookCustomMethodAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
