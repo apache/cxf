@@ -140,6 +140,10 @@ public final class WSS4JUtils {
     }
     
     public static TokenStore getTokenStore(Message message) {
+        return getTokenStore(message, true);
+    }
+    
+    public static TokenStore getTokenStore(Message message, boolean create) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore = 
@@ -147,7 +151,7 @@ public final class WSS4JUtils {
             if (tokenStore == null) {
                 tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             }
-            if (tokenStore == null) {
+            if (create && tokenStore == null) {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
                 if (info.getName() != null) {

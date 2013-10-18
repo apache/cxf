@@ -700,8 +700,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             } catch (WSSecurityException sec) {
                 Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
                 if (ep != null && ep.getEndpointInfo() != null) {
-                    TokenStore store = (TokenStore)ep.getEndpointInfo()
-                        .getProperty(TokenStore.class.getName());
+                    TokenStore store = 
+                        WSS4JUtils.getTokenStore((SoapMessage)reqData.getMsgContext(), false);
                     if (store != null) {
                         return new TokenStoreCallbackHandler(null, store);
                     }
@@ -712,7 +712,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             
         Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
         if (ep != null && ep.getEndpointInfo() != null) {
-            TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
+            TokenStore store = WSS4JUtils.getTokenStore((SoapMessage)reqData.getMsgContext(), false);
             if (store != null) {
                 return new TokenStoreCallbackHandler(cbHandler, store);
             }

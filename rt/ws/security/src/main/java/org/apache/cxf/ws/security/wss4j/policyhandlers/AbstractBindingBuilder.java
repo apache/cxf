@@ -75,7 +75,7 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.WSEncryptionPart;
@@ -408,24 +408,7 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected final TokenStore getTokenStore() {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            TokenStore tokenStore = 
-                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            }
-            if (tokenStore == null) {
-                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
-                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-                if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString().hashCode();
-                }
-                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
-                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
-            }
-            return tokenStore;
-        }
+        return WSS4JUtils.getTokenStore(message);
     }
     
     protected WSSecTimestamp createTimestamp() {

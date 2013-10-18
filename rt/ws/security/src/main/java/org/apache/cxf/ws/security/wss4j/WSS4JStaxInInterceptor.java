@@ -134,7 +134,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             
             TokenStoreCallbackHandler callbackHandler = 
                 new TokenStoreCallbackHandler(
-                    secProps.getCallbackHandler(), getTokenStore(soapMessage)
+                    secProps.getCallbackHandler(), WSS4JUtils.getTokenStore(soapMessage)
                 );
             secProps.setCallbackHandler(callbackHandler);
 
