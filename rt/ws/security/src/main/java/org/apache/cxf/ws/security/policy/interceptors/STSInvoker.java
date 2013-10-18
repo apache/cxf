@@ -29,7 +29,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
@@ -50,6 +49,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
@@ -170,9 +170,16 @@ abstract class STSInvoker implements Invoker {
     }
 
     private SecurityToken findCancelToken(Exchange exchange, Element el) throws WSSecurityException {
-        SecurityTokenReference ref = 
-            new SecurityTokenReference(DOMUtils.getFirstElement(el), new BSPEnforcer());
-        String uri = ref.getReference().getURI();
+        Element childElement = DOMUtils.getFirstElement(el);
+        String uri = "";
+        if ("SecurityContextToken".equals(childElement.getLocalName())) {
+            SecurityContextToken sct = new SecurityContextToken(childElement);
+            uri = sct.getIdentifier();
+        } else {
+            SecurityTokenReference ref = 
+                new SecurityTokenReference(childElement, new BSPEnforcer());
+            uri = ref.getReference().getURI();
+        }
         TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                 .getProperty(TokenStore.class.getName());
         return store.getToken(uri);
