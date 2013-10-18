@@ -70,13 +70,13 @@ import org.apache.ws.security.message.token.SecurityContextToken;
  * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation 
  * and WS-Trust for SPNEGO.
  */
-final class NegotiationUtils {
+public final class NegotiationUtils {
     
     private NegotiationUtils() {
         // complete
     }
 
-    static Trust10 getTrust10(AssertionInfoMap aim) {
+    public static Trust10 getTrust10(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_10);
         if (ais == null || ais.isEmpty()) {
             ais = aim.get(SP11Constants.TRUST_10);
@@ -87,7 +87,7 @@ final class NegotiationUtils {
         return (Trust10)ais.iterator().next().getAssertion();
     }
     
-    static Trust13 getTrust13(AssertionInfoMap aim) {
+    public static Trust13 getTrust13(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_13);
         if (ais == null || ais.isEmpty()) {
             return null;
@@ -95,7 +95,11 @@ final class NegotiationUtils {
         return (Trust13)ais.iterator().next().getAssertion();
     }
     
-    static TokenStore getTokenStore(Message message) {
+    public static TokenStore getTokenStore(Message message) {
+        return getTokenStore(message, true);
+    }
+    
+    public static TokenStore getTokenStore(Message message, boolean create) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
             TokenStore tokenStore = 
@@ -103,7 +107,7 @@ final class NegotiationUtils {
             if (tokenStore == null) {
                 tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             }
-            if (tokenStore == null) {
+            if (create && tokenStore == null) {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
                 if (info.getName() != null) {
@@ -116,7 +120,7 @@ final class NegotiationUtils {
         }
     }
     
-    static Assertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {
+    public static Assertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {
         Collection<AssertionInfo> lst = aim.get(MetadataConstants.USING_ADDRESSING_2004_QNAME);
         Assertion assertion = null;
         if (null != lst && !lst.isEmpty()) {
@@ -144,7 +148,7 @@ final class NegotiationUtils {
         return assertion;
     }
 
-    static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
+    public static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
         Binding transport = null;
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais != null) {
@@ -172,7 +176,7 @@ final class NegotiationUtils {
         return null;
     }
     
-    static int getWSCVersion(String tokenTypeValue) throws ConversationException {
+    public static int getWSCVersion(String tokenTypeValue) throws ConversationException {
         if (tokenTypeValue == null) {
             return ConversationConstants.DEFAULT_VERSION;
         }
@@ -186,7 +190,7 @@ final class NegotiationUtils {
         }
     }
     
-    static void recalcEffectivePolicy(
+    public static void recalcEffectivePolicy(
         SoapMessage message, 
         String namespace, 
         Policy policy,
@@ -247,7 +251,7 @@ final class NegotiationUtils {
     /**
      * Return true on successfully parsing a SecurityContextToken result
      */
-    static boolean parseSCTResult(SoapMessage message) {
+    public static boolean parseSCTResult(SoapMessage message) {
         List<WSHandlerResult> results = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
@@ -279,7 +283,7 @@ final class NegotiationUtils {
         return false;
     }
     
-    static CallbackHandler getCallbackHandler(Object o, Class<?> clazz) {
+    public static CallbackHandler getCallbackHandler(Object o, Class<?> clazz) {
         CallbackHandler handler = null;
         if (o instanceof CallbackHandler) {
             handler = (CallbackHandler)o;

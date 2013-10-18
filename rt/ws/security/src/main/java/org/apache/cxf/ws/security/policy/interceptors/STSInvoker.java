@@ -40,6 +40,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -160,6 +161,8 @@ abstract class STSInvoker implements Invoker {
         TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                 .getProperty(TokenStore.class.getName());
         store.remove(cancelToken.getId());
+        // Put the token on the out message so that we can sign the response
+        exchange.getEndpoint().put(SecurityConstants.TOKEN, cancelToken);
         writer.writeEmptyElement(prefix, "RequestedTokenCancelled", namespace);
         
         writer.writeEndElement();
@@ -230,6 +233,7 @@ abstract class STSInvoker implements Invoker {
             ref.setValueType(refValueType);
         }
         SecurityTokenReference str = new SecurityTokenReference(writer.getDocument());
+        str.addWSSENamespace();
         str.setReference(ref);
 
         writer.getCurrentNode().appendChild(str.getElement());

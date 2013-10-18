@@ -140,7 +140,11 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     SymmetricBinding binding = new SymmetricBinding(SP12Constants.INSTANCE, pbuilder);
                     binding.setIncludeTimestamp(true);
                     ProtectionToken token = new ProtectionToken(SP12Constants.INSTANCE, pbuilder);
-                    token.setToken(new SecureConversationToken(SP12Constants.INSTANCE));
+                    
+                    SecureConversationToken scToken = 
+                        new SecureConversationToken(SP12Constants.INSTANCE);
+                    scToken.setInclusion(SP12Constants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+                    token.setToken(scToken);
                     binding.setProtectionToken(token);
                     binding.setEntireHeadersAndBodySignatures(true);
                     
