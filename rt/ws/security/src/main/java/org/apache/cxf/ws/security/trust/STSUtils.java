@@ -232,7 +232,7 @@ public final class STSUtils {
                                            MessageInfo.Type.OUTPUT);
         oi.setOutput("CancelSecurityTokenResponseMsg", mio);
         mpi = mio.addMessagePart("response");
-        mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
+        mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
         return oi;
     }
 }
