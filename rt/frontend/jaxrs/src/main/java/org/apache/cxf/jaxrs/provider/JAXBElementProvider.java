@@ -433,7 +433,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 if (relRef.endsWith("'")) {
                     relRef = relRef.substring(0, relRef.length() - 1);
                 }
-                String absRef = buildAbsoluteXMLResourceURI(relRef);
+                String absRef = resolveXMLResourceURI(relRef);
                 value = value.substring(0, ind + 6) + absRef + "'?>";
             }
             setXmlPiProperty(ms, value);
@@ -443,14 +443,14 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     private void addSchemaLocation(Marshaller ms, Annotation[] anns) throws Exception {
         XSISchemaLocation sl = AnnotationUtils.getAnnotation(anns, XSISchemaLocation.class);
         if (sl != null) {
-            String value = buildAbsoluteXMLResourceURI(sl.value());
+            String value = sl.resolve() ? resolveXMLResourceURI(sl.value()) : sl.value();
             String propName = !sl.noNamespace() 
                 ? Marshaller.JAXB_SCHEMA_LOCATION : Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
             ms.setProperty(propName, value);
         }
     }
     
-    private String buildAbsoluteXMLResourceURI(String path) {
+    protected String resolveXMLResourceURI(String path) {
         MessageContext mc = getContext();
         if (mc != null) {
             String httpBasePath = (String)mc.get("http.base.path");

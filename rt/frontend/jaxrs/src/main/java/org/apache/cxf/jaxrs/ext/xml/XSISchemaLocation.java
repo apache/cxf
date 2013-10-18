@@ -31,9 +31,17 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface XSISchemaLocation {
     /**
-     * schema location relative to a base URI of the web application
+     * Schema location 
+     * By default it is assumed to be relative to a base URI of the web application
      */
     String value();
+    
+    /**
+     * If the location is relative and this property is set to true then 
+     * the location will be resolved against the base URI of the web application
+     */
+    boolean resolve() default true;
+    
     /**
      * Can be used to get xsi:noNamespaceSchemaLocation produced.
      * By default, xsi:schemaLocation will be set.
