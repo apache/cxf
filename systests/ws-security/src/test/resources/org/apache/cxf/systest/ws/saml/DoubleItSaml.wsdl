@@ -758,7 +758,10 @@
                </wsp:Policy>
             </sp:SignedSupportingTokens>
             <sp:SignedElements>
-                <sp:XPath>//saml2:Assertion</sp:XPath>
+                <sp:XPath xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+                        >/soap:Envelope/soap:Header/wsse:Security/saml2:Assertion</sp:XPath>
             </sp:SignedElements>
          </wsp:All>
       </wsp:ExactlyOne>

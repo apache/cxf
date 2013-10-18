@@ -735,6 +735,36 @@ public class StaxSamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testAsymmetricSamlInitiatorStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT);
+        SecurityTestUtil.enableStreaming(saml2Port);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
+        );
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml2EndorsingOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
