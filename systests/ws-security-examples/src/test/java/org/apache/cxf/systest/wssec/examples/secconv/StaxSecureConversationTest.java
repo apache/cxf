@@ -85,7 +85,7 @@ public class StaxSecureConversationTest extends AbstractBusClientServerTestBase 
         // DOM
         samlPort.doubleIt(25);
         
-        // TODO Streaming investigate
+        // TODO Streaming Ordering issue
         // SecurityTestUtil.enableStreaming(samlPort);
         // samlPort.doubleIt(25);
         

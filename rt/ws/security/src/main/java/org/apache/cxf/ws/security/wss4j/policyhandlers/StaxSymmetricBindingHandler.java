@@ -558,7 +558,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
         } else if (policyToken instanceof IssuedToken || policyToken instanceof SecurityContextToken
             || policyToken instanceof SecureConversationToken || policyToken instanceof SpnegoContextToken) {
-            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+            if (!isRequestor()) {
+                config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+            } else {
+                config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
+            }
             config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
         }
         
