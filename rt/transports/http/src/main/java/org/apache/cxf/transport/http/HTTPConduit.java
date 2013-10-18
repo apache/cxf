@@ -172,7 +172,7 @@ public abstract class HTTPConduit
     private static final String HTTP_POST_METHOD = "POST";
     private static final String HTTP_PUT_METHOD = "PUT";
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT = 
-        new HashSet<String>(Arrays.asList(new String[]{"GET", "DELETE", "HEAD", "OPTIONS", "TRACE"}));
+        new HashSet<String>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     /**
      * This constant is the Message(Map) key for a list of visited URLs that
      * is used in redirect loop protection.
