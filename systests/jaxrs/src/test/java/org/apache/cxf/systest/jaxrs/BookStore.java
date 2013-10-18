@@ -636,12 +636,16 @@ public class BookStore {
     @Path("/bookheaders/simple/")
     @CustomHeaderAdded
     @PostMatchMode
+    @Consumes("application/xml")
     public Response echoBookByHeaderSimple(Book book,
+        @HeaderParam("Content-type") String ct,
         @HeaderParam("BOOK") String headerBook,
         @HeaderParam("Simple") String headerSimple,
         @HeaderParam("ServerReaderInterceptor") String serverInterceptorHeader,
         @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader) throws Exception {
-        
+        if (!"application/xml".equals(ct)) {
+            throw new RuntimeException();
+        }
         ResponseBuilder builder = getBookByHeaderSimpleBuilder(headerBook, headerSimple);
         if (serverInterceptorHeader != null) {
             builder.header("ServerReaderInterceptor", serverInterceptorHeader);
@@ -653,18 +657,45 @@ public class BookStore {
     }
     
     @POST
+    @Path("/bookheaders/simple/")
+    @CustomHeaderAdded
+    @PostMatchMode
+    @Consumes("application/v1+xml")
+    public Response echoBookByHeaderSimple2(Book book,
+        @HeaderParam("Content-type") String ct,                                    
+        @HeaderParam("BOOK") String headerBook,
+        @HeaderParam("Simple") String headerSimple,
+        @HeaderParam("ServerReaderInterceptor") String serverInterceptorHeader,
+        @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader) throws Exception {
+        if (!"application/v1+xml".equals(ct)) {
+            throw new RuntimeException();
+        }
+        ResponseBuilder builder = getBookByHeaderSimpleBuilder(headerBook, headerSimple);
+        if (serverInterceptorHeader != null) {
+            builder.header("ServerReaderInterceptor", serverInterceptorHeader);
+        }
+        if (clientInterceptorHeader != null) {
+            builder.header("ClientWriterInterceptor", clientInterceptorHeader);
+        }
+        builder.header("newmediatypeused", ct);
+        return builder.build();
+    }
+    
+    @POST
     @Path("/bookheaders/simple/async")
     @PostMatchMode
     @CustomHeaderAdded
     @CustomHeaderAddedAsync
     public Response echoBookByHeaderSimpleAsync(Book book,
+                                       @HeaderParam("Content-type") String ct,         
                                        @HeaderParam("BOOK") String headerBook,
                                        @HeaderParam("Simple") String headerSimple,
                                        @HeaderParam("ServerReaderInterceptor") String serverInterceptorHeader,
                                        @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader) 
         throws Exception {
         
-        return echoBookByHeaderSimple(book, headerBook, headerSimple, serverInterceptorHeader, clientInterceptorHeader);
+        return echoBookByHeaderSimple(book, ct, headerBook, headerSimple, serverInterceptorHeader, 
+                                      clientInterceptorHeader);
     }
     
     private ResponseBuilder getBookByHeaderSimpleBuilder(@HeaderParam("BOOK") String headerBook,

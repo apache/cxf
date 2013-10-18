@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -291,12 +292,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testReplaceBookMistypedCTAndHttpVerb() throws Exception {
         
-        String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2"; 
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2/mistyped"; 
         WebClient wc = WebClient.create(endpointAddress,
                                         Collections.singletonList(new ReplaceBodyFilter()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/mistypedxml").type("text/xml").header("THEMETHOD", "PUT");
-        Book book = wc.put(new Book("book", 555L), Book.class);
+        Book book = wc.invoke("DELETE", new Book("book", 555L), Book.class);
         assertEquals(561L, book.getId());
     }
     
@@ -533,6 +534,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testPostBookNewMediaType() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        WebClient wc = createWebClientPost(address);
+        wc.header("newmediatype", "application/v1+xml");
+        Book book = wc.post(new Book("Book", 126L), Book.class);
+        assertEquals(124L, book.getId());
+        validatePostResponse(wc, false);
+        assertEquals("application/v1+xml", wc.getResponse().getHeaderString("newmediatypeused"));
+    }
+    
+    @Test
     public void testBookExistsServerStreamReplace() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/check2";
         WebClient wc = WebClient.create(address);
@@ -571,7 +583,9 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             String expectedMethod = null; 
             if (rc.getAcceptableMediaTypes().contains(MediaType.valueOf("text/mistypedxml"))
                 && rc.getHeaders().getFirst("THEMETHOD") != null) {
-                expectedMethod = "PUT";
+                expectedMethod = "DELETE";
+                rc.setUri(URI.create("http://localhost:" + PORT + "/bookstore/books2"));
+                rc.setMethod(rc.getHeaders().getFirst("THEMETHOD").toString());
             } else {
                 expectedMethod = "POST";
             }

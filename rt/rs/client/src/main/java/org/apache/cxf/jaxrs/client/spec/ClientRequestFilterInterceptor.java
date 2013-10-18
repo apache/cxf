@@ -40,7 +40,7 @@ import org.apache.cxf.transport.MessageObserver;
 public class ClientRequestFilterInterceptor extends AbstractOutDatabindingInterceptor {
 
     public ClientRequestFilterInterceptor() {
-        super(Phase.WRITE);
+        super(Phase.PRE_LOGICAL);
     }
     
     public void handleMessage(Message outMessage) throws Fault {
