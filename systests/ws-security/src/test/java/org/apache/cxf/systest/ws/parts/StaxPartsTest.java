@@ -28,9 +28,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
 
 /**
@@ -105,6 +103,59 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             fail("Failure expected on a required header which isn't present");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // String error = "must be present";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testRequiredElements() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItRequiredElementsPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
+        
+        // This should fail, as the service requires a (bad) header
+        portQName = new QName(NAMESPACE, "DoubleItRequiredElementsPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on a required header which isn't present");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "ToTo must be present";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on a required header which isn't present");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "ToTo must be present";
             // assertTrue(ex.getMessage().contains(error));
         }
         
@@ -190,6 +241,61 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSignedElements() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedElementsPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
+        
+        // This should fail, as the service requires that the To header must be signed
+        portQName = new QName(NAMESPACE, "DoubleItSignedElementsPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        /* TODO See WSS-482
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on a header which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "SignedElements";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on a header which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SignedElements";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        */
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testEncryptedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -265,5 +371,98 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testEncryptedElements() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(25);
+        
+        // This should fail, as the service requires that the header must be encrypted
+        portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        /*
+         * TODO See WSS-482
+        // DOM
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on a header which isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            System.out.println("ERR2: " + ex.getMessage());
+            String error = "EncryptedElements";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on a header which isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "EncryptedElements";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        */
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testContentEncryptedElements() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // This should fail, as the service requires that the header must be encrypted
+        portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on a header which isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "To must be encrypted";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
     
 }

@@ -41,7 +41,9 @@
                 </sp:AsymmetricBinding>
                 <sp:ContentEncryptedElements
                       xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:XPath xmlns:wsa="http://www.w3.org/2005/08/addressing">//wsa:To</sp:XPath>
+                     <sp:XPath xmlns:wsa="http://www.w3.org/2005/08/addressing"
+                              xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                        >/soap:Envelope/soap:Header/wsa:To</sp:XPath>
                 </sp:ContentEncryptedElements>
                 <sp:SignedParts
                     xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
