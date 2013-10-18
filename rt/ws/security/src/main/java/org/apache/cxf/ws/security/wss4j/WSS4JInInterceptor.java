@@ -45,7 +45,6 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -68,6 +67,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.interceptors.NegotiationUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.CustomTokenPrincipal;
@@ -730,8 +730,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 } catch (WSSecurityException sec) {
                     Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
                     if (ep != null && ep.getEndpointInfo() != null) {
-                        TokenStore store = (TokenStore)ep.getEndpointInfo()
-                            .getProperty(TokenStore.class.getName());
+                        TokenStore store = 
+                            NegotiationUtils.getTokenStore((SoapMessage)reqData.getMsgContext(), false);
                         if (store != null) {
                             return new TokenStoreCallbackHandler(null, store);
                         }
@@ -742,7 +742,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
         if (ep != null && ep.getEndpointInfo() != null) {
-            TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
+            TokenStore store = 
+                NegotiationUtils.getTokenStore((SoapMessage)reqData.getMsgContext(), false);
             if (store != null) {
                 return new TokenStoreCallbackHandler(cbHandler, store);
             }
