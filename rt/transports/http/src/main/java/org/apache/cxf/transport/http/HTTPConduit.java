@@ -841,7 +841,10 @@ public abstract class HTTPConduit
      * HTTPConduit.
      */
     public HTTPClientPolicy getClient() {
-        updateClientPolicy(null);
+        Message m = new MessageImpl();
+        m.setExchange(new ExchangeImpl());
+        m.getExchange().put(EndpointInfo.class, this.endpointInfo);
+        updateClientPolicy(m);
         return clientSidePolicy;
     }
 

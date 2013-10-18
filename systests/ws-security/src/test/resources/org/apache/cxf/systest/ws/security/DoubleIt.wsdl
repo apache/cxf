@@ -240,7 +240,23 @@
         </wsdl:operation>
     </wsdl:binding>
 
-
+    <wsdl:binding name="DoubleItBindingCXF5325" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#CXF5325" />
+        <soap:binding style="document"
+          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
 
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItPortHttps" binding="tns:DoubleItBinding">
@@ -281,6 +297,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF4122" binding="tns:DoubleItBindingCXF4122">
             <soap:address location="http://localhost:9010/SecPolTestCXF4122" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItPortCXF5325" binding="tns:DoubleItBindingCXF5325">
+            <soap:address location="https://localhost:9009/SecPolTestCXF5325" />
         </wsdl:port>
     </wsdl:service>
 
@@ -942,4 +961,83 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
+    
+    
+    <wsp:Policy wsu:Id="CXF5325">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsaw:UsingAddressing
+                    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                    wsp:Optional="true" />
+                <wsp:All>
+                    <sp:TransportBinding
+                        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                        xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy"
+                        xmlns:wsa="http://www.w3.org/2005/08/addressing"
+                        xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
+                        xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility"
+                        xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
+                        <wsp:Policy>
+                            <sp:TransportToken>
+                                <wsp:Policy>
+                                    <sp:HttpsToken>
+                                        <wsp:Policy>
+                                            <sp:HttpBasicAuthentication />
+                                        </wsp:Policy>
+                                    </sp:HttpsToken>
+                                </wsp:Policy>
+                            </sp:TransportToken>
+                            <sp:AlgorithmSuite>
+                                <wsp:Policy>
+                                    <sp:Basic128Rsa15 />
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout>
+                                <wsp:Policy>
+                                    <sp:Strict />
+                                </wsp:Policy>
+                            </sp:Layout>
+                        </wsp:Policy>
+                    </sp:TransportBinding>
+                </wsp:All>
+            </wsp:All>
+            <wsp:All>
+                <wsaw:UsingAddressing
+                    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                    wsp:Optional="true" />
+                <wsp:All>
+                    <sp:TransportBinding
+                        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+                        xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy"
+                        xmlns:wsa="http://www.w3.org/2005/08/addressing"
+                        xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
+                        xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility"
+                        xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
+                        <wsp:Policy>
+                            <sp:TransportToken>
+                                <wsp:Policy>
+                                    <sp:HttpsToken>
+                                        <wsp:Policy>
+                                            <sp:RequireClientCertificate />
+                                        </wsp:Policy>
+                                    </sp:HttpsToken>
+                                </wsp:Policy>
+                            </sp:TransportToken>
+                            <sp:AlgorithmSuite>
+                                <wsp:Policy>
+                                    <sp:Basic128Rsa15 />
+                                </wsp:Policy>
+                            </sp:AlgorithmSuite>
+                            <sp:Layout>
+                                <wsp:Policy>
+                                    <sp:Strict />
+                                </wsp:Policy>
+                            </sp:Layout>
+                        </wsp:Policy>
+                    </sp:TransportBinding>
+                </wsp:All>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
 </wsdl:definitions>

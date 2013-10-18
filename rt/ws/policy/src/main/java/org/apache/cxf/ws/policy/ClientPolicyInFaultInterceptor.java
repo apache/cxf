@@ -98,8 +98,8 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
             EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit, msg);        
             LOG.fine("ep: " + ep);
             if (ep != null) {
-                faultInterceptors.addAll(ep.getFaultInterceptors());
-                assertions.addAll(ep.getFaultVocabulary());
+                faultInterceptors.addAll(ep.getFaultInterceptors(msg));
+                assertions.addAll(ep.getFaultVocabulary(msg));
             }
         }
         

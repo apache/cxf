@@ -53,7 +53,9 @@ public interface PolicyEngine {
     
     //
     
-    boolean supportsAlternative(Collection<? extends PolicyComponent> alterative, Assertor assertor);
+    boolean supportsAlternative(Collection<? extends PolicyComponent> alterative,
+                                Assertor assertor,
+                                Message m);
     
     // available throughout the outbound path
     

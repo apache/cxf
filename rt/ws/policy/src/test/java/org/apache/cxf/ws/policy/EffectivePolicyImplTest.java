@@ -52,6 +52,7 @@ import org.junit.Test;
 public class EffectivePolicyImplTest extends Assert {
 
     private IMocksControl control;
+    private Message msg = new MessageImpl();
     
     @Before
     public void setUp() {
@@ -92,7 +93,7 @@ public class EffectivePolicyImplTest extends Assert {
     @Test
     public void testInitialiseFromEndpointPolicy() throws NoSuchMethodException {
         Method m = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
-                                                          new Class[] {PolicyEngine.class});
+                                                          new Class[] {PolicyEngine.class, Message.class});
         EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
             .addMockedMethod(m).createMock(control);
         EndpointPolicyImpl endpointPolicy = control.createMock(EndpointPolicyImpl.class);
@@ -101,7 +102,7 @@ public class EffectivePolicyImplTest extends Assert {
         Collection<Assertion> chosenAlternative = new ArrayList<Assertion>();
         EasyMock.expect(endpointPolicy.getChosenAlternative()).andReturn(chosenAlternative);
         PolicyEngineImpl pe = new PolicyEngineImpl();
-        effectivePolicy.initialiseInterceptors(pe, false);
+        effectivePolicy.initialiseInterceptors(pe, false, msg);
         EasyMock.expectLastCall();
         control.replay();
         effectivePolicy.initialise(endpointPolicy, pe, false, null);
@@ -121,7 +122,7 @@ public class EffectivePolicyImplTest extends Assert {
         Method m2 = EffectivePolicyImpl.class.getDeclaredMethod("chooseAlternative",
             new Class[] {PolicyEngine.class, Assertor.class, Message.class});
         Method m3 = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
-                                                          new Class[] {PolicyEngine.class});
+                                                          new Class[] {PolicyEngine.class, Message.class});
         EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
             .addMockedMethods(m1, m2, m3).createMock(control);        
         EndpointInfo ei = control.createMock(EndpointInfo.class);
@@ -134,7 +135,7 @@ public class EffectivePolicyImplTest extends Assert {
         EasyMock.expectLastCall().andReturn(a);
         effectivePolicy.chooseAlternative(pe, a, null);
         EasyMock.expectLastCall();
-        effectivePolicy.initialiseInterceptors(pe, false);
+        effectivePolicy.initialiseInterceptors(pe, false, msg);
         EasyMock.expectLastCall();
         
         control.replay();
@@ -150,7 +151,7 @@ public class EffectivePolicyImplTest extends Assert {
         Method m2 = EffectivePolicyImpl.class.getDeclaredMethod("chooseAlternative",
             new Class[] {PolicyEngine.class, Assertor.class, Message.class});
         Method m3 = EffectivePolicyImpl.class.getDeclaredMethod("initialiseInterceptors",
-                                                          new Class[] {PolicyEngine.class});
+                                                          new Class[] {PolicyEngine.class, Message.class});
         EffectivePolicyImpl effectivePolicy = EasyMock.createMockBuilder(EffectivePolicyImpl.class)
             .addMockedMethods(m1, m2, m3).createMock(control);        
         EndpointInfo ei = control.createMock(EndpointInfo.class);
@@ -162,7 +163,7 @@ public class EffectivePolicyImplTest extends Assert {
         EasyMock.expectLastCall();
         effectivePolicy.chooseAlternative(pe, a, null);
         EasyMock.expectLastCall();
-        effectivePolicy.initialiseInterceptors(pe, false);
+        effectivePolicy.initialiseInterceptors(pe, false, msg);
         EasyMock.expectLastCall();
         
         control.replay();
@@ -307,7 +308,7 @@ public class EffectivePolicyImplTest extends Assert {
         setupPolicyInterceptorProviderRegistry(engine, reg);
         
         control.replay();
-        epi.initialiseInterceptors(engine, useIn, fault);
+        epi.initialiseInterceptors(engine, useIn, fault, msg);
         assertEquals(0, epi.getInterceptors().size());
         control.verify();
         
@@ -318,7 +319,7 @@ public class EffectivePolicyImplTest extends Assert {
         PolicyAssertion a = control.createMock(PolicyAssertion.class);        
         alternative.add(a);
         control.replay();
-        epi.initialiseInterceptors(engine, useIn, fault);
+        epi.initialiseInterceptors(engine, useIn, fault, msg);
         assertEquals(0, epi.getInterceptors().size());
         control.verify();
         
@@ -329,7 +330,7 @@ public class EffectivePolicyImplTest extends Assert {
         il = new ArrayList<Interceptor<? extends Message>>();
         setupRegistryInterceptors(useIn, fault, reg, qn, il);
         control.replay();
-        epi.initialiseInterceptors(engine, useIn, fault);
+        epi.initialiseInterceptors(engine, useIn, fault, msg);
         assertEquals(0, epi.getInterceptors().size());
         control.verify();
         
@@ -341,7 +342,7 @@ public class EffectivePolicyImplTest extends Assert {
         il.add(pi);
         setupRegistryInterceptors(useIn, fault, reg, qn, il);
         control.replay();
-        epi.initialiseInterceptors(engine, useIn, fault);
+        epi.initialiseInterceptors(engine, useIn, fault, msg);
         assertEquals(1, epi.getInterceptors().size());
         assertSame(pi, epi.getInterceptors().get(0));
         control.verify();

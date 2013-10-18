@@ -34,6 +34,10 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
@@ -101,6 +105,16 @@ public class WSPolicyFeature extends AbstractFeature {
             }
         }
     }
+    
+    private MessageImpl createMessage(Endpoint e, Bus b) {
+        MessageImpl m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        m.setExchange(ex);
+        ex.put(Endpoint.class, e);
+        ex.put(Bus.class, b);
+        ex.put(Service.class, e.getService());
+        return m;
+    }
 
     @Override
     public void initialize(Client client, Bus bus) {
@@ -109,7 +123,7 @@ public class WSPolicyFeature extends AbstractFeature {
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         EndpointInfo ei = endpoint.getEndpointInfo();
         EndpointPolicy ep = pe.getClientEndpointPolicy(ei, null, null);
-        pe.setClientEndpointPolicy(ei, ep.updatePolicy(p));
+        pe.setClientEndpointPolicy(ei, ep.updatePolicy(p, createMessage(endpoint, bus)));
     }
 
     @Override
@@ -119,7 +133,7 @@ public class WSPolicyFeature extends AbstractFeature {
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         EndpointInfo ei = endpoint.getEndpointInfo();
         EndpointPolicy ep = pe.getServerEndpointPolicy(ei, null, null);
-        pe.setServerEndpointPolicy(ei, ep.updatePolicy(p));
+        pe.setServerEndpointPolicy(ei, ep.updatePolicy(p, createMessage(endpoint, bus)));
 
         // Add policy to the service model (and consequently to the WSDL)
         // FIXME - ideally this should probably be moved up to where the policies are applied to the

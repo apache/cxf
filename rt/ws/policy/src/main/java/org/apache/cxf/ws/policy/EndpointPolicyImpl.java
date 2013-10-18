@@ -85,7 +85,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return assertor;
     }
     
-    public EndpointPolicy updatePolicy(Policy p) {
+    public EndpointPolicy updatePolicy(Policy p, Message msg) {
         EndpointPolicyImpl epi = createEndpointPolicy();
         
         if (!PolicyUtils.isEmptyPolicy(p)) {
@@ -99,7 +99,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
         
         epi.checkExactlyOnes();
-        epi.finalizeConfig(null);
+        epi.finalizeConfig(msg);
         return epi;
     }
     
@@ -107,30 +107,30 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return chosenAlternative;
     }
     
-    public synchronized Collection<Assertion> getVocabulary() {
+    public Collection<Assertion> getVocabulary(Message m) {
         if (vocabulary == null) {
-            initializeVocabulary(null);
+            initializeVocabulary(m);
         }
         return vocabulary;
     }
     
-    public synchronized Collection<Assertion> getFaultVocabulary() {
+    public Collection<Assertion> getFaultVocabulary(Message m) {
         if (vocabulary == null) {
-            initializeVocabulary(null);
+            initializeVocabulary(m);
         }
         return faultVocabulary;
     }    
     
-    public synchronized List<Interceptor<? extends Message>> getInterceptors() {
+    public List<Interceptor<? extends Message>> getInterceptors(Message m) {
         if (interceptors == null) {
-            initializeInterceptors(null);
+            initializeInterceptors(m);
         }
         return interceptors;
     }
     
-    public synchronized List<Interceptor<? extends Message>> getFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getFaultInterceptors(Message m) {
         if (interceptors == null) {
-            initializeInterceptors(null);
+            initializeInterceptors(m);
         }
         return faultInterceptors;
     }
@@ -160,7 +160,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         if (requestor) {
             alternative = engine.getAlternativeSelector().selectAlternative(policy, engine, assertor, null, m);
         } else {
-            alternative = getSupportedAlternatives();
+            alternative = getSupportedAlternatives(m);
         }
         if (null == alternative) {
             throw new PolicyException(new org.apache.cxf.common.i18n.Message("NO_ALTERNATIVE_EXC", BUNDLE));
@@ -169,12 +169,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
     
-    protected Collection<Assertion> getSupportedAlternatives() {
+    protected Collection<Assertion> getSupportedAlternatives(Message msg) {
         Collection<Assertion> alternatives = new ArrayList<Assertion>();
 
         for (Iterator<List<Assertion>> it = policy.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
-            if (engine.supportsAlternative(alternative, assertor)) {
+            if (engine.supportsAlternative(alternative, assertor, msg)) {
                 alternatives.addAll(alternative);
             }
         }
@@ -240,11 +240,11 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
     }
 
-    Collection<Assertion> getSupportedAlternatives(Policy p) {
+    Collection<Assertion> getSupportedAlternatives(Policy p, Message msg) {
         Collection<Assertion> alternatives = new ArrayList<Assertion>();
         for (Iterator<List<Assertion>> it = p.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
-            if (engine.supportsAlternative(alternative, null)) {
+            if (engine.supportsAlternative(alternative, null, msg)) {
                 alternatives.addAll(alternative);
             }
         }
@@ -253,7 +253,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
 
     void initializeInterceptors(PolicyInterceptorProviderRegistry reg,
                                 Set<Interceptor<? extends Message>> out, Assertion a, 
-                                boolean fault) {
+                                boolean fault, Message msg) {
         QName qn = a.getName();
         List<Interceptor<? extends org.apache.cxf.message.Message>> i 
             = fault ? reg.getInFaultInterceptorsForAssertion(qn)
@@ -262,8 +262,8 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {
-                for (Assertion a2 : getSupportedAlternatives(p)) {
-                    initializeInterceptors(reg, out, a2, fault);
+                for (Assertion a2 : getSupportedAlternatives(p, msg)) {
+                    initializeInterceptors(reg, out, a2, fault, msg);
                 }
             }
         }
@@ -280,7 +280,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         Set<Interceptor<? extends Message>> out = new LinkedHashSet<Interceptor<? extends Message>>();
         if (getChosenAlternative() != null) {
             for (Assertion a : getChosenAlternative()) {
-                initializeInterceptors(reg, out, a, false);
+                initializeInterceptors(reg, out, a, false, m);
             }
         }
 
@@ -288,7 +288,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             interceptors = new ArrayList<Interceptor<? extends Message>>(out);
             out.clear();
             for (Assertion a : getChosenAlternative()) {
-                initializeInterceptors(reg, out, a, true);
+                initializeInterceptors(reg, out, a, true, m);
             }
             faultInterceptors = new ArrayList<Interceptor<? extends Message>>(out);
         } else if (ei != null && ei.getBinding() != null) {
@@ -300,8 +300,8 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                 Collection<Assertion> c = engine.getAssertions(p, true);
                 if (c != null) {
                     for (Assertion a : c) {
-                        initializeInterceptors(reg, out, a, false);
-                        initializeInterceptors(reg, out, a, true);
+                        initializeInterceptors(reg, out, a, false, m);
+                        initializeInterceptors(reg, out, a, true, m);
                     }
                 }
             }

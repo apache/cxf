@@ -30,6 +30,8 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -82,10 +84,11 @@ public class EndpointPolicyImplTest extends Assert {
     @Test
     public void testAccessors() {
         EndpointPolicyImpl epi = new EndpointPolicyImpl();
+        Message m = new MessageImpl();
         assertNull(epi.getPolicy());
         assertNull(epi.getChosenAlternative());
-        assertNull(epi.getInterceptors());
-        assertNull(epi.getFaultInterceptors());
+        assertNull(epi.getInterceptors(m));
+        assertNull(epi.getFaultInterceptors(m));
 
         Policy p = control.createMock(Policy.class);
         Assertion a = control.createMock(Assertion.class);
@@ -97,13 +100,13 @@ public class EndpointPolicyImplTest extends Assert {
         epi.setChosenAlternative(la);
         assertSame(la, epi.getChosenAlternative());
         epi.setInterceptors(li);
-        assertSame(li, epi.getInterceptors());
+        assertSame(li, epi.getInterceptors(m));
         epi.setFaultInterceptors(li);
-        assertSame(li, epi.getFaultInterceptors());
+        assertSame(li, epi.getFaultInterceptors(m));
         epi.setVocabulary(la);
-        assertSame(la, epi.getVocabulary());
+        assertSame(la, epi.getVocabulary(m));
         epi.setFaultVocabulary(la);
-        assertSame(la, epi.getFaultVocabulary());
+        assertSame(la, epi.getFaultVocabulary(m));
         control.verify();
     }
 
@@ -186,6 +189,12 @@ public class EndpointPolicyImplTest extends Assert {
         control.verify();
     }
 
+    private MessageImpl createMessage() {
+        MessageImpl m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        m.setExchange(ex);
+        return m;
+    }
     @Test
     public void testUpdatePolicy() {
 
@@ -202,7 +211,7 @@ public class EndpointPolicyImplTest extends Assert {
 
         epi.setPolicy(p1.normalize(null, true));
 
-        Policy ep = epi.updatePolicy(p2).getPolicy();
+        Policy ep = epi.updatePolicy(p2, createMessage()).getPolicy();
 
         List<ExactlyOne> pops = CastUtils.cast(ep.getPolicyComponents(), ExactlyOne.class);
         assertEquals("New policy must have 1 top level policy operator", 1, pops.size());
@@ -261,7 +270,7 @@ public class EndpointPolicyImplTest extends Assert {
 
         epi.setPolicy(p1.normalize(true));
 
-        Policy ep = epi.updatePolicy(emptyPolicy).getPolicy();
+        Policy ep = epi.updatePolicy(emptyPolicy, createMessage()).getPolicy();
 
         List<ExactlyOne> pops = CastUtils.cast(ep.getPolicyComponents(), ExactlyOne.class);
         assertEquals("New policy must have 1 top level policy operator", 1, pops.size());
@@ -325,13 +334,13 @@ public class EndpointPolicyImplTest extends Assert {
         control.replay();
         Message m = new MessageImpl();
         epi.initializeInterceptors(m);
-        assertEquals(1, epi.getInterceptors().size());
-        assertSame(api, epi.getInterceptors().get(0));
+        assertEquals(1, epi.getInterceptors(m).size());
+        assertSame(api, epi.getInterceptors(m).get(0));
         if (requestor) {
-            assertEquals(1, epi.getFaultInterceptors().size());
-            assertSame(api, epi.getFaultInterceptors().get(0));
+            assertEquals(1, epi.getFaultInterceptors(m).size());
+            assertSame(api, epi.getFaultInterceptors(m).get(0));
         } else {
-            assertNull(epi.getFaultInterceptors());
+            assertNull(epi.getFaultInterceptors(m));
         }
         control.verify();
     }

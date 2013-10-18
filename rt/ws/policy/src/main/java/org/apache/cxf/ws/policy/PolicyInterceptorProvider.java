@@ -20,13 +20,12 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
+import org.apache.neethi.Assertion;
 
 /**
  * 
@@ -39,13 +38,17 @@ public interface PolicyInterceptorProvider extends InterceptorProvider {
      * @return collection of QNames of known assertion types
      */
     Collection<QName> getAssertionTypes();
-    
-    List<Interceptor<? extends Message>> provideInInterceptors(Message m);
-    
-    List<Interceptor<? extends Message>> provideOutInterceptors(Message m);
-    
-    List<Interceptor<? extends Message>> provideOutFaultInterceptors(Message m);
-    
-    List<Interceptor<? extends Message>> provideInFaultInterceptors(Message m);
-    
+
+    /**
+     * Return false if the message does not contain enough contextual configuration to preemtively 
+     * support the given assertion.  Otherwise, return true.  If false, the PolicyEngine.supportsAlternative
+     * method will not select this policy and will attempt a different alternative. 
+     * 
+     * Example: If the context does not contain login information, an assertion that requires it 
+     * could return false to allow the Alternative selection algorithms to try a different alternative. 
+     * @param msg The contextual message, may be null if no message is in context at this point 
+     * @param assertion
+     * @return
+     */
+    boolean configurationPresent(Message msg, Assertion assertion);
 }

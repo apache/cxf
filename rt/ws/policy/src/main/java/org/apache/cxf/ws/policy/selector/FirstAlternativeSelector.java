@@ -43,7 +43,7 @@ public class FirstAlternativeSelector extends BaseAlternativeSelector {
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
-            if (engine.supportsAlternative(alternative, assertor)
+            if (engine.supportsAlternative(alternative, assertor, msg)
                 && this.isCompatibleWithRequest(alternative, request)) {
                 return alternative;
             }
@@ -51,7 +51,7 @@ public class FirstAlternativeSelector extends BaseAlternativeSelector {
         alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
-            if (engine.supportsAlternative(alternative, assertor)) {
+            if (engine.supportsAlternative(alternative, assertor, msg)) {
                 return alternative;
             }
         }        

@@ -45,7 +45,7 @@ public class MinimalAlternativeSelector extends BaseAlternativeSelector {
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
             
-            if (engine.supportsAlternative(alternative, assertor)
+            if (engine.supportsAlternative(alternative, assertor, msg)
                 && isCompatibleWithRequest(alternative, request)
                 && (null == choice || alternative.size() < choice.size())) {
                 choice = alternative;
@@ -57,7 +57,7 @@ public class MinimalAlternativeSelector extends BaseAlternativeSelector {
             while (alternatives.hasNext()) {
                 List<Assertion> alternative = alternatives.next();
                 
-                if (engine.supportsAlternative(alternative, assertor)
+                if (engine.supportsAlternative(alternative, assertor, msg)
                     && (null == choice || alternative.size() < choice.size())) {
                     choice = alternative;
                 }

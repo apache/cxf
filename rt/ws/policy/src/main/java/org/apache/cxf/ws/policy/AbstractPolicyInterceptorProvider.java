@@ -21,13 +21,12 @@ package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+import org.apache.neethi.Assertion;
 
 /**
  * 
@@ -50,20 +49,7 @@ public abstract class AbstractPolicyInterceptorProvider extends AbstractAttribut
         return assertionTypes;
     }
 
-    public List<Interceptor<? extends Message>> provideInFaultInterceptors(Message m) {
-        return getInFaultInterceptors();
+    public boolean configurationPresent(Message msg, Assertion assertion) {
+        return true;
     }
-
-    public List<Interceptor<? extends Message>> provideInInterceptors(Message m) {
-        return getInInterceptors();
-    }
-
-    public List<Interceptor<? extends Message>> provideOutFaultInterceptors(Message m) {
-        return getOutFaultInterceptors();
-    }
-
-    public List<Interceptor<? extends Message>> provideOutInterceptors(Message m) {
-        return getOutInterceptors();
-    } 
-    
 }

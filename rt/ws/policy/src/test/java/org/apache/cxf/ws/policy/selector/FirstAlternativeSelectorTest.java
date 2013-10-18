@@ -68,16 +68,16 @@ public class FirstAlternativeSelectorTest extends Assert {
         Collection<PolicyAssertion> firstAlternative = 
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
         policy.addPolicyComponent(ea);
-        
-        EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(false);
+        Message m = new MessageImpl();
+
+        EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor, m)).andReturn(false);
         control.replay();
         
-        Message m = new MessageImpl();
         assertNull(selector.selectAlternative(policy, engine, assertor, null, m));  
         control.verify();
         
         control.reset();        
-        EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(true);
+        EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor, m)).andReturn(true);
         control.replay();         
         Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor, null, m); 
         assertSame(1, chosen.size());
@@ -91,8 +91,8 @@ public class FirstAlternativeSelectorTest extends Assert {
         ea.addPolicyComponent(other);
         Collection<PolicyAssertion> secondAlternative = 
             CastUtils.cast(other.getPolicyComponents(), PolicyAssertion.class);
-        EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor)).andReturn(false);
-        EasyMock.expect(engine.supportsAlternative(secondAlternative, assertor)).andReturn(true);
+        EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor, m)).andReturn(false);
+        EasyMock.expect(engine.supportsAlternative(secondAlternative, assertor, m)).andReturn(true);
         control.replay();        
       
         chosen = selector.selectAlternative(policy, engine, assertor, null, m); 

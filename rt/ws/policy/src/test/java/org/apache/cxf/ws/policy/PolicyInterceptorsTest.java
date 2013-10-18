@@ -145,7 +145,7 @@ public class PolicyInterceptorsTest extends Assert {
         EndpointPolicy endpointPolicy = control.createMock(EndpointPolicy.class);
         EasyMock.expect(pe.getClientEndpointPolicy(ei, conduit, message)).andReturn(endpointPolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
-        EasyMock.expect(endpointPolicy.getFaultInterceptors())
+        EasyMock.expect(endpointPolicy.getFaultInterceptors(message))
             .andReturn(li);
         InterceptorChain ic = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(ic);
@@ -153,7 +153,7 @@ public class PolicyInterceptorsTest extends Assert {
         EasyMock.expectLastCall();
         Collection<Assertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, Assertion.class);
-        EasyMock.expect(endpointPolicy.getFaultVocabulary()).andReturn(assertions);
+        EasyMock.expect(endpointPolicy.getFaultVocabulary(message)).andReturn(assertions);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();        
@@ -170,7 +170,7 @@ public class PolicyInterceptorsTest extends Assert {
         EndpointPolicy endpointPolicy = control.createMock(EndpointPolicyImpl.class);
         EasyMock.expect(pe.getServerEndpointPolicy(ei, destination, message)).andReturn(endpointPolicy);
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
-        EasyMock.expect(endpointPolicy.getInterceptors())
+        EasyMock.expect(endpointPolicy.getInterceptors(message))
             .andReturn(li);
         InterceptorChain ic = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(ic);
@@ -178,7 +178,7 @@ public class PolicyInterceptorsTest extends Assert {
         EasyMock.expectLastCall();
         Collection<Assertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, Assertion.class);
-        EasyMock.expect(endpointPolicy.getVocabulary()).andReturn(assertions);
+        EasyMock.expect(endpointPolicy.getVocabulary(message)).andReturn(assertions);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();       

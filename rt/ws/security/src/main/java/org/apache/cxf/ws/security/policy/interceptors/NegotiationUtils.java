@@ -227,12 +227,12 @@ final class NegotiationUtils {
             message.getExchange().put(TokenStore.class.getName(), store);
 
             EndpointPolicy ep = pe.getServerEndpointPolicy(endpoint.getEndpointInfo(), destination, message);
-            List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
+            List<Interceptor<? extends Message>> interceptors = ep.getInterceptors(message);
             for (Interceptor<? extends Message> i : interceptors) {
                 message.getInterceptorChain().add(i);
             }
 
-            Collection<Assertion> assertions = ep.getVocabulary();
+            Collection<Assertion> assertions = ep.getVocabulary(message);
             if (null != assertions) {
                 message.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
             }

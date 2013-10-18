@@ -30,14 +30,18 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
 import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
@@ -46,6 +50,7 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.neethi.Assertion;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -85,6 +90,33 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
         return headers;
     }
 
+    public boolean configurationPresent(Message msg, Assertion assertion) {
+        if (msg == null || !MessageUtils.isRequestor(msg) || !SP11Constants.HTTPS_TOKEN.equals(assertion.getName())) {
+            return true;
+        }
+        
+        HttpsToken token = (HttpsToken)assertion;        
+        if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication
+            || token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
+            try {
+                return tryAuth(msg);
+            } catch (Throwable t) {
+                //ignore, can catch it later
+            }
+        }
+        return true;
+    }    
+    
+    private boolean tryAuth(Message msg) {
+        Conduit conduit = msg.getExchange().getConduit(msg);
+        AuthorizationPolicy p = ((HTTPConduit)conduit).getEffectiveAuthPolicy(msg);
+
+        if (StringUtils.isEmpty(p.getUserName())) {
+            return false;
+        }
+        return true;
+    }
+    
     static class HttpsTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public HttpsTokenOutInterceptor() {
             super(Phase.PRE_STREAM);

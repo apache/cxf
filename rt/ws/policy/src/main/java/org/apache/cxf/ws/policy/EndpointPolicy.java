@@ -36,15 +36,15 @@ import org.apache.neethi.Policy;
 public interface EndpointPolicy {
     
     Policy getPolicy();
-    EndpointPolicy updatePolicy(Policy p);
+    EndpointPolicy updatePolicy(Policy p, Message msg);
     
     Collection<Assertion> getChosenAlternative();
     
-    Collection<Assertion> getVocabulary();
+    Collection<Assertion> getVocabulary(Message m);
     
-    Collection<Assertion> getFaultVocabulary();
+    Collection<Assertion> getFaultVocabulary(Message m);
     
-    List<Interceptor<? extends Message>> getInterceptors();
+    List<Interceptor<? extends Message>> getInterceptors(Message m);
     
-    List<Interceptor<? extends Message>> getFaultInterceptors();
+    List<Interceptor<? extends Message>> getFaultInterceptors(Message m);
 }

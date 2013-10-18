@@ -89,8 +89,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 Conduit conduit = exchange.getConduit(msg);
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit, msg);
                 if (ep != null) {
-                    interceptors.addAll(ep.getInterceptors());
-                    assertions.addAll(ep.getVocabulary());
+                    interceptors.addAll(ep.getInterceptors(msg));
+                    assertions.addAll(ep.getVocabulary(msg));
                 }
             } else {
                 // We do not know the underlying message type yet - so we pre-emptively add interceptors 
@@ -115,8 +115,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             
             EndpointPolicy ep = pe.getServerEndpointPolicy(ei, destination, msg);
             if (ep != null) {
-                interceptors.addAll(ep.getInterceptors());
-                assertions.addAll(ep.getVocabulary());
+                interceptors.addAll(ep.getInterceptors(msg));
+                assertions.addAll(ep.getVocabulary(msg));
             }
         }
         

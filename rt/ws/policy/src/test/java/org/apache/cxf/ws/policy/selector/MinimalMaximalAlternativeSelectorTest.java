@@ -74,8 +74,8 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         Collection<PolicyAssertion> minAlternative = 
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
         policy.addPolicyComponent(ea);  
-        EasyMock.expect(engine.supportsAlternative(maxAlternative, assertor)).andReturn(true);
-        EasyMock.expect(engine.supportsAlternative(minAlternative, assertor)).andReturn(true);
+        EasyMock.expect(engine.supportsAlternative(maxAlternative, assertor, m)).andReturn(true);
+        EasyMock.expect(engine.supportsAlternative(minAlternative, assertor, m)).andReturn(true);
         
         control.replay();        
         Collection<Assertion> choice = 
@@ -86,6 +86,7 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
     
     @Test
     public void testChooseMaxAlternative() {
+        Message m = new MessageImpl();
         AlternativeSelector selector = new MaximalAlternativeSelector();
         
         PolicyEngine engine = control.createMock(PolicyEngine.class);
@@ -104,11 +105,10 @@ public class MinimalMaximalAlternativeSelectorTest extends Assert {
         Collection<PolicyAssertion> minAlternative = 
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
         policy.addPolicyComponent(ea);  
-        EasyMock.expect(engine.supportsAlternative(maxAlternative, assertor)).andReturn(true);
-        EasyMock.expect(engine.supportsAlternative(minAlternative, assertor)).andReturn(true);
+        EasyMock.expect(engine.supportsAlternative(maxAlternative, assertor, m)).andReturn(true);
+        EasyMock.expect(engine.supportsAlternative(minAlternative, assertor, m)).andReturn(true);
         
         control.replay();        
-        Message m = new MessageImpl();
         Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor, null, m); 
         assertEquals(1, choice.size());
         assertSame(a1, choice.iterator().next());
