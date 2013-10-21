@@ -125,10 +125,8 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.2.3 (WSS1.1) Anonymous with X.509 Certificate, Sign, Encrypt
-     * TODO Support streaming derived
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricSignEncrypt() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -148,9 +146,9 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
         // DOM
         x509Port.doubleIt(25);
         
-        // TODO - Support derived Streaming
-        // SecurityTestUtil.enableStreaming(x509Port);
-        // x509Port.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(x509Port);
+        x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -158,10 +156,8 @@ public class StaxX509TokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.2.4 (WSS1.1) Mutual Authentication with X.509 Certificates, Sign, Encrypt
-     * TODO - Support streaming Endorsing
      */
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

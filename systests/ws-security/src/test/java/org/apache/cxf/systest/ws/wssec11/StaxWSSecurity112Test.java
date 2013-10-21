@@ -88,23 +88,17 @@ public class StaxWSSecurity112Test extends WSSecurity11Common {
                 "X-AES128",
                 "X-AES256",
                 "X-TripleDES",
-                /*
-                 * TODO Derived
                 "XD",
                 "XD-ES",
-                "XD-SEES",
-                */
+                // TODO Investigate "XD-SEES",
             };
         } else {
             argv = new String[] {
                 "X",
                 "X-NoTimestamp",
-                /*
-                 * TODO Derived
                 "XD",
                 "XD-ES",
-                "XD-SEES",
-                */
+                // TODO Investigate "XD-SEES",
             };
         }
         runClientServer(argv, unrestrictedPoliciesInstalled, true, true);

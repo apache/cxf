@@ -105,7 +105,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
             "A-NoTimestamp",
             "AD",
             // TODO See WSS-468 EncryptBeforeSigning not working "A-ES",
-            // TODO See WSS-468 Derived "AD-ES",
+            // TODO See WSS-468 Ordering issue as above "AD-ES",
             "UX",
             "UX-NoTimestamp",
             "UXD",
