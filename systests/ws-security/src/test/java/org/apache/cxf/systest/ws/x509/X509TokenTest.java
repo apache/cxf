@@ -154,7 +154,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         // DOM
         x509Port.doubleIt(25);
         
-        // TODO Streaming
+        // TODO WSS-468 Streaming
         // SecurityTestUtil.enableStreaming(x509Port);
         // x509Port.doubleIt(25);
         
@@ -182,7 +182,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         // DOM
         x509Port.doubleIt(25);
         
-        // TODO WSS-469 Streaming
+        // TODO WSS-468 Streaming
         // SecurityTestUtil.enableStreaming(x509Port);
         // x509Port.doubleIt(25);
         
@@ -1095,6 +1095,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportNegativeEndorsingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT2);
+        
+        // DOM
+        port.doubleIt(25);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         // This should fail, as the client is not endorsing the token
@@ -1102,12 +1108,22 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT2);
         
+        // DOM
         try {
             port.doubleIt(25);
             fail("Failure expected on not endorsing the token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on not endorsing the token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
         }
         
         ((java.io.Closeable)port).close();
