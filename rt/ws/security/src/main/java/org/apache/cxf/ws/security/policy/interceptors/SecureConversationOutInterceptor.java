@@ -86,7 +86,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 //server side should be checked on the way in
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
-                }                    
+                }
+                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             }
         }
     }
