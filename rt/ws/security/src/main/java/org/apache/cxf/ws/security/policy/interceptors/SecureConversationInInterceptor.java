@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -61,7 +62,7 @@ import org.apache.neethi.Policy;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
-import org.apache.wss4j.policy.SPConstants.SPVersion;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.ProtectionToken;
@@ -73,7 +74,6 @@ import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SecureConversationInInterceptor.class);
-
     
     public SecureConversationInInterceptor() {
         super(Phase.PRE_STREAM);
@@ -154,20 +154,19 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     final SecureConversationToken secureConversationToken = 
                         new SecureConversationToken(
                             SPConstants.SPVersion.SP12,
-                            SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+                            SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER,
                             null,
                             null,
                             null,
                             new Policy()
                         );
-                    secureConversationToken.setOptional(true);
                     
-                    class InternalProtectionToken extends ProtectionToken {
-                        public InternalProtectionToken(SPVersion version, Policy nestedPolicy) {
-                            super(version, nestedPolicy);
-                            super.setToken(secureConversationToken);
-                        }
-                    }
+                    Policy sctPolicy = new Policy();
+                    ExactlyOne sctPolicyEa = new ExactlyOne();
+                    sctPolicy.addPolicyComponent(sctPolicyEa);
+                    All sctPolicyAll = new All();
+                    sctPolicyAll.addPolicyComponent(secureConversationToken);
+                    sctPolicyEa.addPolicyComponent(sctPolicyAll);
                     
                     Policy bindingPolicy = new Policy();
                     ExactlyOne bindingPolicyEa = new ExactlyOne();
@@ -176,15 +175,15 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     
                     AbstractBinding origBinding = getBinding(aim);
                     bindingPolicyAll.addPolicyComponent(origBinding.getAlgorithmSuite());
+                    bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, sctPolicy));
                     bindingPolicyAll.addAssertion(
                         new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+                    bindingPolicyAll.addAssertion(
+                        new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
                     bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
                     
                     DefaultSymmetricBinding binding = 
                         new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
-                    binding.setProtectionToken(
-                        new InternalProtectionToken(SPConstants.SPVersion.SP12, new Policy())
-                    );
                     binding.setOnlySignEntireHeadersAndBody(true);
                     binding.setProtectTokens(false);
                     
@@ -392,7 +391,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     return;
                 }
                 for (AssertionInfo inf : ais) {
-                    if (foundSCT) {
+                    SecureConversationToken token = (SecureConversationToken)inf.getAssertion();
+                    IncludeTokenType inclusion = token.getIncludeTokenType();
+                    if (foundSCT || token.isOptional()
+                        || (!foundSCT && inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER)) {
                         inf.setAsserted(true);
                     } else {
                         inf.setNotAsserted("No SecureConversation token found in message.");
