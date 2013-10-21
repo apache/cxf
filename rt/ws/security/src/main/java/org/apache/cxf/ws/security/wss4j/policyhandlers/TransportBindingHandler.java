@@ -161,9 +161,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             throw new Fault(e);
         }
         
-        assertAlgorithmSuite(tbinding.getAlgorithmSuite());
-        assertWSSProperties(tbinding.getName().getNamespaceURI());
-        assertTrustProperties(tbinding.getName().getNamespaceURI());
+        if (tbinding != null) {
+            assertAlgorithmSuite(tbinding.getAlgorithmSuite());
+            assertWSSProperties(tbinding.getName().getNamespaceURI());
+            assertTrustProperties(tbinding.getName().getNamespaceURI());
+        }
     }
     
     /**

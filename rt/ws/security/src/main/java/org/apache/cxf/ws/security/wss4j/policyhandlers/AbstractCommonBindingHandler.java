@@ -109,6 +109,10 @@ public abstract class AbstractCommonBindingHandler {
     }
     
     protected void assertAlgorithmSuite(AlgorithmSuite algorithmSuite) {
+        if (algorithmSuite == null) {
+            return;
+        }
+        
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> algorithmSuiteAis = aim.get(algorithmSuite.getName());
         for (AssertionInfo ai : algorithmSuiteAis) {
