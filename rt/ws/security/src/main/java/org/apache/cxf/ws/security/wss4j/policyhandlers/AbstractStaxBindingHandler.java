@@ -24,14 +24,11 @@ import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
@@ -41,18 +38,15 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -62,7 +56,6 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -108,14 +101,12 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.apache.xml.security.utils.Base64;
 import org.opensaml.common.SAMLVersion;
 
 /**
  * 
  */
-public abstract class AbstractStaxBindingHandler {
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractStaxBindingHandler.class);
+public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHandler {
     protected boolean timestampAdded;
     protected boolean signatureConfirmationAdded;
     protected Set<SecurePart> encryptedTokensList = new HashSet<SecurePart>();
@@ -127,15 +118,14 @@ public abstract class AbstractStaxBindingHandler {
     protected Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens;
     
     private final Map<String, Object> properties;
-    private final SoapMessage message;
     
     public AbstractStaxBindingHandler(
         Map<String, Object> properties, 
         SoapMessage msg,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
     ) {
+        super(msg);
         this.properties = properties;
-        this.message = msg;
         this.outboundTokens = outboundTokens;
     }
 
@@ -489,29 +479,11 @@ public abstract class AbstractStaxBindingHandler {
                            encryptedKeySecurityTokenProvider);
     }
     
-    protected void policyNotAsserted(Assertion assertion, String reason) {
-        if (assertion == null) {
-            return;
-        }
-        LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.get(assertion.getName());
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == assertion) {
-                    ai.setNotAsserted(reason);
-                }
-            }
-        }
-        if (!assertion.isOptional()) {
-            throw new PolicyException(new Message(reason, LOG));
-        }
-    }
-    
     protected void configureTimestamp(AssertionInfoMap aim) {
         AbstractBinding binding = getBinding(aim);
         if (binding != null && binding.isIncludeTimestamp()) {
             timestampAdded = true;
+            assertPolicy(new QName(binding.getName().getNamespaceURI(), SPConstants.INCLUDE_TIMESTAMP));
         }
     }
     
@@ -520,6 +492,12 @@ public abstract class AbstractStaxBindingHandler {
         Layout layout = null;
         for (AssertionInfo ai : ais) {
             layout = (Layout)ai.getAssertion();
+            Collection<AssertionInfo> layoutTypeAis = aim.get(layout.getName());
+            if (layoutTypeAis != null) {
+                for (AssertionInfo layoutAi : layoutTypeAis) {
+                    layoutAi.setAsserted(true);
+                }
+            }
             ai.setAsserted(true);
         }
         
@@ -546,76 +524,10 @@ public abstract class AbstractStaxBindingHandler {
         }
     }
 
-    protected AbstractBinding getBinding(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        return null;
-    }
-    
-    protected boolean isRequestor() {
-        return MessageUtils.isRequestor(message);
-    }
-    
-    protected boolean isTokenRequired(IncludeTokenType includeToken) {
-        if (includeToken == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-            return false;
-        } else if (includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
-            return true;
-        } else {
-            boolean initiator = MessageUtils.isRequestor(message);
-            if (initiator && (includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
-                || includeToken == IncludeTokenType.INCLUDE_TOKEN_ONCE)) {
-                return true;
-            } else if (!initiator && includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
-                return true;
-            }
-            return false;
-        }
-    }
-    
-    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
-        AssertionInfoMap aim,
-        String localname
-    ) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
-        }
-
-        return Collections.emptySet();
-    }
-
     protected Map<String, Object> getProperties() {
         return properties;
     }
 
-    protected SoapMessage getMessage() {
-        return message;
-    }
-    
     protected void configureSignature(
         AbstractTokenWrapper wrapper, AbstractToken token, boolean attached
     ) throws WSSecurityException {
@@ -701,25 +613,6 @@ public abstract class AbstractStaxBindingHandler {
         }
         
         return "IssuerSerial";
-    }
-    
-    protected Wss10 getWss10() {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.WSS11);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }  
-        
-        return null;
     }
     
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
@@ -887,36 +780,6 @@ public abstract class AbstractStaxBindingHandler {
             }
         }
     }
-    
-    protected SecurityToken getSecurityToken() {
-        SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-        if (st == null) {
-            String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-            if (id != null) {
-                st = WSS4JUtils.getTokenStore(message).getToken(id);
-            }
-        }
-        if (st != null) {
-            WSS4JUtils.getTokenStore(message).add(st);
-            return st;
-        }
-        return null;
-    }
-
-    
-    protected Collection<Assertion> findAndAssertPolicy(QName n) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            List<Assertion> p = new ArrayList<Assertion>(ais.size());
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-                p.add(ai.getAssertion());
-            }
-            return p;
-        }
-        return null;
-    } 
     
     protected void addSupportingTokens() throws Exception {
         
@@ -1182,16 +1045,6 @@ public abstract class AbstractStaxBindingHandler {
                 internal.handle(callbacks);
             }
         }
-    }
-    
-    private static String getSHA1(byte[] input) {
-        try {
-            byte[] digestBytes = WSSecurityUtil.generateDigest(input);
-            return Base64.encode(digestBytes);
-        } catch (WSSecurityException e) {
-            //REVISIT
-        }
-        return null;
     }
     
     protected org.apache.xml.security.stax.securityToken.SecurityToken 

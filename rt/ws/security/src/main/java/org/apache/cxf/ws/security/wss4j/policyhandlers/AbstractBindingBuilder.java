@@ -25,7 +25,6 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +56,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -71,7 +69,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyConstants;
-import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -151,7 +148,7 @@ import org.opensaml.common.SAMLVersion;
 /**
  * 
  */
-public abstract class AbstractBindingBuilder {
+public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandler {
     public static final String CRYPTO_CACHE = "ws-security.crypto.cache";
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBindingBuilder.class);
     
@@ -163,7 +160,6 @@ public abstract class AbstractBindingBuilder {
     protected WSSecHeader secHeader;
     protected AssertionInfoMap aim;
     protected AbstractBinding binding;
-    protected SoapMessage message;
     protected WSSecTimestamp timestampEl;
     protected String mainSigId;
     protected List<WSEncryptionPart> sigConfList;
@@ -192,12 +188,12 @@ public abstract class AbstractBindingBuilder {
                            WSSecHeader secHeader,
                            AssertionInfoMap aim,
                            SoapMessage message) {
+        super(message);
         this.wssConfig = config;
         this.binding = binding;
         this.aim = aim;
         this.secHeader = secHeader;
         this.saaj = saaj;
-        this.message = message;
         message.getExchange().put(WSHandlerConstants.SEND_SIGV, signatures);
     }
     
@@ -284,116 +280,6 @@ public abstract class AbstractBindingBuilder {
         topDownElement = el;
     }
     
-    protected boolean isRequestor() {
-        return MessageUtils.isRequestor(message);
-    }
-    
-    protected Collection<AssertionInfo> getAllAssertionsByLocalname(String localname) {
-        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        
-        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
-            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
-            if (sp11Ais != null) {
-                ais.addAll(sp11Ais);
-            }
-            if (sp12Ais != null) {
-                ais.addAll(sp12Ais);
-            }
-            return ais;
-        }
-            
-        return Collections.emptySet();
-    }
-    
-    protected void policyNotAsserted(Assertion assertion, Exception reason) {
-        if (assertion == null) {
-            return;
-        }
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
-        }
-        Collection<AssertionInfo> ais = aim.get(assertion.getName());
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == assertion) {
-                    ai.setNotAsserted(reason.getMessage());
-                }
-            }
-        }
-        if (!assertion.isOptional()) {
-            throw new PolicyException(new Message(reason.getMessage(), LOG), reason);
-        }
-    }
-    
-    protected void policyNotAsserted(Assertion assertion, String reason) {
-        if (assertion == null) {
-            return;
-        }
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
-        }
-        Collection<AssertionInfo> ais = aim.get(assertion.getName());
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == assertion) {
-                    ai.setNotAsserted(reason);
-                }
-            }
-        }
-        if (!assertion.isOptional()) {
-            throw new PolicyException(new Message(reason, LOG));
-        }
-    }
-    
-    protected void policyAsserted(Assertion assertion) {
-        if (assertion == null) {
-            return;
-        }
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Asserting " + assertion.getName());
-        }
-        Collection<AssertionInfo> ais = aim.get(assertion.getName());
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == assertion) {
-                    ai.setAsserted(true);
-                }
-            }
-        }
-    }
-    
-    protected void policyAsserted(QName n) {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
-        }
-    }
-    
-    protected void policyAsserted(String localname) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(localname);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
-        }
-    }
-    
-    protected Collection<Assertion> findAndAssertPolicy(QName n) {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
-        if (ais != null && !ais.isEmpty()) {
-            List<Assertion> p = new ArrayList<Assertion>(ais.size());
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-                p.add(ai.getAssertion());
-            }
-            return p;
-        }
-        return null;
-    } 
-    
     protected final Map<Object, Crypto> getCryptoCache() {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
@@ -445,7 +331,9 @@ public abstract class AbstractBindingBuilder {
                         ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST + " requires a timestamp");
                     } else {
                         ai.setAsserted(true);
-                        policyAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
+                        assertPolicy(
+                            new QName(layout.getName().getNamespaceURI(), 
+                                      SPConstants.LAYOUT_LAX_TIMESTAMP_LAST));
                         Element el = timestamp.getElement();
                         secHeader.getSecurityHeader().appendChild(el);
                         if (bottomUpElement == null) {
@@ -457,14 +345,18 @@ public abstract class AbstractBindingBuilder {
                         ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST + " requires a timestamp");
                     } else {
                         addTopDownElement(timestampEl.getElement());
-                        policyAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
+                        assertPolicy(
+                             new QName(layout.getName().getNamespaceURI(), 
+                                       SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST));
                     }
                 } else if (timestampEl != null) {
                     addTopDownElement(timestampEl.getElement());
                 }
                 
-                policyAsserted(SPConstants.LAYOUT_LAX);
-                policyAsserted(SPConstants.LAYOUT_STRICT);
+                assertPolicy(
+                    new QName(layout.getName().getNamespaceURI(), SPConstants.LAYOUT_LAX));
+                assertPolicy(
+                    new QName(layout.getName().getNamespaceURI(), SPConstants.LAYOUT_STRICT));
             }                    
         } else if (timestampEl != null) {
             addTopDownElement(timestampEl.getElement());
@@ -479,7 +371,7 @@ public abstract class AbstractBindingBuilder {
         for (Assertion pa : suppTokens) {
             if (pa instanceof SupportingTokens) {
                 for (AbstractToken token : ((SupportingTokens)pa).getTokens()) {
-                    this.policyAsserted(token);
+                    this.assertPolicy(token);
                 }        
             }
         }
@@ -664,21 +556,6 @@ public abstract class AbstractBindingBuilder {
         return (Element)secHeader.getSecurityHeader().getOwnerDocument().importNode(el, true);
     }
 
-    protected SecurityToken getSecurityToken() {
-        SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-        if (st == null) {
-            String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-            if (id != null) {
-                st = getTokenStore().getToken(id);
-            }
-        }
-        if (st != null) {
-            getTokenStore().add(st);
-            return st;
-        }
-        return null;
-    }
-
     protected void addSignatureParts(Map<AbstractToken, Object> tokenMap,
                                        List<WSEncryptionPart> sigParts) {
         
@@ -835,7 +712,8 @@ public abstract class AbstractBindingBuilder {
             if (token.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
-                policyAsserted(SPConstants.NO_PASSWORD);
+                assertPolicy(
+                     new QName(token.getName().getNamespaceURI(), SPConstants.NO_PASSWORD));
             } else {
                 String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
                 if (StringUtils.isEmpty(password)) {
@@ -846,7 +724,9 @@ public abstract class AbstractBindingBuilder {
                     // If the password is available then build the token
                     if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
-                        policyAsserted(SPConstants.HASH_PASSWORD);
+                        assertPolicy(
+                            new QName(token.getName().getNamespaceURI(), 
+                                      SPConstants.HASH_PASSWORD));
                     } else {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
                     }
@@ -859,16 +739,18 @@ public abstract class AbstractBindingBuilder {
             
             if (token.isCreated() && token.getPasswordType() != UsernameToken.PasswordType.HashPassword) {
                 utBuilder.addCreated();
-                policyAsserted(SP13Constants.CREATED);
+                assertPolicy(SP13Constants.CREATED);
             }
             if (token.isNonce() && token.getPasswordType() != UsernameToken.PasswordType.HashPassword) {
                 utBuilder.addNonce();
-                policyAsserted(SP13Constants.NONCE);
+                assertPolicy(SP13Constants.NONCE);
             }
             
             info.setAsserted(true);
-            policyAsserted(SPConstants.USERNAME_TOKEN10);
-            policyAsserted(SPConstants.USERNAME_TOKEN11);
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN10));
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN11));
             return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
@@ -909,8 +791,10 @@ public abstract class AbstractBindingBuilder {
             }
             
             info.setAsserted(true);
-            policyAsserted(SPConstants.USERNAME_TOKEN10);
-            policyAsserted(SPConstants.USERNAME_TOKEN11);
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN10));
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN11));
             return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
@@ -973,11 +857,14 @@ public abstract class AbstractBindingBuilder {
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
-            policyAsserted("WssSamlV11Token10");
-            policyAsserted("WssSamlV11Token11");
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), "WssSamlV11Token10"));
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), "WssSamlV11Token11"));
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
-            policyAsserted("WssSamlV20Token11");
+            assertPolicy(
+                new QName(token.getName().getNamespaceURI(), "WssSamlV20Token11"));
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
@@ -1634,13 +1521,13 @@ public abstract class AbstractBindingBuilder {
             tokenTypeSet = true;
         }
         
-        policyAsserted(token);
-        policyAsserted(wrapper);
+        assertPolicy(token);
+        assertPolicy(wrapper);
         
         if (!tokenTypeSet) {
             if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
                 Wss10 wss = getWss10();
-                policyAsserted(wss);
+                assertPolicy(wss);
                 if (wss == null || wss.isMustSupportRefKeyIdentifier()) {
                     secBase.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
                 } else if (wss.isMustSupportRefIssuerSerial()) {
@@ -1744,24 +1631,6 @@ public abstract class AbstractBindingBuilder {
         return null;
     }
     
-    protected Wss10 getWss10() {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.WSS10);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }
-        
-        ais = getAllAssertionsByLocalname(SPConstants.WSS11);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }  
-        
-        return null;
-    }
-
     private void checkForX509PkiPath(WSSecSignature sig, AbstractToken token) {
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token) token;
@@ -1786,8 +1655,8 @@ public abstract class AbstractBindingBuilder {
         checkForX509PkiPath(sig, token);
         boolean alsoIncludeToken = false;
         if (token instanceof IssuedToken || token instanceof SamlToken) {
-            policyAsserted(token);
-            policyAsserted(wrapper);
+            assertPolicy(token);
+            assertPolicy(wrapper);
             SecurityToken securityToken = getSecurityToken();
             String tokenType = securityToken.getTokenType();
             
@@ -2020,7 +1889,7 @@ public abstract class AbstractBindingBuilder {
                       
         //Check for whether the token is attached in the message or not
         boolean attached = false;
-        if (includeToken(policyToken.getIncludeTokenType())) {
+        if (isTokenRequired(policyToken.getIncludeTokenType())) {
             attached = true;
         }
         
@@ -2296,7 +2165,8 @@ public abstract class AbstractBindingBuilder {
             }
         }
         
-        policyAsserted(SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
+        assertPolicy(
+            new QName(wss10.getName().getNamespaceURI(), SPConstants.REQUIRE_SIGNATURE_CONFIRMATION));
     }
     
     /**
@@ -2363,23 +2233,5 @@ public abstract class AbstractBindingBuilder {
         part.setElement(element);
         return part;
     }
-    
-    protected boolean includeToken(IncludeTokenType inclusion) {
-        if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
-            return true;
-        }
-        if (isRequestor()) {
-            if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT 
-                || inclusion == IncludeTokenType.INCLUDE_TOKEN_ONCE) {
-                return true;
-            }
-        } else {
-            if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     
 }

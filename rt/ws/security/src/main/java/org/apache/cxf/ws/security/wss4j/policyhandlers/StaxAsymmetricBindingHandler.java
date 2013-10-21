@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -90,11 +91,20 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         if (abinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_BEFORE_SIGNING));
         } else {
             doSignBeforeEncrypt();
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.SIGN_BEFORE_ENCRYPTING));
         }
         
         configureLayout(aim);
+        assertAlgorithmSuite(abinding.getAlgorithmSuite());
+        assertWSSProperties(abinding.getName().getNamespaceURI());
+        assertTrustProperties(abinding.getName().getNamespaceURI());
+        assertPolicy(
+            new QName(abinding.getName().getNamespaceURI(), SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
     }
 
     private void doSignBeforeEncrypt() {
@@ -175,6 +185,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
                     enc.add(securePart);
                 }
+                assertPolicy(
+                    new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
             }
             
             //Do encryption
@@ -274,6 +286,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                             new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
                         encrParts.add(securePart);
                     }
+                    assertPolicy(
+                        new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
                 }
                 
                 doEncryption(wrapper, encrParts, true);
@@ -422,6 +436,11 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken
             || sigToken instanceof SamlToken) {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+        }
+        
+        if (abinding.isProtectTokens()) {
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);

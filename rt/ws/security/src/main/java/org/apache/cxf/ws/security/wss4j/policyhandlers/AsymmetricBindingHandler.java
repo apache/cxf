@@ -28,11 +28,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.Reference;
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -68,7 +68,6 @@ import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.SamlToken;
-
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -102,11 +101,19 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         if (abinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
-            policyAsserted(SPConstants.ENCRYPT_BEFORE_SIGNING);
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_BEFORE_SIGNING));
         } else {
             doSignBeforeEncrypt();
-            policyAsserted(SPConstants.SIGN_BEFORE_ENCRYPTING);
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.SIGN_BEFORE_ENCRYPTING));
         }
+        
+        assertAlgorithmSuite(abinding.getAlgorithmSuite());
+        assertWSSProperties(abinding.getName().getNamespaceURI());
+        assertTrustProperties(abinding.getName().getNamespaceURI());
+        assertPolicy(
+            new QName(abinding.getName().getNamespaceURI(), SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
     }
 
     private void doSignBeforeEncrypt() {
@@ -124,9 +131,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         policyNotAsserted(initiatorToken, "Security token is not found or expired");
                         return;
                     } else {
-                        policyAsserted(initiatorToken);
+                        assertPolicy(initiatorToken);
                         
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
+                        if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
                             Element el = secToken.getToken();
                             this.addEncryptedKeyElement(cloneElement(el));
                             attached = true;
@@ -135,11 +142,11 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null) {
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
+                        if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
                             addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                             storeAssertionAsSecurityToken(assertionWrapper);
                         }
-                        policyAsserted(initiatorToken);
+                        assertPolicy(initiatorToken);
                     }
                 } else if (initiatorToken instanceof SamlToken) {
                     String tokenId = getSAMLToken();
@@ -187,7 +194,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (sigConfList != null && !sigConfList.isEmpty()) {
                     enc.addAll(sigConfList);
                 }
-                policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
+                assertPolicy(
+                    new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
             }
             
             //Do encryption
@@ -244,9 +252,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     policyNotAsserted(initiatorToken, "Security token is not found or expired");
                     return;
                 } else {
-                    policyAsserted(initiatorToken);
+                    assertPolicy(initiatorToken);
                     
-                    if (includeToken(initiatorToken.getIncludeTokenType())) {
+                    if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
                         Element el = secToken.getToken();
                         this.addEncryptedKeyElement(cloneElement(el));
                         attached = true;
@@ -256,11 +264,11 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 try {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null) {
-                        if (includeToken(initiatorToken.getIncludeTokenType())) {
+                        if (isTokenRequired(initiatorToken.getIncludeTokenType())) {
                             addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                             storeAssertionAsSecurityToken(assertionWrapper);
                         }
-                        policyAsserted(initiatorToken);
+                        assertPolicy(initiatorToken);
                     }
                 } catch (Exception e) {
                     String reason = e.getMessage();
@@ -354,7 +362,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         
         // Check for signature protection
         if (abinding.isEncryptSignature()) {
-            policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
 
             // Now encrypt the signature using the above token
             if (mainSigId != null) {
@@ -415,8 +424,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         //Do encryption
         if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
             AbstractToken encrToken = recToken.getToken();
-            policyAsserted(recToken);
-            policyAsserted(encrToken);
+            assertPolicy(recToken);
+            assertPolicy(encrToken);
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 try {
@@ -556,7 +565,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         sigParts.addAll(this.getSignedParts());
         if (sigParts.isEmpty()) {
             // Add the BST to the security header if required
-            if (!attached && includeToken(sigToken.getIncludeTokenType())) {
+            if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
                 WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
                 sig.prependBSTElementToHeader(secHeader);
             } 
@@ -581,7 +590,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 dkSign.prepare(saaj.getSOAPPart(), secHeader);
 
                 if (abinding.isProtectTokens()) {
-                    policyAsserted(SPConstants.PROTECT_TOKENS);
+                    assertPolicy(
+                        new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
                     if (bstElement != null) {
                         WSEncryptionPart bstPart = 
                             new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
@@ -621,7 +631,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                       
             // This action must occur before sig.prependBSTElementToHeader
             if (abinding.isProtectTokens()) {
-                policyAsserted(SPConstants.PROTECT_TOKENS);
+                assertPolicy(
+                    new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
                 if (sig.getBSTTokenId() != null) {
                     WSEncryptionPart bstPart = 
                         new WSEncryptionPart(sig.getBSTTokenId());

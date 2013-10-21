@@ -103,7 +103,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             } else if (token instanceof IssuedToken || token instanceof KerberosToken) {
                 SecurityToken secTok = getSecurityToken();
                 
-                if (includeToken(token.getIncludeTokenType())) {
+                if (isTokenRequired(token.getIncludeTokenType())) {
                     //Add the token
                     addEncryptedKeyElement(cloneElement(secTok.getToken()));
                 }
@@ -140,9 +140,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             policyNotAsserted(transportToken, "No transport token id");
                             return;
                         } else {
-                            policyAsserted(transportToken);
+                            assertPolicy(transportToken);
                         }
-                        if (includeToken(transportToken.getIncludeTokenType())) {
+                        if (isTokenRequired(transportToken.getIncludeTokenType())) {
                             Element el = secToken.getToken();
                             addEncryptedKeyElement(cloneElement(el));
                         } 
@@ -160,6 +160,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             LOG.log(Level.FINE, e.getMessage(), e);
             throw new Fault(e);
         }
+        
+        assertAlgorithmSuite(tbinding.getAlgorithmSuite());
+        assertWSSProperties(tbinding.getName().getNamespaceURI());
+        assertTrustProperties(tbinding.getName().getNamespaceURI());
     }
     
     /**
@@ -387,7 +391,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             );
         }
         
-        if (includeToken(token.getIncludeTokenType())) {
+        if (isTokenRequired(token.getIncludeTokenType())) {
             //Add the token
             Element el = cloneElement(secTok.getToken());
             //if (securityTok != null) {

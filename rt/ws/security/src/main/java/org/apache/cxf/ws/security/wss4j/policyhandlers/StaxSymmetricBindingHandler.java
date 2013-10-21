@@ -124,8 +124,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         if (sbinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
+            assertPolicy(
+                new QName(sbinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_BEFORE_SIGNING));
         } else {
             doSignBeforeEncrypt();
+            assertPolicy(
+                new QName(sbinding.getName().getNamespaceURI(), SPConstants.SIGN_BEFORE_ENCRYPTING));
         }
         
         if (!isRequestor()) {
@@ -133,6 +137,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         configureLayout(aim);
+        assertAlgorithmSuite(sbinding.getAlgorithmSuite());
+        assertWSSProperties(sbinding.getName().getNamespaceURI());
+        assertTrustProperties(sbinding.getName().getNamespaceURI());
+        assertPolicy(
+            new QName(sbinding.getName().getNamespaceURI(), SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
     }
     
     private void doEncryptBeforeSign() {
@@ -225,6 +234,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     SecurePart part = 
                         new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
                     encrParts.add(part);
+                    assertPolicy(
+                        new QName(sbinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
                 }
                 
                 doEncryption(encryptionWrapper, encrParts, true);
@@ -369,6 +380,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 SecurePart part = 
                     new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
                 enc.add(part);
+                assertPolicy(
+                    new QName(sbinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
             }
             
             //Do encryption
@@ -530,8 +543,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         AbstractToken sigToken = wrapper.getToken();
-        if (sbinding.isProtectTokens() && (sigToken instanceof X509Token) && isRequestor()) {
-            parts += "{Element}{" + WSSConstants.NS_XMLENC + "}EncryptedKey;";
+        if (sbinding.isProtectTokens()) {
+            if ((sigToken instanceof X509Token) && isRequestor()) {
+                parts += "{Element}{" + WSSConstants.NS_XMLENC + "}EncryptedKey;";
+            }
+            assertPolicy(
+                new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
