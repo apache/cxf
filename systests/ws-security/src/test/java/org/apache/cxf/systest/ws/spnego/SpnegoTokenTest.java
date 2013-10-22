@@ -127,11 +127,11 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(spnegoPort, PORT);
         
         // DOM
-        // spnegoPort.doubleIt(25);
+        spnegoPort.doubleIt(25);
         
-        // TODO Hanging, see WSS-480 Streaming
-        // SecurityTestUtil.enableStreaming(spnegoPort);
-        // spnegoPort.doubleIt(25);
+        // Streaming
+        SecurityTestUtil.enableStreaming(spnegoPort);
+        spnegoPort.doubleIt(25);
         
         ((java.io.Closeable)spnegoPort).close();
         bus.shutdown(true);

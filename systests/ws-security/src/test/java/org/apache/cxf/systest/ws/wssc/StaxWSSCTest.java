@@ -28,7 +28,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -67,128 +66,120 @@ public class StaxWSSCTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
         stopAllServers();
     }
-  /*  
+ 
+    // TODO
     @Test
+    @org.junit.Ignore
     public void testSecureConversationMutualCertificate10SignEncryptIPingService() throws Exception {
         runTest(false, "SecureConversation_MutualCertificate10SignEncrypt_IPingService");
-        // TODO Hanging due to Derived Keys...
+        // TODO Endorsing streaming not supported
         // runTest(true, "SecureConversation_MutualCertificate10SignEncrypt_IPingService");
     }
-*/
+
     @Test
     public void testACIPingService() throws Exception {
         runTest(false, "AC_IPingService");
         runTest(true, "AC_IPingService");
     }
-/*
+
     @Test
     public void testADCIPingService() throws Exception {
         runTest(false, "ADC_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "ADC_IPingService");
+        runTest(true, "ADC_IPingService");
     }
 
     @Test
     public void testADCESIPingService() throws Exception {
         runTest(false, "ADC-ES_IPingService");
-        // TODO Hanging due to Derived Keys...
+        // TODO Error with "EncryptBeforeSigning" ordering.
         // runTest(true, "ADC-ES_IPingService");
     }
-*/
+
     @Test
     public void testAIPingService() throws Exception {
         runTest(false, "_A_IPingService");
         runTest(true, "_A_IPingService");
     }
-/*
+
     @Test
     public void testADIPingService() throws Exception {
         runTest(false, "_AD_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "_AD_IPingService");
+        runTest(true, "_AD_IPingService");
     }
 
     @Test
     public void testADESIPingService() throws Exception {
         runTest(false, "_AD-ES_IPingService");
-        // TODO Hanging due to Derived Keys...
+        // TODO Error with "EncryptBeforeSigning" ordering.
         // runTest(true, "_AD-ES_IPingService");
     }
-*/
+
     @Test
     public void testUXCIPingService() throws Exception {
         runTest(false, "UXC_IPingService");
         runTest(true, "UXC_IPingService");
     }
-/*
+
     @Test
     public void testUXDCIPingService() throws Exception {
         runTest(false, "UXDC_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "UXDC_IPingService");
+        runTest(true, "UXDC_IPingService");
     }
 
     @Test
     public void testUXDCSEESIPingService() throws Exception {
         runTest(false, "UXDC-SEES_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "UXDC-SEES_IPingService");
+        // TODO runTest(true, "UXDC-SEES_IPingService");
     }
-*/
+
     @Test
     public void testUXIPingService() throws Exception {
         runTest(false, "_UX_IPingService");
         runTest(true, "_UX_IPingService");
     }
-/*
+
     @Test
     public void testUXDIPingService() throws Exception {
         runTest(false, "_UXD_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "_UXD_IPingService");
+        runTest(true, "_UXD_IPingService");
     }
 
     @Test
     public void testUXDSEESIPingService() throws Exception {
         runTest(false, "_UXD-SEES_IPingService");
-        // TODO Hanging due to Derived Keys...
         // runTest(true, "_UXD-SEES_IPingService");
     }
-*/
+
     @Test
     public void testXCIPingService() throws Exception {
         runTest(false, "XC_IPingService");
         // TODO Streaming endorsing not working runTest(true, "XC_IPingService");
     }
-/*
+
     @Test
     public void testXDCIPingService() throws Exception {
         runTest(false, "XDC_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "XDC_IPingService");
+        // TODO Streaming endorsing not working runTest(true, "XDC_IPingService");
     }
 
     @Test
     public void testXDCIPingService1() throws Exception {
         runTest(false, "XDC_IPingService1");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "XDC_IPingService1");
+        // TODO Streaming endorsing not working runTest(true, "XDC_IPingService1");
     }
 
     @Test
     public void testXDCESIPingService() throws Exception {
         runTest(false, "XDC-ES_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "XDC-ES_IPingService");
+        // TODO Streaming endorsing not working runTest(true, "XDC-ES_IPingService");
     }
 
     @Test
     public void testXDCSEESIPingService() throws Exception {
         runTest(false, "XDC-SEES_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "XDC-SEES_IPingService");
+        // TODO runTest(true, "XDC-SEES_IPingService");
     }
-*/
+
     @Test
     public void testXIPingService() throws Exception {
         runTest(false, "_X_IPingService");
@@ -200,28 +191,25 @@ public class StaxWSSCTest extends AbstractBusClientServerTestBase {
         runTest(false, "_X10_IPingService");
         runTest(true, "_X10_IPingService");
     }
-/*
+
     @Test
     public void testXDIPingService() throws Exception {
         runTest(false, "_XD_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "_XD_IPingService");
+        // TODO Streaming endorsing not working runTest(true, "_XD_IPingService");
     }
 
     @Test
     public void testXDSEESIPingService() throws Exception {
         runTest(false, "_XD-SEES_IPingService");
-        // TODO Hanging due to Derived Keys...
-        // runTest(true, "_XD-SEES_IPingService");
+        // TODO Streaming endorsing not working runTest(true, "_XD-SEES_IPingService");
     }
 
     @Test
     public void testXDESIPingService() throws Exception {
         runTest(false, "_XD-ES_IPingService");
-        // TODO Hanging due to Derived Keys...
+        // TODO "EncryptBeforeSigning" ordering issue
         // runTest(true, "_XD-ES_IPingService");
     }
-*/
 
     private void runTest(boolean streaming, String ... argv) throws Exception {
         for (String portPrefix : argv) {
