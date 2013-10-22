@@ -1079,6 +1079,38 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetPrimitiveIntArray() throws Exception {
+        String address = "http://localhost:" + PORT;
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 
+        bean.setProvider(new BookStore.PrimitiveIntArrayReaderWriter());
+        bean.setAddress(address);
+        bean.setResourceClass(BookStore.class);
+        BookStore store = bean.create(BookStore.class);
+        int[] arr = store.getBookIndexAsIntArray();
+        assertEquals(3, arr.length);
+        assertEquals(1, arr[0]);
+        assertEquals(2, arr[1]);
+        assertEquals(3, arr[2]);
+    }
+    
+    @Test
+    public void testGetPrimitiveDoubleArray() throws Exception {
+        String address = "http://localhost:" + PORT;
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 
+        bean.setProvider(new BookStore.PrimitiveDoubleArrayReaderWriter());
+        bean.setAddress(address);
+        bean.setResourceClass(BookStore.class);
+        BookStore store = bean.create(BookStore.class);
+        WebClient.getConfig(store).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        double[] arr = store.getBookIndexAsDoubleArray();
+        assertEquals(3, arr.length);
+        assertEquals(1, arr[0], 0.0);
+        assertEquals(2, arr[1], 0.0);
+        assertEquals(3, arr[2], 0.0);
+    }
+    
+    
+    @Test
     public void testGetStringList() throws Exception {
         String address = "http://localhost:" + PORT;
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 

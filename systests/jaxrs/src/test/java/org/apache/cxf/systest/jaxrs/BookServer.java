@@ -65,6 +65,8 @@ public class BookServer extends AbstractBusTestServerBase {
         p.setEnableBuffering(true);
         p.setReportByteArraySize(true);
         providers.add(p);
+        providers.add(new BookStore.PrimitiveIntArrayReaderWriter());
+        providers.add(new BookStore.PrimitiveDoubleArrayReaderWriter());
         providers.add(new BookStore.StringArrayBodyReaderWriter());
         providers.add(new BookStore.StringListBodyReaderWriter());
         providers.add(new ContentTypeModifyingMBW());
