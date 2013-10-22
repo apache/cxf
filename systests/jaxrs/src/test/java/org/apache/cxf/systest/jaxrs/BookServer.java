@@ -62,6 +62,8 @@ public class BookServer extends AbstractBusTestServerBase {
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
         providers.add(p);
+        providers.add(new BookStore.PrimitiveIntArrayReaderWriter());
+        providers.add(new BookStore.PrimitiveDoubleArrayReaderWriter());
         providers.add(new BookStore.StringArrayBodyReaderWriter());
         providers.add(new BookStore.StringListBodyReaderWriter());
         JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();

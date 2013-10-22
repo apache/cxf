@@ -335,7 +335,7 @@ public final class ProviderFactory {
                                      Class<?> providerClass,
                                      boolean injectContext) {
         
-        Class<?> mapperClass =  ClassHelper.getRealClass(em.getProvider());
+        Class<?> mapperClass = ClassHelper.getRealClass(em.getProvider());
         Type[] types = null;
         if (m != null && MessageUtils.isTrue(m.getContextualProperty(IGNORE_TYPE_VARIABLES))) {
             types = new Type[]{mapperClass};
@@ -375,7 +375,7 @@ public final class ProviderFactory {
                     if (expectedType.isArray() && !actualClass.isArray()) {
                         expectedType = expectedType.getComponentType();
                     }
-                    if (actualClass.isAssignableFrom(expectedType)) {
+                    if (actualClass.isAssignableFrom(expectedType) || actualClass == Object.class) {
                         if (injectContext) {
                             injectContextValues(em, m);
                         }
