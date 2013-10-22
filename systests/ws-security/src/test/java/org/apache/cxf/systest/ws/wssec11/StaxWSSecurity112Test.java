@@ -90,7 +90,7 @@ public class StaxWSSecurity112Test extends WSSecurity11Common {
                 "X-TripleDES",
                 "XD",
                 "XD-ES",
-                // TODO Investigate "XD-SEES",
+                // TODO Endorsing derived streaming not working "XD-SEES",
             };
         } else {
             argv = new String[] {
@@ -98,7 +98,7 @@ public class StaxWSSecurity112Test extends WSSecurity11Common {
                 "X-NoTimestamp",
                 "XD",
                 "XD-ES",
-                // TODO Investigate "XD-SEES",
+                // TODO Endorsing derived streaming not working "XD-SEES",
             };
         }
         runClientServer(argv, unrestrictedPoliciesInstalled, true, true);

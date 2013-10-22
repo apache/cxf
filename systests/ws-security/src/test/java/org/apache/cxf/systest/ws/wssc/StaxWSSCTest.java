@@ -67,7 +67,7 @@ public class StaxWSSCTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
  
-    // TODO
+    // TODO Endorsing derived keys not supported.
     @Test
     @org.junit.Ignore
     public void testSecureConversationMutualCertificate10SignEncryptIPingService() throws Exception {
@@ -129,7 +129,7 @@ public class StaxWSSCTest extends AbstractBusClientServerTestBase {
     @Test
     public void testUXDCSEESIPingService() throws Exception {
         runTest(false, "UXDC-SEES_IPingService");
-        // TODO runTest(true, "UXDC-SEES_IPingService");
+        runTest(true, "UXDC-SEES_IPingService");
     }
 
     @Test
@@ -147,7 +147,7 @@ public class StaxWSSCTest extends AbstractBusClientServerTestBase {
     @Test
     public void testUXDSEESIPingService() throws Exception {
         runTest(false, "_UXD-SEES_IPingService");
-        // runTest(true, "_UXD-SEES_IPingService");
+        runTest(true, "_UXD-SEES_IPingService");
     }
 
     @Test
