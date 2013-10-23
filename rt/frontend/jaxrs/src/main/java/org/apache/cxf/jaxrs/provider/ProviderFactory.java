@@ -617,6 +617,9 @@ public final class ProviderFactory {
             if (entryName.equals(DEFAULT_FILTER_NAME_BINDING)) {
                 map.put(entry.getValue(), Collections.<String>emptyList());
             } else {
+                if (entryName.endsWith(":dynamic") && !names.contains(entryName)) {
+                    continue;
+                }
                 map.add(entry.getValue(), entryName);
             }
         }
@@ -1230,7 +1233,6 @@ public final class ProviderFactory {
             }
         }
     }
-
     public void initProviders(List<ClassResourceInfo> cris) {
         Set<Object> set = getReadersWriters();
         for (Object o : set) {
@@ -1409,7 +1411,8 @@ public final class ProviderFactory {
             nameBinding = DEFAULT_FILTER_NAME_BINDING 
                 + ori.getClassResourceInfo().getServiceClass().getName()
                 + "."
-                + ori.getMethodToInvoke().getName();
+                + ori.getMethodToInvoke().getName()
+                + ":dynamic";
         }
         
         @Override

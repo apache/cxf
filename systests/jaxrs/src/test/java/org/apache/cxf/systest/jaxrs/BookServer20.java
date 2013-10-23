@@ -301,7 +301,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (!responseContext.getHeaders().containsKey("Response")) {
                 throw new RuntimeException();
             }
-            if (!responseContext.getHeaders().containsKey("DynamicResponse")
+        
+            if ((!responseContext.getHeaders().containsKey("DynamicResponse")
+                || !responseContext.getHeaders().containsKey("DynamicResponse2"))
                 && !"Prematch filter error".equals(responseContext.getEntity())) {
                 throw new RuntimeException();
             }
@@ -328,8 +330,23 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     
     @BindingPriority(2)
-    public static class PostMatchDynamicContainerResponseFilter implements ContainerResponseFilter {
+    public static class PostMatchDynamicContainerResponseFilter2 implements ContainerResponseFilter {
 
+        @Override
+        public void filter(ContainerRequestContext requestContext,
+                           ContainerResponseContext responseContext) throws IOException {
+            if (!responseContext.getHeaders().containsKey("Response")) {
+                throw new RuntimeException();
+            }
+            responseContext.getHeaders().add("DynamicResponse2", "Dynamic2");
+            
+        }
+        
+    }
+    
+    @BindingPriority(2)
+    public static class PostMatchDynamicContainerResponseFilter implements ContainerResponseFilter {
+    
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
@@ -399,11 +416,15 @@ public class BookServer20 extends AbstractBusTestServerBase {
     
     public static class CustomDynamicFeature implements DynamicFeature {
 
+        private static final ContainerResponseFilter RESPONSE_FILTER =
+            new PostMatchDynamicContainerResponseFilter2();
+        
         @Override
         public void configure(ResourceInfo resourceInfo, Configurable configurable) {
             
             configurable.register(new PreMatchDynamicContainerRequestFilter());
             configurable.register(new PostMatchDynamicContainerResponseFilter());
+            configurable.register(RESPONSE_FILTER);
         }
         
     }
