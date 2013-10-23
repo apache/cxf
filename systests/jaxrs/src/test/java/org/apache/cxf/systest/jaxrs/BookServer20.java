@@ -304,7 +304,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (!responseContext.getHeaders().containsKey("Response")) {
                 throw new RuntimeException();
             }
-            if (!responseContext.getHeaders().containsKey("DynamicResponse")
+        
+            if ((!responseContext.getHeaders().containsKey("DynamicResponse")
+                || !responseContext.getHeaders().containsKey("DynamicResponse2"))
                 && !"Prematch filter error".equals(responseContext.getEntity())) {
                 throw new RuntimeException();
             }
@@ -330,7 +332,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
     }
     
-    public static class PostMatchDynamicContainerResponseFilter 
+    public static class PostMatchDynamicContainerRequestResponseFilter 
         implements ContainerRequestFilter, ContainerResponseFilter {
 
         @Override
@@ -339,13 +341,29 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (!responseContext.getHeaders().containsKey("Response")) {
                 throw new RuntimeException();
             }
-            responseContext.getHeaders().add("DynamicResponse", "Dynamic");
+            responseContext.getHeaders().add("DynamicResponse2", "Dynamic2");
             
         }
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
             throw new RuntimeException();
+            
+        }
+        
+    }
+    
+    @Priority(2)
+    public static class PostMatchDynamicContainerResponseFilter 
+        implements ContainerResponseFilter {
+    
+        @Override
+        public void filter(ContainerRequestContext requestContext,
+                           ContainerResponseContext responseContext) throws IOException {
+            if (!responseContext.getHeaders().containsKey("Response")) {
+                throw new RuntimeException();
+            }
+            responseContext.getHeaders().add("DynamicResponse", "Dynamic");
             
         }
         
@@ -441,13 +459,17 @@ public class BookServer20 extends AbstractBusTestServerBase {
     
     public static class CustomDynamicFeature implements DynamicFeature {
 
+        private static final ContainerResponseFilter RESPONSE_FILTER =
+            new PostMatchDynamicContainerResponseFilter();
+        
         @Override
         public void configure(ResourceInfo resourceInfo, FeatureContext configurable) {
             
             configurable.register(new PreMatchDynamicContainerRequestFilter());
+            configurable.register(RESPONSE_FILTER);
             Map<Class<?>, Integer> contracts = new HashMap<Class<?>, Integer>();
             contracts.put(ContainerResponseFilter.class, 2);
-            configurable.register(new PostMatchDynamicContainerResponseFilter(), 
+            configurable.register(new PostMatchDynamicContainerRequestResponseFilter(), 
                                   contracts);
         }
         

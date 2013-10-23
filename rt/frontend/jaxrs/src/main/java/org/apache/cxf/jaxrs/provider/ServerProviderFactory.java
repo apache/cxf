@@ -440,6 +440,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                 registerUserProvider(new FilterProviderInfo<Object>(provider, 
                     getBus(),
                     nameBinding,
+                    true,
                     actualContracts));
                 ori.addNameBindings(Collections.singletonList(nameBinding));
             }

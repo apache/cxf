@@ -30,20 +30,23 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
 
     private Set<String> nameBinding;
     private Map<Class<?>, Integer> supportedContracts;
+    private boolean dynamic;
     
     public FilterProviderInfo(T provider,
                               Bus bus,
                               Map<Class<?>, Integer> supportedContracts) {
-        this(provider, bus, ProviderFactory.DEFAULT_FILTER_NAME_BINDING, supportedContracts);        
+        this(provider, bus, ProviderFactory.DEFAULT_FILTER_NAME_BINDING, false, supportedContracts);        
     }
     
     public FilterProviderInfo(T provider,
                               Bus bus,
                               String nameBinding,
+                              boolean dynamic,
                               Map<Class<?>, Integer> supportedContracts) {
         super(provider, bus);
         this.nameBinding = Collections.singleton(nameBinding);
-        this.supportedContracts = supportedContracts;        
+        this.supportedContracts = supportedContracts;
+        this.dynamic = dynamic;
     }
 
     public Set<String> getNameBinding() {
@@ -52,6 +55,10 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
 
     public int getPriority(Class<?> contract) {
         return supportedContracts.get(contract);
+    }
+    
+    public boolean isDynamic() {
+        return dynamic;
     }
 
     public Set<Class<?>> getSupportedContracts() {

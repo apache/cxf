@@ -898,11 +898,17 @@ public abstract class ProviderFactory {
             new MetadataMap<ProviderInfo<T>, String>();
         for (Map.Entry<NameKey, ProviderInfo<T>> entry : boundFilters.entrySet()) {
             String entryName = entry.getKey().getName();
+            ProviderInfo<T> provider = entry.getValue();
             if (entryName.equals(DEFAULT_FILTER_NAME_BINDING)) {
-                ProviderInfo<T> provider = entry.getValue(); 
                 map.put(provider, Collections.<String>emptyList());
             } else {
-                map.add(entry.getValue(), entryName);
+                if (provider instanceof FilterProviderInfo) {
+                    FilterProviderInfo<?> fpi = (FilterProviderInfo<?>)provider;
+                    if (fpi.isDynamic() && !names.containsAll(fpi.getNameBinding())) {
+                        continue;
+                    }
+                }
+                map.add(provider, entryName);
             }
         }
         List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
