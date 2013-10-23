@@ -30,7 +30,11 @@ import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -76,41 +80,56 @@ public class UDPConduit extends AbstractConduit {
         connector.setHandler(new IoHandlerAdapter() {
             public void messageReceived(IoSession session, Object buf) {
                 Message message = (Message)session.getAttribute(CXF_MESSAGE_ATTR);
-                dataReceived(message, (IoBuffer)buf, true);
+                dataReceived(message, (IoBuffer)buf, true, false);
             }
         });
     }
 
-    private void dataReceived(Message message, IoBuffer buf, boolean async) {
-        if (message.getExchange().getInMessage() == null) {
-            final Message inMessage = new MessageImpl();
-            inMessage.setExchange(message.getExchange());
-            message.getExchange().setInMessage(inMessage);
-            
-            IoSessionInputStream ins = new IoSessionInputStream(buf);
-            inMessage.setContent(InputStream.class, ins);
-            inMessage.put(IoSessionInputStream.class, ins);
-            
-            if (async) {
-                WorkQueueManager queuem = bus.getExtension(WorkQueueManager.class);
-                WorkQueue queue = queuem.getNamedWorkQueue("udp-conduit");
-                if (queue == null) {
-                    queue = queuem.getAutomaticWorkQueue();
+    private void dataReceived(Message message, IoBuffer buf, boolean async, boolean multi) {
+        synchronized (message.getExchange()) {
+            if (message.getExchange().getInMessage() == null) {
+                final Message inMessage = new MessageImpl();
+                IoSessionInputStream ins = new IoSessionInputStream(buf);
+                inMessage.setContent(InputStream.class, ins);
+                inMessage.put(IoSessionInputStream.class, ins);
+                
+                message.getExchange().setInMessage(inMessage);
+                inMessage.setExchange(message.getExchange());
+                
+                Map<String, Object> mp = null;
+                if (multi) {
+                    mp = new HashMap<String, Object>(message.getExchange());
                 }
-                queue.execute(new Runnable() {
-                    public void run() {
-                        incomingObserver.onMessage(inMessage);
+                
+                if (async) {
+                    WorkQueueManager queuem = bus.getExtension(WorkQueueManager.class);
+                    WorkQueue queue = queuem.getNamedWorkQueue("udp-conduit");
+                    if (queue == null) {
+                        queue = queuem.getAutomaticWorkQueue();
                     }
-                });
-            } else {
-                incomingObserver.onMessage(inMessage);
-                if (!message.getExchange().isSynchronous()) {
-                    message.getExchange().setInMessage(null);
+                    queue.execute(new Runnable() {
+                        public void run() {
+                            incomingObserver.onMessage(inMessage);
+                        }
+                    });
+                } else {
+                    incomingObserver.onMessage(inMessage);
+                    if (!message.getExchange().isSynchronous() || multi) {
+                        message.getExchange().setInMessage(null);
+                        message.getExchange().setInFaultMessage(null);
+                    }
                 }
+                if (mp != null) {
+                    Collection<String> s = new ArrayList<String>(message.getExchange().keySet());
+                    for (String s2 : s) {
+                        message.getExchange().remove(s2);
+                    }
+                    message.getExchange().putAll(mp);
+                }
+            } else {
+                IoSessionInputStream ins = message.getExchange().getInMessage().get(IoSessionInputStream.class);
+                ins.setBuffer((IoBuffer)buf);
             }
-        } else {
-            IoSessionInputStream ins = message.getExchange().getInMessage().get(IoSessionInputStream.class);
-            ins.setBuffer((IoBuffer)buf);
         }
     }
     
@@ -280,14 +299,14 @@ public class UDPConduit extends AbstractConduit {
                 if (i == null || i <= 0 || message.getExchange().isSynchronous()) {
                     socket.setSoTimeout(30000);
                     socket.receive(p);
-                    dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false);
+                    dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false, false);
                 } else {
                     socket.setSoTimeout(i);
                     boolean found = false;
                     try {
                         while (true) {
                             socket.receive(p);
-                            dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false);
+                            dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false, true);
                             found = true;
                         }
                     } catch (java.net.SocketTimeoutException ex) {
