@@ -49,7 +49,25 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
     private Service service;
     private Binding binding;
     private BindingOperationInfo bindingOp;
-    
+
+    public ExchangeImpl() {
+    }
+    public ExchangeImpl(ExchangeImpl ex) {
+        super(ex);
+        this.destination = ex.destination;
+        this.oneWay = ex.oneWay;
+        this.synchronous = ex.synchronous;
+        this.inMessage = ex.inMessage;
+        this.outMessage = ex.outMessage;
+        this.inFaultMessage = ex.inFaultMessage;
+        this.outFaultMessage = ex.outFaultMessage;
+        this.session = ex.session;
+        this.bus = ex.bus;
+        this.endpoint = ex.endpoint;
+        this.service = ex.service;
+        this.binding = ex.binding;
+        this.bindingOp = ex.bindingOp;
+    }
 
     /*
     public <T> T get(Class<T> key) { 
