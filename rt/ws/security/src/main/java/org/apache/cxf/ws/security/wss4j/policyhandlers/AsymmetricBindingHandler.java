@@ -97,6 +97,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     public void handleBinding() {
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
+        assertPolicy(abinding.getName());
         
         if (abinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
@@ -122,6 +123,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             if (initiatorWrapper == null) {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
+            assertTokenWrapper(initiatorWrapper);
             boolean attached = false;
             if (initiatorWrapper != null) {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
@@ -155,6 +157,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         return;
                     }
                 }
+                assertToken(initiatorToken);
             }
             
             // Add timestamp
@@ -178,6 +181,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     recipientSignatureToken = abinding.getRecipientToken();
                 }
                 if (recipientSignatureToken != null) {
+                    assertTokenWrapper(recipientSignatureToken);
+                    assertToken(recipientSignatureToken.getToken());
                     doSignature(recipientSignatureToken, sigs, attached);
                 }
             }
@@ -213,6 +218,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }            
             doEncryption(encToken, enc, false);
+            if (encToken != null) {
+                assertTokenWrapper(encToken);
+                assertToken(encToken.getToken());
+            }
             
         } catch (Exception e) {
             String reason = e.getMessage();
@@ -222,9 +231,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
     }
 
-    private void doEncryptBeforeSign() {
+    private AbstractTokenWrapper getEncryptBeforeSignWrapper() {
         AbstractTokenWrapper wrapper;
-        AbstractToken encryptionToken = null;
         if (isRequestor()) {
             wrapper = abinding.getRecipientEncryptionToken();
             if (wrapper == null) {
@@ -236,12 +244,21 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 wrapper = abinding.getInitiatorToken();
             }
         }
-        encryptionToken = wrapper.getToken();
+        assertTokenWrapper(wrapper);
+        
+        return wrapper;
+    }
+    
+    private void doEncryptBeforeSign() {
+        AbstractTokenWrapper wrapper = getEncryptBeforeSignWrapper();
+        AbstractToken encryptionToken = wrapper.getToken();
+        assertToken(encryptionToken);
         
         AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
         if (initiatorWrapper == null) {
             initiatorWrapper = abinding.getInitiatorToken();
         }
+        assertTokenWrapper(initiatorWrapper);
         boolean attached = false;
         
         if (initiatorWrapper != null) {
@@ -283,6 +300,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     return;
                 }
             }
+            assertToken(initiatorToken);
         }
         
         List<WSEncryptionPart> encrParts = null;
@@ -296,10 +314,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }
-        
-        //if (encryptionToken == null && encrParts.size() > 0) {
-            //REVISIT - no token to encrypt with  
-        //}
         
         WSSecBase encrBase = null;
         if (encryptionToken != null && encrParts.size() > 0) {
@@ -335,6 +349,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         recipientSignatureToken = abinding.getRecipientToken(); 
                     }
                     if (recipientSignatureToken != null) {
+                        assertTokenWrapper(recipientSignatureToken);
+                        assertToken(recipientSignatureToken.getToken());
                         doSignature(recipientSignatureToken, sigParts, attached);
                     }
                 }

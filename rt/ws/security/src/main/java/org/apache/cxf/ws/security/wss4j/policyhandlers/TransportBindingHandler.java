@@ -147,6 +147,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                             addEncryptedKeyElement(cloneElement(el));
                         } 
                     }
+                    assertToken(transportToken);
+                    assertTokenWrapper(transportTokenWrapper);
                 }
                     
                 handleNonEndorsingSupportingTokens();
@@ -154,6 +156,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     handleEndorsingSupportingTokens();
                 }
             } else {
+                if (tbinding != null && tbinding.getTransportToken() != null) {
+                    assertTokenWrapper(tbinding.getTransportToken());
+                    assertToken(tbinding.getTransportToken().getToken());
+                }
                 addSignatureConfirmation(null);
             }
         } catch (Exception e) {
@@ -162,6 +168,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
         if (tbinding != null) {
+            assertPolicy(tbinding.getName());
             assertAlgorithmSuite(tbinding.getAlgorithmSuite());
             assertWSSProperties(tbinding.getName().getNamespaceURI());
             assertTrustProperties(tbinding.getName().getNamespaceURI());

@@ -81,6 +81,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         if (this.isRequestor()) {
             tbinding = (TransportBinding)getBinding(aim);
             if (tbinding != null) {
+                assertPolicy(tbinding.getName());
                 String asymSignatureAlgorithm = 
                     (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
                 if (asymSignatureAlgorithm != null && tbinding.getAlgorithmSuite() != null) {
@@ -96,6 +97,8 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                     }
                     addIssuedToken((IssuedToken)token.getToken(), secToken, false, false);
                 }
+                assertToken(token.getToken());
+                assertTokenWrapper(token);
             }
             
             try {
@@ -106,6 +109,10 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 throw new Fault(e);
             }
         } else {
+            if (tbinding != null && tbinding.getTransportToken() != null) {
+                assertTokenWrapper(tbinding.getTransportToken());
+                assertToken(tbinding.getTransportToken().getToken());
+            }
             addSignatureConfirmation(null);
         }
         

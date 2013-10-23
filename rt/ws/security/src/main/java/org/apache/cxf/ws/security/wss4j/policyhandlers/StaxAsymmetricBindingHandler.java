@@ -81,6 +81,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
         abinding = (AsymmetricBinding)getBinding(aim);
+        assertPolicy(abinding.getName());
         
         String asymSignatureAlgorithm = 
             (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
@@ -105,6 +106,10 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         assertTrustProperties(abinding.getName().getNamespaceURI());
         assertPolicy(
             new QName(abinding.getName().getNamespaceURI(), SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
+        if (abinding.isProtectTokens()) {
+            assertPolicy(
+                new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
+        }
     }
 
     private void doSignBeforeEncrypt() {
@@ -114,6 +119,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
             if (initiatorWrapper != null) {
+                assertTokenWrapper(initiatorWrapper);
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
@@ -134,6 +140,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 } else if (initiatorToken instanceof SamlToken) {
                     addSamlToken((SamlToken)initiatorToken, false, true);
                 }
+                assertToken(initiatorToken);
             }
             
             // Add timestamp
@@ -155,6 +162,10 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 AbstractTokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
                 if (recipientSignatureToken == null) {
                     recipientSignatureToken = abinding.getRecipientToken();
+                }
+                if (recipientSignatureToken != null) {
+                    assertTokenWrapper(recipientSignatureToken);
+                    assertToken(recipientSignatureToken.getToken());
                 }
                 if (recipientSignatureToken != null && sigs.size() > 0) {
                     doSignature(recipientSignatureToken, sigs);
@@ -202,7 +213,11 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (encToken == null) {
                     encToken = abinding.getInitiatorToken();
                 }
-            }            
+            }           
+            if (encToken != null) {
+                assertTokenWrapper(encToken);
+                assertToken(encToken.getToken());
+            }
             doEncryption(encToken, enc, false);
             
         } catch (Exception e) {
@@ -227,7 +242,9 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     wrapper = abinding.getInitiatorToken();
                 }
             }
+            assertTokenWrapper(wrapper);
             encryptionToken = wrapper.getToken();
+            assertToken(encryptionToken);
             
             AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
             if (initiatorWrapper == null) {
@@ -235,6 +252,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             if (initiatorWrapper != null) {
+                assertTokenWrapper(initiatorWrapper);
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
@@ -308,6 +326,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         recipientSignatureToken = abinding.getRecipientToken(); 
                     }
                     if (recipientSignatureToken != null) {
+                        assertTokenWrapper(recipientSignatureToken);
+                        assertToken(recipientSignatureToken.getToken());
                         doSignature(recipientSignatureToken, sigParts);
                     }
                 }
@@ -436,11 +456,6 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken
             || sigToken instanceof SamlToken) {
             config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
-        }
-        
-        if (abinding.isProtectTokens()) {
-            assertPolicy(
-                new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);

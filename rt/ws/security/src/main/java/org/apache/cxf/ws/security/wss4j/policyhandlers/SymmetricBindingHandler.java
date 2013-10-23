@@ -113,6 +113,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     public void handleBinding() {
         WSSecTimestamp timestamp = createTimestamp();
         handleLayout(timestamp);
+        assertPolicy(sbinding.getName());
         
         if (isRequestor()) {
             //Setup required tokens
@@ -156,6 +157,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     private void doEncryptBeforeSign() {
         try {
             AbstractTokenWrapper encryptionWrapper = getEncryptionToken();
+            assertTokenWrapper(encryptionWrapper);
             AbstractToken encryptionToken = encryptionWrapper.getToken();
             List<WSEncryptionPart> encrParts = getEncryptedParts();
             List<WSEncryptionPart> sigParts = getSignedParts();
@@ -188,6 +190,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         tokenId = getUTDerivedKey();
                     }
                 }
+                assertToken(encryptionToken);
                 if (tok == null) {
                     //if (tokenId == null || tokenId.length() == 0) {
                         //REVISIT - no tokenId?   Exception?
@@ -290,6 +293,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     
     private void doSignBeforeEncrypt() {
         AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
+        assertTokenWrapper(sigAbstractTokenWrapper);
         AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
         String sigTokId = null;
         Element sigTokElem = null;
@@ -316,6 +320,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         sigTokId = getUTDerivedKey();
                     }
                 }
+                assertToken(sigToken);
             } else {
                 policyNotAsserted(sbinding, "No signature token");
                 return;

@@ -44,15 +44,28 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.HttpsToken;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.KerberosToken;
+import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.Wss11;
+import org.apache.wss4j.policy.model.X509Token;
 import org.apache.xml.security.utils.Base64;
 
 /**
@@ -105,6 +118,168 @@ public abstract class AbstractCommonBindingHandler {
         }
         if (!assertion.isOptional()) {
             throw new PolicyException(new Message(reason.getMessage(), LOG), reason);
+        }
+    }
+    
+    protected void assertTokenWrapper(AbstractTokenWrapper tokenWrapper) {
+        if (tokenWrapper == null) {
+            return;
+        }
+        assertPolicy(tokenWrapper.getName());
+    }
+    
+    protected void assertToken(AbstractToken token) {
+        if (token == null) {
+            return;
+        }
+        assertPolicy(token.getName());
+        
+        String namespace = token.getName().getNamespaceURI();
+        if (token instanceof X509Token) {
+            X509Token x509Token = (X509Token)token;
+            assertX509Token(x509Token);
+        } else if (token instanceof HttpsToken) {
+            HttpsToken httpsToken = (HttpsToken)token;
+            if (httpsToken.getAuthenticationType() != null) {
+                assertPolicy(new QName(namespace, httpsToken.getAuthenticationType().name()));
+            }
+        } else if (token instanceof KeyValueToken) {
+            KeyValueToken keyValueToken = (KeyValueToken)token;
+            if (keyValueToken.isRsaKeyValue()) {
+                assertPolicy(new QName(namespace, SPConstants.RSA_KEY_VALUE));
+            }
+        } else if (token instanceof UsernameToken) {
+            UsernameToken usernameToken = (UsernameToken)token;
+            assertUsernameToken(usernameToken);
+        } else if (token instanceof SecureConversationToken) {
+            SecureConversationToken scToken = (SecureConversationToken)token;
+            assertSecureConversationToken(scToken);
+        } else if (token instanceof SecurityContextToken) {
+            SecurityContextToken scToken = (SecurityContextToken)token;
+            assertSecurityContextToken(scToken);
+        } else if (token instanceof SpnegoContextToken) {
+            SpnegoContextToken scToken = (SpnegoContextToken)token;
+            assertSpnegoContextToken(scToken);
+        } else if (token instanceof IssuedToken) {
+            IssuedToken issuedToken = (IssuedToken)token;
+            assertIssuedToken(issuedToken);
+        } else if (token instanceof KerberosToken) {
+            KerberosToken kerberosToken = (KerberosToken)token;
+            assertKerberosToken(kerberosToken);
+        } else if (token instanceof SamlToken) {
+            SamlToken samlToken = (SamlToken)token;
+            assertSamlToken(samlToken);
+        } 
+    }
+    
+    private void assertX509Token(X509Token token) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireEmbeddedTokenReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE));
+        }
+        if (token.isRequireIssuerSerialReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE));
+        }
+        if (token.isRequireKeyIdentifierReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
+        }
+        if (token.isRequireThumbprintReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_THUMBPRINT_REFERENCE));
+        }
+        if (token.getTokenType() != null) {
+            assertPolicy(new QName(namespace, token.getTokenType().name()));
+        }
+    }
+    
+    private void assertUsernameToken(UsernameToken token) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.getPasswordType() != null) {
+            assertPolicy(new QName(namespace, token.getPasswordType().name()));
+        }
+        if (token.getUsernameTokenType() != null) {
+            assertPolicy(new QName(namespace, token.getUsernameTokenType().name()));
+        }
+        if (token.isCreated()) {
+            assertPolicy(SP13Constants.CREATED);
+        }
+        if (token.isNonce()) {
+            assertPolicy(SP13Constants.NONCE);
+        }
+    }
+    
+    private void assertSecurityContextToken(SecurityContextToken token) {
+        String namespace = token.getName().getNamespaceURI();
+        if (token.isRequireExternalUriReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE));
+        }
+        if (token.isSc10SecurityContextToken()) {
+            assertPolicy(new QName(namespace, SPConstants.SC10_SECURITY_CONTEXT_TOKEN));
+        }
+        if (token.isSc13SecurityContextToken()) {
+            assertPolicy(new QName(namespace, SPConstants.SC13_SECURITY_CONTEXT_TOKEN));
+        }
+    }
+    
+    private void assertSecureConversationToken(SecureConversationToken token) {
+        assertSecurityContextToken(token);
+        
+        String namespace = token.getName().getNamespaceURI();
+        if (token.isMustNotSendAmend()) {
+            assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_AMEND));
+        }
+        if (token.isMustNotSendCancel()) {
+            assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_CANCEL));
+        }
+        if (token.isMustNotSendRenew()) {
+            assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_RENEW));
+        }
+    }
+    
+    private void assertSpnegoContextToken(SpnegoContextToken token) {
+        String namespace = token.getName().getNamespaceURI();
+        if (token.isMustNotSendAmend()) {
+            assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_AMEND));
+        }
+        if (token.isMustNotSendCancel()) {
+            assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_CANCEL));
+        }
+        if (token.isMustNotSendRenew()) {
+            assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_RENEW));
+        }
+    }
+    
+    private void assertIssuedToken(IssuedToken token) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireExternalReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_EXTERNAL_REFERENCE));
+        }
+        if (token.isRequireInternalReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_INTERNAL_REFERENCE));
+        }
+    }
+    
+    private void assertKerberosToken(KerberosToken token) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireKeyIdentifierReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
+        }
+        if (token.getApReqTokenType() != null) {
+            assertPolicy(new QName(namespace, token.getApReqTokenType().name()));
+        }
+    }
+    
+    private void assertSamlToken(SamlToken token) {
+        String namespace = token.getName().getNamespaceURI();
+        
+        if (token.isRequireKeyIdentifierReference()) {
+            assertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
+        }
+        if (token.getSamlTokenType() != null) {
+            assertPolicy(new QName(namespace, token.getSamlTokenType().name()));
         }
     }
     

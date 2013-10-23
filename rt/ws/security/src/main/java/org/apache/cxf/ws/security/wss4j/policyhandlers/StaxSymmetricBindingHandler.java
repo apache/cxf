@@ -105,6 +105,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
         sbinding = (SymmetricBinding)getBinding(aim);
+        assertPolicy(sbinding.getName());
         
         String asymSignatureAlgorithm = 
             (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
@@ -142,11 +143,16 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         assertTrustProperties(sbinding.getName().getNamespaceURI());
         assertPolicy(
             new QName(sbinding.getName().getNamespaceURI(), SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
+        if (sbinding.isProtectTokens()) {
+            assertPolicy(
+                new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
+        }
     }
     
     private void doEncryptBeforeSign() {
         try {
             AbstractTokenWrapper encryptionWrapper = getEncryptionToken();
+            assertTokenWrapper(encryptionWrapper);
             AbstractToken encryptionToken = encryptionWrapper.getToken();
 
             //The encryption token can be an IssuedToken or a 
@@ -196,6 +202,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 policyNotAsserted(sbinding, "UsernameTokens not supported with Symmetric binding");
                 return;
             }
+            assertToken(encryptionToken);
             if (tok == null) {
                 if (tokenId != null && tokenId.startsWith("#")) {
                     tokenId = tokenId.substring(1);
@@ -270,6 +277,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     
     private void doSignBeforeEncrypt() {
         AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
+        assertTokenWrapper(sigAbstractTokenWrapper);
         AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
         String sigTokId = null;
         
@@ -319,6 +327,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     policyNotAsserted(sbinding, "UsernameTokens not supported with Symmetric binding");
                     return;
                 }
+                assertToken(sigToken);
             } else {
                 policyNotAsserted(sbinding, "No signature token");
                 return;
@@ -546,12 +555,8 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         AbstractToken sigToken = wrapper.getToken();
-        if (sbinding.isProtectTokens()) {
-            if ((sigToken instanceof X509Token) && isRequestor()) {
-                parts += "{Element}{" + WSSConstants.NS_XMLENC + "}EncryptedKey;";
-            }
-            assertPolicy(
-                new QName(sbinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
+        if (sbinding.isProtectTokens() && sigToken instanceof X509Token && isRequestor()) {
+            parts += "{Element}{" + WSSConstants.NS_XMLENC + "}EncryptedKey;";
         }
         
         config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);

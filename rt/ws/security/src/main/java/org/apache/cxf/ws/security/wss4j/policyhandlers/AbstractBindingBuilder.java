@@ -417,6 +417,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     || token instanceof SecureConversationToken
                     || token instanceof SecurityContextToken
                     || token instanceof KerberosToken)) {
+                assertToken(token);
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
@@ -482,6 +483,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else if (token instanceof X509Token) {
                 //We have to use a cert
                 //Prepare X509 signature
+                assertToken(token);
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 Element bstElem = sig.getBinarySecurityTokenElement();
                 if (bstElem != null) {
@@ -493,6 +495,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
                 ret.put(token, sig);
             } else if (token instanceof KeyValueToken) {
+                assertToken(token);
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 if (suppTokens.isEncryptedToken()) {
                     WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
@@ -693,16 +696,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
 
     protected WSSecUsernameToken addUsernameToken(UsernameToken token) {
-        AssertionInfo info = null;
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
-        for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() == token) {
-                info = ai;
-                if (!isRequestor()) {
-                    info.setAsserted(true);
-                    return null;
-                }
-            }
+        assertToken(token);
+        if (!isRequestor()) {
+            return null;
         }
         
         String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
@@ -746,7 +742,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 assertPolicy(SP13Constants.NONCE);
             }
             
-            info.setAsserted(true);
             assertPolicy(
                 new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN10));
             assertPolicy(
@@ -759,16 +754,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, boolean useMac) {
-        AssertionInfo info = null;
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
-        for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() == token) {
-                info = ai;
-                if (!isRequestor()) {
-                    info.setAsserted(true);
-                    return null;
-                }
-            }
+        assertToken(token);
+        if (!isRequestor()) {
+            return null;
         }
         
         String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
@@ -790,7 +778,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 return null;
             }
             
-            info.setAsserted(true);
             assertPolicy(
                 new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN10));
             assertPolicy(
@@ -803,16 +790,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected SamlAssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
-        AssertionInfo info = null;
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
-        for (AssertionInfo ai : ais) {
-            if (ai.getAssertion() == token) {
-                info = ai;
-                if (!isRequestor()) {
-                    info.setAsserted(true);
-                    return null;
-                }
-            }
+        assertToken(token);
+        if (!isRequestor()) {
+            return null;
         }
         
         //
@@ -850,8 +830,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             policyNotAsserted(token, "No SAML CallbackHandler available");
             return null;
         }
-        
-        info.setAsserted(true);
         
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();

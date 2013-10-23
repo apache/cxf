@@ -130,6 +130,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     }
 
     protected SecurePart addUsernameToken(UsernameToken usernameToken) {
+        assertToken(usernameToken);
         IncludeTokenType includeToken = usernameToken.getIncludeTokenType();
         if (!isTokenRequired(includeToken)) {
             return null;
@@ -206,6 +207,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     protected SecurePart addKerberosToken(
         KerberosToken token, boolean signed, boolean endorsing, boolean encrypting
     ) throws WSSecurityException {
+        assertToken(token);
         IncludeTokenType includeToken = token.getIncludeTokenType();
         if (!isTokenRequired(includeToken)) {
             return null;
@@ -285,6 +287,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         boolean signed,
         boolean endorsing
     ) throws WSSecurityException {
+        assertToken(token);
         IncludeTokenType includeToken = token.getIncludeTokenType();
         if (!isTokenRequired(includeToken)) {
             return null;
@@ -338,6 +341,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     
     protected SecurePart addIssuedToken(IssuedToken token, SecurityToken secToken, 
                                   boolean signed, boolean endorsing) {
+        assertToken(token);
         if (isTokenRequired(token.getIncludeTokenType())) {
             final Element el = secToken.getToken();
             
@@ -500,6 +504,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }
             ai.setAsserted(true);
         }
+        if (layout != null && layout.getLayoutType() != null) {
+            assertPolicy(new QName(layout.getName().getNamespaceURI(), layout.getLayoutType().name()));
+        }
         
         if (!timestampAdded) {
             return;
@@ -519,8 +526,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                        action + " " + ConfigurationConstants.TIMESTAMP);
             }
         } else {
-            config.put(ConfigurationConstants.ACTION, 
-                       ConfigurationConstants.TIMESTAMP);
+            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         }
     }
 
@@ -739,6 +745,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                     }
                 }
             } else if (token instanceof X509Token || token instanceof KeyValueToken) {
+                assertToken(token);
                 configureSignature(suppTokens, token, false);
                 if (suppTokens.isEncryptedToken()) {
                     SecurePart part = 
