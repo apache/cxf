@@ -52,6 +52,15 @@ public final class WSDiscoveryClientTest {
             Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
             WSDiscoveryServiceImpl service = new WSDiscoveryServiceImpl(bus);
             service.startup();
+            
+            //this service will just generate an error.  However, the probes should still
+            //work to probe the above stuff.
+            WSDiscoveryServiceImpl s2 = new WSDiscoveryServiceImpl() {
+                public ProbeMatchesType handleProbe(ProbeType pt) {
+                    throw new RuntimeException("Error!!!");
+                }
+            };
+            s2.startup();
             HelloType h = service.register(ep.getEndpointReference());
 
             
@@ -66,7 +75,7 @@ public final class WSDiscoveryClientTest {
             ProbeType pt = new ProbeType();
             ScopesType scopes = new ScopesType();
             pt.setScopes(scopes);
-            ProbeMatchesType pmts = c.probe(pt);
+            ProbeMatchesType pmts = c.probe(pt, 1000);
             System.out.println("2");
             if  (pmts != null) {
                 for (ProbeMatchType pmt : pmts.getProbeMatch()) {
@@ -75,7 +84,13 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
+            if (pmts.getProbeMatch().size() == 0) {
+                System.exit(0);
+            }
             pmts = c.probe(pt);
+            
+            System.out.println("Size:" + pmts.getProbeMatch().size());
+            
             System.out.println("3");
 
             W3CEndpointReference ref = null;
