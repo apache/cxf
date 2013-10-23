@@ -160,7 +160,9 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
 
     public void setInFaultMessage(Message m) {
         inFaultMessage = m;
-        m.setExchange(this);
+        if (null != m) {
+            m.setExchange(this);
+        }
     }
 
     public Message getOutFaultMessage() {
@@ -169,7 +171,9 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
 
     public void setOutFaultMessage(Message m) {
         outFaultMessage = m;
-        m.setExchange(this);
+        if (null != m) {
+            m.setExchange(this);
+        }
     }
 
     public void setDestination(Destination d) {
