@@ -452,6 +452,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
                 config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
+                if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                    config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
+                }
             } else if ((recToken.getToken() instanceof IssuedToken 
                 || recToken.getToken() instanceof SecureConversationToken
                 || recToken.getToken() instanceof SpnegoContextToken) && !isRequestor()) {
@@ -571,7 +574,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (isRequestor()) {
                 config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
             } else {
-                config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
+                if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
+                    config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+                } else {
+                    config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
+                }
                 config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
             }
         } else if (policyToken instanceof IssuedToken || policyToken instanceof SecurityContextToken
