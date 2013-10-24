@@ -271,7 +271,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
                                 int start,
                                 int len)
         throws XMLStreamException {
-        currentTypeListener.processCharacters(new String(text));
+        currentTypeListener.processCharacters(new String(text, start, len));
     }
 
     public java.lang.String getPrefix(java.lang.String uri)
