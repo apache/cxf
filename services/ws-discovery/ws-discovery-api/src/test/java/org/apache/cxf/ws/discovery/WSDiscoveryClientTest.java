@@ -19,6 +19,12 @@
 
 package org.apache.cxf.ws.discovery;
 
+import java.io.InputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.SocketAddress;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
@@ -27,6 +33,8 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
@@ -35,17 +43,74 @@ import org.apache.cxf.ws.discovery.wsdl.ProbeType;
 import org.apache.cxf.ws.discovery.wsdl.ResolveMatchType;
 import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 
 /**
  * 
  */
 public final class WSDiscoveryClientTest {
-
-    private WSDiscoveryClientTest() {
+    public static final String PORT = TestUtil.getPortNumber(WSDiscoveryClientTest.class);
+   
+    
+    @Test
+    public void testMultiResponses() throws Exception {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    //fake a discovery server to send back some canned messages.
+                    InetAddress address = InetAddress.getByName("239.255.255.250");
+                    MulticastSocket s = new MulticastSocket(Integer.parseInt(PORT));
+                    s.setBroadcast(true);
+                    s.joinGroup(address);
+                    s.setReceiveBufferSize(64 * 1024);
+                    s.setSoTimeout(5000);
+                    byte[] bytes = new byte[64 * 1024];
+                    DatagramPacket p = new DatagramPacket(bytes, bytes.length, address, Integer.parseInt(PORT));
+                    s.receive(p);
+                    SocketAddress sa = p.getSocketAddress();
+                    String incoming = new String(p.getData(), 0, p.getLength(), "UTF-8");
+                    int idx = incoming.indexOf("MessageID>");
+                    incoming = incoming.substring(idx + 10);
+                    idx = incoming.indexOf("</");
+                    incoming = incoming.substring(0, idx);
+                    for (int x = 1; x < 4; x++) {
+                        InputStream ins = WSDiscoveryClientTest.class.getResourceAsStream("msg" + x + ".xml");
+                        String msg = IOUtils.readStringFromStream(ins);
+                        msg = msg.replace("urn:uuid:883d0d53-92aa-4066-9b6f-9eadb1832366",
+                                          incoming);
+                        byte out[] = msg.getBytes("UTF-8");
+                        DatagramPacket outp = new DatagramPacket(out, 0, out.length, sa);
+                        s.send(outp);
+                    }
+                    
+                    s.close();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        }).start();
         
+        
+        Bus bus  = BusFactory.newInstance().createBus();
+        new LoggingFeature().initialize(bus);
+        WSDiscoveryClient c = new WSDiscoveryClient(bus);
+        c.setVersion10();
+        c.setAddress("soap.udp://239.255.255.250:" + PORT);
+
+        ProbeType pt = new ProbeType();
+        ScopesType scopes = new ScopesType();
+        pt.setScopes(scopes);
+        ProbeMatchesType pmts = c.probe(pt, 1000);
+
+        Assert.assertEquals(2, pmts.getProbeMatch().size());
+        c.close();
+        bus.shutdown(true);        
     }
     
     
+    //this is a standalone test
     public static void main(String[] arg) throws Exception {
         try {
             Bus bus = BusFactory.getDefaultBus();
@@ -62,8 +127,6 @@ public final class WSDiscoveryClientTest {
             };
             s2.startup();
             HelloType h = service.register(ep.getEndpointReference());
-
-            
             
             bus  = BusFactory.newInstance().createBus();
             new LoggingFeature().initialize(bus);
