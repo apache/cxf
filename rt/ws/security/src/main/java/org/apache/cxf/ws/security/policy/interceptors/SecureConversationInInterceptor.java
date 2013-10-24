@@ -187,6 +187,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 NegotiationUtils.recalcEffectivePolicy(message, ns, pol, 
                                                        new SecureConversationSTSInvoker(),
                                                        true);
+                //recalc based on new endpoint
+                SoapActionInInterceptor.getAndSetOperation(message, s);
             } else {
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
