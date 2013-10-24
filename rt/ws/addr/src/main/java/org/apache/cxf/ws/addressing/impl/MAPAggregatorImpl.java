@@ -911,6 +911,11 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 InternalContextUtils.rebaseResponse(inMAPs.getFaultTo(),
                                             inMAPs,
                                             message);
+
+                Destination destination
+                    = InternalContextUtils.createDecoupledDestination(message.getExchange(),
+                                                                      inMAPs.getFaultTo());
+                message.getExchange().setDestination(destination);
             }
         }
     }
