@@ -954,6 +954,7 @@ options {
 	exportVocab=IDL;
 	charVocabulary='\u0000'..'\uFFFE';
 	k=4;
+	testLiterals=false;
 }
 
 SEMI

@@ -99,7 +99,7 @@ public class ExceptionVisitor extends VisitorBase {
         // exception members
         AST memberTypeNode = identifierNode.getNextSibling();
         while (memberTypeNode != null) {
-            AST memberNode = memberTypeNode.getNextSibling();
+            AST memberNode = TypesUtils.getCorbaTypeNameNode(memberTypeNode);
 
             TypesVisitor visitor = new TypesVisitor(exceptionScope,
                                                     definition,
