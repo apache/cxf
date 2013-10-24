@@ -435,4 +435,39 @@ public class IDLToWSDLTest extends ToolTestBase {
         String s = StaxUtils.toString(doc.getDocumentElement());
         assertTrue(s.contains("name=\"myStruct\""));
     }
+
+    public void testCXF5340() throws Exception {
+        File input = new File(getClass().getResource("/idl/CXF5340.idl").toURI());
+        String[] args = new String[] {
+            "-o", output.toString(),
+            "-verbose", "-qualified",
+            input.toString()
+        };
+        IDLToWSDL.run(args);
+        File fs = new File(output, "CXF5340.wsdl");
+        assertTrue(fs.getName() + " was not created.", fs.exists());
+
+        String corbaNs = "http://cxf.apache.org/bindings/corba";
+        Document doc = StaxUtils.read(new FileInputStream(fs));
+
+        // const with value "local"
+        NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(corbaNs, "const");
+        assertEquals(1, nl.getLength());
+        Element c = (Element)nl.item(0);
+        assertEquals("repro.NOT_CONN_LOCAL", c.getAttribute("name"));
+        assertEquals("local", c.getAttribute("value"));
+
+        // unsigned long case
+        nl = doc.getDocumentElement().getElementsByTagNameNS(corbaNs, "exception");
+        assertEquals(1, nl.getLength());
+        Element exception = (Element)nl.item(0);
+        nl = exception.getElementsByTagNameNS(corbaNs, "member");
+        assertEquals(2, nl.getLength());
+        Element number = (Element)nl.item(0);
+        assertEquals("ulong", number.getAttribute("idltype").split(":")[1]);
+        assertEquals("m_number", number.getAttribute("name"));
+        Element message = (Element)nl.item(1);
+        assertEquals("string", message.getAttribute("idltype").split(":")[1]);
+        assertEquals("m_message", message.getAttribute("name"));
+    }
 }

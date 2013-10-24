@@ -348,7 +348,6 @@ tryAgain:
 				}
 				if ( _returnToken==null ) continue tryAgain; // found SKIP token
 				_ttype = _returnToken.getType();
-				_ttype = testLiteralsTable(_ttype);
 				_returnToken.setType(_ttype);
 				return _returnToken;
 			}

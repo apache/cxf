@@ -1,0 +1,26 @@
+module repro {
+
+	const string NOT_CONN_LOCAL = "local";
+
+	// Exceptions of this type may be thrown by the following interfaces
+	exception msgError {
+		unsigned long	m_number;		// error number
+		string			m_message;		// error text
+	};
+
+	enum Reply {
+			positive	// i.e. Ok or Yes
+		,	negative	// i.e. No or Cancel
+		,	_dont_use_3	// don't use, align to hbMsg.h
+		,	_dont_use_4	// don't use, align to hbMsg.h
+		,	_dont_use_5	// don't use, align to hbMsg.h
+		,	errTimeout	// i.e. there was a timeout in a timed request
+		,	errError	// i.e. there was an error during the request
+		,	cancelled	// i.e. some person or some process cancelled the request
+	};
+
+	interface Service {
+		Reply getFirst( in Reply rep, out Reply reply ) raises (msgError);
+	};
+
+};
