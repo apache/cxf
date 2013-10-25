@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
@@ -35,6 +36,8 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
+import org.apache.cxf.ws.security.wss4j.policyhandlers.AbstractStaxBindingHandler.TokenStoreCallbackHandler;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -45,8 +48,11 @@ import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
 import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
 import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.TransportBinding;
 import org.apache.wss4j.policy.model.TransportToken;
@@ -261,15 +267,34 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         AbstractToken token, SupportingTokens wrapper
     ) throws Exception {
         if (token instanceof IssuedToken) {
-            addIssuedToken((IssuedToken)token, getSecurityToken(), false, true);
+            SecurityToken securityToken = getSecurityToken();
+            addIssuedToken(token, securityToken, false, true);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
+        } else if (token instanceof SecureConversationToken
+            || token instanceof SecurityContextToken || token instanceof SpnegoContextToken) {
+            SecurityToken securityToken = getSecurityToken();
+            addIssuedToken(token, securityToken, false, true);
             
-            configureSignature(wrapper, token, false);
-        /* TODO if (token instanceof SecureConversationToken
-            || token instanceof SecurityContextToken
-            || token instanceof SpnegoContextToken) {
-            addSig(doIssuedTokenSignature(token, wrapper));
-        */
+            Map<String, Object> config = getProperties();
+            if (securityToken != null) {
+                storeSecurityToken(securityToken);
+                
+                // Set up CallbackHandler which wraps the configured Handler
+                TokenStoreCallbackHandler callbackHandler = 
+                    new TokenStoreCallbackHandler(
+                        (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
+                        WSS4JUtils.getTokenStore(message)
+                    );
+                config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+            }
+            
+            doSignature(token, wrapper);
+            
+            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
+            config.put(ConfigurationConstants.SIG_ALGO, 
+                       tbinding.getAlgorithmSuite().getSymmetricSignature());
+            AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
         } else if (token instanceof X509Token || token instanceof KeyValueToken) {
             doSignature(token, wrapper);
         } else if (token instanceof SamlToken) {

@@ -339,7 +339,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         return new SecurePart(qname, Modifier.Element);
     }
     
-    protected SecurePart addIssuedToken(IssuedToken token, SecurityToken secToken, 
+    protected SecurePart addIssuedToken(AbstractToken token, SecurityToken secToken, 
                                   boolean signed, boolean endorsing) {
         assertToken(token);
         if (isTokenRequired(token.getIncludeTokenType())) {

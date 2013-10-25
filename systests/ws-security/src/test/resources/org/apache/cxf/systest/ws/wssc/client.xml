@@ -39,6 +39,14 @@
         </cxf:features>
     </cxf:bus>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.username.sct" value="Alice"/>
+           <entry key="ws-security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://WSSec/wssc}SecureConversation_UserNameOverTransport_IPingService" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username.sct" value="Alice"/>
@@ -254,6 +262,14 @@
         </http:tlsClientParameters>
         <http:client AllowChunking="false"/>
     </http:conduit>
+    
+     <http:conduit name="https://localhost:.*/DoubleIt.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:trustManagers>
+                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>  
     
     
 </beans>
