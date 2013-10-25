@@ -327,16 +327,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             sigParts.add(timestampPart);
         }
 
-        if (isRequestor()) {
-            try {
-                addSupportingTokens(sigParts);
-            } catch (WSSecurityException ex) {
-                LOG.log(Level.FINE, ex.getMessage(), ex);
-                policyNotAsserted(encryptionToken, ex);
-            }
-        } else {
-            addSignatureConfirmation(sigParts);
+        try {
+            addSupportingTokens(sigParts);
+        } catch (WSSecurityException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
+            policyNotAsserted(encryptionToken, ex);
         }
+        addSignatureConfirmation(sigParts);
 
         try {
             if (sigParts.size() > 0) {

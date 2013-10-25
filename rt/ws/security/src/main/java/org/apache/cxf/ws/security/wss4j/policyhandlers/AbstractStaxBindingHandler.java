@@ -118,14 +118,17 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     protected Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens;
     
     private final Map<String, Object> properties;
+    private AbstractBinding binding;
     
     public AbstractStaxBindingHandler(
         Map<String, Object> properties, 
         SoapMessage msg,
+        AbstractBinding binding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
     ) {
         super(msg);
         this.properties = properties;
+        this.binding = binding;
         this.outboundTokens = outboundTokens;
     }
 
@@ -484,7 +487,6 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     }
     
     protected void configureTimestamp(AssertionInfoMap aim) {
-        AbstractBinding binding = getBinding(aim);
         if (binding != null && binding.isIncludeTimestamp()) {
             timestampAdded = true;
             assertPolicy(new QName(binding.getName().getNamespaceURI(), SPConstants.INCLUDE_TIMESTAMP));
@@ -547,9 +549,6 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 config.put(ConfigurationConstants.USE_SINGLE_CERTIFICATE, "false");
             }
         }
-        
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        AbstractBinding binding = getBinding(aim);
         
         config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
 
@@ -655,6 +654,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             return ret;
         }
         for (AbstractToken token : suppTokens.getTokens()) {
+            assertToken(token);
+            if (!isTokenRequired(token.getIncludeTokenType())) {
+                continue;
+            }
+            
             if (token instanceof UsernameToken) {
                 handleUsernameTokenSupportingToken(
                     (UsernameToken)token, endorse, suppTokens.isEncryptedToken(), ret
@@ -664,70 +668,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                     || token instanceof SecureConversationToken
                     || token instanceof SecurityContextToken
                     || token instanceof KerberosToken)) {
-                //ws-trust/ws-sc stuff.......
-                SecurityToken secToken = getSecurityToken();
-                if (secToken == null) {
-                    policyNotAsserted(token, "Could not find IssuedToken");
-                }
-                Element clone = cloneElement(secToken.getToken());
-                secToken.setToken(clone);
-                addSupportingElement(clone);
-
-                String id = secToken.getId();
-                if (id != null && id.charAt(0) == '#') {
-                    id = id.substring(1);
-                }
-                if (suppTokens.isEncryptedToken()) {
-                    WSEncryptionPart part = new WSEncryptionPart(id, "Element");
-                    part.setElement(clone);
-                    encryptedTokensList.add(part);
-                }
-
-                if (secToken.getX509Certificate() == null) {  
-                    ret.put(token, new WSSecurityTokenHolder(wssConfig, secToken));
-                } else {
-                    WSSecSignature sig = new WSSecSignature(wssConfig);                    
-                    sig.setX509Certificate(secToken.getX509Certificate());
-                    sig.setCustomTokenId(id);
-                    sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                    String tokenType = secToken.getTokenType();
-                    if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                        || WSConstants.SAML_NS.equals(tokenType)) {
-                        sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                    } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                        || WSConstants.SAML2_NS.equals(tokenType)) {
-                        sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                    } else if (tokenType != null) {
-                        sig.setCustomTokenValueType(tokenType);
-                    } else {
-                        sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                    }
-                    sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
-                    sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
-
-                    Crypto crypto = secToken.getCrypto();
-                    String uname = null;
-                    try {
-                        uname = crypto.getX509Identifier(secToken.getX509Certificate());
-                    } catch (WSSecurityException e1) {
-                        LOG.log(Level.FINE, e1.getMessage(), e1);
-                        throw new Fault(e1);
-                    }
-
-                    String password = getPassword(uname, token, WSPasswordCallback.Usage.SIGNATURE);
-                    sig.setUserInfo(uname, password);
-                    try {
-                        sig.prepare(saaj.getSOAPPart(), secToken.getCrypto(), secHeader);
-                    } catch (WSSecurityException e) {
-                        LOG.log(Level.FINE, e.getMessage(), e);
-                        throw new Fault(e);
-                    }
-
-                    ret.put(token, sig);                
-                }
 
             } */
-            } else if (isRequestor() && token instanceof IssuedToken) {
+            } else if (token instanceof IssuedToken) {
                 SecurityToken sigTok = getSecurityToken();
                 SecurePart securePart = addIssuedToken((IssuedToken)token, sigTok, signed, endorse);
                 if (securePart != null) {
@@ -736,7 +679,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                         encryptedTokensList.add(securePart);
                     }
                 }
-            } else if (isRequestor() && token instanceof KerberosToken) {
+            } else if (token instanceof KerberosToken) {
                 SecurePart securePart = addKerberosToken((KerberosToken)token, signed, endorse, false);
                 if (securePart != null) {
                     ret.put(token, securePart);

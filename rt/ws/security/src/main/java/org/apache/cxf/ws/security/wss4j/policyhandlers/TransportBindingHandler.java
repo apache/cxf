@@ -22,6 +22,7 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -54,6 +55,8 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
@@ -173,6 +176,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             assertWSSProperties(tbinding.getName().getNamespaceURI());
             assertTrustProperties(tbinding.getName().getNamespaceURI());
         }
+        assertPolicy(SP12Constants.SIGNED_PARTS);
+        assertPolicy(SP11Constants.SIGNED_PARTS);
+        assertPolicy(SP12Constants.ENCRYPTED_PARTS);
+        assertPolicy(SP11Constants.ENCRYPTED_PARTS);
     }
     
     /**
@@ -220,7 +227,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
                 if (suppTokens != null && suppTokens.getTokens() != null 
                     && suppTokens.getTokens().size() > 0) {
-                    handleSupportingTokens(suppTokens, false);
+                    handleSupportingTokens(suppTokens, false, new HashMap<AbstractToken, Object>());
                 }
                 ai.setAsserted(true);
             }

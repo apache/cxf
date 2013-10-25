@@ -47,7 +47,6 @@ import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
-import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -444,26 +443,6 @@ public abstract class AbstractCommonBindingHandler {
         } catch (WSSecurityException e) {
             //REVISIT
         }
-        return null;
-    }
-    
-    protected AbstractBinding getBinding(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
         return null;
     }
     

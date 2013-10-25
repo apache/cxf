@@ -128,7 +128,6 @@ import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
-import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
@@ -298,8 +297,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected WSSecTimestamp createTimestamp() {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.INCLUDE_TIMESTAMP);
-        if (!ais.isEmpty()) {
+        if (binding.isIncludeTimestamp()) {
             Object o = message.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
             int ttl = 300;  //default is 300 seconds
             if (o instanceof Number) {
@@ -313,6 +311,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             timestampEl = new WSSecTimestamp(wssConfig);
             timestampEl.setTimeToLive(ttl);
             timestampEl.prepare(saaj.getSOAPPart());
+            
+            Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.INCLUDE_TIMESTAMP);
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }                    
@@ -321,63 +321,52 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected WSSecTimestamp handleLayout(WSSecTimestamp timestamp) {
-        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.LAYOUT);
-        if (!ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                Layout layout = (Layout)ai.getAssertion();
-                ai.setAsserted(true);
-                if (layout.getLayoutType() == LayoutType.LaxTsLast) {
-                    if (timestamp == null) {
-                        ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST + " requires a timestamp");
-                    } else {
-                        ai.setAsserted(true);
-                        assertPolicy(
-                            new QName(layout.getName().getNamespaceURI(), 
-                                      SPConstants.LAYOUT_LAX_TIMESTAMP_LAST));
-                        Element el = timestamp.getElement();
-                        secHeader.getSecurityHeader().appendChild(el);
-                        if (bottomUpElement == null) {
-                            bottomUpElement = el;
-                        }
+        if (binding.getLayout() != null) {
+            Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.LAYOUT);
+            AssertionInfo ai = null;
+            for (AssertionInfo layoutAi : ais) {
+                layoutAi.setAsserted(true);
+                ai = layoutAi;
+            }   
+            
+            if (binding.getLayout().getLayoutType() == LayoutType.LaxTsLast) {
+                if (timestamp == null) {
+                    ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST + " requires a timestamp");
+                } else {
+                    ai.setAsserted(true);
+                    assertPolicy(
+                        new QName(binding.getLayout().getName().getNamespaceURI(), 
+                                  SPConstants.LAYOUT_LAX_TIMESTAMP_LAST));
+                    Element el = timestamp.getElement();
+                    secHeader.getSecurityHeader().appendChild(el);
+                    if (bottomUpElement == null) {
+                        bottomUpElement = el;
                     }
-                } else if (layout.getLayoutType() == LayoutType.LaxTsFirst) {
-                    if (timestamp == null) {
-                        ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST + " requires a timestamp");
-                    } else {
-                        addTopDownElement(timestampEl.getElement());
-                        assertPolicy(
-                             new QName(layout.getName().getNamespaceURI(), 
-                                       SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST));
-                    }
-                } else if (timestampEl != null) {
-                    addTopDownElement(timestampEl.getElement());
                 }
-                
-                assertPolicy(
-                    new QName(layout.getName().getNamespaceURI(), SPConstants.LAYOUT_LAX));
-                assertPolicy(
-                    new QName(layout.getName().getNamespaceURI(), SPConstants.LAYOUT_STRICT));
-            }                    
+            } else if (binding.getLayout().getLayoutType() == LayoutType.LaxTsFirst) {
+                if (timestamp == null) {
+                    ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST + " requires a timestamp");
+                } else {
+                    addTopDownElement(timestampEl.getElement());
+                    assertPolicy(
+                         new QName(binding.getLayout().getName().getNamespaceURI(), 
+                                   SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST));
+                }
+            } else if (timestampEl != null) {
+                addTopDownElement(timestampEl.getElement());
+            }
+            
+            assertPolicy(
+                new QName(binding.getLayout().getName().getNamespaceURI(), SPConstants.LAYOUT_LAX));
+            assertPolicy(
+                new QName(binding.getLayout().getName().getNamespaceURI(), SPConstants.LAYOUT_STRICT));
         } else if (timestampEl != null) {
             addTopDownElement(timestampEl.getElement());
         }
         return timestamp;
     }
     
-    protected void assertSupportingTokens(Collection<Assertion> suppTokens) {
-        if (suppTokens == null) {
-            return;
-        }
-        for (Assertion pa : suppTokens) {
-            if (pa instanceof SupportingTokens) {
-                for (AbstractToken token : ((SupportingTokens)pa).getTokens()) {
-                    this.assertPolicy(token);
-                }        
-            }
-        }
-    }
-    
-    protected Map<AbstractToken, Object> handleSupportingTokens(
+    private Map<AbstractToken, Object> handleSupportingTokens(
         Collection<Assertion> tokens, 
         boolean endorse
     ) throws WSSecurityException {
@@ -393,13 +382,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
     
     protected Map<AbstractToken, Object> handleSupportingTokens(
-        SupportingTokens suppTokens,
-        boolean endorse
-    ) throws WSSecurityException {
-        return handleSupportingTokens(suppTokens, endorse, new HashMap<AbstractToken, Object>());
-    }
-    
-    protected Map<AbstractToken, Object> handleSupportingTokens(
         SupportingTokens suppTokens, 
         boolean endorse,
         Map<AbstractToken, Object> ret
@@ -408,16 +390,18 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             return ret;
         }
         for (AbstractToken token : suppTokens.getTokens()) {
+            assertToken(token);
+            if (!isTokenRequired(token.getIncludeTokenType())) {
+                continue;
+            }
             if (token instanceof UsernameToken) {
                 handleUsernameTokenSupportingToken(
                     (UsernameToken)token, endorse, suppTokens.isEncryptedToken(), ret
                 );
-            } else if (isRequestor() 
-                && (token instanceof IssuedToken
+            } else if (token instanceof IssuedToken
                     || token instanceof SecureConversationToken
                     || token instanceof SecurityContextToken
-                    || token instanceof KerberosToken)) {
-                assertToken(token);
+                    || token instanceof KerberosToken) {
                 //ws-trust/ws-sc stuff.......
                 SecurityToken secToken = getSecurityToken();
                 if (secToken == null) {
@@ -483,7 +467,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else if (token instanceof X509Token) {
                 //We have to use a cert
                 //Prepare X509 signature
-                assertToken(token);
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 Element bstElem = sig.getBinarySecurityTokenElement();
                 if (bstElem != null) {
@@ -495,7 +478,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
                 ret.put(token, sig);
             } else if (token instanceof KeyValueToken) {
-                assertToken(token);
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 if (suppTokens.isEncryptedToken()) {
                     WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
@@ -697,7 +679,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
     protected WSSecUsernameToken addUsernameToken(UsernameToken token) {
         assertToken(token);
-        if (!isRequestor()) {
+        if (!isTokenRequired(token.getIncludeTokenType())) {
             return null;
         }
         
@@ -755,7 +737,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, boolean useMac) {
         assertToken(token);
-        if (!isRequestor()) {
+        if (!isTokenRequired(token.getIncludeTokenType())) {
             return null;
         }
         
@@ -791,7 +773,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     protected SamlAssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
         assertToken(token);
-        if (!isRequestor()) {
+        if (!isTokenRequired(token.getIncludeTokenType())) {
             return null;
         }
         
@@ -1997,22 +1979,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         //Do signature
         sig.computeSignature(referenceList, false, null);
         signatures.add(sig.getSignatureValue());
-    }
-    
-    protected void assertSupportingTokens(List<WSEncryptionPart> sigs) {
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP11Constants.SIGNED_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP11Constants.ENDORSING_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants
-                                                       .SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP11Constants.SUPPORTING_TOKENS));
-        assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS));
     }
     
     protected void addSupportingTokens(List<WSEncryptionPart> sigs) throws WSSecurityException {

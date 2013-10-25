@@ -55,6 +55,9 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.SymmetricBinding;
+import org.apache.wss4j.policy.model.TransportBinding;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
@@ -144,12 +147,6 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     private void checkAsymmetricBinding(
         AssertionInfoMap aim, SoapMessage message
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais.isEmpty()) {
-            return;
-        }
-        
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
             s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
@@ -184,12 +181,6 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     private void checkTransportBinding(
         AssertionInfoMap aim, SoapMessage message
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (ais.isEmpty()) {
-            return;
-        }
-        
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
             s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
@@ -224,12 +215,6 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     private void checkSymmetricBinding(
         AssertionInfoMap aim, SoapMessage message
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais.isEmpty()) {
-            return;
-        }
-        
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
             s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
@@ -341,21 +326,39 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         SoapMessage msg, Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
     ) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
-        checkAsymmetricBinding(aim, msg);
-        checkSymmetricBinding(aim, msg);
-        checkTransportBinding(aim, msg);
+        
+        Collection<AssertionInfo> asymAis = 
+            getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (!asymAis.isEmpty()) {
+            checkAsymmetricBinding(aim, msg);
+        }
+        
+        Collection<AssertionInfo> symAis = 
+            getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (!symAis.isEmpty()) {
+            checkSymmetricBinding(aim, msg);
+        }
+        
+        Collection<AssertionInfo> transAis = 
+            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (!transAis.isEmpty()) {
+            checkTransportBinding(aim, msg);
+        }
         
         super.configureProperties(msg, outboundTokens);
         
-        if (!getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING).isEmpty()) {
-            new StaxTransportBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
-        } else if (!getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING).isEmpty()) {
-            new StaxAsymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
-        } else if (!getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING).isEmpty()) {
-            new StaxSymmetricBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
+        if (!transAis.isEmpty()) {
+            TransportBinding binding = (TransportBinding)transAis.iterator().next().getAssertion();
+            new StaxTransportBindingHandler(getProperties(), msg, binding, outboundTokens).handleBinding();
+        } else if (!asymAis.isEmpty()) {
+            AsymmetricBinding binding = (AsymmetricBinding)asymAis.iterator().next().getAssertion();
+            new StaxAsymmetricBindingHandler(getProperties(), msg, binding, outboundTokens).handleBinding();
+        } else if (!symAis.isEmpty()) {
+            SymmetricBinding binding = (SymmetricBinding)symAis.iterator().next().getAssertion();
+            new StaxSymmetricBindingHandler(getProperties(), msg, binding, outboundTokens).handleBinding();
         } else {
             // Fall back to Transport Binding
-            new StaxTransportBindingHandler(getProperties(), msg, outboundTokens).handleBinding();
+            new StaxTransportBindingHandler(getProperties(), msg, null, outboundTokens).handleBinding();
         }
         
     }

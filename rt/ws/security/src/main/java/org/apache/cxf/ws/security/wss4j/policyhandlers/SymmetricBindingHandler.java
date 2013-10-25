@@ -115,11 +115,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         handleLayout(timestamp);
         assertPolicy(sbinding.getName());
         
-        if (isRequestor()) {
-            //Setup required tokens
-            initializeTokens();
-        }
-        
         if (sbinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
@@ -136,22 +131,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         assertTrustProperties(sbinding.getName().getNamespaceURI());
         assertPolicy(
             new QName(sbinding.getName().getNamespaceURI(), SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
-    }
-    
-    private void initializeTokens()  {
-        //Setting up encryption token and signature token
-        /*
-        Token sigTok = getSignatureToken().getToken();
-        //Token encrTok = getEncryptionToken().getToken();
-        
-        if (sigTok instanceof IssuedToken) {
-            //IssuedToken issuedToken = (IssuedToken)sigTok;
-            
-            //REVISIT - WS-Trust STS token retrieval
-        } else if (sigTok instanceof SecureConversationToken) {
-            //REVISIT - SecureConversation token retrieval
-        }
-        */
     }
     
     private void doEncryptBeforeSign() {
@@ -206,7 +185,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
     
                 boolean attached = false;
-                
                 if (isTokenRequired(encryptionToken.getIncludeTokenType())) {
                     Element el = tok.getToken();
                     this.addEncryptedKeyElement(cloneElement(el));
@@ -227,9 +205,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     sigParts.add(timestampPart);        
                 }
                 
-                if (isRequestor()) {
-                    this.addSupportingTokens(sigParts);
-                } else {
+                addSupportingTokens(sigParts);
+                if (!isRequestor()) {
                     addSignatureConfirmation(sigParts);
                 }
                 
@@ -359,15 +336,14 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 sigs.add(timestampPart);        
             }
 
+            addSupportingTokens(sigs);
             if (isRequestor()) {
-                addSupportingTokens(sigs);
                 if (!sigs.isEmpty()) {
                     signatures.add(doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded));
                 }
                 doEndorse();
             } else {
                 //confirm sig
-                assertSupportingTokens(sigs);
                 addSignatureConfirmation(sigs);
                 if (!sigs.isEmpty()) {
                     doSignature(sigs, sigAbstractTokenWrapper, sigToken, sigTok, tokIncluded);

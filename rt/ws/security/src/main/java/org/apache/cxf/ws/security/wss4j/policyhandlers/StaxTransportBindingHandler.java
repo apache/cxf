@@ -37,8 +37,9 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
-import org.apache.cxf.ws.security.wss4j.policyhandlers.AbstractStaxBindingHandler.TokenStoreCallbackHandler;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
@@ -75,9 +76,11 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     public StaxTransportBindingHandler(
         Map<String, Object> properties, 
         SoapMessage msg,
+        TransportBinding tbinding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
     ) {
-        super(properties, msg, outboundTokens);
+        super(properties, msg, tbinding, outboundTokens);
+        this.tbinding = tbinding;
     }
     
     public void handleBinding() {
@@ -85,7 +88,6 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         configureTimestamp(aim);
         
         if (this.isRequestor()) {
-            tbinding = (TransportBinding)getBinding(aim);
             if (tbinding != null) {
                 assertPolicy(tbinding.getName());
                 String asymSignatureAlgorithm = 
@@ -128,6 +130,10 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             assertWSSProperties(tbinding.getName().getNamespaceURI());
             assertTrustProperties(tbinding.getName().getNamespaceURI());
         }
+        assertPolicy(SP12Constants.SIGNED_PARTS);
+        assertPolicy(SP11Constants.SIGNED_PARTS);
+        assertPolicy(SP12Constants.ENCRYPTED_PARTS);
+        assertPolicy(SP11Constants.ENCRYPTED_PARTS);
     }
     
     /**

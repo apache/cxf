@@ -81,10 +81,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     public StaxSymmetricBindingHandler(
         Map<String, Object> properties, 
         SoapMessage msg,
+        SymmetricBinding sbinding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
     ) {
-        super(properties, msg, outboundTokens);
+        super(properties, msg, sbinding, outboundTokens);
         this.message = msg;
+        this.sbinding = sbinding;
     }
     
     private AbstractTokenWrapper getSignatureToken() {
@@ -104,7 +106,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     public void handleBinding() {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
-        sbinding = (SymmetricBinding)getBinding(aim);
         assertPolicy(sbinding.getName());
         
         String asymSignatureAlgorithm = 
@@ -155,8 +156,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             assertTokenWrapper(encryptionWrapper);
             AbstractToken encryptionToken = encryptionWrapper.getToken();
 
-            //The encryption token can be an IssuedToken or a 
-            //SecureConversationToken
             String tokenId = null;
             SecurityToken tok = null;
             if (encryptionToken instanceof KerberosToken) {
@@ -228,9 +227,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 throw new Fault(ex);
             }
             
+            addSupportingTokens();
+            
             if (encryptionToken != null && encrParts.size() > 0) {
                 if (isRequestor()) {
-                    addSupportingTokens();
                     encrParts.addAll(encryptedTokensList);
                 } else {
                     addSignatureConfirmation(sigParts);
@@ -246,27 +246,25 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
                 
                 doEncryption(encryptionWrapper, encrParts, true);
-                if (timestampAdded) {
-                    SecurePart part = 
-                        new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
-                    sigParts.add(part);
-                }
-                sigParts.addAll(this.getSignedParts());
+            }
+            
+            if (timestampAdded) {
+                SecurePart part = 
+                    new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
+                sigParts.add(part);
+            }
+            sigParts.addAll(this.getSignedParts());
                 
+            if (sigParts.size() > 0) {
                 AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
                 AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
-                if ((sigParts.size() > 0) && sigAbstractTokenWrapper != null && isRequestor()) {
+                if (sigAbstractTokenWrapper != null && isRequestor()) {
                     doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
                 } else if (!isRequestor()) {
                     addSignatureConfirmation(sigParts);
-                    if (!sigParts.isEmpty()) {
-                        doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
-                    }
+                    doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
                 }
     
-                //if (isRequestor()) {
-                //    doEndorse();
-                //}
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -355,21 +353,17 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             sigs.addAll(this.getSignedParts());
 
-            if (isRequestor()) {
-                if (!sigs.isEmpty()) {
-                    doSignature(sigAbstractTokenWrapper, sigToken, sigTok, sigs);
-                }
-                // doEndorse();
-            } else {
+            if (!isRequestor()) {
                 addSignatureConfirmation(sigs);
-                if (!sigs.isEmpty()) {
-                    doSignature(sigAbstractTokenWrapper, sigToken, sigTok, sigs);
-                }
             }
             
+            if (!sigs.isEmpty()) {
+                doSignature(sigAbstractTokenWrapper, sigToken, sigTok, sigs);
+            }
+            
+            addSupportingTokens();
+            
             if (isRequestor()) {
-                addSupportingTokens();
-                
                 Map<String, Object> config = getProperties();
                 if (config.containsKey(ConfigurationConstants.ACTION)) {
                     String action = (String)config.get(ConfigurationConstants.ACTION);

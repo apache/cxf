@@ -71,16 +71,17 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
     public StaxAsymmetricBindingHandler(
         Map<String, Object> properties, 
         SoapMessage msg,
+        AsymmetricBinding abinding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
     ) {
-        super(properties, msg, outboundTokens);
+        super(properties, msg, abinding, outboundTokens);
         this.message = msg;
+        this.abinding = abinding;
     }
     
     public void handleBinding() {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
-        abinding = (AsymmetricBinding)getBinding(aim);
         assertPolicy(abinding.getName());
         
         String asymSignatureAlgorithm = 
@@ -154,7 +155,6 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             if (isRequestor() && initiatorWrapper != null) {
                 doSignature(initiatorWrapper, sigs);
-                //doEndorse();
             } else if (!isRequestor()) {
                 //confirm sig
                 addSignatureConfirmation(sigs);
@@ -286,9 +286,10 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 throw new Fault(ex);
             }
             
+            addSupportingTokens();
+            
             if (encryptionToken != null && encrParts.size() > 0) {
                 if (isRequestor()) {
-                    addSupportingTokens();
                     encrParts.addAll(encryptedTokensList);
                 } else {
                     addSignatureConfirmation(sigParts);
@@ -311,14 +312,14 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 doEncryption(wrapper, encrParts, true);
             }
             
+            if (timestampAdded) {
+                SecurePart part = 
+                    new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
+                sigParts.add(part);
+            }
+            
             if (sigParts.size() > 0) {
-                if (timestampAdded) {
-                    SecurePart part = 
-                        new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
-                    sigParts.add(part);
-                }
-                
-                if ((sigParts.size() > 0) && initiatorWrapper != null && isRequestor()) {
+                if (initiatorWrapper != null && isRequestor()) {
                     doSignature(initiatorWrapper, sigParts);
                 } else if (!isRequestor()) {
                     AbstractTokenWrapper recipientSignatureToken = abinding.getRecipientSignatureToken();
@@ -331,10 +332,6 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         doSignature(recipientSignatureToken, sigParts);
                     }
                 }
-    
-                //if (isRequestor()) {
-                //    doEndorse();
-                //}
             }
         } catch (Exception e) {
             String reason = e.getMessage();
