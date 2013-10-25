@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -36,7 +35,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -44,7 +42,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
@@ -52,6 +49,7 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -99,34 +97,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
     }
     
-    static final TokenStore createTokenStore(Message message) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            TokenStore tokenStore = 
-                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
-            }
-            if (tokenStore == null) {
-                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
-                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-                if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString().hashCode();
-                }
-                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
-                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
-            }
-            return tokenStore;
-        }
-    }
-    static final TokenStore getTokenStore(Message message) {
-        TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-        if (tokenStore == null) {
-            tokenStore = createTokenStore(message);
-        }
-        return tokenStore;
-    }
-
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
@@ -179,7 +149,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                             message.put(SecurityConstants.TOKEN, tok);
                             message.put(SecurityConstants.TOKEN_ID, tok.getId());
                         }
-                        getTokenStore(message).add(tok);
+                        WSS4JUtils.getTokenStore(message).add(tok);
                     }
                 } else {
                     //server side should be checked on the way in
@@ -238,7 +208,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (tok == null) {
                     String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                     if (tokId != null) {
-                        tok = getTokenStore(message).getToken(tokId);
+                        tok = WSS4JUtils.getTokenStore(message).getToken(tokId);
                     }
                 }
             } else {
@@ -246,7 +216,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (tok == null) {
                     String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
                     if (tokId != null) {
-                        tok = getTokenStore(message).getToken(tokId);
+                        tok = WSS4JUtils.getTokenStore(message).getToken(tokId);
                     }
                 }
             }
@@ -263,7 +233,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             String appliesTo,
             boolean enableAppliesTo
         ) throws Exception {
-            TokenStore tokenStore = getTokenStore(message);
+            TokenStore tokenStore = WSS4JUtils.getTokenStore(message);
             String key = appliesTo;
             if (!enableAppliesTo || key == null || "".equals(key)) {
                 key = ASSOCIATED_TOKEN;
@@ -329,7 +299,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             if (issuedToken == null) {
                 return;
             }
-            TokenStore tokenStore = getTokenStore(message);
+            TokenStore tokenStore = WSS4JUtils.getTokenStore(message);
             String key = appliesTo;
             if (!enableAppliesTo || key == null || "".equals(key)) {
                 key = ASSOCIATED_TOKEN;
@@ -564,7 +534,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
                 if (valid) {
                     SecurityToken token = createSecurityToken(assertionWrapper);
-                    getTokenStore(message).add(token);
+                    WSS4JUtils.getTokenStore(message).add(token);
                     message.getExchange().remove(SecurityConstants.TOKEN);
                     message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                     return;
@@ -574,7 +544,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 boolean valid = issuedValidator.validatePolicy(issuedAis, binarySecurityToken);
                 if (valid) {
                     SecurityToken token = createSecurityToken(binarySecurityToken);
-                    getTokenStore(message).add(token);
+                    WSS4JUtils.getTokenStore(message).add(token);
                     message.getExchange().remove(SecurityConstants.TOKEN);
                     message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                     return;
