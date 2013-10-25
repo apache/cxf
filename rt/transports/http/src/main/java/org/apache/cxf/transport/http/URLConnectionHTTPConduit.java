@@ -32,6 +32,7 @@ import java.net.URLConnection;
 import java.util.logging.Level;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
@@ -91,7 +92,12 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         URL url = uri.toURL();
         Proxy proxy = proxyFactory.createProxy(csPolicy , uri);
         message.put("http.scheme", uri.getScheme());
-        return connectionFactory.createConnection(tlsClientParameters, proxy, url);
+        // check tlsClientParameters from message header
+        TLSClientParameters clientParameters = message.get(TLSClientParameters.class);
+        if (clientParameters == null) {
+            clientParameters = tlsClientParameters;
+        }
+        return connectionFactory.createConnection(clientParameters, proxy, url);
     }
     protected void setupConnection(Message message, URI currentURL, HTTPClientPolicy csPolicy) throws IOException {
         HttpURLConnection connection = createConnection(message, currentURL, csPolicy);

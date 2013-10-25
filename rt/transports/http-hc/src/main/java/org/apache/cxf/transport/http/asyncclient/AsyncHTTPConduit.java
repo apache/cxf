@@ -159,10 +159,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 break;
             }
             
-        } 
+        }
+        // check tlsClientParameters from message header
+        TLSClientParameters clientParameters = message.get(TLSClientParameters.class);
+        if (clientParameters == null) {
+            clientParameters = tlsClientParameters;
+        }
         if (uri.getScheme().equals("https") 
-            && tlsClientParameters != null
-            && tlsClientParameters.getSSLSocketFactory() != null) {
+            && clientParameters != null
+            && clientParameters.getSSLSocketFactory() != null) {
             //if they configured in an SSLSocketFactory, we cannot do anything
             //with it as the NIO based transport cannot use socket created from
             //the SSLSocketFactory.
@@ -488,8 +493,11 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                         = RegistryBuilder.<SchemeIOSessionStrategy>create()
                             .register("http", NoopIOSessionStrategy.INSTANCE);
                     
-                   
-                    TLSClientParameters tlsClientParameters = getTlsClientParameters();
+                    // check tlsClientParameters from message header
+                    TLSClientParameters tlsClientParameters = outMessage.get(TLSClientParameters.class);
+                    if (tlsClientParameters == null) {
+                        tlsClientParameters = getTlsClientParameters();
+                    }
                     if (tlsClientParameters == null) {
                         tlsClientParameters = new TLSClientParameters();
                     }

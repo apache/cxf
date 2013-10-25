@@ -42,6 +42,7 @@ import javax.net.ssl.SSLSession;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
@@ -85,7 +86,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         bootstrap = new Bootstrap();
         bootstrap.group(group);
         bootstrap.channel(NioSocketChannel.class);
-        bootstrap.handler(new NettyHttpClientPipelineFactory(this));
     }
     
     public NettyHttpConduitFactory getNettyHttpConduitFactory() {
@@ -281,7 +281,18 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         }
 
         protected void connect(boolean output) {
-
+            if (url.getScheme().equals("https")) {
+                TLSClientParameters clientParameters = outMessage.get(TLSClientParameters.class);
+                if (clientParameters == null) {
+                    clientParameters = getTlsClientParameters();
+                }
+                if (clientParameters == null) {
+                    clientParameters = new TLSClientParameters();
+                }
+                bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters));
+            } else {
+                bootstrap.handler(new NettyHttpClientPipelineFactory(null));
+            }
             ChannelFuture connFuture = 
                 bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort()));
 

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.SSLEngine;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.transport.https.SSLUtils;
 
 import io.netty.channel.Channel;
@@ -41,10 +42,10 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpClientPipelineFactory.class);
-    private final NettyHttpConduit httpConduit;
+    private final TLSClientParameters tlsClientParameters;
     
-    public NettyHttpClientPipelineFactory(NettyHttpConduit httpConduit) {
-        this.httpConduit = httpConduit;
+    public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters) {
+        this.tlsClientParameters = clientParameters;
     }
     
     @Override
@@ -69,8 +70,8 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
     }
     
     private SslHandler configureClientSSLOnDemand() throws Exception {
-        if (httpConduit.getTlsClientParameters() != null) {
-            SSLEngine sslEngine = SSLUtils.createClientSSLEngine(httpConduit.getTlsClientParameters());
+        if (tlsClientParameters != null) {
+            SSLEngine sslEngine = SSLUtils.createClientSSLEngine(tlsClientParameters);
             return new SslHandler(sslEngine);
         } else {
             return null;
