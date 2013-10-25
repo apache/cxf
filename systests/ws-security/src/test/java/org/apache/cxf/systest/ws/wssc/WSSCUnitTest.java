@@ -104,6 +104,52 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)port).close();
     }
+    
+    @Test
+    public void testEndorsingSecureConverationDOMSP12() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = WSSCUnitTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSP12Port");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+    }
+    
+    @Test
+    public void testEndorsingSecureConverationStreamingSP12() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = WSSCUnitTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSP12Port");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // Streaming
+        SecurityTestUtil.enableStreaming(port);
+        port.doubleIt(30);
+
+        ((java.io.Closeable)port).close();
+    }
 
 
 }

@@ -79,4 +79,20 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="TransportSP12"
+       address="https://localhost:${testutil.ports.UnitServer}/DoubleItTransportSP12" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportSP12Port"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/wssc/DoubleItWSSC.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler.sct" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>
