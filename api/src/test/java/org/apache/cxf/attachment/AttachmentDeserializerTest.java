@@ -23,9 +23,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,6 +110,17 @@ public class AttachmentDeserializerTest extends Assert {
         assertTrue(attBody instanceof DelegatingInputStream);
         attBody.close();
         assertEquals(2, msg.getAttachments().size());
+        List<String> cidlist = new ArrayList<String>();
+        cidlist.add("xfire_logo.jpg");
+        cidlist.add("xfire_logo2.jpg");
+        
+        for (Iterator<Attachment> it = msg.getAttachments().iterator(); it.hasNext();) {
+            Attachment a = it.next();
+            assertTrue(cidlist.remove(a.getId()));
+            it.remove();
+        }
+        assertEquals(0, cidlist.size());
+        assertEquals(0, msg.getAttachments().size());
     }
     
     @Test

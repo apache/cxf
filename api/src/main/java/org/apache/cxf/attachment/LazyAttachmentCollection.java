@@ -83,6 +83,7 @@ public class LazyAttachmentCollection
     public Iterator<Attachment> iterator() {
         return new Iterator<Attachment>() {
             int current;
+            boolean removed;
             
             public boolean hasNext() {
                 if (attachments.size() > current) {
@@ -106,11 +107,16 @@ public class LazyAttachmentCollection
             public Attachment next() {
                 Attachment a = attachments.get(current);
                 current++;
+                removed = false;
                 return a;
             }
 
             public void remove() {
-                attachments.remove(current);
+                if (removed) {
+                    throw new IllegalStateException();
+                }
+                attachments.remove(--current);
+                removed = true;
             }
             
         };
