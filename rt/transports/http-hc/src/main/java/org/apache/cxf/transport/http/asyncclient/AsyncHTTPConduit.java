@@ -803,7 +803,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     }
 
 
-    public synchronized SSLContext getSSLContext(TLSClientParameters tlsClientParameters) throws GeneralSecurityException {
+    public synchronized SSLContext getSSLContext(TLSClientParameters tlsClientParameters)
+        throws GeneralSecurityException {
 
         int hash = tlsClientParameters.hashCode();
         if (hash == lastTlsHash) {
