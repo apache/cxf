@@ -460,9 +460,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 entity.removeHeaders("Content-Type");
                 entity.setEntity(null);
             }
-            if (url.getScheme().equals("https") && tlsClientParameters == null) {
-                tlsClientParameters = new TLSClientParameters();
-            }
             
             HttpClientContext ctx = HttpClientContext.create();
 
