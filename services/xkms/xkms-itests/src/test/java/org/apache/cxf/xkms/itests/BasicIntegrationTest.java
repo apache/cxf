@@ -24,7 +24,6 @@ import javax.inject.Inject;
 
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -33,10 +32,11 @@ import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
 @ExamReactorStrategy(PerClass.class)
@@ -69,7 +69,6 @@ public class BasicIntegrationTest {
         return new Option[] {
             karafDistributionConfiguration().frameworkUrl(karafUrl).karafVersion(karafVersion)
                 .unpackDirectory(new File("target/paxexam/unpack/")).useDeployFolder(false),
-            logLevel(LogLevel.INFO),
             systemProperty("java.awt.headless").value("true"),
 
             replaceConfigurationFile("data/xkms/certificates/trusted_cas/root.cer",
@@ -83,11 +82,14 @@ public class BasicIntegrationTest {
             replaceConfigurationFile("data/xkms/certificates/crls/wss40CACRL.cer",
                                      new File("src/test/resources/data/xkms/certificates/crls/wss40CACRL.cer")),
             replaceConfigurationFile("etc/org.apache.cxf.xkms.cfg", getConfigFile()),
-
+            replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg", 
+                    new File("src/test/resources/etc/org.ops4j.pax.logging.cfg")),
             editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS), 
             editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", HTTP_PORT),
             editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", XKMS_ENDPOINT),
             features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client"),
+            configureConsole().ignoreLocalConsole(),
+            keepRuntimeFolder()
             //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }

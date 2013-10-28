@@ -23,6 +23,7 @@
 	<cm:property-placeholder persistent-id="org.apache.cxf.xkms" update-strategy="reload">
 		<cm:default-properties>
 			<cm:property name="xkms.enableXKRSS" value="true"/>
+            <cm:property name="xkms.logExceptions" value="false"/>
 			<cm:property name="xkms.certificate.repo" value="ldap"/>
 			<cm:property name="xkms.file.storageDir" value="data/xkms/certificates"/>
 			<cm:property name="xkms.ldap.url" value="tcp:localhost:389"/>
@@ -86,6 +87,7 @@
 
     <bean id="xkmsService" class="org.apache.cxf.xkms.service.XKMSService">
     	<property name="enableXKRSS" value="${xkms.enableXKRSS}" />
+        <property name="logExceptions" value="${xkms.logExceptions}" />
         <property name="validators">
             <list>
                 <ref component-id="dateValidator" />

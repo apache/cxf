@@ -63,36 +63,29 @@ public class XKMSService implements XKMSPortType {
     protected static final Logger LOG = LogUtils.getL7dLogger(XKMSService.class);
 
     private String serviceName = XKMSConstants.XKMS_ENDPOINT_NAME;
-
     private List<Locator> locators = new ArrayList<Locator>();
-
     private List<Validator> validators = new ArrayList<Validator>();
-
     private List<Register> keyRegisterHandlers = new ArrayList<Register>();
-    
     private boolean enableXKRSS = true;
+    private boolean logExceptions;
 
     @Override
     public ReissueResultType reissue(ReissueRequestType request) {
-        assertXKRSSAllowed();
+        ReissueResultType response = XKMSResponseFactory.createResponse(request, new ReissueResultType());
         try {
+            assertXKRSSAllowed();
             validateRequest(request);
-            ReissueResultType response = XKMSResponseFactory.createResponse(request, new ReissueResultType());
-            try {
-                for (Register handler : keyRegisterHandlers) {
-                    if (handler.canProcess(request)) {
-                        return handler.reissue(request, response);
-                    }
+            for (Register handler : keyRegisterHandlers) {
+                if (handler.canProcess(request)) {
+                    return handler.reissue(request, response);
                 }
-                throw new UnsupportedOperationException("Service was unable to handle your request");
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error due X509 Validation: " + e.getMessage(), e);
-                return ExceptionMapper.toResponse(e, response);
             }
+            throw new UnsupportedOperationException("Service was unable to handle your request");
         } catch (Exception e) {
-            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new ReissueResultType()));
+            return handleException("reissue", e, response);
         }
     }
+
 
     @Override
     public CompoundResultType compound(CompoundRequestType request) {
@@ -100,28 +93,24 @@ public class XKMSService implements XKMSPortType {
 
         RuntimeException ex = new UnsupportedOperationException("XKMS compound request is currently not supported");
         CompoundResultType response = XKMSResponseFactory.createResponse(request, new CompoundResultType());
-        return ExceptionMapper.toResponse(ex, response);
+        return handleException("compound", ex, response);
     }
 
     @Override
     public RegisterResultType register(RegisterRequestType request) {
+        RegisterResultType response = XKMSResponseFactory.createResponse(request, new RegisterResultType());
         try {
-            assertXKRSSAllowed();
+            assertXKRSSAllowed();            
             validateRequest(request);
-            RegisterResultType response = XKMSResponseFactory.createResponse(request, new RegisterResultType());
-            try {
-                for (Register handler : keyRegisterHandlers) {
-                    if (handler.canProcess(request)) {
-                        return handler.register(request, response);
-                    }
+            
+            for (Register handler : keyRegisterHandlers) {
+                if (handler.canProcess(request)) {
+                    return handler.register(request, response);
                 }
-                throw new UnsupportedOperationException("Service was unable to handle your request");
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error due X509 Validation: " + e.getMessage(), e);
-                return ExceptionMapper.toResponse(e, response);
             }
+            throw new UnsupportedOperationException("Service was unable to handle your request");
         } catch (Exception e) {
-            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new RegisterResultType()));
+            return handleException("register", e, response);
         }
     }
 
@@ -135,67 +124,56 @@ public class XKMSService implements XKMSPortType {
 
     @Override
     public RevokeResultType revoke(RevokeRequestType request) {
+        RevokeResultType response = XKMSResponseFactory.createResponse(request, new RevokeResultType());
         try {
             assertXKRSSAllowed();
             validateRequest(request);
-            RevokeResultType response = XKMSResponseFactory.createResponse(request, new RevokeResultType());
-            try {
-                for (Register handler : keyRegisterHandlers) {
-                    if (handler.canProcess(request)) {
-                        return handler.revoke(request, response);
-                    }
+            for (Register handler : keyRegisterHandlers) {
+                if (handler.canProcess(request)) {
+                    return handler.revoke(request, response);
                 }
-                throw new UnsupportedOperationException("Service was unable to handle your request");
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error due X509 Validation: " + e.getMessage(), e);
-                return ExceptionMapper.toResponse(e, response);
             }
+            throw new UnsupportedOperationException("Service was unable to handle your request");
         } catch (Exception e) {
-            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new RevokeResultType()));
+            return handleException("revoke", e, response);
         }
     }
 
     @Override
     public LocateResultType locate(LocateRequestType request) {
+        LocateResultType response = XKMSResponseFactory.createResponse(request, new LocateResultType());
         try {
             validateRequest(request);
-            // Create basic response
-            LocateResultType result = XKMSResponseFactory.createResponse(request, new LocateResultType());
             // Search
             for (Locator locator : locators) {
                 UnverifiedKeyBindingType keyBinding = locator.locate(request);
                 if (keyBinding != null) {
-                    result.getUnverifiedKeyBinding().add(keyBinding);
-                    return result;
+                    response.getUnverifiedKeyBinding().add(keyBinding);
+                    return response;
                 }
             }
             // No matches found
-            result.setResultMinor(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_NO_MATCH.value());
-            return result;
+            response.setResultMinor(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_NO_MATCH.value());
+            return response;
         } catch (Exception e) {
-            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new LocateResultType()));
+            return handleException("locate", e, response);
         }
     }
 
     @Override
     public RecoverResultType recover(RecoverRequestType request) {
+        RecoverResultType response = XKMSResponseFactory.createResponse(request, new RecoverResultType());
         try {
             assertXKRSSAllowed();
             validateRequest(request);
-            RecoverResultType response = XKMSResponseFactory.createResponse(request, new RecoverResultType());
-            try {
-                for (Register handler : keyRegisterHandlers) {
-                    if (handler.canProcess(request)) {
-                        return handler.recover(request, response);
-                    }
+            for (Register handler : keyRegisterHandlers) {
+                if (handler.canProcess(request)) {
+                    return handler.recover(request, response);
                 }
-                throw new UnsupportedOperationException("Service was unable to handle your request");
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error during recover: " + e.getMessage(), e);
-                return ExceptionMapper.toResponse(e, response);
             }
+            throw new UnsupportedOperationException("Service was unable to handle your request");
         } catch (Exception e) {
-            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new RecoverResultType()));
+            return handleException("recover", e, response);
         }
     }
 
@@ -209,12 +187,12 @@ public class XKMSService implements XKMSPortType {
 
     @Override
     public ValidateResultType validate(ValidateRequestType request) {
+        ValidateResultType response = XKMSResponseFactory.createResponse(request, new ValidateResultType());
         try {
             validateRequest(request);
 
             // Create basic response
-            ValidateResultType result = XKMSResponseFactory.createResponse(request, new ValidateResultType());
-            KeyBindingType binding = createKeyBinding(result);
+            KeyBindingType binding = createKeyBinding(response);
 
             // Validate request
             for (Validator validator : validators) {
@@ -223,10 +201,17 @@ public class XKMSService implements XKMSPortType {
             }
 
             resolveValidationStatus(binding);
-            return result;
+            return response;
         } catch (Exception e) {
-            return ExceptionMapper.toResponse(e, XKMSResponseFactory.createResponse(request, new ValidateResultType()));
+            return handleException("recover", e, response);
         }
+    }
+    
+    private <T extends ResultType> T handleException(String method, Exception e, T response) {
+        if (logExceptions) {
+            LOG.log(Level.SEVERE, "Error during " + method + ": " + e.getMessage(), e);
+        }
+        return ExceptionMapper.toResponse(e, response);
     }
 
     /**
@@ -322,9 +307,14 @@ public class XKMSService implements XKMSPortType {
         LOG.info("enableXKRSS:" + enableXKRSS);
     }
 
+    public void setLogExceptions(boolean logExceptions) {
+        this.logExceptions = logExceptions;
+    }
+
     private void assertXKRSSAllowed() {
         if (!enableXKRSS) {
             throw new UnsupportedOperationException("XKRSS Operations are disabled");
         }
     }
 }
+
