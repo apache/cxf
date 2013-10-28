@@ -446,10 +446,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 entity.removeHeaders("Content-Type");
                 entity.setEntity(null);
             }
-            if (url.getScheme().equals("https") && tlsClientParameters == null) {
-                tlsClientParameters = new TLSClientParameters();
-            }
-            
+
             BasicHttpContext ctx = new BasicHttpContext();
             if (AsyncHTTPConduit.this.proxyAuthorizationPolicy != null
                 && AsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName() != null) {
@@ -473,7 +470,16 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             reg.register(new AsyncScheme("http", 80, null));
             if ("https".equals(url.getScheme())) {
                 try {
-                    final SSLContext sslcontext = getSSLContext();
+                    // check tlsClientParameters from message header
+                    TLSClientParameters tlsClientParameters = outMessage.get(TLSClientParameters.class);
+                    if (tlsClientParameters == null) {
+                        tlsClientParameters = getTlsClientParameters();
+                    }
+                    if (tlsClientParameters == null) {
+                        tlsClientParameters = new TLSClientParameters();
+                    }
+
+                    final SSLContext sslcontext = getSSLContext(tlsClientParameters);
                     reg.register(new AsyncScheme("https", 443, new SSLLayeringStrategy(sslcontext) {
                         @Override
                         protected void initializeEngine(SSLEngine engine) {
@@ -797,11 +803,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     }
 
 
-    public synchronized SSLContext getSSLContext() throws GeneralSecurityException {
-        TLSClientParameters tlsClientParameters = getTlsClientParameters();
-        if (tlsClientParameters == null) {
-            tlsClientParameters = new TLSClientParameters();
-        }
+    public synchronized SSLContext getSSLContext(TLSClientParameters tlsClientParameters) throws GeneralSecurityException {
+
         int hash = tlsClientParameters.hashCode();
         if (hash == lastTlsHash) {
             return sslContext;
