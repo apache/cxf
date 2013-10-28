@@ -88,7 +88,7 @@ public class DateValidator implements Validator {
 
         for (X509Certificate x509Certificate : certificates) {
             if (!isCertificateValid(x509Certificate)) {
-                LOG.severe("Certificate is expired: " + x509Certificate.getSubjectX500Principal());
+                LOG.info("Certificate is expired: " + x509Certificate.getSubjectX500Principal());
                 return false;
             }
         }
