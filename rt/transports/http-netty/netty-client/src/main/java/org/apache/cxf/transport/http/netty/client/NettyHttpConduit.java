@@ -279,16 +279,21 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 wrappedStream = cachedStream;
             }
         }
+        
+        protected TLSClientParameters findTLSClientParameters() {
+            TLSClientParameters clientParameters = outMessage.get(TLSClientParameters.class);
+            if (clientParameters == null) {
+                clientParameters = getTlsClientParameters();
+            }
+            if (clientParameters == null) {
+                clientParameters = new TLSClientParameters();
+            }
+            return clientParameters;
+        }
 
         protected void connect(boolean output) {
             if (url.getScheme().equals("https")) {
-                TLSClientParameters clientParameters = outMessage.get(TLSClientParameters.class);
-                if (clientParameters == null) {
-                    clientParameters = getTlsClientParameters();
-                }
-                if (clientParameters == null) {
-                    clientParameters = new TLSClientParameters();
-                }
+                TLSClientParameters clientParameters = findTLSClientParameters();
                 bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters));
             } else {
                 bootstrap.handler(new NettyHttpClientPipelineFactory(null));
@@ -340,7 +345,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             connect(true);
            
             HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
-                .getHostnameVerifier(tlsClientParameters);
+                .getHostnameVerifier(findTLSClientParameters());
             
             if (!verifier.verify(url.getHost(), session)) {
                 throw new IOException("Could not verify host " + url.getHost());
