@@ -56,6 +56,15 @@ public class PathSegmentImpl implements PathSegment {
         return path;
     }
     
+    public String getMatrixString() {
+        int index = path.indexOf(';');
+        if (index == -1) {
+            return null;
+        } else {
+            return path.substring(index);
+        }
+    }
+    
     public String toString() {
         return path;
     }
