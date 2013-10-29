@@ -95,15 +95,18 @@ public class TrustedAuthorityValidator implements Validator {
                 
             CertPathValidator validator = CertPathValidator.getInstance("PKIX");
             validator.validate(certPath, pkixParams);
+            
         } catch (InvalidAlgorithmParameterException e) {
+            LOG.log(Level.SEVERE, "Invalid algorithm by certificate chain validation: " + e.getMessage(), e);
             throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
+            LOG.log(Level.SEVERE, "Unknown algorithm by certificate chain validation: " + e.getMessage(), e);
             throw new RuntimeException(e);
         } catch (CertPathBuilderException e) {
-            LOG.log(Level.INFO, e.getMessage(), e);
+            LOG.log(Level.WARNING, "Certificate chain invalid: " + e.getMessage(), e);
             return false;
         } catch (CertPathValidatorException e) {
-            LOG.log(Level.INFO, e.getMessage(), e);
+            LOG.log(Level.WARNING, "Certificate chain invalid: " + e.getMessage(), e);
             return false;
         }
         return true;
