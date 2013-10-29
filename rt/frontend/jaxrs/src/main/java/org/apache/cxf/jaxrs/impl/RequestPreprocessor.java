@@ -79,23 +79,31 @@ public class RequestPreprocessor {
     }
     
     private void handleLanguageMappings(Message m, UriInfo uriInfo) {
-        String path = uriInfo.getPath(false);
+        if (languageMappings.isEmpty()) {
+            return;
+        }
+        PathSegmentImpl ps = new PathSegmentImpl(uriInfo.getPath(false));
+        String path = ps.getPath();
         for (Map.Entry<?, ?> entry : languageMappings.entrySet()) {
             if (path.endsWith("." + entry.getKey())) {
                 updateAcceptLanguageHeader(m, entry.getValue().toString());
-                updatePath(m, path, entry.getKey().toString());
+                updatePath(m, path, entry.getKey().toString(), ps.getMatrixString());
                 break;
             }    
         }
     }
     
     private void handleExtensionMappings(Message m, UriInfo uriInfo) {
-        String path = uriInfo.getPath(false);
+        if (extensionMappings.isEmpty()) {
+            return;
+        }
+        PathSegmentImpl ps = new PathSegmentImpl(uriInfo.getPath(false));
+        String path = ps.getPath();
         for (Map.Entry<?, ?> entry : extensionMappings.entrySet()) {
             String key = entry.getKey().toString();
             if (path.endsWith("." + key)) {
                 updateAcceptTypeHeader(m, entry.getValue().toString());
-                updatePath(m, path, key);
+                updatePath(m, path, key, ps.getMatrixString());
                 if ("wadl".equals(key)) {
                     // the path has been updated and Accept was not necessarily set to 
                     // WADL type (xml or json or html - other options)
@@ -126,8 +134,11 @@ public class RequestPreprocessor {
             .put(HttpHeaders.ACCEPT_LANGUAGE, acceptLanguage);
     }
     
-    private void updatePath(Message m, String path, String suffix) {
+    private void updatePath(Message m, String path, String suffix, String matrixString) {
         String newPath = path.substring(0, path.length() - (suffix.length() + 1));
+        if (matrixString != null) {
+            newPath += matrixString;
+        }
         HttpUtils.updatePath(m, newPath);
     }
     
