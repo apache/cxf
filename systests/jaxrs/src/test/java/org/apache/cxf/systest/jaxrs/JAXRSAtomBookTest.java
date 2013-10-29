@@ -100,6 +100,10 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123.json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
+        // do the same using extension mappings & matrix parameters
+        getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123.json;a=b",
+                               "resources/expected_atom_book_json_matrix.txt",
+                               "*/*");
         
         
     }
