@@ -220,7 +220,8 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         if (svm != null) {
             //filter xop node
             XMLStreamWriter nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
-            if (svm.setupValidation(nullWriter, message.getExchange().getService().getServiceInfos().get(0))) {
+            if (svm.setupValidation(nullWriter, message.getExchange().getEndpoint(),
+                                    message.getExchange().getService().getServiceInfos().get(0))) {
                 XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
                 XMLStreamReader filteredReader =
                 StaxUtils.createFilteredReader(reader,
