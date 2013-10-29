@@ -21,6 +21,7 @@ package org.apache.cxf.staxutils.validation;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
@@ -32,6 +33,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -49,6 +51,7 @@ import org.codehaus.stax2.validation.XMLValidationSchema;
  */
 class Stax2ValidationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(Stax2ValidationUtils.class);
+    private static final String KEY = XMLValidationSchema.class.getName();
 
     public Stax2ValidationUtils() {
         new W3CMultiSchemaFactory(); // will throw if wrong woodstox.
@@ -59,7 +62,9 @@ class Stax2ValidationUtils {
      * 
      * @throws XMLStreamException
      */
-    public void setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException {
+    public boolean setupValidation(XMLStreamReader reader, Endpoint endpoint, ServiceInfo serviceInfo) 
+        throws XMLStreamException {
+        
         // Gosh, this is bad, but I don't know a better solution, unless we're willing
         // to require the stax2 API no matter what.
         XMLStreamReader effectiveReader = reader;
@@ -67,7 +72,10 @@ class Stax2ValidationUtils {
             effectiveReader = ((DepthXMLStreamReader)reader).getReader();
         }
         final XMLStreamReader2 reader2 = (XMLStreamReader2)effectiveReader;
-        XMLValidationSchema vs = getValidator(serviceInfo);
+        XMLValidationSchema vs = getValidator(endpoint, serviceInfo);
+        if (vs == null) {
+            return false;
+        }
         reader2.setValidationProblemHandler(new ValidationProblemHandler() {
 
             public void reportProblem(XMLValidationProblem problem) throws XMLValidationException {
@@ -76,11 +84,17 @@ class Stax2ValidationUtils {
             }
         });
         reader2.validateAgainst(vs);
+        return true;
     }
 
-    public void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
+    public boolean setupValidation(XMLStreamWriter writer, Endpoint endpoint, ServiceInfo serviceInfo) 
+        throws XMLStreamException {
+        
         XMLStreamWriter2 writer2 = (XMLStreamWriter2)writer;
-        XMLValidationSchema vs = getValidator(serviceInfo);
+        XMLValidationSchema vs = getValidator(endpoint, serviceInfo);
+        if (vs == null) {
+            return false;
+        }
         writer2.setValidationProblemHandler(new ValidationProblemHandler() {
 
             public void reportProblem(XMLValidationProblem problem) throws XMLValidationException {
@@ -88,6 +102,7 @@ class Stax2ValidationUtils {
             }
         });
         writer2.validateAgainst(vs);
+        return true;
     }
 
     /**
@@ -97,32 +112,45 @@ class Stax2ValidationUtils {
      * @return
      * @throws XMLStreamException
      */
-    private XMLValidationSchema getValidator(ServiceInfo serviceInfo) throws XMLStreamException {
-        Map<String, EmbeddedSchema> sources = new TreeMap<String, EmbeddedSchema>();
-
-        for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
-            XmlSchema sch = schemaInfo.getSchema();
-            String uri = sch.getTargetNamespace();
-            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri)) {
-                continue;
+    private XMLValidationSchema getValidator(Endpoint endpoint, ServiceInfo serviceInfo) throws XMLStreamException {
+        synchronized (endpoint) {
+            XMLValidationSchema ret = (XMLValidationSchema)endpoint.get(KEY);
+            if (ret == null) {
+                if (endpoint.containsKey(KEY)) {
+                    return null;
+                }
+                Map<String, EmbeddedSchema> sources = new TreeMap<String, EmbeddedSchema>();
+        
+                for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
+                    XmlSchema sch = schemaInfo.getSchema();
+                    String uri = sch.getTargetNamespace();
+                    if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri)) {
+                        continue;
+                    }
+                    LOG.info(uri);
+        
+                    Element serialized = schemaInfo.getElement();
+                    String schemaSystemId = sch.getSourceURI();
+                    if (null == schemaSystemId) {
+                        schemaSystemId = sch.getTargetNamespace();
+                    }
+        
+                    EmbeddedSchema embeddedSchema = new EmbeddedSchema(schemaSystemId, serialized);
+                    sources.put(sch.getTargetNamespace(), embeddedSchema);
+                }
+        
+                W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
+                // I don't think that we need the baseURI.
+                try {
+                    ret = factory.loadSchemas(null, sources);
+                    endpoint.put(KEY, ret);
+                } catch (XMLStreamException ex) {
+                    LOG.log(Level.INFO, "Problem loading schemas. Falling back to slower method.", ret);
+                    endpoint.put(KEY, null);
+                }
             }
-            LOG.info(uri);
-
-            Element serialized = schemaInfo.getElement();
-            String schemaSystemId = sch.getSourceURI();
-            if (null == schemaSystemId) {
-                schemaSystemId = sch.getTargetNamespace();
-            }
-
-            EmbeddedSchema embeddedSchema = new EmbeddedSchema(schemaSystemId, serialized);
-            sources.put(sch.getTargetNamespace(), embeddedSchema);
+            return ret;
         }
-
-        W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
-        XMLValidationSchema vs;
-        // I don't think that we need the baseURI.
-        vs = factory.loadSchemas(null, sources);
-        return vs;
     }
 
 }

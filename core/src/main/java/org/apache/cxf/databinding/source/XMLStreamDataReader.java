@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.activation.DataSource;
@@ -227,17 +226,13 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
 
         WoodstoxValidationImpl impl = new WoodstoxValidationImpl();
         XMLStreamWriter nullWriter = null;
-        boolean canValidate = impl.canValidate();
-        if (canValidate) {
+        if (impl.canValidate()) {
             nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
-            try {
-                impl.setupValidation(nullWriter, message.getExchange().getService().getServiceInfos().get(0));
-            } catch (Throwable t) {
-                LOG.log(Level.FINE, "Trouble setting up validation.", t);
-                canValidate = false;
-            }
+            impl.setupValidation(nullWriter, message.getExchange().getEndpoint(),
+                                 message.getExchange().getService().getServiceInfos().get(0));
         }
-        if (canValidate) {
+        //check if the impl can still validate after the setup, possible issue loading schemas or similar
+        if (impl.canValidate()) {
             //Can use the MSV libs and woodstox to handle the schema validation during 
             //parsing and processing.   Much faster and single traversal
             //filter xop node

@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
@@ -54,15 +55,18 @@ public class WoodstoxValidationImpl {
     /** {@inheritDoc}
      * @throws XMLStreamException */
     public void setupValidation(XMLStreamReader reader, 
+                                Endpoint endpoint,
                                 ServiceInfo serviceInfo) throws XMLStreamException {
-        if (utils != null && reader != null) {
-            utils.setupValidation(reader, serviceInfo);
+        if (utils != null && reader != null && !utils.setupValidation(reader, endpoint, serviceInfo)) {
+            utils = null;
         }
     }
 
-    public void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
-        if (utils != null && writer != null) {
-            utils.setupValidation(writer, serviceInfo);
+    public void setupValidation(XMLStreamWriter writer, 
+                                Endpoint endpoint,
+                                ServiceInfo serviceInfo) throws XMLStreamException {
+        if (utils != null && writer != null && !utils.setupValidation(writer, endpoint, serviceInfo)) {
+            utils = null;
         }
     }
 }

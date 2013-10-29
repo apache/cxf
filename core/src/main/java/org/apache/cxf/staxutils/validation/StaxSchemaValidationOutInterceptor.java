@@ -56,7 +56,8 @@ public class StaxSchemaValidationOutInterceptor extends AbstractPhaseInterceptor
             try {
                 WoodstoxValidationImpl mgr = new WoodstoxValidationImpl();
                 if (mgr.canValidate()) {
-                    mgr.setupValidation(writer, message.getExchange().getService().getServiceInfos().get(0));
+                    mgr.setupValidation(writer, message.getExchange().getEndpoint(),
+                                        message.getExchange().getService().getServiceInfos().get(0));
                 }
             } catch (Throwable t) {
                 //likely no MSV or similar
