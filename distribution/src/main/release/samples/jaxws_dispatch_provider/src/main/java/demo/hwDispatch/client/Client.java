@@ -33,7 +33,9 @@ import javax.xml.ws.Service.Mode;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.example.newwsdlfile.NewWSDLFile_Service;
+import org.apache.hello_world_soap_http.SOAPService1;
+import org.apache.hello_world_soap_http.SOAPService2;
+import org.apache.hello_world_soap_http.SOAPService3;
 
 public final class Client {
 
@@ -58,14 +60,14 @@ public final class Client {
         MessageFactory factory = MessageFactory.newInstance();
         System.out.println(wsdlURL + "\n\n");
 
-        QName serviceName1 = new QName("http://www.example.org/NewWSDLFile/", "NewWSDLFile");
-        QName portName1 = new QName("http://www.example.org/NewWSDLFile/", "NewWSDLFileSOAP");
+        QName serviceName1 = new QName("http://apache.org/hello_world_soap_http", "SOAPService1");
+        QName portName1 = new QName("http://apache.org/hello_world_soap_http", "SoapPort1");
 
-        NewWSDLFile_Service service1 = new NewWSDLFile_Service(wsdlURL, serviceName1);
-        InputStream is1 =  Client.class.getResourceAsStream("/NoteDocLiteralReq.xml");
+        SOAPService1 service1 = new SOAPService1(wsdlURL, serviceName1);
+        InputStream is1 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq1.xml");
         if (is1 == null) {
             System.err.println("Failed to create input stream from file "
-                               + "NoteDocLiteralReq.xml, please check");
+                               + "GreetMeDocLiteralReq1.xml, please check");
             System.exit(-1);
         }
         SOAPMessage soapReq1 = factory.createMessage(null, is1);
@@ -77,21 +79,49 @@ public final class Client {
         SOAPMessage soapResp = dispSOAPMsg.invoke(soapReq1);
         System.out.println("Response from server: " + soapResp.getSOAPBody().getTextContent());
 
-	NewWSDLFile_Service service2 = new NewWSDLFile_Service(wsdlURL, serviceName1);
-        InputStream is2 =  Client.class.getResourceAsStream("/NoteDocLiteralReq_doesnt_match_schema.xml");
+        QName serviceName2 = new QName("http://apache.org/hello_world_soap_http", "SOAPService2");
+        QName portName2 = new QName("http://apache.org/hello_world_soap_http", "SoapPort2");
+
+        SOAPService2 service2 = new SOAPService2(wsdlURL, serviceName2);
+        InputStream is2 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq2.xml");
         if (is2 == null) {
             System.err.println("Failed to create input stream from file "
-                               + "NoteDocLiteralReq_doesnt_match_schema.xml, please check");
+                               + "GreetMeDocLiteralReq2.xml, please check");
             System.exit(-1);
         }
         SOAPMessage soapReq2 = factory.createMessage(null, is2);
+        DOMSource domReqMessage = new DOMSource(soapReq2.getSOAPPart());
 
-        Dispatch<SOAPMessage> dispSOAPMsg2 = service2.createDispatch(portName1,
-                                                                    SOAPMessage.class, Mode.MESSAGE);
+        Dispatch<DOMSource> dispDOMSrcMessage = service2.createDispatch(portName2,
+                                                                        DOMSource.class, Mode.MESSAGE);
+        System.out.println("Invoking server through Dispatch interface using DOMSource in MESSAGE Mode");
+        DOMSource domRespMessage = dispDOMSrcMessage.invoke(domReqMessage);
+        System.out.println("Response from server: "
+                           + domRespMessage.getNode().getLastChild().getTextContent());
 
-        System.out.println("Invoking server through Dispatch interface using SOAPMessage");
-        SOAPMessage soapResp2 = dispSOAPMsg2.invoke(soapReq2);
-        System.out.println("Response from server: " + soapResp2.getSOAPBody().getTextContent());
+
+        QName serviceName3 = new QName("http://apache.org/hello_world_soap_http", "SOAPService3");
+        QName portName3 = new QName("http://apache.org/hello_world_soap_http", "SoapPort3");
+
+        SOAPService3 service3 = new SOAPService3(wsdlURL, serviceName3);
+        InputStream is3 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq3.xml");
+        if (is3 == null) {
+            System.err.println("Failed to create input stream from file "
+                               + "GreetMeDocLiteralReq3.xml, please check");
+            System.exit(-1);
+        }
+
+        SOAPMessage soapReq3 = MessageFactory.newInstance().createMessage(null, is3);
+        DOMSource domReqPayload = new DOMSource(soapReq3.getSOAPBody().extractContentAsDocument());
+
+        Dispatch<DOMSource> dispDOMSrcPayload = service3.createDispatch(portName3,
+                                                                        DOMSource.class, Mode.PAYLOAD);
+        System.out.println("Invoking server through Dispatch interface using DOMSource in PAYLOAD Mode");
+        DOMSource domRespPayload = dispDOMSrcPayload.invoke(domReqPayload);
+
+        System.out.println("Response from server: "
+                           + fetchElementByName(domRespPayload.getNode(), 
+                                                "greetMeResponse").getTextContent());
 
         System.exit(0);
     }

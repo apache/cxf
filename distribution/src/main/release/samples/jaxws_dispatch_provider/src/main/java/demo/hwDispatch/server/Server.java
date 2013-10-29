@@ -19,27 +19,26 @@
 
 package demo.hwDispatch.server;
 import javax.xml.ws.Endpoint;
-import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Server {
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
 
-        System.out.println("Starting NewWSDLFile service");
-        Object implementor = new NewWSDLFileSoapMessageProvider();
-        String address = "http://localhost:9000/SoapContext/NewWSDLFileSOAP";
-        //EndpointImpl ep = (EndpointImpl)Endpoint.publish(address, implementor); 
-	//ep.getFeatures().add(new WSAddressingFeature());
-	EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
-	ep.getProperties().put("schema-validation-enabled","true");
-	ep.publish(address);
-
-	// also start a second server using Spring
-	new ClassPathXmlApplicationContext("server-applicationContext.xml");
-        System.in.read();
+        System.out.println("Starting SoapService1");
+        Object implementor = new GreeterSoapMessageProvider();
+        String address = "http://localhost:9000/SoapContext/SoapPort1";
+        Endpoint.publish(address, implementor);
+        
+        System.out.println("Starting SoapService2");
+        implementor = new GreeterDOMSourceMessageProvider();
+        address = "http://localhost:9000/SoapContext/SoapPort2";
+        Endpoint.publish(address, implementor);
+        
+        System.out.println("Starting SoapService3");
+        implementor = new GreeterDOMSourcePayloadProvider();
+        address = "http://localhost:9000/SoapContext/SoapPort3";
+        Endpoint.publish(address, implementor);        
     }
 
     public static void main(String args[]) throws Exception {
