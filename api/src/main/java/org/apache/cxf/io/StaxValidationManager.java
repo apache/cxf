@@ -36,7 +36,7 @@ public interface StaxValidationManager {
      * @param serviceInfo - the Service to pull the schema from
      * @throws XMLStreamException 
      */
-    void setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException;
+    boolean setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException;
     
     /**
      * Install the schemas onto the writer for validation.
@@ -44,6 +44,6 @@ public interface StaxValidationManager {
      * @param serviceInfo - the Service to pull the schema from
      * @throws XMLStreamException 
      */
-    void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException;
+    boolean setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException;
 
 }
