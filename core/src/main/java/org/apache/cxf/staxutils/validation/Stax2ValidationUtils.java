@@ -53,8 +53,22 @@ class Stax2ValidationUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(Stax2ValidationUtils.class);
     private static final String KEY = XMLValidationSchema.class.getName();
 
+    private static final boolean HAS_WOODSTOX;
+    static {
+        boolean hasw = false;
+        try {
+            new W3CMultiSchemaFactory(); // will throw if wrong woodstox.
+            hasw = true;
+        } catch (Throwable t) {
+            //ignore
+        }
+        HAS_WOODSTOX = hasw;
+    }
+    
     public Stax2ValidationUtils() {
-        new W3CMultiSchemaFactory(); // will throw if wrong woodstox.
+        if (!HAS_WOODSTOX) {
+            throw new RuntimeException("Could not load woodstox");
+        }
     }
 
     /**
