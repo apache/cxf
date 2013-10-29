@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.service.model.ServiceInfo;
 
@@ -62,18 +63,19 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
     /** {@inheritDoc}
      * @throws XMLStreamException */
     public boolean setupValidation(XMLStreamReader reader,
-                                ServiceInfo serviceInfo) throws XMLStreamException {
+                                   Endpoint endpoint,
+                                   ServiceInfo serviceInfo) throws XMLStreamException {
         if (utils != null && reader != null) {
-            utils.setupValidation(reader, serviceInfo);
-            return true;
+            return utils.setupValidation(reader, endpoint, serviceInfo);
         }
         return false;
     }
 
-    public boolean setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException {
+    public boolean setupValidation(XMLStreamWriter writer,
+                                   Endpoint endpoint,
+                                   ServiceInfo serviceInfo) throws XMLStreamException {
         if (utils != null && writer != null) {
-            utils.setupValidation(writer, serviceInfo);
-            return true;
+            return utils.setupValidation(writer, endpoint, serviceInfo);
         }
         return false;
     }

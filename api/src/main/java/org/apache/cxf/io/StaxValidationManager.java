@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
@@ -36,7 +37,7 @@ public interface StaxValidationManager {
      * @param serviceInfo - the Service to pull the schema from
      * @throws XMLStreamException 
      */
-    boolean setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException;
+    boolean setupValidation(XMLStreamReader reader, Endpoint endpoint, ServiceInfo serviceInfo) throws XMLStreamException;
     
     /**
      * Install the schemas onto the writer for validation.
@@ -44,6 +45,6 @@ public interface StaxValidationManager {
      * @param serviceInfo - the Service to pull the schema from
      * @throws XMLStreamException 
      */
-    boolean setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException;
+    boolean setupValidation(XMLStreamWriter writer, Endpoint endpoint, ServiceInfo serviceInfo) throws XMLStreamException;
 
 }

@@ -66,7 +66,7 @@ public class AegisSchemaValidationInInterceptor extends AbstractPhaseInterceptor
         if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
             StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
             if (mgr != null) {
-                mgr.setupValidation(reader, service);
+                mgr.setupValidation(reader, message.getExchange().getEndpoint(), service);
             }
         }
     }

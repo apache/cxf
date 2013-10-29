@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.activation.DataSource;
@@ -220,7 +219,6 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         boolean stax = false;
         if (svm != null) {
             //filter xop node
-            
             XMLStreamWriter nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
             if (svm.setupValidation(nullWriter, message.getExchange().getService().getServiceInfos().get(0))) {
                 XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
