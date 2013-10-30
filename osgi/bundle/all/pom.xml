@@ -20,15 +20,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-bundle</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>Apache CXF Bundle Jar</name>
     <description>Apache CXF Bundle Jar</description>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-bundle-parent</artifactId>
+        <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
+        <relativePath>../../../parent</relativePath>
     </parent>
     <properties>
         <bundle.symbolic.name>${project.groupId}.bundle</bundle.symbolic.name>
@@ -320,117 +321,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Implementation-Title>Apache CXF</Implementation-Title>
-                        <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                        <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
-                        <Specification-Title>Apache CXF</Specification-Title>
-                        <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
-                        <SPI-Provider>true</SPI-Provider>
-                        <DynamicImport-Package>
-                            com.sun.xml.bind,
-                            com.sun.xml.bind.*,
-                            com.sun.xml.internal.bind,
-                            com.sun.xml.internal.bind.*,
-                            com.ctc.wstx.*,
-                            org.apache.commons.logging.*,
-                            org.slf4j.*,
-                            org.slf4j.impl.*,
-                            org.eclipse.jetty.plus.jaas,
-                            org.eclipse.jetty.plus.jaas.*,
-                            org.apache.karaf.jaas.modules,
-                            org.apache.karaf.jaas.modules.*,
-                            org.eclipse.jetty.jmx,
-                            org.eclipse.jetty.jmx.*
-                        </DynamicImport-Package>
-                        <Import-Package>
-                            !org.apache.cxf.*,
-                            repackage;resolution:=optional,
-                            !META-INF.cxf,
-                            !META-INF.cxf.osgi,
-                            antlr*;resolution:=optional,
-                            com.sun*;resolution:=optional,
-                            com.ctc.wstx.msv*;resolution:=optional,
-                            net.sf.ehcache*;resolution:=optional,
-                            org.codehaus.stax2*;resolution:=optional,
-                            commonj.sdo*;resolution:=optional,
-                            javax.ws.rs*;resolution:=optional,
-                            javax.resource*;resolution:=optional,
-                            javax.xml.soap,
-                            junit.framework*;resolution:=optional,
-                            net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
-                            net.oauth*;resolution:=optional,
-                            org.apache.abdera*;resolution:=optional;version="[1.0,2)",
-                            org.apache.aries*;resolution:=optional;version="${cxf.aries.version.range}",
-                            org.apache.commons.lang*;resolution:=optional;version="[2.4,3)",
-                            org.apache.commons.codec*;resolution:=optional,
-                            org.apache.commons.logging*;resolution:=optional,
-                            org.apache.commons.pool*;resolution:=optional,
-                            org.apache.log4j*;resolution:=optional,
-                            org.apache.lucene.document;resolution:=optional,
-                            org.apache.lucene.index;resolution:=optional,
-                            org.apache.lucene.search;resolution:=optional,    
-                            org.apache.mina*;resolution:=optional,
-                            org.apache.tuscany.sdo*;resolution:=optional,
-                            org.apache.velocity*;resolution:=optional,
-                            org.apache.xmlbeans*;resolution:=optional,
-                            org.apache.xml.security*;resolution:=optional,
-                            org.apache.ws.security*;resolution:=optional,
-                            org.codehaus.jettison*;resolution:=optional,
-                            org.dom4j*;resolution:=optional,
-                            org.eclipse.emf*;resolution:=optional,
-                            org.eclipse.jetty*;resolution:=optional;version="${cxf.jetty.osgi.version}",
-                            org.apache.http.nio.conn;resolution:=optional;version="${cxf.httpcomponents.asyncclient.version.range}",
-                            org.apache.http.nio.conn.scheme;resolution:=optional;version="${cxf.httpcomponents.asyncclient.version.range}",
-                            org.apache.http.nio.conn.ssl;resolution:=optional;version="${cxf.httpcomponents.asyncclient.version.range}",
-                            org.apache.http.impl.nio.client;resolution:=optional;version="${cxf.httpcomponents.asyncclient.version.range}",
-                            org.apache.http.impl.nio.conn;resolution:=optional;version="${cxf.httpcomponents.asyncclient.version.range}",
-                            org.apache.http.*;resolution:=optional;version="${cxf.httpcomponents.core.version.range}",
-                            org.ietf.jgss*;resolution:=optional,
-                            org.jaxen*;resolution:=optional,
-                            org.jdom*;resolution:=optional,
-                            org.jibx*;resolution:=optional;version="[1.2.3,2)",
-                            org.joda.time;resolution:=optional,
-                            org.junit*;resolution:=optional,
-                            org.mozilla.javascript*;resolution:=optional,
-                            org.objectweb.asm*;version="[2.0,4)";resolution:=optional,
-                            org.omg*;resolution:=optional,
-                            org.opensaml*;resolution:=optional,
-                            org.osgi.service.blueprint*;resolution:=optional,
-                            org.slf4j*;resolution:=optional;version="[1.5,2)",
-                            org.springframework*;resolution:=optional;version="[2.5,4)",
-                            javax.activation;version="[0.0,2)",
-                            javax.annotation;version="${cxf.osgi.javax.annotation.version}",
-                            javax.jms;resolution:=optional;version="[0.0,2)",
-                            javax.jws*;version="[0.0,3)",
-                            javax.mail*;version="[0.0,2)",
-                            javax.servlet.*;version="[0.0,4)";resolution:=optional,
-                            javax.xml.bind*;version="[0.0,3)",
-                            javax.xml.stream*;version="[0.0,2)",
-                            javax.xml.ws.spi.http*;version="[0.0,3)";resolution:=optional,
-                            javax.xml.ws*;version="[0.0,3)",
-                            javax.persistence*;resolution:=optional,
-                            *
-                        </Import-Package>
-                        <Bundle-Activator>org.apache.cxf.bus.osgi.CXFActivator</Bundle-Activator>
-                        <Export-Package>
-                            org.apache.cxf.*;version=${cxf.osgi.version.clean};-split-package:=merge-first,
-                            '=META-INF.cxf.osgi';version=${cxf.osgi.version.clean},
-                            '=META-INF.cxf';version=${cxf.osgi.version.clean}
-                        </Export-Package>
-                        <_failok>true</_failok>
-                        <_nouses>true</_nouses>
-                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
