@@ -145,7 +145,6 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                 MessageDigest digester = MessageDigest.getInstance(digAlg);
                 String a1 = username + ":" + realm + ":" + password;
                 if ("MD5-sess".equalsIgnoreCase(algorithm)) {
-                    algorithm = "MD5";
                     String tmp2 = encode(digester.digest(a1.getBytes(charset)));
                     a1 = tmp2 + ':' + nonce + ':' + cnonce;
                 }
@@ -172,6 +171,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                 outParams.put("nc", ncstring);
                 outParams.put("cnonce", cnonce);
                 outParams.put("response", response);
+                outParams.put("algorithm", algorithm);
                 return new HttpAuthHeader(HttpAuthHeader.AUTH_TYPE_DIGEST, outParams).getFullHeader();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
