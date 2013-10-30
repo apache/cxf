@@ -192,22 +192,15 @@ public class XkmsCryptoProvider extends CryptoBase {
         }
         
         // Try local cache first
-        if (xkmsClientCache != null) {
-            XKMSCacheToken cachedToken = xkmsClientCache.get(id.toLowerCase());
-            if (cachedToken != null && cachedToken.getX509Certificate() != null) {
-                return new X509Certificate[] {cachedToken.getX509Certificate()};
-            }
+        X509Certificate[] certs = checkX509Cache(id.toLowerCase());
+        if (certs != null) {
+            return certs;
         }
         
         // Now ask the XKMS Service
         X509Certificate cert = xkmsInvoker.getCertificateForId(application, id);
         
-        // Store in the cache
-        storeCertificateInCache(cert, id.toLowerCase(), false);
-
-        return new X509Certificate[] {
-            cert
-        };
+        return buildX509GetResult(id.toLowerCase(), cert);
     }
 
     private X509Certificate[] getX509FromXKMSByIssuerSerial(String issuer, BigInteger serial) {
@@ -216,21 +209,44 @@ public class XkmsCryptoProvider extends CryptoBase {
         
         String key = getKeyForIssuerSerial(issuer, serial);
         // Try local cache first
-        if (xkmsClientCache != null) {
-            XKMSCacheToken cachedToken = xkmsClientCache.get(key);
-            if (cachedToken != null && cachedToken.getX509Certificate() != null) {
-                return new X509Certificate[] {cachedToken.getX509Certificate()};
-            }
+        X509Certificate[] certs = checkX509Cache(key);
+        if (certs != null) {
+            return certs;
         }
-        // Now ask the XKMS Service
-        X509Certificate certificate = xkmsInvoker.getCertificateForIssuerSerial(issuer, serial);
         
-        // Store in the cache
-        storeCertificateInCache(certificate, key, false);
+        // Now ask the XKMS Service
+        X509Certificate cert = xkmsInvoker.getCertificateForIssuerSerial(issuer, serial);
+        
+        return buildX509GetResult(key, cert);
+    }
 
-        return new X509Certificate[] {
-            certificate
-        };
+    private X509Certificate[] checkX509Cache(String key) {
+        if (xkmsClientCache == null) {
+            return null;
+        }
+        
+        XKMSCacheToken cachedToken = xkmsClientCache.get(key);
+        if (cachedToken != null && cachedToken.getX509Certificate() != null) {
+            return new X509Certificate[] {
+                cachedToken.getX509Certificate()
+            };
+        } else {
+            return null;
+        }
+    }
+
+    private X509Certificate[] buildX509GetResult(String key, X509Certificate cert) {
+        if (cert != null) {
+            // Certificate was found: store in the cache
+            storeCertificateInCache(cert, key, false);
+
+            return new X509Certificate[] {
+                cert
+            };
+        } else {
+            // Certificate was not found: return empty list
+            return new X509Certificate[0];
+        }
     }
 
     /**

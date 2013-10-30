@@ -36,7 +36,6 @@ import org.apache.cxf.xkms.client.X509AppId;
 import org.apache.cxf.xkms.exception.ExceptionMapper;
 import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.exception.XKMSLocateException;
-import org.apache.cxf.xkms.exception.XKMSNotFoundException;
 import org.apache.cxf.xkms.exception.XKMSValidateException;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
@@ -151,14 +150,14 @@ class XKMSInvoker {
         }
 
         if (!locateResultType.getUnverifiedKeyBinding().iterator().hasNext()) {
-            throw new XKMSNotFoundException(
-                 "X509Certificate is not found for id: " + ids);
+            LOG.warn("X509Certificate is not found in XKMS for id: " + ids);
+            return null;
         }
         KeyInfoType keyInfo = locateResultType.getUnverifiedKeyBinding()
             .iterator().next().getKeyInfo();
         if (!keyInfo.getContent().iterator().hasNext()) {
-            throw new XKMSNotFoundException(
-                 "X509Certificate is not found for id: " + ids);
+            LOG.warn("X509Certificate is not found in XKMS for id: " + ids);
+            return null;
         }
         JAXBElement<X509DataType> x509Data = (JAXBElement<X509DataType>)keyInfo
             .getContent().iterator().next();
