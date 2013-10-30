@@ -92,10 +92,6 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
             }, new ExpressionPool());
         }
         
-        public final XMLSchemaGrammar getResultNoError() {
-            return grammar;
-        }
-        
         public void setLocator(Locator locator) {
             if (locator == null && getLocator() != null && getLocator().getSystemId() != null) {
                 sysIds.add(getLocator().getSystemId());
@@ -126,9 +122,6 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
         }
         
         XMLSchemaGrammar grammar = multiSchemaReader.getResult();
-        if (grammar == null) {
-            grammar = xmlSchemaReader.getResultNoError();
-        }        
         if (grammar == null) {
             throw new XMLStreamException("Failed to load schemas");
         }
