@@ -42,6 +42,8 @@ import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.FaultAction;
 import javax.xml.ws.Provider;
+import javax.xml.ws.RespectBinding;
+import javax.xml.ws.RespectBindingFeature;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebFault;
 import javax.xml.ws.WebServiceFeature;
@@ -187,6 +189,15 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 features.add(new AddressingFeature(addressing.enabled(), addressing.required()));
             }
 
+        }
+
+        RespectBinding respectBinding = implInfo.getImplementorClass().getAnnotation(
+            RespectBinding.class);
+        if (respectBinding == null && serviceClass != null) {
+            respectBinding = serviceClass.getAnnotation(RespectBinding.class);
+        }
+        if (respectBinding != null) {
+            features.add(new RespectBindingFeature(respectBinding.enabled()));
         }
 
         if (features.size() > 0) {
