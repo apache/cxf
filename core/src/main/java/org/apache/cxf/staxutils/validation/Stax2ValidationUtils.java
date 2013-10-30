@@ -141,7 +141,6 @@ class Stax2ValidationUtils {
                     if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri)) {
                         continue;
                     }
-                    LOG.info(uri);
         
                     Element serialized = schemaInfo.getElement();
                     String schemaSystemId = sch.getSourceURI();
