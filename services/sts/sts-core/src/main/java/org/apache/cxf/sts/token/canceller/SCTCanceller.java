@@ -19,15 +19,16 @@
 
 package org.apache.cxf.sts.token.canceller;
 
+import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.SecretKey;
 import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -41,6 +42,10 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**
  * This class cancels a SecurityContextToken.
@@ -118,8 +123,34 @@ public class SCTCanceller implements TokenCanceller {
     }
     
     private boolean matchKey(TokenCancellerParameters tokenParameters, byte[] secretKey) {
-        boolean result = false;
         MessageContext messageContext = tokenParameters.getWebServiceContext().getMessageContext();
+
+        if (matchDOMSignatureSecret(messageContext, secretKey)) {
+            return true;
+        }
+        
+        try {
+            if (matchStreamingSignatureSecret(messageContext, secretKey)) {
+                return true;
+            }
+        } catch (XMLSecurityException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Set whether proof of possession is required or not to cancel a token
+     */
+    public void setVerifyProofOfPossession(boolean verifyProofOfPossession) {
+        this.verifyProofOfPossession = verifyProofOfPossession;
+    }
+    
+    private boolean matchDOMSignatureSecret(
+        MessageContext messageContext, byte[] secretToMatch
+    ) {
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
@@ -131,7 +162,7 @@ public class SCTCanceller implements TokenCanceller {
                 Integer action = (Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION);
                 if (action.equals(WSConstants.SIGN)) {
                     byte[] receivedKey = (byte[])engineResult.get(WSSecurityEngineResult.TAG_SECRET);
-                    if (Arrays.equals(secretKey, receivedKey)) {
+                    if (Arrays.equals(secretToMatch, receivedKey)) {
                         LOG.log(
                             Level.FINE, 
                             "Verification of the proof of possession of the key associated with "
@@ -142,14 +173,41 @@ public class SCTCanceller implements TokenCanceller {
                 }
             }
         }
-
-        return result;
+        
+        return false;
     }
-
-    /**
-     * Set whether proof of possession is required or not to cancel a token
-     */
-    public void setVerifyProofOfPossession(boolean verifyProofOfPossession) {
-        this.verifyProofOfPossession = verifyProofOfPossession;
+    
+    private boolean matchStreamingSignatureSecret(
+        MessageContext messageContext, byte[] secretToMatch
+    ) throws XMLSecurityException {
+        @SuppressWarnings("unchecked")
+        final List<SecurityEvent> incomingEventList = 
+            (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
+        if (incomingEventList != null) {
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
+                    || WSSecurityEventConstants.SignedElement 
+                        == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
+                    if (token != null && token.getSecretKey() != null) {
+                        for (String key : token.getSecretKey().keySet()) {
+                            Key keyObject = token.getSecretKey().get(key);
+                            if (keyObject instanceof SecretKey
+                                && Arrays.equals(secretToMatch, ((SecretKey)keyObject).getEncoded())) {
+                                LOG.log(
+                                    Level.FINE, 
+                                    "Verification of the proof of possession of the key associated with "
+                                    + "the security context successful."
+                                );
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
 }

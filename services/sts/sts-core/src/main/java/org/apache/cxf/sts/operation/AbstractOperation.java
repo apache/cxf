@@ -85,6 +85,12 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 /**
  * This abstract class contains some common functionality for different operations.
@@ -532,6 +538,7 @@ public abstract class AbstractOperation {
         @SuppressWarnings("unchecked")
         List<WSHandlerResult> results = 
             (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
+        // DOM
         if (results != null) {
             for (WSHandlerResult rResult : results) {
                 List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
@@ -548,6 +555,31 @@ public abstract class AbstractOperation {
                 }
             }
         }
+        
+        // Streaming
+        @SuppressWarnings("unchecked")
+        final List<SecurityEvent> incomingEventList = 
+            (List<SecurityEvent>) context.get(SecurityEvent.class.getName() + ".in");
+        if (incomingEventList != null) {
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
+                    || WSSecurityEventConstants.SignedElement 
+                        == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
+                    try {
+                        if (token != null && token.getX509Certificates() != null
+                            && token.getX509Certificates().length > 0) {
+                            return token.getX509Certificates()[0];
+                        }
+                    } catch (XMLSecurityException ex) {
+                        LOG.log(Level.FINE, ex.getMessage(), ex);
+                        return null;
+                    }
+                }
+            }
+        }
+        
         return null;
     }
     
@@ -717,5 +749,25 @@ public abstract class AbstractOperation {
         if (eventPublisher != null) {
             eventPublisher.handleSTSEvent(event);
         }
+    }
+    
+    protected static org.apache.xml.security.stax.securityToken.SecurityToken 
+    findInboundSecurityToken(
+        SecurityEventConstants.Event event,
+        MessageContext messageContext
+    ) throws XMLSecurityException {
+        @SuppressWarnings("unchecked")
+        final List<SecurityEvent> incomingEventList = 
+            (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
+        if (incomingEventList != null) {
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (event == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
+                    return token;
+                }
+            }
+        }
+        return null;
     }
 }

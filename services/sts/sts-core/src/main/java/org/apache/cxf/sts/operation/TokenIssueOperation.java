@@ -387,23 +387,35 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
+        // Try DOM results first
         if (handlerResults != null && handlerResults.size() > 0) {
             WSHandlerResult handlerResult = handlerResults.get(0);
             List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
 
             for (WSSecurityEngineResult engineResult : engineResults) {
-                /*
-                   Integer actInt = (Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION);
-                    String id = (String)engineResult.get(WSSecurityEngineResult.TAG_ID);
-                    Element tokenElement = 
-                        (Element)engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                 */
                 Object token = engineResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 if (token instanceof SamlAssertionWrapper) {
                     return (SamlAssertionWrapper)token;
                 }
             }
         }
+        
+        // Now try steaming results
+        /*
+         * TODO Uncomment this after we release a beta/RC
+        try {
+            org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
+                findInboundSecurityToken(WSSecurityEventConstants.SamlToken, messageContext);
+            if (securityToken instanceof SamlSecurityToken
+                && ((SamlSecurityToken)securityToken).getSamlAssertionWrapper() != null) {
+                return ((SamlSecurityToken)securityToken).getSamlAssertionWrapper();
+            }
+        } catch (XMLSecurityException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
+            return null;
+        }
+        */
+        
         return null;
     }
 
