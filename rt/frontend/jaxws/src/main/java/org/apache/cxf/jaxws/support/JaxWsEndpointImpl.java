@@ -262,7 +262,8 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             Iterator<ExtensibilityElement> extensionElements = bindingExtensors.iterator();
             while (extensionElements.hasNext()) {
                 ExtensibilityElement ext = extensionElements.next();
-                if (ext instanceof UnknownExtensibilityElement && Boolean.TRUE.equals(ext.getRequired())) {
+                if (ext instanceof UnknownExtensibilityElement && Boolean.TRUE.equals(ext.getRequired())
+                    && this.wsFeatures != null) {
                     for (WebServiceFeature feature : this.wsFeatures) {
                         if (feature instanceof RespectBindingFeature && feature.isEnabled()) {
                             
