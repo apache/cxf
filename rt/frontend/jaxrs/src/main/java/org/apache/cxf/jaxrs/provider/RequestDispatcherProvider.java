@@ -88,6 +88,8 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private boolean saveParametersAsAttributes;
     private boolean logRedirects;
     private boolean strictPathCheck;
+    private String locationPrefix;
+    private String resourceExtension;
     
     private MessageContext mc; 
 
@@ -115,7 +117,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         if (simpleName.length() > 1) {
             sb.append(simpleName.substring(1));
         }
-        return DEFAULT_LOCATION_PREFIX + sb.toString() + DEFAULT_RESOURCE_EXTENSION;  
+        String thePrefix = locationPrefix == null ? DEFAULT_LOCATION_PREFIX : locationPrefix;
+        String theExtension = resourceExtension == null ? DEFAULT_RESOURCE_EXTENSION : resourceExtension;
+        return thePrefix + sb.toString() + theExtension;  
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -232,9 +236,24 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             }
         }
         
-        Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
-        return resourcePathProp != null ? resourcePathProp.toString() : null;
+        return getPathFromMessageContext();
         
+    }
+    
+    private String getPathFromMessageContext() {
+        Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
+        if (resourcePathProp != null) {
+            StringBuilder sb = new StringBuilder();
+            if (locationPrefix != null) {
+                sb.append(locationPrefix);
+            }
+            sb.append(resourcePathProp.toString());
+            if (resourceExtension != null) {
+                sb.append(resourceExtension);
+            }
+            return sb.toString();
+        }
+        return null;
     }
     
     private String getRequestPath() {
