@@ -19,8 +19,16 @@
 
 package org.apache.cxf.systest.ws.wssc;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -28,6 +36,22 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.addressing.policy.MetadataConstants;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
+import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.neethi.All;
+import org.apache.neethi.ExactlyOne;
+import org.apache.neethi.Policy;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.ProtectionToken;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.X509Token;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,6 +63,7 @@ import org.junit.Test;
  */
 public class WSSCUnitTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(UnitServer.class);
+    static final String PORT2 = allocatePort(UnitServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -151,5 +176,154 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
     }
 
+    @Test
+    public void testIssueUnitTest() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        
+        STSClient stsClient = new STSClient(bus);
+        stsClient.setSecureConv(true);
+        stsClient.setLocation("https://localhost:" + PORT + "/" + "DoubleItTransport");
+        
+        // Add Addressing policy
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        all.addPolicyComponent(new PrimitiveAssertion(MetadataConstants.USING_ADDRESSING_2006_QNAME,
+                                                      false));
+        ea.addPolicyComponent(all);
+        
+        stsClient.setPolicy(p);
+        
+        stsClient.requestSecurityToken("http://localhost:" + PORT + "/" + "DoubleItTransport");
+    }
+    
+    @Test
+    public void testIssueAndCancelUnitTest() throws Exception {
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = WSSCUnitTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        STSClient stsClient = new STSClient(bus);
+        stsClient.setSecureConv(true);
+        stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
+        
+        stsClient.setPolicy(createSymmetricBindingPolicy());
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("ws-security.encryption.username", "bob");
+        TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
+        properties.put("ws-security.callback-handler", callbackHandler);
+        properties.put("ws-security.signature.properties", "alice.properties");
+        properties.put("ws-security.encryption.properties", "bob.properties");
+        stsClient.setProperties(properties);
+        
+        SecurityToken securityToken = 
+            stsClient.requestSecurityToken("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
+        assertNotNull(securityToken);
+        callbackHandler.setSecurityToken(securityToken);
+        
+        assertTrue(stsClient.cancelSecurityToken(securityToken));
+    }
+
+    // mock up a SymmetricBinding policy to talk to the STS
+    private Policy createSymmetricBindingPolicy() {
+        // Add Addressing policy
+        Policy p = new Policy();
+        ExactlyOne ea = new ExactlyOne();
+        p.addPolicyComponent(ea);
+        All all = new All();
+        all.addPolicyComponent(new PrimitiveAssertion(MetadataConstants.USING_ADDRESSING_2006_QNAME,
+                                                      false));
+        ea.addPolicyComponent(all);
+        
+        // X509 Token
+        final X509Token x509Token = 
+            new X509Token(
+                SPConstants.SPVersion.SP12,
+                SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER,
+                null,
+                null,
+                null,
+                new Policy()
+            );
+        
+        Policy x509Policy = new Policy();
+        ExactlyOne x509PolicyEa = new ExactlyOne();
+        x509Policy.addPolicyComponent(x509PolicyEa);
+        All x509PolicyAll = new All();
+        x509PolicyAll.addPolicyComponent(x509Token);
+        x509PolicyEa.addPolicyComponent(x509PolicyAll);
+        
+        // AlgorithmSuite
+        Policy algSuitePolicy = new Policy();
+        ExactlyOne algSuitePolicyEa = new ExactlyOne();
+        algSuitePolicy.addPolicyComponent(algSuitePolicyEa);
+        All algSuitePolicyAll = new All();
+        algSuitePolicyAll.addAssertion(
+            new PrimitiveAssertion(new QName(SP12Constants.SP_NS, SP12Constants.ALGO_SUITE_BASIC128)));
+        algSuitePolicyEa.addPolicyComponent(algSuitePolicyAll);
+        AlgorithmSuite algorithmSuite = new AlgorithmSuite(SPConstants.SPVersion.SP12, algSuitePolicy);
+        
+        // Symmetric Binding
+        Policy bindingPolicy = new Policy();
+        ExactlyOne bindingPolicyEa = new ExactlyOne();
+        bindingPolicy.addPolicyComponent(bindingPolicyEa);
+        All bindingPolicyAll = new All();
+        
+        bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, x509Policy));
+        bindingPolicyAll.addPolicyComponent(algorithmSuite);
+        bindingPolicyAll.addAssertion(
+            new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+        bindingPolicyAll.addAssertion(
+            new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
+        bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
+        
+        DefaultSymmetricBinding binding = 
+            new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
+        binding.setOnlySignEntireHeadersAndBody(true);
+        binding.setProtectTokens(false);
+        all.addPolicyComponent(binding);
+        
+        List<Header> headers = new ArrayList<Header>();
+        SignedParts signedParts = 
+            new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
+        all.addPolicyComponent(signedParts);
+        
+        return p;
+    }
+    
+    private static class TokenCallbackHandler implements CallbackHandler {
+        
+        private SecurityToken securityToken;
+        
+        @Override
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (int i = 0; i < callbacks.length; i++) {
+                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+                if (securityToken != null && pc.getIdentifier().equals(securityToken.getId())) {
+                    pc.setKey(securityToken.getSecret());
+                } else {
+                    new org.apache.cxf.systest.ws.common.KeystorePasswordCallback().handle(callbacks);
+                }
+                    
+            }
+        }
+
+        public void setSecurityToken(SecurityToken securityToken) {
+            this.securityToken = securityToken;
+        }
+        
+    };
 }

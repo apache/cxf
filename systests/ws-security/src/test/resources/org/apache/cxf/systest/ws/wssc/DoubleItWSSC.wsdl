@@ -68,12 +68,35 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItSymmetricBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItTransportPort" binding="tns:DoubleItTransportBinding">
             <soap:address location="https://localhost:9001/DoubleItTransport" />
         </wsdl:port>
         <wsdl:port name="DoubleItTransportSP12Port" binding="tns:DoubleItTransportSP12Binding">
             <soap:address location="https://localhost:9001/DoubleItTransportSP12" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricPort" binding="tns:DoubleItSymmetricBinding">
+            <soap:address location="http://localhost:9001/DoubleItSymmetric" />
         </wsdl:port>
     </wsdl:service>
 
@@ -234,6 +257,116 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItSymmetricPolicy" 
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+		<wsp:ExactlyOne>
+			<wsp:All>
+				<sp:SymmetricBinding>
+					<wsp:Policy>
+						<sp:ProtectionToken>
+							<wsp:Policy>
+								<sp:SecureConversationToken
+									sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+									<wsp:Policy>
+										<sp:BootstrapPolicy>
+											<wsp:Policy>
+												<sp:SignedParts>
+													<sp:Body />
+													<!--
+													<sp:Header Name="To"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+													<sp:Header Name="From"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+													<sp:Header Name="FaultTo"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+													<sp:Header Name="ReplyTo"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+													<sp:Header Name="MessageID"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+													<sp:Header Name="RelatesTo"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+													<sp:Header Name="Action"
+														Namespace="http://schemas.xmlsoap.org/ws/2004/08/addressing" />
+														-->
+												</sp:SignedParts>
+												<sp:SymmetricBinding>
+													<wsp:Policy>
+														<sp:ProtectionToken>
+															<wsp:Policy>
+																<sp:X509Token
+																	sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+																	<wsp:Policy>
+																		<sp:WssX509V3Token10 />
+																	</wsp:Policy>
+																</sp:X509Token>
+															</wsp:Policy>
+														</sp:ProtectionToken>
+														<sp:AlgorithmSuite>
+															<wsp:Policy>
+																<sp:Basic128 />
+															</wsp:Policy>
+														</sp:AlgorithmSuite>
+														<sp:Layout>
+															<wsp:Policy>
+																<sp:Lax />
+															</wsp:Policy>
+														</sp:Layout>
+														<sp:IncludeTimestamp />
+														<sp:OnlySignEntireHeadersAndBody />
+													</wsp:Policy>
+												</sp:SymmetricBinding>
+												<sp:Wss11>
+													<wsp:Policy>
+														<sp:MustSupportRefKeyIdentifier />
+														<sp:MustSupportRefIssuerSerial />
+														<sp:MustSupportRefThumbprint />
+														<sp:MustSupportRefEncryptedKey />
+													</wsp:Policy>
+												</sp:Wss11>
+												<sp:Trust13>
+													<wsp:Policy>
+														<sp:MustSupportIssuedTokens />
+														<sp:RequireClientEntropy />
+														<sp:RequireServerEntropy />
+													</wsp:Policy>
+												</sp:Trust13>
+											</wsp:Policy>
+										</sp:BootstrapPolicy>
+									</wsp:Policy>
+								</sp:SecureConversationToken>
+							</wsp:Policy>
+						</sp:ProtectionToken>
+						<sp:AlgorithmSuite>
+							<wsp:Policy>
+								<sp:Basic128 />
+							</wsp:Policy>
+						</sp:AlgorithmSuite>
+						<sp:Layout>
+							<wsp:Policy>
+								<sp:Lax />
+							</wsp:Policy>
+						</sp:Layout>
+						<sp:IncludeTimestamp />
+						<sp:OnlySignEntireHeadersAndBody />
+					</wsp:Policy>
+				</sp:SymmetricBinding>
+				<sp:Wss10>
+					<wsp:Policy>
+						<sp:MustSupportRefKeyIdentifier />
+						<sp:MustSupportRefIssuerSerial />
+					</wsp:Policy>
+				</sp:Wss10>
+				<sp:Trust10>
+					<wsp:Policy>
+						<sp:MustSupportIssuedTokens />
+						<sp:RequireClientEntropy />
+						<sp:RequireServerEntropy />
+					</wsp:Policy>
+				</sp:Trust10>
+			</wsp:All>
+		</wsp:ExactlyOne>
+	</wsp:Policy>
     
     <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Input_Policy">
       <wsp:ExactlyOne xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
