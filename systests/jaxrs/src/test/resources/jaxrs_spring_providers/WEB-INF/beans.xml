@@ -45,6 +45,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         <jaxrs:serviceBeans>
             <ref bean="petstore"/>
         </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+           <bean class="org.apache.cxf.systest.jaxrs.ResponseCheckInterceptor"/>
+        </jaxrs:inInterceptors>
         <jaxrs:providers>
             <bean class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
                 <property name="marshallAsJaxbElement" value="true"/>
