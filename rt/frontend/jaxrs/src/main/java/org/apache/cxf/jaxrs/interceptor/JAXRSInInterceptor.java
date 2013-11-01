@@ -93,8 +93,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (RuntimeException ex) {
             convertExceptionToResponseIfPossible(ex, message);
         }
-        
-        
+        Response r = message.getExchange().get(Response.class);
+        if (r != null) {
+            createOutMessage(message, r);
+            message.getInterceptorChain().doInterceptStartingAt(message,
+                                                                OutgoingChainInterceptor.class.getName());
+        }
     }
     
     private void processRequest(Message message) {
@@ -304,14 +308,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                     message.put(FaultListener.class.getName(), new NoOpFaultListener());
                 }
                 
-                Endpoint e = message.getExchange().get(Endpoint.class);
-                Message mout = new MessageImpl();
-                mout.setContent(List.class, new MessageContentsList(r));
-                mout.setExchange(message.getExchange());
-                mout = e.getBinding().createMessage(mout);
-                mout.setInterceptorChain(OutgoingChainInterceptor.getOutInterceptorChain(message.getExchange()));
-                message.getExchange().setOutMessage(mout);
-                
+                createOutMessage(message, r);
                 
                 Iterator<Interceptor<? extends Message>> iterator = message.getInterceptorChain().iterator();
                 while (iterator.hasNext()) {
@@ -341,5 +338,17 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (cri != null) {
             cri.clearThreadLocalProxies();
         }
+    }
+    
+    private Message createOutMessage(Message inMessage, Response r) {
+        Endpoint e = inMessage.getExchange().get(Endpoint.class);
+        Message mout = new MessageImpl();
+        mout.setContent(List.class, new MessageContentsList(r));
+        mout.setExchange(inMessage.getExchange());
+        mout = e.getBinding().createMessage(mout);
+        mout.setInterceptorChain(
+             OutgoingChainInterceptor.getOutInterceptorChain(inMessage.getExchange()));
+        inMessage.getExchange().setOutMessage(mout);
+        return mout;
     }
 }
