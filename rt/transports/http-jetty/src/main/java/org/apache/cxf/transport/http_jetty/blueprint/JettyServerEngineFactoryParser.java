@@ -70,7 +70,7 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             ef.addProperty("parsedElement", createValue(context, xmlString));
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
-
+            ef.setDestroyMethod("destroy");
             return ef;
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);

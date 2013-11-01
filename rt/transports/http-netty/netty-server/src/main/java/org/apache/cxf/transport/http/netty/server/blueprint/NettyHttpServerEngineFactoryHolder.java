@@ -161,7 +161,10 @@ public class NettyHttpServerEngineFactoryHolder {
     }
 
     public void destroy() {
+        // need to release the reference of the jaxb Classes
         factory.postShutdown();
+        jaxbClasses.clear();
+        jaxbContext = null;
     }
 
     public String getParsedElement() {

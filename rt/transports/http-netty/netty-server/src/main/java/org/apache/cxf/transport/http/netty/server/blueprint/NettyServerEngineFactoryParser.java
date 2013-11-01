@@ -58,14 +58,14 @@ public class NettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             ef.setId("netty.engine.factory-holder-" + UUID.randomUUID().toString());
         }
         ef.setRuntimeClass(NettyHttpServerEngineFactoryHolder.class);
-
+        
         try {
             // Print the DOM node
             String xmlString = StaxUtils.toString(element);
             ef.addProperty("parsedElement", createValue(context, xmlString));
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
-
+            ef.setDestroyMethod("destroy");
             return ef;
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
