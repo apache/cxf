@@ -115,7 +115,12 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         //must turn off mtom when using WS-Sec so binary is inlined so it can
         //be properly signed/encrypted/etc...
         if (!mtomEnabled) {
-            mc.put(org.apache.cxf.message.Message.MTOM_ENABLED, false);
+            String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
+            if (mc.get(mtomKey) == Boolean.TRUE) {
+                LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
+                            + " is set to false");
+            }
+            mc.put(mtomKey, Boolean.FALSE);
         }
         
         if (mc.getContent(SOAPMessage.class) == null) {
