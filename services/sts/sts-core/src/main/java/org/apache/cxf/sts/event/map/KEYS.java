@@ -16,22 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.sts.event.map;
 
-package org.apache.cxf.sts.event;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-
-public class StacktraceDefaultFormatter implements StacktraceFormatter {
-
-    @Override
-    public String format(Throwable t) {
-        final Writer result = new StringWriter();
-        t.printStackTrace(new PrintWriter(result));
-        return result.toString();
-    }
-
+public enum KEYS {
+    TIME,
+    OPERATION,
+    WS_SEC_PRINCIPAL,
+    STATUS,
+    TOKENTYPE,
+    EXCEPTION,
+    REALM,
+    APPLIESTO,
+    CLAIMS_PRIMARY,
+    CLAIMS_SECONDARY,
+    DURATION,
+    ACTAS_PRINCIPAL,
+    ONBEHALFOF_PRINCIPAL,
+    VALIDATE_PRINCIPAL,
+    CANCEL_PRINCIPAL,
+    RENEW_PRINCIPAL,
+    REMOTE_HOST,
+    REMOTE_PORT,
+    URL,
+    STACKTRACE
 }
-
-

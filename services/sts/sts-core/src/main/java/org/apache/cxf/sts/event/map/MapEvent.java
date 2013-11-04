@@ -16,25 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.sts.event.map;
 
-package org.apache.cxf.sts.event;
+import java.util.Map;
 
-public class StacktraceHtmlFormatter implements StacktraceFormatter {
-
-    public static final String NEW_LINE = "<br>";
+public class MapEvent {
+    private String topic;
+    private Map<String, ?> properties;
     
-    @Override
-    public String format(Throwable t) {
-        final StringBuilder result = new StringBuilder("<html>");
-        result.append(t.toString());
-        result.append(NEW_LINE);
+    public MapEvent(String topic, Map<String, ?> properties) {
+        super();
+        this.topic = topic;
+        this.properties = properties;
+    }
 
-        for (StackTraceElement element : t.getStackTrace()) {
-            result.append(element);
-            result.append(NEW_LINE);
-        }
-        result.append("</html>");
-        return result.toString();
+    public String getTopic() {
+        return topic;
+    }
+
+    public Map<String, ?> getProperties() {
+        return properties;
     }
 
 }
