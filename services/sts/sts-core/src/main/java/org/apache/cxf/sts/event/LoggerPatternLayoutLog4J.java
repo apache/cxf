@@ -19,6 +19,7 @@
 
 package org.apache.cxf.sts.event;
 
+import org.apache.cxf.sts.event.map.MapEventLogger;
 import org.apache.log4j.PatternLayout;
 
 public class LoggerPatternLayoutLog4J extends PatternLayout {
@@ -34,7 +35,7 @@ public class LoggerPatternLayoutLog4J extends PatternLayout {
         if (this.header != null) {
             return this.header + System.getProperty("line.separator");
         }
-        LoggerListener ll = new LoggerListener();
+        MapEventLogger ll = new MapEventLogger();
         StringBuffer line = new StringBuffer();
         for (String item : ll.getFieldOrder()) {
             line.append(item).append(";");
