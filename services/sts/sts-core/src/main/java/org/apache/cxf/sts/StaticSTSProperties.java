@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.Relationship;
@@ -65,13 +65,14 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private List<Relationship> relationships;
     private RelationshipResolver relationshipResolver;
     private SAMLRealmCodec samlRealmCodec;
+    private Bus bus;
 
     /**
      * Load the CallbackHandler, Crypto objects, if necessary.
      */
     public void configureProperties() throws STSException {
         if (signatureCrypto == null && signatureCryptoProperties != null) {
-            Properties sigProperties = getProps(signatureCryptoProperties);
+            Properties sigProperties = getProps(signatureCryptoProperties, bus);
             if (sigProperties == null) {
                 LOG.fine("Cannot load signature properties using: " + signatureCryptoProperties);
                 throw new STSException("Configuration error: cannot load signature properties");
@@ -85,7 +86,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         }
         
         if (encryptionCrypto == null && encryptionCryptoProperties != null) {
-            Properties encrProperties = getProps(encryptionCryptoProperties);
+            Properties encrProperties = getProps(encryptionCryptoProperties, bus);
             if (encrProperties == null) {
                 LOG.fine("Cannot load encryption properties using: " + encryptionCryptoProperties);
                 throw new STSException("Configuration error: cannot load encryption properties");
@@ -321,14 +322,17 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         return identityMapper;
     }
     
-    private static Properties getProps(Object o) {
+    private static Properties getProps(Object o, Bus bus) {
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
         } else if (o instanceof String) {
             URL url = null;
-            Bus bus = PhaseInterceptorChain.getCurrentMessage().getExchange().getBus();
-            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            Bus b = bus;
+            if (b == null) {
+                b = BusFactory.getThreadDefaultBus();
+            }
+            ResourceManager rm = b.getExtension(ResourceManager.class);
             url = rm.resolveResource((String)o, URL.class);
             try {
                 if (url == null) {
@@ -396,5 +400,13 @@ public class StaticSTSProperties implements STSPropertiesMBean {
 
     public void setSamlRealmCodec(SAMLRealmCodec samlRealmCodec) {
         this.samlRealmCodec = samlRealmCodec;
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public void setBus(Bus bus) {
+        this.bus = bus;
     }
 }
