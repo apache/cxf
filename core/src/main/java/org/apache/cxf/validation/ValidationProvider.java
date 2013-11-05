@@ -76,9 +76,9 @@ public class ValidationProvider {
         this.factory = factory;
     }
     
-    public< T > void validate(final T instance, final Method method, final Object[] arguments) {
+    public< T > void validateParameters(final T instance, final Method method, final Object[] arguments) {
         
-        final ExecutableValidator methodValidator = factory.getValidator().forExecutables();
+        final ExecutableValidator methodValidator = getExecutableValidator();
         final Set< ConstraintViolation< T > > violations = methodValidator.validateParameters(instance, 
             method, arguments);
         
@@ -87,13 +87,36 @@ public class ValidationProvider {
         }                
     }
     
-    public< T > void validate(final T instance, final Method method, final Object returnValue) {
-        final ExecutableValidator methodValidator = factory.getValidator().forExecutables();
+    public< T > void validateReturnValue(final T instance, final Method method, final Object returnValue) {
+        final ExecutableValidator methodValidator = getExecutableValidator();
         final Set<ConstraintViolation< T > > violations = methodValidator.validateReturnValue(instance, 
             method, returnValue);
         
         if (!violations.isEmpty()) {
             throw new ResponseConstraintViolationException(violations);
         }                
+    }
+    
+    public< T > void validateReturnValue(final T returnValue) {
+        final Set<ConstraintViolation< T > > violations = doValidateBean(returnValue);
+        if (!violations.isEmpty()) {
+            throw new ResponseConstraintViolationException(violations);
+        }                
+    }
+    
+    public< T > void validateBean(final T bean) {
+        final Set<ConstraintViolation< T > > violations = doValidateBean(bean);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }                
+    }
+    
+    private< T > Set<ConstraintViolation< T > > doValidateBean(final T bean) {
+        return factory.getValidator().validate(bean);
+    }
+    
+    private ExecutableValidator getExecutableValidator() {
+        
+        return factory.getValidator().forExecutables();
     }
 }

@@ -19,6 +19,9 @@
 package org.apache.cxf.jaxrs.validation;
 
 import java.lang.reflect.Method;
+import java.util.List;
+
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.validation.AbstractValidationOutInterceptor;
@@ -45,8 +48,15 @@ public class JAXRSValidationOutInterceptor extends AbstractValidationOutIntercep
         }
     }
     
-    @Override 
-    protected Object getResponseObject(Object o) {  
-        return ValidationUtils.getResponseObject(o);
+    @Override
+    protected void handleValidation(final Message message, final Object resourceInstance,
+                                    final Method method, final List<Object> arguments) {  
+        if (arguments.size() == 1) {
+            if (arguments.get(0) instanceof Response && ((Response)arguments.get(0)).getEntity() != null) {
+                getOutProvider(message).validateReturnValue(((Response)arguments.get(0)).getEntity());
+            } else {
+                super.handleValidation(message, resourceInstance, method, arguments);
+            }
+        }        
     }
 }

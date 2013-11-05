@@ -50,6 +50,12 @@ public class BookStoreWithValidation extends AbstractBookStoreWithValidation imp
         return books.get(id);
     }
     
+    @GET
+    @Path("/booksResponse/{bookId}")
+    public Response getBookResponse(@PathParam("bookId") String id) {
+        return Response.ok(books.get(id)).build();
+    }
+    
     @POST
     @Path("/books")
     public Response addBook(@Context final UriInfo uriInfo, 

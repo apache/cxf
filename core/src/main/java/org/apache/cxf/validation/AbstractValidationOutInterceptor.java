@@ -35,16 +35,9 @@ public abstract class AbstractValidationOutInterceptor extends AbstractValidatio
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {  
-        if (arguments.size() == 1) {
-            Object responseObject = getResponseObject(arguments.get(0));
-            if (responseObject != null) {
-                getOutProvider(message).validate(resourceInstance, method, responseObject);
-            }
+        if (arguments.size() == 1 && arguments.get(0) != null) {
+            getOutProvider(message).validateReturnValue(resourceInstance, method, arguments.get(0));
         }        
-    }
-    
-    protected Object getResponseObject(Object object) {
-        return object;
     }
     
     protected ValidationProvider getOutProvider(Message message) {

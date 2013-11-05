@@ -139,6 +139,15 @@ public class JAXRSClientServerValidationTest extends AbstractBusClientServerTest
         r = createWebClient("/bookstore/books/1234").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
+    
+    @Test
+    public void testThatResponseValidationForOneResponseBookFails()  {
+        Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+
+        r = createWebClient("/bookstore/booksResponse/1234").get();
+        assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
+    }
 
     @Test
     public void testThatResponseValidationForAllBooksFails()  {

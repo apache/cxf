@@ -20,8 +20,6 @@ package org.apache.cxf.jaxrs.validation;
 
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Response;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -52,7 +50,5 @@ public final class ValidationUtils {
         
     }
     
-    public static Object getResponseObject(Object o) {  
-        return o instanceof Response ? ((Response)o).getEntity() : o;
-    }
+    
 }

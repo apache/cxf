@@ -36,7 +36,7 @@ public abstract class AbstractValidationInInterceptor extends AbstractValidation
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {
         ValidationProvider provider = getProvider(message);
-        provider.validate(resourceInstance, method, arguments.toArray());
+        provider.validateParameters(resourceInstance, method, arguments.toArray());
         message.getExchange().put(ValidationProvider.class, provider);
     }
 }

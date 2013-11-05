@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.validation.ValidationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
@@ -48,13 +49,16 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
         
         ValidationProvider theProvider = getProvider(message);
         
-        theProvider.validate(serviceObject, m, params.toArray());
+        theProvider.validateParameters(serviceObject, m, params.toArray());
         
         Object response = super.invoke(exchange, serviceObject, m, params);
         
-        Object responseToValidate = ValidationUtils.getResponseObject(response);
-        if (responseToValidate != null) {
-            theProvider.validate(serviceObject, m, responseToValidate);
+        if (response != null) {
+            if (response instanceof Response && ((Response)response).getEntity() != null) {
+                theProvider.validateReturnValue(((Response)response).getEntity());
+            } else {
+                theProvider.validateReturnValue(serviceObject, m, response);
+            }
         }
         
         return response;
