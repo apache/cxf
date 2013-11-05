@@ -28,6 +28,7 @@ public class ResourceTypes {
     private Map<Class<?>, Type> allTypes = new HashMap<Class<?>, Type>();
     private Map<Class<?>, QName> collectionMap = new HashMap<Class<?>, QName>();
     private Map<Class<?>, QName> xmlNameMap = new HashMap<Class<?>, QName>();
+    private Map<Class<?>, Class<?>> substitutions = new HashMap<Class<?>, Class<?>>();
     public Map<Class<?>, Type> getAllTypes() {
         return allTypes;
     }
@@ -39,5 +40,8 @@ public class ResourceTypes {
     }
     public Map<Class<?>, QName> getXmlNameMap() {
         return xmlNameMap;
+    }
+    public Map<Class<?>, Class<?>> getSubstitutions() {
+        return substitutions;
     }
 }

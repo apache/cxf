@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.jaxrs.model.wadl.XMLName;
@@ -66,6 +67,14 @@ public class PetStore {
     public PetStoreStatus getJaxbStatus() {
 
         return new PetStoreStatus();
+    }
+    
+    @GET
+    @Path("/petstore/jaxb/statusType/")
+    @Produces("text/xml")
+    public PetStoreStatusType getJaxbStatusTyoe() {
+
+        return new PetStoreStatusImpl1();
     }
     
     @GET
@@ -108,5 +117,27 @@ public class PetStore {
     
     @XmlRootElement(name = "elstatus", namespace = "http://pets")
     public static class PetStoreStatusElement extends PetStoreStatus {
+    }
+    
+    @XmlType(name = "statusType", namespace = "http://pets")
+    @XmlSeeAlso({PetStoreStatusImpl1.class, PetStoreStatusImpl2.class })
+    public static class PetStoreStatusType {
+        private String status = PetStore.CLOSED;
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+        
+    }
+    
+    @XmlRootElement(name = "statusImpl1", namespace = "http://pets")
+    public static class PetStoreStatusImpl1 extends PetStoreStatusType {
+    }
+    @XmlRootElement(name = "statusImpl2", namespace = "http://pets")
+    public static class PetStoreStatusImpl2 extends PetStoreStatusType {
     }
 }
