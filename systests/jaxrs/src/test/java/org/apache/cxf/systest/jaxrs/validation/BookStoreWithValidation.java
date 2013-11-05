@@ -22,10 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -40,7 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
-public class BookStoreWithValidation {
+public class BookStoreWithValidation extends AbstractBookStoreWithValidation implements  BookStoreValidatable {
     private Map< String, BookWithValidation > books = new HashMap< String, BookWithValidation >();
     
     public BookStoreWithValidation() {
@@ -48,8 +45,8 @@ public class BookStoreWithValidation {
 
     @GET
     @Path("/books/{bookId}")
-    @Valid 
-    public BookWithValidation getBook(@Pattern(regexp = "\\d+") @PathParam("bookId") String id) {
+    @Override
+    public BookWithValidation getBook(@PathParam("bookId") String id) {
         return books.get(id);
     }
     
@@ -64,8 +61,8 @@ public class BookStoreWithValidation {
     
     @GET
     @Path("/books")
-    @Valid public Collection< BookWithValidation > list(
-            @Min(1) @DefaultValue("1") @QueryParam("page") int page) {
+    @Override
+    public Collection< BookWithValidation > list(@DefaultValue("1") @QueryParam("page") int page) {
         return books.values();
     }
     
