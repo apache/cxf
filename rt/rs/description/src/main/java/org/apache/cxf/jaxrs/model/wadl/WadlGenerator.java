@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -137,6 +139,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean useJaxbContextForQnames = true;
     private boolean supportCollections = true;
     private boolean supportJaxbXmlType = true;
+    private boolean supportJaxbSubstitutions = true;
 
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
@@ -220,7 +223,9 @@ public class WadlGenerator implements ContainerRequestFilter {
         ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris, 
                                                                                useJaxbContextForQnames,
                                                                                jaxbWriter);
+        checkXmlSeeAlso(resourceTypes);
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
+        
         
         JAXBContext jaxbContext = useJaxbContextForQnames ? ResourceUtils
             .createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
@@ -374,6 +379,28 @@ public class WadlGenerator implements ContainerRequestFilter {
         return xmlEncodeIfNeeded(thePath);
     }
 
+    private void checkXmlSeeAlso(ResourceTypes resourceTypes) {
+        if (!this.useJaxbContextForQnames) {
+            return;
+        }
+        List<Class<?>> extraClasses = new LinkedList<Class<?>>();
+        for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
+            if (!isXmlRoot(cls)) {
+                XmlSeeAlso seeAlsoAnn = cls.getAnnotation(XmlSeeAlso.class);
+                if (seeAlsoAnn != null) {
+                    List<Class<?>> seeAlsoList = CastUtils.cast(Arrays.asList(seeAlsoAnn.value()));
+                    for (Class<?> seeAlsoCls : seeAlsoList) {
+                        resourceTypes.getSubstitutions().put(seeAlsoCls, cls);
+                    }
+                    extraClasses.addAll(seeAlsoList);
+                }
+            }
+        }
+        for (Class<?> cls : extraClasses) {
+            resourceTypes.getAllTypes().put(cls, cls);
+        }
+    }
+    
     private String xmlEncodeIfNeeded(String value) {
         
         StringBuilder builder = new StringBuilder(value.length());
@@ -1027,6 +1054,10 @@ public class WadlGenerator implements ContainerRequestFilter {
             .append("\"");
     }
 
+    private boolean isXmlRoot(Class<?> cls) {
+        return cls.getAnnotation(XmlRootElement.class) != null;
+    }
+    
     private SchemaCollection getSchemaCollection(ResourceTypes resourceTypes, JAXBContext context) {
         if (context == null) {
             return null;
@@ -1048,7 +1079,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 
                 if (supportJaxbXmlType) {
                     for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
-                        if (cls.getAnnotation(XmlRootElement.class) != null) {
+                        if (isXmlRoot(cls)) {
                             continue;
                         }
                         XmlType root = cls.getAnnotation(XmlType.class);
@@ -1064,7 +1095,30 @@ public class WadlGenerator implements ContainerRequestFilter {
                                     .createElementNS(Constants.URI_2001_SCHEMA_XSD, "xs:element");
                                 newElement.setAttribute("name", elementName.getLocalPart());
                                 newElement.setAttribute("type", tnsPrefix + typeName.getLocalPart());
+                                
+                                if (Modifier.isAbstract(cls.getModifiers()) 
+                                    && resourceTypes.getSubstitutions().values().contains(cls)) {
+                                    newElement.setAttribute("abstract", "true");
+                                }
+                                
                                 doc.getDocumentElement().appendChild(newElement);
+                            }
+                        }
+                    }
+                    if (supportJaxbSubstitutions) {
+                        for (Map.Entry<Class<?>, Class<?>> entry : resourceTypes.getSubstitutions().entrySet()) {
+                            QName typeName = theResolver.resolve(entry.getKey(), new Annotation[] {},
+                                                                 Collections.<Class<?>, QName> emptyMap());
+                            for (Element element : DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
+                                                                                       Constants.URI_2001_SCHEMA_XSD, 
+                                                                                       "element")) {
+                                if (element.getAttribute("name").equals(typeName.getLocalPart())) {
+                                    QName groupName = theResolver.resolve(entry.getValue(), new Annotation[] {},
+                                                                         Collections.<Class<?>, QName> emptyMap());
+                                    if (groupName != null) {
+                                        element.setAttribute("substitutionGroup", tnsPrefix + groupName.getLocalPart());
+                                    }
+                                }
                             }
                         }
                     }
@@ -1721,6 +1775,10 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setSupportJaxbXmlType(boolean supportJaxbXmlType) {
         this.supportJaxbXmlType = supportJaxbXmlType;
+    }
+
+    public void setSupportJaxbSubstitutions(boolean supportJaxbSubstitutions) {
+        this.supportJaxbSubstitutions = supportJaxbSubstitutions;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {

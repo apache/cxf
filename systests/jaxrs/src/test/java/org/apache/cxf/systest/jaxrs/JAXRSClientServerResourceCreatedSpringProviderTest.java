@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamReader;
@@ -38,9 +39,11 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -113,10 +116,16 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         String s = bos.toString();
         assertTrue(s.contains("<xs:element name=\"elstatus\" type=\"petStoreStatusElement\"/>"));
         assertTrue(s.contains("<xs:element name=\"status\" type=\"status\"/>"));
+        assertTrue(s.contains("<xs:element name=\"statusType\" type=\"statusType\"/>"));
+        assertTrue(s.contains(
+            "<xs:element name=\"statusImpl1\" substitutionGroup=\"statusType\" type=\"petStoreStatusImpl1\"/>"));
+        assertTrue(s.contains(
+            "<xs:element name=\"statusImpl2\" substitutionGroup=\"statusType\" type=\"petStoreStatusImpl2\"/>"));
         assertTrue(s.contains("<xs:element name=\"statuses\""));
         assertTrue(s.contains("element=\"prefix1:status\""));
         assertTrue(s.contains("element=\"prefix1:elstatus\""));
         assertTrue(s.contains("element=\"prefix1:statuses\""));
+        assertTrue(s.contains("element=\"prefix1:statusType\""));
     }
     
     @Test
@@ -298,4 +307,16 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         return IOUtils.toString(in);
     }
 
+    
+    @Test
+    public void testPostPetStatusType() throws Exception {
+        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        p.setUnmarshallAsJaxbElement(true);
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/webapp/pets/petstore/jaxb/statusType/",
+                                        Collections.singletonList(p));
+        WebClient.getConfig(wc).getInInterceptors().add(new LoggingInInterceptor());
+        wc.accept("text/xml");
+        PetStore.PetStoreStatusType type = wc.get(PetStore.PetStoreStatusType.class);
+        assertEquals(PetStore.CLOSED, type.getStatus());
+    }
 }
