@@ -389,8 +389,10 @@ public class WadlGenerator implements ContainerRequestFilter {
                 XmlSeeAlso seeAlsoAnn = cls.getAnnotation(XmlSeeAlso.class);
                 if (seeAlsoAnn != null) {
                     List<Class<?>> seeAlsoList = CastUtils.cast(Arrays.asList(seeAlsoAnn.value()));
-                    for (Class<?> seeAlsoCls : seeAlsoList) {
-                        resourceTypes.getSubstitutions().put(seeAlsoCls, cls);
+                    if (this.supportJaxbSubstitutions) {
+                        for (Class<?> seeAlsoCls : seeAlsoList) {
+                            resourceTypes.getSubstitutions().put(seeAlsoCls, cls);
+                        }
                     }
                     extraClasses.addAll(seeAlsoList);
                 }
