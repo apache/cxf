@@ -115,6 +115,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (client == null) {
             client = factory.createClient(this);
         }
+        if (client == null) {
+            throw new IOException("HttpAsyncClient is null");
+        }
         return client;
     }
     public AsyncHTTPConduitFactory getAsyncHTTPConduitFactory() {
