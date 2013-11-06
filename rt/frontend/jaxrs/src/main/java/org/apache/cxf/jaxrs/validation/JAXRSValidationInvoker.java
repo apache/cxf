@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.ws.rs.core.Response;
 
@@ -59,8 +60,11 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
         Object response = super.invoke(exchange, serviceObject, m, params);
         
         if (response != null) {
-            if (response instanceof Response && ((Response)response).getEntity() != null) {
-                theProvider.validateReturnValue(((Response)response).getEntity());
+            if (response instanceof Response) {
+                Object entity = ((Response)response).getEntity();
+                if (entity != null && m.getAnnotation(Valid.class) != null) {
+                    theProvider.validateReturnValue(entity);    
+                }
             } else {
                 theProvider.validateReturnValue(serviceObject, m, response);
             }
