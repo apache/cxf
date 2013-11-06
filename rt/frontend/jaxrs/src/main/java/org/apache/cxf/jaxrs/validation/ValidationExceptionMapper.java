@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -31,22 +32,28 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.validation.ResponseConstraintViolationException;
 
 @Provider
-public class ConstraintViolationExceptionMapper implements ExceptionMapper< ConstraintViolationException > {
-    private static final Logger LOG = LogUtils.getL7dLogger(ConstraintViolationExceptionMapper.class);
+public class ValidationExceptionMapper implements ExceptionMapper< ValidationException > {
+    private static final Logger LOG = LogUtils.getL7dLogger(ValidationExceptionMapper.class);
     
     @Override
-    public Response toResponse(ConstraintViolationException exception) {
-        for (final ConstraintViolation< ? > violation: exception.getConstraintViolations()) {
-            LOG.log(Level.SEVERE, 
-                violation.getRootBeanClass().getSimpleName() 
-                + "." + violation.getPropertyPath() 
-                + ": " + violation.getMessage());
-        }
-        
-        if (exception instanceof ResponseConstraintViolationException) {
+    public Response toResponse(ValidationException exception) {
+        if (exception instanceof ConstraintViolationException) { 
+            final ConstraintViolationException constraint = (ConstraintViolationException) exception;
+            
+            for (final ConstraintViolation< ? > violation: constraint.getConstraintViolations()) {
+                LOG.log(Level.SEVERE, 
+                    violation.getRootBeanClass().getSimpleName() 
+                    + "." + violation.getPropertyPath() 
+                    + ": " + violation.getMessage());
+            }
+            
+            if (constraint instanceof ResponseConstraintViolationException) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+            
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        
-        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 }

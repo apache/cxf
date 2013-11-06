@@ -31,9 +31,9 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutExceptionMapperInterceptor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.validation.ConstraintViolationExceptionMapper;
 import org.apache.cxf.jaxrs.validation.JAXRSValidationInInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSValidationOutInterceptor;
+import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -55,7 +55,7 @@ public class JAXRSClientServerValidationTest extends AbstractBusClientServerTest
             sf.setResourceClasses(BookStoreWithValidation.class);
             sf.setResourceProvider(BookStoreWithValidation.class, 
                 new SingletonResourceProvider(new BookStoreWithValidation()));
-            sf.setProvider(new ConstraintViolationExceptionMapper());
+            sf.setProvider(new ValidationExceptionMapper());
 
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.setInInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
