@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -58,8 +59,11 @@ public class JAXRSValidationOutInterceptor extends AbstractValidationOutIntercep
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {  
         if (arguments.size() == 1) {
-            if (arguments.get(0) instanceof Response && ((Response)arguments.get(0)).getEntity() != null) {
-                getOutProvider(message).validateReturnValue(((Response)arguments.get(0)).getEntity());
+            if (arguments.get(0) instanceof Response) {
+                Object entity = ((Response)arguments.get(0)).getEntity();
+                if (entity != null && method.getAnnotation(Valid.class) != null) {
+                    getOutProvider(message).validateReturnValue(entity);    
+                }
             } else {
                 super.handleValidation(message, resourceInstance, method, arguments);
             }

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.DELETE;
@@ -52,6 +53,7 @@ public class BookStoreWithValidation extends AbstractBookStoreWithValidation imp
     
     @GET
     @Path("/booksResponse/{bookId}")
+    @Valid
     public Response getBookResponse(@PathParam("bookId") String id) {
         return Response.ok(books.get(id)).build();
     }
