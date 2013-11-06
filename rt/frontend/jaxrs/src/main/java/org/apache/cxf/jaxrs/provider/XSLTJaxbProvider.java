@@ -104,16 +104,17 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
-            return false;
-        }
-        // JAXB support is required
         if (!super.isReadable(type, genericType, anns, mt)) {
             return false;
         }
+        
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            return supportJaxbOnly;
+        }
+        
         // if the user has set the list of in classes and a given class 
         // is in that list then it can only be handled by the template
-        if (inClassCanBeHandled(type.getName())) {
+        if (inClassCanBeHandled(type.getName()) || inClassesToHandle == null && !supportJaxbOnly) {
             return inTemplatesAvailable(mt); 
         } else {
             return supportJaxbOnly;
@@ -122,16 +123,17 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
-            return false;
-        }
         // JAXB support is required
-        if (!super.isReadable(type, genericType, anns, mt)) {
+        if (!super.isWriteable(type, genericType, anns, mt)) {
             return false;
         }
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            return supportJaxbOnly;
+        }
+        
         // if the user has set the list of out classes and a given class 
         // is in that list then it can only be handled by the template
-        if (outClassCanBeHandled(type.getName())) {
+        if (outClassCanBeHandled(type.getName()) || outClassesToHandle == null && !supportJaxbOnly) {
             return outTemplatesAvailable(mt); 
         } else {
             return supportJaxbOnly;
@@ -191,7 +193,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     private void trySettingProperties(Object filter, TemplatesImpl ti) {
         try {
             //Saxon doesn't allow creating a Filter or Handler from anything other than it's original 
-            //Templates.  That then requires setting the paramaters after the fact, but there
+            //Templates.  That then requires setting the parameters after the fact, but there
             //isn't a standard API for that, so we have to grab the Transformer via reflection to
             //set the parameters.
             Transformer tr = (Transformer)filter.getClass().getMethod("getTransformer").invoke(filter);
@@ -322,7 +324,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
     
     public boolean inClassCanBeHandled(String className) {
-        return inClassesToHandle == null || inClassesToHandle.contains(className); 
+        return inClassesToHandle != null && inClassesToHandle.contains(className); 
     }
     
     public void setOutClassNames(List<String> classNames) {
@@ -330,7 +332,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
     
     public boolean outClassCanBeHandled(String className) {
-        return outClassesToHandle == null || outClassesToHandle.contains(className); 
+        return outClassesToHandle != null && outClassesToHandle.contains(className); 
     }
     
     protected Templates createTemplates(Templates templates, 
