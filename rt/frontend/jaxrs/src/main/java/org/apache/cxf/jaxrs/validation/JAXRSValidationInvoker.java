@@ -36,6 +36,7 @@ import org.apache.cxf.validation.ValidationProvider;
 public class JAXRSValidationInvoker extends JAXRSInvoker {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSValidationInvoker.class);
     private volatile ValidationProvider provider;
+    private boolean validateServiceObject = true;
     
     @Override
     public Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {
@@ -48,6 +49,10 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
         }
         
         ValidationProvider theProvider = getProvider(message);
+        
+        if (isValidateServiceObject()) {
+            theProvider.validateBean(serviceObject);
+        }
         
         theProvider.validateParameters(serviceObject, m, params.toArray());
         
@@ -78,5 +83,13 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
     
     public void setProvider(ValidationProvider provider) {
         this.provider = provider;
+    }
+
+    public boolean isValidateServiceObject() {
+        return validateServiceObject;
+    }
+
+    public void setValidateServiceObject(boolean validateServiceObject) {
+        this.validateServiceObject = validateServiceObject;
     }
 }
