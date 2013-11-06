@@ -18,13 +18,19 @@
  */
 package org.apache.cxf.jaxrs.validation;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.AbstractValidationInInterceptor;
 
 
-public class JAXRSValidationInInterceptor extends AbstractValidationInInterceptor {
+public class JAXRSValidationInInterceptor extends AbstractValidationInInterceptor 
+    implements ContainerRequestFilter {
     public JAXRSValidationInInterceptor() {
     }
     public JAXRSValidationInInterceptor(String phase) {
@@ -43,5 +49,10 @@ public class JAXRSValidationInInterceptor extends AbstractValidationInIntercepto
         } else {
             return super.getResourceMethod(message);
         }
+    }
+    @Override
+    public void filter(ContainerRequestContext context) throws IOException {
+        super.handleMessage(PhaseInterceptorChain.getCurrentMessage());
+        
     }
 }
