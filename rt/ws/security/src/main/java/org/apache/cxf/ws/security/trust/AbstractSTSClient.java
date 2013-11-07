@@ -44,7 +44,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -89,6 +88,8 @@ import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
+import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
+import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -111,6 +112,7 @@ import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyRegistry;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
@@ -203,6 +205,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     public void setBeanName(String s) {
         name = s;
     }
+    
+    public String getLocation() {
+        return location;
+    }
 
     public void setLocation(String location) {
         this.location = location;
@@ -239,6 +245,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             this.setPolicyInternal((Policy) newPolicy);
         } else if (newPolicy instanceof Element) {
             this.setPolicyInternal((Element) newPolicy);    
+        } else if (newPolicy instanceof String) {
+            this.setPolicyInternal((String) newPolicy);    
         } else {
             throw new IllegalArgumentException("Unsupported policy object.  Type must be "
                        + "org.apache.neethi.Policy or org.w3c.dom.Element.");
@@ -451,6 +459,18 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected void setPolicyInternal(Element newPolicy) {
         this.setPolicyInternal(bus.getExtension(PolicyBuilder.class).getPolicy(newPolicy));
     }
+    
+    protected void setPolicyInternal(String policyReference) {
+        PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
+        ReferenceResolver resolver = new RemoteReferenceResolver(null, builder);
+        PolicyRegistry registry = bus.getExtension(PolicyEngine.class).getRegistry();
+        Policy resolved = registry.lookup(policyReference);
+        if (null != resolved) {
+            this.setPolicyInternal(resolved);
+        } else {
+            this.setPolicyInternal(resolver.resolveReference(policyReference));
+        }
+    }
 
     public Client getClient()  throws BusException, EndpointException {
         if (client == null) {
@@ -464,6 +484,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             return;
         }
         location = EndpointReferenceUtils.getAddress(ref);
+        if (location != null) {
+            location = location.trim();
+        }
         final QName sName = EndpointReferenceUtils.getServiceName(ref, bus);
         if (sName != null) {
             serviceName = sName;
