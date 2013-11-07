@@ -105,19 +105,21 @@ public final class STSUtils {
             if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {
                 client.setSoap12();
             }
-            if ((itok != null) && (itok.getIssuer() != null)) {
-                EndpointReferenceType epr = null;
-                try {
-                    epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
-                } catch (JAXBException e) {
-                    throw new IllegalArgumentException(e);
-                }
-                //configure via mex
-                boolean useEPRWSAAddrAsMEXLocation = !Boolean.valueOf(
-                        (String)message.getContextualProperty(
-                         SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
-                client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
+        }
+        
+        if (client.getLocation() == null && client.getWsdlLocation() == null 
+            && itok != null && itok.getIssuer() != null) {
+            EndpointReferenceType epr = null;
+            try {
+                epr = VersionTransformer.parseEndpointReference(itok.getIssuer());
+            } catch (JAXBException e) {
+                throw new IllegalArgumentException(e);
             }
+            //configure via mex
+            boolean useEPRWSAAddrAsMEXLocation = 
+                !Boolean.valueOf((String)message.getContextualProperty(
+                    SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
+            client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
         }
         return client;
     }

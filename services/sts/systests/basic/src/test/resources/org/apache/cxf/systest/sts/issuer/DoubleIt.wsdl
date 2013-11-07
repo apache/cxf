@@ -28,22 +28,6 @@
     <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" 
                  namespace="http://www.example.org/contract/DoubleIt"/>
 
-	<wsdl:binding name="DoubleItTransportUTBinding" type="tns:DoubleItPortType">
-		<wsp:PolicyReference URI="#DoubleItBindingTransportUTPolicy" />
-		<soap:binding style="document"
-			transport="http://schemas.xmlsoap.org/soap/http" />
-		<wsdl:operation name="DoubleIt">
-			<soap:operation soapAction="" />
-			<wsdl:input>
-				<soap:body use="literal" />
-				<wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-				<wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
-			</wsdl:output>
-		</wsdl:operation>
-	</wsdl:binding>
 	<wsdl:binding name="DoubleItTransportSAML1Binding" type="tns:DoubleItPortType">
 		<wsp:PolicyReference URI="#DoubleItBindingTransportSAML1Policy" />
 		<soap:binding style="document"
@@ -60,24 +44,8 @@
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
-	<wsdl:binding name="DoubleItTransportSAML1Binding2" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItBindingTransportSAML1Policy" />
-        <soap:binding style="document"
-            transport="http://schemas.xmlsoap.org/soap/http" />
-        <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
-            <wsdl:input>
-                <soap:body use="literal" />
-                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal" />
-                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
-            </wsdl:output>
-        </wsdl:operation>
-    </wsdl:binding>
-	<wsdl:binding name="DoubleItAsymmetricBSTBinding" type="tns:DoubleItPortType">
-		<wsp:PolicyReference URI="#DoubleItBindingAsymmetricBSTPolicy" />
+	<wsdl:binding name="DoubleItTransportSAML2Binding" type="tns:DoubleItPortType">
+		<wsp:PolicyReference URI="#DoubleItBindingTransportSAML2Policy" />
 		<soap:binding style="document"
 			transport="http://schemas.xmlsoap.org/soap/http" />
 		<wsdl:operation name="DoubleIt">
@@ -94,29 +62,17 @@
 	</wsdl:binding>
 
 	<wsdl:service name="DoubleItService">
-		<wsdl:port name="DoubleItTransportUTPort" binding="tns:DoubleItTransportUTBinding">
-			<soap:address
-				location="https://localhost:8081/doubleit/services/doubleittransportut" />
-		</wsdl:port>
 		<wsdl:port name="DoubleItTransportSAML1Port" binding="tns:DoubleItTransportSAML1Binding">
 			<soap:address
 				location="https://localhost:8081/doubleit/services/doubleittransportsaml1" />
 		</wsdl:port>
-		<wsdl:port name="DoubleItTransportSAML1Port2" binding="tns:DoubleItTransportSAML1Binding2">
-            <soap:address
-                location="https://localhost:8081/doubleit/services/doubleittransportsaml12" />
-        </wsdl:port>
-		<wsdl:port name="DoubleItTransportSAML1AlternativePort" binding="tns:DoubleItTransportSAML1Binding">
-            <soap:address
-                location="https://localhost:8081/doubleit/services/doubleittransportsaml1alternative" />
-        </wsdl:port>
-		<wsdl:port name="DoubleItAsymmetricBSTPort" binding="tns:DoubleItAsymmetricBSTBinding">
+		<wsdl:port name="DoubleItTransportSAML2Port" binding="tns:DoubleItTransportSAML2Binding">
 			<soap:address
-				location="http://localhost:8082/doubleit/services/doubleitasymmetricbst" />
+				location="https://localhost:8081/doubleit/services/doubleittransportsaml2" />
 		</wsdl:port>
 	</wsdl:service>
 	
-	<wsp:Policy wsu:Id="DoubleItBindingTransportUTPolicy">
+	<wsp:Policy wsu:Id="DoubleItBindingTransportSAML1Policy">
 		<wsp:ExactlyOne>
 			<wsp:All>
 				<wsam:Addressing wsp:Optional="false">
@@ -127,8 +83,8 @@
 					<wsp:Policy>
 						<sp:TransportToken>
 							<wsp:Policy>
-								<sp:HttpsToken>
-                                    <wsp:Policy/>
+							    <sp:HttpsToken>
+                                   <wsp:Policy/>
                                 </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
@@ -145,17 +101,27 @@
 						<sp:IncludeTimestamp />
 					</wsp:Policy>
 				</sp:TransportBinding>
-				<sp:SignedSupportingTokens
-					xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-					<wsp:Policy>
-						<sp:UsernameToken
-							sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-							<wsp:Policy>
-								<sp:WssUsernameToken11 />
-							</wsp:Policy>
-						</sp:UsernameToken>
-					</wsp:Policy>
-				</sp:SignedSupportingTokens>
+				<sp:EndorsingSupportingTokens
+                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:IssuedToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <sp:RequestSecurityTokenTemplate>
+                                <t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1</t:TokenType>
+                                <t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey</t:KeyType>
+                            </sp:RequestSecurityTokenTemplate>
+                            <wsp:Policy>
+                                <sp:RequireInternalReference />
+                            </wsp:Policy>
+                            <sp:Issuer>
+                                <wsaw:Address>https://localhost:30101/SecurityTokenService/Transport</wsaw:Address>
+                                <wsaw:Metadata xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512/">
+                                    <wsam:ServiceName EndpointName="Transport_Port">wst:SecurityTokenService</wsam:ServiceName>
+                                </wsaw:Metadata>
+                            </sp:Issuer>
+                        </sp:IssuedToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
 				<sp:Wss11>
 					<wsp:Policy>
 						<sp:MustSupportRefIssuerSerial />
@@ -173,7 +139,7 @@
 			</wsp:All>
 		</wsp:ExactlyOne>
 	</wsp:Policy>
-	<wsp:Policy wsu:Id="DoubleItBindingTransportSAML1Policy">
+	<wsp:Policy wsu:Id="DoubleItBindingTransportSAML2Policy">
 		<wsp:ExactlyOne>
 			<wsp:All>
 				<wsam:Addressing wsp:Optional="false">
@@ -184,16 +150,9 @@
 					<wsp:Policy>
 						<sp:TransportToken>
 							<wsp:Policy>
-								<sp:IssuedToken
-									sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-									<sp:RequestSecurityTokenTemplate>
-										<t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1</t:TokenType>
-										<t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey</t:KeyType>
-									</sp:RequestSecurityTokenTemplate>
-									<wsp:Policy>
-										<sp:RequireInternalReference />
-									</wsp:Policy>
-								</sp:IssuedToken>
+								<sp:HttpsToken>
+                                   <wsp:Policy/>
+                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
@@ -209,66 +168,33 @@
 						<sp:IncludeTimestamp />
 					</wsp:Policy>
 				</sp:TransportBinding>
-				<sp:Wss11>
-					<wsp:Policy>
-						<sp:MustSupportRefIssuerSerial />
-						<sp:MustSupportRefThumbprint />
-						<sp:MustSupportRefEncryptedKey />
-					</wsp:Policy>
-				</sp:Wss11>
-				<sp:Trust13>
-					<wsp:Policy>
-						<sp:MustSupportIssuedTokens />
-						<sp:RequireClientEntropy />
-						<sp:RequireServerEntropy />
-					</wsp:Policy>
-				</sp:Trust13>
-			</wsp:All>
-		</wsp:ExactlyOne>
-	</wsp:Policy>
-	<wsp:Policy wsu:Id="DoubleItBindingAsymmetricBSTPolicy">
-		<wsp:ExactlyOne>
-			<wsp:All>
-				<wsam:Addressing wsp:Optional="false">
-					<wsp:Policy />
-				</wsam:Addressing>
-				<sp:AsymmetricBinding>
-					<wsp:Policy>
-						<sp:InitiatorToken>
-							<wsp:Policy>
-								<sp:X509Token
-									sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-									<wsp:Policy>
-										<sp:WssX509V3Token10 />
-									</wsp:Policy>
-								</sp:X509Token>
-							</wsp:Policy>
-						</sp:InitiatorToken>
-						<sp:RecipientToken>
-							<wsp:Policy>
-								<sp:X509Token
-									sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
-									<wsp:Policy>
-										<sp:WssX509V3Token10 />
-										<sp:RequireIssuerSerialReference />
-									</wsp:Policy>
-								</sp:X509Token>
-							</wsp:Policy>
-						</sp:RecipientToken>
-						<sp:Layout>
-							<wsp:Policy>
-								<sp:Lax />
-							</wsp:Policy>
-						</sp:Layout>
-						<sp:IncludeTimestamp />
-						<sp:OnlySignEntireHeadersAndBody />
-						<sp:AlgorithmSuite>
-							<wsp:Policy>
-								<sp:Basic128 />
-							</wsp:Policy>
-						</sp:AlgorithmSuite>
-					</wsp:Policy>
-				</sp:AsymmetricBinding>
+				<sp:EndorsingSupportingTokens
+                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:IssuedToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <sp:RequestSecurityTokenTemplate>
+                                <t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1</t:TokenType>
+                                <t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey</t:KeyType>
+                            </sp:RequestSecurityTokenTemplate>
+                            <wsp:Policy>
+                                <sp:RequireInternalReference />
+                            </wsp:Policy>
+                            <sp:Issuer>
+                                <wsaw:Address>https://localhost:30101/SecurityTokenService/Transport</wsaw:Address>
+                                <wsaw:Metadata>
+                                    <wsx:Metadata>
+                                        <wsx:MetadataSection>
+                                            <wsx:MetadataReference>
+                                                <wsaw:Address>https://localhost:30101/SecurityTokenService/Transport/mex</wsaw:Address>
+                                            </wsx:MetadataReference>
+                                        </wsx:MetadataSection>
+                                    </wsx:Metadata>
+                                </wsaw:Metadata>
+                            </sp:Issuer>
+                        </sp:IssuedToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
 				<sp:Wss11>
 					<wsp:Policy>
 						<sp:MustSupportRefIssuerSerial />
