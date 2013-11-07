@@ -160,6 +160,7 @@ public class StaxAsymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
 
     // TODO Encrypted tokens not yet working with StAX
+    // See WSS-484
     @org.junit.Test
     @org.junit.Ignore
     public void testUsernameTokenSAML1Encrypted() throws Exception {
