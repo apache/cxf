@@ -30,10 +30,10 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.validation.AbstractValidationOutInterceptor;
+import org.apache.cxf.validation.ValidationOutInterceptor;
 
 
-public class JAXRSValidationOutInterceptor extends AbstractValidationOutInterceptor
+public class JAXRSValidationOutInterceptor extends ValidationOutInterceptor
     implements ContainerResponseFilter {
     public JAXRSValidationOutInterceptor() {
     }
@@ -42,16 +42,16 @@ public class JAXRSValidationOutInterceptor extends AbstractValidationOutIntercep
     }
     
     @Override
-    protected Object getResourceInstance(Message message) {
+    protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
     }
     
     @Override
-    protected Method getResourceMethod(Message message) {
+    protected Method getServiceMethod(Message message) {
         if (!ValidationUtils.isAnnotatedMethodAvailable(message)) {
             return null;
         } else {
-            return super.getResourceMethod(message);
+            return super.getServiceMethod(message);
         }
     }
     

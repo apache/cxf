@@ -36,10 +36,15 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 public abstract class AbstractValidationInterceptor extends AbstractPhaseInterceptor< Message > {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
     
+    private Object serviceObject;
     private volatile ValidationProvider provider;
     
     public AbstractValidationInterceptor(String phase) {
         super(phase);
+    }
+        
+    public void setServiceObject(Object object) {
+        this.serviceObject = object;
     }
     
     public void setProvider(ValidationProvider provider) {
@@ -48,16 +53,16 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
     
     @Override
     public void handleMessage(Message message) throws Fault {        
-        final Object resourceInstance = getResourceInstance(message);
-        if (resourceInstance == null) {
-            String error = "Resource instance is not available";
+        final Object theServiceObject = getServiceObject(message);
+        if (theServiceObject == null) {
+            String error = "Service object is not available";
             LOG.severe(error);
             throw new ValidationException(error);
         }
         
-        final Method method = getResourceMethod(message);
+        final Method method = getServiceMethod(message);
         if (method == null) {
-            String error = "Resource method is not available";
+            String error = "Service method is not available";
             LOG.severe(error);
             throw new ValidationException(error);
         }
@@ -65,13 +70,15 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         
         final List< Object > arguments = MessageContentsList.getContentsList(message);
         
-        handleValidation(message, resourceInstance, method, arguments);
+        handleValidation(message, theServiceObject, method, arguments);
                     
     }
     
-    protected abstract Object getResourceInstance(Message message);
+    protected Object getServiceObject(Message message) {
+        return serviceObject;
+    }
     
-    protected Method getResourceMethod(Message message) {
+    protected Method getServiceMethod(Message message) {
         Message inMessage = message.getExchange().getInMessage();
         Method method = (Method)inMessage.get("org.apache.cxf.resource.method");
         if (method == null) {

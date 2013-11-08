@@ -26,10 +26,10 @@ import javax.ws.rs.container.ContainerRequestFilter;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.validation.AbstractValidationInInterceptor;
+import org.apache.cxf.validation.ValidationInInterceptor;
 
 
-public class JAXRSValidationInInterceptor extends AbstractValidationInInterceptor 
+public class JAXRSValidationInInterceptor extends ValidationInInterceptor 
     implements ContainerRequestFilter {
     public JAXRSValidationInInterceptor() {
     }
@@ -38,16 +38,16 @@ public class JAXRSValidationInInterceptor extends AbstractValidationInIntercepto
     }
 
     @Override
-    protected Object getResourceInstance(Message message) {
+    protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
     }
     
     @Override
-    protected Method getResourceMethod(Message message) {
+    protected Method getServiceMethod(Message message) {
         if (!ValidationUtils.isAnnotatedMethodAvailable(message)) {
             return null;
         } else {
-            return super.getResourceMethod(message);
+            return super.getServiceMethod(message);
         }
     }
     @Override

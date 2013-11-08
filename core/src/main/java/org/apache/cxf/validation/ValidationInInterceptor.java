@@ -24,11 +24,11 @@ import java.util.List;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-public abstract class AbstractValidationInInterceptor extends AbstractValidationInterceptor {
-    public AbstractValidationInInterceptor() {
+public class ValidationInInterceptor extends AbstractValidationInterceptor {
+    public ValidationInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
-    public AbstractValidationInInterceptor(String phase) {
+    public ValidationInInterceptor(String phase) {
         super(phase);
     }
 
