@@ -110,6 +110,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         super.setBus(bus);
         checkBindingFactory(bus);
         serviceFactory.setBus(bus);
+        bus.setProperty(JAXRSServiceFactoryBean.class.getName(), serviceFactory);
     }
     
     /*
@@ -204,6 +205,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
      */
     public void setServiceFactory(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
+        getBus().setProperty(JAXRSServiceFactoryBean.class.getName(), serviceFactory);
     }
 
     protected Endpoint createEndpoint() throws BusException, EndpointException {
