@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs.validation;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -129,6 +130,27 @@ public class JAXRSClientServerValidationTest extends AbstractBusClientServerTest
     public void testThatNoValidationConstraintsAreViolatedWithDefaultValue()  {
         final Response r = createWebClient("/bookstore/books").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
+    }
+    
+    @Test
+    public void testThatNoValidationConstraintsAreViolatedWithBook()  {
+        final Response r = createWebClient("/bookstore/books/direct").type("text/xml").post(
+              new BookWithValidation("BeanVal", "1"));
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+    }
+    
+    @Test
+    public void testThatValidationConstraintsAreViolatedWithBook()  {
+        final Response r = createWebClient("/bookstore/books/direct").type("text/xml").post(
+              new BookWithValidation("BeanVal"));
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
+    }
+    
+    @Test
+    public void testThatValidationConstraintsAreViolatedWithBooks()  {
+        final Response r = createWebClient("/bookstore/books/directmany").type("text/xml").postCollection(
+              Collections.singletonList(new BookWithValidation("BeanVal")), BookWithValidation.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
     
     @Test

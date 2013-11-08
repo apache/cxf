@@ -20,11 +20,13 @@ package org.apache.cxf.systest.jaxrs.validation;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -65,6 +67,22 @@ public class BookStoreWithValidation extends AbstractBookStoreWithValidation imp
             @FormParam("name") String name) {
         books.put(id, new BookWithValidation(name, id));   
         return Response.created(uriInfo.getRequestUriBuilder().path(id).build()).build();
+    }
+    
+    @POST
+    @Path("/books/direct")
+    @Consumes("text/xml")
+    public Response addBookDirect(@Valid BookWithValidation book, @Context final UriInfo uriInfo) {
+        books.put(book.getId(), book);   
+        return Response.created(uriInfo.getRequestUriBuilder().path(book.getId()).build()).build();
+    }
+    
+    @POST
+    @Path("/books/directmany")
+    @Consumes("text/xml")
+    public Response addBooksDirect(@Valid List<BookWithValidation> list, @Context final UriInfo uriInfo) {
+        books.put(list.get(0).getId(), list.get(0));   
+        return Response.created(uriInfo.getRequestUriBuilder().path(list.get(0).getId()).build()).build();
     }
     
     @GET

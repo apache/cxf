@@ -21,11 +21,6 @@ package org.apache.cxf.systest.jaxrs.validation;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
-@JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
 @XmlRootElement(name = "BookWithValidation")
 public class BookWithValidation {
     @NotNull private String name;
