@@ -17,33 +17,21 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions name="c/epr.idl"
- targetNamespace="http://schemas.apache.org/idl/c/epr.idl"
- xmlns="http://schemas.xmlsoap.org/wsdl/"
- xmlns:tns="http://schemas.apache.org/idl/c/epr.idl"
- xmlns:xsd="http://www.w3.org/2001/XMLSchema"
- xmlns:xs="http://www.w3.org/2001/XMLSchema"
- xmlns:xsd1="http://schemas.apache.org/idltypes/c/epr.idl"
- xmlns:corba="http://cxf.apache.org/bindings/corba"
- xmlns:corbatm="http://schemas.apache.org/typemap/corba/c/epr.idl"
- xmlns:addressing="http://www.w3.org/2005/08/addressing">
-  <types>
-    <schema targetNamespace="http://schemas.apache.org/idltypes/c/epr.idl"
-     xmlns="http://www.w3.org/2001/XMLSchema"
-     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-     <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
-      <xsd:element name="TestServer.register.cb" type="addressing:EndpointReferenceType"/>
-    </schema>
-  </types>
-  <message name="TestServer.register">
-    <part name="cb" element="xsd1:TestServer.register.cb"/>
-  </message>
-  <message name="TestServer.registerResponse"/>
-  <portType name="TestServer">
-    <operation name="register">
-      <input message="tns:TestServer.register" name="register"/>
-      <output message="tns:TestServer.registerResponse" name="registerResponse"/>
-    </operation>
-  </portType>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/idl/c/epr.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/c/epr.idl" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/typemap/corba/c/epr.idl" xmlns:addressing="http://www.w3.org/2005/08/addressing" name="c/epr.idl" targetNamespace="http://schemas.apache.org/idl/c/epr.idl">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/c/epr.idl">
+            <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
+            <xsd:element name="TestServer.register.cb" type="addressing:EndpointReferenceType"/>
+        </schema>
+    </types>
+    <message name="TestServer.register">
+        <part name="cb" element="xsd1:TestServer.register.cb"/>
+    </message>
+    <message name="TestServer.registerResponse"/>
+    <portType name="TestServer">
+        <operation name="register">
+            <input message="tns:TestServer.register" name="register"/>
+            <output message="tns:TestServer.registerResponse" name="registerResponse"/>
+        </operation>
+    </portType>
 </definitions>

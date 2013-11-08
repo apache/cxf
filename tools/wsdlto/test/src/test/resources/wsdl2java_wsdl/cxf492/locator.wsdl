@@ -17,19 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<definitions targetNamespace="http://apache.org/locator" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:ls="http://apache.org/locator" 
-    xmlns:query="http://apache.org/locator/query" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/locator/types" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:ls="http://apache.org/locator" xmlns:query="http://apache.org/locator/query" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/locator/types" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/locator">
     <types>
         <xs:schema targetNamespace="http://apache.org/locator/types">
-	    		<xs:include schemaLocation="types.xsd"/>
-    	</xs:schema> 
+            <xs:include schemaLocation="types.xsd"/>
+        </xs:schema>
     </types>
     <message name="registerPeerManagerInput">
         <part element="tns:registerPeerManager" name="parameters"/>
@@ -96,7 +88,7 @@
         <operation name="registerEndpoint">
             <xs:documentation>
         Register an endpoint to become available in the locator.  Once registered, an  
-        endpoint will be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints&quot; operations.
+        endpoint will be returned in response to the "list_endpoints" and "query_endpoints" operations.
       </xs:documentation>
             <input message="ls:registerEndpointInput"/>
             <output message="ls:registerEndpointOutput"/>
@@ -104,7 +96,7 @@
         <operation name="deregisterEndpoint">
             <xs:documentation>
         Deregister an endpoint from the locator. Once deregistered an endpoint will
-        no longer be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints operations.
+        no longer be returned in response to the "list_endpoints" and "query_endpoints operations.
       </xs:documentation>
             <input message="ls:deregisterEndpointInput"/>
             <output message="ls:deregisterEndpointOutput"/>

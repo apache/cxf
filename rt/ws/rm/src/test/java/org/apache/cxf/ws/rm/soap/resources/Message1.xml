@@ -17,23 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<S:Envelope xmlns:S12="http://www.w3.org/2003/05/soap-envelope"
-xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" 
-xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" 
-xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"> 
-    <S:Header> 
-        <wsa:MessageID>http://Business456.com/guid/71e0654e-5ce8-477b-bb9d-34f05cfcbc9e</wsa:MessageID> 
-        <wsa:To>http://fabrikam123.com/serviceB/123</wsa:To> 
+<S:Envelope xmlns:S12="http://www.w3.org/2003/05/soap-envelope" xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+    <S:Header>
+        <wsa:MessageID>http://Business456.com/guid/71e0654e-5ce8-477b-bb9d-34f05cfcbc9e</wsa:MessageID>
+        <wsa:To>http://fabrikam123.com/serviceB/123</wsa:To>
         <wsa:From>
             <wsa:Address>http://Business456.com/serviceA/789</wsa:Address>
         </wsa:From>
         <wsa:Action>http://fabrikam123.com/serviceB/123/request</wsa:Action>
-        <wsrm:Sequence> 
-            <wsrm:Identifier>http://Business456.com/RM/ABC</wsrm:Identifier> 
-            <wsrm:MessageNumber>1</wsrm:MessageNumber> 
-        </wsrm:Sequence> 
-    </S:Header> 
-    <S:Body> 
-         <!-- Some Application Data --> 
+        <wsrm:Sequence>
+            <wsrm:Identifier>http://Business456.com/RM/ABC</wsrm:Identifier>
+            <wsrm:MessageNumber>1</wsrm:MessageNumber>
+        </wsrm:Sequence>
+    </S:Header>
+    <S:Body>
+        <!-- Some Application Data -->
     </S:Body>
 </S:Envelope>

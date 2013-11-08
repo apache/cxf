@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,38 +17,38 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<handler-config> 
-  <handler-chain> 
-    <handler-chain-name>TestHandlerChain</handler-chain-name> 
-    <handler> 
-      <handler-name>DummyHandler</handler-name> 
-      <handler-class>org.apache.cxf.bus.handlers.DummyHandler</handler-class> 
-      <init-param> 
-	<param-name>foo</param-name> 
-	<param-value>1</param-value> 
-      </init-param> 
-      <init-param> 
-	<param-name>bar</param-name> 
-	<param-value>2</param-value> 
-      </init-param> 
-    </handler> 
-  </handler-chain> 
-  <handler-chain> 
-    <handler-chain-name>BrokenHandlerChain</handler-chain-name> 
-    <handler> 
-      <handler-name>DummyHandler</handler-name> 
-      <handler-class>org.foo.bar.NoSuchHandler</handler-class> 
-      <init-param> 
-	<param-name>foo</param-name> 
-	<param-value>bar</param-value> 
-      </init-param> 
-    </handler> 
-  </handler-chain> 
-  <handler-chain> 
-    <handler-chain-name>HandlerChainNoInitParam</handler-chain-name> 
-    <handler> 
-      <handler-name>DummyHandler</handler-name> 
-      <handler-class>org.apache.cxf.bus.handlers.DummyHandler</handler-class> 
-    </handler> 
-  </handler-chain> 
-</handler-config> 
+<handler-config>
+    <handler-chain>
+        <handler-chain-name>TestHandlerChain</handler-chain-name>
+        <handler>
+            <handler-name>DummyHandler</handler-name>
+            <handler-class>org.apache.cxf.bus.handlers.DummyHandler</handler-class>
+            <init-param>
+                <param-name>foo</param-name>
+                <param-value>1</param-value>
+            </init-param>
+            <init-param>
+                <param-name>bar</param-name>
+                <param-value>2</param-value>
+            </init-param>
+        </handler>
+    </handler-chain>
+    <handler-chain>
+        <handler-chain-name>BrokenHandlerChain</handler-chain-name>
+        <handler>
+            <handler-name>DummyHandler</handler-name>
+            <handler-class>org.foo.bar.NoSuchHandler</handler-class>
+            <init-param>
+                <param-name>foo</param-name>
+                <param-value>bar</param-value>
+            </init-param>
+        </handler>
+    </handler-chain>
+    <handler-chain>
+        <handler-chain-name>HandlerChainNoInitParam</handler-chain-name>
+        <handler>
+            <handler-name>DummyHandler</handler-name>
+            <handler-class>org.apache.cxf.bus.handlers.DummyHandler</handler-class>
+        </handler>
+    </handler-chain>
+</handler-config>

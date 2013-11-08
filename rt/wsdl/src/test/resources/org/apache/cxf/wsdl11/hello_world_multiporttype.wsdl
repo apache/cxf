@@ -17,28 +17,19 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="HelloWorldService" 
-    targetNamespace="http://cxf.apache.org/test/hello_world_multi" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/test/hello_world_multi" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-
-
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/test/hello_world_multi" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldService" targetNamespace="http://cxf.apache.org/test/hello_world_multi">
     <message name="greetMe">
         <part name="stringParam0" type="xsd:string"/>
     </message>
     <message name="greetMeResponse">
         <part name="return" type="xsd:string"/>
     </message>
-    
     <message name="greetMe2">
         <part name="stringParam0" type="xsd:string"/>
     </message>
     <message name="greetMe2Response">
         <part name="return" type="xsd:string"/>
-    </message>    
-    
+    </message>
     <portType name="HelloWorldPortType">
         <operation name="greetMe">
             <input message="tns:greetMe" name="greetMe"/>
@@ -51,46 +42,36 @@
             <output message="tns:greetMe2Response" name="greetMe2Response"/>
         </operation>
     </portType>
-
-       
     <binding name="HelloWorldBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
-                <soap:body 
-                    namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
             </input>
             <output name="greetMeResponse">
-                <soap:body  
-                    namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
             </output>
         </operation>
-    </binding>    
+    </binding>
     <binding name="HelloWorldBinding2" type="tns:HelloWorldPortType2">
         <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="greetMe2">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe2">
-                <soap:body 
-                    namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
             </input>
             <output name="greetMe2Response">
-                <soap:body  
-                    namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/test/hello_world_multi" use="literal"/>
             </output>
         </operation>
-    </binding>    
-        
+    </binding>
     <service name="HelloWorldService">
         <port binding="tns:HelloWorldBinding" name="HelloWorldPort">
-		    <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>            
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
         </port>
         <port binding="tns:HelloWorldBinding2" name="HelloWorldPort2">
-		    <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>            
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
         </port>
     </service>
-       
 </definitions>
-
-

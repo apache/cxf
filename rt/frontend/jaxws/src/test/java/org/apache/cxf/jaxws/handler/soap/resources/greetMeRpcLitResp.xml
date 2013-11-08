@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,17 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" 
-		   xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SOAP-ENV:Body>
-	<ns1:sendReceiveDataResponse xmlns:ns1="http://apache.org/hello_world_rpclit">
-	    <ns5:out xmlns:ns5="http://apache.org/hello_world_rpclit/types">
-		<ns5:elem1>return is element 1</ns5:elem1>
-		<ns5:elem2>return is element 2</ns5:elem2>
-		<ns5:elem3>42</ns5:elem3>
-	    </ns5:out>
-	</ns1:sendReceiveDataResponse>
+        <ns1:sendReceiveDataResponse xmlns:ns1="http://apache.org/hello_world_rpclit">
+            <ns5:out xmlns:ns5="http://apache.org/hello_world_rpclit/types">
+                <ns5:elem1>return is element 1</ns5:elem1>
+                <ns5:elem2>return is element 2</ns5:elem2>
+                <ns5:elem3>42</ns5:elem3>
+            </ns5:out>
+        </ns1:sendReceiveDataResponse>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
-

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,17 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxws:bindings wsdlLocation="hello_world.wsdl"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-	xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	node="wsdl:definitions/wsdl:types/xsd:schema">
-	<jaxb:bindings version="2.0" node="xsd:element[@name='CreateProcess']/xsd:complexType/xsd:sequence/xsd:element[@name='MyProcess']/xsd:simpleType">
-		<jaxb:typesafeEnumClass name="MyProcess">
-			<jaxb:typesafeEnumMember name="BLUE" value="BLUE" />
-			<jaxb:typesafeEnumMember name="RED" value="RED" />
-			<jaxb:typesafeEnumMember name="GREEN" value="GREEN" />
-		</jaxb:typesafeEnumClass>
-	</jaxb:bindings>
+<jaxws:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" wsdlLocation="hello_world.wsdl" node="wsdl:definitions/wsdl:types/xsd:schema">
+    <jaxb:bindings version="2.0" node="xsd:element[@name='CreateProcess']/xsd:complexType/xsd:sequence/xsd:element[@name='MyProcess']/xsd:simpleType">
+        <jaxb:typesafeEnumClass name="MyProcess">
+            <jaxb:typesafeEnumMember name="BLUE" value="BLUE"/>
+            <jaxb:typesafeEnumMember name="RED" value="RED"/>
+            <jaxb:typesafeEnumMember name="GREEN" value="GREEN"/>
+        </jaxb:typesafeEnumClass>
+    </jaxb:bindings>
 </jaxws:bindings>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements. See the NOTICE file
@@ -16,16 +17,10 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<jaxws:bindings wsdlLocation="test.wsdl"
-          xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
-          xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-          xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <jaxws:bindings  node="wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='http://apache.org/hello_world_soap_http/types']">
-      <jaxb:globalBindings>
-        <jaxb:javaType name="java.util.Date" xmlType="xs:dateTime"
-                      parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime"
-                      printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
-      </jaxb:globalBindings>
-  </jaxws:bindings>
+<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="test.wsdl">
+    <jaxws:bindings node="wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='http://apache.org/hello_world_soap_http/types']">
+        <jaxb:globalBindings>
+            <jaxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
+        </jaxb:globalBindings>
+    </jaxws:bindings>
 </jaxws:bindings>

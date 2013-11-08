@@ -17,37 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:http="http://cxf.apache.org/transports/http/configuration"
-  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-  xmlns:jaxws="http://cxf.apache.org/jaxws"
-  xsi:schemaLocation="
-  		   http://cxf.apache.org/configuration/security
-  		      http://cxf.apache.org/schemas/configuration/security.xsd
-           http://cxf.apache.org/transports/http/configuration
-              http://cxf.apache.org/schemas/configuration/http-conf.xsd
-           http://cxf.apache.org/transports/http-jetty/configuration
-              http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-           http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://cxf.apache.org/jaxws
-              http://cxf.apache.org/schemas/jaxws.xsd">
-              
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-
-  <!--  Resolve wsdl using the classloader -->
-  <jaxws:endpoint 
-    id="greeter1" 
-    address="/greeter"
-  	implementor="org.apache.hello_world_soap_http.GreeterImpl"
-  	wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl" />
-  	
-  <!--  Resolve wsdl using the servlet context -->
-  <jaxws:endpoint 
-    id="greeter2" 
-    address="/greeter2"
-  	implementor="org.apache.hello_world_soap_http.GreeterImpl"
-  	wsdlLocation="wsdl/hello_world.wsdl" />
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="                    http://cxf.apache.org/configuration/security                       http://cxf.apache.org/schemas/configuration/security.xsd            http://cxf.apache.org/transports/http/configuration               http://cxf.apache.org/schemas/configuration/http-conf.xsd            http://cxf.apache.org/transports/http-jetty/configuration               http://cxf.apache.org/schemas/configuration/http-jetty.xsd            http://www.springframework.org/schema/beans               http://www.springframework.org/schema/beans/spring-beans.xsd            http://cxf.apache.org/jaxws               http://cxf.apache.org/schemas/jaxws.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <!--  Resolve wsdl using the classloader -->
+    <jaxws:endpoint id="greeter1" address="/greeter" implementor="org.apache.hello_world_soap_http.GreeterImpl" wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"/>
+    <!--  Resolve wsdl using the servlet context -->
+    <jaxws:endpoint id="greeter2" address="/greeter2" implementor="org.apache.hello_world_soap_http.GreeterImpl" wsdlLocation="wsdl/hello_world.wsdl"/>
 </beans>

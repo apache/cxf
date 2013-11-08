@@ -17,15 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http"
-    xmlns:x1="http://apache.org/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://apache.org/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http" xmlns:x1="http://apache.org/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/types" targetNamespace="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -50,7 +44,6 @@
                     </sequence>
                 </complexType>
             </element>
-
             <element name="testNillable">
                 <complexType>
                     <sequence>
@@ -66,7 +59,6 @@
                     </sequence>
                 </complexType>
             </element>
-
             <element name="greetMeLater">
                 <complexType>
                     <sequence>
@@ -225,29 +217,27 @@
             <wsdl:output message="tns:greetMeResponse"/>
         </wsdl:operation>
         <wsdl:operation name="testNillable">
-            <wsdl:input  message="tns:testNillableRequest"/>
-            <wsdl:output  message="tns:testNillableResponse"/>
+            <wsdl:input message="tns:testNillableRequest"/>
+            <wsdl:output message="tns:testNillableResponse"/>
         </wsdl:operation>
         <wsdl:operation name="greetMeLater">
-            <wsdl:input  message="tns:greetMeLaterRequest"/>
-            <wsdl:output  message="tns:greetMeLaterResponse"/>
+            <wsdl:input message="tns:greetMeLaterRequest"/>
+            <wsdl:output message="tns:greetMeLaterResponse"/>
         </wsdl:operation>
         <wsdl:operation name="greetMeSometime">
-            <wsdl:input  message="tns:greetMeSometimeRequest"/>
-            <wsdl:output  message="tns:greetMeSometimeResponse"/>
+            <wsdl:input message="tns:greetMeSometimeRequest"/>
+            <wsdl:output message="tns:greetMeSometimeResponse"/>
         </wsdl:operation>
         <wsdl:operation name="greetMeOneWay">
-            <wsdl:input  message="tns:greetMeOneWayRequest"/>
+            <wsdl:input message="tns:greetMeOneWayRequest"/>
         </wsdl:operation>
         <wsdl:operation name="testDocLitFault">
-            <wsdl:input  message="tns:testDocLitFaultRequest"/>
-            <wsdl:output  message="tns:testDocLitFaultResponse"/>
+            <wsdl:input message="tns:testDocLitFaultRequest"/>
+            <wsdl:output message="tns:testDocLitFaultResponse"/>
             <wsdl:fault name="NoSuchCodeLitFault" message="tns:NoSuchCodeLitFault"/>
             <wsdl:fault name="BadRecordLitFault" message="tns:BadRecordLitFault"/>
         </wsdl:operation>
-
     </wsdl:portType>
-
     <wsdl:portType name="DocLitBare">
         <wsdl:operation name="testDocLitBare">
             <wsdl:input name="testDocLitBareRequest" message="tns:testDocLitBareRequest"/>
@@ -322,7 +312,6 @@
                 <soap:fault name="BadRecordLitFault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-
     </wsdl:binding>
     <wsdl:binding name="Doc_Lit_Bare_SOAPBinding" type="tns:DocLitBare">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -336,30 +325,24 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-
-
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
         </wsdl:port>
-
         <wsdl:port name="SoapPort1" binding="tns:Greeter_SOAPBinding">
             <soap:address location="http://localhost:7000/SoapContext/SoapPort"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SOAPProviderService">
         <wsdl:port name="SoapProviderPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="http://localhost:9003/SoapContext/SoapProviderPort"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SOAPDispatchService">
         <wsdl:port name="SoapDispatchPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="http://localhost:9006/SOAPDispatchService/SoapDispatchPort"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SOAPService_DocLitBare">
         <wsdl:port name="SoapPort2" binding="tns:Doc_Lit_Bare_SOAPBinding">
             <soap:address location="http://localhost:7600/SoapContext/SoapPort"/>
@@ -404,4 +387,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

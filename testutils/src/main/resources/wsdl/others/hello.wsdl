@@ -17,38 +17,38 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<wsdl:definitions name="HelloService" targetNamespace="http://cxf.apache.org/systest/jaxws/" xmlns:ns1="http://cxf.apache.org/systest/jaxws/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:message name="sayHi">
-    <wsdl:part name="arg0" type="xsd:string">
+<wsdl:definitions xmlns:ns1="http://cxf.apache.org/systest/jaxws/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="HelloService" targetNamespace="http://cxf.apache.org/systest/jaxws/">
+    <wsdl:message name="sayHi">
+        <wsdl:part name="arg0" type="xsd:string">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="sayHiResponse">
-    <wsdl:part name="return" type="xsd:string">
+    </wsdl:message>
+    <wsdl:message name="sayHiResponse">
+        <wsdl:part name="return" type="xsd:string">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="Hello">
-    <wsdl:operation name="sayHi">
-      <wsdl:input name="sayHi" message="ns1:sayHi">
+    </wsdl:message>
+    <wsdl:portType name="Hello">
+        <wsdl:operation name="sayHi">
+            <wsdl:input name="sayHi" message="ns1:sayHi">
     </wsdl:input>
-      <wsdl:output name="sayHiResponse" message="ns1:sayHiResponse">
+            <wsdl:output name="sayHiResponse" message="ns1:sayHiResponse">
     </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="HelloServiceSoapBinding" type="ns1:Hello">
-    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="sayHi">
-      <soap:operation soapAction="" style="rpc"/>
-      <wsdl:input name="sayHi">
-        <soap:body use="literal" namespace="http://cxf.apache.org/systest/jaxws/"/>
-      </wsdl:input>
-      <wsdl:output name="sayHiResponse">
-        <soap:body use="literal" namespace="http://cxf.apache.org/systest/jaxws/"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="HelloService">
-    <wsdl:port name="HelloPort" binding="ns1:HelloServiceSoapBinding">
-      <soap:address location="http://localhost:9091/hello"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions> 
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="HelloServiceSoapBinding" type="ns1:Hello">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="sayHi">
+            <soap:operation soapAction="" style="rpc"/>
+            <wsdl:input name="sayHi">
+                <soap:body use="literal" namespace="http://cxf.apache.org/systest/jaxws/"/>
+            </wsdl:input>
+            <wsdl:output name="sayHiResponse">
+                <soap:body use="literal" namespace="http://cxf.apache.org/systest/jaxws/"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="HelloService">
+        <wsdl:port name="HelloPort" binding="ns1:HelloServiceSoapBinding">
+            <soap:address location="http://localhost:9091/hello"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

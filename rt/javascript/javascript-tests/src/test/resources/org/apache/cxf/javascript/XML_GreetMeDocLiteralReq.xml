@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -15,8 +16,8 @@
   KIND, either express or implied. See the License for the
   specific language governing permissions and limitations
   under the License.
---><!-- this message goes to org.apache.hello_world_xml_http.wrapped.GreeterImpl -->
-<ns2:greetMe xmlns="http://www.w3.org/2005/02/addressing/wsdl"
-	xmlns:ns2="http://apache.org/hello_world_xml_http/wrapped/types">
-	<ns2:requestType>שלום</ns2:requestType>
+-->
+<!-- this message goes to org.apache.hello_world_xml_http.wrapped.GreeterImpl -->
+<ns2:greetMe xmlns="http://www.w3.org/2005/02/addressing/wsdl" xmlns:ns2="http://apache.org/hello_world_xml_http/wrapped/types">
+    <ns2:requestType>&#x5E9;&#x5DC;&#x5D5;&#x5DD;</ns2:requestType>
 </ns2:greetMe>

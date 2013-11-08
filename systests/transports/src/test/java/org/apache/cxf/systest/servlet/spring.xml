@@ -17,38 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
-  
-  
-  <bean id="greeterServerFactory"
-    class="org.apache.cxf.jaxws.JaxWsServerFactoryBean" init-method="create">
-    <property name="serviceClass" value="org.apache.hello_world_soap_http.GreeterImpl" />
-    <property name="serviceBean">
-      <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
-    </property>
-    <property name="address" value="/services/Greeter"/>
-    <property name="bus" ref="cxf"/>
-    <property name="bindingId" value="http://apache.org/cxf/binding/http"/>
-  </bean>
-  
-   <jaxws:endpoint id="endpoint1" 
-              implementor="org.apache.hello_world_soap_http.GreeterImpl"
-              address="/services/Greeter1"
-              wsdlLocation="/wsdl/hello_world.wsdl"
-              />
-   
-    <jaxws:endpoint id="endpoint2" 
-              implementor="org.apache.hello_world_soap_http.GreeterImpl"
-              address="/services/Greeter2"
-              publishedEndpointUrl="http://cxf.apache.org/Greeter"
-              />     
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean id="greeterServerFactory" class="org.apache.cxf.jaxws.JaxWsServerFactoryBean" init-method="create">
+        <property name="serviceClass" value="org.apache.hello_world_soap_http.GreeterImpl"/>
+        <property name="serviceBean">
+            <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </property>
+        <property name="address" value="/services/Greeter"/>
+        <property name="bus" ref="cxf"/>
+        <property name="bindingId" value="http://apache.org/cxf/binding/http"/>
+    </bean>
+    <jaxws:endpoint id="endpoint1" implementor="org.apache.hello_world_soap_http.GreeterImpl" address="/services/Greeter1" wsdlLocation="/wsdl/hello_world.wsdl"/>
+    <jaxws:endpoint id="endpoint2" implementor="org.apache.hello_world_soap_http.GreeterImpl" address="/services/Greeter2" publishedEndpointUrl="http://cxf.apache.org/Greeter"/>
 </beans>

@@ -17,15 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/cxf1404/hello_world_soap_http"
-    xmlns:x1="http://cxf.apache.org/cxf1404/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/cxf1404/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/cxf1404/hello_world_soap_http" xmlns:x1="http://cxf.apache.org/cxf1404/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/cxf1404/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/cxf1404/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/cxf1404/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/cxf1404/hello_world_soap_http/types" targetNamespace="http://cxf.apache.org/cxf1404/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="greetMe">
                 <complexType>
                     <sequence>
@@ -50,7 +44,6 @@
     <wsdl:message name="greetMeResponse">
         <wsdl:part name="parameters" element="x1:greetMeResponse"/>
     </wsdl:message>
-    
     <wsdl:portType name="Greeter">
         <wsdl:operation name="greetMe" parameterOrder="parameters">
             <wsdl:input name="greetMeRequest" message="tns:greetMeRequest"/>
@@ -75,4 +68,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

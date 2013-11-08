@@ -17,186 +17,129 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:p="http://cxf.apache.org/policy"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
-          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
-          http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
-          http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
-          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-          http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItBearerPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItBearerPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignedPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignedPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricInitiatorPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricInitiatorPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml1HOKHandler"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSaml2BearerPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml2BearerHandler"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSaml2BearerPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml2BearerHandler"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesSaml2Port" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml2SenderVouchesHandler"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSSenderVouchesSaml2Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml2SenderVouchesHandler"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingSaml2Port" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml2HOKHandler"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTLSHOKSignedEndorsingSaml2Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml2HOKHandler"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSVPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSVPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.saml-callback-handler" value-ref="saml1SenderVouchesHandler"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricIssuedTokenPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.sts.client">
-               <bean class="org.apache.cxf.ws.security.trust.STSClient">
-                   <constructor-arg ref="cxf"/>
-                   <property name="wsdlLocation" 
-                             value="http://localhost:8080/SecurityTokenService/Symmetric?wsdl"/>
-                   <property name="serviceName" 
-                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
-                   <property name="endpointName" 
-                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Symmetric_Port"/>
-                   <property name="properties">
-                       <map>
-                           <entry key="ws-security.username" value="alice"/>
-                           <entry key="ws-security.callback-handler" 
-                                  value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-                           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
-                           <entry key="ws-security.encryption.username" value="cxfca"/>
-                       </map>
-                   </property>
-               </bean>            
-           </entry> 
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricIssuedTokenPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.sts.client">
+                <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                    <constructor-arg ref="cxf"/>
+                    <property name="wsdlLocation" value="http://localhost:8080/SecurityTokenService/Symmetric?wsdl"/>
+                    <property name="serviceName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                    <property name="endpointName" value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Symmetric_Port"/>
+                    <property name="properties">
+                        <map>
+                            <entry key="ws-security.username" value="alice"/>
+                            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
+                            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+                            <entry key="ws-security.encryption.username" value="cxfca"/>
+                        </map>
+                    </property>
+                </bean>
+            </entry>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <bean id="saml1SenderVouchesHandler" 
-          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
-          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:sender-vouches"/>
+    <bean id="saml1SenderVouchesHandler" class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:sender-vouches"/>
     </bean>
-    
-    <bean id="saml2SenderVouchesHandler" 
-          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
-          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:sender-vouches"/>
-          <property name="saml2" value="true"/>
+    <bean id="saml2SenderVouchesHandler" class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:sender-vouches"/>
+        <property name="saml2" value="true"/>
     </bean>
-    
-    <bean id="saml1HOKHandler" 
-          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
-          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:holder-of-key"/>
-          <property name="signed" value="true"/>
+    <bean id="saml1HOKHandler" class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:1.0:cm:holder-of-key"/>
+        <property name="signed" value="true"/>
     </bean>
-    
-    <bean id="saml2HOKHandler" 
-          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
-          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key"/>
-          <property name="saml2" value="true"/>
-          <property name="signed" value="true"/>
+    <bean id="saml2HOKHandler" class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key"/>
+        <property name="saml2" value="true"/>
+        <property name="signed" value="true"/>
     </bean>
-    
-    <bean id="saml2BearerHandler" 
-          class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
-          <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:bearer"/>
-          <property name="saml2" value="true"/>
+    <bean id="saml2BearerHandler" class="org.apache.cxf.systest.wssec.examples.saml.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:bearer"/>
+        <property name="saml2" value="true"/>
     </bean>
-    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
@@ -206,6 +149,5 @@
                 <sec:keyStore type="jks" password="password" resource="cxfca.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
-    </http:conduit>  
-    
+    </http:conduit>
 </beans>

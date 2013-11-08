@@ -17,21 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xsi:schemaLocation="
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation=" http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <http:conduit name="{http://cxf.apache.org/greeter_control}GreeterPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.decoupled}/decoupled_endpoint"/>
+        <http:client DecoupledEndpoint="http://localhost:${testutil.ports.decoupled}/decoupled_endpoint"/>
     </http:conduit>
-
     <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
     </bean>
-
 </beans>

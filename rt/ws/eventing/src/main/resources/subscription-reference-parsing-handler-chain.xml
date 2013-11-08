@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jws:handler-chains xmlns:jws="http://java.sun.com/xml/ns/javaee">
-
     <jws:handler-chain>
         <jws:handler>
             <jws:handler-name>EventingSoapHandler</jws:handler-name>
             <jws:handler-class>org.apache.cxf.ws.eventing.shared.handlers.SubscriptionReferenceParsingHandler</jws:handler-class>
         </jws:handler>
     </jws:handler-chain>
-
 </jws:handler-chains>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,17 +22,14 @@
     <artifactId>wsdl_first_https</artifactId>
     <name>WSDL first demo using HTTPS</name>
     <description>WSDL first demo using HTTPS</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <properties>
         <wsdl.location>${basedir}/src/main/config/hello_world.wsdl</wsdl.location>
     </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -85,7 +83,7 @@
                                     <executable>java</executable>
                                     <arguments>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.hw_https.server.Server</argument>
                                     </arguments>
                                 </configuration>

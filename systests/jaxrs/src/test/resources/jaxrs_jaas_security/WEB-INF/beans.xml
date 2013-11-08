@@ -17,109 +17,78 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:util="http://www.springframework.org/schema/util"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
-  <jaxrs:server address="/jaas">
-    <jaxrs:serviceBeans>
-       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:inInterceptors>
-        <ref bean="authenticationInterceptor"/>
-        <ref bean="authorizationInterceptor"/>
-    </jaxrs:inInterceptors>
-    
-    <jaxrs:outFaultInterceptors>
-        <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
-    </jaxrs:outFaultInterceptors>
-    
-  </jaxrs:server>
-  
-  <jaxrs:server address="/jaas2">
-    <jaxrs:serviceBeans>
-       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:providers>
-        <ref bean="authenticationFilter"/>
-        <ref bean="authorizationFilter"/>
-    </jaxrs:providers>
-  </jaxrs:server>
-  
-  <jaxrs:server address="/jaasConfig">
-    <jaxrs:serviceBeans>
-       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:inInterceptors>
-        <ref bean="authenticationInterceptorWithConfig"/>
-        <ref bean="authorizationInterceptor"/>
-    </jaxrs:inInterceptors>
-    
-    <jaxrs:outFaultInterceptors>
-        <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
-    </jaxrs:outFaultInterceptors>
-    
-  </jaxrs:server>
-  
-  <jaxrs:server address="/jaasConfigFilter">
-	    <jaxrs:serviceBeans>
-	       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-	    </jaxrs:serviceBeans>		   
-	    <jaxrs:providers>
-	        <ref bean="authenticationFilterConfig"/>
-	        <ref bean="authorizationFilter"/>
-	    </jaxrs:providers>
-  </jaxrs:server>
-  
-  
-  <bean id="authenticationInterceptor" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <jaxrs:server address="/jaas">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="authenticationInterceptor"/>
+            <ref bean="authorizationInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
+        </jaxrs:outFaultInterceptors>
+    </jaxrs:server>
+    <jaxrs:server address="/jaas2">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="authenticationFilter"/>
+            <ref bean="authorizationFilter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server address="/jaasConfig">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="authenticationInterceptorWithConfig"/>
+            <ref bean="authorizationInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
+        </jaxrs:outFaultInterceptors>
+    </jaxrs:server>
+    <jaxrs:server address="/jaasConfigFilter">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="authenticationFilterConfig"/>
+            <ref bean="authorizationFilter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <bean id="authenticationInterceptor" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
         <property name="contextName" value="BookLogin"/>
         <property name="rolePrefix" value="ROLE_"/>
-  </bean>
-  
-  <bean id="bookLoginConfig" class="org.apache.cxf.systest.jaxrs.security.BookLoginJaasConfiguration"/>
-  <bean id="authenticationInterceptorWithConfig" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
+    </bean>
+    <bean id="bookLoginConfig" class="org.apache.cxf.systest.jaxrs.security.BookLoginJaasConfiguration"/>
+    <bean id="authenticationInterceptorWithConfig" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
         <property name="loginConfig" ref="bookLoginConfig"/>
         <property name="rolePrefix" value="ROLE_"/>
-  </bean>
-  
-  <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
+    </bean>
+    <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
         <property name="methodRolesMap" ref="rolesMap"/>
-  </bean>
-  
-  <bean id="authenticationFilter" class="org.apache.cxf.systest.jaxrs.security.JettyJAASFilter">
+    </bean>
+    <bean id="authenticationFilter" class="org.apache.cxf.systest.jaxrs.security.JettyJAASFilter">
         <property name="contextName" value="BookLogin"/>
         <property name="rolePrefix" value="ROLE_"/>
-        
         <property name="redirectURI" value="/login.jsp"/>
-  </bean>
-  
-  <bean id="authenticationFilterConfig" class="org.apache.cxf.systest.jaxrs.security.JettyJAASFilter">
+    </bean>
+    <bean id="authenticationFilterConfig" class="org.apache.cxf.systest.jaxrs.security.JettyJAASFilter">
         <property name="loginConfig" ref="bookLoginConfig"/>
         <property name="rolePrefix" value="ROLE_"/>
-  </bean>
-  
-  <bean id="authorizationFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
+    </bean>
+    <bean id="authorizationFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
         <property name="interceptor" ref="authorizationInterceptor"/>
-  </bean>
-  
-  <util:map id="rolesMap">
-     <entry key="getThatBook" value="ROLE_BOOK_OWNER"/>
-     <entry key="getBook" value="ROLE_BOOK_OWNER"/>
-  </util:map>
-  
+    </bean>
+    <util:map id="rolesMap">
+        <entry key="getThatBook" value="ROLE_BOOK_OWNER"/>
+        <entry key="getBook" value="ROLE_BOOK_OWNER"/>
+    </util:map>
 </beans>
 <!-- END SNIPPET: beans -->
-

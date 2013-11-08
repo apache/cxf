@@ -17,17 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HandlerTest" targetNamespace="http://apache.org/handler_test"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/handler_test"
-    xmlns:x1="http://apache.org/handler_test/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/handler_test" xmlns:x1="http://apache.org/handler_test/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HandlerTest" targetNamespace="http://apache.org/handler_test">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/handler_test/types"
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:x1="http://apache.org/handler_test/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/handler_test/types" targetNamespace="http://apache.org/handler_test/types" elementFormDefault="qualified">
             <element name="ping">
                 <complexType/>
             </element>
@@ -56,7 +48,6 @@
                     </sequence>
                 </complexType>
             </element>
-
         </schema>
     </wsdl:types>
     <wsdl:message name="pingRequest">
@@ -85,7 +76,7 @@
         <wsdl:operation name="pingWithArgs">
             <wsdl:input message="tns:pingWithArgsRequest" name="pingWithArgsRequest"/>
             <wsdl:output message="tns:pingResponse" name="pingResponse"/>
-            <wsdl:fault  message="tns:PingException" name="PingException"/>
+            <wsdl:fault message="tns:PingException" name="PingException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:portType name="HandlerTest1">
@@ -119,11 +110,11 @@
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="PingException">
-                <soap:fault name="PingException" use="literal" />
+                <soap:fault name="PingException" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-     <wsdl:binding name="HandlerTest_SOAPBinding1" type="tns:HandlerTest1">
+    <wsdl:binding name="HandlerTest_SOAPBinding1" type="tns:HandlerTest1">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="pingOneWay1">
             <soap:operation soapAction="" style="document"/>
@@ -131,12 +122,12 @@
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-    </wsdl:binding>   
+    </wsdl:binding>
     <wsdl:service name="HandlerTestService">
         <wsdl:port binding="tns:HandlerTest_SOAPBinding" name="SoapPort">
             <soap:address location="http://localhost:9005/HandlerTest/SoapPort"/>
         </wsdl:port>
-       <wsdl:port binding="tns:HandlerTest_SOAPBinding1" name="SoapPort1">
+        <wsdl:port binding="tns:HandlerTest_SOAPBinding1" name="SoapPort1">
             <soap:address location="http://localhost:9005/HandlerTest/SoapPort1"/>
         </wsdl:port>
     </wsdl:service>

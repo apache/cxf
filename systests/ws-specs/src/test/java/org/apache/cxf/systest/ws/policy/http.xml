@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
     </bean>
-
 </beans>

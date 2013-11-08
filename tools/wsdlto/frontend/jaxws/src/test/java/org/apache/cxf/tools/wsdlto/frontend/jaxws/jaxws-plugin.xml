@@ -17,15 +17,15 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<plugin name="tools-jaxws-frontend" version="2.0" provider="apache cxf" xmlns="http://cxf.apache.org/tools/plugin">
+<plugin xmlns="http://cxf.apache.org/tools/plugin" name="tools-jaxws-frontend" version="2.0" provider="apache cxf">
     <frontend name="jaxws" package="org.apache.cxf.tools.wsdlto.frontend.jaxws" profile="JAXWSProfile">
-	<container name="JAXWSContainer" toolspec="jaxws-toolspec.xml"/>
-	<processor name="WSDLToJavaProcessor" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.processor"/>
-	<builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
-	<generators package="org.apache.cxf.tools.wsdlto.frontend.jaxws.generators">
-	    <generator name="AntGenerator"/>
-	    <generator name="ImplGenerator"/>
-	</generators>
+        <container name="JAXWSContainer" toolspec="jaxws-toolspec.xml"/>
+        <processor name="WSDLToJavaProcessor" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.processor"/>
+        <builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
+        <generators package="org.apache.cxf.tools.wsdlto.frontend.jaxws.generators">
+            <generator name="AntGenerator"/>
+            <generator name="ImplGenerator"/>
+        </generators>
     </frontend>
     <databinding name="jaxb" package="org.apache.cxf.tools.wsdlto.frontend.jaxws" profile="DummyDataBinding"/>
 </plugin>

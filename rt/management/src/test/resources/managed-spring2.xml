@@ -17,21 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:im="http://cxf.apache.org/management"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xsi:schemaLocation="
-       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:im="http://cxf.apache.org/management" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <cxf:bus id="CXF-Test-Bus" bus="cxf">
-      <cxf:properties>
-        <entry key="bus.jmx.enabled" value="true"/>
-        <entry key="bus.jmx.threaded" value="false"/>     
-        <entry key="bus.jmx.daemon" value="false"/>
-        <entry key="bus.jmx.JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi" />
-      </cxf:properties>
+        <cxf:properties>
+            <entry key="bus.jmx.enabled" value="true"/>
+            <entry key="bus.jmx.threaded" value="false"/>
+            <entry key="bus.jmx.daemon" value="false"/>
+            <entry key="bus.jmx.JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi"/>
+        </cxf:properties>
     </cxf:bus>
-  
 </beans>

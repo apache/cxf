@@ -17,21 +17,21 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/sequence_octet/typemap">
-    <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="" elemtype="corba:octet" elemname="item" bound="0" repositoryID="IDL:mySequenceOctet:1.0" type="xs:base64Binary" name="mySequenceOctet" />
-    <corba:anonsequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="" elemtype="corba:octet" elemname="item" bound="0" type="xs:base64Binary" name="_Anon1_mySequenceSequenceOctet" />
-    <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/sequence_octet/typemap" xmlns="" elemtype="ns4:_Anon1_mySequenceSequenceOctet" elemname="item" bound="0" repositoryID="IDL:mySequenceSequenceOctet:1.0" type="ns5:mySequenceSequenceOctet" name="mySequenceSequenceOctet" />
-    <corba:alias basetype="corba:octet" repositoryID="IDL:aliasOctet:1.0" name="aliasOctet" />
-    <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/sequence_octet/typemap" xmlns="" elemtype="ns4:aliasOctet" elemname="item" bound="0" repositoryID="IDL:octetSeq:1.0" type="xs:base64Binary" name="octetSeq" />
-  </corba:typeMapping>
-  <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <xs:complexType name="mySequenceSequenceOctet">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:base64Binary"/>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:schema>
-  </wsdl:types>
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/sequence_octet">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/sequence_octet/typemap">
+        <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="" elemtype="corba:octet" elemname="item" bound="0" repositoryID="IDL:mySequenceOctet:1.0" type="xs:base64Binary" name="mySequenceOctet"/>
+        <corba:anonsequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="" elemtype="corba:octet" elemname="item" bound="0" type="xs:base64Binary" name="_Anon1_mySequenceSequenceOctet"/>
+        <corba:sequence xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/sequence_octet/typemap" xmlns="" elemtype="ns4:_Anon1_mySequenceSequenceOctet" elemname="item" bound="0" repositoryID="IDL:mySequenceSequenceOctet:1.0" type="ns5:mySequenceSequenceOctet" name="mySequenceSequenceOctet"/>
+        <corba:alias basetype="corba:octet" repositoryID="IDL:aliasOctet:1.0" name="aliasOctet"/>
+        <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/sequence_octet/typemap" xmlns="" elemtype="ns4:aliasOctet" elemname="item" bound="0" repositoryID="IDL:octetSeq:1.0" type="xs:base64Binary" name="octetSeq"/>
+    </corba:typeMapping>
+    <wsdl:types>
+        <xs:schema xmlns="http://cxf.apache.org/bindings/corba/idl/sequence_octet" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/sequence_octet">
+            <xs:complexType name="mySequenceSequenceOctet">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:base64Binary"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
 </wsdl:definitions>

@@ -17,70 +17,19 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/hello_world_soap_http"
-    xmlns:x1="http://apache.org/hello_world_soap_http/types"
-    xmlns:ns="http://cxf.apache.org/extension/ns"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http" xmlns:x1="http://apache.org/hello_world_soap_http/types" xmlns:ns="http://cxf.apache.org/extension/ns" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/types" 
-            xmlns="http://www.w3.org/2001/XMLSchema"
-	    xmlns:tns="http://apache.org/hello_world_soap_http/types"
-            elementFormDefault="qualified">/
-	    <simpleType name="MyStringType">
-		<restriction base="string">
-		    <maxLength value="30" />
-		</restriction>
-	    </simpleType>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/hello_world_soap_http/types" targetNamespace="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">/
+            <simpleType name="MyStringType"><restriction base="string"><maxLength value="30"/></restriction></simpleType>
 
-            <element name="sayHi">
-                <complexType/>
-            </element>
-            <element name="sayHiResponse">
-                <complexType>
-                    <sequence>
-                        <element name="responseType" type="string"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="greetMe">
-                <complexType>
-                    <sequence>
-                        <element name="requestType" type="tns:MyStringType"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="greetMeResponse">
-                <complexType>
-                    <sequence>
-                        <element name="responseType" type="string"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="greetMeOneWay">
-                <complexType>
-                    <sequence>
-                        <element name="requestType" type="string"/>
-                    </sequence>
-                </complexType>
-            </element>
-            <element name="pingMe">
-                <complexType/>
-            </element>
-            <element name="pingMeResponse">
-                <complexType/>
-            </element>
-            <element name="faultDetail">
-                <complexType>
-                    <sequence>
-                        <element name="minor" type="short"/>
-                        <element name="major" type="short"/>
-                    </sequence>
-                </complexType>
-            </element>
+            <element name="sayHi"><complexType/></element>
+            <element name="sayHiResponse"><complexType><sequence><element name="responseType" type="string"/></sequence></complexType></element>
+            <element name="greetMe"><complexType><sequence><element name="requestType" type="tns:MyStringType"/></sequence></complexType></element>
+            <element name="greetMeResponse"><complexType><sequence><element name="responseType" type="string"/></sequence></complexType></element>
+            <element name="greetMeOneWay"><complexType><sequence><element name="requestType" type="string"/></sequence></complexType></element>
+            <element name="pingMe"><complexType/></element>
+            <element name="pingMeResponse"><complexType/></element>
+            <element name="faultDetail"><complexType><sequence><element name="minor" type="short"/><element name="major" type="short"/></sequence></complexType></element>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
@@ -103,27 +52,23 @@
     </wsdl:message>
     <wsdl:message name="pingMeResponse">
         <wsdl:part name="out" element="x1:pingMeResponse"/>
-    </wsdl:message>		
+    </wsdl:message>
     <wsdl:message name="pingMeFault">
         <wsdl:part name="faultDetail" element="x1:faultDetail"/>
     </wsdl:message>
-
     <wsdl:portType name="Greeter" ns:booleanAttr="true" ns:stringAttr="portType:Greeter">
         <ns:stringElem>portType:Greeter</ns:stringElem>
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMe">
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
-
         <wsdl:operation name="pingMe" ns:stringAttr="portType/operation:pingMe">
             <ns:stringElem>portType/operation:pingMe</ns:stringElem>
             <wsdl:input name="pingMeRequest" message="tns:pingMeRequest" ns:stringAttr="portType/operation/input:pingMeRequest">
@@ -135,13 +80,11 @@
             <wsdl:fault name="pingMeFault" message="tns:pingMeFault" ns:stringAttr="portType/operation/fault:pingMeFault">
                 <ns:stringElem>portType/operation/fault:pingMeFault</ns:stringElem>
             </wsdl:fault>
-        </wsdl:operation> 
+        </wsdl:operation>
     </wsdl:portType>
-
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter" ns:stringAttr="binding:Greeter_SOAPBinding">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <ns:stringElem>binding:Greeter_SOAPBinding</ns:stringElem>
-        
         <wsdl:operation name="sayHi">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="sayHiRequest">
@@ -151,7 +94,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMe">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeRequest">
@@ -161,14 +103,12 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMeOneWay">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-
         <wsdl:operation name="pingMe" ns:stringAttr="binding/operation:pingMe">
             <ns:stringElem>binding/operation:pingMe</ns:stringElem>
             <soap:operation style="document"/>
@@ -185,9 +125,7 @@
                 <soap:fault name="pingMeFault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-        
     </wsdl:binding>
-
     <wsdl:service name="SOAPService" ns:stringAttr="service:SOAPService">
         <wsdl:port binding="tns:Greeter_SOAPBinding" name="SoapPort" ns:stringAttr="service/port:SoapPort">
             <ns:stringElem>service/port:SoapPort</ns:stringElem>
@@ -195,6 +133,4 @@
         </wsdl:port>
         <ns:stringElem>service:SOAPService</ns:stringElem>
     </wsdl:service>
-
 </wsdl:definitions>
-

@@ -17,19 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" 
-		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-		  xmlns:tns="http://apache.org/header_test" 
-		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-		  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-		  targetNamespace="http://apache.org/header_test" 
-		  name="TestHeaderWSDL"
-		  xmlns:all="http://apache.org/tests/type_test/all"
-		  xmlns:chc="http://apache.org/tests/type_test/choice"
-		  xmlns:seq="http://apache.org/tests/type_test/sequence">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/header_test" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:all="http://apache.org/tests/type_test/all" xmlns:chc="http://apache.org/tests/type_test/choice" xmlns:seq="http://apache.org/tests/type_test/sequence" targetNamespace="http://apache.org/header_test" name="TestHeaderWSDL">
     <wsdl:types>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-            targetNamespace="http://apache.org/tests/type_test/all">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/tests/type_test/all">
             <element name="test_all" type="all:SimpleAll"/>
             <complexType name="SimpleAll">
                 <all>
@@ -40,8 +30,7 @@
                 <attribute name="varAttrString" type="string"/>
             </complexType>
         </schema>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-            targetNamespace="http://apache.org/tests/type_test/sequence">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/tests/type_test/sequence">
             <element name="test_seq" type="seq:SimpleStruct"/>
             <complexType name="SimpleStruct">
                 <sequence>
@@ -52,8 +41,7 @@
                 <attribute name="varAttrString" type="string"/>
             </complexType>
         </schema>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-            targetNamespace="http://apache.org/tests/type_test/choice">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/tests/type_test/choice">
             <element name="test_chc" type="chc:SimpleChoice"/>
             <complexType name="SimpleChoice">
                 <choice>

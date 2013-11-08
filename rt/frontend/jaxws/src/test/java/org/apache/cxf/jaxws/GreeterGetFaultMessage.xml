@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,9 +18,9 @@
   under the License.
 -->
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Body>
-  <m:testDocLitFault xmlns:m="http://apache.org/hello_world_soap_http/types">
-    <m:faultType>BadRecordLitFault</m:faultType>
-  </m:testDocLitFault>
- </env:Body>
+    <env:Body>
+        <m:testDocLitFault xmlns:m="http://apache.org/hello_world_soap_http/types">
+            <m:faultType>BadRecordLitFault</m:faultType>
+        </m:testDocLitFault>
+    </env:Body>
 </env:Envelope>

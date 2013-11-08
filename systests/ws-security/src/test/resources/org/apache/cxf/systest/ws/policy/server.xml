@@ -17,33 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-        http://www.w3.org/ns/ws-policy                                  http://www.w3.org/2007/02/ws-policy.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd         http://www.w3.org/ns/ws-policy                                  http://www.w3.org/2007/02/ws-policy.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
     <!-- -->
     <!-- Any services listening on port 9009 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
@@ -66,220 +47,144 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    
-    
-	<jaxws:endpoint id="AsymmetricEndpoint"
-		address="http://localhost:${testutil.ports.Server}/DoubleItAsymmetric"
-		serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort"
-		xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-		wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
-
-		<jaxws:properties>
-			<entry key="ws-security.callback-handler"
-				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-			<entry key="ws-security.signature.properties" value="bob.properties" />
-			<entry key="ws-security.encryption.username" value="useReqSigCert" />
-			<entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-		</jaxws:properties>
-		<jaxws:features>
-            <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Combined" />
-            </p:policies>
-        </jaxws:features>
-
-	</jaxws:endpoint>
-
-    <jaxws:endpoint id="NoSecurityEndpoint"
-        address="http://localhost:${testutil.ports.Server}/DoubleItNoSecurity"
-        serviceName="s:DoubleItService" endpointName="s:DoubleItNoSecurityPort"
-        xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-        wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
-
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItAsymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.signature.properties" value="bob.properties" />
-            <entry key="ws-security.encryption.username" value="useReqSigCert" />
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Combined" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Combined"/>
             </p:policies>
         </jaxws:features>
-
     </jaxws:endpoint>
-    
-    <jaxws:endpoint id="UsernameTokenEndpoint"
-        address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken"
-        serviceName="s:DoubleItService" endpointName="s:DoubleItUsernameTokenPort"
-        xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-        wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
-
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NoSecurityEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItNoSecurity" serviceName="s:DoubleItService" endpointName="s:DoubleItNoSecurityPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
         <jaxws:properties>
-            <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-            <entry key="ws-security.signature.properties" value="bob.properties" />
-            <entry key="ws-security.encryption.username" value="useReqSigCert" />
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Combined" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Combined"/>
             </p:policies>
         </jaxws:features>
-
     </jaxws:endpoint>
-    
-    <jaxws:endpoint id="ClientCertTokenEndpoint"
-		address="https://localhost:${testutil.ports.Server.2}/DoubleItClientCert"
-		serviceName="s:DoubleItService" endpointName="s:DoubleItClientCertPort"
-		xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-		wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl" depends-on="tls-settings">
-
-		<jaxws:properties>
-			<entry key="ws-security.callback-handler"
-				value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-		</jaxws:properties>
-		
-		<jaxws:features>
-			<p:policies>
-				<wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy"
-					URI="#RequireClientCertificatePolicy" />
-			</p:policies>
-		</jaxws:features>
-
-	</jaxws:endpoint>
-    
-    <jaxws:endpoint 
-       id="TransportSupportingSigned"
-       address="https://localhost:${testutil.ports.Server.2}/DoubleItTransportSupportingSigned" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItTransportSupportingSignedPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl"
-       depends-on="tls-settings">
-        
-       <jaxws:properties>
-          <entry key="ws-security.signature.properties" value="bob.properties"/> 
-          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-       </jaxws:properties> 
-       <jaxws:features>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UsernameTokenEndpoint" address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken" serviceName="s:DoubleItService" endpointName="s:DoubleItUsernameTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                                     URI="#DoubleItTransportSupportingSignedPolicy" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Combined"/>
             </p:policies>
         </jaxws:features>
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="TransportUTSupportingSigned"
-       address="https://localhost:${testutil.ports.Server.2}/DoubleItTransportUTSupportingSigned" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItTransportUTSupportingSignedPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl"
-       depends-on="tls-settings">
-        
-       <jaxws:properties>
-          <entry key="ws-security.signature.properties" value="bob.properties"/> 
-          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
-          <entry key="ws-security.callback-handler"
-                value="org.apache.cxf.systest.ws.common.UTPasswordCallback" />
-       </jaxws:properties> 
-       <jaxws:features>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="ClientCertTokenEndpoint" address="https://localhost:${testutil.ports.Server.2}/DoubleItClientCert" serviceName="s:DoubleItService" endpointName="s:DoubleItClientCertPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                                     URI="#DoubleItTransportSupportingSignedPolicy" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#RequireClientCertificatePolicy"/>
             </p:policies>
         </jaxws:features>
-     
-    </jaxws:endpoint> 
-
-
-	<wsp:Policy wsu:Id="Combined"
-		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-		xmlns:wsp="http://www.w3.org/ns/ws-policy">
-		<wsp:ExactlyOne>
-			<wsp:All>
-				<wsp:Policy wsu:Id="UsernameToken"
-					xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-					xmlns:wsp="http://www.w3.org/ns/ws-policy"
-					xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-					<wsp:ExactlyOne>
-						<wsp:All>
-							<sp:SupportingTokens>
-								<wsp:Policy>
-									<sp:UsernameToken
-										sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-										<wsp:Policy/>
-								    </sp:UsernameToken>
-								</wsp:Policy>
-							</sp:SupportingTokens>
-						</wsp:All>
-					</wsp:ExactlyOne>
-				</wsp:Policy>
-			</wsp:All>
-			<wsp:All>
-				<wsp:Policy wsu:Id="Asymmetric"
-					xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-					xmlns:wsp="http://www.w3.org/ns/ws-policy">
-					<wsp:ExactlyOne>
-						<wsp:All>
-							<sp:AsymmetricBinding
-								xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-								<wsp:Policy>
-									<sp:InitiatorToken>
-										<wsp:Policy>
-											<sp:X509Token
-												sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-												<wsp:Policy>
-													<sp:WssX509V3Token10 />
-												</wsp:Policy>
-											</sp:X509Token>
-										</wsp:Policy>
-									</sp:InitiatorToken>
-									<sp:RecipientToken>
-										<wsp:Policy>
-											<sp:X509Token
-												sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
-												<wsp:Policy>
-													<sp:WssX509V3Token10 />
-													<sp:RequireIssuerSerialReference />
-												</wsp:Policy>
-											</sp:X509Token>
-										</wsp:Policy>
-									</sp:RecipientToken>
-									<sp:Layout>
-										<wsp:Policy>
-											<sp:Lax />
-										</wsp:Policy>
-									</sp:Layout>
-									<sp:IncludeTimestamp />
-									<sp:OnlySignEntireHeadersAndBody />
-									<sp:AlgorithmSuite>
-										<wsp:Policy>
-											<sp:Basic128 />
-										</wsp:Policy>
-									</sp:AlgorithmSuite>
-								</wsp:Policy>
-							</sp:AsymmetricBinding>
-						</wsp:All>
-					</wsp:ExactlyOne>
-				</wsp:Policy>
-			</wsp:All>
-		</wsp:ExactlyOne>
-	</wsp:Policy>
-	
-	<wsp:Policy wsu:Id="DoubleItTransportSupportingSignedPolicy"
-	    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSupportingSigned" address="https://localhost:${testutil.ports.Server.2}/DoubleItTransportSupportingSigned" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSupportingSignedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#DoubleItTransportSupportingSignedPolicy"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportUTSupportingSigned" address="https://localhost:${testutil.ports.Server.2}/DoubleItTransportUTSupportingSigned" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportUTSupportingSignedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#DoubleItTransportSupportingSignedPolicy"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:endpoint>
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" wsu:Id="Combined">
         <wsp:ExactlyOne>
             <wsp:All>
-                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
+                <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="UsernameToken">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:SupportingTokens>
+                                <wsp:Policy>
+                                    <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                        <wsp:Policy/>
+                                    </sp:UsernameToken>
+                                </wsp:Policy>
+                            </sp:SupportingTokens>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </wsp:All>
+            <wsp:All>
+                <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" wsu:Id="Asymmetric">
+                    <wsp:ExactlyOne>
+                        <wsp:All>
+                            <sp:AsymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                                <wsp:Policy>
+                                    <sp:InitiatorToken>
+                                        <wsp:Policy>
+                                            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                                <wsp:Policy>
+                                                    <sp:WssX509V3Token10/>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:Policy>
+                                    </sp:InitiatorToken>
+                                    <sp:RecipientToken>
+                                        <wsp:Policy>
+                                            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                                <wsp:Policy>
+                                                    <sp:WssX509V3Token10/>
+                                                    <sp:RequireIssuerSerialReference/>
+                                                </wsp:Policy>
+                                            </sp:X509Token>
+                                        </wsp:Policy>
+                                    </sp:RecipientToken>
+                                    <sp:Layout>
+                                        <wsp:Policy>
+                                            <sp:Lax/>
+                                        </wsp:Policy>
+                                    </sp:Layout>
+                                    <sp:IncludeTimestamp/>
+                                    <sp:OnlySignEntireHeadersAndBody/>
+                                    <sp:AlgorithmSuite>
+                                        <wsp:Policy>
+                                            <sp:Basic128/>
+                                        </wsp:Policy>
+                                    </sp:AlgorithmSuite>
+                                </wsp:Policy>
+                            </sp:AsymmetricBinding>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" wsu:Id="DoubleItTransportSupportingSignedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl"/>
                 <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
                     <wsp:Policy>
                         <sp:TransportToken>
@@ -291,24 +196,23 @@
                         </sp:TransportToken>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
+                        <sp:IncludeTimestamp/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:Basic128 />
+                                <sp:Basic128/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
                 </sp:TransportBinding>
-                <sp:EndorsingSupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"  >
-                   <wsp:Policy>
-                        <sp:X509Token
-                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                           <wsp:Policy>
-                              <sp:WssX509V3Token10 />
-                           </wsp:Policy>
+                <sp:EndorsingSupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:WssX509V3Token10/>
+                            </wsp:Policy>
                         </sp:X509Token>
                         <sp:SignedParts>
                             <sp:Body/>
@@ -319,39 +223,33 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-	
-	<wsp:Policy wsu:Id="RequireClientCertificatePolicy"
-		xmlns:wsp="http://www.w3.org/ns/ws-policy"
-		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-		xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-		<wsp:ExactlyOne>
-			<wsp:All>
-				<sp:TransportBinding>
-					<wsp:Policy>
-						<sp:TransportToken>
-							<wsp:Policy>
-								<sp:HttpsToken RequireClientCertificate="true" />
-							</wsp:Policy>
-						</sp:TransportToken>
-						<sp:AlgorithmSuite>
-							<wsp:Policy>
-								<sp:Basic256 />
-							</wsp:Policy>
-						</sp:AlgorithmSuite>
-					</wsp:Policy>
-				</sp:TransportBinding>
-
-				<sp:SupportingTokens>
-					<wsp:Policy>
-						<sp:UsernameToken>
-							<wsp:Policy>
-								<sp:WssUsernameToken11 />
-							</wsp:Policy>
-						</sp:UsernameToken>
-					</wsp:Policy>
-				</sp:SupportingTokens>
-			</wsp:All>
-		</wsp:ExactlyOne>
-	</wsp:Policy>
-    
+    <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" wsu:Id="RequireClientCertificatePolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding>
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken RequireClientCertificate="true"/>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:SupportingTokens>
+                    <wsp:Policy>
+                        <sp:UsernameToken>
+                            <wsp:Policy>
+                                <sp:WssUsernameToken11/>
+                            </wsp:Policy>
+                        </sp:UsernameToken>
+                    </wsp:Policy>
+                </sp:SupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
 </beans>

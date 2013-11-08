@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,13 +24,11 @@
     <name>Apache CXF Runtime</name>
     <description>Apache CXF Runtime</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <modules>
         <module>wsdl</module>
         <module>transports/local</module>
@@ -60,7 +59,7 @@
         <module>rs/client</module>
         <module>rs/description</module>
         <module>rs/extensions/providers</module>
-        <module>rs/extensions/search</module> 
+        <module>rs/extensions/search</module>
         <module>rs/security/xml</module>
         <module>rs/security/sso/saml</module>
         <module>rs/security/oauth-parent</module>
@@ -70,5 +69,4 @@
         <module>javascript</module>
         <module>security</module>
     </modules>
-
 </project>

@@ -17,18 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/schemas/cxf/idl/HelloWorld"
-  xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/HelloWorld"
-  xmlns:ns1="http://cxf.apache.org/schemas/cxf/idl/HelloWorld/corba/typemap/"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/HelloWorld" xmlns:ns1="http://cxf.apache.org/schemas/cxf/idl/HelloWorld/corba/typemap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/HelloWorld">
     <wsdl:types>
-        <xs:schema attributeFormDefault="unqualified"
-           elementFormDefault="unqualified"
-           targetNamespace="http://cxf.apache.org/schemas/cxf/idl/HelloWorld"
-           xmlns="http://cxf.apache.org/schemas/cxf/idl/HelloWorld"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:schema xmlns="http://cxf.apache.org/schemas/cxf/idl/HelloWorld" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/HelloWorld">
             <xs:element name="greetMeResponse" type="xs:string"/>
             <xs:element name="greetMe" type="xs:string"/>
         </xs:schema>

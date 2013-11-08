@@ -17,53 +17,34 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="
-        http://cxf.apache.org/core
-        http://cxf.apache.org/schemas/core.xsd
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-        http://cxf.apache.org/jaxws                                     
-        http://cxf.apache.org/schemas/jaxws.xsd
-        http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     <cxf:bus>
         <cxf:features>
-            <cxf:logging />
+            <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-
     <bean id="xkmsProviderBean" class="org.apache.cxf.xkms.service.XKMSService">
         <property name="validators">
             <list>
-                <ref bean="dateValidator" />
-                <ref bean="trustedAuthorityValidator" />
+                <ref bean="dateValidator"/>
+                <ref bean="trustedAuthorityValidator"/>
             </list>
         </property>
         <property name="locators">
             <list>
-                <ref bean="x509Locator" />
+                <ref bean="x509Locator"/>
             </list>
         </property>
         <property name="keyRegisterHandlers">
             <list>
-                <ref bean="x509Register" />
+                <ref bean="x509Register"/>
             </list>
         </property>
     </bean>
-
-    <jaxws:endpoint id="XKMSService"
-        xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
-        serviceName="serviceNamespace:XKMSService" endpointName="serviceNamespace:XKMSPort"
-        implementor="#xkmsProviderBean" address="/XKMS">
+    <jaxws:endpoint xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl" id="XKMSService" serviceName="serviceNamespace:XKMSService" endpointName="serviceNamespace:XKMSPort" implementor="#xkmsProviderBean" address="/XKMS">
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">
-                <bean
-                    class="org.apache.cxf.xkms.model.extensions.ClassArrayFactoryBean">
+                <bean class="org.apache.cxf.xkms.model.extensions.ClassArrayFactoryBean">
                     <property name="classNames">
                         <list>
                             <value>org.apache.cxf.xkms.model.extensions.ResultDetails</value>
@@ -73,5 +54,4 @@
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
-
 </beans>

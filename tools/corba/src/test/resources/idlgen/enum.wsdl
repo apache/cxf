@@ -17,73 +17,47 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions targetNamespace="http://efms.att.com/ms/BVOIP/v1" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:ch="http://cio.att.com/CommonHeader/v2" 
-    xmlns:corba="http://cxf.apache.org/bindings/corba" 
-    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
-    xmlns:msbvoip="http://efms.att.com/ms/BVOIP/v1" 
-    xmlns:ns1="http://efms.att.com/ms/BVOIP/v1/corba/typemap/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:ch="http://cio.att.com/CommonHeader/v2" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:msbvoip="http://efms.att.com/ms/BVOIP/v1" xmlns:ns1="http://efms.att.com/ms/BVOIP/v1/corba/typemap/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://efms.att.com/ms/BVOIP/v1">
     <corba:typeMapping targetNamespace="http://efms.att.com/ms/BVOIP/v1/corba/typemap/">
-        <corba:struct name="CancelObjectResponseType" 
-            repositoryID="IDL:CancelObjectResponseType:1.0" 
-            type="msbvoip:CancelObjectResponse"/>
-        <corba:enum name="BillingElementEnum" repositoryID="IDL:BillingElementEnum:1.0" 
-            type="msbvoip:BillingElementEnum">
+        <corba:struct name="CancelObjectResponseType" repositoryID="IDL:CancelObjectResponseType:1.0" type="msbvoip:CancelObjectResponse"/>
+        <corba:enum name="BillingElementEnum" repositoryID="IDL:BillingElementEnum:1.0" type="msbvoip:BillingElementEnum">
             <corba:enumerator value="BVOIP"/>
             <corba:enumerator value="TOLLFREE"/>
         </corba:enum>
-        <corba:enum name="OrderReleaseStatusEnum" 
-            repositoryID="IDL:OrderReleaseStatusEnum:1.0" 
-            type="msbvoip:OrderReleaseStatusEnum">
+        <corba:enum name="OrderReleaseStatusEnum" repositoryID="IDL:OrderReleaseStatusEnum:1.0" type="msbvoip:OrderReleaseStatusEnum">
             <corba:enumerator value="Release"/>
         </corba:enum>
-        <corba:enum name="BillingResultEnum" repositoryID="IDL:BillingResultEnum:1.0" 
-            type="msbvoip:BillingResultEnum">
+        <corba:enum name="BillingResultEnum" repositoryID="IDL:BillingResultEnum:1.0" type="msbvoip:BillingResultEnum">
             <corba:enumerator value="COMPLETE"/>
             <corba:enumerator value="ERROR"/>
         </corba:enum>
-        <corba:enum name="OrderTypeEnum" repositoryID="IDL:OrderTypeEnum:1.0" 
-            type="msbvoip:OrderTypeEnum">
+        <corba:enum name="OrderTypeEnum" repositoryID="IDL:OrderTypeEnum:1.0" type="msbvoip:OrderTypeEnum">
             <corba:enumerator value="BVOIP"/>
             <corba:enumerator value="TFAF"/>
         </corba:enum>
-        <corba:sequence bound="0" elemtype="ns1:OrderSrPair" name="ArrayOfOrderSrPairs" 
-            repositoryID="IDL:ArrayOfOrderSrPairs:1.0" type="msbvoip:ArrayOfOrderSrPairs"/>
-        <corba:sequence bound="1" elemtype="corba:string" name="USRPOrderNumberArray" 
-            repositoryID="IDL:USRPOrderNumberArray:1.0" type="msbvoip:USRPOrderNumber"/>
-        <corba:enum name="OrderStatusEnum" repositoryID="IDL:OrderStatusEnum:1.0" 
-            type="msbvoip:OrderStatusEnum">
+        <corba:sequence bound="0" elemtype="ns1:OrderSrPair" name="ArrayOfOrderSrPairs" repositoryID="IDL:ArrayOfOrderSrPairs:1.0" type="msbvoip:ArrayOfOrderSrPairs"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="USRPOrderNumberArray" repositoryID="IDL:USRPOrderNumberArray:1.0" type="msbvoip:USRPOrderNumber"/>
+        <corba:enum name="OrderStatusEnum" repositoryID="IDL:OrderStatusEnum:1.0" type="msbvoip:OrderStatusEnum">
             <corba:enumerator value="0"/>
             <corba:enumerator value="1"/>
             <corba:enumerator value="2"/>
             <corba:enumerator value="3"/>
             <corba:enumerator value="4"/>
         </corba:enum>
-        <corba:struct name="SendTargetSystemResultRequestType" 
-            repositoryID="IDL:SendTargetSystemResultRequestType:1.0" 
-            type="msbvoip:SendTargetSystemResultRequest">
+        <corba:struct name="SendTargetSystemResultRequestType" repositoryID="IDL:SendTargetSystemResultRequestType:1.0" type="msbvoip:SendTargetSystemResultRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
             <corba:member idltype="corba:string" name="PackageName"/>
             <corba:member idltype="ns1:TargetSystemEnum" name="TargetSystem"/>
             <corba:member idltype="ns1:TargetSystemActionEnum" name="TargetSystemAction"/>
             <corba:member idltype="ns1:TargetSystemResultEnum" name="TargetSystemResult"/>
-            <corba:member idltype="ns1:TargetSystemErrorCodeArray" 
-                name="TargetSystemErrorCode"/>
-            <corba:member idltype="ns1:TargetSystemErrorMessageArray" 
-                name="TargetSystemErrorMessage"/>
+            <corba:member idltype="ns1:TargetSystemErrorCodeArray" name="TargetSystemErrorCode"/>
+            <corba:member idltype="ns1:TargetSystemErrorMessageArray" name="TargetSystemErrorMessage"/>
             <corba:member idltype="ns1:TNStartArray" name="TNStart"/>
             <corba:member idltype="ns1:TNEndArray" name="TNEnd"/>
         </corba:struct>
-        <corba:sequence bound="1" elemtype="corba:long" name="TargetSystemErrorCodeArray" 
-            repositoryID="IDL:TargetSystemErrorCodeArray:1.0" 
-            type="msbvoip:TargetSystemErrorCode"/>
-        <corba:struct name="SendBillingResultRequestType" 
-            repositoryID="IDL:SendBillingResultRequestType:1.0" 
-            type="msbvoip:SendBillingResultRequest">
+        <corba:sequence bound="1" elemtype="corba:long" name="TargetSystemErrorCodeArray" repositoryID="IDL:TargetSystemErrorCodeArray:1.0" type="msbvoip:TargetSystemErrorCode"/>
+        <corba:struct name="SendBillingResultRequestType" repositoryID="IDL:SendBillingResultRequestType:1.0" type="msbvoip:SendBillingResultRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
             <corba:member idltype="corba:string" name="PackageName"/>
@@ -92,20 +66,14 @@
             <corba:member idltype="ns1:BillingElementEnum" name="BillingElement"/>
             <corba:member idltype="ns1:BillingResultEnum" name="BillingResult"/>
             <corba:member idltype="ns1:BillingErrorCodeArray" name="BillingErrorCode"/>
-            <corba:member idltype="ns1:BillingErrorMessageArray" 
-                name="BillingErrorMessage"/>
+            <corba:member idltype="ns1:BillingErrorMessageArray" name="BillingErrorMessage"/>
         </corba:struct>
-        <corba:sequence bound="0" elemtype="ns1:ActivityItem" name="ArrayOfActivityItems" 
-            repositoryID="IDL:ArrayOfActivityItems:1.0" 
-            type="msbvoip:ArrayOfActivityItems"/>
-        <corba:sequence bound="1" elemtype="corba:string" name="GRCArray" 
-            repositoryID="IDL:GRCArray:1.0" type="msbvoip:GRC"/>
-        <corba:struct name="ActivityItem" repositoryID="IDL:ActivityItem:1.0" 
-            type="msbvoip:ActivityItem">
+        <corba:sequence bound="0" elemtype="ns1:ActivityItem" name="ArrayOfActivityItems" repositoryID="IDL:ArrayOfActivityItems:1.0" type="msbvoip:ArrayOfActivityItems"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="GRCArray" repositoryID="IDL:GRCArray:1.0" type="msbvoip:GRC"/>
+        <corba:struct name="ActivityItem" repositoryID="IDL:ActivityItem:1.0" type="msbvoip:ActivityItem">
             <corba:member idltype="ns1:RequestOptionEnum" name="RequestOption"/>
         </corba:struct>
-        <corba:enum name="CountryCodeEnum" repositoryID="IDL:CountryCodeEnum:1.0" 
-            type="msbvoip:CountryCodeEnum">
+        <corba:enum name="CountryCodeEnum" repositoryID="IDL:CountryCodeEnum:1.0" type="msbvoip:CountryCodeEnum">
             <corba:enumerator value="AF"/>
             <corba:enumerator value="AL"/>
             <corba:enumerator value="DZ"/>
@@ -351,9 +319,7 @@
             <corba:enumerator value="X_AN_C"/>
             <corba:enumerator value="X_UK_E"/>
         </corba:enum>
-        <corba:struct name="SendOrderReadyRequestType" 
-            repositoryID="IDL:SendOrderReadyRequestType:1.0" 
-            type="msbvoip:SendOrderReadyRequest">
+        <corba:struct name="SendOrderReadyRequestType" repositoryID="IDL:SendOrderReadyRequestType:1.0" type="msbvoip:SendOrderReadyRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
             <corba:member idltype="corba:long" name="GIOMOrderVersion"/>
@@ -363,40 +329,31 @@
             <corba:member idltype="ns1:GCSMSolutionNumberArray" name="GCSMSolutionNumber"/>
             <corba:member idltype="ns1:OrderTypeEnum" name="OrderType"/>
         </corba:struct>
-        <corba:enum name="TargetSystemEnum" repositoryID="IDL:TargetSystemEnum:1.0" 
-            type="msbvoip:TargetSystemEnum">
+        <corba:enum name="TargetSystemEnum" repositoryID="IDL:TargetSystemEnum:1.0" type="msbvoip:TargetSystemEnum">
             <corba:enumerator value="LNP"/>
             <corba:enumerator value="SPP"/>
         </corba:enum>
-        <corba:struct name="SendBillingResultResponseType" 
-            repositoryID="IDL:SendBillingResultResponseType:1.0" 
-            type="msbvoip:SendBillingResultResponse"/>
-        <corba:struct name="FullOrder" repositoryID="IDL:FullOrder:1.0" 
-            type="msbvoip:FullOrder">
+        <corba:struct name="SendBillingResultResponseType" repositoryID="IDL:SendBillingResultResponseType:1.0" type="msbvoip:SendBillingResultResponse"/>
+        <corba:struct name="FullOrder" repositoryID="IDL:FullOrder:1.0" type="msbvoip:FullOrder">
             <corba:member idltype="corba:string" name="OrderNumber"/>
             <corba:member idltype="corba:longlong" name="ToSiteOriginalKey"/>
             <corba:member idltype="ns1:YesNoEnum" name="IsCheckedOut"/>
             <corba:member idltype="ns1:OrderStateEnum" name="OrderState"/>
             <corba:member idltype="ns1:ArrayOfActivityItems" name="ActivityList"/>
         </corba:struct>
-        <corba:struct name="GetOrderStatusRequestType" 
-            repositoryID="IDL:GetOrderStatusRequestType:1.0" 
-            type="msbvoip:GetOrderStatusRequest">
+        <corba:struct name="GetOrderStatusRequestType" repositoryID="IDL:GetOrderStatusRequestType:1.0" type="msbvoip:GetOrderStatusRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
             <corba:member idltype="corba:string" name="PackageName"/>
         </corba:struct>
-        <corba:enum name="TargetSystemResultEnum" 
-            repositoryID="IDL:TargetSystemResultEnum:1.0" 
-            type="msbvoip:TargetSystemResultEnum">
+        <corba:enum name="TargetSystemResultEnum" repositoryID="IDL:TargetSystemResultEnum:1.0" type="msbvoip:TargetSystemResultEnum">
             <corba:enumerator value="ACK"/>
             <corba:enumerator value="COMPLETE"/>
             <corba:enumerator value="CONFLICT"/>
             <corba:enumerator value="ERROR"/>
             <corba:enumerator value="FOC"/>
         </corba:enum>
-        <corba:struct name="CreateCrRequestType" 
-            repositoryID="IDL:CreateCrRequestType:1.0" type="msbvoip:CreateCrRequest">
+        <corba:struct name="CreateCrRequestType" repositoryID="IDL:CreateCrRequestType:1.0" type="msbvoip:CreateCrRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="ns1:SolutionCrNumberArray" name="SolutionCrNumber"/>
             <corba:member idltype="corba:string" name="CrNumber"/>
@@ -408,17 +365,13 @@
             <corba:member idltype="ns1:YesNoEnum" name="AttTnInd"/>
             <corba:member idltype="ns1:UserTypeEnum" name="UserType"/>
         </corba:struct>
-        <corba:struct name="ReviewSuppResponseType" 
-            repositoryID="IDL:ReviewSuppResponseType:1.0" 
-            type="msbvoip:ReviewSuppResponse"/>
-        <corba:enum name="SuppActionEnum" repositoryID="IDL:SuppActionEnum:1.0" 
-            type="msbvoip:SuppActionEnum">
+        <corba:struct name="ReviewSuppResponseType" repositoryID="IDL:ReviewSuppResponseType:1.0" type="msbvoip:ReviewSuppResponse"/>
+        <corba:enum name="SuppActionEnum" repositoryID="IDL:SuppActionEnum:1.0" type="msbvoip:SuppActionEnum">
             <corba:enumerator value="Add"/>
             <corba:enumerator value="Change"/>
             <corba:enumerator value="Delete"/>
         </corba:enum>
-        <corba:struct name="SiteAddress" repositoryID="IDL:SiteAddress:1.0" 
-            type="msbvoip:SiteAddress">
+        <corba:struct name="SiteAddress" repositoryID="IDL:SiteAddress:1.0" type="msbvoip:SiteAddress">
             <corba:member idltype="corba:string" name="StreetAddress"/>
             <corba:member idltype="corba:string" name="Room"/>
             <corba:member idltype="corba:string" name="Floor"/>
@@ -430,76 +383,53 @@
             <corba:member idltype="ns1:PostalCodeArray" name="PostalCode"/>
             <corba:member idltype="ns1:CountryCodeEnum" name="Country"/>
         </corba:struct>
-        <corba:struct name="SendOrderReadyResponseType" 
-            repositoryID="IDL:SendOrderReadyResponseType:1.0" 
-            type="msbvoip:SendOrderReadyResponse"/>
-        <corba:sequence bound="1" elemtype="corba:string" 
-            name="TargetSystemErrorMessageArray" 
-            repositoryID="IDL:TargetSystemErrorMessageArray:1.0" 
-            type="msbvoip:TargetSystemErrorMessage"/>
-        <corba:enum name="UserTypeEnum" repositoryID="IDL:UserTypeEnum:1.0" 
-            type="msbvoip:UserTypeEnum">
+        <corba:struct name="SendOrderReadyResponseType" repositoryID="IDL:SendOrderReadyResponseType:1.0" type="msbvoip:SendOrderReadyResponse"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="TargetSystemErrorMessageArray" repositoryID="IDL:TargetSystemErrorMessageArray:1.0" type="msbvoip:TargetSystemErrorMessage"/>
+        <corba:enum name="UserTypeEnum" repositoryID="IDL:UserTypeEnum:1.0" type="msbvoip:UserTypeEnum">
             <corba:enumerator value="1"/>
             <corba:enumerator value="2"/>
         </corba:enum>
-        <corba:struct name="CancelObjectRequestType" 
-            repositoryID="IDL:CancelObjectRequestType:1.0" 
-            type="msbvoip:CancelObjectRequest">
+        <corba:struct name="CancelObjectRequestType" repositoryID="IDL:CancelObjectRequestType:1.0" type="msbvoip:CancelObjectRequest">
             <corba:member idltype="ns1:ObjectTypeEnum" name="ObjectType"/>
             <corba:member idltype="corba:string" name="ObjectId"/>
             <corba:member idltype="corba:string" name="Reason"/>
         </corba:struct>
-        <corba:sequence bound="1" elemtype="corba:string" name="TNEndArray" 
-            repositoryID="IDL:TNEndArray:1.0" type="msbvoip:TNEnd"/>
-        <corba:enum name="EventEnum" repositoryID="IDL:EventEnum:1.0" 
-            type="msbvoip:EventEnum">
+        <corba:sequence bound="1" elemtype="corba:string" name="TNEndArray" repositoryID="IDL:TNEndArray:1.0" type="msbvoip:TNEnd"/>
+        <corba:enum name="EventEnum" repositoryID="IDL:EventEnum:1.0" type="msbvoip:EventEnum">
             <corba:enumerator value="Cancel"/>
             <corba:enumerator value="LNS_Prov_Status"/>
             <corba:enumerator value="Ten_D_Trigger_Remove_Status"/>
             <corba:enumerator value="VoIP_NE_Prov_Status"/>
         </corba:enum>
-        <corba:enum name="ObjectTypeEnum" repositoryID="IDL:ObjectTypeEnum:1.0" 
-            type="msbvoip:ObjectTypeEnum">
+        <corba:enum name="ObjectTypeEnum" repositoryID="IDL:ObjectTypeEnum:1.0" type="msbvoip:ObjectTypeEnum">
             <corba:enumerator value="Activity"/>
             <corba:enumerator value="CR"/>
             <corba:enumerator value="Order"/>
             <corba:enumerator value="SolutionCR"/>
             <corba:enumerator value="SR"/>
         </corba:enum>
-        <corba:sequence bound="1" elemtype="corba:string" name="BillingErrorMessageArray" 
-            repositoryID="IDL:BillingErrorMessageArray:1.0" 
-            type="msbvoip:BillingErrorMessage"/>
-        <corba:struct name="NotifySvcOrderActStatusResponseType" 
-            repositoryID="IDL:NotifySvcOrderActStatusResponseType:1.0" 
-            type="msbvoip:NotifySvcOrderActStatusResponse"/>
-        <corba:sequence bound="1" elemtype="corba:string" name="SrNumberArray" 
-            repositoryID="IDL:SrNumberArray:1.0" type="msbvoip:SrNumber"/>
-        <corba:enum name="OrderStateEnum" repositoryID="IDL:OrderStateEnum:1.0" 
-            type="msbvoip:OrderStateEnum">
+        <corba:sequence bound="1" elemtype="corba:string" name="BillingErrorMessageArray" repositoryID="IDL:BillingErrorMessageArray:1.0" type="msbvoip:BillingErrorMessage"/>
+        <corba:struct name="NotifySvcOrderActStatusResponseType" repositoryID="IDL:NotifySvcOrderActStatusResponseType:1.0" type="msbvoip:NotifySvcOrderActStatusResponse"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="SrNumberArray" repositoryID="IDL:SrNumberArray:1.0" type="msbvoip:SrNumber"/>
+        <corba:enum name="OrderStateEnum" repositoryID="IDL:OrderStateEnum:1.0" type="msbvoip:OrderStateEnum">
             <corba:enumerator value="Deleted"/>
             <corba:enumerator value="Not_Processed"/>
             <corba:enumerator value="Processed"/>
         </corba:enum>
-        <corba:enum name="ProductEnum" repositoryID="IDL:ProductEnum:1.0" 
-            type="msbvoip:ProductEnum">
+        <corba:enum name="ProductEnum" repositoryID="IDL:ProductEnum:1.0" type="msbvoip:ProductEnum">
             <corba:enumerator value="BVOIP"/>
         </corba:enum>
-        <corba:sequence bound="1" elemtype="corba:string" name="SolutionCrNumberArray" 
-            repositoryID="IDL:SolutionCrNumberArray:1.0" type="msbvoip:SolutionCrNumber"/>
-        <corba:struct name="OrderSrPair" repositoryID="IDL:OrderSrPair:1.0" 
-            type="msbvoip:OrderSrPair">
+        <corba:sequence bound="1" elemtype="corba:string" name="SolutionCrNumberArray" repositoryID="IDL:SolutionCrNumberArray:1.0" type="msbvoip:SolutionCrNumber"/>
+        <corba:struct name="OrderSrPair" repositoryID="IDL:OrderSrPair:1.0" type="msbvoip:OrderSrPair">
             <corba:member idltype="corba:string" name="OrderNumber"/>
             <corba:member idltype="ns1:SrNumberArray" name="SrNumber"/>
             <corba:member idltype="ns1:OrderReleaseStatusEnum" name="ReleaseStatus"/>
         </corba:struct>
-        <corba:struct name="CreateSrResponseType" 
-            repositoryID="IDL:CreateSrResponseType:1.0" type="msbvoip:CreateSrResponse">
+        <corba:struct name="CreateSrResponseType" repositoryID="IDL:CreateSrResponseType:1.0" type="msbvoip:CreateSrResponse">
             <corba:member idltype="ns1:ArrayOfOrderSrPairs" name="SrNumberList"/>
         </corba:struct>
-        <corba:sequence bound="1" elemtype="corba:string" name="BuildingArray" 
-            repositoryID="IDL:BuildingArray:1.0" type="msbvoip:Building"/>
-        <corba:enum name="RequestOptionEnum" repositoryID="IDL:RequestOptionEnum:1.0" 
-            type="msbvoip:RequestOptionEnum">
+        <corba:sequence bound="1" elemtype="corba:string" name="BuildingArray" repositoryID="IDL:BuildingArray:1.0" type="msbvoip:Building"/>
+        <corba:enum name="RequestOptionEnum" repositoryID="IDL:RequestOptionEnum:1.0" type="msbvoip:RequestOptionEnum">
             <corba:enumerator value="0"/>
             <corba:enumerator value="1"/>
             <corba:enumerator value="2"/>
@@ -510,13 +440,10 @@
             <corba:enumerator value="8"/>
             <corba:enumerator value="9"/>
         </corba:enum>
-        <corba:enum name="BillingActionEnum" repositoryID="IDL:BillingActionEnum:1.0" 
-            type="msbvoip:BillingActionEnum">
+        <corba:enum name="BillingActionEnum" repositoryID="IDL:BillingActionEnum:1.0" type="msbvoip:BillingActionEnum">
             <corba:enumerator value="START"/>
         </corba:enum>
-        <corba:struct name="NotifySvcOrderActStatusRequestType" 
-            repositoryID="IDL:NotifySvcOrderActStatusRequestType:1.0" 
-            type="msbvoip:NotifySvcOrderActStatusRequest">
+        <corba:struct name="NotifySvcOrderActStatusRequestType" repositoryID="IDL:NotifySvcOrderActStatusRequestType:1.0" type="msbvoip:NotifySvcOrderActStatusRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="OrderNumber"/>
             <corba:member idltype="corba:long" name="VersionNumber"/>
@@ -524,32 +451,24 @@
             <corba:member idltype="ns1:EventStatusEnum" name="EventStatus"/>
             <corba:member idltype="corba:string" name="SPP_Link"/>
         </corba:struct>
-        <corba:enum name="EventStatusEnum" repositoryID="IDL:EventStatusEnum:1.0" 
-            type="msbvoip:EventStatusEnum">
+        <corba:enum name="EventStatusEnum" repositoryID="IDL:EventStatusEnum:1.0" type="msbvoip:EventStatusEnum">
             <corba:enumerator value="failure"/>
             <corba:enumerator value="success"/>
         </corba:enum>
-        <corba:sequence bound="1" elemtype="corba:string" name="PostalCodeArray" 
-            repositoryID="IDL:PostalCodeArray:1.0" type="msbvoip:PostalCode"/>
-        <corba:enum name="BillingSystemEnum" repositoryID="IDL:BillingSystemEnum:1.0" 
-            type="msbvoip:BillingSystemEnum">
+        <corba:sequence bound="1" elemtype="corba:string" name="PostalCodeArray" repositoryID="IDL:PostalCodeArray:1.0" type="msbvoip:PostalCode"/>
+        <corba:enum name="BillingSystemEnum" repositoryID="IDL:BillingSystemEnum:1.0" type="msbvoip:BillingSystemEnum">
             <corba:enumerator value="CADM"/>
             <corba:enumerator value="WAT/SOP"/>
         </corba:enum>
-        <corba:sequence bound="1" elemtype="corba:string" name="GCSMSolutionNumberArray" 
-            repositoryID="IDL:GCSMSolutionNumberArray:1.0" 
-            type="msbvoip:GCSMSolutionNumber"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="GCSMSolutionNumberArray" repositoryID="IDL:GCSMSolutionNumberArray:1.0" type="msbvoip:GCSMSolutionNumber"/>
         <corba:struct name="Site" repositoryID="IDL:Site:1.0" type="msbvoip:Site">
             <corba:member idltype="corba:longlong" name="SiteOriginalKey"/>
             <corba:member idltype="corba:string" name="SiteName"/>
             <corba:member idltype="ns1:SiteAddress" name="Address"/>
         </corba:struct>
-        <corba:sequence bound="1" elemtype="corba:string" name="SuiteArray" 
-            repositoryID="IDL:SuiteArray:1.0" type="msbvoip:Suite"/>
-        <corba:struct name="CreateCrResponseType" 
-            repositoryID="IDL:CreateCrResponseType:1.0" type="msbvoip:CreateCrResponse"/>
-        <corba:struct name="ReviewSuppRequestType" 
-            repositoryID="IDL:ReviewSuppRequestType:1.0" type="msbvoip:ReviewSuppRequest">
+        <corba:sequence bound="1" elemtype="corba:string" name="SuiteArray" repositoryID="IDL:SuiteArray:1.0" type="msbvoip:Suite"/>
+        <corba:struct name="CreateCrResponseType" repositoryID="IDL:CreateCrResponseType:1.0" type="msbvoip:CreateCrResponse"/>
+        <corba:struct name="ReviewSuppRequestType" repositoryID="IDL:ReviewSuppRequestType:1.0" type="msbvoip:ReviewSuppRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="GIOMOrderNumber"/>
             <corba:member idltype="corba:long" name="GIOMOrderVersion"/>
@@ -557,54 +476,38 @@
             <corba:member idltype="ns1:DDMMYYYYhhmm" name="CreatedDateandTime"/>
             <corba:member idltype="ns1:OrderTypeEnum" name="OrderType"/>
         </corba:struct>
-        <corba:enum name="YesNoEnum" repositoryID="IDL:YesNoEnum:1.0" 
-            type="msbvoip:YesNoEnum">
+        <corba:enum name="YesNoEnum" repositoryID="IDL:YesNoEnum:1.0" type="msbvoip:YesNoEnum">
             <corba:enumerator value="N"/>
             <corba:enumerator value="Y"/>
         </corba:enum>
-        <corba:enum name="TargetSystemActionEnum" 
-            repositoryID="IDL:TargetSystemActionEnum:1.0" 
-            type="msbvoip:TargetSystemActionEnum">
+        <corba:enum name="TargetSystemActionEnum" repositoryID="IDL:TargetSystemActionEnum:1.0" type="msbvoip:TargetSystemActionEnum">
             <corba:enumerator value="APRQ"/>
             <corba:enumerator value="CancelVPR"/>
             <corba:enumerator value="PPRQ"/>
             <corba:enumerator value="VPR"/>
         </corba:enum>
-        <corba:sequence bound="1" elemtype="corba:string" name="BillingErrorCodeArray" 
-            repositoryID="IDL:BillingErrorCodeArray:1.0" type="msbvoip:BillingErrorCode"/>
-        <corba:exception name="WSException" repositoryID="IDL:WSException:1.0" 
-            type="msbvoip:SendTargetSystemResultResponse"/>
-        <corba:struct name="GetOrderStatusResponseType" 
-            repositoryID="IDL:GetOrderStatusResponseType:1.0" 
-            type="msbvoip:GetOrderStatusResponse">
+        <corba:sequence bound="1" elemtype="corba:string" name="BillingErrorCodeArray" repositoryID="IDL:BillingErrorCodeArray:1.0" type="msbvoip:BillingErrorCode"/>
+        <corba:exception name="WSException" repositoryID="IDL:WSException:1.0" type="msbvoip:SendTargetSystemResultResponse"/>
+        <corba:struct name="GetOrderStatusResponseType" repositoryID="IDL:GetOrderStatusResponseType:1.0" type="msbvoip:GetOrderStatusResponse">
             <corba:member idltype="ns1:OrderStatusEnum" name="OrderStatus"/>
             <corba:member idltype="ns1:YesNoEnum" name="SuppInd"/>
             <corba:member idltype="ns1:YesNoEnum" name="CancelInd"/>
         </corba:struct>
-        <corba:sequence bound="1" elemtype="corba:string" name="TNStartArray" 
-            repositoryID="IDL:TNStartArray:1.0" type="msbvoip:TNStart"/>
-        <corba:struct name="CreateSrRequestType" 
-            repositoryID="IDL:CreateSrRequestType:1.0" type="msbvoip:CreateSrRequest">
+        <corba:sequence bound="1" elemtype="corba:string" name="TNStartArray" repositoryID="IDL:TNStartArray:1.0" type="msbvoip:TNStart"/>
+        <corba:struct name="CreateSrRequestType" repositoryID="IDL:CreateSrRequestType:1.0" type="msbvoip:CreateSrRequest">
             <corba:member idltype="ns1:ProductEnum" name="Product"/>
             <corba:member idltype="corba:string" name="CrNumber"/>
             <corba:member idltype="ns1:ArrayOfSites" name="SiteList"/>
             <corba:member idltype="ns1:ArrayOfFullOrders" name="OrderList"/>
         </corba:struct>
-        <corba:sequence bound="1" elemtype="corba:string" name="StateArray" 
-            repositoryID="IDL:StateArray:1.0" type="msbvoip:State"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="StateArray" repositoryID="IDL:StateArray:1.0" type="msbvoip:State"/>
         <corba:anonstring bound="12" name="DDMMYYYYhhmm" type="xsd:string"/>
-        <corba:sequence bound="0" elemtype="ns1:FullOrder" name="ArrayOfFullOrders" 
-            repositoryID="IDL:ArrayOfFullOrders:1.0" type="msbvoip:ArrayOfFullOrders"/>
-        <corba:sequence bound="0" elemtype="ns1:Site" name="ArrayOfSites" 
-            repositoryID="IDL:ArrayOfSites:1.0" type="msbvoip:ArrayOfSites"/>
-        <corba:sequence bound="1" elemtype="corba:string" name="CountyArray" 
-            repositoryID="IDL:CountyArray:1.0" type="msbvoip:County"/>
-    </corba:typeMapping>    
+        <corba:sequence bound="0" elemtype="ns1:FullOrder" name="ArrayOfFullOrders" repositoryID="IDL:ArrayOfFullOrders:1.0" type="msbvoip:ArrayOfFullOrders"/>
+        <corba:sequence bound="0" elemtype="ns1:Site" name="ArrayOfSites" repositoryID="IDL:ArrayOfSites:1.0" type="msbvoip:ArrayOfSites"/>
+        <corba:sequence bound="1" elemtype="corba:string" name="CountyArray" repositoryID="IDL:CountyArray:1.0" type="msbvoip:County"/>
+    </corba:typeMapping>
     <types>
-        <schema elementFormDefault="qualified" 
-            targetNamespace="http://efms.att.com/ms/BVOIP/v1" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified" targetNamespace="http://efms.att.com/ms/BVOIP/v1">
             <!-- Simple Types -->
             <!-- Key -->
             <simpleType name="KeyType">
@@ -1047,8 +950,7 @@
             </complexType>
             <complexType name="ArrayOfActivityItems">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="1" name="ActivityItem" 
-                        type="msbvoip:ActivityItem"/>
+                    <element maxOccurs="unbounded" minOccurs="1" name="ActivityItem" type="msbvoip:ActivityItem"/>
                 </sequence>
             </complexType>
             <!-- End of Activity (OrderItem) -->
@@ -1062,8 +964,7 @@
             </complexType>
             <complexType name="ArrayOfSites">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="1" name="Site" 
-                        type="msbvoip:Site"/>
+                    <element maxOccurs="unbounded" minOccurs="1" name="Site" type="msbvoip:Site"/>
                 </sequence>
             </complexType>
             <!-- End of Site (CreateSrRequest) -->
@@ -1079,8 +980,7 @@
             </complexType>
             <complexType name="ArrayOfFullOrders">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="1" name="Order" 
-                        type="msbvoip:FullOrder"/>
+                    <element maxOccurs="unbounded" minOccurs="1" name="Order" type="msbvoip:FullOrder"/>
                 </sequence>
             </complexType>
             <!-- End of OrderItem(CreateSrRequest) -->
@@ -1094,8 +994,7 @@
             </complexType>
             <complexType name="ArrayOfOrderSrPairs">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="1" name="OrderSrPair" 
-                        type="msbvoip:OrderSrPair"/>
+                    <element maxOccurs="unbounded" minOccurs="1" name="OrderSrPair" type="msbvoip:OrderSrPair"/>
                 </sequence>
             </complexType>
             <!-- End of Order / SR pair (CreateSrResponse) -->
@@ -1160,24 +1059,18 @@
             <element name="GetOrderStatusRequest">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="Product" 
-                            type="msbvoip:ProductEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
-                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="Product" type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" type="xsd:string"/>
                     </sequence>
                 </complexType>
             </element>
             <element name="GetOrderStatusResponse">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="OrderStatus" 
-                            type="msbvoip:OrderStatusEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="SuppInd" 
-                            type="msbvoip:YesNoEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="CancelInd" 
-                            type="msbvoip:YesNoEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="OrderStatus" type="msbvoip:OrderStatusEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="SuppInd" type="msbvoip:YesNoEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="CancelInd" type="msbvoip:YesNoEnum"/>
                     </sequence>
                 </complexType>
             </element>
@@ -1185,18 +1078,12 @@
             <element name="NotifySvcOrderActStatusRequest">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="Product" 
-                            type="msbvoip:ProductEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="OrderNumber" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="VersionNumber" 
-                            type="xsd:int"/>
-                        <element maxOccurs="1" minOccurs="1" name="Event" 
-                            type="msbvoip:EventEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="EventStatus" 
-                            type="msbvoip:EventStatusEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="SPP_Link" 
-                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="Product" type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="OrderNumber" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="VersionNumber" type="xsd:int"/>
+                        <element maxOccurs="1" minOccurs="1" name="Event" type="msbvoip:EventEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="EventStatus" type="msbvoip:EventStatusEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="SPP_Link" type="xsd:string"/>
                     </sequence>
                 </complexType>
             </element>
@@ -1209,18 +1096,12 @@
             <element name="ReviewSuppRequest">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="Product" 
-                            type="msbvoip:ProductEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderVersion" 
-                            type="xsd:int"/>
-                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="CreatedDateandTime" 
-                            type="msbvoip:DDMMYYYYhhmm"/>
-                        <element maxOccurs="1" minOccurs="1" name="OrderType" 
-                            type="msbvoip:OrderTypeEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="Product" type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderVersion" type="xsd:int"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="CreatedDateandTime" type="msbvoip:DDMMYYYYhhmm"/>
+                        <element maxOccurs="1" minOccurs="1" name="OrderType" type="msbvoip:OrderTypeEnum"/>
                     </sequence>
                 </complexType>
             </element>
@@ -1233,24 +1114,15 @@
             <element name="SendBillingResultRequest">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="Product" 
-                            type="msbvoip:ProductEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="BillingSystem" 
-                            type="msbvoip:BillingSystemEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="BillingAction" 
-                            type="msbvoip:BillingActionEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="BillingElement" 
-                            type="msbvoip:BillingElementEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="BillingResult" 
-                            type="msbvoip:BillingResultEnum"/>
-                        <element maxOccurs="1" minOccurs="0" name="BillingErrorCode" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="0" name="BillingErrorMessage" 
-                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="Product" type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingSystem" type="msbvoip:BillingSystemEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingAction" type="msbvoip:BillingActionEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingElement" type="msbvoip:BillingElementEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="BillingResult" type="msbvoip:BillingResultEnum"/>
+                        <element maxOccurs="1" minOccurs="0" name="BillingErrorCode" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="BillingErrorMessage" type="xsd:string"/>
                     </sequence>
                 </complexType>
             </element>
@@ -1268,10 +1140,8 @@
                         <element name="GIOMOrderVersion" type="xsd:int"/>
                         <element name="PackageName" type="xsd:string"/>
                         <element name="CreatedDateandTime" type="msbvoip:DDMMYYYYhhmm"/>
-                        <element maxOccurs="1" minOccurs="0" name="USRPOrderNumber" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="0" name="GCSMSolutionNumber" 
-                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="USRPOrderNumber" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="GCSMSolutionNumber" type="xsd:string"/>
                         <element name="OrderType" type="msbvoip:OrderTypeEnum"/>
                     </sequence>
                 </complexType>
@@ -1285,26 +1155,16 @@
             <element name="SendTargetSystemResultRequest">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="Product" 
-                            type="msbvoip:ProductEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="PackageName" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="1" name="TargetSystem" 
-                            type="msbvoip:TargetSystemEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="TargetSystemAction" 
-                            type="msbvoip:TargetSystemActionEnum"/>
-                        <element maxOccurs="1" minOccurs="1" name="TargetSystemResult" 
-                            type="msbvoip:TargetSystemResultEnum"/>
-                        <element maxOccurs="1" minOccurs="0" name="TargetSystemErrorCode" 
-                            type="xsd:int"/>
-                        <element maxOccurs="1" minOccurs="0" 
-                            name="TargetSystemErrorMessage" type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="0" name="TNStart" 
-                            type="xsd:string"/>
-                        <element maxOccurs="1" minOccurs="0" name="TNEnd" 
-                            type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="Product" type="msbvoip:ProductEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="GIOMOrderNumber" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="PackageName" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="1" name="TargetSystem" type="msbvoip:TargetSystemEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="TargetSystemAction" type="msbvoip:TargetSystemActionEnum"/>
+                        <element maxOccurs="1" minOccurs="1" name="TargetSystemResult" type="msbvoip:TargetSystemResultEnum"/>
+                        <element maxOccurs="1" minOccurs="0" name="TargetSystemErrorCode" type="xsd:int"/>
+                        <element maxOccurs="1" minOccurs="0" name="TargetSystemErrorMessage" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="TNStart" type="xsd:string"/>
+                        <element maxOccurs="1" minOccurs="0" name="TNEnd" type="xsd:string"/>
                     </sequence>
                 </complexType>
             </element>
@@ -1395,15 +1255,12 @@
         </operation>
         <operation name="GetOrderStatus">
             <input message="msbvoip:GetOrderStatusRequest" name="GetOrderStatus"/>
-            <output message="msbvoip:GetOrderStatusResponse" 
-                name="GetOrderStatusResponse"/>
+            <output message="msbvoip:GetOrderStatusResponse" name="GetOrderStatusResponse"/>
             <fault message="msbvoip:WSException" name="WSException"/>
         </operation>
         <operation name="NotifySvcOrderActStatus">
-            <input message="msbvoip:NotifySvcOrderActStatusRequest" 
-                name="NotifySvcOrderActStatus"/>
-            <output message="msbvoip:NotifySvcOrderActStatusResponse" 
-                name="NotifySvcOrderActStatusResponse"/>
+            <input message="msbvoip:NotifySvcOrderActStatusRequest" name="NotifySvcOrderActStatus"/>
+            <output message="msbvoip:NotifySvcOrderActStatusResponse" name="NotifySvcOrderActStatusResponse"/>
             <fault message="msbvoip:WSException" name="WSException"/>
         </operation>
         <operation name="ReviewSupp">
@@ -1413,21 +1270,17 @@
         </operation>
         <operation name="SendBillingResult">
             <input message="msbvoip:SendBillingResultRequest" name="SendBillingResult"/>
-            <output message="msbvoip:SendBillingResultResponse" 
-                name="SendBillingResultResponse"/>
+            <output message="msbvoip:SendBillingResultResponse" name="SendBillingResultResponse"/>
             <fault message="msbvoip:WSException" name="WSException"/>
         </operation>
         <operation name="SendOrderReady">
             <input message="msbvoip:SendOrderReadyRequest" name="SendOrderReady"/>
-            <output message="msbvoip:SendOrderReadyResponse" 
-                name="SendOrderReadyResponse"/>
+            <output message="msbvoip:SendOrderReadyResponse" name="SendOrderReadyResponse"/>
             <fault message="msbvoip:WSException" name="WSException"/>
         </operation>
         <operation name="SendTargetSystemResult">
-            <input message="msbvoip:SendTargetSystemResultRequest" 
-                name="SendTargetSystemResult"/>
-            <output message="msbvoip:SendTargetSystemResultResponse" 
-                name="SendTargetSystemResultResponse"/>
+            <input message="msbvoip:SendTargetSystemResultRequest" name="SendTargetSystemResult"/>
+            <output message="msbvoip:SendTargetSystemResultResponse" name="SendTargetSystemResultResponse"/>
             <fault message="msbvoip:WSException" name="WSException"/>
         </operation>
     </portType>
@@ -1435,8 +1288,7 @@
     <binding name="BVOIPSoap" type="msbvoip:BVOIPPortType">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="CancelObject">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CancelObject" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CancelObject" style="document"/>
             <input name="CancelObject">
                 <soap:body use="literal"/>
             </input>
@@ -1448,8 +1300,7 @@
             </fault>
         </operation>
         <operation name="CreateCr">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CreateCr" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CreateCr" style="document"/>
             <input name="CreateCr">
                 <soap:body use="literal"/>
             </input>
@@ -1461,8 +1312,7 @@
             </fault>
         </operation>
         <operation name="CreateSr">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CreateSr" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/CreateSr" style="document"/>
             <input name="CreateSr">
                 <soap:body use="literal"/>
             </input>
@@ -1474,8 +1324,7 @@
             </fault>
         </operation>
         <operation name="GetOrderStatus">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/GetOrderStatus" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/GetOrderStatus" style="document"/>
             <input name="GetOrderStatus">
                 <soap:body use="literal"/>
             </input>
@@ -1487,9 +1336,7 @@
             </fault>
         </operation>
         <operation name="NotifySvcOrderActStatus">
-            <soap:operation 
-                soapAction="http://efms.att.com/ms/BVOIP/NotifySvcOrderActStatus" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/NotifySvcOrderActStatus" style="document"/>
             <input name="NotifySvcOrderActStatus">
                 <soap:body use="literal"/>
             </input>
@@ -1501,8 +1348,7 @@
             </fault>
         </operation>
         <operation name="ReviewSupp">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/ReviewSupp" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/ReviewSupp" style="document"/>
             <input name="ReviewSupp">
                 <soap:body use="literal"/>
             </input>
@@ -1514,8 +1360,7 @@
             </fault>
         </operation>
         <operation name="SendBillingResult">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendBillingResult" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendBillingResult" style="document"/>
             <input name="SendBillingResult">
                 <soap:body use="literal"/>
             </input>
@@ -1527,8 +1372,7 @@
             </fault>
         </operation>
         <operation name="SendOrderReady">
-            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendOrderReady" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendOrderReady" style="document"/>
             <input name="SendOrderReady">
                 <soap:body use="literal"/>
             </input>
@@ -1540,9 +1384,7 @@
             </fault>
         </operation>
         <operation name="SendTargetSystemResult">
-            <soap:operation 
-                soapAction="http://efms.att.com/ms/BVOIP/SendTargetSystemResult" 
-                style="document"/>
+            <soap:operation soapAction="http://efms.att.com/ms/BVOIP/SendTargetSystemResult" style="document"/>
             <input name="SendTargetSystemResult">
                 <soap:body use="literal"/>
             </input>
@@ -1570,8 +1412,7 @@
         <operation name="CreateCr">
             <corba:operation name="CreateCr">
                 <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
-                <corba:param idltype="ns1:SolutionCrNumberArray" mode="in" 
-                    name="SolutionCrNumber"/>
+                <corba:param idltype="ns1:SolutionCrNumberArray" mode="in" name="SolutionCrNumber"/>
                 <corba:param idltype="corba:string" mode="in" name="CrNumber"/>
                 <corba:param idltype="corba:string" mode="in" name="MCN"/>
                 <corba:param idltype="ns1:GRCArray" mode="in" name="GRC"/>
@@ -1633,8 +1474,7 @@
                 <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
                 <corba:param idltype="corba:long" mode="in" name="GIOMOrderVersion"/>
                 <corba:param idltype="corba:string" mode="in" name="PackageName"/>
-                <corba:param idltype="ns1:DDMMYYYYhhmm" mode="in" 
-                    name="CreatedDateandTime"/>
+                <corba:param idltype="ns1:DDMMYYYYhhmm" mode="in" name="CreatedDateandTime"/>
                 <corba:param idltype="ns1:OrderTypeEnum" mode="in" name="OrderType"/>
                 <corba:raises exception="ns1:WSException"/>
             </corba:operation>
@@ -1647,18 +1487,12 @@
                 <corba:param idltype="ns1:ProductEnum" mode="in" name="Product"/>
                 <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
                 <corba:param idltype="corba:string" mode="in" name="PackageName"/>
-                <corba:param idltype="ns1:BillingSystemEnum" mode="in" 
-                    name="BillingSystem"/>
-                <corba:param idltype="ns1:BillingActionEnum" mode="in" 
-                    name="BillingAction"/>
-                <corba:param idltype="ns1:BillingElementEnum" mode="in" 
-                    name="BillingElement"/>
-                <corba:param idltype="ns1:BillingResultEnum" mode="in" 
-                    name="BillingResult"/>
-                <corba:param idltype="ns1:BillingErrorCodeArray" mode="in" 
-                    name="BillingErrorCode"/>
-                <corba:param idltype="ns1:BillingErrorMessageArray" mode="in" 
-                    name="BillingErrorMessage"/>
+                <corba:param idltype="ns1:BillingSystemEnum" mode="in" name="BillingSystem"/>
+                <corba:param idltype="ns1:BillingActionEnum" mode="in" name="BillingAction"/>
+                <corba:param idltype="ns1:BillingElementEnum" mode="in" name="BillingElement"/>
+                <corba:param idltype="ns1:BillingResultEnum" mode="in" name="BillingResult"/>
+                <corba:param idltype="ns1:BillingErrorCodeArray" mode="in" name="BillingErrorCode"/>
+                <corba:param idltype="ns1:BillingErrorMessageArray" mode="in" name="BillingErrorMessage"/>
                 <corba:raises exception="ns1:WSException"/>
             </corba:operation>
             <input name="SendBillingResult"/>
@@ -1671,12 +1505,9 @@
                 <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
                 <corba:param idltype="corba:long" mode="in" name="GIOMOrderVersion"/>
                 <corba:param idltype="corba:string" mode="in" name="PackageName"/>
-                <corba:param idltype="ns1:DDMMYYYYhhmm" mode="in" 
-                    name="CreatedDateandTime"/>
-                <corba:param idltype="ns1:USRPOrderNumberArray" mode="in" 
-                    name="USRPOrderNumber"/>
-                <corba:param idltype="ns1:GCSMSolutionNumberArray" mode="in" 
-                    name="GCSMSolutionNumber"/>
+                <corba:param idltype="ns1:DDMMYYYYhhmm" mode="in" name="CreatedDateandTime"/>
+                <corba:param idltype="ns1:USRPOrderNumberArray" mode="in" name="USRPOrderNumber"/>
+                <corba:param idltype="ns1:GCSMSolutionNumberArray" mode="in" name="GCSMSolutionNumber"/>
                 <corba:param idltype="ns1:OrderTypeEnum" mode="in" name="OrderType"/>
                 <corba:raises exception="ns1:WSException"/>
             </corba:operation>
@@ -1690,14 +1521,10 @@
                 <corba:param idltype="corba:string" mode="in" name="GIOMOrderNumber"/>
                 <corba:param idltype="corba:string" mode="in" name="PackageName"/>
                 <corba:param idltype="ns1:TargetSystemEnum" mode="in" name="TargetSystem"/>
-                <corba:param idltype="ns1:TargetSystemActionEnum" mode="in" 
-                    name="TargetSystemAction"/>
-                <corba:param idltype="ns1:TargetSystemResultEnum" mode="in" 
-                    name="TargetSystemResult"/>
-                <corba:param idltype="ns1:TargetSystemErrorCodeArray" mode="in" 
-                    name="TargetSystemErrorCode"/>
-                <corba:param idltype="ns1:TargetSystemErrorMessageArray" mode="in" 
-                    name="TargetSystemErrorMessage"/>
+                <corba:param idltype="ns1:TargetSystemActionEnum" mode="in" name="TargetSystemAction"/>
+                <corba:param idltype="ns1:TargetSystemResultEnum" mode="in" name="TargetSystemResult"/>
+                <corba:param idltype="ns1:TargetSystemErrorCodeArray" mode="in" name="TargetSystemErrorCode"/>
+                <corba:param idltype="ns1:TargetSystemErrorMessageArray" mode="in" name="TargetSystemErrorMessage"/>
                 <corba:param idltype="ns1:TNStartArray" mode="in" name="TNStart"/>
                 <corba:param idltype="ns1:TNEndArray" mode="in" name="TNEnd"/>
                 <corba:raises exception="ns1:WSException"/>

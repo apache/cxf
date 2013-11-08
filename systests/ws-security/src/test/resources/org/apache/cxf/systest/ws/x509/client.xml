@@ -17,430 +17,312 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:p="http://cxf.apache.org/policy"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
-          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
-          http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
-          http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
-          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-          http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierDerivedPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierDerivedPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierEncryptBeforeSigningPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierEncryptBeforeSigningPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierEncryptBeforeSigningDerivedPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierEncryptBeforeSigningDerivedPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort2" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKeyIdentifierPort2" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItIssuerSerialPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItIssuerSerialPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItThumbprintPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItThumbprintPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItContentEncryptedElementsPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItContentEncryptedElementsPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricIssuerSerialPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricIssuerSerialPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSP11Port" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSP11Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptedPasswordPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob-enc.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice-enc.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptedPasswordPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob-enc.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice-enc.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSHA256Port" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.asymmetric.signature.algorithm" 
-                  value="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSHA256Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.asymmetric.signature.algorithm" value="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricThumbprintPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricThumbprintPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptBeforeSigningPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptBeforeSigningPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptBeforeSigningNoEncPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptBeforeSigningNoEncPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptSignaturePort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptSignaturePort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignaturePort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignaturePort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignatureSP11Port" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSignatureSP11Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptionPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricEncryptionPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricProtectTokensPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricProtectTokensPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricUsernameTokenPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricUsernameTokenPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricProtectTokensPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricProtectTokensPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingSP11Port" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingSP11Port" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSignedEndorsingPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSignedEndorsingPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingEncryptedPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingEncryptedPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSignedEndorsingEncryptedPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSignedEndorsingEncryptedPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedCertConstraintsPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedCertConstraintsPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportKVTPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportKVTPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingTokenPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
-       <jaxws:features>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingTokenPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                    URI="classpath:/org/apache/cxf/systest/ws/x509/supp-token-policy.xml" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/x509/supp-token-policy.xml"/>
             </p:policies>
         </jaxws:features>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingTokenPort2" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
-       <jaxws:features>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingTokenPort2" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                    URI="classpath:/org/apache/cxf/systest/ws/x509/clean-policy.xml" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/x509/clean-policy.xml"/>
             </p:policies>
         </jaxws:features>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportPKISupportingTokenPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
-       <jaxws:features>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportPKISupportingTokenPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                    URI="classpath:/org/apache/cxf/systest/ws/x509/supp-token-policy.xml" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/x509/supp-token-policy.xml"/>
             </p:policies>
         </jaxws:features>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportNegativeEndorsingPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
-       <jaxws:features>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportNegativeEndorsingPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                    URI="classpath:/org/apache/cxf/systest/ws/x509/end-supp-token-policy.xml" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/x509/end-supp-token-policy.xml"/>
             </p:policies>
         </jaxws:features>
     </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportNegativeEndorsingPort2" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.username" value="bob"/>
-           <entry key="ws-security.signature.properties" value="alice.properties"/> 
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-       </jaxws:properties>
-       <jaxws:features>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportNegativeEndorsingPort2" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+            <entry key="ws-security.signature.properties" value="alice.properties"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
             <p:policies>
-                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
-                    URI="classpath:/org/apache/cxf/systest/ws/x509/supp-token-policy.xml" />
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/x509/supp-token-policy.xml"/>
             </p:policies>
         </jaxws:features>
     </jaxws:client>
-    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
-    </http:conduit>  
-    
+    </http:conduit>
 </beans>

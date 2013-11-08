@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,11 +18,9 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-	<soap:Body>
-		<ns3:testHeader5 xmlns:ns3="http://apache.org/header_test/types"
-			xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl">
-			<ns3:requestType>TestHeader50</ns3:requestType>
-		</ns3:testHeader5>
-	</soap:Body>
-
+    <soap:Body>
+        <ns3:testHeader5 xmlns:ns3="http://apache.org/header_test/types" xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl">
+            <ns3:requestType>TestHeader50</ns3:requestType>
+        </ns3:testHeader5>
+    </soap:Body>
 </soap:Envelope>

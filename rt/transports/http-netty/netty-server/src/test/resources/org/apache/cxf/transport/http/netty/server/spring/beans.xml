@@ -17,68 +17,42 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:beans="http://www.springframework.org/schema/beans"    
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:h="http://cxf.apache.org/transports/http/configuration"
-       xmlns:hn="http://cxf.apache.org/transports/http-netty-server/configuration"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-		http://www.springframework.org/schema/beans 
-		    http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://cxf.apache.org/configuration/security 
-		    http://cxf.apache.org/schemas/configuration/security.xsd
-		http://cxf.apache.org/transports/http/configuration 
-		    http://cxf.apache.org/schemas/configuration/http-conf.xsd
-		http://cxf.apache.org/transports/http-netty-server/configuration 
-		    http://cxf.apache.org/schemas/configuration/http-netty-server.xsd"
->
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://cxf.apache.org/transports/http/configuration" xmlns:hn="http://cxf.apache.org/transports/http-netty-server/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="                 http://www.springframework.org/schema/beans                      http://www.springframework.org/schema/beans/spring-beans.xsd                 http://cxf.apache.org/configuration/security                      http://cxf.apache.org/schemas/configuration/security.xsd                 http://cxf.apache.org/transports/http/configuration                      http://cxf.apache.org/schemas/configuration/http-conf.xsd                 http://cxf.apache.org/transports/http-netty-server/configuration                      http://cxf.apache.org/schemas/configuration/http-netty-server.xsd">
     <h:destination name="{urn:test:ns}Foo.http-destination">
-      <h:server ContentEncoding="foobar"/>
+        <h:server ContentEncoding="foobar"/>
     </h:destination>
-    
     <h:conduit name="{urn:test:ns}Foo.http-conduit">
-      <h:client ConnectionTimeout="97"/>
+        <h:client ConnectionTimeout="97"/>
     </h:conduit>
-
     <h:conduit name="*Bar.http-conduit">
-      <h:client ConnectionTimeout="79"/>
+        <h:client ConnectionTimeout="79"/>
     </h:conduit>
-
     <hn:engine-factory bus="cxf">
-       <hn:identifiedTLSServerParameters id="sample1">
-         <hn:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
-            <sec:clientAuthentication want="false" required="false"/>
-        </hn:tlsServerParameters>
-       </hn:identifiedTLSServerParameters>
-       
-       <hn:identifiedThreadingParameters id="sampleThreading1">
-	      <hn:threadingParameters threadPoolSize="120"/>
-	   </hn:identifiedThreadingParameters>
-       
-	   <hn:engine port="9000" readIdleTime="30000" writeIdleTime="90000">
-	      <hn:threadingParametersRef id="sampleThreading1"/>	      
-	   </hn:engine>
-	   
-	   <hn:engine port="0">
-	      <hn:threadingParameters threadPoolSize="400"/>
-	   </hn:engine>
-	   
-	   <hn:engine port="9001" readIdleTime="40000" maxChunkContentSize="10000">
-	     <hn:threadingParameters threadPoolSize="99" />	      
-	     <hn:sessionSupport>true</hn:sessionSupport>
-	  </hn:engine> 
-	  
-	  <hn:engine port="9002">
-        <hn:tlsServerParameters>
-           <sec:clientAuthentication want="true" required="true"/>
-        </hn:tlsServerParameters>
-      </hn:engine>
-      
-      <hn:engine port="9003">
-         <hn:tlsServerParametersRef id="sample1"/>
-      </hn:engine>
-      
-	</hn:engine-factory>
+        <hn:identifiedTLSServerParameters id="sample1">
+            <hn:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
+                <sec:clientAuthentication want="false" required="false"/>
+            </hn:tlsServerParameters>
+        </hn:identifiedTLSServerParameters>
+        <hn:identifiedThreadingParameters id="sampleThreading1">
+            <hn:threadingParameters threadPoolSize="120"/>
+        </hn:identifiedThreadingParameters>
+        <hn:engine port="9000" readIdleTime="30000" writeIdleTime="90000">
+            <hn:threadingParametersRef id="sampleThreading1"/>
+        </hn:engine>
+        <hn:engine port="0">
+            <hn:threadingParameters threadPoolSize="400"/>
+        </hn:engine>
+        <hn:engine port="9001" readIdleTime="40000" maxChunkContentSize="10000">
+            <hn:threadingParameters threadPoolSize="99"/>
+            <hn:sessionSupport>true</hn:sessionSupport>
+        </hn:engine>
+        <hn:engine port="9002">
+            <hn:tlsServerParameters>
+                <sec:clientAuthentication want="true" required="true"/>
+            </hn:tlsServerParameters>
+        </hn:engine>
+        <hn:engine port="9003">
+            <hn:tlsServerParametersRef id="sample1"/>
+        </hn:engine>
+    </hn:engine-factory>
 </beans>

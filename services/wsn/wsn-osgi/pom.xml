@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -24,14 +25,12 @@
     <name>Apache CXF WSN OSGi</name>
     <description>Apache CXF WSN Full OSGi</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf.services.wsn</groupId>
@@ -45,7 +44,6 @@
             </exclusions>
         </dependency>
     </dependencies>
-    
     <build>
         <plugins>
             <plugin>
@@ -82,5 +80,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>wssec_ut</artifactId>
     <name>CXF WS-Security UT Demo</name>
     <description>CXF WS-Security UT Demo</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -142,7 +142,5 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
-        
-
     </dependencies>
 </project>

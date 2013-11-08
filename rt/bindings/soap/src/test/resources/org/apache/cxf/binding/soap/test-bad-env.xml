@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -32,7 +33,7 @@
                 <p:arriving>New York</p:arriving>
                 <p:departureDate>2001-12-20</p:departureDate>
                 <p:departureTime>mid-morning</p:departureTime>
-                <p:seatPreference />
+                <p:seatPreference/>
             </p:return>
         </p:itinerary>
         <q:lodging xmlns:q="http://travelcompany.example.org/reservation/hotels">

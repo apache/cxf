@@ -17,58 +17,45 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="exceptions.idl"
- targetNamespace="http://schemas.apache.org/idl/exceptions.idl"
- xmlns="http://schemas.xmlsoap.org/wsdl/"
- xmlns:tns="http://schemas.apache.org/idl/exceptions.idl"
- xmlns:xsd="http://www.w3.org/2001/XMLSchema"
- xmlns:xsd1="http://schemas.apache.org/idltypes/exceptions.idl"
- xmlns:xsd2="urn:mytypes"
- xmlns:corba="http://schemas.apache.org/bindings/corba"
- xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap">
-    
-  <types>
-    <schema targetNamespace="http://schemas.apache.org/idltypes/exceptions.idl"
-     xmlns="http://www.w3.org/2001/XMLSchema"
-     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-      <xsd:complexType name="TestException.BadRecord">
-        <xsd:sequence>
-          <xsd:element name="reason" type="xsd:string"/>
-          <xsd:element name="code" type="xsd:short"/>
-        </xsd:sequence>
-      </xsd:complexType>
-      <xsd:element name="TestException.ExceptionTest.review_data.data" type="xsd:string"/>
-      <xsd:element name="TestException.BadRecord" type="xsd1:TestException.BadRecord"/>
-        <xsd:element name="ExceptionEl" type="xsd2:MyExceptionType"/>
-    </schema>
-      <schema targetNamespace="urn:mytypes"
-          xmlns="http://www.w3.org/2001/XMLSchema"
-          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-          <xsd:complexType name="MyExceptionType">
-              <xsd:sequence>
-                  <xsd:element name="message" type="xsd:string"/>
-                  <xsd:element name="code" type="xsd:short"/>
-                  <xsd:element name="company" type="xsd:string"/>
-              </xsd:sequence>
-          </xsd:complexType>
-      </schema>
-  </types>
-  <message name="TestException.ExceptionTest.review_data">
-    <part name="data" element="xsd1:TestException.ExceptionTest.review_data.data"/>
-  </message>
-  <message name="TestException.ExceptionTest.review_dataResponse"/>
-  <message name="_exception.TestException.BadRecord">
-    <part name="exception" element="xsd1:TestException.BadRecord"/>
-  </message>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/idl/exceptions.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/exceptions.idl" xmlns:xsd2="urn:mytypes" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap" name="exceptions.idl" targetNamespace="http://schemas.apache.org/idl/exceptions.idl">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/exceptions.idl">
+            <xsd:complexType name="TestException.BadRecord">
+                <xsd:sequence>
+                    <xsd:element name="reason" type="xsd:string"/>
+                    <xsd:element name="code" type="xsd:short"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="TestException.ExceptionTest.review_data.data" type="xsd:string"/>
+            <xsd:element name="TestException.BadRecord" type="xsd1:TestException.BadRecord"/>
+            <xsd:element name="ExceptionEl" type="xsd2:MyExceptionType"/>
+        </schema>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="urn:mytypes">
+            <xsd:complexType name="MyExceptionType">
+                <xsd:sequence>
+                    <xsd:element name="message" type="xsd:string"/>
+                    <xsd:element name="code" type="xsd:short"/>
+                    <xsd:element name="company" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </schema>
+    </types>
+    <message name="TestException.ExceptionTest.review_data">
+        <part name="data" element="xsd1:TestException.ExceptionTest.review_data.data"/>
+    </message>
+    <message name="TestException.ExceptionTest.review_dataResponse"/>
+    <message name="_exception.TestException.BadRecord">
+        <part name="exception" element="xsd1:TestException.BadRecord"/>
+    </message>
     <message name="MyExceptionMessage">
         <part name="exception" element="xsd1:ExceptionEl"/>
     </message>
-  <portType name="TestException.ExceptionTest">
-    <operation name="review_data">
-      <input message="tns:TestException.ExceptionTest.review_data" name="review_data"/>
-      <output message="tns:TestException.ExceptionTest.review_dataResponse" name="review_dataResponse"/>
-      <fault message="tns:_exception.TestException.BadRecord" name="TestException.BadRecord"/>
-        <fault message="tns:MyExceptionMessage" name="MyException"/>
-    </operation>
-  </portType>
+    <portType name="TestException.ExceptionTest">
+        <operation name="review_data">
+            <input message="tns:TestException.ExceptionTest.review_data" name="review_data"/>
+            <output message="tns:TestException.ExceptionTest.review_dataResponse" name="review_dataResponse"/>
+            <fault message="tns:_exception.TestException.BadRecord" name="TestException.BadRecord"/>
+            <fault message="tns:MyExceptionMessage" name="MyException"/>
+        </operation>
+    </portType>
 </definitions>

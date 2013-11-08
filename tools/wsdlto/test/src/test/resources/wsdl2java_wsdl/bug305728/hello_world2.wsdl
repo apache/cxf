@@ -17,32 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/w2j/hello_world" xmlns:x1="http://cxf.apache.org/w2j/hello_world/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://cxf.apache.org/w2j/hello_world">
     <wsdl:types>
-        <schema
-            targetNamespace="http://cxf.apache.org/w2j/hello_world/types" 
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            elementFormDefault="qualified">
-
-            <import namespace="http://cxf.apache.org/w2j/hello_world/types" 
-                    schemaLocation="hello_world_types2.xsd"/>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world/types" elementFormDefault="qualified">
+            <import namespace="http://cxf.apache.org/w2j/hello_world/types" schemaLocation="hello_world_types2.xsd"/>
         </schema>
     </wsdl:types>
-
     <wsdl:message name="sayHiRequest">
         <wsdl:part element="x1:sayHi" name="in"/>
     </wsdl:message>
     <wsdl:message name="sayHiResponse">
         <wsdl:part element="x1:sayHiResponse" name="out"/>
     </wsdl:message>
-    
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
@@ -50,4 +36,3 @@
         </wsdl:operation>
     </wsdl:portType>
 </wsdl:definitions>
-

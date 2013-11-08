@@ -17,24 +17,15 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:im="http://cxf.apache.org/management"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xsi:schemaLocation="
-       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:im="http://cxf.apache.org/management" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <cxf:bus id="CXF-Test-Bus" bus="cxf"/>
-  
     <bean id="org.apache.cxf.management.InstrumentationManager" class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
-        <property name="bus" ref="cxf" />
+        <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
-        <property name="threaded" value="false"/>        
-        <property name="daemon" value="false"/>            
-        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi" />
-    </bean> 
- 
+        <property name="threaded" value="false"/>
+        <property name="daemon" value="false"/>
+        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi"/>
+    </bean>
     <cxf:workqueue name="default" highWaterMark="15" lowWaterMark="5"/>
     <cxf:workqueue name="test-wq" highWaterMark="10" lowWaterMark="2"/>
 </beans>

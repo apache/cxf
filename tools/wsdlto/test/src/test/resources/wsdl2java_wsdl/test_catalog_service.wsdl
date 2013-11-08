@@ -17,21 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
-      <xsd:schema>
-          <xsd:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" schemaLocation="nosuchpath/schema1.xsd"/>
+        <xsd:schema>
+            <xsd:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" schemaLocation="nosuchpath/schema1.xsd"/>
         </xsd:schema>
     </wsdl:types>
-
     <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http" location="nosuchpath/test_catalog_messages.wsdl"/>
-
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
@@ -47,4 +39,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

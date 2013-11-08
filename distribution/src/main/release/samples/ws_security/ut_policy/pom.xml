@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,14 +22,12 @@
     <artifactId>wssec_ut_policy</artifactId>
     <name>WS-Security UT Policy Demo</name>
     <description>WS-Security UT Policy Demo</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-
     <build>
         <plugins>
             <plugin>
@@ -81,7 +80,7 @@
                                     <executable>java</executable>
                                     <arguments>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.wssec.server.Server</argument>
                                     </arguments>
                                 </configuration>
@@ -179,6 +178,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>        
+        </dependency>
     </dependencies>
 </project>

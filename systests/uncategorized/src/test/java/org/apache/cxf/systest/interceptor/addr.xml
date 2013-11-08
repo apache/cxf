@@ -17,41 +17,32 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cxf="http://cxf.apache.org/core"
-       
-       xsi:schemaLocation="
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
     <bean id="logIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
     <bean id="logOut" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
     <bean id="catcher" class="org.apache.cxf.systest.interceptor.FaultHandlingInterceptor"/>
-    
     <cxf:bus>
         <cxf:inInterceptors>
-                <ref bean="logIn"/>
-                <ref bean="mapCodec"/>
-                <ref bean="mapAggregator"/>
+            <ref bean="logIn"/>
+            <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
         </cxf:inInterceptors>
         <cxf:outInterceptors>
-                <ref bean="logOut"/>
-                <ref bean="mapCodec"/>
-                <ref bean="mapAggregator"/>
+            <ref bean="logOut"/>
+            <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
         </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
-                <ref bean="logOut"/>
-                <ref bean="catcher"/>
-                <ref bean="mapCodec"/>
-                <ref bean="mapAggregator"/>
+            <ref bean="logOut"/>
+            <ref bean="catcher"/>
+            <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
         </cxf:outFaultInterceptors>
         <cxf:inFaultInterceptors>
-                <ref bean="mapCodec"/>
-                <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
         </cxf:inFaultInterceptors>
-    </cxf:bus>    
-    
+    </cxf:bus>
 </beans>

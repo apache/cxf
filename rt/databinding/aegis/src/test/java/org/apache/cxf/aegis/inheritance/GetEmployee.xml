@@ -1,5 +1,6 @@
+<?xml version="1.0"?>
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Body xmlns="urn:xfire:inheritance">
-	<getEmployee/>
- </env:Body>
+    <env:Body xmlns="urn:xfire:inheritance">
+        <getEmployee/>
+    </env:Body>
 </env:Envelope>

@@ -17,45 +17,32 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration" 
-       xmlns:sec="http://cxf.apache.org/configuration/security"       
-       xsi:schemaLocation="
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd 
-http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd 
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-
-   <http:conduit name="{http://apache.org/hello_world}HelloWorld.http-conduit">   
-	   <http:tlsClientParameters sslCacheTimeout="3600000" disableCNCheck="true">
-	      <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password"
-	                resource="org/apache/cxf/transport/https/resources/Bethal.jks"/>
-	      </sec:keyManagers>
-	      <sec:trustManagers>
-	          <sec:keyStore type="JKS" password="password"
-	               resource="org/apache/cxf/transport/https/resources/Gordy.jks"/>
-	      </sec:trustManagers>
-	      <sec:cipherSuitesFilter>
-	        <!-- these filters ensure that a ciphersuite with
-	          export-suitable or null encryption is used,
-	          but exclude anonymous Diffie-Hellman key change as
-	          this is vulnerable to man-in-the-middle attacks -->
-	        <sec:include>.*_EXPORT_.*</sec:include>
-	        <sec:include>.*_EXPORT1024_.*</sec:include>
-	        <sec:include>.*_WITH_DES_.*</sec:include>
-            <sec:include>.*_WITH_AES_.*</sec:include>
-	        <sec:include>.*_WITH_NULL_.*</sec:include>
-	        <sec:exclude>.*_DH_anon_.*</sec:exclude>
-	      </sec:cipherSuitesFilter>
-	  </http:tlsClientParameters>
-	  <http:authorization>
-	     <sec:UserName>Betty</sec:UserName>
-	     <sec:Password>password</sec:Password>
-	  </http:authorization>
-      <http:client AutoRedirect="true" Connection="Keep-Alive" ChunkLength="10240"/>
-
-   </http:conduit>    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf-beans="http://cxf.apache.org/configuration/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation=" http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd  http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <http:conduit name="{http://apache.org/hello_world}HelloWorld.http-conduit">
+        <http:tlsClientParameters sslCacheTimeout="3600000" disableCNCheck="true">
+            <sec:keyManagers keyPassword="password">
+                <sec:keyStore type="JKS" password="password" resource="org/apache/cxf/transport/https/resources/Bethal.jks"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" resource="org/apache/cxf/transport/https/resources/Gordy.jks"/>
+            </sec:trustManagers>
+            <sec:cipherSuitesFilter>
+                <!-- these filters ensure that a ciphersuite with
+                  export-suitable or null encryption is used,
+                  but exclude anonymous Diffie-Hellman key change as
+                  this is vulnerable to man-in-the-middle attacks -->
+                <sec:include>.*_EXPORT_.*</sec:include>
+                <sec:include>.*_EXPORT1024_.*</sec:include>
+                <sec:include>.*_WITH_DES_.*</sec:include>
+                <sec:include>.*_WITH_AES_.*</sec:include>
+                <sec:include>.*_WITH_NULL_.*</sec:include>
+                <sec:exclude>.*_DH_anon_.*</sec:exclude>
+            </sec:cipherSuitesFilter>
+        </http:tlsClientParameters>
+        <http:authorization>
+            <sec:UserName>Betty</sec:UserName>
+            <sec:Password>password</sec:Password>
+        </http:authorization>
+        <http:client AutoRedirect="true" Connection="Keep-Alive" ChunkLength="10240"/>
+    </http:conduit>
 </beans>

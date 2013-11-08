@@ -17,33 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:interop="http://WSSec/wssec10"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:interop="http://WSSec/wssec10" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-
     <!-- -->
     <!-- Any services listening on port 9009 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
@@ -56,7 +37,7 @@
                 </sec:keyManagers>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
-                </sec:trustManagers> 
+                </sec:trustManagers>
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_EXPORT_.*</sec:include>
                     <sec:include>.*_EXPORT1024_.*</sec:include>
@@ -69,259 +50,113 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    
     <!-- <bean id="kerberosTicketDecoderImpl" 
           class="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenDecoderImpl"/>-->
-    
-    <jaxws:endpoint 
-       id="KerberosOverTransport"
-       address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItKerberosTransport" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosTransportPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl"
-       depends-on="tls-settings">
-        
-       <jaxws:properties>
-           <entry key="ws-security.is-bsp-compliant" value="false"/>
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosOverSymmetric"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetric" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSymmetricPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosOverSymmetricSupporting"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricSupporting" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSymmetricSupportingPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosSupporting"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSupporting" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSupportingPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosOverAsymmetric"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetric" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosAsymmetricPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.username" value="bob"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
-           <entry key="ws-security.encryption.username" value="alice"/>
-           <entry key="ws-security.is-bsp-compliant" value="false"/>
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosOverTransportEndorsing"
-       address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItKerberosTransportEndorsing" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosTransportEndorsingPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl"
-       depends-on="tls-settings">
-        
-       <jaxws:properties>
-           <entry key="ws-security.is-bsp-compliant" value="false"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosOverAsymmetricEndorsing"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetricEndorsing" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosAsymmetricEndorsingPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.username" value="bob"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
-           <entry key="ws-security.encryption.username" value="alice"/>
-           <entry key="ws-security.is-bsp-compliant" value="false"/>
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransport" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItKerberosTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
     </jaxws:endpoint>
-    
-    <jaxws:endpoint 
-       id="KerberosOverSymmetricProtection"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricProtection" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSymmetricProtectionPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint>  
-    
-    <jaxws:endpoint 
-       id="KerberosOverSymmetricDerivedProtection"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricDerivedProtection" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSymmetricDerivedProtectionPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint>  
-    
-    <jaxws:endpoint 
-       id="KerberosOverAsymmetricSignedEndorsing"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetricSignedEndorsing" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosAsymmetricSignedEndorsingPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.username" value="bob"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
-           <entry key="ws-security.encryption.username" value="alice"/>
-           <entry key="ws-security.is-bsp-compliant" value="false"/>
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetric" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
     </jaxws:endpoint>
-    
-    <jaxws:endpoint 
-       id="KerberosOverAsymmetricSignedEncrypted"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetricSignedEncrypted" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosAsymmetricSignedEncryptedPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.username" value="bob"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.encryption.properties" value="alice.properties"/> 
-           <entry key="ws-security.encryption.username" value="alice"/>
-           <entry key="ws-security.is-bsp-compliant" value="false"/>
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetricSupporting" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
     </jaxws:endpoint>
-    
-    <jaxws:endpoint 
-       id="KerberosOverSymmetricEndorsingEncrypted"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricEndorsingEncrypted" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSymmetricEndorsingEncryptedPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="KerberosOverSymmetricSignedEndorsingEncrypted"
-       address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricSignedEndorsingEncrypted" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKerberosSymmetricSignedEndorsingEncryptedPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
-        
-       <jaxws:properties>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
-           <entry key="ws-security.signature.properties" value="bob.properties"/> 
-           <entry key="ws-security.enable.streaming" value="true"/>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosSupporting" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetric" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="bob"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransportEndorsing" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItKerberosTransportEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetricEndorsing" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetricEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="bob"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetricProtection" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricProtection" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricProtectionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetricDerivedProtection" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricDerivedProtection" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricDerivedProtectionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetricSignedEndorsing" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetricSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="bob"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverAsymmetricSignedEncrypted" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosAsymmetricSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosAsymmetricSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="bob"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.properties" value="alice.properties"/>
+            <entry key="ws-security.encryption.username" value="alice"/>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetricEndorsingEncrypted" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetricSignedEndorsingEncrypted" address="http://localhost:${testutil.ports.StaxServer}/DoubleItKerberosSymmetricSignedEndorsingEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricSignedEndorsingEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.kerberos.KerberosPasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>

@@ -17,44 +17,34 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-       xsi:schemaLocation="
-http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xsi:schemaLocation=" http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <httpj:engine-factory bus="cxf">
         <httpj:engine port="${testutil.ports.JettyDigestAuthTest}">
             <httpj:handlers>
                 <bean class="org.eclipse.jetty.security.ConstraintSecurityHandler">
-                    <property name="loginService" ref="securityLoginService" />
+                    <property name="loginService" ref="securityLoginService"/>
                     <property name="authMethod" value="DIGEST"/>
                     <property name="constraintMappings">
                         <list>
-                            <ref bean="securityConstraintMapping" />
+                            <ref bean="securityConstraintMapping"/>
                         </list>
                     </property>
                 </bean>
             </httpj:handlers>
         </httpj:engine>
     </httpj:engine-factory>
-
     <bean id="securityLoginService" class="org.eclipse.jetty.security.HashLoginService">
-        <property name="name" value="WSRealm" />
-        <property name="config" value="src/test/java/org/apache/cxf/systest/http_jetty/jetty-realm.properties" />
+        <property name="name" value="WSRealm"/>
+        <property name="config" value="src/test/java/org/apache/cxf/systest/http_jetty/jetty-realm.properties"/>
     </bean>
-
     <bean id="securityConstraint" class="org.eclipse.jetty.util.security.Constraint">
-        <property name="name" value="DIGEST" />
-        <property name="roles" value="admin" />
-        <property name="authenticate" value="true" />
+        <property name="name" value="DIGEST"/>
+        <property name="roles" value="admin"/>
+        <property name="authenticate" value="true"/>
     </bean>
- 
     <bean id="securityConstraintMapping" class="org.eclipse.jetty.security.ConstraintMapping">
-        <property name="constraint" ref="securityConstraint" />
-        <property name="pathSpec" value="/*" />
+        <property name="constraint" ref="securityConstraint"/>
+        <property name="pathSpec" value="/*"/>
     </bean>
 </beans>
-

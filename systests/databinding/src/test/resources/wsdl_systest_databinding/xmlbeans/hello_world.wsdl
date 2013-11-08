@@ -17,31 +17,21 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans"
-    xmlns:x1="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans" xmlns:x1="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans/types"
-            xmlns="http://www.w3.org/2001/XMLSchema"
-        xmlns:tns="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans/types"
-            elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans/types" targetNamespace="http://apache.org/hello_world_soap_http_xmlbeans/xmlbeans/types" elementFormDefault="qualified">
             <simpleType name="MyStringType">
                 <restriction base="string">
-                    <maxLength value="30" />
+                    <maxLength value="30"/>
                 </restriction>
             </simpleType>
             <xsd:simpleType name="TestEnum">
                 <xsd:restriction base="xsd:string">
-                    <xsd:enumeration value="ONE" />
-                    <xsd:enumeration value="TWO" />
-                    <xsd:enumeration value="THREE" />
+                    <xsd:enumeration value="ONE"/>
+                    <xsd:enumeration value="TWO"/>
+                    <xsd:enumeration value="THREE"/>
                 </xsd:restriction>
-            </xsd:simpleType> 
-            
+            </xsd:simpleType>
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -52,7 +42,6 @@
                     </sequence>
                 </complexType>
             </element>
-            
             <element name="sayHiArray">
                 <complexType>
                     <sequence>
@@ -81,7 +70,6 @@
                     </sequence>
                 </complexType>
             </element>
-            
             <element name="greetMe">
                 <complexType>
                     <sequence>
@@ -159,8 +147,6 @@
     <wsdl:message name="greetMeFault">
         <wsdl:part name="greetMeFault" element="x1:greetMeFaultDetail"/>
     </wsdl:message>
-
-
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
@@ -174,19 +160,14 @@
             <wsdl:input message="tns:sayHiEnumRequest" name="sayHiEnumRequest"/>
             <wsdl:output message="tns:sayHiEnumResponse" name="sayHiEnumResponse"/>
         </wsdl:operation>
-        
-
         <wsdl:operation name="greetMe">
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
             <wsdl:fault name="greetMeFault" message="tns:greetMeFault"/>
         </wsdl:operation>
-        
-
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
-
         <wsdl:operation name="pingMe">
             <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
             <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
@@ -195,8 +176,6 @@
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        
-
         <wsdl:operation name="sayHi">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="sayHiRequest">
@@ -206,7 +185,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-
         <wsdl:operation name="sayHiArray">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="sayHiArrayRequest">
@@ -225,8 +203,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
-
         <wsdl:operation name="greetMe">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeRequest">
@@ -239,15 +215,12 @@
                 <soap:fault name="greetMeFault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-        
-
         <wsdl:operation name="greetMeOneWay">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-
         <wsdl:operation name="pingMe">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -260,8 +233,6 @@
                 <soap:fault name="pingMeFault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-        
-
     </wsdl:binding>
     <wsdl:service name="SOAPService">
         <wsdl:port binding="tns:Greeter_SOAPBinding" name="SoapPort">
@@ -269,4 +240,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

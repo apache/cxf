@@ -17,10 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<mappings xmlns:stalk='urn:beanz'>
+<mappings xmlns:stalk="urn:beanz">
     <mapping name="stalk:SimpleBean">
-    	<property name='numbers' nillable='false' minOccurs='2' maxOccurs='50' />
-    	<property name='number' typeName='xsd:long' xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        <property name="numbers" nillable="false" minOccurs="2" maxOccurs="50"/>
+        <property xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="number" typeName="xsd:long"/>
     </mapping>
-    
 </mappings>

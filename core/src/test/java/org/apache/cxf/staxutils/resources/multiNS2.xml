@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,6 +18,6 @@
   under the License.
 -->
 <a:foo xmlns:a="urn:abc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <wireTransfer xmlns:q1="http://bar.com/foobar" xsi:type="q1:SwiftWireTransfer">10</wireTransfer>
-  <wireTransfer xmlns:q2="http://bar.com/foobar" xsi:type="q2:SwiftWireTransfer">20</wireTransfer>
+    <wireTransfer xmlns:q1="http://bar.com/foobar" xsi:type="q1:SwiftWireTransfer">10</wireTransfer>
+    <wireTransfer xmlns:q2="http://bar.com/foobar" xsi:type="q2:SwiftWireTransfer">20</wireTransfer>
 </a:foo>

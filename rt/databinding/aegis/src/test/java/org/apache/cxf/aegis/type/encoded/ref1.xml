@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,21 +18,20 @@
   under the License.
 -->
 <root xmlns:b="urn:Bean" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <b:po>
-    <shipping href="#real"/>
-    <billing href="#fake"/>
-  </b:po>
-
-  <real id="#real" xsi:type="b:address">
-    <street>1234 Riverside Drive</street>
-    <city>Gainesville</city>
-    <state>FL</state>
-    <zip>30506</zip>
-  </real>
-  <fake id="#fake" xsi:type="b:address">
-    <street>1234 Fake Street</street>
-    <city>Las Vegas</city>
-    <state>NV</state>
-    <zip>89102</zip>
-  </fake>
+    <b:po>
+        <shipping href="#real"/>
+        <billing href="#fake"/>
+    </b:po>
+    <real id="#real" xsi:type="b:address">
+        <street>1234 Riverside Drive</street>
+        <city>Gainesville</city>
+        <state>FL</state>
+        <zip>30506</zip>
+    </real>
+    <fake id="#fake" xsi:type="b:address">
+        <street>1234 Fake Street</street>
+        <city>Las Vegas</city>
+        <state>NV</state>
+        <zip>89102</zip>
+    </fake>
 </root>

@@ -19,25 +19,14 @@
 -->
 <!--WSDL file template-->
 <!--(c) 2005, IONA Technologies, Inc.-->
-<definitions name="InvoiceServer.wsdl" 
-    targetNamespace="http://apache.org/InvoiceServer" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:inv="http://apache.org/Invoice" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/InvoiceServer" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:inv="http://apache.org/Invoice" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/InvoiceServer" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="InvoiceServer.wsdl" targetNamespace="http://apache.org/InvoiceServer">
     <types>
-        <schema targetNamespace="http://apache.org/InvoiceServer" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-            <import namespace="http://apache.org/Invoice" 
-                schemaLocation="Invoice.xsd"/>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://apache.org/InvoiceServer">
+            <import namespace="http://apache.org/Invoice" schemaLocation="Invoice.xsd"/>
             <element name="sendInvoice">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="invoice" 
-                            type="inv:Invoice"/>
+                        <element maxOccurs="1" minOccurs="1" name="invoice" type="inv:Invoice"/>
                     </sequence>
                 </complexType>
             </element>
@@ -49,31 +38,26 @@
             <element name="getInvoicesForCustomer">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="firstName" 
-                            type="string"/>
-                        <element maxOccurs="1" minOccurs="1" name="lastName" 
-                            type="string"/>
+                        <element maxOccurs="1" minOccurs="1" name="firstName" type="string"/>
+                        <element maxOccurs="1" minOccurs="1" name="lastName" type="string"/>
                     </sequence>
                 </complexType>
             </element>
             <element name="getInvoicesForCustomerResponse">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="unbounded" minOccurs="0" name="return" 
-                            type="inv:Invoice"/>
+                        <element maxOccurs="unbounded" minOccurs="0" name="return" type="inv:Invoice"/>
                     </sequence>
                 </complexType>
             </element>
             <element name="NoSuchCustomer">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="1" minOccurs="1" name="firstName" 
-                            type="string"/>
-                        <element maxOccurs="1" minOccurs="1" name="lastName" 
-                            type="string"/>
+                        <element maxOccurs="1" minOccurs="1" name="firstName" type="string"/>
+                        <element maxOccurs="1" minOccurs="1" name="lastName" type="string"/>
                     </sequence>
                 </complexType>
-            </element>           
+            </element>
             <element name="listCustomers">
                 <complexType>
                     <sequence/>
@@ -82,8 +66,7 @@
             <element name="listCustomersResponse">
                 <complexType>
                     <sequence>
-                        <element maxOccurs="unbounded" minOccurs="0" name="return" 
-                            type="inv:Customer"/>
+                        <element maxOccurs="unbounded" minOccurs="0" name="return" type="inv:Customer"/>
                     </sequence>
                 </complexType>
             </element>
@@ -117,10 +100,8 @@
         </operation>
         <operation name="getInvoicesForCustomer">
             <input message="tns:getInvoicesForCustomer" name="getInvoicesForCustomer"/>
-            <output message="tns:getInvoicesForCustomerResponse" 
-                name="getInvoicesForCustomerResponse"/>
-            <fault message="tns:NoSuchCustomerFault" 
-                name="NoSuchCustomerFault"/> 
+            <output message="tns:getInvoicesForCustomerResponse" name="getInvoicesForCustomerResponse"/>
+            <fault message="tns:NoSuchCustomerFault" name="NoSuchCustomerFault"/>
         </operation>
         <operation name="listCustomers">
             <input message="tns:listCustomers" name="listCustomers"/>
@@ -146,7 +127,6 @@
             <output name="getInvoicesForCustomerResponse">
                 <soap:body use="literal"/>
             </output>
-            
             <fault name="NoSuchCustomerFault">
                 <soap:fault name="NoSuchCustomerFault" use="literal"/>
             </fault>

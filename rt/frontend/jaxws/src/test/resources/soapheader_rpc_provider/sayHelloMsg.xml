@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,14 +18,14 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-	<soap:Header>
-		<headerMessage xmlns="http://apache.org/header_test/rpc/types">
-			<headerVal>header</headerVal>
-		</headerMessage>
-	</soap:Header>
-	<soap:Body>
-		<ns1:testHeader1 xmlns:ns1="http://apache.org/header_test">
-			<in xmlns:ns2="http://apache.org/header_test/rpc/types">part</in>
-		</ns1:testHeader1>
-	</soap:Body>
+    <soap:Header>
+        <headerMessage xmlns="http://apache.org/header_test/rpc/types">
+            <headerVal>header</headerVal>
+        </headerMessage>
+    </soap:Header>
+    <soap:Body>
+        <ns1:testHeader1 xmlns:ns1="http://apache.org/header_test">
+            <in xmlns:ns2="http://apache.org/header_test/rpc/types">part</in>
+        </ns1:testHeader1>
+    </soap:Body>
 </soap:Envelope>

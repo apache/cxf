@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,7 +24,6 @@
     <name>Apache CXF Runtime OAuth 1.0a</name>
     <description>Apache CXF Runtime OAuth 1.0a</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
@@ -35,7 +35,6 @@
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
         </cxf.osgi.import>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -52,7 +51,6 @@
             <artifactId>oauth-provider</artifactId>
             <version>${oauth.version}</version>
         </dependency>
-        
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
@@ -67,5 +65,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
 </project>

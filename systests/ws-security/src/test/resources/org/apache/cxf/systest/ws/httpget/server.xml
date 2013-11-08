@@ -17,72 +17,32 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <jaxws:endpoint 
-       id="KeyIdentifier"
-       address="http://localhost:${testutil.ports.Server}/DoubleItX509KeyIdentifier" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItKeyIdentifierPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
-        
-       <jaxws:properties>
-          <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-          <entry key="ws-security.signature.properties" value="bob.properties"/> 
-       </jaxws:properties> 
-     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KeyIdentifier" address="http://localhost:${testutil.ports.Server}/DoubleItX509KeyIdentifier" serviceName="s:DoubleItService" endpointName="s:DoubleItKeyIdentifierPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+        </jaxws:properties>
     </jaxws:endpoint>
-    
-    <jaxws:endpoint 
-       id="SignBody"
-       address="http://localhost:${testutil.ports.Server}/DoubleItSignBody" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItSignBodyPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
-        
-       <jaxws:inInterceptors>
-         <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-           <constructor-arg>
-            <map>
-               <entry key="action" value="Signature Timestamp"/>
-               <entry key="signaturePropFile" value="alice.properties"/>
-               <entry key="passwordCallbackClass" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-            </map>
-           </constructor-arg>
-        </bean>
-        <!--<bean class="org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker"/>-->
-       </jaxws:inInterceptors>
-    </jaxws:endpoint> 
-    
-    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignBody" address="http://localhost:${testutil.ports.Server}/DoubleItSignBody" serviceName="s:DoubleItService" endpointName="s:DoubleItSignBodyPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/httpget/DoubleItHTTPGet.wsdl">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Signature Timestamp"/>
+                        <entry key="signaturePropFile" value="alice.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+            <!--<bean class="org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker"/>-->
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
 </beans>

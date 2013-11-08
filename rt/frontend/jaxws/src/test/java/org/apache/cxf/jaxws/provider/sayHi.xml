@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,5 +18,5 @@
   under the License.
 -->
 <sayHi xmlns="http://service.jaxws.cxf.apache.org/">
-	<text>hi</text>
+    <text>hi</text>
 </sayHi>

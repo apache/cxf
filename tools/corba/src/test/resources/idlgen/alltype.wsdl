@@ -17,18 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="BaseService" targetNamespace="http://schemas.apache.org/tests" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" 
-    xmlns:corba="http://cxf.apache.org/bindings/corba" 
-    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://schemas.apache.org/tests" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://schemas.apache.org/tests" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BaseService" targetNamespace="http://schemas.apache.org/tests">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/tests" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/tests">
             <complexType name="SOAPStruct">
                 <all>
                     <element name="varFloat" type="float"/>
@@ -62,8 +53,7 @@
         </operation>
     </binding>
     <corba:typeMapping targetNamespace="http://schemas.apache.org/tests/corba/typemap/">
-        <corba:struct name="SOAPStruct" repositoryID="IDL:SOAPStruct:1.0" 
-            type="tns:SOAPStruct">
+        <corba:struct name="SOAPStruct" repositoryID="IDL:SOAPStruct:1.0" type="tns:SOAPStruct">
             <corba:member idltype="corba:float" name="varFloat"/>
             <corba:member idltype="corba:long" name="varInt"/>
             <corba:member idltype="corba:string" name="varString"/>

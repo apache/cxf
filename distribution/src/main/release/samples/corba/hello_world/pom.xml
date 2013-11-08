@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -20,10 +21,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>corba-hello-world</artifactId>
     <packaging>jar</packaging>
-
     <name>hello-world sample using JAX-WS API's to talk via CORBA/IIOP</name>
     <description>hello-world sample using JAX-WS API's to talk via CORBA/IIOP</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -103,7 +102,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -130,7 +128,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -144,7 +141,7 @@
                         </goals>
                         <configuration>
                             <resources>
-                                <resource> 
+                                <resource>
                                     <directory>${basedir}/target/generated-wsdl</directory>
                                 </resource>
                             </resources>
@@ -152,7 +149,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>idlj-maven-plugin</artifactId>
@@ -230,7 +226,6 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>corba.server</id>
             <build>
@@ -278,7 +273,6 @@
             </build>
         </profile>
     </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

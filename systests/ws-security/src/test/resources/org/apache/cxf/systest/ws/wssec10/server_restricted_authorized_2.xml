@@ -17,26 +17,8 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:interop="http://WSSec/wssec10"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:interop="http://WSSec/wssec10" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <!-- -->
     <!-- Any services listening on port 9001 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
@@ -49,8 +31,7 @@
                 </sec:keyManagers>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="password" resource="certs/restricted/alice.jks"/>
-                </sec:trustManagers> 
-
+                </sec:trustManagers>
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_EXPORT_.*</sec:include>
                     <sec:include>.*_EXPORT1024_.*</sec:include>
@@ -65,49 +46,33 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
-        
     </cxf:bus>
-
-
     <bean id="simpleUTInterceptor" class="org.apache.cxf.systest.ws.wssec10.server.SimpleSubjectCreatingInterceptor"/>
     <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
         <property name="methodRolesMap">
             <map>
-               <entry key="echo" value="developers"/>
+                <entry key="echo" value="developers"/>
             </map>
         </property>
     </bean>
-    
-    
     <!-- -->
     <!-- Scenario 3.1 -->
     <!-- -->
-    <jaxws:endpoint 
-       id="UserNameOverTransport"
-       address="https://localhost:${testutil.ports.AuthorizedServer2.1}/UserNameOverTransport" 
-       serviceName="interop:PingService"
-       endpointName="interop:UserNameOverTransport_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted"
-       depends-on="tls-settings">
-        
-       <jaxws:properties>
+    <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.AuthorizedServer2.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted" depends-on="tls-settings">
+        <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <!-- new property -->
             <entry key="ws-security.validate.token" value="false"/>
-        </jaxws:properties> 
-
+        </jaxws:properties>
         <jaxws:inInterceptors>
             <ref bean="simpleUTInterceptor"/>
             <ref bean="authorizationInterceptor"/>
-       </jaxws:inInterceptors> 
-     
+        </jaxws:inInterceptors>
     </jaxws:endpoint>
-        
 </beans>

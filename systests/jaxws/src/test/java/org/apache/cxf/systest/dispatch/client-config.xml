@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,19 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xsi:schemaLocation="
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-
-	<import resource="classpath:META-INF/cxf/cxf.xml" />
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapDispatchPort" createdFromAPI="true">
-         <jaxws:features>
-             <bean class="org.apache.cxf.systest.dispatch.TestDispatchFeature"/>
-         </jaxws:features>
+        <jaxws:features>
+            <bean class="org.apache.cxf.systest.dispatch.TestDispatchFeature"/>
+        </jaxws:features>
     </jaxws:client>
 </beans>

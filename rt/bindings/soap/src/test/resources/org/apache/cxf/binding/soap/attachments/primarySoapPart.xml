@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -16,14 +17,12 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<soap:Envelope xmlns:soap='http://www.w3.org/2003/05/soap-envelope' xmlns="http://cxf.apache.org/mime/types"
-    xmlns:xop='http://www.w3.org/2004/08/xop/include' xmlns:xmlmime='http://www.w3.org/2004/11/xmlmime'>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns="http://cxf.apache.org/mime/types" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:xmlmime="http://www.w3.org/2004/11/xmlmime">
     <soap:Body>
         <testXop xmlns="http://cxf.apache.org/mime/types">
             <name>hello world</name>
             <attachinfo>
-                <xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include"
-                    href='cid:http://cxf.apache.org/my.wav' />
+                <xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="cid:http://cxf.apache.org/my.wav"/>
             </attachinfo>
         </testXop>
     </soap:Body>

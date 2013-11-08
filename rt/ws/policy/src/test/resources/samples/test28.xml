@@ -1,9 +1,6 @@
-<wsp:Policy 
-	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
-	xmlns:tst="http://sample.org/Assertions"
-	nonsattr="a"
-	ns:nsattr="b" xmlns:ns="http://x.y.z">
-  <tst:A wsp:Optional="true">A</tst:A>
-  <tst:B wsp:Optional="true">B</tst:B>
-  <tst:C wsp:Optional="true">C</tst:C>  
+<?xml version="1.0"?>
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:tst="http://sample.org/Assertions" xmlns:ns="http://x.y.z" nonsattr="a" ns:nsattr="b">
+    <tst:A wsp:Optional="true">A</tst:A>
+    <tst:B wsp:Optional="true">B</tst:B>
+    <tst:C wsp:Optional="true">C</tst:C>
 </wsp:Policy>

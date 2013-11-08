@@ -17,58 +17,47 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="XMLOverHttp" 
-	     targetNamespace="http://apache.org/xml_http_wrapped" 
-	     xmlns="http://schemas.xmlsoap.org/wsdl/" 
-	     xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
-	     xmlns:tns="http://apache.org/xml_http_wrapped"
-	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-	     xmlns:xformat="http://cxf.apache.org/bindings/xmlformat" 
-	     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <types>
-    <schema targetNamespace="http://apache.org/xml_http_wrapped"
-	    xmlns="http://www.w3.org/2001/XMLSchema">
-      <element name="sayHello">
-	<complexType>
-	  <sequence>
-	    <element name="request" type="xsd:string"/>
-	  </sequence>
-	</complexType>
-      </element>
-      
-      <element name="sayHelloResponse">
-	<complexType>
-	  <sequence>
-	    <element name="response" type="xsd:string"/>
-	  </sequence>
-	</complexType>
-      </element>
-    </schema>
-  </types>
-
-  <message name="sayHelloRequest">
-    <part element="tns:sayHello" name="sayHello"/>
-  </message>
-  <message name="sayHelloResponse">
-    <part element="tns:sayHelloResponse" name="sayHelloResponse"/>
-  </message>
-
-  <portType name="GreetingPortType">
-    <operation name="sayHello">
-      <input message="tns:sayHelloRequest" name="sayHelloRequest"/>
-      <output message="tns:sayHelloResponse" name="sayHelloResponse"/>
-    </operation>
-  </portType>
-  <binding name="GreetingPortTypeXMLBinding" type="tns:GreetingPortType">
-    <xformat:binding/>
-    <operation name="sayHello">
-      <input name="sayHelloRequest"/>
-      <output name="sayHelloResponse"/>
-    </operation>
-  </binding>
-  <service name="XMLoverHTTP">
-	<port binding="tns:GreetingPortTypeXMLBinding" name="XMLPort">
-	<http:address location="http://localhost:0/some_url"/>
-	</port>
-  </service>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://apache.org/xml_http_wrapped" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xformat="http://cxf.apache.org/bindings/xmlformat" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="XMLOverHttp" targetNamespace="http://apache.org/xml_http_wrapped">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/xml_http_wrapped">
+            <element name="sayHello">
+                <complexType>
+                    <sequence>
+                        <element name="request" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="sayHelloResponse">
+                <complexType>
+                    <sequence>
+                        <element name="response" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
+    <message name="sayHelloRequest">
+        <part element="tns:sayHello" name="sayHello"/>
+    </message>
+    <message name="sayHelloResponse">
+        <part element="tns:sayHelloResponse" name="sayHelloResponse"/>
+    </message>
+    <portType name="GreetingPortType">
+        <operation name="sayHello">
+            <input message="tns:sayHelloRequest" name="sayHelloRequest"/>
+            <output message="tns:sayHelloResponse" name="sayHelloResponse"/>
+        </operation>
+    </portType>
+    <binding name="GreetingPortTypeXMLBinding" type="tns:GreetingPortType">
+        <xformat:binding/>
+        <operation name="sayHello">
+            <input name="sayHelloRequest"/>
+            <output name="sayHelloResponse"/>
+        </operation>
+    </binding>
+    <service name="XMLoverHTTP">
+        <port binding="tns:GreetingPortTypeXMLBinding" name="XMLPort">
+            <http:address location="http://localhost:0/some_url"/>
+        </port>
+    </service>
 </definitions>

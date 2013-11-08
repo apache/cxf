@@ -17,53 +17,40 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xsi:schemaLocation="
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation=" http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator">
-    	<property name="allowDuplicates" value="false"/>
+        <property name="allowDuplicates" value="false"/>
     </bean>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
     <bean id="loggingIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
     <bean id="loggingOut" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
-
     <cxf:bus>
         <cxf:inInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="loggingIn"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="loggingIn"/>
         </cxf:inInterceptors>
         <cxf:inFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="loggingIn"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="loggingIn"/>
         </cxf:inFaultInterceptors>
         <cxf:outInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="loggingOut"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="loggingOut"/>
         </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="loggingOut"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="loggingOut"/>
         </cxf:outFaultInterceptors>
     </cxf:bus>
-
     <!--jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" 
                   createdFromAPI="true">
         <jaxws:conduitSelector>
             <bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </jaxws:conduitSelector>
     </jaxws:client-->
-    
 </beans>

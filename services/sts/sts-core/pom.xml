@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <packaging>bundle</packaging>
     <name>Apache CXF STS Core</name>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -44,7 +43,7 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${project.version}</version>
@@ -62,25 +61,25 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.springframework.ldap</groupId>
-           <artifactId>spring-ldap-core</artifactId>
-           <version>${cxf.spring.ldap.version}</version>
-           <scope>provided</scope>
-           <optional>true</optional>
-           <exclusions>
-               <exclusion>
-                   <groupId>commons-logging</groupId>
-                   <artifactId>commons-logging</artifactId>
-               </exclusion>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+            <version>${cxf.spring.ldap.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-           <groupId>com.hazelcast</groupId>
-           <artifactId>hazelcast</artifactId>
-           <version>${cxf.hazelcast.version}</version>
-           <scope>provided</scope>
-           <optional>true</optional>
-        </dependency> 
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>${cxf.hazelcast.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -122,10 +121,8 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-             
-   </dependencies>
-
-   <build>
+    </dependencies>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -144,7 +141,7 @@
                             org.apache.cxf.sts.*;version=${project.version}
                         </Export-Package>
                         <Import-Package>
-                        	javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+                                javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
                             org.apache.cxf.sts.provider.*;version=${project.version},
                             !org.apache.cxf.sts.*,
                             org.apache.cxf.*;version=${project.version},
@@ -160,4 +157,3 @@
         </plugins>
     </build>
 </project>
- 

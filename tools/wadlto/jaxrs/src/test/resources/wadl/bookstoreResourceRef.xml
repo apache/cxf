@@ -18,10 +18,7 @@
   under the License.
 -->
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
-
- <resources base="http://localhost:8080/baz">
-     <resource path="/bookstore" id="{wadl.model.jaxrs.cxf.apache.org}BookStore"
-               type="bookstoreImportResultType.xml#main-resource"/>
- </resources>
-
+    <resources base="http://localhost:8080/baz">
+        <resource path="/bookstore" id="{wadl.model.jaxrs.cxf.apache.org}BookStore" type="bookstoreImportResultType.xml#main-resource"/>
+    </resources>
 </application>

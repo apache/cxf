@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8" ?>
- <!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
   distributed with this work for additional information
@@ -17,10 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<SOAP-ENV:Body>
-		<ns4:ping xmlns:ns4="http://apache.org/handler_test/types"/>
-	</SOAP-ENV:Body>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SOAP-ENV:Body>
+        <ns4:ping xmlns:ns4="http://apache.org/handler_test/types"/>
+    </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>

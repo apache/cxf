@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>js_provider</artifactId>
     <name>Hello world javascript demo</name>
     <description>Hello world javascript demo</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -136,7 +136,6 @@
             </build>
         </profile>
     </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,18 +22,15 @@
     <artifactId>mtom</artifactId>
     <name>MTOM Demo for SWA and XOP</name>
     <description>MTOM Demo for SWA and XOP</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <wsdl.location>${basedir}/src/main/resources/mtom_xop.wsdl</wsdl.location>
     </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -66,7 +64,7 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -121,7 +119,6 @@
             </build>
         </profile>
     </profiles>
-    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -143,6 +140,5 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-javamail_1.4_spec</artifactId>
         </dependency>
-        
     </dependencies>
 </project>

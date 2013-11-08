@@ -17,39 +17,25 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jms="http://cxf.apache.org/transports/jms"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xsi:schemaLocation="
-       http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-
-    <bean id="myOrbConfigurer"
-        class="org.apache.cxf.binding.corba.runtime.OrbConfigurer">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="myOrbConfigurer" class="org.apache.cxf.binding.corba.runtime.OrbConfigurer">
         <property name="orbProperties">
             <props>
-              <prop key="prop1">  
+                <prop key="prop1">  
                      value1
                </prop>
-               <prop key="prop2">  
+                <prop key="prop2">  
                      value2
                </prop>
-               <prop key="org.omg.CORBA.ORBClass">  
+                <prop key="org.omg.CORBA.ORBClass">  
                      com.orbimplco.MyORBImpl
                </prop>
-               <prop key="org.omg.CORBA.ORBSingletonClass">  
+                <prop key="org.omg.CORBA.ORBSingletonClass">  
                      com.orbimplco.MyORBSingleton
                </prop>
-               
             </props>
-         </property>
-         
-         <property name="orbArgs">
+        </property>
+        <property name="orbArgs">
             <list>
                 <value>-ORBdomain_name</value>
                 <value>test-domain</value>

@@ -18,9 +18,7 @@
   under the License.
 -->
 <ns1:sendReceiveDataResponse xmlns:ns1="http://apache.org/hello_world_rpclit">
-    <out xmlns:ns3="http://apache.org/hello_world_rpclit"
-        xmlns:ns2="http://apache.org/hello_world_rpclit/types"
-        >
+    <out xmlns:ns3="http://apache.org/hello_world_rpclit" xmlns:ns2="http://apache.org/hello_world_rpclit/types">
         <ns2:elem1>elem1</ns2:elem1>
         <ns2:elem2>elem2</ns2:elem2>
         <ns2:elem3>45</ns2:elem3>

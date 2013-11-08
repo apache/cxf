@@ -17,26 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
-	<!--  For Testing using the Spring commons processor, uncomment one of:--> 
-	<!-- 
-		<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
-		<context:annotation-config/>
-	-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--  For Testing using the Spring commons processor, uncomment one of:-->
+    <!-- 
+                <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+                <context:annotation-config/>
+        -->
     <bean id="cxf" class="org.apache.cxf.bus.spring.SpringBus" destroy-method="shutdown"/>
-    
-    
-    <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" 
-    	class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
-    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" 
-    	class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
-    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" 
-    	class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
-
+    <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
+    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>
+    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
 </beans>

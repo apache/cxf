@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,21 +24,18 @@
     <name>Apache CXF Runtime Object Binding</name>
     <description>Apache CXF Runtime Object Binding</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <properties>
         <cxf.osgi.import>
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.apache.aries*;version="${cxf.aries.version.range}"
         </cxf.osgi.import>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
@@ -49,29 +47,27 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
-             <groupId>org.springframework</groupId>
-             <artifactId>spring-beans</artifactId>
-             <scope>provided</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.springframework</groupId>
-             <artifactId>spring-core</artifactId>
-             <scope>provided</scope>
-         </dependency>
-
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-simple</artifactId>
             <version>${project.version}</version>
@@ -89,15 +85,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
-         </dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 </project>

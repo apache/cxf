@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -17,13 +18,13 @@
     under the License.
 -->
 <archetype>
-  <id>cxf-spring-basic</id>
-  <sources>
-      <source>src/main/java/HelloWorldImpl.java</source>
-      <source>src/main/java/HelloWorld.java</source>
-  </sources>
-  <resources>
-    <resource>src/main/webapp/WEB-INF/beans.xml</resource>
-    <resource>src/main/webapp/WEB-INF/web.xml</resource>
-  </resources>
+    <id>cxf-spring-basic</id>
+    <sources>
+        <source>src/main/java/HelloWorldImpl.java</source>
+        <source>src/main/java/HelloWorld.java</source>
+    </sources>
+    <resources>
+        <resource>src/main/webapp/WEB-INF/beans.xml</resource>
+        <resource>src/main/webapp/WEB-INF/web.xml</resource>
+    </resources>
 </archetype>

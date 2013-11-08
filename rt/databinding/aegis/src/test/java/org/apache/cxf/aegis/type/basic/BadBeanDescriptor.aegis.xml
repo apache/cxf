@@ -1,4 +1,5 @@
+<?xml version="1.0"?>
 <mappings xmlns:btrnmi="urn:org.apache.cxf.aegis.type">
-  <mapping name="oacat:Invalid">
+    <mapping name="oacat:Invalid">
   </mapping>
 </mappings>

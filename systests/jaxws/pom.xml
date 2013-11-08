@@ -30,7 +30,6 @@
     <name>Apache CXF JAX-WS System Tests</name>
     <description>Apache CXF JAX-WS System Tests</description>
     <url>http://cxf.apache.org</url>
-
     <build>
         <plugins>
             <plugin>
@@ -69,7 +68,6 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>xerces</groupId>
@@ -114,7 +112,6 @@
             <artifactId>cxf-rt-bindings-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
@@ -200,18 +197,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-          <scope>test</scope>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
-         </dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
@@ -227,10 +224,7 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
-
     <profiles>
         <profile>
             <id>async</id>

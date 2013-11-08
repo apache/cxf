@@ -1,1 +1,7 @@
-<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" ><!-- 1M --><wsp:ExactlyOne><wsp:Policy /></wsp:ExactlyOne></wsp:Policy>
+<?xml version="1.0"?>
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+    <!-- 1M -->
+    <wsp:ExactlyOne>
+        <wsp:Policy/>
+    </wsp:ExactlyOne>
+</wsp:Policy>

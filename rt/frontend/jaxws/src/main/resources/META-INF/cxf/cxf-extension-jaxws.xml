@@ -17,20 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:foo="http://cxf.apache.org/configuration/foo"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
-
-    <bean class="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver"
-        id="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver" lazy-init="true">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:foo="http://cxf.apache.org/configuration/foo" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver" id="org.apache.cxf.jaxws.context.WebServiceContextResourceResolver" lazy-init="true">
         <constructor-arg ref="cxf"/>
     </bean>
-    <bean class="org.apache.cxf.jaxws.context.WebServiceContextImpl"
-        id="org.apache.cxf.jaxws.context.WebServiceContextImpl" lazy-init="true"/>
-    <alias name="org.apache.cxf.jaxws.context.WebServiceContextImpl"
-        alias="javax.xml.ws.WebServiceContext"/>
+    <bean class="org.apache.cxf.jaxws.context.WebServiceContextImpl" id="org.apache.cxf.jaxws.context.WebServiceContextImpl" lazy-init="true"/>
+    <alias name="org.apache.cxf.jaxws.context.WebServiceContextImpl" alias="javax.xml.ws.WebServiceContext"/>
 </beans>

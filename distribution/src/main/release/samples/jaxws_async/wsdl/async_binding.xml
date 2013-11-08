@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,13 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-
-<bindings
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    wsdlLocation="hello_world_async.wsdl"
-    xmlns="http://java.sun.com/xml/ns/jaxws">
+<bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://java.sun.com/xml/ns/jaxws" wsdlLocation="hello_world_async.wsdl">
     <bindings node="wsdl:definitions">
         <enableAsyncMapping>true</enableAsyncMapping>
     </bindings>

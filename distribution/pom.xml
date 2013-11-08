@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,28 +24,23 @@
     <name>Apache CXF Distribution</name>
     <description>Apache CXF Distribution</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
-
     <properties>
         <maven.test.skip>true</maven.test.skip>
         <cxf.version>${project.version}</cxf.version>
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
-
         <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
     </properties>
-
     <modules>
         <module>manifest</module>
     </modules>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -61,7 +57,6 @@
             <artifactId>cxf-tools-wsdlto-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-wsdlto-frontend-javascript</artifactId>
@@ -97,7 +92,6 @@
             <artifactId>cxf-tools-java2ws</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}.xjc-utils</groupId>
             <artifactId>cxf-xjc-runtime</artifactId>
@@ -133,19 +127,16 @@
             <artifactId>cxf-rt-features-clustering</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-management</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
@@ -184,13 +175,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
@@ -201,25 +190,21 @@
             <artifactId>cxf-rt-bindings-corba</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-bindings-xml</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-bindings-object</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-bindings-coloc</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
@@ -270,7 +255,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
@@ -296,7 +280,6 @@
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -357,7 +340,6 @@
             <artifactId>cxf-rt-javascript</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <!-- services jars -->
         <dependency>
             <groupId>org.apache.cxf.services.sts</groupId>
@@ -394,8 +376,6 @@
             <artifactId>cxf-services-ws-discovery-service</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
@@ -408,13 +388,11 @@
             <groupId>com.sun.xml.fastinfoset</groupId>
             <artifactId>FastInfoset</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -522,20 +500,20 @@
                         <phase>process-sources</phase>
                         <configuration>
                             <tasks>
-                                <mkdir dir="${basedir}/target" />
-                                <pathconvert property="cp" refid="maven.runtime.classpath" />
+                                <mkdir dir="${basedir}/target"/>
+                                <pathconvert property="cp" refid="maven.runtime.classpath"/>
                                 <condition property="output.cp" value="set CXF_CLASSPATH=${cp}">
-                                    <os family="windows" />
+                                    <os family="windows"/>
                                 </condition>
                                 <condition property="output.ext" value=".bat">
-                                    <os family="windows" />
+                                    <os family="windows"/>
                                 </condition>
-                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}" />
-                                <property name="output.ext" value="" />
-                                <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}" />
-                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}" />
-                                <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}" />
-                                <delete file="build.xml" />
+                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}"/>
+                                <property name="output.ext" value=""/>
+                                <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}"/>
+                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}"/>
+                                <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}"/>
+                                <delete file="build.xml"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -559,7 +537,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <!-- build the samples as well to make sure they really do build -->

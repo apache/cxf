@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -29,7 +30,6 @@
     <name>Apache CXF WS-Security Interop System Tests</name>
     <description>Apache CXF WS-Security Interop System Tests</description>
     <url>http://cxf.apache.org</url>
-    
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
         <testResources>
@@ -46,7 +46,6 @@
                 </includes>
             </testResource>
         </testResources>
-        
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -98,25 +97,21 @@
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
@@ -132,7 +127,6 @@
             <artifactId>cxf-rt-ws-addr</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
@@ -149,20 +143,20 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-           <groupId>net.sf.ehcache</groupId>
-           <artifactId>ehcache</artifactId>
-           <version>${cxf.ehcache.version}</version>
-       </dependency>
-       <dependency>
-          <groupId>org.springframework.ldap</groupId>
-          <artifactId>spring-ldap-core</artifactId>
-          <version>${cxf.spring.ldap.version}</version>
-       </dependency>
-       <dependency>
-          <groupId>com.hazelcast</groupId>
-          <artifactId>hazelcast</artifactId>
-          <version>${cxf.hazelcast.version}</version>
-       </dependency> 
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${cxf.ehcache.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+            <version>${cxf.spring.ldap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>${cxf.hazelcast.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
@@ -173,23 +167,19 @@
             <groupId>${cxf.asm.groupId}</groupId>
             <artifactId>${cxf.asm.artifactId}</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
-         </dependency>
-
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

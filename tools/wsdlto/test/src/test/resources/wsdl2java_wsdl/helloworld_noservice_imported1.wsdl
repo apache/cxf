@@ -17,20 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorldImport1"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world1"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world1">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world1" xmlns:x1="http://cxf.apache.org/w2j/hello_world/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldImport1" targetNamespace="http://cxf.apache.org/w2j/hello_world1">
     <wsdl:types>
-        <schema
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:x1="http://cxf.apache.org/w2j/hello_world/types"
-            targetNamespace="http://cxf.apache.org/w2j/hello_world/types"
-            elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world/types" targetNamespace="http://cxf.apache.org/w2j/hello_world/types" elementFormDefault="qualified">
             <element name="pingMe">
                 <complexType/>
             </element>
@@ -47,7 +36,6 @@
             </element>
         </schema>
     </wsdl:types>
-
     <wsdl:message name="pingMeRequest">
         <wsdl:part name="in" element="x1:pingMe"/>
     </wsdl:message>
@@ -63,5 +51,5 @@
             <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
             <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
         </wsdl:operation>
-    </wsdl:portType>  
+    </wsdl:portType>
 </wsdl:definitions>

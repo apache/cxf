@@ -17,22 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="TestInterfacePort" targetNamespace="http://cxf.apache.org/test" 
-    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
-    xmlns:ns1="http://cxf.apache.org/test" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://cxf.apache.org/org.apache.cxf.test.TestInterface/xsd">
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ns1="http://cxf.apache.org/test" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://cxf.apache.org/org.apache.cxf.test.TestInterface/xsd" name="TestInterfacePort" targetNamespace="http://cxf.apache.org/test">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/org.apache.cxf.test.TestInterface/xsd" 
-            xmlns="http://www.w3.org/2001/XMLSchema">
-            
-	    <simpleType name="charType">
-		<restriction base="xsd:string">
-		    <maxLength value="1"/>
-		</restriction>
-	    </simpleType>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/org.apache.cxf.test.TestInterface/xsd">
+            <simpleType name="charType">
+                <restriction base="xsd:string">
+                    <maxLength value="1"/>
+                </restriction>
+            </simpleType>
             <element name="getMessage" type="xsd1:charType"/>
             <element name="getMessageResponse" type="xsd1:charType"/>
             <element name="setMessage">
@@ -49,20 +41,18 @@
                     </restriction>
                 </simpleType>
             </element>
-
             <element name="charEl_x" type="xsd1:charType"/>
             <element name="charEl_y" type="xsd1:charType"/>
             <element name="charEl_z" type="xsd1:charType"/>
             <element name="charEl_return">
                 <complexType>
-		    <sequence>
-			<element name="varChar" type="xsd1:charType"/>
-			<element name="varInt" type="xsd:int"/>
-			<element name="varString" type="xsd:string"/>
-		    </sequence>
-		</complexType>
+                    <sequence>
+                        <element name="varChar" type="xsd1:charType"/>
+                        <element name="varInt" type="xsd:int"/>
+                        <element name="varString" type="xsd:string"/>
+                    </sequence>
+                </complexType>
             </element>
-            
         </schema>
     </wsdl:types>
     <wsdl:message name="getMessage">

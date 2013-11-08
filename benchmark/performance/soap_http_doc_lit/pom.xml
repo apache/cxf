@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -25,7 +26,6 @@
     <name>Apache CXF Benchmark SOAP/HTTP/Doc/Lit</name>
     <description>Apache CXF Benchmark SOAP/HTTP/Doc/Lit</description>
     <url>http://cxf.apache.org</url>
-
     <properties>
         <cxf.version>2.7.1-SNAPSHOT</cxf.version>
     </properties>
@@ -66,9 +66,8 @@
             <version>1.6.1</version>
         </dependency>
     </dependencies>
-
     <build>
-      <defaultGoal>install</defaultGoal>
+        <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -102,8 +101,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
-
     <profiles>
         <profile>
             <id>server</id>
@@ -260,5 +257,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

@@ -30,40 +30,18 @@ The limited permissions granted above are perpetual and will not be revoked by O
 
 This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 -->
-
-<wsdl:definitions name="WS-Resource"
-  xmlns="http://schemas.xmlsoap.org/wsdl/" 
-  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2" 
-  xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
-  targetNamespace="http://docs.oasis-open.org/wsrf/rw-2">
-  
-  <!-- ===================== Types Definitions ====================== -->
-
-  <wsdl:types>
-    <xsd:schema 
-       xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-       targetNamespace="http://docs.oasis-open.org/wsrf/rw-2"
-       elementFormDefault="qualified" 
-       attributeFormDefault="unqualified">
-
-       <xsd:import namespace="http://docs.oasis-open.org/wsrf/r-2"
-                   schemaLocation="./r-2.xsd" /> 
-    </xsd:schema>
-  </wsdl:types>
-
-  <!-- ================= WS-Resource faults ========================= -->
-
-  <wsdl:message name="ResourceUnknownFault">
-    <wsdl:part name="ResourceUnknownFault"
-               element="wsrf-r:ResourceUnknownFault" />
-  </wsdl:message> 
-
-  <wsdl:message name="ResourceUnavailableFault">
-    <wsdl:part name="ResourceUnavailableFault"
-               element="wsrf-r:ResourceUnavailableFault" />
-  </wsdl:message> 
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2" xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" name="WS-Resource" targetNamespace="http://docs.oasis-open.org/wsrf/rw-2">
+    <!-- ===================== Types Definitions ====================== -->
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://docs.oasis-open.org/wsrf/rw-2" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xsd:import namespace="http://docs.oasis-open.org/wsrf/r-2" schemaLocation="./r-2.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+    <!-- ================= WS-Resource faults ========================= -->
+    <wsdl:message name="ResourceUnknownFault">
+        <wsdl:part name="ResourceUnknownFault" element="wsrf-r:ResourceUnknownFault"/>
+    </wsdl:message>
+    <wsdl:message name="ResourceUnavailableFault">
+        <wsdl:part name="ResourceUnavailableFault" element="wsrf-r:ResourceUnavailableFault"/>
+    </wsdl:message>
 </wsdl:definitions>
-

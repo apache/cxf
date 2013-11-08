@@ -20,10 +20,10 @@
 <mappings>
     <mapping name="FlatArrayService">
         <method name="submitStringArray">
-            <parameter index="0" minOccurs='2' maxOccurs='50' nillable='false' flat='true' />
+            <parameter index="0" minOccurs="2" maxOccurs="50" nillable="false" flat="true"/>
         </method>
-         <method name="getStringArrayValue">
-            <return-type flat='true' />
+        <method name="getStringArrayValue">
+            <return-type flat="true"/>
         </method>
     </mapping>
 </mappings>

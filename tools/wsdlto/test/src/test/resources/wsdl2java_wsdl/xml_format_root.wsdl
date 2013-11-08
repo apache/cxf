@@ -17,66 +17,50 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="XMLOverHttp" 
-	     targetNamespace="http://apache.org/xml_http_bare" 
-	     xmlns="http://schemas.xmlsoap.org/wsdl/" 
-	     xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
-	     xmlns:tns="http://apache.org/xml_http_bare" 
-	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-	     xmlns:xformat="http://cxf.apache.org/bindings/xformat" 
-	     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <wsdl:types>
-    <schema targetNamespace="http://apache.org/xml_http_bare"
-	    xmlns="http://www.w3.org/2001/XMLSchema">
-      <element name="responseType" type="xsd:string"/>
-      <element name="requestType" type="xsd:string"/>
-    </schema>
-  </wsdl:types>
-
-  <wsdl:message name="sayHiRequest"/>
-  <wsdl:message name="sayHiResponse">
-    <wsdl:part element="tns:responseType" name="theResponse"/>
-  </wsdl:message>
-  <wsdl:message name="greetMeRequest">
-    <wsdl:part element="tns:requestType" name="me"/>
-  </wsdl:message>
-
-  <wsdl:message name="greetMeResponse">
-    <wsdl:part element="tns:responseType" name="theResponse"/>
-  </wsdl:message>
-
-
-  <wsdl:portType name="Greeter">
-    <wsdl:operation name="sayHi">
-      <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
-      <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
-    </wsdl:operation>
-    <wsdl:operation name="greetMe">
-      <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
-      <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <wsdl:binding name="Greeter_XMLBinding" type="tns:Greeter">
-    <xformat:binding/>
-    <wsdl:operation name="sayHi">
-      <wsdl:input name="sayHiRequest">
-	<xformat:body/>
-      </wsdl:input>
-      <wsdl:output name="sayHiResponse">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://apache.org/xml_http_bare" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xformat="http://cxf.apache.org/bindings/xformat" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="XMLOverHttp" targetNamespace="http://apache.org/xml_http_bare">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/xml_http_bare">
+            <element name="responseType" type="xsd:string"/>
+            <element name="requestType" type="xsd:string"/>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="sayHiRequest"/>
+    <wsdl:message name="sayHiResponse">
+        <wsdl:part element="tns:responseType" name="theResponse"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeRequest">
+        <wsdl:part element="tns:requestType" name="me"/>
+    </wsdl:message>
+    <wsdl:message name="greetMeResponse">
+        <wsdl:part element="tns:responseType" name="theResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="sayHi">
+            <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
+            <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="greetMe">
+            <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
+            <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Greeter_XMLBinding" type="tns:Greeter">
+        <xformat:binding/>
+        <wsdl:operation name="sayHi">
+            <wsdl:input name="sayHiRequest">
+                <xformat:body/>
+            </wsdl:input>
+            <wsdl:output name="sayHiResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="greetMe">
-      <wsdl:input name="greetMeRequest"/>
-      <wsdl:output name="greetMeResponse"/>
-    </wsdl:operation>
-  </wsdl:binding>
-
-  <wsdl:service name="XMLService">
-
-	<wsdl:port binding="tns:Greeter_XMLBinding" name="XMLPort">
-	<http:address location="http://localhost:9090/some_url"/>
-	</wsdl:port>
-
-  </wsdl:service>
+        </wsdl:operation>
+        <wsdl:operation name="greetMe">
+            <wsdl:input name="greetMeRequest"/>
+            <wsdl:output name="greetMeResponse"/>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="XMLService">
+        <wsdl:port binding="tns:Greeter_XMLBinding" name="XMLPort">
+            <http:address location="http://localhost:9090/some_url"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

@@ -17,57 +17,39 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xsi:schemaLocation="
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-  
     <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.MultiplexClientServerTest}/decoupled_endpoint"/>
+        <http:client DecoupledEndpoint="http://localhost:${testutil.ports.MultiplexClientServerTest}/decoupled_endpoint"/>
     </http:conduit>
-    
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator">
-    	<property name="allowDuplicates" value="false"/>
+        <property name="allowDuplicates" value="false"/>
     </bean>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
     <bean id="loggingIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
-
     <cxf:bus>
         <cxf:inInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="loggingIn"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="loggingIn"/>
         </cxf:inInterceptors>
         <cxf:inFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
         </cxf:inFaultInterceptors>
         <cxf:outInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-        </cxf:outInterceptors>                
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+        </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
         </cxf:outFaultInterceptors>
     </cxf:bus>
-
-    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" 
-                  createdFromAPI="true">
+    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:conduitSelector>
             <bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </jaxws:conduitSelector>
     </jaxws:client>
-
 </beans>

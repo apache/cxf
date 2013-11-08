@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,11 @@
     <name>Apache CXF Runtime JavaScript Client Generator</name>
     <description>Apache CXF Runtime JavaScript Client Generator</description>
     <url>http://cxf.apache.org/</url>
-
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-runtime-javascript</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

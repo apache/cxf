@@ -17,132 +17,113 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <!-- The xhtml namespace is for usage documentation -->
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-	  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-	  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-	  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd">
     <annotation>
-	Examples :
-	java2ws -javascript org.apache.hello_world_soap_http.Greeter -o bloop.js
+        Examples :
+        java2ws -javascript org.apache.hello_world_soap_http.Greeter -o bloop.js
     </annotation>
     <usage>
-	<optionGroup id="options">
-	    
-	    <option id="databinding" maxOccurs="1">
-		<annotation>
-		    Specify the data binding (aegis or jaxb). Default is jaxb for jaxws 
-		    frontend, and aegis for simple frontend.
-		</annotation>
+        <optionGroup id="options">
+            <option id="databinding" maxOccurs="1">
+                <annotation>
+                    Specify the data binding (aegis or jaxb). Default is jaxb for jaxws 
+                    frontend, and aegis for simple frontend.
+                </annotation>
                 <switch>db</switch>
-		<switch>databinding</switch>
-		<associatedArgument placement="afterSpace">
-		    <annotation>jaxb or aegis</annotation>
-		</associatedArgument>
-	    </option>
-	    
-	    <option id="javascriptUtils" maxOccurs="1">
-		<annotation>
-		    Write the JavaScript common utilities at the beginning of the output.
-		</annotation>
-		<switch>jsutils</switch>
-	    </option>
-
-	    <option id="outputfile" maxOccurs="1">
-		<annotation>
-		    Specify the output wsdl file name
-		</annotation>
-		<switch>o</switch>
+                <switch>databinding</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>jaxb or aegis</annotation>
+                </associatedArgument>
+            </option>
+            <option id="javascriptUtils" maxOccurs="1">
+                <annotation>
+                    Write the JavaScript common utilities at the beginning of the output.
+                </annotation>
+                <switch>jsutils</switch>
+            </option>
+            <option id="outputfile" maxOccurs="1">
+                <annotation>
+                    Specify the output wsdl file name
+                </annotation>
+                <switch>o</switch>
                 <switch>output</switch>
-		<associatedArgument placement="afterSpace">
-		    <annotation>output-file</annotation>
-		</associatedArgument>
-	    </option>
-	    
-	    <option id="outputdir" maxOccurs="1">
-		<annotation>
-		    The directory in which the output wsdl and other 
-		    resource files are placed
-		</annotation>
-		<switch>d</switch>
-		<associatedArgument placement="afterSpace">
-		    <annotation>resource-directory</annotation>
-		</associatedArgument>
-	    </option>
-
-	    <option id="beans" maxOccurs="unbounded">
-		<annotation>Specify the pathname of a file defining additional Spring beans to customize databinding
-		configuration.</annotation>
-		<switch>beans</switch>
-		<associatedArgument placement="afterSpace">
-		    <annotation>pathname of the bean definition file.</annotation>
-		</associatedArgument>
-	    </option>
-	    
-	    <option id="classpath" maxOccurs="1">
-		<annotation>
-		    Specify the SEI and types class search path of
-		    directories and zip/jar files
-		</annotation>
-		<switch>cp</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>output-file</annotation>
+                </associatedArgument>
+            </option>
+            <option id="outputdir" maxOccurs="1">
+                <annotation>
+                    The directory in which the output wsdl and other 
+                    resource files are placed
+                </annotation>
+                <switch>d</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>resource-directory</annotation>
+                </associatedArgument>
+            </option>
+            <option id="beans" maxOccurs="unbounded">
+                <annotation>Specify the pathname of a file defining additional Spring beans to customize databinding
+                configuration.</annotation>
+                <switch>beans</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>pathname of the bean definition file.</annotation>
+                </associatedArgument>
+            </option>
+            <option id="classpath" maxOccurs="1">
+                <annotation>
+                    Specify the SEI and types class search path of
+                    directories and zip/jar files
+                </annotation>
+                <switch>cp</switch>
                 <switch>classpath</switch>
-		<associatedArgument placement="afterSpace">
-		    <annotation>class-path</annotation>
-		</associatedArgument>
-	    </option>
-
-	    <option id="soap12" maxOccurs="1">
-		<annotation>
-		    Specify to generate SOAP 1.2 binding
-		</annotation>
-		<switch>soap12</switch>
-	    </option>
-
-	</optionGroup>
-
-	<optionGroup id="common_options">
-	    <option id="help" maxOccurs="1">
-		<annotation>
-		    Display detailed information for options.
-		</annotation>
-		<switch>h</switch>
-		<switch>?</switch>
-		<switch>help</switch>
-	    </option>
-
-	    <option id="version">
-		<annotation>
-		    Display the version of the tool.
-		</annotation>
-		<switch>version</switch>
-		<switch>v</switch>
-	    </option>
-
-	    <option id="verbose">
-		<annotation>
-		    Verbose mode
-		</annotation>
-		<switch>verbose</switch>
-		<switch>V</switch>
-	    </option>
-
-	    <option id="quiet">
-		<annotation>
-		    Quiet mode
-		</annotation>
-		<switch>quiet</switch>
-		<switch>q</switch>
-		<switch>Q</switch>
-	    </option>
-	</optionGroup>
-
-	<argument id="classname" minOccurs="1" maxOccurs="1">
-	    <annotation>
-		SEI class name
-	    </annotation>
-	</argument>
+                <associatedArgument placement="afterSpace">
+                    <annotation>class-path</annotation>
+                </associatedArgument>
+            </option>
+            <option id="soap12" maxOccurs="1">
+                <annotation>
+                    Specify to generate SOAP 1.2 binding
+                </annotation>
+                <switch>soap12</switch>
+            </option>
+        </optionGroup>
+        <optionGroup id="common_options">
+            <option id="help" maxOccurs="1">
+                <annotation>
+                    Display detailed information for options.
+                </annotation>
+                <switch>h</switch>
+                <switch>?</switch>
+                <switch>help</switch>
+            </option>
+            <option id="version">
+                <annotation>
+                    Display the version of the tool.
+                </annotation>
+                <switch>version</switch>
+                <switch>v</switch>
+            </option>
+            <option id="verbose">
+                <annotation>
+                    Verbose mode
+                </annotation>
+                <switch>verbose</switch>
+                <switch>V</switch>
+            </option>
+            <option id="quiet">
+                <annotation>
+                    Quiet mode
+                </annotation>
+                <switch>quiet</switch>
+                <switch>q</switch>
+                <switch>Q</switch>
+            </option>
+        </optionGroup>
+        <argument id="classname" minOccurs="1" maxOccurs="1">
+            <annotation>
+                SEI class name
+            </annotation>
+        </argument>
     </usage>
 </toolspec>

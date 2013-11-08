@@ -17,30 +17,20 @@
     limitations under the License.
 
 -->
-<wsdl:definitions name="wsdl-first"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:tns="http://cxf.apache.org/samples/wsdl-first/interfaces"
-	xmlns:unused="http://cxf.apache.org/samples/wsdl-first"
-	targetNamespace="http://cxf.apache.org/samples/wsdl-first">
-
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://cxf.apache.org/samples/wsdl-first/interfaces" xmlns:unused="http://cxf.apache.org/samples/wsdl-first" name="wsdl-first" targetNamespace="http://cxf.apache.org/samples/wsdl-first">
     <wsdl:import namespace="http://cxf.apache.org/samples/wsdl-first/interfaces" location="./person-soap-interfaces.wsdl"/>
-
     <wsdl:binding name="PersonSOAPBinding" type="tns:Person">
-    	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-		<wsdl:operation name="GetPerson">
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-			<wsdl:fault name="UnknownPerson">
-				<soap:fault use="literal" name="UnknownPerson" />
-			</wsdl:fault>
-       </wsdl:operation>
-   </wsdl:binding>
-
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="GetPerson">
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="UnknownPerson">
+                <soap:fault use="literal" name="UnknownPerson"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
 </wsdl:definitions>

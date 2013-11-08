@@ -19,107 +19,81 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="SOAPBuilders-mime-cr-test" xmlns:types="http://cxf.apache.org/mime/types"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/mime"
-    xmlns:jms="http://cxf.apache.org/transports/jms"
-    xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/mime">
-
+<wsdl:definitions xmlns:types="http://cxf.apache.org/mime/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/mime" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" name="SOAPBuilders-mime-cr-test" targetNamespace="http://cxf.apache.org/mime">
     <wsdl:types>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/mime/types"
-            xmlns:xmime="http://www.w3.org/2005/05/xmlmime" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/mime/types" elementFormDefault="qualified">
             <complexType name="XopType">
                 <sequence>
-                    <element name="name" type="xsd:string" />
+                    <element name="name" type="xsd:string"/>
                     <element name="attachinfo" type="xsd:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
                 </sequence>
             </complexType>
             <complexType name="XopStringType">
                 <sequence>
-                    <element name="name" type="xsd:string" />
+                    <element name="name" type="xsd:string"/>
                     <element name="attachinfo" type="xsd:base64Binary" xmime:expectedContentTypes="text/plain; charset=utf-8"/>
                 </sequence>
             </complexType>
-            <element name="testXop" type="types:XopType" />
-            <element name="testXopResponse" type="types:XopType" />
+            <element name="testXop" type="types:XopType"/>
+            <element name="testXopResponse" type="types:XopType"/>
             <element name="testXopStringArgument" type="types:XopStringType"/>
             <element name="testXopStringResponse" type="types:XopStringType"/>
         </schema>
-
     </wsdl:types>
-
     <wsdl:message name="testXopIn">
-        <wsdl:part name="data" element="types:testXop" />
+        <wsdl:part name="data" element="types:testXop"/>
     </wsdl:message>
-
     <wsdl:message name="testXopOut">
-        <wsdl:part name="data" element="types:testXopResponse" />
+        <wsdl:part name="data" element="types:testXopResponse"/>
     </wsdl:message>
-
     <wsdl:message name="testXopStringIn">
-        <wsdl:part name="data" element="types:testXopStringArgument" />
+        <wsdl:part name="data" element="types:testXopStringArgument"/>
     </wsdl:message>
-
     <wsdl:message name="testXopStringOut">
-        <wsdl:part name="data" element="types:testXopStringResponse" />
+        <wsdl:part name="data" element="types:testXopStringResponse"/>
     </wsdl:message>
-
     <wsdl:portType name="TestMtom">
-
         <wsdl:operation name="testXop">
-            <wsdl:input message="tns:testXopIn" />
-            <wsdl:output message="tns:testXopOut" />
+            <wsdl:input message="tns:testXopIn"/>
+            <wsdl:output message="tns:testXopOut"/>
         </wsdl:operation>
-
         <wsdl:operation name="testXopString">
-            <wsdl:input message="tns:testXopStringIn" />
-            <wsdl:output message="tns:testXopStringOut" />
+            <wsdl:input message="tns:testXopStringIn"/>
+            <wsdl:output message="tns:testXopStringOut"/>
         </wsdl:operation>
-
     </wsdl:portType>
-
     <wsdl:binding name="TestMtomBinding" type="tns:TestMtom">
-        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="testXop">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-
         <wsdl:operation name="testXopString">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-
     </wsdl:binding>
-
     <wsdl:service name="TestMtomService">
         <wsdl:port name="TestMtomPort" binding="tns:TestMtomBinding">
-            <soap:address location="http://localhost:9036/mime-test" />
+            <soap:address location="http://localhost:9036/mime-test"/>
         </wsdl:port>
     </wsdl:service>
-    
     <wsdl:service name="TestMtomJMSService">
         <wsdl:port name="TestMtomJMSPort" binding="tns:TestMtomBinding">
-            <jms:address
-               destinationStyle="queue"
-               jndiConnectionFactoryName="ConnectionFactory"
-               jndiDestinationName="dynamicQueues/person.queue">
-               <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-               <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-          </jms:address>
-
+            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/person.queue">
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+            </jms:address>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>

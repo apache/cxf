@@ -17,33 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:simple="http://cxf.apache.org/simple"
-      xmlns:soap="http://cxf.apache.org/bindings/soap"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
-http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
-      <property name="transportIds">
-          <list>
-              <value>http://cxf.apache.org/transports/local</value>
-              <value>http://schemas.xmlsoap.org/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-          </list>
-      </property>
-  </bean>
-  
-  <bean id="greeter" class="org.apache.cxf.service.factory.HelloServiceImpl"/>
-  <simple:server id="server" serviceBean="#greeter" 
-    serviceClass="org.apache.cxf.service.factory.HelloService"
-    address="local://hello" />
-  
-  <simple:client id="client" serviceClass="org.apache.cxf.service.factory.HelloService"
-    address="local://hello" />
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:simple="http://cxf.apache.org/simple" xmlns:soap="http://cxf.apache.org/bindings/soap" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+        <property name="transportIds">
+            <list>
+                <value>http://cxf.apache.org/transports/local</value>
+                <value>http://schemas.xmlsoap.org/soap/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="greeter" class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+    <simple:server id="server" serviceBean="#greeter" serviceClass="org.apache.cxf.service.factory.HelloService" address="local://hello"/>
+    <simple:client id="client" serviceClass="org.apache.cxf.service.factory.HelloService" address="local://hello"/>
 </beans>

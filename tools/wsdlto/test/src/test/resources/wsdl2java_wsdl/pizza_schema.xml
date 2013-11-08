@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -17,41 +17,29 @@ KIND, either express or implied. See the License for the
  specific language governing permissions and limitations
  under the License.
  -->
-<xsd:schema targetNamespace="http://mypizzaco.com/pizza/types"
-            xmlns:tns="http://mypizzaco.com/pizza/types"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            elementFormDefault="qualified"
-            version="1.0">
-
-  <xsd:element name="CallerIDHeader" type="tns:CallerIDHeaderType" />
-
-  <xsd:complexType name="CallerIDHeaderType">
-    <xsd:sequence>
-      <xsd:element name="Name" type="xsd:string" />
-      <xsd:element name="PhoneNumber" type="xsd:string" />
-    </xsd:sequence>
-  </xsd:complexType>
-
-  <xsd:element name="OrderPizza" type="tns:OrderPizzaType" />
-
-  <xsd:complexType name="OrderPizzaType">
-    <xsd:sequence>
-      <xsd:element name="Toppings" type="tns:ToppingsListType" />
-    </xsd:sequence>
-  </xsd:complexType>
-
-  <xsd:element name="OrderPizzaResponse" type="tns:OrderPizzaResponseType" />
-
-  <xsd:complexType name="OrderPizzaResponseType">
-    <xsd:sequence>
-      <xsd:element name="MinutesUntilReady" type="xsd:int" />
-    </xsd:sequence>
-  </xsd:complexType>
-
-  <xsd:complexType name="ToppingsListType">
-    <xsd:sequence>
-      <xsd:element name="Topping" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-    </xsd:sequence>
-  </xsd:complexType>
-
+<xsd:schema xmlns:tns="http://mypizzaco.com/pizza/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://mypizzaco.com/pizza/types" elementFormDefault="qualified" version="1.0">
+    <xsd:element name="CallerIDHeader" type="tns:CallerIDHeaderType"/>
+    <xsd:complexType name="CallerIDHeaderType">
+        <xsd:sequence>
+            <xsd:element name="Name" type="xsd:string"/>
+            <xsd:element name="PhoneNumber" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="OrderPizza" type="tns:OrderPizzaType"/>
+    <xsd:complexType name="OrderPizzaType">
+        <xsd:sequence>
+            <xsd:element name="Toppings" type="tns:ToppingsListType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="OrderPizzaResponse" type="tns:OrderPizzaResponseType"/>
+    <xsd:complexType name="OrderPizzaResponseType">
+        <xsd:sequence>
+            <xsd:element name="MinutesUntilReady" type="xsd:int"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ToppingsListType">
+        <xsd:sequence>
+            <xsd:element name="Topping" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
 </xsd:schema>

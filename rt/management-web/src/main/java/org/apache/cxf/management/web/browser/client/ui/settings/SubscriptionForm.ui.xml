@@ -17,53 +17,46 @@
   specific language governing permissions and limitations
   under the License.
   -->
-
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-
-    <ui:with field='res'
-             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
-
-	<g:HTMLPanel>
-		<table cellspacing="6">
-			<tr>
-				<td>
-					<g:Label>Name:</g:Label>
-				</td>
-				<td>
-					<g:TextBox ui:field="nameTextBox"></g:TextBox>
-				</td>
-			</tr>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:with field="res" type="org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources"/>
+    <g:HTMLPanel>
+        <table cellspacing="6">
             <tr>
-                <td></td>
+                <td>
+                    <g:Label>Name:</g:Label>
+                </td>
+                <td>
+                    <g:TextBox ui:field="nameTextBox"/>
+                </td>
+            </tr>
+            <tr>
+                <td/>
                 <td>
                     <g:Label ui:field="nameErrorLabel" addStyleNames="{res.css.editFeedDialogErrorMessage}"/>
                 </td>
             </tr>
-			<tr>
-				<td>
-					<g:Label>URL:</g:Label>
-				</td>
-				<td>
-					<g:TextBox ui:field="urlTextBox"></g:TextBox>
-				</td>
-			</tr>
             <tr>
-                <td></td>
+                <td>
+                    <g:Label>URL:</g:Label>
+                </td>
+                <td>
+                    <g:TextBox ui:field="urlTextBox"/>
+                </td>
+            </tr>
+            <tr>
+                <td/>
                 <td>
                     <g:Label ui:field="urlErrorLabel" addStyleNames="{res.css.editFeedDialogErrorMessage}"/>
                 </td>
             </tr>
-		</table>
-		<g:FlowPanel addStyleNames="{res.css.editFeedDialogButtons}">
-			<g:Button ui:field="cancelButton">
+        </table>
+        <g:FlowPanel addStyleNames="{res.css.editFeedDialogButtons}">
+            <g:Button ui:field="cancelButton">
                 Cancel
             </g:Button>
-			<g:Button ui:field="saveButton" addStyleNames="{res.css.editFeedDialogAddButton}">
+            <g:Button ui:field="saveButton" addStyleNames="{res.css.editFeedDialogAddButton}">
                 Save
-			</g:Button>
-		</g:FlowPanel>
-
-	</g:HTMLPanel>
-
+                        </g:Button>
+        </g:FlowPanel>
+    </g:HTMLPanel>
 </ui:UiBinder>

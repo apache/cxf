@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>wsdl_first_soap12</artifactId>
     <name>WSDL first demo using SOAP12 in Document/Literal Style</name>
     <description>WSDL first demo using SOAP12 in Document/Literal Style</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

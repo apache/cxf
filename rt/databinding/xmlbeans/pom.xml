@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <name>Apache CXF Runtime XmlBeans DataBinding</name>
     <description>Apache CXF Runtime XmlBeans DataBinding</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <properties>
         <cxf.spi-dir>spi-2.1</cxf.spi-dir>
         <cxf.osgi.import>
@@ -43,13 +42,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-common</artifactId>
@@ -63,15 +60,12 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
@@ -82,7 +76,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
@@ -127,8 +120,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
     <build>
         <plugins>
             <plugin>
@@ -180,7 +171,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>jdk15</id>
@@ -210,7 +200,7 @@
                                     <target>
                                         <!-- XmlBeans generated code uses raw List types -->
                                         <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore"/>
                                         </propertyfile>
                                     </target>
                                 </configuration>

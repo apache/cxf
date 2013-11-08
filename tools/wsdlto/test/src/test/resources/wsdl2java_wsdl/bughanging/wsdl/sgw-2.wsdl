@@ -30,138 +30,73 @@ The limited permissions granted above are perpetual and will not be revoked by O
 
 This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 -->
-
-<wsdl:definitions name="ServiceGroup"
-  xmlns="http://schemas.xmlsoap.org/wsdl/" 
-  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-  xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"   
-  xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2"
-  xmlns:wsrf-rpw="http://docs.oasis-open.org/wsrf/rpw-2"
-  xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2"  
-  xmlns:wsrf-sg="http://docs.oasis-open.org/wsrf/sg-2"
-  xmlns:wsrf-sgw="http://docs.oasis-open.org/wsrf/sgw-2"
-  targetNamespace="http://docs.oasis-open.org/wsrf/sgw-2">
-
-  <!-- ========================== Imports =========================== --> 
-
-  <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rpw-2" 
-               location="rpw-2.wsdl" />
- 
-  <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rw-2" 
-               location="rw-2.wsdl" />
-
-  <!-- ===================== Types Definitions ====================== -->
-
-  <wsdl:types>
-    <xsd:schema> 
-      <xsd:import namespace="http://docs.oasis-open.org/wsrf/sg-2" 
-                  schemaLocation="../schemas/wsdl/sg-2.xsd" />
-
-      <xsd:import namespace="http://docs.oasis-open.org/wsrf/rp-2" 
-                  schemaLocation="../schemas/wsdl/rp-2.xsd" />
-
-      <xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
-                  schemaLocation="../schemas/wsdl/bf-2.xsd" />
-    </xsd:schema>
-  </wsdl:types>
-
-  <!-- ==================== Message Definitions ===================== -->
-
-  <!-- =============== ServiceGroupRegistration::Add ================ 
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2" xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2" xmlns:wsrf-rpw="http://docs.oasis-open.org/wsrf/rpw-2" xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" xmlns:wsrf-sg="http://docs.oasis-open.org/wsrf/sg-2" xmlns:wsrf-sgw="http://docs.oasis-open.org/wsrf/sgw-2" name="ServiceGroup" targetNamespace="http://docs.oasis-open.org/wsrf/sgw-2">
+    <!-- ========================== Imports =========================== -->
+    <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rpw-2" location="rpw-2.wsdl"/>
+    <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rw-2" location="rw-2.wsdl"/>
+    <!-- ===================== Types Definitions ====================== -->
+    <wsdl:types>
+        <xsd:schema>
+            <xsd:import namespace="http://docs.oasis-open.org/wsrf/sg-2" schemaLocation="../schemas/wsdl/sg-2.xsd"/>
+            <xsd:import namespace="http://docs.oasis-open.org/wsrf/rp-2" schemaLocation="../schemas/wsdl/rp-2.xsd"/>
+            <xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2" schemaLocation="../schemas/wsdl/bf-2.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+    <!-- ==================== Message Definitions ===================== -->
+    <!-- =============== ServiceGroupRegistration::Add ================ 
     Add(MemberEPR, Content, [InitialTerminationTime])
     returns: EPR to ServiceGroupEntry
   -->
-
-  <wsdl:message name="AddRequest">
-    <wsdl:part name="AddRequest" element="wsrf-sg:Add" />
-  </wsdl:message>
-  
-  <wsdl:message name="AddResponse">
-    <wsdl:part name="AddResponse" element="wsrf-sg:AddResponse" />
-  </wsdl:message>
- 
-  <wsdl:message name="ContentCreationFailedFault">
-    <wsdl:part name="ContentCreationFailedFault" 
-               element="wsrf-sg:ContentCreationFailedFault" />
-  </wsdl:message>
-
-  <wsdl:message name="UnsupportedMemberInterfaceFault">
-    <wsdl:part name="UnsupportedMemberInterfaceFault" 
-               element="wsrf-sg:UnsupportedMemberInterfaceFault" />
-  </wsdl:message>
-
-  <wsdl:message name="AddRefusedFault">
-    <wsdl:part name="AddRefusedFault" 
-               element="wsrf-sg:AddRefusedFault" />
-  </wsdl:message>
-
-  <!-- =================== PortType Definitions ===================== -->  
-
-  <wsdl:portType name="ServiceGroup"
-      wsrf-rp:ResourceProperties="wsrf-sg:ServiceGroupRP">
-    <wsdl:operation name="GetResourceProperty">
-      <wsdl:input name="GetResourcePropertyRequest" 
-                  message="wsrf-rpw:GetResourcePropertyRequest" />
-      <wsdl:output name="GetResourcePropertyResponse" 
-                   message="wsrf-rpw:GetResourcePropertyResponse" />
-      <wsdl:fault name="InvalidResourcePropertyQNameFault" 
-                  message="wsrf-rpw:InvalidResourcePropertyQNameFault" />
-      <wsdl:fault name="ResourceUnknownFault" 
-                  message="wsrf-rw:ResourceUnknownFault" />
-      <wsdl:fault name="ResourceUnavailableFault" 
-                  message="wsrf-rw:ResourceUnavailableFault" />
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <wsdl:portType name="ServiceGroupEntry"
-      wsrf-rp:ResourceProperties="wsrf-sg:ServiceGroupEntryRP">
-    <wsdl:operation name="GetResourceProperty">
-      <wsdl:input name="GetResourcePropertyRequest" 
-                  message="wsrf-rpw:GetResourcePropertyRequest" />
-      <wsdl:output name="GetResourcePropertyResponse" 
-                   message="wsrf-rpw:GetResourcePropertyResponse" />
-      <wsdl:fault name="InvalidResourcePropertyQNameFault" 
-                  message="wsrf-rpw:InvalidResourcePropertyQNameFault" />   
-      <wsdl:fault name="ResourceUnknownFault" 
-                  message="wsrf-rw:ResourceUnknownFault" />
-      <wsdl:fault name="ResourceUnavailableFault" 
-                  message="wsrf-rw:ResourceUnavailableFault" />
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <wsdl:portType name="ServiceGroupRegistration"
-      wsrf-rp:ResourceProperties="wsrf-sg:ServiceGroupRP">
-    <wsdl:operation name="GetResourceProperty">
-      <wsdl:input name="GetResourcePropertyRequest" 
-                  message="wsrf-rpw:GetResourcePropertyRequest" />
-      <wsdl:output name="GetResourcePropertyResponse" 
-                  message="wsrf-rpw:GetResourcePropertyResponse" />
-      <wsdl:fault name="InvalidResourcePropertyQNameFault" 
-                  message="wsrf-rpw:InvalidResourcePropertyQNameFault" /> 
-      <wsdl:fault name="ResourceUnknownFault" 
-                  message="wsrf-rw:ResourceUnknownFault" />
-      <wsdl:fault name="ResourceUnavailableFault" 
-                  message="wsrf-rw:ResourceUnavailableFault" />
-    </wsdl:operation>
-    <wsdl:operation name="Add">
-      <wsdl:input name="AddRequest" 
-                  message="wsrf-sgw:AddRequest" />
-      <wsdl:output name="AddResponse" 
-                  message="wsrf-sgw:AddResponse" />
-      <wsdl:fault name="ContentCreationFailedFault" 
-                  message="wsrf-sgw:ContentCreationFailedFault" />
-      <wsdl:fault name="UnsupportedMemberInterfaceFault" 
-                  message="wsrf-sgw:UnsupportedMemberInterfaceFault" />      
-      <wsdl:fault name="AddRefusedFault" 
-                  message="wsrf-sgw:AddRefusedFault" /> 
-      <wsdl:fault name="ResourceUnknownFault" 
-                  message="wsrf-rw:ResourceUnknownFault" />
-      <wsdl:fault name="ResourceUnavailableFault" 
-                  message="wsrf-rw:ResourceUnavailableFault" />  
-    </wsdl:operation>
-  </wsdl:portType>
-
+    <wsdl:message name="AddRequest">
+        <wsdl:part name="AddRequest" element="wsrf-sg:Add"/>
+    </wsdl:message>
+    <wsdl:message name="AddResponse">
+        <wsdl:part name="AddResponse" element="wsrf-sg:AddResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ContentCreationFailedFault">
+        <wsdl:part name="ContentCreationFailedFault" element="wsrf-sg:ContentCreationFailedFault"/>
+    </wsdl:message>
+    <wsdl:message name="UnsupportedMemberInterfaceFault">
+        <wsdl:part name="UnsupportedMemberInterfaceFault" element="wsrf-sg:UnsupportedMemberInterfaceFault"/>
+    </wsdl:message>
+    <wsdl:message name="AddRefusedFault">
+        <wsdl:part name="AddRefusedFault" element="wsrf-sg:AddRefusedFault"/>
+    </wsdl:message>
+    <!-- =================== PortType Definitions ===================== -->
+    <wsdl:portType name="ServiceGroup" wsrf-rp:ResourceProperties="wsrf-sg:ServiceGroupRP">
+        <wsdl:operation name="GetResourceProperty">
+            <wsdl:input name="GetResourcePropertyRequest" message="wsrf-rpw:GetResourcePropertyRequest"/>
+            <wsdl:output name="GetResourcePropertyResponse" message="wsrf-rpw:GetResourcePropertyResponse"/>
+            <wsdl:fault name="InvalidResourcePropertyQNameFault" message="wsrf-rpw:InvalidResourcePropertyQNameFault"/>
+            <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault"/>
+            <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="ServiceGroupEntry" wsrf-rp:ResourceProperties="wsrf-sg:ServiceGroupEntryRP">
+        <wsdl:operation name="GetResourceProperty">
+            <wsdl:input name="GetResourcePropertyRequest" message="wsrf-rpw:GetResourcePropertyRequest"/>
+            <wsdl:output name="GetResourcePropertyResponse" message="wsrf-rpw:GetResourcePropertyResponse"/>
+            <wsdl:fault name="InvalidResourcePropertyQNameFault" message="wsrf-rpw:InvalidResourcePropertyQNameFault"/>
+            <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault"/>
+            <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="ServiceGroupRegistration" wsrf-rp:ResourceProperties="wsrf-sg:ServiceGroupRP">
+        <wsdl:operation name="GetResourceProperty">
+            <wsdl:input name="GetResourcePropertyRequest" message="wsrf-rpw:GetResourcePropertyRequest"/>
+            <wsdl:output name="GetResourcePropertyResponse" message="wsrf-rpw:GetResourcePropertyResponse"/>
+            <wsdl:fault name="InvalidResourcePropertyQNameFault" message="wsrf-rpw:InvalidResourcePropertyQNameFault"/>
+            <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault"/>
+            <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault"/>
+        </wsdl:operation>
+        <wsdl:operation name="Add">
+            <wsdl:input name="AddRequest" message="wsrf-sgw:AddRequest"/>
+            <wsdl:output name="AddResponse" message="wsrf-sgw:AddResponse"/>
+            <wsdl:fault name="ContentCreationFailedFault" message="wsrf-sgw:ContentCreationFailedFault"/>
+            <wsdl:fault name="UnsupportedMemberInterfaceFault" message="wsrf-sgw:UnsupportedMemberInterfaceFault"/>
+            <wsdl:fault name="AddRefusedFault" message="wsrf-sgw:AddRefusedFault"/>
+            <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault"/>
+            <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
 </wsdl:definitions>

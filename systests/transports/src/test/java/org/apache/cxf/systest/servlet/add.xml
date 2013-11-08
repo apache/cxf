@@ -18,5 +18,5 @@
   under the License.
 -->
 <customer xmlns="http://cxf.apache.org/jra">
-<name>Hadrian</name>
+    <name>Hadrian</name>
 </customer>

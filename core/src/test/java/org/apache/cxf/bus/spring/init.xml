@@ -17,21 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xsi:schemaLocation="
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation=" http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestListener">
         <property name="bus" ref="cxf"/>
     </bean>
-
     <cxf:bus>
         <cxf:features>
-            <bean class= "org.apache.cxf.bus.spring.SpringBusFactoryTest$TestFeature"/>
+            <bean class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestFeature"/>
         </cxf:features>
     </cxf:bus>
-    
 </beans>

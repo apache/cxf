@@ -30,13 +30,9 @@
     <name>Apache CXF JAX-RS System Advanced Security Tests</name>
     <description>Apache CXF JAX-RS System Advanced Security Tests</description>
     <url>http://cxf.apache.org</url>
-    
-
     <properties>
         <oauth.version>20100527</oauth.version>
     </properties>
-    
-
     <dependencies>
         <dependency>
             <groupId>xalan</groupId>
@@ -181,7 +177,6 @@
             <artifactId>spring-context</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>${cxf.spring.mock}</artifactId>
@@ -210,10 +205,7 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-    
-
     <build>
         <plugins>
             <plugin>
@@ -229,7 +221,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>async</id>
@@ -242,7 +233,6 @@
             </dependencies>
         </profile>
     </profiles>
-    
     <repositories>
         <repository>
             <id>oauth</id>

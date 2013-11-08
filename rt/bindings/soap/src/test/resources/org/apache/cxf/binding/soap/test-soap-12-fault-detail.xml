@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -17,15 +18,14 @@
     under the License.
 -->
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
- <soap:Body>
-  <soap:Fault>
-   <soap:Code>
-    <soap:Value>soap:Receiver</soap:Value>
-   </soap:Code>
-   <soap:Reason>
-    <soap:Text xml:lang="en">Simulated failure</soap:Text>
-   </soap:Reason>
-  </soap:Fault>
- </soap:Body>
+    <soap:Body>
+        <soap:Fault>
+            <soap:Code>
+                <soap:Value>soap:Receiver</soap:Value>
+            </soap:Code>
+            <soap:Reason>
+                <soap:Text xml:lang="en">Simulated failure</soap:Text>
+            </soap:Reason>
+        </soap:Fault>
+    </soap:Body>
 </soap:Envelope>
-

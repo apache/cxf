@@ -24,15 +24,12 @@
     <name>Apache CXF Runtime Aegis Databinding</name>
     <description>Apache CXF Runtime Aegis Databinding</description>
     <url>http://cxf.apache.org/</url>
-
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -68,10 +65,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
-         </dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
@@ -107,14 +104,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-          <scope>test</scope>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-          <scope>test</scope>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -126,9 +123,7 @@
             <artifactId>spring-context</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

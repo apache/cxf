@@ -17,28 +17,19 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         metadata-complete="true" version="2.5">
-
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee          http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" metadata-complete="true" version="2.5">
     <context-param>
         <param-name>oauth.data.provider-class</param-name>
         <param-value>demo.oauth.server.controllers.SampleOAuthDataProvider</param-value>
     </context-param>
-
     <filter>
         <filter-name>oauthFilter</filter-name>
         <filter-class>org.apache.cxf.rs.security.oauth.filters.OAuthServletFilter</filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>oauthFilter</filter-name>
         <url-pattern>/auth/resources/person/*</url-pattern>
     </filter-mapping>
-
-
     <filter>
         <filter-name>oauthSpringFilter</filter-name>
         <filter-class>demo.oauth.server.spring.SpringOAuthAuthenticationFilter
@@ -49,38 +40,30 @@
         <url-pattern>/auth/resources/person/*</url-pattern>
     </filter-mapping>
     <!-- **************** Spring configuration *****************-->
-
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/*-beans.xml</param-value>
     </context-param>
-
-
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
     <servlet>
         <servlet-name>spring</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>spring</servlet-name>
         <url-pattern>/app/*</url-pattern>
     </servlet-mapping>
-
     <!-- **************** CXF configuration *****************-->
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
@@ -89,12 +72,10 @@
         </servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/auth/*</url-pattern>
     </servlet-mapping>
-
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>

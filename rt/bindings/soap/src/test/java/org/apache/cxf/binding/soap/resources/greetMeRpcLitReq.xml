@@ -17,15 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
-		   xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SOAP-ENV:Body>
-	<ns1:sendReceiveData xmlns:ns1="http://apache.org/hello_world_rpclit">
-	    <in xmlns:ns5="http://apache.org/hello_world_rpclit/types">
-		<ns5:elem1>this is element 1</ns5:elem1>
-		<ns5:elem2>this is element 2</ns5:elem2>
-	    <ns5:elem3>42</ns5:elem3></in>
-	</ns1:sendReceiveData>
+        <ns1:sendReceiveData xmlns:ns1="http://apache.org/hello_world_rpclit">
+            <in xmlns:ns5="http://apache.org/hello_world_rpclit/types">
+                <ns5:elem1>this is element 1</ns5:elem1>
+                <ns5:elem2>this is element 2</ns5:elem2>
+                <ns5:elem3>42</ns5:elem3>
+            </in>
+        </ns1:sendReceiveData>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>

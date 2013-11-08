@@ -17,64 +17,42 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns='http://www.springframework.org/schema/beans'
-	xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:beans='http://www.springframework.org/schema/beans'
-	xmlns:jaxws='http://cxf.apache.org/jaxws'
-	xsi:schemaLocation='http://cxf.apache.org/core
-    http://cxf.apache.org/schemas/core.xsd
-    http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-    http://cxf.apache.org/jaxws
-    http://cxf.apache.org/schemas/jaxws.xsd'>
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
-
-	<bean id="UsernameTokenSign_Request" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-		<constructor-arg>
-			<map>
-				<entry key="action" value="UsernameToken Timestamp Signature" />
-				<entry key="passwordType" value="PasswordDigest" />
-				<entry key="passwordCallbackClass"
-					value="org.apache.cxf.systest.ws.security.handler.UsernamePasswordCallback" />
-				<entry key="signaturePropFile"
-					value="org/apache/cxf/systest/ws/security/handler/Server_SignVerf.properties" />
-			</map>
-		</constructor-arg>
-	</bean>
-
-	<bean id="UsernameTokenSign_Response" class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-		<constructor-arg>
-			<map>
-				<entry key="action" value="UsernameToken Timestamp Signature" />
-				<entry key="passwordType" value="PasswordText" />
-				<entry key="user" value="serverx509v1" />
-				<entry key="passwordCallbackClass"
-					value="org.apache.cxf.systest.ws.security.handler.UsernamePasswordCallback" />
-				<entry key="signaturePropFile"
-					value="org/apache/cxf/systest/ws/security/handler/Server_Decrypt.properties" />
-				<entry key="signatureKeyIdentifier" value="DirectReference" />
-				<entry key="signatureParts"
-					value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body" />
-			</map>
-		</constructor-arg>
-	</bean>
-
-	<jaxws:endpoint id='HelloWorldWS'
-		address="http://localhost:${testutil.ports.Server}/wsse/HelloWorldWS"
-		wsdlLocation=""
-		implementor='org.apache.cxf.systest.ws.security.handler.HelloWorldImpl'>
-		<jaxws:inInterceptors>
-			<ref bean="UsernameTokenSign_Request" />
-			<bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor" />
-		</jaxws:inInterceptors>
-		<jaxws:outInterceptors>
-			<ref bean="UsernameTokenSign_Response" />
-			<bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor" />
-		</jaxws:outInterceptors>
-		<jaxws:handlers>
-		    <bean class="org.apache.cxf.systest.ws.security.handler.JAXWSHandler" />
-		</jaxws:handlers>
-	</jaxws:endpoint>
-
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="http://cxf.apache.org/core     http://cxf.apache.org/schemas/core.xsd     http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-2.0.xsd     http://cxf.apache.org/jaxws     http://cxf.apache.org/schemas/jaxws.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean id="UsernameTokenSign_Request" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+        <constructor-arg>
+            <map>
+                <entry key="action" value="UsernameToken Timestamp Signature"/>
+                <entry key="passwordType" value="PasswordDigest"/>
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.handler.UsernamePasswordCallback"/>
+                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/handler/Server_SignVerf.properties"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="UsernameTokenSign_Response" class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+        <constructor-arg>
+            <map>
+                <entry key="action" value="UsernameToken Timestamp Signature"/>
+                <entry key="passwordType" value="PasswordText"/>
+                <entry key="user" value="serverx509v1"/>
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.security.handler.UsernamePasswordCallback"/>
+                <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/security/handler/Server_Decrypt.properties"/>
+                <entry key="signatureKeyIdentifier" value="DirectReference"/>
+                <entry key="signatureParts" value="{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    <jaxws:endpoint id="HelloWorldWS" address="http://localhost:${testutil.ports.Server}/wsse/HelloWorldWS" wsdlLocation="" implementor="org.apache.cxf.systest.ws.security.handler.HelloWorldImpl">
+        <jaxws:inInterceptors>
+            <ref bean="UsernameTokenSign_Request"/>
+            <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="UsernameTokenSign_Response"/>
+            <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
+        </jaxws:outInterceptors>
+        <jaxws:handlers>
+            <bean class="org.apache.cxf.systest.ws.security.handler.JAXWSHandler"/>
+        </jaxws:handlers>
+    </jaxws:endpoint>
 </beans>

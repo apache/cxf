@@ -23,14 +23,12 @@
     <name>OAuth 1.0a client</name>
     <url>http://cxf.apache.org</url>
     <packaging>war</packaging>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
     <build>
         <finalName>oauth_1.0a_client</finalName>
         <plugins>
@@ -53,7 +51,6 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -71,7 +68,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.oauth.core</groupId>
             <artifactId>oauth-consumer</artifactId>
@@ -82,12 +78,10 @@
             <artifactId>oauth-provider</artifactId>
             <version>20100527</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_3.0_spec</artifactId>
         </dependency>
-
         <dependency>
             <artifactId>standard</artifactId>
             <groupId>taglibs</groupId>
@@ -96,7 +90,6 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>oauth</id>

@@ -17,11 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!-- Endpoint Level Interceptors-->
     <!-- Inserted From JaxWsEndpointImpl, EndpointImpl-->
     <bean id="wrapperClassIn" class="org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor"/>
@@ -35,11 +31,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean id="soapHandler" class="org.apache.cxf.jaxws.handler.soap.SOAPHandlerInterceptor"/>
     <bean id="logicalHandler" class="org.apache.cxf.jaxws.handler.LogicalHandlerInterceptor"/>
     -->
-    
     <!-- WSA Interceptors-->
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
-
     <!-- WS-RM Interceptors-->
     <bean id="rmLogicalOut" class="org.apache.cxf.ws.rm.RMOutInterceptor">
         <property name="bus" ref="cxf"/>
@@ -48,11 +42,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <property name="bus" ref="cxf"/>
     </bean>
     <bean id="rmCodec" class="org.apache.cxf.ws.rm.soap.RMSoapInterceptor"/>
-
     <!-- Logging and Utility Interceptor-->
     <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
     <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-
     <!--WS-A Interceptors not required in Fault Chain-->
     <bean name="{http://cxf.apache.org/greeter_control}GreeterPort.endpoint" abstract="true">
         <property name="inInterceptors">
@@ -90,6 +82,5 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <ref bean="messageSender"/>
             </list>
         </property>
-    </bean> 
-
+    </bean>
 </beans>

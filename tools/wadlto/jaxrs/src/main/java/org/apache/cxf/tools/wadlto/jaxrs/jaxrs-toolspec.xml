@@ -17,19 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-      xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-      xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-      xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd">
     <annotation>
 Examples:
 
         wadl2java application.wadl
         wadl2java -p com.books application.wadl
     </annotation>
-
     <usage>
         <optionGroup id="options">
             <option id="wadlns">
@@ -41,7 +35,6 @@ Examples:
                     <annotation>wadl-namespace</annotation>
                 </associatedArgument>
             </option>
-            
             <option id="packagename">
                 <annotation>
                     Specifies the java package name to use for the generated code
@@ -52,7 +45,6 @@ Examples:
                     <annotation>package-name</annotation>
                 </associatedArgument>
             </option>
-            
             <option id="schemaPackagename" maxOccurs="unbounded">
                 <annotation>
                     Specifies the java package name to use for the generated code
@@ -66,7 +58,6 @@ Examples:
                     <annotation>[schema-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
-            
             <option id="schemaTypeMap" maxOccurs="unbounded">
                 <annotation>
                     Specifies the optional mapping between WADL parameter 
@@ -78,7 +69,6 @@ Examples:
                     <annotation>schema-type=java-type</annotation>
                 </associatedArgument>
             </option>
-            
             <option id="mediaTypeMap" maxOccurs="unbounded">
                 <annotation>
                     Specifies the optional mapping between a WADL representation
@@ -90,7 +80,6 @@ Examples:
                     <annotation>media-type=class-name</annotation>
                 </associatedArgument>
             </option>
-
             <option id="resourcename">
                 <annotation>
                     Specify the simple class name to use for the generated code
@@ -101,7 +90,6 @@ Examples:
                     <annotation>resource-name</annotation>
                 </associatedArgument>
             </option>
-            
             <option id="binding" maxOccurs="unbounded">
                 <annotation>
                     Specify external jaxb binding files. Use one
@@ -112,7 +100,6 @@ Examples:
                     <annotation>binding-file-name</annotation>
                 </associatedArgument>
             </option>
-            
             <option id="catalog" maxOccurs="1">
                 <annotation>
                     Specify catalog file to map the imported wadl/schema.
@@ -122,7 +109,6 @@ Examples:
                     <annotation>catalog-file-name</annotation>
                 </associatedArgument>
             </option>
-
             <option id="outputdir" maxOccurs="1">
                 <annotation>
                     Specify the directory into which the code is placed.
@@ -132,13 +118,11 @@ Examples:
                     <annotation>output-directory</annotation>
                 </associatedArgument>
             </option>
-
             <option id="compile" maxOccurs="1">
                 <annotation>
                     Specifies that the generated code is compiled by the tool.</annotation>
                 <switch>compile</switch>
             </option>
-
             <option id="classdir" maxOccurs="1">
                 <annotation>
                     Specifies the directory into which compiled class files are placed.</annotation>
@@ -147,21 +131,18 @@ Examples:
                     <annotation>compile-classes-directory</annotation>
                 </associatedArgument>
             </option>
-
             <option id="interface" maxOccurs="1">
                 <annotation>
                     Specifies that interface is generated.
                 </annotation>
                 <switch>interface</switch>
             </option>
-
             <option id="impl" maxOccurs="1">
                 <annotation>
                     Specifies that a dummy service implementation is generated.
                 </annotation>
                 <switch>impl</switch>
             </option>
-            
             <option id="generateEnums" maxOccurs="1">
                 <annotation>
                     Specifies that Enum classes can be generated to represent
@@ -169,7 +150,6 @@ Examples:
                 </annotation>
                 <switch>generateEnums</switch>
             </option>
-            
             <option id="inheritResourceParams" maxOccurs="1">
                 <annotation>
                     Specifies that resource-level (path or matrix) parameters
@@ -177,19 +157,16 @@ Examples:
                 </annotation>
                 <switch>inheritResourceParams</switch>
             </option>
-            
             <option id="notypes" maxOccurs="1">
                 <annotation>Turns off generating types</annotation>
                 <switch>noTypes</switch>
             </option>
-            
             <option id="noVoidForEmptyResponses" maxOccurs="1">
                 <annotation>
                    Use JAX-RS Response return type for methods with no response representation
                 </annotation>
                 <switch>noVoidForEmptyResponses</switch>
             </option>
-            
             <option id="noAddressBinding" maxOccurs="1">
                 <annotation>
                     Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType 
@@ -197,7 +174,6 @@ Examples:
                 </annotation>
                 <switch>noAddressBinding</switch>
             </option>
-            
             <option id="supportMultipleXmlReps" maxOccurs="1">
                 <annotation>
                     Specifies that if a method contains multiple request XML representations
@@ -209,7 +185,6 @@ Examples:
                 </annotation>
                 <switch>supportMultipleXmlReps</switch>
             </option>
- 
             <option id="async" maxOccurs="unbounded">
                 <annotation>
                     Specifies a comma separated list of method names or identifiers 
@@ -219,8 +194,7 @@ Examples:
                     <annotation>methodNames</annotation>
                 </associatedArgument>
                 <switch>async</switch>
-            </option>           
-
+            </option>
             <option id="xjc" maxOccurs="unbounded">
                 <annotation>
                     Specifies a comma separated list of arguments that are passed directly to XJC when the
@@ -236,7 +210,6 @@ Examples:
                 </associatedArgument>
                 <switch>xjc</switch>
             </option>
-            
             <option id="encoding" maxOccurs="1">
                 <annotation>
                     Specifies the charset encoding to use when generating java sources 
@@ -246,7 +219,6 @@ Examples:
                     <annotation>encoding</annotation>
                 </associatedArgument>
             </option>
-            
             <!-- 
 
             <option id="validate" maxOccurs="1">
@@ -258,7 +230,6 @@ Examples:
             </option>
             
             -->
-            
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
@@ -269,21 +240,18 @@ Examples:
                 <switch>?</switch>
                 <switch>help</switch>
             </option>
-
             <option id="version">
                 <annotation>
                     Display the version of the tool.</annotation>
                 <switch>version</switch>
                 <switch>v</switch>
             </option>
-
             <option id="verbose">
                 <annotation>
                     Specifies that the generator runs in verbose mode.</annotation>
                 <switch>verbose</switch>
                 <switch>V</switch>
             </option>
-
             <option id="quiet">
                 <annotation>
                     Specifies that the generator runs in quiet mode.</annotation>

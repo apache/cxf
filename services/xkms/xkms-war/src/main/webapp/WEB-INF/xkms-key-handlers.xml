@@ -9,74 +9,45 @@
     License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
     OF ANY KIND, either express or implied. See the License for the specific 
     language governing permissions and limitations under the License. -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="
-        http://cxf.apache.org/core
-        http://cxf.apache.org/schemas/core.xsd
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-        http://cxf.apache.org/jaxws                                     
-        http://cxf.apache.org/schemas/jaxws.xsd
-        http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-
-
-    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
-
-    <bean id="trustedAuthorityValidator"
-        class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
-        <constructor-arg ref="certificateRepo" />
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator"/>
+    <bean id="trustedAuthorityValidator" class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
+        <constructor-arg ref="certificateRepo"/>
     </bean>
-
     <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">
-        <constructor-arg ref="certificateRepo" />
+        <constructor-arg ref="certificateRepo"/>
     </bean>
-
-    <bean id="x509Register"
-        class="org.apache.cxf.xkms.x509.handlers.X509Register">
-        <constructor-arg ref="certificateRepo" />
+    <bean id="x509Register" class="org.apache.cxf.xkms.x509.handlers.X509Register">
+        <constructor-arg ref="certificateRepo"/>
     </bean>
-
-
     <!-- LDAP based implementation -->
-
-    <bean id="certificateRepo"
-        class="org.apache.cxf.xkms.x509.repo.ldap.LdapCertificateRepo">
-        <constructor-arg ref="ldapSearch" />
-        <constructor-arg ref="ldapSchemaConfig" />
-        <constructor-arg value="dc=example,dc=com" />
+    <bean id="certificateRepo" class="org.apache.cxf.xkms.x509.repo.ldap.LdapCertificateRepo">
+        <constructor-arg ref="ldapSearch"/>
+        <constructor-arg ref="ldapSchemaConfig"/>
+        <constructor-arg value="dc=example,dc=com"/>
     </bean>
-
     <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSearch">
-        <constructor-arg value="ldap://localhost:2389" />
-        <constructor-arg value="cn=Directory Manager,dc=example,dc=com" />
-        <constructor-arg value="test" />
-        <constructor-arg value="2" />
+        <constructor-arg value="ldap://localhost:2389"/>
+        <constructor-arg value="cn=Directory Manager,dc=example,dc=com"/>
+        <constructor-arg value="test"/>
+        <constructor-arg value="2"/>
     </bean>
-
     <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig">
-        <property name="certObjectClass" value="inetOrgPerson" />
-        <property name="attrUID" value="uid" />
-        <property name="attrIssuerID" value="manager" />
-        <property name="attrSerialNumber" value="employeeNumber" />
-        <property name="attrCrtBinary" value="userCertificate;binary" />
-        <property name="constAttrNamesCSV" value="sn" />
-        <property name="constAttrValuesCSV" value="X509 certificate" />
-        <property name="serviceCertRDNTemplate" value="cn=%s,ou=services" />
-        <property name="serviceCertUIDTemplate" value="cn=%s" />
-	<property name="trustedAuthorityFilter" value="(&#038;(objectClass=inetOrgPerson)(ou:dn:=CAs))" />
-	<property name="intermediateFilter" value="(objectClass=inetOrgPerson)" />
+        <property name="certObjectClass" value="inetOrgPerson"/>
+        <property name="attrUID" value="uid"/>
+        <property name="attrIssuerID" value="manager"/>
+        <property name="attrSerialNumber" value="employeeNumber"/>
+        <property name="attrCrtBinary" value="userCertificate;binary"/>
+        <property name="constAttrNamesCSV" value="sn"/>
+        <property name="constAttrValuesCSV" value="X509 certificate"/>
+        <property name="serviceCertRDNTemplate" value="cn=%s,ou=services"/>
+        <property name="serviceCertUIDTemplate" value="cn=%s"/>
+        <property name="trustedAuthorityFilter" value="(&amp;(objectClass=inetOrgPerson)(ou:dn:=CAs))"/>
+        <property name="intermediateFilter" value="(objectClass=inetOrgPerson)"/>
     </bean>
-
-
     <!-- File based implementation -->
-
     <!-- bean id="certificateRepo"
         class="org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo">
         <constructor-arg value="../conf/certs" />
     </bean-->
-
 </beans>

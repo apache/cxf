@@ -17,26 +17,18 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
-
-
     <jaxrs:server id="oauthServer" address="/oauth/">
         <jaxrs:serviceBeans>
             <ref bean="temporaryCredentialService"/>
         </jaxrs:serviceBeans>
         <jaxrs:properties>
-           <entry key="report.failure.details" value="true"/>
-           <entry key="report.failure.details.as.header" value="true"/>
+            <entry key="report.failure.details" value="true"/>
+            <entry key="report.failure.details.as.header" value="true"/>
         </jaxrs:properties>
     </jaxrs:server>
-
-    <bean id="temporaryCredentialService"
-          class="org.apache.cxf.rs.security.oauth.services.RequestTokenService">
+    <bean id="temporaryCredentialService" class="org.apache.cxf.rs.security.oauth.services.RequestTokenService">
     </bean>
-
 </beans>

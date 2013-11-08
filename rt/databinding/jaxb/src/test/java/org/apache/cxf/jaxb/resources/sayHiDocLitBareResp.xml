@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,8 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<ns5:inout xmlns:ns4="http://www.w3.org/2005/02/addressing/wsdl" 
-	   xmlns:ns5="http://apache.org/hello_world_doc_lit_bare/types">
+<ns5:inout xmlns:ns4="http://www.w3.org/2005/02/addressing/wsdl" xmlns:ns5="http://apache.org/hello_world_doc_lit_bare/types">
     <ns5:tickerSymbol>APACHE</ns5:tickerSymbol>
     <ns5:tickerPrice>4.5</ns5:tickerPrice>
 </ns5:inout>

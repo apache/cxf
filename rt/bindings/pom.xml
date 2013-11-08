@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,21 +24,16 @@
     <name>Apache CXF Runtime Bindings</name>
     <description>Apache CXF Runtime Bindings</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
-
     <modules>
         <module>soap</module>
         <module>xml</module>
         <module>object</module>
         <module>coloc</module>
-	<module>corba</module>
+        <module>corba</module>
     </modules>
-
-
 </project>

@@ -17,30 +17,26 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<wsdl:definitions targetNamespace="http://schemas.apache.org/yoko/idl/OptionsPT" 
-		  xmlns:tns="http://schemas.apache.org/yoko/idl/OptionsPT" 
-		  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd1="http://schemas.apache.org/yoko/idl/OptionsPT-types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:tns="http://schemas.apache.org/yoko/idl/OptionsPT" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd1="http://schemas.apache.org/yoko/idl/OptionsPT-types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/yoko/idl/OptionsPT">
     <wsdl:types>
-	<xsd:schema>
-	    <xsd:import namespace="http://schemas.apache.org/yoko/idl/OptionsPT-types" schemaLocation="schemapt.xsd"/>
-	</xsd:schema>
+        <xsd:schema>
+            <xsd:import namespace="http://schemas.apache.org/yoko/idl/OptionsPT-types" schemaLocation="schemapt.xsd"/>
+        </xsd:schema>
     </wsdl:types>
     <wsdl:message name="getEmployee">
-	<wsdl:part name="inparameter" element="xsd1:getEmployee">
-	</wsdl:part>
+        <wsdl:part name="inparameter" element="xsd1:getEmployee">
+        </wsdl:part>
     </wsdl:message>
     <wsdl:message name="getEmployeeResponse">
-	<wsdl:part name="outparameter" element="xsd1:getEmployeeResponse">
-	</wsdl:part>
+        <wsdl:part name="outparameter" element="xsd1:getEmployeeResponse">
+        </wsdl:part>
     </wsdl:message>
     <wsdl:portType name="foo.bar">
-	<wsdl:operation name="getEmployee">
-	    <wsdl:input name="getEmployeeRequest" message="tns:getEmployee">
-	    </wsdl:input>
-	    <wsdl:output name="getEmployeeResponse" message="tns:getEmployeeResponse">
-	    </wsdl:output>
-	</wsdl:operation>
+        <wsdl:operation name="getEmployee">
+            <wsdl:input name="getEmployeeRequest" message="tns:getEmployee">
+            </wsdl:input>
+            <wsdl:output name="getEmployeeResponse" message="tns:getEmployeeResponse">
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:portType>
 </wsdl:definitions>

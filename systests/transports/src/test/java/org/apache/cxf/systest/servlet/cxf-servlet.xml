@@ -17,64 +17,22 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-  
-  <jaxws:endpoint 
-    id="greeter1" 
-    address="/greeter"
-  	implementor="org.apache.hello_world_soap_http.GreeterImpl"
-  	wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"      />
- 
-  <jaxws:endpoint 
-    id="greeter2" 
-    address="/greeter2"
-  	implementor="org.apache.hello_world_xml_http.wrapped.GreeterImpl"
-  	wsdlLocation="/org/apache/cxf/systest/servlet/hello_world_xml_wrapped.wsdl" />
-  
-  <jaxws:endpoint 
-    id="greeter3" 
-    address="/greeter3"
-    implementor="org.apache.cxf.systest.servlet.CXFServletTest$NoWsdlGreeter">
-    <jaxws:schemaLocations >
-        <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
-    </jaxws:schemaLocations>
-  </jaxws:endpoint>
-
-  <jaxws:endpoint 
-    id="greeter4" 
-    address="/greeter4"
-    implementor="org.apache.cxf.systest.servlet.CXFServletTest$NoWsdlGreeter">
-    <jaxws:schemaLocations >
-        <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
-    </jaxws:schemaLocations>
-    <jaxws:properties>
-        <entry key="publishedEndpointUrl" value="http://cxf.apache.org/MyGreeter"/>
-    </jaxws:properties>
-  </jaxws:endpoint>
-
-  <jaxws:endpoint
-    id="greeter5"
-    address="/greeter5"
-    publishedEndpointUrl="http://cxf.apache.org/publishedEndpointUrl1"
-        implementor="org.apache.hello_world_soap_http.GreeterImpl"
-        wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"
-        serviceName="e:SOAPService"
-        endpointName="e:SoapPort" 
-        xmlns:e="http://apache.org/hello_world_soap_http"     />
- 
-  <jaxws:endpoint
-    id="greeter6"
-    address="/greeter6"
-    publishedEndpointUrl="http://cxf.apache.org/publishedEndpointUrl2"
-        implementor="org.apache.hello_world_soap_http.GreeterImpl"
-        wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"      
-        serviceName="e:SOAPService"
-        endpointName="e:SoapPort1"
-        xmlns:e="http://apache.org/hello_world_soap_http"    />
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <jaxws:endpoint id="greeter1" address="/greeter" implementor="org.apache.hello_world_soap_http.GreeterImpl" wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl"/>
+    <jaxws:endpoint id="greeter2" address="/greeter2" implementor="org.apache.hello_world_xml_http.wrapped.GreeterImpl" wsdlLocation="/org/apache/cxf/systest/servlet/hello_world_xml_wrapped.wsdl"/>
+    <jaxws:endpoint id="greeter3" address="/greeter3" implementor="org.apache.cxf.systest.servlet.CXFServletTest$NoWsdlGreeter">
+        <jaxws:schemaLocations>
+            <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
+        </jaxws:schemaLocations>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="greeter4" address="/greeter4" implementor="org.apache.cxf.systest.servlet.CXFServletTest$NoWsdlGreeter">
+        <jaxws:schemaLocations>
+            <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
+        </jaxws:schemaLocations>
+        <jaxws:properties>
+            <entry key="publishedEndpointUrl" value="http://cxf.apache.org/MyGreeter"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world_soap_http" id="greeter5" address="/greeter5" publishedEndpointUrl="http://cxf.apache.org/publishedEndpointUrl1" implementor="org.apache.hello_world_soap_http.GreeterImpl" wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl" serviceName="e:SOAPService" endpointName="e:SoapPort"/>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world_soap_http" id="greeter6" address="/greeter6" publishedEndpointUrl="http://cxf.apache.org/publishedEndpointUrl2" implementor="org.apache.hello_world_soap_http.GreeterImpl" wsdlLocation="/org/apache/cxf/systest/servlet/hello_world.wsdl" serviceName="e:SOAPService" endpointName="e:SoapPort1"/>
 </beans>

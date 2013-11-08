@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank">
     <corba:typeMapping targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap">
-        <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank" binding="AccountCORBABinding" repositoryID="IDL:Account:1.0" type="ns4:EndpointReferenceType" name="Account" />
-        <corba:object xmlns="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="EndpointReferenceType" name="CORBA.Object" />
+        <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank" binding="AccountCORBABinding" repositoryID="IDL:Account:1.0" type="ns4:EndpointReferenceType" name="Account"/>
+        <corba:object xmlns="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="EndpointReferenceType" name="CORBA.Object"/>
     </corba:typeMapping>
     <wsdl:types>
-        <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:schema xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/Bank">
             <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
             </xs:import>
             <xs:element name="get_balance">
@@ -285,11 +285,11 @@
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="BankCORBABinding" type="tns:Bank">
-        <corba:binding repositoryID="IDL:Bank:1.0" />
+        <corba:binding repositoryID="IDL:Bank:1.0"/>
         <wsdl:operation name="create_account">
             <corba:operation name="create_account">
-                <corba:param mode="in" name="account_name" idltype="corba:string" />
-                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="Account" />
+                <corba:param mode="in" name="account_name" idltype="corba:string"/>
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="Account"/>
             </corba:operation>
             <wsdl:input name="create_accountRequest">
             </wsdl:input>
@@ -298,8 +298,8 @@
         </wsdl:operation>
         <wsdl:operation name="create_epr_account">
             <corba:operation name="create_epr_account">
-                <corba:param mode="in" name="account_name" idltype="corba:string" />
-                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object" />
+                <corba:param mode="in" name="account_name" idltype="corba:string"/>
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object"/>
             </corba:operation>
             <wsdl:input name="create_epr_accountRequest">
             </wsdl:input>
@@ -308,8 +308,8 @@
         </wsdl:operation>
         <wsdl:operation name="get_account">
             <corba:operation name="get_account">
-                <corba:param mode="in" name="account_name" idltype="corba:string" />
-                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="Account" />
+                <corba:param mode="in" name="account_name" idltype="corba:string"/>
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="Account"/>
             </corba:operation>
             <wsdl:input name="get_accountRequest">
             </wsdl:input>
@@ -318,8 +318,8 @@
         </wsdl:operation>
         <wsdl:operation name="get_epr_account">
             <corba:operation name="get_epr_account">
-                <corba:param mode="in" name="account_name" idltype="corba:string" />
-                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object" />
+                <corba:param mode="in" name="account_name" idltype="corba:string"/>
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object"/>
             </corba:operation>
             <wsdl:input name="get_epr_accountRequest">
             </wsdl:input>
@@ -328,8 +328,8 @@
         </wsdl:operation>
         <wsdl:operation name="get_account_epr_with_no_use_attribute">
             <corba:operation name="get_account_epr_with_no_use_attribute">
-                <corba:param mode="in" name="account_name" idltype="corba:string" />
-                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object" />
+                <corba:param mode="in" name="account_name" idltype="corba:string"/>
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/Bank/typemap" name="return" idltype="CORBA.Object"/>
             </corba:operation>
             <wsdl:input name="get_account_epr_with_no_use_attributeRequest">
             </wsdl:input>
@@ -338,7 +338,7 @@
         </wsdl:operation>
         <wsdl:operation name="find_account">
             <corba:operation name="find_account">
-                <corba:param mode="inout" name="account_details" idltype="corba:any" />
+                <corba:param mode="inout" name="account_details" idltype="corba:any"/>
             </corba:operation>
             <wsdl:input name="find_accountRequest">
             </wsdl:input>
@@ -347,7 +347,7 @@
         </wsdl:operation>
         <wsdl:operation name="remove_account">
             <corba:operation name="remove_account">
-                <corba:param mode="in" name="account_name" idltype="corba:string" />
+                <corba:param mode="in" name="account_name" idltype="corba:string"/>
             </corba:operation>
             <wsdl:input name="remove_accountRequest">
             </wsdl:input>
@@ -356,10 +356,10 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="AccountCORBABinding" type="tns:Account">
-        <corba:binding repositoryID="IDL:Account:1.0" />
+        <corba:binding repositoryID="IDL:Account:1.0"/>
         <wsdl:operation name="get_balance">
             <corba:operation name="get_balance">
-                <corba:return name="return" idltype="corba:float" />
+                <corba:return name="return" idltype="corba:float"/>
             </corba:operation>
             <wsdl:input name="get_balanceRequest">
             </wsdl:input>
@@ -368,7 +368,7 @@
         </wsdl:operation>
         <wsdl:operation name="deposit">
             <corba:operation name="deposit">
-                <corba:param mode="in" name="addition" idltype="corba:float" />
+                <corba:param mode="in" name="addition" idltype="corba:float"/>
             </corba:operation>
             <wsdl:input name="depositRequest">
             </wsdl:input>
@@ -378,13 +378,13 @@
     </wsdl:binding>
     <wsdl:service name="AccountCORBAService">
         <wsdl:port name="AccountCORBAPort" binding="tns:AccountCORBABinding">
-            <corba:address location="corbaname::localhost:1050#Account" />
+            <corba:address location="corbaname::localhost:1050#Account"/>
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="BankCORBAService">
         <wsdl:port name="BankCORBAPort" binding="tns:BankCORBABinding">
-            <corba:address location="corbaname::localhost:1050#Bank" />
-            <corba:policy poaname="Bank" serviceid="Bank" persistent="false" />
+            <corba:address location="corbaname::localhost:1050#Bank"/>
+            <corba:policy poaname="Bank" serviceid="Bank" persistent="false"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

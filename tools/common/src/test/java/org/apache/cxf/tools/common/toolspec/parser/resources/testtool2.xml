@@ -17,54 +17,38 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
 <!-- The xhtml namespace is for usage documentation -->
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-  <streams>
-  	<outstream id="testID"/>
-  </streams>
-  
-  <usage>
-
-    <optionGroup id="options">
-
-      <option id="namespace" maxOccurs="1" minOccurs="0">
-        <annotation>Namespace</annotation>
-        <switch>n</switch>
-        <associatedArgument placement="afterSpace">
-	  <valuetype>IdentifyString</valuetype>
-          <annotation>C++ Namespace</annotation>
-        </associatedArgument>
-      </option>
-  
-      <option id="impl" minOccurs="0">
-	    <switch>impl</switch>
-      </option>
-      
-      <option id="required" minOccurs="1">
-            <switch>r</switch>
-      </option>
-
-    </optionGroup>
-
-    <optionGroup id="common_options">
-      <option id="help" maxOccurs="1" minOccurs="0">
-	<switch>?</switch>
-      </option>
-      <option id="version" minOccurs="0">
-	<switch>v</switch>
-      </option>
-    </optionGroup>
-
-    <argument id="wsdlurl" minOccurs="1" maxOccurs="1"  streamref="streamref">
-       <annotation>WSDL/SCHEMA URL</annotation>
-    </argument>
-  </usage>
-  
-  
-
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd">
+    <streams>
+        <outstream id="testID"/>
+    </streams>
+    <usage>
+        <optionGroup id="options">
+            <option id="namespace" maxOccurs="1" minOccurs="0">
+                <annotation>Namespace</annotation>
+                <switch>n</switch>
+                <associatedArgument placement="afterSpace">
+                    <valuetype>IdentifyString</valuetype>
+                    <annotation>C++ Namespace</annotation>
+                </associatedArgument>
+            </option>
+            <option id="impl" minOccurs="0">
+                <switch>impl</switch>
+            </option>
+            <option id="required" minOccurs="1">
+                <switch>r</switch>
+            </option>
+        </optionGroup>
+        <optionGroup id="common_options">
+            <option id="help" maxOccurs="1" minOccurs="0">
+                <switch>?</switch>
+            </option>
+            <option id="version" minOccurs="0">
+                <switch>v</switch>
+            </option>
+        </optionGroup>
+        <argument id="wsdlurl" minOccurs="1" maxOccurs="1" streamref="streamref">
+            <annotation>WSDL/SCHEMA URL</annotation>
+        </argument>
+    </usage>
 </toolspec>

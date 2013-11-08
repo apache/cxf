@@ -18,242 +18,148 @@
   under the License.
 -->
 <!-- START SNIPPET: beans -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client"
-  xmlns:jaxws="http://cxf.apache.org/jaxws"
-  xmlns:util="http://www.springframework.org/schema/util"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util.xsd
-http://cxf.apache.org/jaxws
-http://cxf.apache.org/schemas/jaxws.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd
-http://cxf.apache.org/jaxrs-client
-http://cxf.apache.org/schemas/jaxrs-client.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-
-  <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
-      <property name="bus" ref="cxf"/>
-      <property name="enabled" value="true"/>
-   </bean>
-
-  <jaxrs-client:client id="restClient"
-         address="http://localhost:${testutil.ports.BookServerRestSoap}/test/services/rest"
-         serviceClass="org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws"
-         inheritHeaders="true">
-         <jaxrs-client:headers>
-             <entry key="Accept" value="text/xml"/>
-         </jaxrs-client:headers>
-  </jaxrs-client:client>       
-         
-  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl"/>
-  <bean id="bookstore-simple" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl">
-     <property name="ignoreJaxrsClient" value="true"/>
-  </bean>
-
-  <jaxws:endpoint xmlns:s="http://books.com"
-      serviceName="s:BookService"
-      endpointName="s:BookPort"
-      id="soapservice"
-      implementor="#bookstore"
-      address="/soap/bookservice" />
-
-  <jaxrs:server id="restservice"
-		        address="/rest">
-    <jaxrs:serviceBeans>
-      <ref bean="bookstore"/>
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-
-  <jaxrs:server id="hello_rest" address="/hello-rest">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"/>
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
-
-  <jaxws:endpoint xmlns:s="http://hello.com"
-      serviceName="s:HelloWorld"
-      endpointName="s:HelloWorldPort"
-      id="hello_soap"
-      implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
-      address="/hello-soap"/>
-
-  <jaxws:endpoint xmlns:s="http://books.com"
-      serviceName="s:BookService"
-      endpointName="s:BookPort"
-      id="soapservice2"
-      implementor="#bookstore2"
-      address="/soap/bookservice2">
-      <jaxws:properties>
-          <entry key="org.apache.cxf.endpoint.private" value="true"/>
-      </jaxws:properties>
-  </jaxws:endpoint>
-  <jaxws:endpoint xmlns:s="http://hello.com"
-      serviceName="s:HelloWorld"
-      endpointName="s:HelloWorldPort"
-      id="hello_soap-databinding"
-      implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
-      address="/hello-soap-databinding-jaxb">
-      
-      <jaxws:dataBinding>
-          <ref bean="jaxrs-data-binding"/>
-      </jaxws:dataBinding>
-      
-  </jaxws:endpoint>
-  
-  <jaxws:endpoint xmlns:s="http://hello.com"
-      serviceName="s:HelloWorld"
-      endpointName="s:HelloWorldPort"
-      id="hello_soap-databinding-xslt"
-      implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
-      address="/hello-soap-databinding-xslt">
-      
-      <jaxws:dataBinding>
-          <ref bean="jaxrs-data-binding-xslt"/>
-      </jaxws:dataBinding>
-      
-  </jaxws:endpoint>
-          
-  <bean id="jaxrs-data-binding" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
-      <property name="provider" ref="jaxbProviderSoap"/>
-  </bean>
-  
-  <bean id="jaxbProviderSoap" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider"/>
-  
-  <bean id="jaxrs-data-binding-xslt" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
-      <property name="provider" ref="jaxbProviderXslt"/>
-  </bean>
-  
-  <bean id="jaxbProviderXslt" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">
-      <property name="inTemplate" value="classpath:/WEB-INF/template.xsl"/>
-      <property name="outTemplate" value="classpath:/WEB-INF/template.xsl"/>
-  </bean>
-
-  <jaxrs:server id="restservice2"
-		        address="/rest2">
-    <jaxrs:serviceBeans>
-      <ref bean="bookstore2"/>
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl2"/>
-
-  <jaxrs:server id="restservice3"
-		        address="/rest3">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset"/>
-    </jaxrs:serviceBeans>
-    
-    <jaxrs:providers>
-       <ref bean="jaxbProviderFI" />
-       <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
-           <property name="ignoreRequests" value="true"/>
-       </bean>
-    </jaxrs:providers>
-
-    <jaxrs:properties>
-      <entry key="org.apache.cxf.endpoint.private" value="true"/>
-    </jaxrs:properties>    		   
-  </jaxrs:server> 
-
-  <jaxrs:server id="restservice4"
-		        address="/rest4">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset2"/>
-    </jaxrs:serviceBeans>
-    
-    <jaxrs:providers>
-       <ref bean="jaxbProviderFI" />
-    </jaxrs:providers>
-  </jaxrs:server>
-
-  <jaxrs:server id="restservice5"
-		        address="/rest5">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset3"/>
-    </jaxrs:serviceBeans>
-    
-    <jaxrs:providers>
-       <ref bean="jaxbProviderFI" />
-    </jaxrs:providers>
-    
-    <jaxrs:properties>
-      <entry key="org.apache.cxf.fastinfoset.enabled" value="true"/>
-    </jaxrs:properties>
-  </jaxrs:server>
-
-  <bean id="jaxbProviderFI" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="produceMediaTypes" ref="fastinfosetType"/>
-      <property name="consumeMediaTypes" ref="fastinfosetType"/>
-  </bean>
-
-  <util:list id="fastinfosetType">
-    <value>application/fastinfoset</value>
-  </util:list>
-   
-  <jaxrs:server id="restTransform"
-		        address="/rest-transform">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.BookStore"/>
-    </jaxrs:serviceBeans>
-    
-    <jaxrs:features>
-       <ref bean="transformFeatureRest" />
-    </jaxrs:features>
-  </jaxrs:server> 
-   
-  <bean id="transformFeatureRest" class="org.apache.cxf.feature.StaxTransformFeature">
-      <!-- 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
+        <property name="bus" ref="cxf"/>
+        <property name="enabled" value="true"/>
+    </bean>
+    <jaxrs-client:client id="restClient" address="http://localhost:${testutil.ports.BookServerRestSoap}/test/services/rest" serviceClass="org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws" inheritHeaders="true">
+        <jaxrs-client:headers>
+            <entry key="Accept" value="text/xml"/>
+        </jaxrs-client:headers>
+    </jaxrs-client:client>
+    <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl"/>
+    <bean id="bookstore-simple" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl">
+        <property name="ignoreJaxrsClient" value="true"/>
+    </bean>
+    <jaxws:endpoint xmlns:s="http://books.com" serviceName="s:BookService" endpointName="s:BookPort" id="soapservice" implementor="#bookstore" address="/soap/bookservice"/>
+    <jaxrs:server id="restservice" address="/rest">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxrs:server id="hello_rest" address="/hello-rest">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxws:endpoint xmlns:s="http://hello.com" serviceName="s:HelloWorld" endpointName="s:HelloWorldPort" id="hello_soap" implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl" address="/hello-soap"/>
+    <jaxws:endpoint xmlns:s="http://books.com" serviceName="s:BookService" endpointName="s:BookPort" id="soapservice2" implementor="#bookstore2" address="/soap/bookservice2">
+        <jaxws:properties>
+            <entry key="org.apache.cxf.endpoint.private" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://hello.com" serviceName="s:HelloWorld" endpointName="s:HelloWorldPort" id="hello_soap-databinding" implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl" address="/hello-soap-databinding-jaxb">
+        <jaxws:dataBinding>
+            <ref bean="jaxrs-data-binding"/>
+        </jaxws:dataBinding>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://hello.com" serviceName="s:HelloWorld" endpointName="s:HelloWorldPort" id="hello_soap-databinding-xslt" implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl" address="/hello-soap-databinding-xslt">
+        <jaxws:dataBinding>
+            <ref bean="jaxrs-data-binding-xslt"/>
+        </jaxws:dataBinding>
+    </jaxws:endpoint>
+    <bean id="jaxrs-data-binding" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
+        <property name="provider" ref="jaxbProviderSoap"/>
+    </bean>
+    <bean id="jaxbProviderSoap" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider"/>
+    <bean id="jaxrs-data-binding-xslt" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
+        <property name="provider" ref="jaxbProviderXslt"/>
+    </bean>
+    <bean id="jaxbProviderXslt" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">
+        <property name="inTemplate" value="classpath:/WEB-INF/template.xsl"/>
+        <property name="outTemplate" value="classpath:/WEB-INF/template.xsl"/>
+    </bean>
+    <jaxrs:server id="restservice2" address="/rest2">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore2"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl2"/>
+    <jaxrs:server id="restservice3" address="/rest3">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProviderFI"/>
+            <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
+                <property name="ignoreRequests" value="true"/>
+            </bean>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="org.apache.cxf.endpoint.private" value="true"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server id="restservice4" address="/rest4">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset2"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProviderFI"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="restservice5" address="/rest5">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset3"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProviderFI"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="org.apache.cxf.fastinfoset.enabled" value="true"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <bean id="jaxbProviderFI" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="produceMediaTypes" ref="fastinfosetType"/>
+        <property name="consumeMediaTypes" ref="fastinfosetType"/>
+    </bean>
+    <util:list id="fastinfosetType">
+        <value>application/fastinfoset</value>
+    </util:list>
+    <jaxrs:server id="restTransform" address="/rest-transform">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.BookStore"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:features>
+            <ref bean="transformFeatureRest"/>
+        </jaxrs:features>
+    </jaxrs:server>
+    <bean id="transformFeatureRest" class="org.apache.cxf.feature.StaxTransformFeature">
+        <!-- 
          apply the transformation only if the boolean property with the given name
          is set to true on the message
-      -->   
-      <property name="contextPropertyName" value="http.service.redirection"/>
-      
-      <property name="outTransformElements">
-        <map>
-         <entry key="Book" value="TheBook"/>
-        </map>
-      </property>
-      <property name="inTransformElements">
-        <map>
-         <entry key="{http://www.example.org/super-books}*" value="*"/>
-        </map>
-      </property>  
-  </bean> 
-  
-  <jaxws:endpoint xmlns:s="http://books.com"
-      serviceName="s:BookService"
-      endpointName="s:BookPort"
-      id="soapservice-transform"
-      implementor="#bookstore-simple"
-      address="/soap-transform/bookservice">
-      
-      <jaxws:features>
-       <ref bean="transformFeatureSoap" />
-      </jaxws:features>
-      
-   </jaxws:endpoint> 
-   
-   <bean id="transformFeatureSoap" class="org.apache.cxf.feature.StaxTransformFeature">
-      
-      <property name="outTransformElements">
-        <map>
-         <entry key="{http://jaxws.jaxrs.systest.cxf.apache.org/}*" value="*"/>
-        </map>
-      </property>
-      <property name="inTransformElements">
-        <map>
-         <entry key="getBook" value="{http://jaxws.jaxrs.systest.cxf.apache.org/}getBook"/>
-        </map>
-      </property>
-   </bean>
-   
+      -->
+        <property name="contextPropertyName" value="http.service.redirection"/>
+        <property name="outTransformElements">
+            <map>
+                <entry key="Book" value="TheBook"/>
+            </map>
+        </property>
+        <property name="inTransformElements">
+            <map>
+                <entry key="{http://www.example.org/super-books}*" value="*"/>
+            </map>
+        </property>
+    </bean>
+    <jaxws:endpoint xmlns:s="http://books.com" serviceName="s:BookService" endpointName="s:BookPort" id="soapservice-transform" implementor="#bookstore-simple" address="/soap-transform/bookservice">
+        <jaxws:features>
+            <ref bean="transformFeatureSoap"/>
+        </jaxws:features>
+    </jaxws:endpoint>
+    <bean id="transformFeatureSoap" class="org.apache.cxf.feature.StaxTransformFeature">
+        <property name="outTransformElements">
+            <map>
+                <entry key="{http://jaxws.jaxrs.systest.cxf.apache.org/}*" value="*"/>
+            </map>
+        </property>
+        <property name="inTransformElements">
+            <map>
+                <entry key="getBook" value="{http://jaxws.jaxrs.systest.cxf.apache.org/}getBook"/>
+            </map>
+        </property>
+    </bean>
 </beans>
 <!-- END SNIPPET: beans -->

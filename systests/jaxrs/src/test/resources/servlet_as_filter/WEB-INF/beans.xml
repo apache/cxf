@@ -17,23 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
-	<import resource="classpath:/META-INF/cxf/cxf.xml"/>
-
-    <jaxrs:server id="bookservice"
-                  address="/resources">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:/META-INF/cxf/cxf.xml"/>
+    <jaxrs:server id="bookservice" address="/resources">
         <jaxrs:serviceBeans>
             <ref bean="servletconfigstore"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="servletconfigstore" class="org.apache.cxf.systest.jaxrs.SpringServletConfigStore"/>
-
-    
 </beans>

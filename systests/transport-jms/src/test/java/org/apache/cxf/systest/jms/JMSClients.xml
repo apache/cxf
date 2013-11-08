@@ -17,48 +17,28 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <!--jaxws:endpoint
         id="GreerterJMSService"
         implementor="org.apache.cxf.systest.jms.GreeterImplQueueOneWay"
         address="http://cxf.apache.org/transports/jms" /-->
-        
-    <jaxws:client id="jmsRPCClient" 
-    	serviceClass="org.apache.cxf.hello_world_jms.HelloWorldPortType"    
-    	serviceName="s:HelloWorldService"
-    	endpointName="s:HelloWorldPort"    	
-    	xmlns:s="http://cxf.apache.org/hello_world_jms"
-    	wsdlLocation="classpath:wsdl/jms_test.wsdl"/>       
-    		   
-    
-    <bean id="jmsQueueOneWayServiceClient" class="org.apache.cxf.hello_world_jms.HelloWorldOneWayPort"
-       factory-bean="jmsQueueOneWayServiceClientFactory"
- 	   factory-method="create"/>
-
-    <bean id="jmsQueueOneWayServiceClientFactory"
-          class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
-          <property name="serviceClass" value="org.apache.cxf.hello_world_jms.HelloWorldOneWayPort"/>
-          <property name="wsdlURL" value="classpath:wsdl/jms_test.wsdl" />
-          <property name="serviceName">
-              <bean class="javax.xml.namespace.QName" scope="prototype">
-                  <constructor-arg value="http://cxf.apache.org/hello_world_jms" />
-                  <constructor-arg value="HelloWorldOneWayQueueService" />
-              </bean>
-          </property>
-          <property name="endpointName">
-              <bean class="javax.xml.namespace.QName" scope="prototype">
-                  <constructor-arg value="http://cxf.apache.org/hello_world_jms" />
-                  <constructor-arg value="HelloWorldOneWayQueuePort" />
-              </bean>
-          </property>
-   </bean>
-   
- </beans>  
+    <jaxws:client xmlns:s="http://cxf.apache.org/hello_world_jms" id="jmsRPCClient" serviceClass="org.apache.cxf.hello_world_jms.HelloWorldPortType" serviceName="s:HelloWorldService" endpointName="s:HelloWorldPort" wsdlLocation="classpath:wsdl/jms_test.wsdl"/>
+    <bean id="jmsQueueOneWayServiceClient" class="org.apache.cxf.hello_world_jms.HelloWorldOneWayPort" factory-bean="jmsQueueOneWayServiceClientFactory" factory-method="create"/>
+    <bean id="jmsQueueOneWayServiceClientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+        <property name="serviceClass" value="org.apache.cxf.hello_world_jms.HelloWorldOneWayPort"/>
+        <property name="wsdlURL" value="classpath:wsdl/jms_test.wsdl"/>
+        <property name="serviceName">
+            <bean class="javax.xml.namespace.QName" scope="prototype">
+                <constructor-arg value="http://cxf.apache.org/hello_world_jms"/>
+                <constructor-arg value="HelloWorldOneWayQueueService"/>
+            </bean>
+        </property>
+        <property name="endpointName">
+            <bean class="javax.xml.namespace.QName" scope="prototype">
+                <constructor-arg value="http://cxf.apache.org/hello_world_jms"/>
+                <constructor-arg value="HelloWorldOneWayQueuePort"/>
+            </bean>
+        </property>
+    </bean>
+</beans>

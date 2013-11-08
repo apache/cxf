@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,12 +18,12 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
- <soap:Header/>
-  <soap:Body>
-    <ns2:subscribeResponse xmlns="http://cxf.apache.org/vgop/serviceorder/v1_0/common" xmlns:ns2="http://cxf.apache.org/vgop/serviceorder/v1_0">
-     <ns2:SubscribeResp>
-      <ns2:result>0</ns2:result>
-     </ns2:SubscribeResp>
-   </ns2:subscribeResponse>
-  </soap:Body>
+    <soap:Header/>
+    <soap:Body>
+        <ns2:subscribeResponse xmlns="http://cxf.apache.org/vgop/serviceorder/v1_0/common" xmlns:ns2="http://cxf.apache.org/vgop/serviceorder/v1_0">
+            <ns2:SubscribeResp>
+                <ns2:result>0</ns2:result>
+            </ns2:SubscribeResp>
+        </ns2:subscribeResponse>
+    </soap:Body>
 </soap:Envelope>

@@ -1,8 +1,9 @@
+<?xml version="1.0"?>
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Header/>
- <env:Body xmlns="urn:xfire:idref">
-	<getSampleElement>
+    <env:Header/>
+    <env:Body xmlns="urn:xfire:idref">
+        <getSampleElement>
       
-	</getSampleElement>
- </env:Body>
+        </getSampleElement>
+    </env:Body>
 </env:Envelope>

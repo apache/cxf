@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -18,35 +17,22 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions name="multipartService"    
-    targetNamespace="http://schemas.apache.org/tests" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" 
-    xmlns:corba="http://cxf.apache.org/bindings/corba" 
-    xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://schemas.apache.org/tests" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/tests">
-    
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://schemas.apache.org/tests/corba/typemap/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://schemas.apache.org/tests" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/tests" name="multipartService" targetNamespace="http://schemas.apache.org/tests">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/tests" 
-	     xmlns="http://www.w3.org/2001/XMLSchema"
-	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/tests">
             <xsd:simpleType name="Test.MultiPart.Name">
                 <xsd:restriction base="xsd:string"/>
             </xsd:simpleType>
             <xsd:simpleType name="Test.MultiPart.NickName">
                 <xsd:restriction base="xsd1:Test.MultiPart.Name"/>
-            </xsd:simpleType> 
+            </xsd:simpleType>
             <xsd:simpleType name="Test.MultiPart.Colour">
                 <xsd:restriction base="xsd:string">
                     <xsd:enumeration value="RED"/>
                     <xsd:enumeration value="GREEN"/>
                     <xsd:enumeration value="BLUE"/>
                 </xsd:restriction>
-            </xsd:simpleType>            
+            </xsd:simpleType>
             <xsd:element name="Test.MultiPart._get_string_attribute.return" type="xsd:string"/>
             <xsd:element name="Test.MultiPart._get_test_id.return" type="xsd:float"/>
             <xsd:element name="Test.MultiPart._set_test_id._arg" type="xsd:float"/>
@@ -109,8 +95,7 @@
             <xsd:element name="Test.MultiPart.test_enum.x" type="xsd1:Test.MultiPart.Colour"/>
             <xsd:element name="Test.MultiPart.test_enum.y" type="xsd1:Test.MultiPart.Colour"/>
             <xsd:element name="Test.MultiPart.test_enum.z" type="xsd1:Test.MultiPart.Colour"/>
-            <xsd:element name="Test.MultiPart.test_enum.return" type="xsd1:Test.MultiPart.Colour"/>          
-         
+            <xsd:element name="Test.MultiPart.test_enum.return" type="xsd1:Test.MultiPart.Colour"/>
             <xsd:element name="Test.MultiPart.test_integer.x" type="xsd:integer"/>
             <xsd:element name="Test.MultiPart.test_integer.y" type="xsd:integer"/>
             <xsd:element name="Test.MultiPart.test_integer.z" type="xsd:integer"/>
@@ -131,7 +116,6 @@
             <xsd:element name="Test.MultiPart.test_negativeInteger.y" type="xsd:negativeInteger"/>
             <xsd:element name="Test.MultiPart.test_negativeInteger.z" type="xsd:negativeInteger"/>
             <xsd:element name="Test.MultiPart.test_negativeInteger.return" type="xsd:negativeInteger"/>
-
             <xsd:element name="Test.MultiPart.test_normalizedString.x" type="xsd:normalizedString"/>
             <xsd:element name="Test.MultiPart.test_normalizedString.y" type="xsd:normalizedString"/>
             <xsd:element name="Test.MultiPart.test_normalizedString.z" type="xsd:normalizedString"/>
@@ -314,7 +298,7 @@
         <part name="return" element="xsd1:Test.MultiPart.test_enum.return"/>
         <part name="y" element="xsd1:Test.MultiPart.test_enum.y"/>
         <part name="z" element="xsd1:Test.MultiPart.test_enum.z"/>
-    </message>    
+    </message>
     <message name="Test.MultiPart.test_integer">
         <part name="x" element="xsd1:Test.MultiPart.test_integer.x"/>
         <part name="y" element="xsd1:Test.MultiPart.test_integer.y"/>

@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorldFault">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wswa="http://www.w3.org/2006/05/addressing/wsdl" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorldFault">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="BareDocument" type="string"/>
             <element name="BareDocumentResponse">
                 <complexType>
@@ -35,18 +28,16 @@
                     </sequence>
                     <attribute name="id" type="int"/>
                 </complexType>
-            </element> 
-
+            </element>
             <element name="BadRecordLit" type="string"/>
             <complexType name="BadRecord">
                 <sequence>
                     <element name="reason" type="string"/>
                     <element name="code" type="short"/>
                 </sequence>
-            </complexType>      
+            </complexType>
         </schema>
     </wsdl:types>
-
     <wsdl:message name="Bad_RecordLit_Fault">
         <wsdl:part name="BadRecordLit" element="x1:BadRecordLit"/>
     </wsdl:message>
@@ -55,19 +46,16 @@
     </wsdl:message>
     <wsdl:message name="testDocLitBareResponse">
         <wsdl:part name="out" element="x1:BareDocumentResponse"/>
-    </wsdl:message> 
-    
+    </wsdl:message>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="testDocLitFault">
             <wsdl:input message="tns:testDocLitBareRequest" wswa:Action="http://cxf.apache.org/w2j/hello_world_soap_http/Fault"/>
             <wsdl:output message="tns:testDocLitBareResponse" wswa:Action="http://cxf.apache.org/w2j/hello_world_soap_http/Fault"/>
             <wsdl:fault name="myfault" message="tns:Bad_RecordLit_Fault" wswa:Action="http://cxf.apache.org/w2j/hello_world_soap_http/Fault"/>
-        </wsdl:operation>       
+        </wsdl:operation>
     </wsdl:portType>
-    
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <wsdl:operation name="testDocLitFault">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -80,7 +68,6 @@
                 <soap:fault name="myfault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-
     </wsdl:binding>
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
@@ -89,4 +76,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

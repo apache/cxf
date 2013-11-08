@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,16 +18,16 @@
   under the License.
 -->
 <b:po xmlns:b="urn:Bean">
-  <b:shipping>
-      <b:street>1234 Riverside Drive</b:street>
-      <b:city>Gainesville</b:city>
-      <b:state>FL</b:state>
-      <b:zip>30506</b:zip>
-  </b:shipping>
-  <b:billing>
-      <b:street>1234 Fake Street</b:street>
-      <b:city>Las Vegas</b:city>
-      <b:state>NV</b:state>
-      <b:zip>89102</b:zip>
-  </b:billing>
+    <b:shipping>
+        <b:street>1234 Riverside Drive</b:street>
+        <b:city>Gainesville</b:city>
+        <b:state>FL</b:state>
+        <b:zip>30506</b:zip>
+    </b:shipping>
+    <b:billing>
+        <b:street>1234 Fake Street</b:street>
+        <b:city>Las Vegas</b:city>
+        <b:state>NV</b:state>
+        <b:zip>89102</b:zip>
+    </b:billing>
 </b:po>

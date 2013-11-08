@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -25,20 +26,17 @@
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>http://cxf.apache.org</url>
-
     <properties>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
         </dependency>
     </dependencies>
-
     <modules>
         <module>in_jvm_transport</module>
         <module>js_browser_client_simple</module>
@@ -92,14 +90,11 @@
         <module>corba/bank</module>
         <module>corba/bank_ws_addressing</module>
         <module>corba/hello_world</module>
-
         <module>oauth/server</module>
         <module>oauth/client</module>
-
         <module>jax_rs/minimal_osgi</module>
         <module>ws_discovery</module>
-	<module>ws_eventing</module>
-
+        <module>ws_eventing</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -125,7 +120,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <defaultGoal>install</defaultGoal>
         <pluginManagement>
@@ -139,7 +133,7 @@
                         <target>1.6</target>
                     </configuration>
                 </plugin>
-                 <plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>1.2</version>
@@ -178,23 +172,21 @@
             </pluginRepositories>
         </profile>
     </profiles>
-
     <!--
      we turn off the deploy in the properties above, but deploy plugin will
      still barf without this section in the pom
      -->
     <distributionManagement>
-         <repository>
-             <id>apache.releases.https</id>
-             <name>Apache Release Distribution Repository</name>
-             <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
-         </repository>
-         <snapshotRepository>
-             <id>apache.snapshots.https</id>
-             <name>Apache Development Snapshot Repository</name>
-             <url>https://repository.apache.org/content/repositories/snapshots</url>
-             <uniqueVersion>false</uniqueVersion>
-         </snapshotRepository>
-     </distributionManagement>
-
+        <repository>
+            <id>apache.releases.https</id>
+            <name>Apache Release Distribution Repository</name>
+            <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>apache.snapshots.https</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

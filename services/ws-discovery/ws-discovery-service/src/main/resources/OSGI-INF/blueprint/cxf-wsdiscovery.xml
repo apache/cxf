@@ -17,32 +17,22 @@
     limitations under the License.
 
 -->
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:cxf="http://cxf.apache.org/blueprint/core"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
-
-  	<cm:property-placeholder persistent-id="org.apache.cxf.service.ws-discovery" id="cxfWSDiscoveryProperties">
-    	<cm:default-properties>
-      		<cm:property name="org.apache.cxf.service.ws-discovery.address" value="soap.udp://239.255.255.250:3702"/>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+    <cm:property-placeholder persistent-id="org.apache.cxf.service.ws-discovery" id="cxfWSDiscoveryProperties">
+        <cm:default-properties>
+            <cm:property name="org.apache.cxf.service.ws-discovery.address" value="soap.udp://239.255.255.250:3702"/>
         </cm:default-properties>
     </cm:property-placeholder>
-
     <cxf:bus name="cxf"/>
-
     <!-- Single discovery service to avoid lots of UDP packets, particularly on probes -->
     <bean id="discoveryService" class="org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl">
-        <argument ref="cxf" />
+        <argument ref="cxf"/>
         <argument>
-           <map>
-               <entry key="org.apache.cxf.service.ws-discovery.address" 
-                      value="${org.apache.cxf.service.ws-discovery.address}"/>
-           </map>
+            <map>
+                <entry key="org.apache.cxf.service.ws-discovery.address" value="${org.apache.cxf.service.ws-discovery.address}"/>
+            </map>
         </argument>
-         
-        <cm:managed-properties persistent-id="org.apache.cxf.service.ws-discovery"
-                        update-strategy="component-managed" update-method="update"/> 
+        <cm:managed-properties persistent-id="org.apache.cxf.service.ws-discovery" update-strategy="component-managed" update-method="update"/>
     </bean>
-
-    <service ref="discoveryService" interface="org.apache.cxf.ws.discovery.WSDiscoveryService" />
-
+    <service ref="discoveryService" interface="org.apache.cxf.ws.discovery.WSDiscoveryService"/>
 </blueprint>

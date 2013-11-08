@@ -17,27 +17,21 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/schemas/cxf/idl/bank" 
-    xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/bank" 
-    xmlns:corba="http://cxf.apache.org/bindings/corba" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/bank">
     <corba:typeMapping targetNamespace="http://cxf.apache.org/schemas/cxf/idl/bank/typemap">
         <corba:struct xmlns:ns4="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" repositoryID="IDL:Account:1.0" name="Account" type="ns4:Account">
-            <corba:member name="name" idltype="corba:string" />
-            <corba:member name="balance" idltype="corba:long" />
+            <corba:member name="name" idltype="corba:string"/>
+            <corba:member name="balance" idltype="corba:long"/>
         </corba:struct>
         <corba:exception xmlns:ns4="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" repositoryID="IDL:AccountNotFoundException:1.0" name="AccountNotFoundException" type="ns4:AccountNotFoundExceptionType">
-            <corba:member name="name" idltype="corba:string" />
+            <corba:member name="name" idltype="corba:string"/>
         </corba:exception>
         <corba:exception xmlns:ns4="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" repositoryID="IDL:AccountAlreadyExistsException:1.0" name="AccountAlreadyExistsException" type="ns4:AccountAlreadyExistsExceptionType">
-            <corba:member name="name" idltype="corba:string" />
+            <corba:member name="name" idltype="corba:string"/>
         </corba:exception>
     </corba:typeMapping>
     <wsdl:types>
-        <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:schema xmlns="http://cxf.apache.org/schemas/cxf/idl/bank" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/schemas/cxf/idl/bank">
             <xs:complexType name="Account">
                 <xs:sequence>
                     <xs:element name="name" type="xs:string">
@@ -129,9 +123,9 @@
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="BankSOAPBinding" type="tns:Bank">
-        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="getAccount">
-            <soap:operation soapAction="" style="document" />
+            <soap:operation soapAction="" style="document"/>
             <wsdl:input name="getAccountRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -143,7 +137,7 @@
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="createAccount">
-            <soap:operation name="createAccount" />
+            <soap:operation name="createAccount"/>
             <wsdl:input name="createAccountRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -156,12 +150,12 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="BankCORBABinding" type="tns:Bank">
-        <corba:binding repositoryID="IDL:cxf/Bank:1.0" />
+        <corba:binding repositoryID="IDL:cxf/Bank:1.0"/>
         <wsdl:operation name="getAccount">
             <corba:operation name="getAccount">
-                <corba:param mode="in" name="name" idltype="corba:string" />
-                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" name="return" idltype="Account" />
-                <corba:raises xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" exception="AccountNotFoundException" />
+                <corba:param mode="in" name="name" idltype="corba:string"/>
+                <corba:return xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" name="return" idltype="Account"/>
+                <corba:raises xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" exception="AccountNotFoundException"/>
             </corba:operation>
             <wsdl:input name="getAccountRequest">
             </wsdl:input>
@@ -172,10 +166,10 @@
         </wsdl:operation>
         <wsdl:operation name="createAccount">
             <corba:operation name="createAccount">
-                <corba:param mode="in" name="name" idltype="corba:string" />
-                <corba:param xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" mode="out" name="account" idltype="Account" />
-                <corba:return name="return" idltype="corba:boolean" />
-                <corba:raises xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" exception="AccountAlreadyExistsException" />
+                <corba:param mode="in" name="name" idltype="corba:string"/>
+                <corba:param xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" mode="out" name="account" idltype="Account"/>
+                <corba:return name="return" idltype="corba:boolean"/>
+                <corba:raises xmlns="http://cxf.apache.org/schemas/cxf/idl/bank/typemap" exception="AccountAlreadyExistsException"/>
             </corba:operation>
             <wsdl:input name="createAccountRequest">
             </wsdl:input>
@@ -187,12 +181,12 @@
     </wsdl:binding>
     <wsdl:service name="BankSOAPService">
         <wsdl:port name="BankSOAPPort" binding="tns:BankSOAPBinding">
-            <soap:address location="http://localhost:10000/bank/BankSOAPService" />
+            <soap:address location="http://localhost:10000/bank/BankSOAPService"/>
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="BankCORBAService">
         <wsdl:port name="BankCORBAPort" binding="tns:BankCORBABinding">
-            <corba:address location="file:target/bank.ref" />
+            <corba:address location="file:target/bank.ref"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

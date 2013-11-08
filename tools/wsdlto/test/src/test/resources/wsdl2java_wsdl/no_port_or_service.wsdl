@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="no_port_or_service" 
-    targetNamespace="http://cxf.apache.org/no_port_or_service" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:tns="http://cxf.apache.org/no_port_or_service" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://cxf.apache.org/no_port_or_service/types">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/no_port_or_service" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://cxf.apache.org/no_port_or_service/types" name="no_port_or_service" targetNamespace="http://cxf.apache.org/no_port_or_service">
     <types>
-        <schema targetNamespace="http://cxf.apache.org/no_port_or_service/types"
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/no_port_or_service/types">
             <complexType name="theComplexType">
                 <sequence>
                     <element name="element_one" type="string"/>

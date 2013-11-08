@@ -18,14 +18,5 @@
   under the License.
 -->
 <endpoints>
-
-    <endpoint
-        name="complex_type"
-        interface="org.apache.cxf.performance.complex_type.ComplexPortType"
-        implementation="org.apache.cxf.performance.complex_type.server.ServerImpl"
-        wsdl="WEB-INF/wsdl/complex_type.wsdl"
-        service="{http://cxf.apache.org/performance/complex_type}ComplexService"
-        port="{http://cxf.apache.org/performance/complex_type}SoapPort"
-        url-pattern="/complex_type" />
-
+    <endpoint name="complex_type" interface="org.apache.cxf.performance.complex_type.ComplexPortType" implementation="org.apache.cxf.performance.complex_type.server.ServerImpl" wsdl="WEB-INF/wsdl/complex_type.wsdl" service="{http://cxf.apache.org/performance/complex_type}ComplexService" port="{http://cxf.apache.org/performance/complex_type}SoapPort" url-pattern="/complex_type"/>
 </endpoints>

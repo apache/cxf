@@ -18,14 +18,13 @@
   under the License.
 -->
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
-
- <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore">
-     <method name="POST">
-        <request>
-            <param name="name" style="plain" type="xs:string"/>
-        </request>
-     </method>
-   </resource>
- </resources>  
+    <resources base="http://localhost:8080/baz">
+        <resource path="/bookstore">
+            <method name="POST">
+                <request>
+                    <param name="name" style="plain" type="xs:string"/>
+                </request>
+            </method>
+        </resource>
+    </resources>
 </application>

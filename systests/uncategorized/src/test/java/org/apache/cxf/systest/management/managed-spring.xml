@@ -17,20 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-  
-    <bean id="org.apache.cxf.management.InstrumentationManager"
-        class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
-        <property name="bus" ref="cxf" />
-        <property name="enabled" value="true" />
-        <property name="JMXServiceURL" 
-        	value="service:jmx:rmi:///jndi/rmi://localhost:${testutil.ports.ManagedClientServerTest.1}/jmxrmi" />
-    </bean> 
- 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean id="org.apache.cxf.management.InstrumentationManager" class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
+        <property name="bus" ref="cxf"/>
+        <property name="enabled" value="true"/>
+        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:${testutil.ports.ManagedClientServerTest.1}/jmxrmi"/>
+    </bean>
     <bean id="wq" class="org.apache.cxf.workqueue.AutomaticWorkQueueImpl">
         <property name="name" value="testQueue"/>
         <property name="highWaterMark" value="50"/>

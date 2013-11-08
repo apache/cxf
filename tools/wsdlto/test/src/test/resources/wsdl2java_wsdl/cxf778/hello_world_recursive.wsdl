@@ -17,17 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:import="http://cxf.apache.org/w2j/hello_world_soap_http/import"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:import="http://cxf.apache.org/w2j/hello_world_soap_http/import" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
     <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http/import" location="hello_world_recursive_import.wsdl"/>
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -126,7 +119,7 @@
                     </sequence>
                     <attribute name="id" type="int"/>
                 </complexType>
-            </element>      
+            </element>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
@@ -167,7 +160,7 @@
     </wsdl:message>
     <wsdl:message name="testDocLitBareResponse">
         <wsdl:part name="out" element="x1:BareDocumentResponse"/>
-    </wsdl:message> 
+    </wsdl:message>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
@@ -177,7 +170,7 @@
             <wsdl:input name="greetMeRequest" message="tns:greetMeRequest"/>
             <wsdl:output name="greetMeResponse" message="tns:greetMeResponse"/>
         </wsdl:operation>
-       <wsdl:operation name="greetMeSometime">
+        <wsdl:operation name="greetMeSometime">
             <wsdl:input name="greetMeSometimeRequest" message="tns:greetMeSometimeRequest"/>
             <wsdl:output name="greetMeSometimeResponse" message="tns:greetMeSometimeResponse"/>
         </wsdl:operation>
@@ -193,13 +186,11 @@
         <wsdl:operation name="testDocLitBare">
             <wsdl:input name="testDocLitBareRequest" message="tns:testDocLitBareRequest"/>
             <wsdl:output name="testDocLitBareResponse" message="tns:testDocLitBareResponse"/>
-        </wsdl:operation>       
+        </wsdl:operation>
     </wsdl:portType>
-    
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="import:Greeter_SOAPBinding">
             <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

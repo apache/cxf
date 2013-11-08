@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsp:Policy 
-    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
-    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <wsp:ExactlyOne>
-    <wsp:All>
-      <sp:SymmetricBinding>
-        <wsp:Policy>
-          <sp:ProtectionToken>
-            <wsp:Policy>
-              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <wsp:ExactlyOne>
+        <wsp:All>
+            <sp:SymmetricBinding>
                 <wsp:Policy>
-                  <sp:RequireEmbeddedTokenReference />
-                  <sp:WssX509V3Token10 />
+                    <sp:ProtectionToken>
+                        <wsp:Policy>
+                            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                                <wsp:Policy>
+                                    <sp:RequireEmbeddedTokenReference/>
+                                    <sp:WssX509V3Token10/>
+                                </wsp:Policy>
+                            </sp:X509Token>
+                        </wsp:Policy>
+                    </sp:ProtectionToken>
+                    <sp:AlgorithmSuite>
+                        <wsp:Policy>
+                            <sp:Basic128Rsa15/>
+                        </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                    <sp:Layout>
+                        <wsp:Policy>
+                            <sp:Strict/>
+                        </wsp:Policy>
+                    </sp:Layout>
                 </wsp:Policy>
-              </sp:X509Token>
-            </wsp:Policy>
-          </sp:ProtectionToken>
-          <sp:AlgorithmSuite>
-            <wsp:Policy>
-              <sp:Basic128Rsa15 />
-            </wsp:Policy>
-          </sp:AlgorithmSuite>
-          <sp:Layout>
-            <wsp:Policy>
-              <sp:Strict />
-            </wsp:Policy>
-          </sp:Layout>
-        </wsp:Policy>
-      </sp:SymmetricBinding>
-      <sp:ContentEncryptedElements>
-        <sp:XPath>//soap:Body</sp:XPath>
-      </sp:ContentEncryptedElements>  
-    </wsp:All>
-  </wsp:ExactlyOne>
+            </sp:SymmetricBinding>
+            <sp:ContentEncryptedElements>
+                <sp:XPath>//soap:Body</sp:XPath>
+            </sp:ContentEncryptedElements>
+        </wsp:All>
+    </wsp:ExactlyOne>
 </wsp:Policy>

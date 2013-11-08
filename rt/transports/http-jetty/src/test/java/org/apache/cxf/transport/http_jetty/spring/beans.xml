@@ -17,77 +17,51 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:beans="http://www.springframework.org/schema/beans"    
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:h="http://cxf.apache.org/transports/http/configuration"
-       xmlns:hj="http://cxf.apache.org/transports/http-jetty/configuration"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-		http://www.springframework.org/schema/beans 
-		    http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://cxf.apache.org/configuration/security 
-		    http://cxf.apache.org/schemas/configuration/security.xsd
-		http://cxf.apache.org/transports/http/configuration 
-		    http://cxf.apache.org/schemas/configuration/http-conf.xsd
-		http://cxf.apache.org/transports/http-jetty/configuration 
-		    http://cxf.apache.org/schemas/configuration/http-jetty.xsd"
->
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://cxf.apache.org/transports/http/configuration" xmlns:hj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="                 http://www.springframework.org/schema/beans                      http://www.springframework.org/schema/beans/spring-beans.xsd                 http://cxf.apache.org/configuration/security                      http://cxf.apache.org/schemas/configuration/security.xsd                 http://cxf.apache.org/transports/http/configuration                      http://cxf.apache.org/schemas/configuration/http-conf.xsd                 http://cxf.apache.org/transports/http-jetty/configuration                      http://cxf.apache.org/schemas/configuration/http-jetty.xsd">
     <h:destination name="{urn:test:ns}Foo.http-destination">
-      <h:server ContentEncoding="foobar"/>
+        <h:server ContentEncoding="foobar"/>
     </h:destination>
-    
     <h:conduit name="{urn:test:ns}Foo.http-conduit">
-      <h:client ConnectionTimeout="97"/>
+        <h:client ConnectionTimeout="97"/>
     </h:conduit>
-
     <h:conduit name="*Bar.http-conduit">
-      <h:client ConnectionTimeout="79"/>
+        <h:client ConnectionTimeout="79"/>
     </h:conduit>
-
     <hj:engine-factory bus="cxf">
-       <hj:identifiedTLSServerParameters id="sample1">
-         <hj:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
-            <sec:clientAuthentication want="false" required="false"/>
-        </hj:tlsServerParameters>
-       </hj:identifiedTLSServerParameters>
-       
-	   <hj:identifiedThreadingParameters id="sampleThreading1">
-	      <hj:threadingParameters minThreads="111" maxThreads="120"/>
-	   </hj:identifiedThreadingParameters>
-       
-	   <hj:engine port="9000" maxIdleTime="30000">
-	      <hj:threadingParametersRef id="sampleThreading1"/>	      
-	   </hj:engine>
-	   
-	   <hj:engine port="0">
-	      <hj:threadingParameters minThreads="21" maxThreads="389"/>
-	   </hj:engine>
-	   
-	   <hj:engine port="9001" maxIdleTime="40000" sendServerVersion="false">
-	       <hj:threadingParameters minThreads="99" maxThreads="777"/>	      
-	     <hj:connector>
-           <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
-              <beans:property name = "port" value="9001" />
-           </beans:bean>
-         </hj:connector>
-         <hj:handlers>
-           <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>         
-         </hj:handlers>
-         <hj:sessionSupport>true</hj:sessionSupport>
-	  </hj:engine> 
-	  
-	  <hj:engine port="9002">
-        <hj:tlsServerParameters>
-           <sec:clientAuthentication want="true" required="true"/>
-        </hj:tlsServerParameters>
-           <hj:threadingParametersRef id="sampleThreading1"/>
-      </hj:engine>
-      
-      <hj:engine port="9003">
-         <hj:tlsServerParametersRef id="sample1"/>
-      </hj:engine>
-      
-	</hj:engine-factory>
+        <hj:identifiedTLSServerParameters id="sample1">
+            <hj:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
+                <sec:clientAuthentication want="false" required="false"/>
+            </hj:tlsServerParameters>
+        </hj:identifiedTLSServerParameters>
+        <hj:identifiedThreadingParameters id="sampleThreading1">
+            <hj:threadingParameters minThreads="111" maxThreads="120"/>
+        </hj:identifiedThreadingParameters>
+        <hj:engine port="9000" maxIdleTime="30000">
+            <hj:threadingParametersRef id="sampleThreading1"/>
+        </hj:engine>
+        <hj:engine port="0">
+            <hj:threadingParameters minThreads="21" maxThreads="389"/>
+        </hj:engine>
+        <hj:engine port="9001" maxIdleTime="40000" sendServerVersion="false">
+            <hj:threadingParameters minThreads="99" maxThreads="777"/>
+            <hj:connector>
+                <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
+                    <beans:property name="port" value="9001"/>
+                </beans:bean>
+            </hj:connector>
+            <hj:handlers>
+                <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+            </hj:handlers>
+            <hj:sessionSupport>true</hj:sessionSupport>
+        </hj:engine>
+        <hj:engine port="9002">
+            <hj:tlsServerParameters>
+                <sec:clientAuthentication want="true" required="true"/>
+            </hj:tlsServerParameters>
+            <hj:threadingParametersRef id="sampleThreading1"/>
+        </hj:engine>
+        <hj:engine port="9003">
+            <hj:tlsServerParametersRef id="sample1"/>
+        </hj:engine>
+    </hj:engine-factory>
 </beans>

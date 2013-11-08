@@ -17,32 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:p="http://cxf.apache.org/policy"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
-          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
-          http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
-          http://www.springframework.org/schema/util            http://www.springframework.org/schema/util/spring-util-2.0.xsd
-          http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
-          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-          http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://www.springframework.org/schema/util            http://www.springframework.org/schema/util/spring-util-2.0.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
     <!-- Begin Symmetric -->
     <!--
     <bean id="additionalClasses"
@@ -59,66 +41,53 @@
         </jaxws:properties>
     </jaxws:client>
     -->
-    
     <bean id="xkmsClient" class="org.apache.cxf.xkms.client.XKMSClientFactory" factory-method="create">
         <constructor-arg>
             <value>https://localhost:${testutil.ports.XKMSServer}/XKMS</value>
         </constructor-arg>
         <constructor-arg ref="cxf"/>
     </bean>
-    
     <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
         <constructor-arg>
-            <ref bean="xkmsClient" />
+            <ref bean="xkmsClient"/>
         </constructor-arg>
     </bean>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.crypto" value-ref="xkmsCrypto"/> 
-           <entry key="ws-security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.crypto" value-ref="xkmsCrypto"/>
+            <entry key="ws-security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
+        </jaxws:properties>
     </jaxws:client>
     <!-- End Symmetric -->
-    
     <!-- Begin Asymmetric -->
-    <bean id="crypto" class="org.apache.wss4j.common.crypto.CryptoFactory" 
-        factory-method="getInstance">
+    <bean id="crypto" class="org.apache.wss4j.common.crypto.CryptoFactory" factory-method="getInstance">
         <constructor-arg>
-            <util:properties id="cryptoProperties" 
-                     location="classpath:alice.properties"/>
+            <util:properties id="cryptoProperties" location="classpath:alice.properties"/>
         </constructor-arg>
     </bean>
-    
     <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
         <constructor-arg>
-            <ref bean="xkmsClient" />
+            <ref bean="xkmsClient"/>
         </constructor-arg>
         <constructor-arg>
-             <ref bean="crypto" />
+            <ref bean="crypto"/>
         </constructor-arg>
     </bean>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" 
-                  createdFromAPI="true">
-       <jaxws:properties>
-           <entry key="ws-security.encryption.crypto" value-ref="xkmsAsymmetricCrypto"/> 
-           <entry key="ws-security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
-           <entry key="ws-security.callback-handler" 
-                  value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-           <entry key="ws-security.signature.username" value="alice"/>
-           <entry key="ws-security.signature.crypto" value-ref="xkmsAsymmetricCrypto"/>
-       </jaxws:properties>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.crypto" value-ref="xkmsAsymmetricCrypto"/>
+            <entry key="ws-security.encryption.username" value="CN=bob, OU=eng, O=apache.org"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.username" value="alice"/>
+            <entry key="ws-security.signature.crypto" value-ref="xkmsAsymmetricCrypto"/>
+        </jaxws:properties>
     </jaxws:client>
     <!-- End Asymmetric -->
-    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
-    </http:conduit>  
-    
+    </http:conduit>
 </beans>

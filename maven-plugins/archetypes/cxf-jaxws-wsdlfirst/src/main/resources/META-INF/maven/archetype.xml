@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -17,13 +18,13 @@
     under the License.
 -->
 <archetype>
-  <id>cxf-wsdlfirst-jaxws</id>
-  <sources>
-      <source>src/main/java/HelloWorldPortTypeImpl.java</source>
-  </sources>
-  <resources>
-    <resource>src/main/webapp/WEB-INF/beans.xml</resource>
-    <resource>src/main/webapp/WEB-INF/web.xml</resource>
-    <resource>src/main/webapp/WEB-INF/wsdl/HelloWorld.wsdl</resource>
-  </resources>
+    <id>cxf-wsdlfirst-jaxws</id>
+    <sources>
+        <source>src/main/java/HelloWorldPortTypeImpl.java</source>
+    </sources>
+    <resources>
+        <resource>src/main/webapp/WEB-INF/beans.xml</resource>
+        <resource>src/main/webapp/WEB-INF/web.xml</resource>
+        <resource>src/main/webapp/WEB-INF/wsdl/HelloWorld.wsdl</resource>
+    </resources>
 </archetype>

@@ -17,18 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
-	<import resource="classpath:/META-INF/cxf/cxf.xml"/>
-
-    <jaxrs:server id="bookservice"
-                  address="/resources">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:/META-INF/cxf/cxf.xml"/>
+    <jaxrs:server id="bookservice" address="/resources">
         <jaxrs:serviceBeans>
             <ref bean="bookstore"/>
             <ref bean="servletconfigstore"/>
@@ -40,13 +31,12 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
             <ref bean="plainTextProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
-    
     <jaxrs:server id="petservice" address="/pets">
         <jaxrs:serviceBeans>
             <ref bean="petstore"/>
         </jaxrs:serviceBeans>
         <jaxrs:inInterceptors>
-           <bean class="org.apache.cxf.systest.jaxrs.ResponseCheckInterceptor"/>
+            <bean class="org.apache.cxf.systest.jaxrs.ResponseCheckInterceptor"/>
         </jaxrs:inInterceptors>
         <jaxrs:providers>
             <bean class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
@@ -58,22 +48,17 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
             </bean>
         </jaxrs:providers>
     </jaxrs:server>
-    
     <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
     <bean id="petstore" class="org.apache.cxf.systest.jaxrs.PetStore"/>
     <bean id="servletconfigstore" class="org.apache.cxf.systest.jaxrs.SpringServletConfigStore"/>
     <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
         <property name="toHandle" value="true"/>
-    </bean>   
+    </bean>
     <bean id="exceptionMapper2" class="org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper"/>
     <bean id="plainTextProvider" class="org.apache.cxf.systest.jaxrs.StringTextWriter"/>
-    
-    <jaxrs:server id="bookservice2"
-                  address="/resources2"
-                  publishedEndpointUrl="http://proxy">
+    <jaxrs:server id="bookservice2" address="/resources2" publishedEndpointUrl="http://proxy">
         <jaxrs:serviceBeans>
             <ref bean="bookstore"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    
 </beans>

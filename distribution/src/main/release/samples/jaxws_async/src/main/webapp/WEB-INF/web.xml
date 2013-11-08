@@ -17,12 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-         http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee           http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <display-name>cxf</display-name>
-
     <servlet>
         <description>Apache CXF Endpoint</description>
         <display-name>cxf</display-name>
@@ -31,15 +27,11 @@
         <load-on-startup>1</load-on-startup>
         <async-supported>true</async-supported>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>cxf</servlet-name>
         <url-pattern>/services/*</url-pattern>
     </servlet-mapping>
-
     <session-config>
         <session-timeout>60</session-timeout>
     </session-config>
-
 </web-app>
-

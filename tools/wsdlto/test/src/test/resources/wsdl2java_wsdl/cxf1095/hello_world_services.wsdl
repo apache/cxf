@@ -17,23 +17,11 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<wsdl:definitions name="HelloWorld"
-		  xmlns="http://schemas.xmlsoap.org/wsdl/"
-		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"		 
-		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-		  xmlns:tns="http://cxf.apache.org/w2j/hello_world/services"
-		  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-		  xmlns:x1="http://cxf.apache.org/w2j/hello_world/bindings"
-		  xmlns:x2="http://cxf.apache.org/w2j/hello_world"
-		  targetNamespace="http://cxf.apache.org/w2j/hello_world/services">
-    <wsdl:import
-        namespace="http://cxf.apache.org/w2j/hello_world/bindings"
-        location="hello_world_bindings.wsdl"/>
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/w2j/hello_world/services" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world/bindings" xmlns:x2="http://cxf.apache.org/w2j/hello_world" name="HelloWorld" targetNamespace="http://cxf.apache.org/w2j/hello_world/services">
+    <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world/bindings" location="hello_world_bindings.wsdl"/>
     <wsdl:service name="SOAPService">
-	<wsdl:port name="SoapPort" binding="x1:SOAPBinding">
-	    <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
-	</wsdl:port>
+        <wsdl:port name="SoapPort" binding="x1:SOAPBinding">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

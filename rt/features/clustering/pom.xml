@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,22 +24,18 @@
     <name>Apache CXF Runtime Clustering</name>
     <description>Failover and loadbalancing support</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <properties>
         <cxf.osgi.import>
             org.apache.aries*;version="${cxf.aries.version.range}",
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
     </properties>
-
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -55,7 +52,6 @@
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.core</artifactId>
@@ -75,5 +71,4 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
-
 </project>

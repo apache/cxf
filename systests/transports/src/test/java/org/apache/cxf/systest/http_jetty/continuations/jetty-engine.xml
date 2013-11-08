@@ -17,16 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-  xsi:schemaLocation="
-           http://cxf.apache.org/transports/http-jetty/configuration
-              http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-           http://www.springframework.org/schema/beans 
-              http://www.springframework.org/schema/beans/spring-beans.xsd">              
- <httpj:engine-factory bus="cxf">
-  <httpj:engine port='9091' continuationsEnabled="true"/>
- </httpj:engine-factory>
- 
- </beans>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xsi:schemaLocation="            http://cxf.apache.org/transports/http-jetty/configuration               http://cxf.apache.org/schemas/configuration/http-jetty.xsd            http://www.springframework.org/schema/beans                http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <httpj:engine-factory bus="cxf">
+        <httpj:engine port="9091" continuationsEnabled="true"/>
+    </httpj:engine-factory>
+</beans>

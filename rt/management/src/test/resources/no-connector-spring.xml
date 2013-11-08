@@ -17,17 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:im="http://cxf.apache.org/management"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:im="http://cxf.apache.org/management" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="org.apache.cxf.management.InstrumentationManager" class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
-        <property name="bus" ref="cxf" />
+        <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
-        <property name="createMBServerConnectorFactory" value="false" />
-                        
-    </bean> 
- 
+        <property name="createMBServerConnectorFactory" value="false"/>
+    </bean>
 </beans>

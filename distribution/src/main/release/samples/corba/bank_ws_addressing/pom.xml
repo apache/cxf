@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -20,10 +21,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>corba-bank-ws-addressing</artifactId>
     <packaging>jar</packaging>
-
     <name>Bank sample using JAX-WS API's to talk via CORBA/IIOP</name>
     <description>Bank sample using JAX-WS API's to talk via CORBA/IIOP</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -65,7 +64,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <execute />
+                                        <execute/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -133,7 +132,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
     <profiles>
@@ -183,7 +181,6 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>corba.server</id>
             <build>
@@ -231,7 +228,6 @@
             </build>
         </profile>
     </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

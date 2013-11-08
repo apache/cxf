@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <name>Apache CXF Runtime Local Transport</name>
     <description>Apache CXF Runtime Local Transport</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -43,6 +42,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
-
 </project>

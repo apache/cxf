@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <name>Apache CXF Command Line Tools WSDLTo Core</name>
     <description>Apache CXF Command Line Tools WSDLTo Core</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -41,20 +40,17 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-validator</artifactId>
             <version>${project.version}</version>
-
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-wsdl</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -65,7 +61,6 @@
             <artifactId>${cxf.asm.artifactId}</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
@@ -83,7 +78,6 @@
             <artifactId>jaxb-impl</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

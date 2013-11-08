@@ -17,36 +17,26 @@
     limitations under the License.
 
 -->
-<wsdl:definitions name="wsdl-first"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:tns="http://cxf.apache.org/samples/wsdl-first/interfaces"
-	xmlns:typens="http://cxf.apache.org/samples/wsdl-first/types"
-	targetNamespace="http://cxf.apache.org/samples/wsdl-first/interfaces">
-
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://cxf.apache.org/samples/wsdl-first/interfaces" xmlns:typens="http://cxf.apache.org/samples/wsdl-first/types" name="wsdl-first" targetNamespace="http://cxf.apache.org/samples/wsdl-first/interfaces">
     <wsdl:types>
-      <xsd:schema targetNamespace="http://cxf.apache.org/samples/wsdl-first/types" elementFormDefault="qualified">
-         <xsd:include schemaLocation="./person-types.xsd"/>
-      </xsd:schema>
+        <xsd:schema targetNamespace="http://cxf.apache.org/samples/wsdl-first/types" elementFormDefault="qualified">
+            <xsd:include schemaLocation="./person-types.xsd"/>
+        </xsd:schema>
     </wsdl:types>
-
-	<wsdl:message name="GetPersonRequest">
-		<wsdl:part name="payload" element="typens:GetPerson"/>
-	</wsdl:message>
-	<wsdl:message name="GetPersonResponse">
-		<wsdl:part name="payload" element="typens:GetPersonResponse"/>
-	</wsdl:message>
-	<wsdl:message name="UnknownPersonFault">
-		<wsdl:part name="payload" element="typens:UnknownPersonFault"/>
-	</wsdl:message>
-
+    <wsdl:message name="GetPersonRequest">
+        <wsdl:part name="payload" element="typens:GetPerson"/>
+    </wsdl:message>
+    <wsdl:message name="GetPersonResponse">
+        <wsdl:part name="payload" element="typens:GetPersonResponse"/>
+    </wsdl:message>
+    <wsdl:message name="UnknownPersonFault">
+        <wsdl:part name="payload" element="typens:UnknownPersonFault"/>
+    </wsdl:message>
     <wsdl:portType name="Person">
-		<wsdl:operation name="GetPerson">
-			<wsdl:input message="tns:GetPersonRequest"/>
-			<wsdl:output message="tns:GetPersonResponse"/>
-			<wsdl:fault name="UnknownPerson" message="tns:UnknownPersonFault"/>
-		</wsdl:operation>
-	</wsdl:portType>
+        <wsdl:operation name="GetPerson">
+            <wsdl:input message="tns:GetPersonRequest"/>
+            <wsdl:output message="tns:GetPersonResponse"/>
+            <wsdl:fault name="UnknownPerson" message="tns:UnknownPersonFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
 </wsdl:definitions>

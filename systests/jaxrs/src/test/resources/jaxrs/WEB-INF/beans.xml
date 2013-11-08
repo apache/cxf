@@ -24,283 +24,216 @@
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:util="http://www.springframework.org/schema/util"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:cxf="http://cxf.apache.org/core"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd
-http://cxf.apache.org/core
-http://cxf.apache.org/schemas/core.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
-  <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
-  
-  <jaxrs:server id="bookservice"
-		        address="/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:providers>
-       <ref bean="jaxbProvider"/>
-       <ref bean="jsonProvider"/>
-       <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
-           <property name="externalLinks">
-               <list>
-                  <value>classpath:/WEB-INF/schemas/book.xsd</value>
-               </list>
-           </property>
-       </bean>
-    </jaxrs:providers>
-  </jaxrs:server>
-
-  <jaxrs:server id="bookservice2"
-		        address="/thebooks/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-    <jaxrs:providers>
-       <ref bean="jaxbProvider"/>
-       <ref bean="jsonProvider"/>
-       <bean class="org.apache.cxf.systest.jaxrs.CustomWebApplicationExceptionMapper"/>
-    </jaxrs:providers> 
-    
-  </jaxrs:server>
-
-  <jaxrs:server id="bookservice3"
-		        address="/thebooks3/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-    <jaxrs:providers>
-       <ref bean="jaxbProvider"/>
-       <ref bean="jsonProvider"/>
-       <bean class="org.apache.cxf.systest.jaxrs.InternalServerErrorExceptionMapper"/>
-    </jaxrs:providers> 
-    <jaxrs:features>
-       <cxf:logging/>
-    </jaxrs:features>    
-  </jaxrs:server>
-  
-  <jaxrs:server id="booksxsi"
-		        address="/thebooksxsi/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-    <jaxrs:providers>
-       <ref bean="jaxbProviderXsi"/>
-    </jaxrs:providers> 
-    <jaxrs:features>
-       <cxf:logging/>
-    </jaxrs:features>    
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookservice4"
-		        address="/thebooks4/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-    
-    <jaxrs:providers>
-       <bean class="org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider"/>
-    </jaxrs:providers> 
-    
-  </jaxrs:server> 
-
-  <jaxrs:server id="bookservice5"
-		        address="/thebooks5/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-
-    <jaxrs:providers>
-       <ref bean="xsltProvider"/>
-    </jaxrs:providers> 
-    
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookserviceWithStax"
-		        address="/thebooksWithStax/bookstore">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-
-    <jaxrs:providers>
-       <bean class="org.apache.cxf.systest.jaxrs.XmlStreamReaderProvider"/>
-       <bean class="org.apache.cxf.systest.jaxrs.XmlStreamWriterProvider"/>
-    </jaxrs:providers> 
-    
-    <jaxrs:inInterceptors>
-       <bean class="org.apache.cxf.systest.jaxrs.XMLStreamReaderInInterceptor"/>
-    </jaxrs:inInterceptors>
-    
-    <jaxrs:outInterceptors>
-       <bean class="org.apache.cxf.systest.jaxrs.XMLStreamWriterOutInterceptor"/>
-    </jaxrs:outInterceptors>
-    
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookJsonp" address="/jsonp">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>
-    <jaxrs:providers>		  
-	    <bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
-	      <property name="produceMediaTypes" ref="jsonTypes"/>
-	    </bean>
-    </jaxrs:providers> 
-    <jaxrs:inInterceptors>
-       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpInInterceptor"/>
-    </jaxrs:inInterceptors>
-    <jaxrs:outInterceptors>
-       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
-       <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPostStreamInterceptor"/>
-    </jaxrs:outInterceptors> 
-  </jaxrs:server> 
-  
-  <util:map id="outTemplates">
-      <entry key="application/xhtml+xml" value="classpath:/WEB-INF/templates/template.xsl"/>
-      <entry key="application/xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template2.xsl"/>
-  </util:map>
-  
-  <util:list id="outClassNames">
-      <value>org.apache.cxf.systest.jaxrs.Book</value>
-  </util:list> 
-  
-  <bean id="xsltProvider" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">    
-      <property name="resolver" ref="uriResolver"/>
-      <property name="outMediaTemplates" ref="outTemplates"/>
-      <property name="outClassNames" ref="outClassNames"/>
-  </bean>
-
-  <bean id="uriResolver" class="org.apache.cxf.systest.jaxrs.URIResolverImpl"/>     
-  
-  <jaxrs:server id="bookservice6" address="/thebooks6" 
-     modelRef="classpath:/WEB-INF/model/resources.xml"/>
-
-  <jaxrs:server id="bookservice7" address="/thebooks7">
-    <jaxrs:model>
-      <jaxrs:resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations" path="bookstore">
-        <jaxrs:operation name="getBook" verb="GET" path="/books/{id}">
-           <jaxrs:param name="id" type="PATH"/>
-        </jaxrs:operation>
-        <jaxrs:operation name="getBookChapter" path="/books/{id}/chapter">
-           <jaxrs:param name="id" type="PATH"/>
-        </jaxrs:operation> 
-      </jaxrs:resource>
-      <jaxrs:resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
-        <jaxrs:operation name="getItself" verb="GET"/>
-      </jaxrs:resource>
-    </jaxrs:model>
-  </jaxrs:server>  
-
-  <jaxrs:server id="bookservice8" address="/thebooks8">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.GenericRestServiceImpl"/>
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
-
-  <jaxrs:server id="bookserviceGenerated" address="/generated"
-    docLocation="classpath:/wadl/bookstoreImportResource.wadl">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.codegen.service.BookStore"/>
-    </jaxrs:serviceBeans>
-    <jaxrs:providers>
-       <ref bean="jaxbProviderForTypes"/>
-    </jaxrs:providers>
-  </jaxrs:server>
-
-  <jaxrs:server id="bookservice9"
-		        address="/thebooks9">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:inInterceptors>
-      <bean class="org.apache.cxf.interceptor.security.DepthRestrictingStreamInterceptor">
-          <property name="innerElementLevelThreshold" value="2"/>
-      </bean>
-    </jaxrs:inInterceptors>
-    <jaxrs:properties>
-       <entry key="maxFormParameterCount" value="2"/>
-    </jaxrs:properties>
-        
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookservice10"
-		        address="/thebooks10">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:properties>
-       <entry key="depthInnerElementCountThreshold" value="2"/>
-    </jaxrs:properties>
-        
-  </jaxrs:server>
-
-  <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="unmarshallAsJaxbElement" value="true"/>
-      <property name="schemaLocations" ref="theSchemaLocations"/>
-  </bean>
-
-  <util:list id="theSchemaLocations">
-    <value>classpath:/wadl/schemas/book.xsd</value>
-  </util:list>
-
-  <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="schemaHandler" ref="schemaHolder"/>
-  </bean>
-  
-  <util:list id="jaxbClasses">
-    <value>org.apache.cxf.systest.jaxrs.Book</value>
-  </util:list>
-  <bean id="jaxbProviderXsi" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="jaxbElementClassNames" ref="jaxbClasses"/>
-      <property name="extraClass">
-         <list>
-           <value>org.apache.cxf.systest.jaxrs.SuperBook</value>
-         </list>
-      </property>
-  </bean>
-  
-  <bean id="schemaHolder" class="org.apache.cxf.jaxrs.utils.schemas.SchemaHandler">
-      <property name="schemaLocations" ref="theSchemas"/>
-  </bean>
-  
-  <util:list id="theSchemas">
-      <value>classpath:/org/apache/cxf/systest/jaxrs/resources/book.xsd</value>
-  </util:list>
-  
-  <util:list id="jsonTypes">
-    <value>application/json</value>
-    <value>application/x-javascript</value>
-    <value>application/vnd.example-com.foo+json</value>
-  </util:list>
-  
-  <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
-       <entry key="http://www.example.org/books" value="b"/>
-  </util:map> 
-  
-  <util:list id="jsonKeys">
-    <value>books</value>
-  </util:list>
-  
-  <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
-      <property name="namespaceMap" ref="jsonNamespaceMap"/> 
-      <property name="schemaHandler" ref="schemaHolder"/>
-
-      <property name="serializeAsArray" value="true"/> 
-      <property name="arrayKeys" ref="jsonKeys"/>
-      
-      <property name="produceMediaTypes" ref="jsonTypes"/>
-      <property name="consumeMediaTypes" ref="jsonTypes"/>
-  </bean>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
+    <jaxrs:server id="bookservice" address="/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProvider"/>
+            <ref bean="jsonProvider"/>
+            <bean class="org.apache.cxf.jaxrs.model.wadl.WadlGenerator">
+                <property name="externalLinks">
+                    <list>
+                        <value>classpath:/WEB-INF/schemas/book.xsd</value>
+                    </list>
+                </property>
+            </bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice2" address="/thebooks/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProvider"/>
+            <ref bean="jsonProvider"/>
+            <bean class="org.apache.cxf.systest.jaxrs.CustomWebApplicationExceptionMapper"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice3" address="/thebooks3/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProvider"/>
+            <ref bean="jsonProvider"/>
+            <bean class="org.apache.cxf.systest.jaxrs.InternalServerErrorExceptionMapper"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+            <cxf:logging/>
+        </jaxrs:features>
+    </jaxrs:server>
+    <jaxrs:server id="booksxsi" address="/thebooksxsi/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProviderXsi"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+            <cxf:logging/>
+        </jaxrs:features>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice4" address="/thebooks4/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice5" address="/thebooks5/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="xsltProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookserviceWithStax" address="/thebooksWithStax/bookstore">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.systest.jaxrs.XmlStreamReaderProvider"/>
+            <bean class="org.apache.cxf.systest.jaxrs.XmlStreamWriterProvider"/>
+        </jaxrs:providers>
+        <jaxrs:inInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.XMLStreamReaderInInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.XMLStreamWriterOutInterceptor"/>
+        </jaxrs:outInterceptors>
+    </jaxrs:server>
+    <jaxrs:server id="bookJsonp" address="/jsonp">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+                <property name="produceMediaTypes" ref="jsonTypes"/>
+            </bean>
+        </jaxrs:providers>
+        <jaxrs:inInterceptors>
+            <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpInInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
+            <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPostStreamInterceptor"/>
+        </jaxrs:outInterceptors>
+    </jaxrs:server>
+    <util:map id="outTemplates">
+        <entry key="application/xhtml+xml" value="classpath:/WEB-INF/templates/template.xsl"/>
+        <entry key="application/xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template2.xsl"/>
+    </util:map>
+    <util:list id="outClassNames">
+        <value>org.apache.cxf.systest.jaxrs.Book</value>
+    </util:list>
+    <bean id="xsltProvider" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">
+        <property name="resolver" ref="uriResolver"/>
+        <property name="outMediaTemplates" ref="outTemplates"/>
+        <property name="outClassNames" ref="outClassNames"/>
+    </bean>
+    <bean id="uriResolver" class="org.apache.cxf.systest.jaxrs.URIResolverImpl"/>
+    <jaxrs:server id="bookservice6" address="/thebooks6" modelRef="classpath:/WEB-INF/model/resources.xml"/>
+    <jaxrs:server id="bookservice7" address="/thebooks7">
+        <jaxrs:model>
+            <jaxrs:resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations" path="bookstore">
+                <jaxrs:operation name="getBook" verb="GET" path="/books/{id}">
+                    <jaxrs:param name="id" type="PATH"/>
+                </jaxrs:operation>
+                <jaxrs:operation name="getBookChapter" path="/books/{id}/chapter">
+                    <jaxrs:param name="id" type="PATH"/>
+                </jaxrs:operation>
+            </jaxrs:resource>
+            <jaxrs:resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
+                <jaxrs:operation name="getItself" verb="GET"/>
+            </jaxrs:resource>
+        </jaxrs:model>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice8" address="/thebooks8">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.GenericRestServiceImpl"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxrs:server id="bookserviceGenerated" address="/generated" docLocation="classpath:/wadl/bookstoreImportResource.wadl">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.codegen.service.BookStore"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jaxbProviderForTypes"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice9" address="/thebooks9">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.security.DepthRestrictingStreamInterceptor">
+                <property name="innerElementLevelThreshold" value="2"/>
+            </bean>
+        </jaxrs:inInterceptors>
+        <jaxrs:properties>
+            <entry key="maxFormParameterCount" value="2"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice10" address="/thebooks10">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:properties>
+            <entry key="depthInnerElementCountThreshold" value="2"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="unmarshallAsJaxbElement" value="true"/>
+        <property name="schemaLocations" ref="theSchemaLocations"/>
+    </bean>
+    <util:list id="theSchemaLocations">
+        <value>classpath:/wadl/schemas/book.xsd</value>
+    </util:list>
+    <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="schemaHandler" ref="schemaHolder"/>
+    </bean>
+    <util:list id="jaxbClasses">
+        <value>org.apache.cxf.systest.jaxrs.Book</value>
+    </util:list>
+    <bean id="jaxbProviderXsi" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="jaxbElementClassNames" ref="jaxbClasses"/>
+        <property name="extraClass">
+            <list>
+                <value>org.apache.cxf.systest.jaxrs.SuperBook</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="schemaHolder" class="org.apache.cxf.jaxrs.utils.schemas.SchemaHandler">
+        <property name="schemaLocations" ref="theSchemas"/>
+    </bean>
+    <util:list id="theSchemas">
+        <value>classpath:/org/apache/cxf/systest/jaxrs/resources/book.xsd</value>
+    </util:list>
+    <util:list id="jsonTypes">
+        <value>application/json</value>
+        <value>application/x-javascript</value>
+        <value>application/vnd.example-com.foo+json</value>
+    </util:list>
+    <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
+        <entry key="http://www.example.org/books" value="b"/>
+    </util:map>
+    <util:list id="jsonKeys">
+        <value>books</value>
+    </util:list>
+    <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+        <property name="namespaceMap" ref="jsonNamespaceMap"/>
+        <property name="schemaHandler" ref="schemaHolder"/>
+        <property name="serializeAsArray" value="true"/>
+        <property name="arrayKeys" ref="jsonKeys"/>
+        <property name="produceMediaTypes" ref="jsonTypes"/>
+        <property name="consumeMediaTypes" ref="jsonTypes"/>
+    </bean>
 </beans>
 <!-- END SNIPPET: beans -->

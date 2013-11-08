@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,7 +18,6 @@
   under the License.
 -->
 <ns2:testDoubleBean xmlns:ns2="http://testbeans.com/double">
-  <bean xmlns="http://testbeans.com"/>
-  <beanNext xmlns="http://testbeans.com"/>
+    <bean xmlns="http://testbeans.com"/>
+    <beanNext xmlns="http://testbeans.com"/>
 </ns2:testDoubleBean>
-

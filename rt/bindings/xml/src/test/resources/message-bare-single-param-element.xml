@@ -17,8 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<requestType
-	xmlns="http://apache.org/hello_world_xml_http/bare/types"
-	xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl">
-	tli
+<requestType xmlns="http://apache.org/hello_world_xml_http/bare/types" xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl">
+        tli
 </requestType>

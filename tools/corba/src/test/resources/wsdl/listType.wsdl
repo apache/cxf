@@ -17,28 +17,23 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"            
-             xmlns:tns="http://schemas.apache.org/tests/type_test"
-             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:ref="http://schemas.apache.org/references" name="type_test"
-             targetNamespace="http://schemas.apache.org/tests/type_test">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/tests/type_test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ref="http://schemas.apache.org/references" name="type_test" targetNamespace="http://schemas.apache.org/tests/type_test">
     <types>
-        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" 
-                    targetNamespace="http://schemas.apache.org/tests/type_test">
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.apache.org/tests/type_test">
             <simpleType name="ShortEnum">
                 <restriction base="short">
                     <enumeration value="-1"/>
                     <enumeration value="2"/>
                     <enumeration value="-3"/>
-                 </restriction>
+                </restriction>
             </simpleType>
             <simpleType name="ShortEnumList">
                 <list itemType="tns:ShortEnum"/>
-            </simpleType>   
+            </simpleType>
             <xsd:element name="ShortEnumList_x" type="tns:ShortEnumList"/>
             <xsd:element name="ShortEnumList_y" type="tns:ShortEnumList"/>
             <xsd:element name="ShortEnumList_z" type="tns:ShortEnumList"/>
-            <xsd:element name="ShortEnumList_return" type="tns:ShortEnumList"/>      
+            <xsd:element name="ShortEnumList_return" type="tns:ShortEnumList"/>
         </xsd:schema>
     </types>
     <message name="test_ShortEnumList">
@@ -52,19 +47,14 @@
     </message>
     <message name="test_void"/>
     <message name="test_void_response"/>
-    
     <portType name="TypeTestPortType">
         <operation name="test_ShortEnumList">
             <input name="test_ShortEnumList" message="tns:test_ShortEnumList"/>
             <output name="test_ShortEnumList_response" message="tns:test_ShortEnumList_response"/>
-        </operation>  
+        </operation>
         <operation name="test_void">
             <input name="test_void" message="tns:test_void"/>
             <output name="test_void_response" message="tns:test_void_response"/>
         </operation>
     </portType>
-    
 </definitions>
-    
-    
-    

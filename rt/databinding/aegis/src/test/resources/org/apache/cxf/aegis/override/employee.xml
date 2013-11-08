@@ -17,8 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<employee xmlns="http://inheritance.aegis.cxf.apache.org" 
-		  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-		  xsi:type="Employee">
-  <division>long</division>
+<employee xmlns="http://inheritance.aegis.cxf.apache.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Employee">
+    <division>long</division>
 </employee>

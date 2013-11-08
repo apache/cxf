@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -18,140 +17,113 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
 <!-- The xhtml namespace is for usage documentation -->
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification 
-                      http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-  <annotation> Examples :
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification                        http://cxf.apache.org/schema/xutil/tool-specification.xsd">
+    <annotation> Examples :
         wsdltoidl HelloWorld.wsdl
         wsdltoidl -corba -i GreetPortType -o Greeting.wsdl TestGreeting.wsdl
         wsdltoidl -idl -b TestBinding Test.wsdl
   </annotation>
-
-  <usage>
-
-    <optionGroup id="options">
-
-      <option id="corba" maxOccurs="1">
-        <annotation>Generates CORBA Binding.</annotation>
-        <switch>corba</switch>
-      </option>
-
-      <option id="idl" maxOccurs="1">
-        <annotation>Generates a idl from a wsdl.</annotation>
-        <switch>idl</switch>
-      </option>
-
-      <option id="porttype" maxOccurs="1">
-        <annotation>Specify the portType to use.</annotation>
-        <switch>i</switch>
-        <associatedArgument placement="afterSpace">
-          <annotation>port-type-name</annotation>
-        </associatedArgument>
-      </option>
-
-      <option id="binding" maxOccurs="1">
-        <annotation>Specify the binding to use.</annotation>
-        <switch>b</switch>
-        <associatedArgument placement="afterSpace">
-          <annotation>binding-name</annotation>
-        </associatedArgument>
-      </option>
-
-      <option id="outputdir" maxOccurs="1">
-        <annotation>The directory in which the generated wsdl/idl is placed</annotation>
-        <switch>d</switch>
-        <associatedArgument placement="afterSpace">
-          <annotation>output-directory</annotation>
-        </associatedArgument>
-      </option>
-      
-      <option id="wsdloutputfile" maxOccurs="1">
-        <annotation>The wsdl output file name.</annotation>
-        <switch>w</switch>
-        <associatedArgument placement="afterSpace">
-          <annotation>wsdloutput-file</annotation>
-        </associatedArgument>
-      </option>
-
-      <option id="idloutputfile" maxOccurs="1">
-        <annotation>The idl output file name.</annotation>
-        <switch>o</switch>
-        <switch>output</switch>
-        <associatedArgument placement="afterSpace">
-          <annotation>idl-output-file</annotation>
-        </associatedArgument>
-      </option>
-      
-      <option id="namespace" maxOccurs="1">
-        <annotation>The corba type-map namespace.</annotation>
-        <switch>props</switch>
-        <associatedArgument placement="afterSpace">
-          <annotation>corba-typemap-namespace</annotation>
-        </associatedArgument>
-      </option>
-
-     <option id="wrapped" maxOccurs="1">
-      <annotation>Generate corba binding operation using wrapper types instead of unwrapping into separa
+    <usage>
+        <optionGroup id="options">
+            <option id="corba" maxOccurs="1">
+                <annotation>Generates CORBA Binding.</annotation>
+                <switch>corba</switch>
+            </option>
+            <option id="idl" maxOccurs="1">
+                <annotation>Generates a idl from a wsdl.</annotation>
+                <switch>idl</switch>
+            </option>
+            <option id="porttype" maxOccurs="1">
+                <annotation>Specify the portType to use.</annotation>
+                <switch>i</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>port-type-name</annotation>
+                </associatedArgument>
+            </option>
+            <option id="binding" maxOccurs="1">
+                <annotation>Specify the binding to use.</annotation>
+                <switch>b</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>binding-name</annotation>
+                </associatedArgument>
+            </option>
+            <option id="outputdir" maxOccurs="1">
+                <annotation>The directory in which the generated wsdl/idl is placed</annotation>
+                <switch>d</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>output-directory</annotation>
+                </associatedArgument>
+            </option>
+            <option id="wsdloutputfile" maxOccurs="1">
+                <annotation>The wsdl output file name.</annotation>
+                <switch>w</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>wsdloutput-file</annotation>
+                </associatedArgument>
+            </option>
+            <option id="idloutputfile" maxOccurs="1">
+                <annotation>The idl output file name.</annotation>
+                <switch>o</switch>
+                <switch>output</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>idl-output-file</annotation>
+                </associatedArgument>
+            </option>
+            <option id="namespace" maxOccurs="1">
+                <annotation>The corba type-map namespace.</annotation>
+                <switch>props</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>corba-typemap-namespace</annotation>
+                </associatedArgument>
+            </option>
+            <option id="wrapped" maxOccurs="1">
+                <annotation>Generate corba binding operation using wrapper types instead of unwrapping into separa
 te parameters.</annotation>
-      <switch>wrapped</switch>
-    </option>
-    
-    <option id="address" maxOccurs="1">
-        <annotation>Specify the value to be used for the corba:address location attribute.</annotation>
-        <switch>a</switch>
-        <switch>address</switch>
-        <associatedArgument placement="afterSpace">
-            <annotation>corba-address</annotation>
-        </associatedArgument>
-    </option>
-
-    <option id="addressfile" maxOccurs="1">
-        <annotation>Use the contents of file as the value for the corba:address locationattribute.</annotation>
-         <switch>f</switch>
-         <associatedArgument placement="afterSpace">
-             <annotation>corba-address-file</annotation>
-         </associatedArgument>
-    </option>
-
-    </optionGroup>
-    <optionGroup id="common_options">
-		
-	    <option id="help" maxOccurs="1">
-			<annotation>Display detailed information for options.</annotation>
-			<switch>h</switch>
-			<switch>?</switch>
-			<switch>help</switch>
-	    </option>
-		    
-	    <option id="version">
-			<annotation>Display the version of the tool.</annotation>
-			<switch>version</switch>
-			<switch>v</switch>
-	    </option>
-	
-	    <option id="verbose">
-			<annotation>Verbose mode</annotation>
-			<switch>verbose</switch>
-			<switch>V</switch>
-	    </option>
-	
-	    <option id="quiet">
-			<annotation>Quiet mode</annotation>
-			<switch>quiet</switch>
-			<switch>q</switch>
-			<switch>Q</switch>
-	    </option>
-
-	</optionGroup>
-
-    <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
-       <annotation>WSDL URL</annotation>
-    </argument>
-  </usage>
-
+                <switch>wrapped</switch>
+            </option>
+            <option id="address" maxOccurs="1">
+                <annotation>Specify the value to be used for the corba:address location attribute.</annotation>
+                <switch>a</switch>
+                <switch>address</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>corba-address</annotation>
+                </associatedArgument>
+            </option>
+            <option id="addressfile" maxOccurs="1">
+                <annotation>Use the contents of file as the value for the corba:address locationattribute.</annotation>
+                <switch>f</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>corba-address-file</annotation>
+                </associatedArgument>
+            </option>
+        </optionGroup>
+        <optionGroup id="common_options">
+            <option id="help" maxOccurs="1">
+                <annotation>Display detailed information for options.</annotation>
+                <switch>h</switch>
+                <switch>?</switch>
+                <switch>help</switch>
+            </option>
+            <option id="version">
+                <annotation>Display the version of the tool.</annotation>
+                <switch>version</switch>
+                <switch>v</switch>
+            </option>
+            <option id="verbose">
+                <annotation>Verbose mode</annotation>
+                <switch>verbose</switch>
+                <switch>V</switch>
+            </option>
+            <option id="quiet">
+                <annotation>Quiet mode</annotation>
+                <switch>quiet</switch>
+                <switch>q</switch>
+                <switch>Q</switch>
+            </option>
+        </optionGroup>
+        <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
+            <annotation>WSDL URL</annotation>
+        </argument>
+    </usage>
 </toolspec>

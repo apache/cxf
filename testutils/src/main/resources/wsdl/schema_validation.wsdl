@@ -17,45 +17,33 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/schema_validation" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/schema_validation"
-    xmlns:x1="http://apache.org/schema_validation/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/schema_validation" xmlns:x1="http://apache.org/schema_validation/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/schema_validation">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/schema_validation/types" 
-            xmlns:x1="http://apache.org/schema_validation/types"
-            xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-            
+        <schema xmlns:x1="http://apache.org/schema_validation/types" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/schema_validation/types" elementFormDefault="qualified">
             <simpleType name="RequestIdType">
-				<restriction base="xsd:string">
-		    		<pattern value="[0-9]{10}" />
-	        	</restriction>
-        	</simpleType>
-        	
-        	<simpleType name="ResponseTransactionType">
-				<restriction base="xsd:string">
-		    		<pattern value="[a-zA-Z]{10}" />
-	        	</restriction>
-        	</simpleType>
-        
+                <restriction base="xsd:string">
+                    <pattern value="[0-9]{10}"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="ResponseTransactionType">
+                <restriction base="xsd:string">
+                    <pattern value="[a-zA-Z]{10}"/>
+                </restriction>
+            </simpleType>
             <element name="SomeRequest">
-            	<complexType>
-	            	<sequence>
-	            		<element name="id" type="x1:RequestIdType"/>
-	            	</sequence>
-	            </complexType>
-			</element>
-			            
+                <complexType>
+                    <sequence>
+                        <element name="id" type="x1:RequestIdType"/>
+                    </sequence>
+                </complexType>
+            </element>
             <element name="SomeResponse">
-            	<complexType>
-	            	<sequence>
-	            		<element name="transactionId" type="x1:ResponseTransactionType"/>
-	            	</sequence>
-    	        </complexType>
-	    	</element>
+                <complexType>
+                    <sequence>
+                        <element name="transactionId" type="x1:ResponseTransactionType"/>
+                    </sequence>
+                </complexType>
+            </element>
             <element name="SomeRequestWithHeader">
                 <complexType>
                     <sequence>
@@ -63,14 +51,13 @@
                     </sequence>
                 </complexType>
             </element>
-                        
             <element name="SomeResponseWithHeader">
                 <complexType>
                     <sequence>
                         <element name="transactionId" type="x1:ResponseTransactionType"/>
                     </sequence>
                 </complexType>
-            </element>   
+            </element>
             <element name="SomeHeader">
                 <complexType>
                     <sequence>
@@ -78,8 +65,6 @@
                     </sequence>
                 </complexType>
             </element>
-            
-
             <complexType name="ComplexStruct">
                 <sequence>
                     <element name="elem1" type="string"/>
@@ -155,11 +140,9 @@
     <wsdl:message name="doSomethingRequest">
         <wsdl:part element="x1:SomeRequest" name="in"/>
     </wsdl:message>
-    
     <wsdl:message name="doSomethingResponse">
         <wsdl:part element="x1:SomeResponse" name="in"/>
     </wsdl:message>
-    
     <wsdl:message name="doSomethingRequestWithHeader">
         <wsdl:part element="x1:SomeRequestWithHeader" name="in"/>
         <wsdl:part element="x1:SomeHeader" name="inHeader"/>
@@ -167,11 +150,9 @@
     <wsdl:message name="doSomethingResponseWithHeader">
         <wsdl:part element="x1:SomeResponseWithHeader" name="in"/>
     </wsdl:message>
-
     <wsdl:message name="setComplexStructRequest">
         <wsdl:part element="x1:setComplexStruct" name="in"/>
     </wsdl:message>
-    
     <wsdl:message name="setComplexStructResponse">
         <wsdl:part element="x1:setComplexStructResponse" name="out"/>
     </wsdl:message>
@@ -193,28 +174,23 @@
     <wsdl:message name="getOccuringStructResponse">
         <wsdl:part element="x1:getOccuringStructResponse" name="out"/>
     </wsdl:message>
-    
     <wsdl:portType name="SchemaValidation">
-    	<wsdl:operation name="doSomething">
+        <wsdl:operation name="doSomething">
             <wsdl:input message="tns:doSomethingRequest" name="doSomethingRequest"/>
             <wsdl:output message="tns:doSomethingResponse" name="doSomethingResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="setComplexStruct">
             <wsdl:input message="tns:setComplexStructRequest" name="setComplexStructRequest"/>
             <wsdl:output message="tns:setComplexStructResponse" name="setComplexStructResponse"/>
         </wsdl:operation>
-
         <wsdl:operation name="setOccuringStruct">
             <wsdl:input message="tns:setOccuringStructRequest" name="setOccuringStructRequest"/>
             <wsdl:output message="tns:setOccuringStructResponse" name="setOccuringStructResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="getComplexStruct">
             <wsdl:input message="tns:getComplexStructRequest" name="getComplexStructRequest"/>
             <wsdl:output message="tns:getComplexStructResponse" name="getComplexStructResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="getOccuringStruct">
             <wsdl:input message="tns:getOccuringStructRequest" name="getOccuringStructRequest"/>
             <wsdl:output message="tns:getOccuringStructResponse" name="getOccuringStructResponse"/>
@@ -224,10 +200,8 @@
             <wsdl:output message="tns:doSomethingResponseWithHeader" name="doSomethingResponseWithHeader"/>
         </wsdl:operation>
     </wsdl:portType>
-
     <wsdl:binding name="SchemaValidationBinding" type="tns:SchemaValidation">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        
         <wsdl:operation name="doSomething">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -247,7 +221,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="setComplexStruct">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -257,7 +230,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="setOccuringStruct">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -267,7 +239,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="getComplexStruct">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -277,7 +248,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="getOccuringStruct">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -287,14 +257,10 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
     </wsdl:binding>
-    
     <wsdl:service name="SchemaValidationService">
         <wsdl:port binding="tns:SchemaValidationBinding" name="SoapPort">
             <soap:address location="http://localhost:9900/SoapContext/SoapPort"/>
         </wsdl:port>
     </wsdl:service>
-    
 </wsdl:definitions>
-

@@ -1,41 +1,37 @@
-<wsp:Policy wsu:Id="TransportUsernameTokenPolicy"
-        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:TransportBinding
-                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <sp:TransportToken>
-                            <wsp:Policy>
-                                <sp:HttpsToken>
-                                    <wsp:Policy/>
-                                </sp:HttpsToken>
-                            </wsp:Policy>
-                        </sp:TransportToken>
-                        <sp:Layout>
-                            <wsp:Policy>
-                                <sp:Lax />
-                            </wsp:Policy>
-                        </sp:Layout>
-                        <sp:AlgorithmSuite>
-                            <wsp:Policy>
-                                <sp:Basic128 />
-                            </wsp:Policy>
-                        </sp:AlgorithmSuite>
-                    </wsp:Policy>
-                </sp:TransportBinding>
-                <sp:SupportingTokens
-                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <sp:UsernameToken
-                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                            <wsp:Policy>
-                                <sp:HashPassword/>
-                            </wsp:Policy>
-                        </sp:UsernameToken>
-                    </wsp:Policy>
-                </sp:SupportingTokens>
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
+<?xml version="1.0"?>
+<wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" wsu:Id="TransportUsernameTokenPolicy">
+    <wsp:ExactlyOne>
+        <wsp:All>
+            <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <sp:TransportToken>
+                        <wsp:Policy>
+                            <sp:HttpsToken>
+                                <wsp:Policy/>
+                            </sp:HttpsToken>
+                        </wsp:Policy>
+                    </sp:TransportToken>
+                    <sp:Layout>
+                        <wsp:Policy>
+                            <sp:Lax/>
+                        </wsp:Policy>
+                    </sp:Layout>
+                    <sp:AlgorithmSuite>
+                        <wsp:Policy>
+                            <sp:Basic128/>
+                        </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                </wsp:Policy>
+            </sp:TransportBinding>
+            <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                        <wsp:Policy>
+                            <sp:HashPassword/>
+                        </wsp:Policy>
+                    </sp:UsernameToken>
+                </wsp:Policy>
+            </sp:SupportingTokens>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

@@ -17,25 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxws="http://cxf.apache.org/jaxws"
-  xsi:schemaLocation="
-           http://cxf.apache.org/jaxws                                 
-              http://cxf.apache.org/schemas/jaxws.xsd
-           http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd">
-              
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-  
-  <bean id='rpc-service' class='org.apache.cxf.javascript.fortest.SimpleRPCImpl'/>
-  
-  <jaxws:server id="rpc-service-endpoint" 
-    address="http://localhost:${testutil.ports.TestPort}/SimpleRPC" >
-     <jaxws:serviceBean>
-      <ref bean="rpc-service" />
-    </jaxws:serviceBean>
-  </jaxws:server>
- 
- </beans>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="            http://cxf.apache.org/jaxws                                                http://cxf.apache.org/schemas/jaxws.xsd            http://www.springframework.org/schema/beans               http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <bean id="rpc-service" class="org.apache.cxf.javascript.fortest.SimpleRPCImpl"/>
+    <jaxws:server id="rpc-service-endpoint" address="http://localhost:${testutil.ports.TestPort}/SimpleRPC">
+        <jaxws:serviceBean>
+            <ref bean="rpc-service"/>
+        </jaxws:serviceBean>
+    </jaxws:server>
+</beans>

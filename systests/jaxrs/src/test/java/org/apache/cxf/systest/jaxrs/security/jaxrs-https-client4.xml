@@ -17,21 +17,8 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxrs="http://cxf.apache.org/jaxrs-client"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd
-        http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
-        ">
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxrs="http://cxf.apache.org/jaxrs-client" xmlns:cxf="http://cxf.apache.org/core" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <!-- -->
     <!-- HTTP/S configuration for proxy & web clients -->
     <!-- -->
@@ -39,29 +26,22 @@ under the License.
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
-	           </sec:keyManagers>
-	        <sec:trustManagers>
-	           <sec:keyStore type="JKS" password="password"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
-	        </sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+            </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
-
-
-    <jaxrs:client id="bookService" 
-       address="https://localhost:${testutil.ports.jaxrs-https}"
-serviceClass="org.apache.cxf.systest.jaxrs.BookStore">
+    <jaxrs:client id="bookService" address="https://localhost:${testutil.ports.jaxrs-https}" serviceClass="org.apache.cxf.systest.jaxrs.BookStore">
         <jaxrs:providers>
             <bean class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
                 <property name="inTransformElements">
-                 <map>
-                   <entry key="Book" value="TheBook"/>
-                 </map>
+                    <map>
+                        <entry key="Book" value="TheBook"/>
+                    </map>
                 </property>
             </bean>
         </jaxrs:providers>
     </jaxrs:client>
-
 </beans>

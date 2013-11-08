@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,20 +18,20 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-     <RequestSecurityTokenResponseCollection xmlns="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:ns2="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:ns3="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns:ns5="http://docs.oasis-open.org/ws-sx/ws-trust/200802">
-        <RequestSecurityTokenResponse>
-           <!-- test irrelevant part commented out -->
-           <wsp:AppliesTo xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
-              <wsa:EndpointReference>
-                 <wsa:Address>https://nssstg1.msvcs.example.com/FIM/sps/spwsfstd/wsf</wsa:Address>
-              </wsa:EndpointReference>
-           </wsp:AppliesTo>
-           <Lifetime>
-              <ns2:Created>2012-03-01T11:33:36.459Z</ns2:Created>
-              <ns2:Expires>2012-03-01T11:38:36.459Z</ns2:Expires>
-           </Lifetime>
-        </RequestSecurityTokenResponse>
-     </RequestSecurityTokenResponseCollection>
-  </soap:Body>
+    <soap:Body>
+        <RequestSecurityTokenResponseCollection xmlns="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:ns2="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:ns3="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns:ns5="http://docs.oasis-open.org/ws-sx/ws-trust/200802">
+            <RequestSecurityTokenResponse>
+                <!-- test irrelevant part commented out -->
+                <wsp:AppliesTo xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+                    <wsa:EndpointReference>
+                        <wsa:Address>https://nssstg1.msvcs.example.com/FIM/sps/spwsfstd/wsf</wsa:Address>
+                    </wsa:EndpointReference>
+                </wsp:AppliesTo>
+                <Lifetime>
+                    <ns2:Created>2012-03-01T11:33:36.459Z</ns2:Created>
+                    <ns2:Expires>2012-03-01T11:38:36.459Z</ns2:Expires>
+                </Lifetime>
+            </RequestSecurityTokenResponse>
+        </RequestSecurityTokenResponseCollection>
+    </soap:Body>
 </soap:Envelope>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements. See the NOTICE file
@@ -17,13 +18,9 @@
  under the License.
 -->
 <model xmlns="http://cxf.apache.org/jaxrs">
- <resource name="org.apache.cxf.systest.sts.basic_auth.DoubleItPortTypeImpl" path="/">
-    
-    <operation name="doubleIt" verb="POST" path="/"
-               consumes="text/plain" produces="text/plain">
-        <param name="numberToDouble" type="REQUEST_BODY"/>
-    </operation>
-    
- </resource>
- 
+    <resource name="org.apache.cxf.systest.sts.basic_auth.DoubleItPortTypeImpl" path="/">
+        <operation name="doubleIt" verb="POST" path="/" consumes="text/plain" produces="text/plain">
+            <param name="numberToDouble" type="REQUEST_BODY"/>
+        </operation>
+    </resource>
 </model>

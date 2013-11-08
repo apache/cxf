@@ -17,14 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean name="{http://cxf.apache.org/factory_pattern}NumberPort.http-destination" abstract="true">
-      <!--  applying with wildcard to all JettyHTTPDestinations instead of this verbose method -->
+        <!--  applying with wildcard to all JettyHTTPDestinations instead of this verbose method -->
     </bean>
     <bean name="*" abstract="true" class="org.apache.cxf.transport.http_jetty.JettyHTTPDestination">
-      <property name="multiplexWithAddress" value="true"/>
+        <property name="multiplexWithAddress" value="true"/>
     </bean>
 </beans>

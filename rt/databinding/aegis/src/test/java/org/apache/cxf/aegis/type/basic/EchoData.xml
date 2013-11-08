@@ -1,11 +1,12 @@
+<?xml version="1.0"?>
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Header/>
- <env:Body>
-  <echoData xmlns="http://services.aegis.cxf.apache.org">
-    <bean>
-      <data></data>
-      <moreData></moreData>
-    </bean>
-  </echoData>
- </env:Body>
+    <env:Header/>
+    <env:Body>
+        <echoData xmlns="http://services.aegis.cxf.apache.org">
+            <bean>
+                <data/>
+                <moreData/>
+            </bean>
+        </echoData>
+    </env:Body>
 </env:Envelope>

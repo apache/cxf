@@ -17,28 +17,21 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http_secure"
-    xmlns:x1="http://apache.org/hello_world_soap_http_secure/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://apache.org/hello_world_soap_http_secure" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http_secure" xmlns:x1="http://apache.org/hello_world_soap_http_secure/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http_secure" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http_secure/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http_secure/types" elementFormDefault="qualified">
-
-	     <xsd:complexType name="Result">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http_secure/types" targetNamespace="http://apache.org/hello_world_soap_http_secure/types" elementFormDefault="qualified">
+            <xsd:complexType name="Result">
                 <xsd:sequence>
                     <xsd:element name="didPass" type="xsd:boolean"/>
-		    <xsd:element name="returnString" type="xsd:string"/>
-		    <xsd:element name="failureReason" type="xsd:string"/>
+                    <xsd:element name="returnString" type="xsd:string"/>
+                    <xsd:element name="failureReason" type="xsd:string"/>
                 </xsd:sequence>
             </xsd:complexType>
             <element name="greetMeThreeTier">
                 <complexType>
                     <sequence>
                         <element name="requestType" type="xsd:string"/>
-			<element name="testIndex" type="xsd:int"/>
+                        <element name="testIndex" type="xsd:int"/>
                     </sequence>
                 </complexType>
             </element>
@@ -49,12 +42,11 @@
                     </sequence>
                 </complexType>
             </element>
-
             <element name="greetMeTwoTier">
                 <complexType>
                     <sequence>
                         <element name="requestType" type="xsd:string"/>
-			<element name="testIndex" type="xsd:int"/>
+                        <element name="testIndex" type="xsd:int"/>
                     </sequence>
                 </complexType>
             </element>
@@ -73,15 +65,12 @@
     <wsdl:message name="greetMeResponseThreeTier">
         <wsdl:part name="out" element="x1:greetMeResponseThreeTier"/>
     </wsdl:message>
-
     <wsdl:message name="greetMeRequestTwoTier">
         <wsdl:part name="in" element="x1:greetMeTwoTier"/>
     </wsdl:message>
     <wsdl:message name="greetMeResponseTwoTier">
         <wsdl:part name="out" element="x1:greetMeResponseTwoTier"/>
-    </wsdl:message> 
-
-
+    </wsdl:message>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="greetMeThreeTier">
             <wsdl:input name="greetMeRequestThreeTier" message="tns:greetMeRequestThreeTier"/>
@@ -94,7 +83,7 @@
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        <wsdl:operation name="greetMeThreeTier"> 
+        <wsdl:operation name="greetMeThreeTier">
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
@@ -103,7 +92,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="greetMeTwoTier"> 
+        <wsdl:operation name="greetMeTwoTier">
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
@@ -113,93 +102,76 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-
     <wsdl:service name="SecureSOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9001/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
-
     <wsdl:service name="SecureDontRequireClientAuthSOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9002/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
-    </wsdl:service> 
-    
-
+    </wsdl:service>
     <wsdl:service name="TargetSecureSOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9001/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="InterSecureSOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9003/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="TargetSecureDontRequireClientAuthSOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9002/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="InterSecureDontRequireClientAuthSOAPService">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9004/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SecureSOAPServiceServerConfiguredByGoodProvider">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9005/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SecureSOAPServiceServerConfiguredByBadProvider">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9006/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SecureSOAPServiceP12">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9007/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SecureSOAPServiceDifferentCipherSuites">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9011/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="SecureSOAPServiceClientPropertiesSet">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9014/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
-
     <wsdl:service name="SecureSOAPServiceClientPropertiesNotSet">
         <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="https://localhost:9015/SoapContext/SoapPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>
-

@@ -19,37 +19,30 @@
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_doc_lit_bare" xmlns:x1="http://apache.org/hello_world_doc_lit_bare/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_doc_lit_bare" name="DocLitBare">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_doc_lit_bare/types" xmlns:tns="http://apache.org/hello_world_doc_lit_bare/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns:tns="http://apache.org/hello_world_doc_lit_bare/types" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_doc_lit_bare/types" elementFormDefault="qualified">
             <element name="intRequest" type="xsd:int"/>
             <element name="intInOutRequest" type="xsd:int"/>
-            <element name="outStringResponse" type="xsd:string" nillable="true" />
-            <element name="outIntResponse" type="xsd:int" />
+            <element name="outStringResponse" type="xsd:string" nillable="true"/>
+            <element name="outIntResponse" type="xsd:int"/>
         </schema>
-
     </wsdl:types>
-    
     <message name="pingMeRequest">
         <part name="intRequest" element="x1:intRequest"/>
-        <part name="intInOutRequest" element="x1:intInOutRequest" />
+        <part name="intInOutRequest" element="x1:intInOutRequest"/>
     </message>
-    
     <message name="pingMeResponse">
         <part name="outStringResponse" element="x1:outStringResponse"/>
-        <part name="outIntResponse" element="x1:outIntResponse" />
-        <part name="intInOutRequest" element="x1:intInOutRequest" />
-
+        <part name="outIntResponse" element="x1:outIntResponse"/>
+        <part name="intInOutRequest" element="x1:intInOutRequest"/>
     </message>
-
     <portType name="pingMePortType">
         <operation name="pingMe">
             <input message="tns:pingMeRequest"/>
             <output message="tns:pingMeResponse"/>
-        </operation>        
+        </operation>
     </portType>
-    
     <binding name="pingMeSoapBinding" type="tns:pingMePortType">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <operation name="pingMe">
             <input>
                 <soap:body use="literal"/>
@@ -57,10 +50,8 @@
             <output>
                 <soap:body use="literal"/>
             </output>
-        </operation>       
+        </operation>
     </binding>
-
-    
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="tns:pingMeSoapBinding">
             <soap:address location="http://localhost:9107/soapContext"/>

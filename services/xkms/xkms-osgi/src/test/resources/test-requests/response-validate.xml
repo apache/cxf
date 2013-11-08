@@ -1,10 +1,7 @@
+<?xml version="1.0"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
-        <ns2:ValidateResult xmlns="http://www.w3.org/2000/09/xmldsig#"
-            xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#"
-            ResultMajor="http://www.w3.org/2002/03/xkms#Success"
-            RequestId="CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS"
-            Id="bbc29ec6-11b5-4dd1-97d4-01279fb0e8a5" Service="http://services.sopera.org/xkms/v2.0">
+        <ns2:ValidateResult xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#" ResultMajor="http://www.w3.org/2002/03/xkms#Success" RequestId="CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS" Id="bbc29ec6-11b5-4dd1-97d4-01279fb0e8a5" Service="http://services.sopera.org/xkms/v2.0">
             <ns2:KeyBinding>
                 <ns2:Status StatusValue="http://www.w3.org/2002/03/xkms#Valid">
                     <ns2:ValidReason>http://www.w3.org/2002/03/xkms#IssuerTrust</ns2:ValidReason>

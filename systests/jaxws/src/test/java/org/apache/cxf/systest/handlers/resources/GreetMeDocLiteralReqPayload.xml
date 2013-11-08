@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,4 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<ns4:addNumbers xmlns:ns4="http://apache.org/handlers/types"><ns4:arg0>10</ns4:arg0><ns4:arg1>20</ns4:arg1></ns4:addNumbers>
+<ns4:addNumbers xmlns:ns4="http://apache.org/handlers/types">
+    <ns4:arg0>10</ns4:arg0>
+    <ns4:arg1>20</ns4:arg1>
+</ns4:addNumbers>

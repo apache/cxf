@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>configuration_interceptor</artifactId>
     <name>CXF Sample of Stream GZIP Interceptor</name>
     <description>CXF Sample of Stream GZIP Interceptor</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -84,7 +84,7 @@
                                     <arguments>
                                         <argument>-Dcxf.config.file=${project.build.directory}/classes/server.xml</argument>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.stream.server.Server</argument>
                                     </arguments>
                                 </configuration>
@@ -113,7 +113,7 @@
                                     <arguments>
                                         <argument>-Dcxf.config.file=${project.build.directory}/classes/client.xml</argument>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.stream.client.Client</argument>
                                     </arguments>
                                 </configuration>

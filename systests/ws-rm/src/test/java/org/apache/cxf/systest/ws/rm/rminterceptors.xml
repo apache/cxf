@@ -17,14 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd ">
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
     <bean id="rmLogicalOut" class="org.apache.cxf.ws.rm.RMOutInterceptor">
@@ -37,39 +30,37 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
     <bean id="rmDelivery" class="org.apache.cxf.ws.rm.RMDeliveryInterceptor">
         <property name="bus" ref="cxf"/>
     </bean>
-
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
-
     <cxf:bus>
         <cxf:inInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="rmLogicalIn"/>
-                <ref bean="rmCodec"/>
-                <ref bean="rmDelivery"/>
-                <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="rmLogicalIn"/>
+            <ref bean="rmCodec"/>
+            <ref bean="rmDelivery"/>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
         </cxf:inInterceptors>
         <cxf:inFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="rmLogicalIn"/>
-                <ref bean="rmCodec"/>
-                <ref bean="rmDelivery"/>
-                <!-- bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="rmLogicalIn"/>
+            <ref bean="rmCodec"/>
+            <ref bean="rmDelivery"/>
+            <!-- bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
         </cxf:inFaultInterceptors>
         <cxf:outInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="rmLogicalOut"/>
-                <ref bean="rmCodec"/>
-                <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="rmLogicalOut"/>
+            <ref bean="rmCodec"/>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
-                <ref bean="rmLogicalOut"/>
-                <ref bean="rmCodec"/>
-                <!-- bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" /-->
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
+            <ref bean="rmLogicalOut"/>
+            <ref bean="rmCodec"/>
+            <!-- bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" /-->
         </cxf:outFaultInterceptors>
     </cxf:bus>
 </beans>

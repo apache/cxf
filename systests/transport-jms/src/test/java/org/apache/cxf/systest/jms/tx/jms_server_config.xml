@@ -17,68 +17,33 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ct="http://cxf.apache.org/configuration/types"
-    xmlns:jms="http://cxf.apache.org/transports/jms"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"    
-    xsi:schemaLocation="
-http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-    
- <import resource="classpath:META-INF/cxf/cxf.xml" />
- 
- <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
- 
- <jaxws:endpoint implementor="#transactionalImplementor" 
- 	implementorClass="org.apache.hello_world_doc_lit.Greeter"
- 	wsdlLocation="testutils/hello_world_doc_lit.wsdl"
- 	serviceName="s:SOAPService2" 
-    endpointName="s:SoapPort2"
-    xmlns:s= "http://apache.org/hello_world_doc_lit" />
-    
-    <jms:destination name="{http://apache.org/hello_world_doc_lit}SoapPort2.jms-destination">      
-      <jms:jmsConfig-ref>jmsConf</jms:jmsConfig-ref>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ct="http://cxf.apache.org/configuration/types" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:p="http://www.springframework.org/schema/p" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <jaxws:endpoint xmlns:s="http://apache.org/hello_world_doc_lit" implementor="#transactionalImplementor" implementorClass="org.apache.hello_world_doc_lit.Greeter" wsdlLocation="testutils/hello_world_doc_lit.wsdl" serviceName="s:SOAPService2" endpointName="s:SoapPort2"/>
+    <jms:destination name="{http://apache.org/hello_world_doc_lit}SoapPort2.jms-destination">
+        <jms:jmsConfig-ref>jmsConf</jms:jmsConfig-ref>
     </jms:destination>
-    
-  
-  <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
-  	<constructor-arg value="${EmbeddedBrokerURL}"/>
-  </bean>
-  
-  <bean id="singleConnectionFactory"
-    class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
-    <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
-  </bean>
-  
-  <bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
-     <property name="connectionFactory" ref="singleConnectionFactory"/>
-  </bean>
-  
-  <bean id="implementor" class="org.apache.cxf.systest.jms.tx.GreeterImplWithTransaction"/>
-  
-  <bean id="transactionalImplementor"
-     class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-  	<property name="transactionManager" ref="jmsTransactionManager" />
-  	<property name="target" ref="implementor" />
-  	<property name="transactionAttributes">
-  	  <props>
-  	  	<prop key="greetMe">PROPAGATION_REQUIRED</prop>
-  	  	<!-- Commit if pingMe throw PingMeFault -->
-  	  	<prop key="pingMe">PROPAGATION_REQUIRED,+PingMeFault</prop>  	  	
-  	  </props>
-    </property>
-  </bean>  
-  
-  <bean id="jmsConf" class="org.apache.cxf.transport.jms.JMSConfiguration"
-  	p:connectionFactory-ref="singleConnectionFactory"
-  	p:sessionTransacted="true"
-  	p:transactionManager-ref="jmsTransactionManager"  	
-  	p:usingEndpointInfo="true"
-  />
-
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+        <constructor-arg value="${EmbeddedBrokerURL}"/>
+    </bean>
+    <bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
+        <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
+    </bean>
+    <bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+        <property name="connectionFactory" ref="singleConnectionFactory"/>
+    </bean>
+    <bean id="implementor" class="org.apache.cxf.systest.jms.tx.GreeterImplWithTransaction"/>
+    <bean id="transactionalImplementor" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="jmsTransactionManager"/>
+        <property name="target" ref="implementor"/>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="greetMe">PROPAGATION_REQUIRED</prop>
+                <!-- Commit if pingMe throw PingMeFault -->
+                <prop key="pingMe">PROPAGATION_REQUIRED,+PingMeFault</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="jmsConf" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="singleConnectionFactory" p:sessionTransacted="true" p:transactionManager-ref="jmsTransactionManager" p:usingEndpointInfo="true"/>
 </beans>

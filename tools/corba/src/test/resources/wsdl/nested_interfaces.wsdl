@@ -17,19 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="nested_interfaces" 
-    targetNamespace="http://schemas.apache.org/idl/nested_interfaces.idl" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:corba="http://schemas.apache.org/bindings/corba" 
-    xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_interfaces.idl" 
-    xmlns:tns="http://schemas.apache.org/idl/nested_interfaces.idl" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_interfaces.idl" xmlns:tns="http://schemas.apache.org/idl/nested_interfaces.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/nested_interfaces.idl" name="nested_interfaces" targetNamespace="http://schemas.apache.org/idl/nested_interfaces.idl">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/nested_interfaces.idl" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/nested_interfaces.idl">
             <complexType name="A.A1.AA1">
                 <sequence>
                     <element name="s" type="string"/>

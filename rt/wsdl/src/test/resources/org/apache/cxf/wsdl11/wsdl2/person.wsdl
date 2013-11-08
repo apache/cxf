@@ -17,21 +17,11 @@
     limitations under the License.
 
 -->
-<wsdl:definitions name="wsdl-first"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:tns="http://cxf.apache.org/samples/wsdl-first"
-	targetNamespace="urn:cxf:apache:org:samples:wsdl-first">
-
-    <wsdl:import namespace="http://cxf.apache.org/samples/wsdl-first"
-                 location="../wsdl1/person-soap-binding.wsdl"/>
-
-	<wsdl:service name="PersonService">
-    	<wsdl:port binding="tns:PersonSOAPBinding" name="soap">
-           <soap:address location="http://localhost:8092/PersonService/" />
-       </wsdl:port>
-   </wsdl:service>
-
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns="http://cxf.apache.org/samples/wsdl-first" name="wsdl-first" targetNamespace="urn:cxf:apache:org:samples:wsdl-first">
+    <wsdl:import namespace="http://cxf.apache.org/samples/wsdl-first" location="../wsdl1/person-soap-binding.wsdl"/>
+    <wsdl:service name="PersonService">
+        <wsdl:port binding="tns:PersonSOAPBinding" name="soap">
+            <soap:address location="http://localhost:8092/PersonService/"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

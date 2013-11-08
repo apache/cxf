@@ -17,23 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:test="http://apache.org/hello_world_soap_http"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:wsa="http://cxf.apache.org/ws/addressing"
-    
-    xsi:schemaLocation="http://cxf.apache.org/core
-        http://cxf.apache.org/schemas/core.xsd
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/jaxws                                     
-        http://cxf.apache.org/schemas/jaxws.xsd">
-  
-   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://cxf.apache.org/ws/addressing" xsi:schemaLocation="http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <!--    
          Enable logging at all endpoints    
     -->
@@ -42,55 +27,37 @@
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
-
     <!--    
          UsernameToken endpoint definition    
          This endpoint is configured to read the username and password tokens    
          and validate them using a password callback handler.    
     -->
-    <jaxws:endpoint
-        id="UsernameTokenEndpoint"
-        implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
-        address="http://localhost:${testutil.ports.StaxServer}/GreeterService/UsernameTokenPort"
-        serviceName="test:GreeterService"
-        endpointName="test:UsernameTokenPort"
-        >
+    <jaxws:endpoint id="UsernameTokenEndpoint" implementor="org.apache.cxf.systest.ws.security.GreeterImpl" address="http://localhost:${testutil.ports.StaxServer}/GreeterService/UsernameTokenPort" serviceName="test:GreeterService" endpointName="test:UsernameTokenPort">
         <jaxws:features>
-        	<wsa:addressing/>
+            <wsa:addressing/>
         </jaxws:features>
         <jaxws:inInterceptors>
             <ref bean="UsernameToken_Request"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-
     <!--    
          WSS4JStaxInInterceptor for UsernameTokenEndpoint above    
     -->
-    <bean 
-        id="UsernameToken_Request"
-        class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor"
-        >
+    <bean id="UsernameToken_Request" class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
         <constructor-arg>
             <map>
-                <entry key="action" value="UsernameToken"/> 
+                <entry key="action" value="UsernameToken"/>
                 <entry key="passwordType" value="PasswordDigest"/>
-                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/> 
+                <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             </map>
         </constructor-arg>
     </bean>
-
     <!--    
          TimestampSignEncryptEndpoint endpoint definition    
          This endpoint is configured to work with public key certificates    
          on both client (Alice) and service (Bob) side.    
     -->
-    <jaxws:endpoint 
-        id="TimestampSignEncryptEndpoint"
-        implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
-        address="http://localhost:${testutil.ports.StaxServer}/GreeterService/TimestampSignEncryptPort"
-        serviceName="test:GreeterService"
-        endpointName="test:TimestampSignEncryptPort"
-        >
+    <jaxws:endpoint id="TimestampSignEncryptEndpoint" implementor="org.apache.cxf.systest.ws.security.GreeterImpl" address="http://localhost:${testutil.ports.StaxServer}/GreeterService/TimestampSignEncryptPort" serviceName="test:GreeterService" endpointName="test:TimestampSignEncryptPort">
         <jaxws:outInterceptors>
             <ref bean="TimestampSignEncrypt_Response"/>
         </jaxws:outInterceptors>
@@ -98,15 +65,11 @@
             <ref bean="TimestampSignEncrypt_Request"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-
     <!--    
          WSS4JStaxInInterceptor for decrypting and validating the signature of the
          SOAP request.
     -->
-    <bean 
-        id="TimestampSignEncrypt_Request"
-        class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor"
-        >
+    <bean id="TimestampSignEncrypt_Request" class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
         <constructor-arg>
             <map>
                 <!-- Use this action order for local clients -->
@@ -120,14 +83,10 @@
             </map>
         </constructor-arg>
     </bean>
-    
     <!--    
          WSS4JStaxOutInterceptor for encoding and signing the SOAP response.    
     -->
-    <bean 
-        id="TimestampSignEncrypt_Response"
-        class="org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor"
-        >
+    <bean id="TimestampSignEncrypt_Response" class="org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor">
         <constructor-arg>
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
@@ -147,5 +106,4 @@
             </map>
         </constructor-arg>
     </bean>
-    
 </beans>

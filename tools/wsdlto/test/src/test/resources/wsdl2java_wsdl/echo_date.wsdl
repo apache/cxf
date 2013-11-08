@@ -17,54 +17,54 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="EchoDateService" targetNamespace="http://date.fortest.tools.cxf.apache.org/" xmlns:ns1="http://date.fortest.tools.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:types>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://date.fortest.tools.cxf.apache.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://date.fortest.tools.cxf.apache.org/">
-      <xsd:element name="echoDate" type="echoDate"/>
-      <xsd:complexType name="echoDate">
-        <xsd:sequence>
-          <xsd:element minOccurs="0" name="arg0" type="xsd:dateTime"/>
-        </xsd:sequence>
-      </xsd:complexType>
-      <xsd:element name="echoDateResponse" type="echoDateResponse"/>
-      <xsd:complexType name="echoDateResponse">
-        <xsd:sequence>
-          <xsd:element minOccurs="0" name="return" type="xsd:dateTime"/>
-        </xsd:sequence>
-      </xsd:complexType>
-    </xsd:schema>
-  </wsdl:types>
-  <wsdl:message name="echoDateResponse">
-    <wsdl:part name="result" element="ns1:echoDateResponse">
+<wsdl:definitions xmlns:ns1="http://date.fortest.tools.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="EchoDateService" targetNamespace="http://date.fortest.tools.cxf.apache.org/">
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://date.fortest.tools.cxf.apache.org/" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://date.fortest.tools.cxf.apache.org/">
+            <xsd:element name="echoDate" type="echoDate"/>
+            <xsd:complexType name="echoDate">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="arg0" type="xsd:dateTime"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="echoDateResponse" type="echoDateResponse"/>
+            <xsd:complexType name="echoDateResponse">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" name="return" type="xsd:dateTime"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="echoDateResponse">
+        <wsdl:part name="result" element="ns1:echoDateResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="echoDate">
-    <wsdl:part name="parameters" element="ns1:echoDate">
+    </wsdl:message>
+    <wsdl:message name="echoDate">
+        <wsdl:part name="parameters" element="ns1:echoDate">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="EchoDate">
-    <wsdl:operation name="echoDate">
-      <wsdl:input name="echoDate" message="ns1:echoDate">
+    </wsdl:message>
+    <wsdl:portType name="EchoDate">
+        <wsdl:operation name="echoDate">
+            <wsdl:input name="echoDate" message="ns1:echoDate">
       </wsdl:input>
-      <wsdl:output name="echoDateResponse" message="ns1:echoDateResponse">
+            <wsdl:output name="echoDateResponse" message="ns1:echoDateResponse">
       </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="EchoDateServiceSoapBinding" type="ns1:EchoDate">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="echoDate">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="echoDate">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="echoDateResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="EchoDateService">
-    <wsdl:port name="EchoDatePort" binding="ns1:EchoDateServiceSoapBinding">
-      <soap:address location="http://localhost:9090/hello"/>
-    </wsdl:port>
-  </wsdl:service>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="EchoDateServiceSoapBinding" type="ns1:EchoDate">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="echoDate">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="echoDate">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoDateResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="EchoDateService">
+        <wsdl:port name="EchoDatePort" binding="ns1:EchoDateServiceSoapBinding">
+            <soap:address location="http://localhost:9090/hello"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

@@ -17,25 +17,19 @@
   specific language governing permissions and limitations
   under the License.
   -->
-
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-
-   <ui:with field='res'
-            type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
-
-   <g:HTMLPanel>
-      <table>
-         <tbody>
-            <tr>
-               <td align="right">
-                  <g:Hyperlink ui:field="settingsHyperlink" styleName='{res.css.topbarLink}'>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:with field="res" type="org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources"/>
+    <g:HTMLPanel>
+        <table>
+            <tbody>
+                <tr>
+                    <td align="right">
+                        <g:Hyperlink ui:field="settingsHyperlink" styleName="{res.css.topbarLink}">
                      Settings
                   </g:Hyperlink>
-               </td>
-            </tr>
-         </tbody>
-      </table>
-   </g:HTMLPanel>
-
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </g:HTMLPanel>
 </ui:UiBinder>

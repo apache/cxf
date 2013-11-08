@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,22 +17,16 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"> 
-  <soap:Header>
-    <ns2:SoapHeaderIn xmlns:ns4="http://cxf.apache.org/transform/fault" 
-      xmlns:ns3="http://cxf.apache.org/transform/header/element" 
-      xmlns:ns2="http://cxf.apache.org/transform/header" 
-      xmlns="http://cxf.apache.org/transform/test">
-      <ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>
-      <ns2:SomeComplexHeaderType>
-        <ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>
-      </ns2:SomeComplexHeaderType>
-    </ns2:SoapHeaderIn>
-  </soap:Header>
-  <soap:Body>
-    <TransformTestRequest xmlns="http://cxf.apache.org/transform/test" 
-      xmlns:ns2="http://cxf.apache.org/transform/header" 
-      xmlns:ns3="http://cxf.apache.org/transform/header/element"
-      xmlns:ns4="http://cxf.apache.org/transform/fault" />
-  </soap:Body>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <ns2:SoapHeaderIn xmlns:ns4="http://cxf.apache.org/transform/fault" xmlns:ns3="http://cxf.apache.org/transform/header/element" xmlns:ns2="http://cxf.apache.org/transform/header" xmlns="http://cxf.apache.org/transform/test">
+            <ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>
+            <ns2:SomeComplexHeaderType>
+                <ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>
+            </ns2:SomeComplexHeaderType>
+        </ns2:SoapHeaderIn>
+    </soap:Header>
+    <soap:Body>
+        <TransformTestRequest xmlns="http://cxf.apache.org/transform/test" xmlns:ns2="http://cxf.apache.org/transform/header" xmlns:ns3="http://cxf.apache.org/transform/header/element" xmlns:ns4="http://cxf.apache.org/transform/fault"/>
+    </soap:Body>
 </soap:Envelope>

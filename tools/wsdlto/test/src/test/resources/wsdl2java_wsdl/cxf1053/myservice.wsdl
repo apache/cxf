@@ -17,61 +17,46 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<wsdl:definitions name="myservice" targetNamespace="http://www.company.com/MyService" 
-    xmlns:tns="http://www.company.com/MyService"
-    xmlns:extra="http://www.company.com/extra" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-    
+<wsdl:definitions xmlns:tns="http://www.company.com/MyService" xmlns:extra="http://www.company.com/extra" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="myservice" targetNamespace="http://www.company.com/MyService">
     <wsdl:types>
         <xsd:schema>
             <xsd:import namespace="http://www.company.com/extra" schemaLocation="http://www.company.com/extra.xsd"/>
         </xsd:schema>
     </wsdl:types>
-    
     <wsdl:message name="extraFault">
-        <wsdl:part name="fault" element="extra:extraError" />
+        <wsdl:part name="fault" element="extra:extraError"/>
     </wsdl:message>
-    
     <wsdl:message name="extraRequest">
         <wsdl:part name="parameters" element="extra:extraByNameAndTypeRequest"/>
     </wsdl:message>
-    
     <wsdl:message name="extraResponse">
-        <wsdl:part name="parameters" element="extra:extraByNameAndTypeResponse" />
+        <wsdl:part name="parameters" element="extra:extraByNameAndTypeResponse"/>
     </wsdl:message>
-    
     <wsdl:portType name="myManager">
         <wsdl:operation name="extraSearch">
-            <wsdl:input  name="extraRequest"  message="tns:extraRequest" />
-            <wsdl:output name="extraResponse" message="tns:extraResponse" />
-            <wsdl:fault  name="extraFault"    message="tns:extraFault" />
+            <wsdl:input name="extraRequest" message="tns:extraRequest"/>
+            <wsdl:output name="extraResponse" message="tns:extraResponse"/>
+            <wsdl:fault name="extraFault" message="tns:extraFault"/>
         </wsdl:operation>
     </wsdl:portType>
-    
     <wsdl:binding name="myServiceSoapBinding" type="tns:myManager">
-        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-        
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="extraSearch">
-            <soap:operation soapAction="" style="document" />
+            <soap:operation soapAction="" style="document"/>
             <wsdl:input name="extraRequest">
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output name="extraResponse">
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="extraFault">
-                <soap:fault name="extraFault" use="literal" />
+                <soap:fault name="extraFault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-        
     </wsdl:binding>
-    
     <wsdl:service name="MyService">
         <wsdl:port name="MyService" binding="tns:myServiceSoapBinding">
-            <soap:address location="http://localhost:8080/MyServiceServer/services/myServiceServer" />
+            <soap:address location="http://localhost:8080/MyServiceServer/services/myServiceServer"/>
         </wsdl:port>
     </wsdl:service>
-    
 </wsdl:definitions>

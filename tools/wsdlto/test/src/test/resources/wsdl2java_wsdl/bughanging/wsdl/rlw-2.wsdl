@@ -30,74 +30,51 @@ The limited permissions granted above are perpetual and will not be revoked by O
 
 This document and the information contained herein is provided on an "AS IS" basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 -->
-
-<wsdl:definitions name="WS-ResourceLifetime"
-  targetNamespace="http://docs.oasis-open.org/wsrf/rlw-2"
-  xmlns="http://schemas.xmlsoap.org/wsdl/"
-  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-  xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
-  xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
-  xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2"
-  xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2"
-  xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
-
-  <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rw-2"
-               location="rw-2.wsdl" />
-  <wsdl:types>
-    <xsd:schema
-      attributeFormDefault="unqualified"
-      elementFormDefault="qualified"
-      xmlns="http://www.w3.org/2001/XMLSchema">
-
-      <xsd:import namespace="http://docs.oasis-open.org/wsrf/rl-2"
-                  schemaLocation="../schemas/wsdl/rl-2.xsd" />
-    </xsd:schema>
-  </wsdl:types>
-
-  <wsdl:message name="SetTerminationTimeRequest">
-    <wsdl:part element="wsrf-rl:SetTerminationTime" name="SetTerminationTimeRequest" />
-  </wsdl:message>
-  <wsdl:message name="SetTerminationTimeResponse">
-    <wsdl:part element="wsrf-rl:SetTerminationTimeResponse" name="SetTerminationTimeResponse" />
-  </wsdl:message>
-  <wsdl:message name="UnableToSetTerminationTimeFault">
-    <wsdl:part element="wsrf-rl:UnableToSetTerminationTimeFault" name="UnableToSetTerminationTimeFault" />
-  </wsdl:message>
-  <wsdl:message name="TerminationTimeChangeRejectedFault">
-    <wsdl:part element="wsrf-rl:TerminationTimeChangeRejectedFault" name="TerminationTimeChangeRejectedFault" />
-  </wsdl:message>
-
-  <wsdl:message name="DestroyRequest">
-    <wsdl:part element="wsrf-rl:Destroy" name="DestroyRequest" />
-  </wsdl:message>
-  <wsdl:message name="DestroyResponse">
-    <wsdl:part element="wsrf-rl:DestroyResponse" name="DestroyResponse" />
-  </wsdl:message>
-  <wsdl:message name="ResourceNotDestroyedFault">
-    <wsdl:part element="wsrf-rl:ResourceNotDestroyedFault" name="ResourceNotDestroyedFault" />
-  </wsdl:message>
-
-  <wsdl:portType name="ImmediateResourceTermination">
-    <wsdl:operation name="Destroy">
-      <wsdl:input name="DestroyRequest" message="wsrf-rlw:DestroyRequest" />
-      <wsdl:output name="DestroyResponse" message="wsrf-rlw:DestroyResponse" />
-      <wsdl:fault message="wsrf-rlw:ResourceNotDestroyedFault" name="ResourceNotDestroyedFault" />
-      <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault" />
-      <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault" />
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <wsdl:portType name="ScheduledResourceTermination"
-      wsrf-rp:ResourceProperties="wsrf-rl:ScheduledResourceTerminationRP">
-    <wsdl:operation name="SetTerminationTime">
-      <wsdl:input name="SetTerminationTimeRequest" message="wsrf-rlw:SetTerminationTimeRequest" />
-      <wsdl:output name="SetTerminationTimeResponse" message="wsrf-rlw:SetTerminationTimeResponse" />
-      <wsdl:fault message="wsrf-rlw:UnableToSetTerminationTimeFault" name="UnableToSetTerminationTimeFault" />
-      <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault" />
-      <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault" />
-      <wsdl:fault message="wsrf-rlw:TerminationTimeChangeRejectedFault" name="TerminationTimeChangeRejectedFault" />
-    </wsdl:operation>
-  </wsdl:portType>
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2" xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2" xmlns:wsrf-rlw="http://docs.oasis-open.org/wsrf/rlw-2" xmlns:wsrf-rp="http://docs.oasis-open.org/wsrf/rp-2" xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="WS-ResourceLifetime" targetNamespace="http://docs.oasis-open.org/wsrf/rlw-2">
+    <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rw-2" location="rw-2.wsdl"/>
+    <wsdl:types>
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+            <xsd:import namespace="http://docs.oasis-open.org/wsrf/rl-2" schemaLocation="../schemas/wsdl/rl-2.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="SetTerminationTimeRequest">
+        <wsdl:part element="wsrf-rl:SetTerminationTime" name="SetTerminationTimeRequest"/>
+    </wsdl:message>
+    <wsdl:message name="SetTerminationTimeResponse">
+        <wsdl:part element="wsrf-rl:SetTerminationTimeResponse" name="SetTerminationTimeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="UnableToSetTerminationTimeFault">
+        <wsdl:part element="wsrf-rl:UnableToSetTerminationTimeFault" name="UnableToSetTerminationTimeFault"/>
+    </wsdl:message>
+    <wsdl:message name="TerminationTimeChangeRejectedFault">
+        <wsdl:part element="wsrf-rl:TerminationTimeChangeRejectedFault" name="TerminationTimeChangeRejectedFault"/>
+    </wsdl:message>
+    <wsdl:message name="DestroyRequest">
+        <wsdl:part element="wsrf-rl:Destroy" name="DestroyRequest"/>
+    </wsdl:message>
+    <wsdl:message name="DestroyResponse">
+        <wsdl:part element="wsrf-rl:DestroyResponse" name="DestroyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ResourceNotDestroyedFault">
+        <wsdl:part element="wsrf-rl:ResourceNotDestroyedFault" name="ResourceNotDestroyedFault"/>
+    </wsdl:message>
+    <wsdl:portType name="ImmediateResourceTermination">
+        <wsdl:operation name="Destroy">
+            <wsdl:input name="DestroyRequest" message="wsrf-rlw:DestroyRequest"/>
+            <wsdl:output name="DestroyResponse" message="wsrf-rlw:DestroyResponse"/>
+            <wsdl:fault message="wsrf-rlw:ResourceNotDestroyedFault" name="ResourceNotDestroyedFault"/>
+            <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault"/>
+            <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="ScheduledResourceTermination" wsrf-rp:ResourceProperties="wsrf-rl:ScheduledResourceTerminationRP">
+        <wsdl:operation name="SetTerminationTime">
+            <wsdl:input name="SetTerminationTimeRequest" message="wsrf-rlw:SetTerminationTimeRequest"/>
+            <wsdl:output name="SetTerminationTimeResponse" message="wsrf-rlw:SetTerminationTimeResponse"/>
+            <wsdl:fault message="wsrf-rlw:UnableToSetTerminationTimeFault" name="UnableToSetTerminationTimeFault"/>
+            <wsdl:fault name="ResourceUnknownFault" message="wsrf-rw:ResourceUnknownFault"/>
+            <wsdl:fault name="ResourceUnavailableFault" message="wsrf-rw:ResourceUnavailableFault"/>
+            <wsdl:fault message="wsrf-rlw:TerminationTimeChangeRejectedFault" name="TerminationTimeChangeRejectedFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
 </wsdl:definitions>

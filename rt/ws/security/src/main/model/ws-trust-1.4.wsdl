@@ -7,82 +7,66 @@ This document and translations of it may be copied and furnished to others, and 
 The limited permissions granted above are perpetual and will not be revoked by OASIS or its successors or assigns.
 This document and the information contained herein is provided on an AS IS basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 -->
-<wsdl:definitions
-        targetNamespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl"
-        xmlns:tns="http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl"
-        xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
-        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata">
-  <!-- this is the WS-I BP-compliant way to import a schema -->
-  <wsdl:types>
-    <xs:schema>
-      <xs:import
-namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
-schemaLocation="ws-trust-1.3.xsd"/>
-    </xs:schema>
-  </wsdl:types>
-
-  <!-- WS-Trust defines the following GEDs -->
-  <wsdl:message name="RequestSecurityTokenMsg">
-    <wsdl:part name="request" element="wst:RequestSecurityToken" />
-  </wsdl:message>
-  <wsdl:message name="RequestSecurityTokenResponseMsg">
-    <wsdl:part name="response"
-            element="wst:RequestSecurityTokenResponse" />
-  </wsdl:message>
-  <wsdl:message name="RequestSecurityTokenCollectionMsg">
-    <wsdl:part name="requestCollection"
-            element="wst:RequestSecurityTokenCollection"/>
-  </wsdl:message>
-  <wsdl:message name="RequestSecurityTokenResponseCollectionMsg">
-    <wsdl:part name="responseCollection"
-            element="wst:RequestSecurityTokenResponseCollection"/>
-  </wsdl:message>
-
-  <!-- This portType an example of a Requestor (or other) endpoint that 
+<wsdl:definitions xmlns:tns="http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" targetNamespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl">
+    <!-- this is the WS-I BP-compliant way to import a schema -->
+    <wsdl:types>
+        <xs:schema>
+            <xs:import namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512" schemaLocation="ws-trust-1.3.xsd"/>
+        </xs:schema>
+    </wsdl:types>
+    <!-- WS-Trust defines the following GEDs -->
+    <wsdl:message name="RequestSecurityTokenMsg">
+        <wsdl:part name="request" element="wst:RequestSecurityToken"/>
+    </wsdl:message>
+    <wsdl:message name="RequestSecurityTokenResponseMsg">
+        <wsdl:part name="response" element="wst:RequestSecurityTokenResponse"/>
+    </wsdl:message>
+    <wsdl:message name="RequestSecurityTokenCollectionMsg">
+        <wsdl:part name="requestCollection" element="wst:RequestSecurityTokenCollection"/>
+    </wsdl:message>
+    <wsdl:message name="RequestSecurityTokenResponseCollectionMsg">
+        <wsdl:part name="responseCollection" element="wst:RequestSecurityTokenResponseCollection"/>
+    </wsdl:message>
+    <!-- This portType an example of a Requestor (or other) endpoint that 
          Accepts SOAP-based challenges from a Security Token Service -->
-  <wsdl:portType name="WSSecurityRequestor">
-    <wsdl:operation name="Challenge">
-      <wsdl:input message="tns:RequestSecurityTokenResponseMsg"/>
-      <wsdl:output message="tns:RequestSecurityTokenResponseMsg"/>
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <!-- This portType is an example of an STS supporting full protocol -->
-  <wsdl:portType name="SecurityTokenService">
-    <wsdl:operation name="Cancel">
-      <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" message="tns:RequestSecurityTokenMsg"/>
-      <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/CancelFinal" message="tns:RequestSecurityTokenResponseMsg"/>
-    </wsdl:operation>
-    <wsdl:operation name="Issue">
-      <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" message="tns:RequestSecurityTokenMsg"/>
-      <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal" message="tns:RequestSecurityTokenResponseCollectionMsg"/>
-    </wsdl:operation>
-    <wsdl:operation name="Renew">
-      <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" message="tns:RequestSecurityTokenMsg"/>
-      <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/RenewFinal" message="tns:RequestSecurityTokenResponseMsg"/>
-    </wsdl:operation>
-    <wsdl:operation name="Validate">
-      <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate" message="tns:RequestSecurityTokenMsg"/>
-      <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/ValidateFinal" message="tns:RequestSecurityTokenResponseMsg"/>
-    </wsdl:operation>
-    <wsdl:operation name="KeyExchangeToken">
-      <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KET" message="tns:RequestSecurityTokenMsg"/>
-      <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/KETFinal" message="tns:RequestSecurityTokenResponseMsg"/>
-    </wsdl:operation>
-    <wsdl:operation name="RequestCollection">
-      <wsdl:input message="tns:RequestSecurityTokenCollectionMsg"/>
-      <wsdl:output message="tns:RequestSecurityTokenResponseCollectionMsg"/>
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <!-- This portType is an example of an endpoint that accepts 
+    <wsdl:portType name="WSSecurityRequestor">
+        <wsdl:operation name="Challenge">
+            <wsdl:input message="tns:RequestSecurityTokenResponseMsg"/>
+            <wsdl:output message="tns:RequestSecurityTokenResponseMsg"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <!-- This portType is an example of an STS supporting full protocol -->
+    <wsdl:portType name="SecurityTokenService">
+        <wsdl:operation name="Cancel">
+            <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" message="tns:RequestSecurityTokenMsg"/>
+            <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/CancelFinal" message="tns:RequestSecurityTokenResponseMsg"/>
+        </wsdl:operation>
+        <wsdl:operation name="Issue">
+            <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" message="tns:RequestSecurityTokenMsg"/>
+            <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal" message="tns:RequestSecurityTokenResponseCollectionMsg"/>
+        </wsdl:operation>
+        <wsdl:operation name="Renew">
+            <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" message="tns:RequestSecurityTokenMsg"/>
+            <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/RenewFinal" message="tns:RequestSecurityTokenResponseMsg"/>
+        </wsdl:operation>
+        <wsdl:operation name="Validate">
+            <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate" message="tns:RequestSecurityTokenMsg"/>
+            <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/ValidateFinal" message="tns:RequestSecurityTokenResponseMsg"/>
+        </wsdl:operation>
+        <wsdl:operation name="KeyExchangeToken">
+            <wsdl:input wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KET" message="tns:RequestSecurityTokenMsg"/>
+            <wsdl:output wsam:Action="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/KETFinal" message="tns:RequestSecurityTokenResponseMsg"/>
+        </wsdl:operation>
+        <wsdl:operation name="RequestCollection">
+            <wsdl:input message="tns:RequestSecurityTokenCollectionMsg"/>
+            <wsdl:output message="tns:RequestSecurityTokenResponseCollectionMsg"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <!-- This portType is an example of an endpoint that accepts 
          Unsolicited RequestSecurityTokenResponse messages -->
-  <wsdl:portType name="SecurityTokenResponseService">
-    <wsdl:operation name="RequestSecurityTokenResponse">
-      <wsdl:input message="tns:RequestSecurityTokenResponseMsg"/>
-    </wsdl:operation>
-  </wsdl:portType>
-
+    <wsdl:portType name="SecurityTokenResponseService">
+        <wsdl:operation name="RequestSecurityTokenResponse">
+            <wsdl:input message="tns:RequestSecurityTokenResponseMsg"/>
+        </wsdl:operation>
+    </wsdl:portType>
 </wsdl:definitions>

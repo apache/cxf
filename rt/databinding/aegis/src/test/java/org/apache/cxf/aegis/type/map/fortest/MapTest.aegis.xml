@@ -18,15 +18,15 @@
   under the License.
 -->
 <mappings>
-	<mapping>
-		<method name="getMapStringToLong">
-			<return-type typeName="mstl"  />
-		</method>
-		<method name="getRawMapStringToInteger">
-		  <return-type valueType="java.lang.Integer"/>
-		</method>
-		<method name="getMapLongToString">
-			<return-type typeName="mlts" />
-		</method>
-	</mapping>
+    <mapping>
+        <method name="getMapStringToLong">
+            <return-type typeName="mstl"/>
+        </method>
+        <method name="getRawMapStringToInteger">
+            <return-type valueType="java.lang.Integer"/>
+        </method>
+        <method name="getMapLongToString">
+            <return-type typeName="mlts"/>
+        </method>
+    </mapping>
 </mappings>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,10 +18,9 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-	<soap:Body>
-		<ns2:sayHi xmlns:ns2="http://apache.org/hello_world_soap_http/types">
-			<arg0>hola</arg0>
-		</ns2:sayHi>
-	</soap:Body>
-
+    <soap:Body>
+        <ns2:sayHi xmlns:ns2="http://apache.org/hello_world_soap_http/types">
+            <arg0>hola</arg0>
+        </ns2:sayHi>
+    </soap:Body>
 </soap:Envelope>

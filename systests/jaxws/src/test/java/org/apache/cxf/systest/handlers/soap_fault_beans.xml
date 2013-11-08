@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,37 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns:jaxws="http://cxf.apache.org/jaxws" 
-xmlns:cxf="http://cxf.apache.org/core" 
-xsi:schemaLocation=" 
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"> 
- 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-	
-	<jaxws:endpoint id="cxfHandlerTestEndpoint"
-		implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers"
-		address="http://localhost:${testutil.ports.SoapFaultHandler}/SpringEndpoint">
-    	<jaxws:properties>
-    	     <entry key="soap.env.ns.map">
-				<map>
-					<entry key="cxf" value="http://cxf.apache.org/handler_test/types" />
-				</map>
-			</entry>
-    	</jaxws:properties>
-    	<jaxws:handlers>
-    		<bean class="org.apache.cxf.systest.handlers.FaultThrowingHandler"/>
-    	</jaxws:handlers>
-    	
-    </jaxws:endpoint> 
-	
-    <jaxws:client id="cxfHandlerTestClientEndpoint"
-    	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:${testutil.ports.SoapFaultHandler}/SpringEndpoint">
-    </jaxws:client> 
-    
-    
-</beans> 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <jaxws:endpoint id="cxfHandlerTestEndpoint" implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers" address="http://localhost:${testutil.ports.SoapFaultHandler}/SpringEndpoint">
+        <jaxws:properties>
+            <entry key="soap.env.ns.map">
+                <map>
+                    <entry key="cxf" value="http://cxf.apache.org/handler_test/types"/>
+                </map>
+            </entry>
+        </jaxws:properties>
+        <jaxws:handlers>
+            <bean class="org.apache.cxf.systest.handlers.FaultThrowingHandler"/>
+        </jaxws:handlers>
+    </jaxws:endpoint>
+    <jaxws:client id="cxfHandlerTestClientEndpoint" serviceClass="org.apache.handlers.AddNumbers" address="http://localhost:${testutil.ports.SoapFaultHandler}/SpringEndpoint">
+    </jaxws:client>
+</beans>

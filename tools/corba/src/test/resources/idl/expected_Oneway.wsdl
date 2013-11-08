@@ -17,543 +17,543 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Oneway" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Oneway" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
-  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Oneway/typemap"/>
-  <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Oneway" xmlns="http://cxf.apache.org/bindings/corba/idl/Oneway" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <xs:element name="onewayOperation">
-        <xs:complexType>
-          <xs:sequence>
+<wsdl:definitions xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Oneway" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Oneway">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Oneway/typemap"/>
+    <wsdl:types>
+        <xs:schema xmlns="http://cxf.apache.org/bindings/corba/idl/Oneway" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Oneway">
+            <xs:element name="onewayOperation">
+                <xs:complexType>
+                    <xs:sequence>
           </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="onewayInOperation">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inString" type="xs:string">
+                </xs:complexType>
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="onewayInInOperation">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inString1" type="xs:string">
+            <xs:element name="onewayInOperation">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inString" type="xs:string">
             </xs:element>
-            <xs:element name="inString2" type="xs:string">
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="voidInOperation">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inLong" type="xs:int">
+            <xs:element name="onewayInInOperation">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inString1" type="xs:string">
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="voidInOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="voidOutOperation">
-        <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="voidOutOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="outLong" type="xs:int">
+                        <xs:element name="inString2" type="xs:string">
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="voidInOutOperation">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inOutLong" type="xs:int">
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="voidInOutOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inOutLong" type="xs:int">
+            <xs:element name="voidInOperation">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inLong" type="xs:int">
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortInOperation">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inShort" type="xs:short">
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
+            <xs:element name="voidInOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
           </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortInOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="return" type="xs:short">
+                </xs:complexType>
             </xs:element>
+            <xs:element name="voidOutOperation">
+                <xs:complexType>
+                    <xs:sequence>
           </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortOutOperation">
-        <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortOutOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="return" type="xs:short">
+                </xs:complexType>
             </xs:element>
-            <xs:element name="outShort" type="xs:short">
+            <xs:element name="voidOutOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="outLong" type="xs:int">
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortInOutOperation">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="inOutShort" type="xs:short">
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortInOutOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="return" type="xs:short">
+            <xs:element name="voidInOutOperation">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inOutLong" type="xs:int">
             </xs:element>
-            <xs:element name="inOutShort" type="xs:short">
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortOperation">
-        <xs:complexType>
-          <xs:sequence>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="shortOperationResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="return" type="xs:short">
+            <xs:element name="voidInOutOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inOutLong" type="xs:int">
             </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortInOperation">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inShort" type="xs:short">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortInOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:short">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortOutOperation">
+                <xs:complexType>
+                    <xs:sequence>
           </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="testOperaition">
-        <xs:complexType>
-          <xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortOutOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:short">
+            </xs:element>
+                        <xs:element name="outShort" type="xs:short">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortInOutOperation">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="inOutShort" type="xs:short">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortInOutOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:short">
+            </xs:element>
+                        <xs:element name="inOutShort" type="xs:short">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortOperation">
+                <xs:complexType>
+                    <xs:sequence>
           </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="testOperaitionResponse">
-        <xs:complexType>
-          <xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="shortOperationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:short">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="testOperaition">
+                <xs:complexType>
+                    <xs:sequence>
           </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:schema>
-  </wsdl:types>
-  <wsdl:message name="shortOutOperation">
-    <wsdl:part name="inparameter" element="tns:shortOutOperation">
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="testOperaitionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+          </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="shortOutOperation">
+        <wsdl:part name="inparameter" element="tns:shortOutOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortOutOperationResponse">
-    <wsdl:part name="outparameter" element="tns:shortOutOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="shortOutOperationResponse">
+        <wsdl:part name="outparameter" element="tns:shortOutOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="testOperaitionResponse">
-    <wsdl:part name="outparameter" element="tns:testOperaitionResponse">
+    </wsdl:message>
+    <wsdl:message name="testOperaitionResponse">
+        <wsdl:part name="outparameter" element="tns:testOperaitionResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="voidInOperation">
-    <wsdl:part name="inparameter" element="tns:voidInOperation">
+    </wsdl:message>
+    <wsdl:message name="voidInOperation">
+        <wsdl:part name="inparameter" element="tns:voidInOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="voidInOutOperationResponse">
-    <wsdl:part name="outparameter" element="tns:voidInOutOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="voidInOutOperationResponse">
+        <wsdl:part name="outparameter" element="tns:voidInOutOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="onewayInInOperation">
-    <wsdl:part name="inparameter" element="tns:onewayInInOperation">
+    </wsdl:message>
+    <wsdl:message name="onewayInInOperation">
+        <wsdl:part name="inparameter" element="tns:onewayInInOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="voidOutOperationResponse">
-    <wsdl:part name="outparameter" element="tns:voidOutOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="voidOutOperationResponse">
+        <wsdl:part name="outparameter" element="tns:voidOutOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="onewayOperation">
-    <wsdl:part name="inparameter" element="tns:onewayOperation">
+    </wsdl:message>
+    <wsdl:message name="onewayOperation">
+        <wsdl:part name="inparameter" element="tns:onewayOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="voidInOutOperation">
-    <wsdl:part name="inparameter" element="tns:voidInOutOperation">
+    </wsdl:message>
+    <wsdl:message name="voidInOutOperation">
+        <wsdl:part name="inparameter" element="tns:voidInOutOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="onewayInOperation">
-    <wsdl:part name="inparameter" element="tns:onewayInOperation">
+    </wsdl:message>
+    <wsdl:message name="onewayInOperation">
+        <wsdl:part name="inparameter" element="tns:onewayInOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortOperationResponse">
-    <wsdl:part name="outparameter" element="tns:shortOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="shortOperationResponse">
+        <wsdl:part name="outparameter" element="tns:shortOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortInOutOperation">
-    <wsdl:part name="inparameter" element="tns:shortInOutOperation">
+    </wsdl:message>
+    <wsdl:message name="shortInOutOperation">
+        <wsdl:part name="inparameter" element="tns:shortInOutOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortInOperationResponse">
-    <wsdl:part name="outparameter" element="tns:shortInOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="shortInOperationResponse">
+        <wsdl:part name="outparameter" element="tns:shortInOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="voidInOperationResponse">
-    <wsdl:part name="outparameter" element="tns:voidInOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="voidInOperationResponse">
+        <wsdl:part name="outparameter" element="tns:voidInOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortInOperation">
-    <wsdl:part name="inparameter" element="tns:shortInOperation">
+    </wsdl:message>
+    <wsdl:message name="shortInOperation">
+        <wsdl:part name="inparameter" element="tns:shortInOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortOperation">
-    <wsdl:part name="inparameter" element="tns:shortOperation">
+    </wsdl:message>
+    <wsdl:message name="shortOperation">
+        <wsdl:part name="inparameter" element="tns:shortOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="voidOutOperation">
-    <wsdl:part name="inparameter" element="tns:voidOutOperation">
+    </wsdl:message>
+    <wsdl:message name="voidOutOperation">
+        <wsdl:part name="inparameter" element="tns:voidOutOperation">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="testOperaition">
-    <wsdl:part name="inparameter" element="tns:testOperaition">
+    </wsdl:message>
+    <wsdl:message name="testOperaition">
+        <wsdl:part name="inparameter" element="tns:testOperaition">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="shortInOutOperationResponse">
-    <wsdl:part name="outparameter" element="tns:shortInOutOperationResponse">
+    </wsdl:message>
+    <wsdl:message name="shortInOutOperationResponse">
+        <wsdl:part name="outparameter" element="tns:shortInOutOperationResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="OperationTest">
-    <wsdl:operation name="onewayOperation">
-      <wsdl:input name="onewayOperationRequest" message="tns:onewayOperation">
+    </wsdl:message>
+    <wsdl:portType name="OperationTest">
+        <wsdl:operation name="onewayOperation">
+            <wsdl:input name="onewayOperationRequest" message="tns:onewayOperation">
     </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInOperation">
-      <wsdl:input name="onewayInOperationRequest" message="tns:onewayInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInOperation">
+            <wsdl:input name="onewayInOperationRequest" message="tns:onewayInOperation">
     </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInInOperation">
-      <wsdl:input name="onewayInInOperationRequest" message="tns:onewayInInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInInOperation">
+            <wsdl:input name="onewayInInOperationRequest" message="tns:onewayInInOperation">
     </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOperation">
-      <wsdl:input name="voidInOperationRequest" message="tns:voidInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOperation">
+            <wsdl:input name="voidInOperationRequest" message="tns:voidInOperation">
     </wsdl:input>
-      <wsdl:output name="voidInOperationResponse" message="tns:voidInOperationResponse">
+            <wsdl:output name="voidInOperationResponse" message="tns:voidInOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidOutOperation">
-      <wsdl:input name="voidOutOperationRequest" message="tns:voidOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="voidOutOperation">
+            <wsdl:input name="voidOutOperationRequest" message="tns:voidOutOperation">
     </wsdl:input>
-      <wsdl:output name="voidOutOperationResponse" message="tns:voidOutOperationResponse">
+            <wsdl:output name="voidOutOperationResponse" message="tns:voidOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOutOperation">
-      <wsdl:input name="voidInOutOperationRequest" message="tns:voidInOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOutOperation">
+            <wsdl:input name="voidInOutOperationRequest" message="tns:voidInOutOperation">
     </wsdl:input>
-      <wsdl:output name="voidInOutOperationResponse" message="tns:voidInOutOperationResponse">
+            <wsdl:output name="voidInOutOperationResponse" message="tns:voidInOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOperation">
-      <wsdl:input name="shortInOperationRequest" message="tns:shortInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOperation">
+            <wsdl:input name="shortInOperationRequest" message="tns:shortInOperation">
     </wsdl:input>
-      <wsdl:output name="shortInOperationResponse" message="tns:shortInOperationResponse">
+            <wsdl:output name="shortInOperationResponse" message="tns:shortInOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOutOperation">
-      <wsdl:input name="shortOutOperationRequest" message="tns:shortOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortOutOperation">
+            <wsdl:input name="shortOutOperationRequest" message="tns:shortOutOperation">
     </wsdl:input>
-      <wsdl:output name="shortOutOperationResponse" message="tns:shortOutOperationResponse">
+            <wsdl:output name="shortOutOperationResponse" message="tns:shortOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOutOperation">
-      <wsdl:input name="shortInOutOperationRequest" message="tns:shortInOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOutOperation">
+            <wsdl:input name="shortInOutOperationRequest" message="tns:shortInOutOperation">
     </wsdl:input>
-      <wsdl:output name="shortInOutOperationResponse" message="tns:shortInOutOperationResponse">
+            <wsdl:output name="shortInOutOperationResponse" message="tns:shortInOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOperation">
-      <wsdl:input name="shortOperationRequest" message="tns:shortOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortOperation">
+            <wsdl:input name="shortOperationRequest" message="tns:shortOperation">
     </wsdl:input>
-      <wsdl:output name="shortOperationResponse" message="tns:shortOperationResponse">
+            <wsdl:output name="shortOperationResponse" message="tns:shortOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:portType name="inheritOperationTest">
-    <wsdl:operation name="onewayOperation">
-      <wsdl:input name="onewayOperationRequest" message="tns:onewayOperation">
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="inheritOperationTest">
+        <wsdl:operation name="onewayOperation">
+            <wsdl:input name="onewayOperationRequest" message="tns:onewayOperation">
     </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInOperation">
-      <wsdl:input name="onewayInOperationRequest" message="tns:onewayInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInOperation">
+            <wsdl:input name="onewayInOperationRequest" message="tns:onewayInOperation">
     </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInInOperation">
-      <wsdl:input name="onewayInInOperationRequest" message="tns:onewayInInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInInOperation">
+            <wsdl:input name="onewayInInOperationRequest" message="tns:onewayInInOperation">
     </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOperation">
-      <wsdl:input name="voidInOperationRequest" message="tns:voidInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOperation">
+            <wsdl:input name="voidInOperationRequest" message="tns:voidInOperation">
     </wsdl:input>
-      <wsdl:output name="voidInOperationResponse" message="tns:voidInOperationResponse">
+            <wsdl:output name="voidInOperationResponse" message="tns:voidInOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidOutOperation">
-      <wsdl:input name="voidOutOperationRequest" message="tns:voidOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="voidOutOperation">
+            <wsdl:input name="voidOutOperationRequest" message="tns:voidOutOperation">
     </wsdl:input>
-      <wsdl:output name="voidOutOperationResponse" message="tns:voidOutOperationResponse">
+            <wsdl:output name="voidOutOperationResponse" message="tns:voidOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOutOperation">
-      <wsdl:input name="voidInOutOperationRequest" message="tns:voidInOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOutOperation">
+            <wsdl:input name="voidInOutOperationRequest" message="tns:voidInOutOperation">
     </wsdl:input>
-      <wsdl:output name="voidInOutOperationResponse" message="tns:voidInOutOperationResponse">
+            <wsdl:output name="voidInOutOperationResponse" message="tns:voidInOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOperation">
-      <wsdl:input name="shortInOperationRequest" message="tns:shortInOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOperation">
+            <wsdl:input name="shortInOperationRequest" message="tns:shortInOperation">
     </wsdl:input>
-      <wsdl:output name="shortInOperationResponse" message="tns:shortInOperationResponse">
+            <wsdl:output name="shortInOperationResponse" message="tns:shortInOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOutOperation">
-      <wsdl:input name="shortOutOperationRequest" message="tns:shortOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortOutOperation">
+            <wsdl:input name="shortOutOperationRequest" message="tns:shortOutOperation">
     </wsdl:input>
-      <wsdl:output name="shortOutOperationResponse" message="tns:shortOutOperationResponse">
+            <wsdl:output name="shortOutOperationResponse" message="tns:shortOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOutOperation">
-      <wsdl:input name="shortInOutOperationRequest" message="tns:shortInOutOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOutOperation">
+            <wsdl:input name="shortInOutOperationRequest" message="tns:shortInOutOperation">
     </wsdl:input>
-      <wsdl:output name="shortInOutOperationResponse" message="tns:shortInOutOperationResponse">
+            <wsdl:output name="shortInOutOperationResponse" message="tns:shortInOutOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOperation">
-      <wsdl:input name="shortOperationRequest" message="tns:shortOperation">
+        </wsdl:operation>
+        <wsdl:operation name="shortOperation">
+            <wsdl:input name="shortOperationRequest" message="tns:shortOperation">
     </wsdl:input>
-      <wsdl:output name="shortOperationResponse" message="tns:shortOperationResponse">
+            <wsdl:output name="shortOperationResponse" message="tns:shortOperationResponse">
     </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="testOperaition">
-      <wsdl:input name="testOperaitionRequest" message="tns:testOperaition">
+        </wsdl:operation>
+        <wsdl:operation name="testOperaition">
+            <wsdl:input name="testOperaitionRequest" message="tns:testOperaition">
     </wsdl:input>
-      <wsdl:output name="testOperaitionResponse" message="tns:testOperaitionResponse">
+            <wsdl:output name="testOperaitionResponse" message="tns:testOperaitionResponse">
     </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="OperationTestCORBABinding" type="tns:OperationTest">
-    <corba:binding repositoryID="IDL:OperationTest:1.0"/>
-    <wsdl:operation name="onewayOperation">
-      <corba:operation name="onewayOperation"/>
-      <wsdl:input name="onewayOperationRequest">
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="OperationTestCORBABinding" type="tns:OperationTest">
+        <corba:binding repositoryID="IDL:OperationTest:1.0"/>
+        <wsdl:operation name="onewayOperation">
+            <corba:operation name="onewayOperation"/>
+            <wsdl:input name="onewayOperationRequest">
       </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInOperation">
-      <corba:operation name="onewayInOperation">
-        <corba:param mode="in" name="inString" idltype="corba:string"/>
-      </corba:operation>
-      <wsdl:input name="onewayInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInOperation">
+            <corba:operation name="onewayInOperation">
+                <corba:param mode="in" name="inString" idltype="corba:string"/>
+            </corba:operation>
+            <wsdl:input name="onewayInOperationRequest">
       </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInInOperation">
-      <corba:operation name="onewayInInOperation">
-        <corba:param mode="in" name="inString1" idltype="corba:string"/>
-        <corba:param mode="in" name="inString2" idltype="corba:string"/>
-      </corba:operation>
-      <wsdl:input name="onewayInInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInInOperation">
+            <corba:operation name="onewayInInOperation">
+                <corba:param mode="in" name="inString1" idltype="corba:string"/>
+                <corba:param mode="in" name="inString2" idltype="corba:string"/>
+            </corba:operation>
+            <wsdl:input name="onewayInInOperationRequest">
       </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOperation">
-      <corba:operation name="voidInOperation">
-        <corba:param mode="in" name="inLong" idltype="corba:long"/>
-      </corba:operation>
-      <wsdl:input name="voidInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOperation">
+            <corba:operation name="voidInOperation">
+                <corba:param mode="in" name="inLong" idltype="corba:long"/>
+            </corba:operation>
+            <wsdl:input name="voidInOperationRequest">
       </wsdl:input>
-      <wsdl:output name="voidInOperationResponse">
+            <wsdl:output name="voidInOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidOutOperation">
-      <corba:operation name="voidOutOperation">
-        <corba:param mode="out" name="outLong" idltype="corba:long"/>
-      </corba:operation>
-      <wsdl:input name="voidOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="voidOutOperation">
+            <corba:operation name="voidOutOperation">
+                <corba:param mode="out" name="outLong" idltype="corba:long"/>
+            </corba:operation>
+            <wsdl:input name="voidOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="voidOutOperationResponse">
+            <wsdl:output name="voidOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOutOperation">
-      <corba:operation name="voidInOutOperation">
-        <corba:param mode="inout" name="inOutLong" idltype="corba:long"/>
-      </corba:operation>
-      <wsdl:input name="voidInOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOutOperation">
+            <corba:operation name="voidInOutOperation">
+                <corba:param mode="inout" name="inOutLong" idltype="corba:long"/>
+            </corba:operation>
+            <wsdl:input name="voidInOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="voidInOutOperationResponse">
+            <wsdl:output name="voidInOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOperation">
-      <corba:operation name="shortInOperation">
-        <corba:param mode="in" name="inShort" idltype="corba:short"/>
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOperation">
+            <corba:operation name="shortInOperation">
+                <corba:param mode="in" name="inShort" idltype="corba:short"/>
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortInOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortInOperationResponse">
+            <wsdl:output name="shortInOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOutOperation">
-      <corba:operation name="shortOutOperation">
-        <corba:param mode="out" name="outShort" idltype="corba:short"/>
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortOutOperation">
+            <corba:operation name="shortOutOperation">
+                <corba:param mode="out" name="outShort" idltype="corba:short"/>
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortOutOperationResponse">
+            <wsdl:output name="shortOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOutOperation">
-      <corba:operation name="shortInOutOperation">
-        <corba:param mode="inout" name="inOutShort" idltype="corba:short"/>
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortInOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOutOperation">
+            <corba:operation name="shortInOutOperation">
+                <corba:param mode="inout" name="inOutShort" idltype="corba:short"/>
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortInOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortInOutOperationResponse">
+            <wsdl:output name="shortInOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOperation">
-      <corba:operation name="shortOperation">
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortOperation">
+            <corba:operation name="shortOperation">
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortOperationResponse">
+            <wsdl:output name="shortOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:binding name="inheritOperationTestCORBABinding" type="tns:inheritOperationTest">
-    <corba:binding repositoryID="IDL:inheritOperationTest:1.0" bases="IDL:OperationTest:1.0"/>
-    <wsdl:operation name="onewayOperation">
-      <corba:operation name="onewayOperation"/>
-      <wsdl:input name="onewayOperationRequest">
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="inheritOperationTestCORBABinding" type="tns:inheritOperationTest">
+        <corba:binding repositoryID="IDL:inheritOperationTest:1.0" bases="IDL:OperationTest:1.0"/>
+        <wsdl:operation name="onewayOperation">
+            <corba:operation name="onewayOperation"/>
+            <wsdl:input name="onewayOperationRequest">
       </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInOperation">
-      <corba:operation name="onewayInOperation">
-        <corba:param mode="in" name="inString" idltype="corba:string"/>
-      </corba:operation>
-      <wsdl:input name="onewayInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInOperation">
+            <corba:operation name="onewayInOperation">
+                <corba:param mode="in" name="inString" idltype="corba:string"/>
+            </corba:operation>
+            <wsdl:input name="onewayInOperationRequest">
       </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="onewayInInOperation">
-      <corba:operation name="onewayInInOperation">
-        <corba:param mode="in" name="inString1" idltype="corba:string"/>
-        <corba:param mode="in" name="inString2" idltype="corba:string"/>
-      </corba:operation>
-      <wsdl:input name="onewayInInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="onewayInInOperation">
+            <corba:operation name="onewayInInOperation">
+                <corba:param mode="in" name="inString1" idltype="corba:string"/>
+                <corba:param mode="in" name="inString2" idltype="corba:string"/>
+            </corba:operation>
+            <wsdl:input name="onewayInInOperationRequest">
       </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOperation">
-      <corba:operation name="voidInOperation">
-        <corba:param mode="in" name="inLong" idltype="corba:long"/>
-      </corba:operation>
-      <wsdl:input name="voidInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOperation">
+            <corba:operation name="voidInOperation">
+                <corba:param mode="in" name="inLong" idltype="corba:long"/>
+            </corba:operation>
+            <wsdl:input name="voidInOperationRequest">
       </wsdl:input>
-      <wsdl:output name="voidInOperationResponse">
+            <wsdl:output name="voidInOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidOutOperation">
-      <corba:operation name="voidOutOperation">
-        <corba:param mode="out" name="outLong" idltype="corba:long"/>
-      </corba:operation>
-      <wsdl:input name="voidOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="voidOutOperation">
+            <corba:operation name="voidOutOperation">
+                <corba:param mode="out" name="outLong" idltype="corba:long"/>
+            </corba:operation>
+            <wsdl:input name="voidOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="voidOutOperationResponse">
+            <wsdl:output name="voidOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="voidInOutOperation">
-      <corba:operation name="voidInOutOperation">
-        <corba:param mode="inout" name="inOutLong" idltype="corba:long"/>
-      </corba:operation>
-      <wsdl:input name="voidInOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="voidInOutOperation">
+            <corba:operation name="voidInOutOperation">
+                <corba:param mode="inout" name="inOutLong" idltype="corba:long"/>
+            </corba:operation>
+            <wsdl:input name="voidInOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="voidInOutOperationResponse">
+            <wsdl:output name="voidInOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOperation">
-      <corba:operation name="shortInOperation">
-        <corba:param mode="in" name="inShort" idltype="corba:short"/>
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortInOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOperation">
+            <corba:operation name="shortInOperation">
+                <corba:param mode="in" name="inShort" idltype="corba:short"/>
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortInOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortInOperationResponse">
+            <wsdl:output name="shortInOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOutOperation">
-      <corba:operation name="shortOutOperation">
-        <corba:param mode="out" name="outShort" idltype="corba:short"/>
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortOutOperation">
+            <corba:operation name="shortOutOperation">
+                <corba:param mode="out" name="outShort" idltype="corba:short"/>
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortOutOperationResponse">
+            <wsdl:output name="shortOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortInOutOperation">
-      <corba:operation name="shortInOutOperation">
-        <corba:param mode="inout" name="inOutShort" idltype="corba:short"/>
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortInOutOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortInOutOperation">
+            <corba:operation name="shortInOutOperation">
+                <corba:param mode="inout" name="inOutShort" idltype="corba:short"/>
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortInOutOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortInOutOperationResponse">
+            <wsdl:output name="shortInOutOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="shortOperation">
-      <corba:operation name="shortOperation">
-        <corba:return name="return" idltype="corba:short"/>
-      </corba:operation>
-      <wsdl:input name="shortOperationRequest">
+        </wsdl:operation>
+        <wsdl:operation name="shortOperation">
+            <corba:operation name="shortOperation">
+                <corba:return name="return" idltype="corba:short"/>
+            </corba:operation>
+            <wsdl:input name="shortOperationRequest">
       </wsdl:input>
-      <wsdl:output name="shortOperationResponse">
+            <wsdl:output name="shortOperationResponse">
       </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="testOperaition">
-      <corba:operation name="testOperaition"/>
-      <wsdl:input name="testOperaitionRequest">
+        </wsdl:operation>
+        <wsdl:operation name="testOperaition">
+            <corba:operation name="testOperaition"/>
+            <wsdl:input name="testOperaitionRequest">
       </wsdl:input>
-      <wsdl:output name="testOperaitionResponse">
+            <wsdl:output name="testOperaitionResponse">
       </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="inheritOperationTestCORBAService">
-    <wsdl:port name="inheritOperationTestCORBAPort" binding="tns:inheritOperationTestCORBABinding">
-      <corba:address location="IOR:"/>
-    </wsdl:port>
-  </wsdl:service>
-  <wsdl:service name="OperationTestCORBAService">
-    <wsdl:port name="OperationTestCORBAPort" binding="tns:OperationTestCORBABinding">
-      <corba:address location="IOR:"/>
-    </wsdl:port>
-  </wsdl:service>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="inheritOperationTestCORBAService">
+        <wsdl:port name="inheritOperationTestCORBAPort" binding="tns:inheritOperationTestCORBABinding">
+            <corba:address location="IOR:"/>
+        </wsdl:port>
+    </wsdl:service>
+    <wsdl:service name="OperationTestCORBAService">
+        <wsdl:port name="OperationTestCORBAPort" binding="tns:OperationTestCORBABinding">
+            <corba:address location="IOR:"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

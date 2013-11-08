@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,57 +17,35 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns:jaxws="http://cxf.apache.org/jaxws" 
-xmlns:cxf="http://cxf.apache.org/core" 
-xsi:schemaLocation=" 
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"> 
-<import resource="classpath:META-INF/cxf/cxf.xml" /> 
- 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-	
-	<jaxws:endpoint id="cxfHandlerTestEndpoint"
-		implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers"
-		address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
-    	<jaxws:handlers>
-    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
-    	</jaxws:handlers>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <jaxws:endpoint id="cxfHandlerTestEndpoint" implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers" address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
+        <jaxws:handlers>
+            <bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+        </jaxws:handlers>
         <jaxws:properties>
-                <entry key="autoRewriteSoapAddress" value="false"/>
+            <entry key="autoRewriteSoapAddress" value="false"/>
         </jaxws:properties>
     </jaxws:endpoint>
-	<jaxws:server id="cxfHandlerTestServer"
-		serviceClass="org.apache.handlers.AddNumbers"
-		address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringServer">
-		<jaxws:serviceBean>
-                <bean class="org.apache.cxf.systest.handlers.AddNumbersNoHandlers" />
+    <jaxws:server id="cxfHandlerTestServer" serviceClass="org.apache.handlers.AddNumbers" address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringServer">
+        <jaxws:serviceBean>
+            <bean class="org.apache.cxf.systest.handlers.AddNumbersNoHandlers"/>
         </jaxws:serviceBean>
-		
-    	<jaxws:handlers>
-    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
-    	</jaxws:handlers>
+        <jaxws:handlers>
+            <bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+        </jaxws:handlers>
     </jaxws:server>
-
-    <jaxws:client id="cxfHandlerTestClientEndpoint"
-    	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
-    	<jaxws:handlers>
-    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
-    	</jaxws:handlers>
-    </jaxws:client> 
-    <jaxws:client id="cxfHandlerTestClientEndpointNoHandler"
-    	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
-    </jaxws:client> 
-    <jaxws:client id="cxfHandlerTestClientServer"
-    	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringServer">
-    	<jaxws:handlers>
-    		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
-    	</jaxws:handlers>
-    </jaxws:client> 
-    
-</beans> 
+    <jaxws:client id="cxfHandlerTestClientEndpoint" serviceClass="org.apache.handlers.AddNumbers" address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
+        <jaxws:handlers>
+            <bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+        </jaxws:handlers>
+    </jaxws:client>
+    <jaxws:client id="cxfHandlerTestClientEndpointNoHandler" serviceClass="org.apache.handlers.AddNumbers" address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringEndpoint">
+    </jaxws:client>
+    <jaxws:client id="cxfHandlerTestClientServer" serviceClass="org.apache.handlers.AddNumbers" address="http://localhost:${testutil.ports.springportNoAutoRewriteSoapAddressTest}/SpringServer">
+        <jaxws:handlers>
+            <bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
+        </jaxws:handlers>
+    </jaxws:client>
+</beans>

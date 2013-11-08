@@ -18,46 +18,31 @@ OASIS takes no position regarding the validity or scope of any intellectual prop
 
 The name "OASIS" is trademarks of OASIS, the owner and developer of this specification, and should be used only to refer to the organization and its official outputs. OASIS welcomes reference to, and implementation and use of, specifications, while reserving the right to enforce its marks against misleading uses. Please see http://www.oasis-open.org/who/trademark.php for above guidance.
 -->
-<wsdl:definitions
-    targetNamespace="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
-    xmlns:tns="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
-    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/">
-  <wsdl:types>
-    <xs:schema>
-      <xs:import
-          namespace="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
-          schemaLocation="wsdd-discovery-1.1-schema-os.xsd" />
-    </xs:schema>
-  </wsdl:types>
-
-  <wsdl:message name="HelloMessage" >
-    <wsdl:part name="parameters" element="tns:Hello" />
-  </wsdl:message>
-
-  <wsdl:message name="ByeMessage" >
-    <wsdl:part name="parameters" element="tns:Bye" />
-  </wsdl:message>
-
-  <wsdl:message name="ProbeMessage" >
-    <wsdl:part name="parameters" element="tns:Probe" />
-  </wsdl:message>
-
-  <wsdl:message name="ProbeMatchMessage" >
-    <wsdl:part name="parameters" element="tns:ProbeMatches" />
-  </wsdl:message>
-
-  <wsdl:message name="ResolveMessage" >
-    <wsdl:part name="parameters" element="tns:Resolve" />
-  </wsdl:message>
-
-  <wsdl:message name="ResolveMatchMessage" >
-    <wsdl:part name="parameters" element="tns:ResolveMatches" />
-  </wsdl:message>
-
-  <!-- wsdl:portType name="TargetService" >
+<wsdl:definitions xmlns:tns="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01">
+    <wsdl:types>
+        <xs:schema>
+            <xs:import namespace="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01" schemaLocation="wsdd-discovery-1.1-schema-os.xsd"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="HelloMessage">
+        <wsdl:part name="parameters" element="tns:Hello"/>
+    </wsdl:message>
+    <wsdl:message name="ByeMessage">
+        <wsdl:part name="parameters" element="tns:Bye"/>
+    </wsdl:message>
+    <wsdl:message name="ProbeMessage">
+        <wsdl:part name="parameters" element="tns:Probe"/>
+    </wsdl:message>
+    <wsdl:message name="ProbeMatchMessage">
+        <wsdl:part name="parameters" element="tns:ProbeMatches"/>
+    </wsdl:message>
+    <wsdl:message name="ResolveMessage">
+        <wsdl:part name="parameters" element="tns:Resolve"/>
+    </wsdl:message>
+    <wsdl:message name="ResolveMatchMessage">
+        <wsdl:part name="parameters" element="tns:ResolveMatches"/>
+    </wsdl:message>
+    <!-- wsdl:portType name="TargetService" >
     <wsdl:operation name="HelloOp" >
       <wsdl:output message="tns:HelloMessage"
       wsaw:Action
@@ -95,91 +80,65 @@ The name "OASIS" is trademarks of OASIS, the owner and developer of this specifi
       />
     </wsdl:operation>
   </wsdl:portType-->
-
-  <!-- If this portType is included in Types, it indicates the 
+    <!-- If this portType is included in Types, it indicates the 
        Target Service is a Discovery Proxy operating in a managed mode. 
        Discovery Proxies also implement tns:TargetService in an ad hoc mode.
   -->
-  <wsdl:portType name="DiscoveryProxy">
-    <wsdl:operation name="HelloOp" >
-      <wsdl:input message="tns:HelloMessage"
-      wsaw:Action
-      ="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Hello"
-      />
-    </wsdl:operation>
-    <wsdl:operation name="ByeOp" >
-      <wsdl:input message="tns:ByeMessage"
-      wsaw:Action
-      ="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Bye"
-      />
-    </wsdl:operation>
-    <wsdl:operation name="ProbeOp" >
-      <wsdl:input message="tns:ProbeMessage"
-      wsaw:Action
-      ="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Probe"
-      />
-      <wsdl:output message="tns:ProbeMatchMessage"
-      wsaw:Action
-      ="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ProbeMatches"
-      />
-    </wsdl:operation>
-    <wsdl:operation name="ResolveOp" >
-      <wsdl:input message="tns:ResolveMessage"
-      wsaw:Action
-      ="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Resolve"
-      />
-      <wsdl:output message="tns:ResolveMatchMessage"
-      wsaw:Action
-      ="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ResolveMatches"
-      />
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="DiscoveryProxy" type="tns:DiscoveryProxy">
-  	<soap:binding style="document"
-  		transport="http://schemas.xmlsoap.org/soap/http" />
-  	<wsdl:operation name="HelloOp">
-  		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/HelloOp" />
-  		<wsdl:input>
-  			<soap:body use="literal" />
-  		</wsdl:input>
-  	</wsdl:operation>
-  	<wsdl:operation name="ByeOp">
-  		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ByeOp" />
-  		<wsdl:input>
-  			<soap:body use="literal" />
-  		</wsdl:input>
-  	</wsdl:operation>
-  	<wsdl:operation name="ProbeOp">
-  		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ProbeOp" />
-  		<wsdl:input>
-  			<soap:body use="literal" />
-  		</wsdl:input>
-  		<wsdl:output>
-  			<soap:body use="literal" />
-  		</wsdl:output>
-  	</wsdl:operation>
-  	<wsdl:operation name="ResolveOp">
-  		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ResolveOp" />
-  		<wsdl:input>
-  			<soap:body use="literal" />
-  		</wsdl:input>
-  		<wsdl:output>
-  			<soap:body use="literal" />
-  		</wsdl:output>
-  	</wsdl:operation>
-  </wsdl:binding>
-  
-  
- 	<wsdl:service name="Discovery">
+    <wsdl:portType name="DiscoveryProxy">
+        <wsdl:operation name="HelloOp">
+            <wsdl:input message="tns:HelloMessage" wsaw:Action="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Hello"/>
+        </wsdl:operation>
+        <wsdl:operation name="ByeOp">
+            <wsdl:input message="tns:ByeMessage" wsaw:Action="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Bye"/>
+        </wsdl:operation>
+        <wsdl:operation name="ProbeOp">
+            <wsdl:input message="tns:ProbeMessage" wsaw:Action="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Probe"/>
+            <wsdl:output message="tns:ProbeMatchMessage" wsaw:Action="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ProbeMatches"/>
+        </wsdl:operation>
+        <wsdl:operation name="ResolveOp">
+            <wsdl:input message="tns:ResolveMessage" wsaw:Action="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/Resolve"/>
+            <wsdl:output message="tns:ResolveMatchMessage" wsaw:Action="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ResolveMatches"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="DiscoveryProxy" type="tns:DiscoveryProxy">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="HelloOp">
+            <soap:operation soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/HelloOp"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="ByeOp">
+            <soap:operation soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ByeOp"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="ProbeOp">
+            <soap:operation soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ProbeOp"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ResolveOp">
+            <soap:operation soapAction="http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ResolveOp"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="Discovery">
         <wsdl:port name="DiscoveryUDP" binding="tns:DiscoveryProxy">
             <soap:address location="soap.udp://:3702"/>
         </wsdl:port>
         <wsdl:port name="DiscoveryProxy" binding="tns:DiscoveryProxy">
             <soap:address location="http://0.0.0.0:3702/DiscoveryProxy"/>
         </wsdl:port>
-    </wsdl:service>  
+    </wsdl:service>
 </wsdl:definitions>

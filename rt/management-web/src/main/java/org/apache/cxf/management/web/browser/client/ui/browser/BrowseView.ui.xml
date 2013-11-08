@@ -17,34 +17,25 @@
   specific language governing permissions and limitations
   under the License.
   -->
-
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-
-    <ui:with field='res'
-             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>    
-
-	<g:RootLayoutPanel>
-		<g:layer>
-			<g:DockLayoutPanel unit='EM'>
-				<g:north size='2'>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:with field="res" type="org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources"/>
+    <g:RootLayoutPanel>
+        <g:layer>
+            <g:DockLayoutPanel unit="EM">
+                <g:north size="2">
                     <g:FlowPanel ui:field="navigationHeaderSlot"/>
-				</g:north>
-
-				<g:center>
-					<g:SplitLayoutPanel>
-						<g:west size='192'>
-                            <g:FlowPanel styleName="{res.css.navigationSidebarSlot}"
-                                         ui:field="navigationSidebarSlot"/>
+                </g:north>
+                <g:center>
+                    <g:SplitLayoutPanel>
+                        <g:west size="192">
+                            <g:FlowPanel styleName="{res.css.navigationSidebarSlot}" ui:field="navigationSidebarSlot"/>
                         </g:west>
-                        
                         <g:center>
-                             <g:FlowPanel  styleName="{res.css.viewerSlot}" ui:field="viewerSlot"/>
+                            <g:FlowPanel styleName="{res.css.viewerSlot}" ui:field="viewerSlot"/>
                         </g:center>
-					</g:SplitLayoutPanel>
-				</g:center>
-			</g:DockLayoutPanel>
-		</g:layer>
-	</g:RootLayoutPanel>
-
+                    </g:SplitLayoutPanel>
+                </g:center>
+            </g:DockLayoutPanel>
+        </g:layer>
+    </g:RootLayoutPanel>
 </ui:UiBinder>

@@ -17,25 +17,10 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-             xmlns:tns="http://www.apache.org/bus/demos/bank"
-             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:xsd1="http://soapinterop.org/xsd"
-             xmlns:corba="http://cxf.apache.org/bindings/corba"
-             xmlns:ns1="http://www.apache.org/corba/typemap/BasePortType.idl"
-             xmlns:wsa="http://www.w3.org/2005/08/addressing"
-             xmlns:bank="http://www.apache.org/bus/demos/bank"
-             targetNamespace="http://www.apache.org/bus/demos/bank"
-             name="BaseService" >
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.apache.org/bus/demos/bank" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://soapinterop.org/xsd" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://www.apache.org/corba/typemap/BasePortType.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:bank="http://www.apache.org/bus/demos/bank" targetNamespace="http://www.apache.org/bus/demos/bank" name="BaseService">
     <types>
-        
-        <schema elementFormDefault="qualified" 
-                targetNamespace="http://www.apache.org/bus/demos/bank" 
-                xmlns="http://www.w3.org/2001/XMLSchema">
-            
-            <import namespace="http://www.w3.org/2005/08/addressing" 
-		    schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.apache.org/bus/demos/bank">
+            <import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/>
             <complexType name="AccountNames">
                 <sequence>
                     <element maxOccurs="unbounded" minOccurs="0" name="name" type="xsd:string"/>
@@ -48,11 +33,10 @@
             </xsd:element>
         </schema>
     </types>
-    <message name="list_accounts" />
+    <message name="list_accounts"/>
     <message name="list_accountsResponse">
         <part name="return" type="bank:AccountNames"/>
     </message>
-    
     <message name="create_account">
         <part name="account_name" type="xsd:string"/>
     </message>
@@ -68,31 +52,24 @@
     <message name="delete_account">
         <part name="account_name" type="xsd:string"/>
     </message>
-    <message name="delete_accountResponse" />
-    
+    <message name="delete_accountResponse"/>
     <message name="get_balance"/>
     <message name="get_balanceResponse">
         <part name="balance" type="xsd:float"/>
     </message>
-    
     <message name="deposit">
         <part name="addition" type="xsd:float"/>
     </message>
-    
     <message name="depositResponse"/>
-    
-    
-    <portType name="Bank">        
+    <portType name="Bank">
         <operation name="list_accounts">
             <input name="list_accounts" message="tns:create_account"/>
             <output name="list_accountsResponse" message="tns:list_accountsResponse"/>
         </operation>
-        
         <operation name="create_account">
             <input name="create_account" message="tns:create_account"/>
             <output name="create_accountResponse" message="tns:create_accountResponse"/>
         </operation>
-        
         <operation name="get_account">
             <input name="get_account" message="tns:get_account"/>
             <output name="get_accountResponse" message="tns:get_accountResponse"/>
@@ -101,7 +78,6 @@
             <input name="delete_account" message="tns:delete_account"/>
             <output name="delete_accountResponse" message="tns:delete_accountResponse"/>
         </operation>
-        
     </portType>
     <portType name="Account">
         <operation name="get_balance">
@@ -113,5 +89,4 @@
             <output name="depositResponse" message="tns:depositResponse"/>
         </operation>
     </portType>
-
 </definitions>

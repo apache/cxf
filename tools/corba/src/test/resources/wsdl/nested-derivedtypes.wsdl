@@ -17,18 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="mf" targetNamespace="http://schemas.apache.org/idl/mf.idl" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:corba="http://schemas.apache.org/bindings/corba" 
-    xmlns:corbatm="http://schemas.apache.org/typemap/corba/mf.idl" 
-    xmlns:tns="http://schemas.apache.org/idl/mf.idl" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/typemap/corba/mf.idl" xmlns:tns="http://schemas.apache.org/idl/mf.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/mf.idl" name="mf" targetNamespace="http://schemas.apache.org/idl/mf.idl">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/mf.idl" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/mf.idl" elementFormDefault="qualified">
             <complexType name="base">
                 <sequence>
                     <element name="e1" type="int"/>
@@ -85,8 +76,7 @@
             </complexType>
             <complexType name="ExtendFromEmptySequence">
                 <sequence>
-                    <element name="ExtendFromEmptySequenceSequenceStruct_f" 
-                        type="xsd1:ExtendFromEmptySequenceSequenceStruct"/>
+                    <element name="ExtendFromEmptySequenceSequenceStruct_f" type="xsd1:ExtendFromEmptySequenceSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="ContainingAnonSequenceSequenceStruct">
@@ -98,8 +88,7 @@
             <complexType name="ContainingAnonSequence">
                 <sequence>
                     <element name="varFloat" type="float"/>
-                    <element name="ContainingAnonSequenceSequenceStruct_f" 
-                        type="xsd1:ContainingAnonSequenceSequenceStruct"/>
+                    <element name="ContainingAnonSequenceSequenceStruct_f" type="xsd1:ContainingAnonSequenceSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="ExtendFromContainingAnonSequenceSequenceStruct">
@@ -109,10 +98,8 @@
             </complexType>
             <complexType name="ExtendFromContainingAnonSequence">
                 <sequence>
-                    <element name="ContainingAnonSequence_f" 
-                        type="xsd1:ContainingAnonSequence"/>
-                    <element name="ExtendFromContainingAnonSequenceSequenceStruct_f" 
-                        type="xsd1:ExtendFromContainingAnonSequenceSequenceStruct"/>
+                    <element name="ContainingAnonSequence_f" type="xsd1:ContainingAnonSequence"/>
+                    <element name="ExtendFromContainingAnonSequenceSequenceStruct_f" type="xsd1:ExtendFromContainingAnonSequenceSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="ExtendFromSchemaTypeSequenceStruct">
@@ -125,8 +112,7 @@
                 <sequence>
                     <element name="attrString" type="string"/>
                     <element name="string_f" type="string"/>
-                    <element name="ExtendFromSchemaTypeSequenceStruct_f" 
-                        type="xsd1:ExtendFromSchemaTypeSequenceStruct"/>
+                    <element name="ExtendFromSchemaTypeSequenceStruct_f" type="xsd1:ExtendFromSchemaTypeSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="baseAll">
@@ -143,8 +129,7 @@
             <complexType name="AllExtendingAll">
                 <sequence>
                     <element name="baseAll_f" type="xsd1:baseAll"/>
-                    <element name="AllExtendingAllAllStruct_f" 
-                        type="xsd1:AllExtendingAllAllStruct"/>
+                    <element name="AllExtendingAllAllStruct_f" type="xsd1:AllExtendingAllAllStruct"/>
                 </sequence>
             </complexType>
             <complexType name="SequenceExtendedFromAllSequenceStruct">
@@ -155,8 +140,7 @@
             <complexType name="SequenceExtendedFromAll">
                 <sequence>
                     <element name="baseAll_f" type="xsd1:baseAll"/>
-                    <element name="SequenceExtendedFromAllSequenceStruct_f" 
-                        type="xsd1:SequenceExtendedFromAllSequenceStruct"/>
+                    <element name="SequenceExtendedFromAllSequenceStruct_f" type="xsd1:SequenceExtendedFromAllSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="ChoiceElem">
@@ -182,8 +166,7 @@
             <complexType name="ExtendFromChoice">
                 <sequence>
                     <element name="ChoiceElem_f" type="xsd1:ChoiceElem"/>
-                    <element name="ExtendFromChoiceSequenceStruct_f" 
-                        type="xsd1:ExtendFromChoiceSequenceStruct"/>
+                    <element name="ExtendFromChoiceSequenceStruct_f" type="xsd1:ExtendFromChoiceSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="ChoiceDerivedFromSequenceChoiceType">
@@ -204,8 +187,7 @@
             <complexType name="ChoiceDerivedFromSequence">
                 <sequence>
                     <element name="base_f" type="xsd1:base"/>
-                    <element name="ChoiceDerivedFromSequenceChoiceType_f" 
-                        type="xsd1:ChoiceDerivedFromSequenceChoiceType"/>
+                    <element name="ChoiceDerivedFromSequenceChoiceType_f" type="xsd1:ChoiceDerivedFromSequenceChoiceType"/>
                 </sequence>
             </complexType>
             <complexType name="ChoiceInTheMiddleSequenceStruct">
@@ -215,10 +197,8 @@
             </complexType>
             <complexType name="ChoiceInTheMiddle">
                 <sequence>
-                    <element name="ChoiceDerivedFromSequence_f" 
-                        type="xsd1:ChoiceDerivedFromSequence"/>
-                    <element name="ChoiceInTheMiddleSequenceStruct_f" 
-                        type="xsd1:ChoiceInTheMiddleSequenceStruct"/>
+                    <element name="ChoiceDerivedFromSequence_f" type="xsd1:ChoiceDerivedFromSequence"/>
+                    <element name="ChoiceInTheMiddleSequenceStruct_f" type="xsd1:ChoiceInTheMiddleSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="RepeatedElement">
@@ -234,8 +214,7 @@
             <complexType name="ExtendFromRepeatedElement">
                 <sequence>
                     <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
-                    <element name="ExtendFromRepeatedElementSequenceStruct_f" 
-                        type="xsd1:ExtendFromRepeatedElementSequenceStruct"/>
+                    <element name="ExtendFromRepeatedElementSequenceStruct_f" type="xsd1:ExtendFromRepeatedElementSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="sArray">
@@ -251,8 +230,7 @@
             <complexType name="RepeatedFromRepeatedElement">
                 <sequence>
                     <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
-                    <element name="RepeatedFromRepeatedElementSequenceStruct_f" 
-                        type="xsd1:RepeatedFromRepeatedElementSequenceStruct"/>
+                    <element name="RepeatedFromRepeatedElementSequenceStruct_f" type="xsd1:RepeatedFromRepeatedElementSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="RepeatedSequenceFromRepeatedElementSequenceStruct">
@@ -262,16 +240,13 @@
             </complexType>
             <complexType name="RepeatedSequenceFromRepeatedElementSequenceStructArray">
                 <sequence>
-                    <element maxOccurs="4" minOccurs="0" name="item" 
-                        type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStruct"/>
+                    <element maxOccurs="4" minOccurs="0" name="item" type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStruct"/>
                 </sequence>
             </complexType>
             <complexType name="RepeatedSequenceFromRepeatedElement">
                 <sequence>
                     <element name="RepeatedElement_f" type="xsd1:RepeatedElement"/>
-                    <element 
-                        name="RepeatedSequenceFromRepeatedElementSequenceStructArray_f" 
-                        type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStructArray"/>
+                    <element name="RepeatedSequenceFromRepeatedElementSequenceStructArray_f" type="xsd1:RepeatedSequenceFromRepeatedElementSequenceStructArray"/>
                 </sequence>
             </complexType>
             <element name="DerivedTypesPortType.echoBaseObj">
@@ -351,12 +326,10 @@
                     </sequence>
                 </complexType>
             </element>
-            <element 
-                name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult">
+            <element name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult">
                 <complexType>
                     <sequence>
-                        <element name="return" 
-                            type="xsd1:ExtendFromContainingAnonSequence"/>
+                        <element name="return" type="xsd1:ExtendFromContainingAnonSequence"/>
                     </sequence>
                 </complexType>
             </element>
@@ -499,170 +472,121 @@
         <part element="xsd1:DerivedTypesPortType.echoSub3ObjResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromEmptySequence">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequence" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequence" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromEmptySequenceResponse">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequenceResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromEmptySequenceResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromContainingAnonSequence">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequence" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequence" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse">
-        <part 
-            element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromSchemaType">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromSchemaType" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromSchemaType" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromSchemaTypeResponse">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromSchemaTypeResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromSchemaTypeResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoAllExtendingAll">
         <part element="xsd1:DerivedTypesPortType.echoAllExtendingAll" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoAllExtendingAllResponse">
-        <part element="xsd1:DerivedTypesPortType.echoAllExtendingAllResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoAllExtendingAllResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoSequenceExtendedFromAll">
-        <part element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAll" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAll" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoSequenceExtendedFromAllResponse">
-        <part element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAllResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoSequenceExtendedFromAllResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromChoice">
         <part element="xsd1:DerivedTypesPortType.echoExtendFromChoice" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromChoiceResponse">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromChoiceResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromChoiceResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoChoiceDerivedFromSequence">
-        <part element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequence" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequence" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse">
-        <part element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequenceResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoChoiceDerivedFromSequenceResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoChoiceInTheMiddle">
         <part element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddle" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoChoiceInTheMiddleResponse">
-        <part element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddleResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoChoiceInTheMiddleResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromRepeatedElement">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElement" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElement" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoExtendFromRepeatedElementResponse">
-        <part element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElementResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoExtendFromRepeatedElementResult" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoRepeatedFromRepeatedElement">
-        <part element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElement" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElement" name="parameters"/>
     </message>
     <message name="DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse">
-        <part element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElementResult" 
-            name="parameters"/>
+        <part element="xsd1:DerivedTypesPortType.echoRepeatedFromRepeatedElementResult" name="parameters"/>
     </message>
     <portType name="DerivedTypesPortType">
         <operation name="echoBaseObj">
             <input message="tns:DerivedTypesPortType.echoBaseObj" name="echoBaseObj"/>
-            <output message="tns:DerivedTypesPortType.echoBaseObjResponse" 
-                name="echoBaseObjResponse"/>
+            <output message="tns:DerivedTypesPortType.echoBaseObjResponse" name="echoBaseObjResponse"/>
         </operation>
         <operation name="echoSub1Obj">
             <input message="tns:DerivedTypesPortType.echoSub1Obj" name="echoSub1Obj"/>
-            <output message="tns:DerivedTypesPortType.echoSub1ObjResponse" 
-                name="echoSub1ObjResponse"/>
+            <output message="tns:DerivedTypesPortType.echoSub1ObjResponse" name="echoSub1ObjResponse"/>
         </operation>
         <operation name="echoSub2Obj">
             <input message="tns:DerivedTypesPortType.echoSub2Obj" name="echoSub2Obj"/>
-            <output message="tns:DerivedTypesPortType.echoSub2ObjResponse" 
-                name="echoSub2ObjResponse"/>
+            <output message="tns:DerivedTypesPortType.echoSub2ObjResponse" name="echoSub2ObjResponse"/>
         </operation>
         <operation name="echoSub3Obj">
             <input message="tns:DerivedTypesPortType.echoSub3Obj" name="echoSub3Obj"/>
-            <output message="tns:DerivedTypesPortType.echoSub3ObjResponse" 
-                name="echoSub3ObjResponse"/>
+            <output message="tns:DerivedTypesPortType.echoSub3ObjResponse" name="echoSub3ObjResponse"/>
         </operation>
         <operation name="echoExtendFromEmptySequence">
-            <input message="tns:DerivedTypesPortType.echoExtendFromEmptySequence" 
-                name="echoExtendFromEmptySequence"/>
-            <output 
-                message="tns:DerivedTypesPortType.echoExtendFromEmptySequenceResponse" 
-                name="echoExtendFromEmptySequenceResponse"/>
+            <input message="tns:DerivedTypesPortType.echoExtendFromEmptySequence" name="echoExtendFromEmptySequence"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromEmptySequenceResponse" name="echoExtendFromEmptySequenceResponse"/>
         </operation>
         <operation name="echoExtendFromContainingAnonSequence">
-            <input 
-                message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequence" 
-                name="echoExtendFromContainingAnonSequence"/>
-            <output 
-                message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse" 
-                name="echoExtendFromContainingAnonSequenceResponse"/>
+            <input message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequence" name="echoExtendFromContainingAnonSequence"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromContainingAnonSequenceResponse" name="echoExtendFromContainingAnonSequenceResponse"/>
         </operation>
         <operation name="echoExtendFromSchemaType">
-            <input message="tns:DerivedTypesPortType.echoExtendFromSchemaType" 
-                name="echoExtendFromSchemaType"/>
-            <output message="tns:DerivedTypesPortType.echoExtendFromSchemaTypeResponse" 
-                name="echoExtendFromSchemaTypeResponse"/>
+            <input message="tns:DerivedTypesPortType.echoExtendFromSchemaType" name="echoExtendFromSchemaType"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromSchemaTypeResponse" name="echoExtendFromSchemaTypeResponse"/>
         </operation>
         <operation name="echoAllExtendingAll">
-            <input message="tns:DerivedTypesPortType.echoAllExtendingAll" 
-                name="echoAllExtendingAll"/>
-            <output message="tns:DerivedTypesPortType.echoAllExtendingAllResponse" 
-                name="echoAllExtendingAllResponse"/>
+            <input message="tns:DerivedTypesPortType.echoAllExtendingAll" name="echoAllExtendingAll"/>
+            <output message="tns:DerivedTypesPortType.echoAllExtendingAllResponse" name="echoAllExtendingAllResponse"/>
         </operation>
         <operation name="echoSequenceExtendedFromAll">
-            <input message="tns:DerivedTypesPortType.echoSequenceExtendedFromAll" 
-                name="echoSequenceExtendedFromAll"/>
-            <output 
-                message="tns:DerivedTypesPortType.echoSequenceExtendedFromAllResponse" 
-                name="echoSequenceExtendedFromAllResponse"/>
+            <input message="tns:DerivedTypesPortType.echoSequenceExtendedFromAll" name="echoSequenceExtendedFromAll"/>
+            <output message="tns:DerivedTypesPortType.echoSequenceExtendedFromAllResponse" name="echoSequenceExtendedFromAllResponse"/>
         </operation>
         <operation name="echoExtendFromChoice">
-            <input message="tns:DerivedTypesPortType.echoExtendFromChoice" 
-                name="echoExtendFromChoice"/>
-            <output message="tns:DerivedTypesPortType.echoExtendFromChoiceResponse" 
-                name="echoExtendFromChoiceResponse"/>
+            <input message="tns:DerivedTypesPortType.echoExtendFromChoice" name="echoExtendFromChoice"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromChoiceResponse" name="echoExtendFromChoiceResponse"/>
         </operation>
         <operation name="echoChoiceDerivedFromSequence">
-            <input message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequence" 
-                name="echoChoiceDerivedFromSequence"/>
-            <output 
-                message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse" 
-                name="echoChoiceDerivedFromSequenceResponse"/>
+            <input message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequence" name="echoChoiceDerivedFromSequence"/>
+            <output message="tns:DerivedTypesPortType.echoChoiceDerivedFromSequenceResponse" name="echoChoiceDerivedFromSequenceResponse"/>
         </operation>
         <operation name="echoChoiceInTheMiddle">
-            <input message="tns:DerivedTypesPortType.echoChoiceInTheMiddle" 
-                name="echoChoiceInTheMiddle"/>
-            <output message="tns:DerivedTypesPortType.echoChoiceInTheMiddleResponse" 
-                name="echoChoiceInTheMiddleResponse"/>
+            <input message="tns:DerivedTypesPortType.echoChoiceInTheMiddle" name="echoChoiceInTheMiddle"/>
+            <output message="tns:DerivedTypesPortType.echoChoiceInTheMiddleResponse" name="echoChoiceInTheMiddleResponse"/>
         </operation>
         <operation name="echoExtendFromRepeatedElement">
-            <input message="tns:DerivedTypesPortType.echoExtendFromRepeatedElement" 
-                name="echoExtendFromRepeatedElement"/>
-            <output 
-                message="tns:DerivedTypesPortType.echoExtendFromRepeatedElementResponse" 
-                name="echoExtendFromRepeatedElementResponse"/>
+            <input message="tns:DerivedTypesPortType.echoExtendFromRepeatedElement" name="echoExtendFromRepeatedElement"/>
+            <output message="tns:DerivedTypesPortType.echoExtendFromRepeatedElementResponse" name="echoExtendFromRepeatedElementResponse"/>
         </operation>
         <operation name="echoRepeatedFromRepeatedElement">
-            <input message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElement" 
-                name="echoRepeatedFromRepeatedElement"/>
-            <output 
-                message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse" 
-                name="echoRepeatedFromRepeatedElementResponse"/>
+            <input message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElement" name="echoRepeatedFromRepeatedElement"/>
+            <output message="tns:DerivedTypesPortType.echoRepeatedFromRepeatedElementResponse" name="echoRepeatedFromRepeatedElementResponse"/>
         </operation>
     </portType>
 </definitions>

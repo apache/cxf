@@ -17,23 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="multipart.idl"
- targetNamespace="http://schemas.apache.org/idl/multipart.idl"
- xmlns="http://schemas.xmlsoap.org/wsdl/"
- xmlns:tns="http://schemas.apache.org/idl/multipart.idl"
- xmlns:xsd="http://www.w3.org/2001/XMLSchema"
- xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl"
- xmlns:corba="http://schemas.apache.org/bindings/corba"
- xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/idl/multipart.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap" name="multipart.idl" targetNamespace="http://schemas.apache.org/idl/multipart.idl">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/multipart.idl"
-     xmlns="http://www.w3.org/2001/XMLSchema"
-     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-     
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/multipart.idl">
             <xsd:complexType name="Details">
                 <xsd:sequence>
-                   <xsd:element name="name" type="xsd:string"/>
-                   <xsd:element name="address" type="xsd:string" nillable="true"/>
+                    <xsd:element name="name" type="xsd:string"/>
+                    <xsd:element name="address" type="xsd:string" nillable="true"/>
                 </xsd:sequence>
             </xsd:complexType>
             <xsd:element name="DetailsEl" type="xsd1:Details"/>

@@ -17,27 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http_provider" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/hello_world_soap_http_provider"
-    xmlns:x1="http://apache.org/hello_world_soap_http_provider"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http_provider" xmlns:x1="http://apache.org/hello_world_soap_http_provider" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http_provider">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http_provider" 
-            xmlns="http://www.w3.org/2001/XMLSchema"
-	    xmlns:tns="http://apache.org/hello_world_soap_http_provider"
-            elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/hello_world_soap_http_provider" targetNamespace="http://apache.org/hello_world_soap_http_provider" elementFormDefault="qualified">
             <element name="exception">
-				<complexType>
-					<sequence>
-						<element name="errorCode" type="xsd:string" />
-						<element name="message" nillable="true" type="xsd:string" />
-						<element name="reasonCode" nillable="true" type="xsd:string" />
-					</sequence>
-				</complexType>
-			</element>
+                <complexType>
+                    <sequence>
+                        <element name="errorCode" type="xsd:string"/>
+                        <element name="message" nillable="true" type="xsd:string"/>
+                        <element name="reasonCode" nillable="true" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
             <element name="pingMe">
                 <complexType/>
             </element>
@@ -51,18 +42,16 @@
     </wsdl:message>
     <wsdl:message name="pingMeResponse">
         <wsdl:part name="out" element="x1:pingMeResponse"/>
-    </wsdl:message>		
+    </wsdl:message>
     <wsdl:message name="serviceException">
         <wsdl:part name="exception" element="x1:exception"/>
     </wsdl:message>
-
-    
     <wsdl:portType name="Greeter">
         <wsdl:operation name="pingMe">
             <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
             <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
             <wsdl:fault name="exception" message="tns:serviceException"/>
-        </wsdl:operation> 
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -78,7 +67,6 @@
                 <soap:fault name="exception" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-        
     </wsdl:binding>
     <wsdl:service name="SOAPService">
         <wsdl:port binding="tns:Greeter_SOAPBinding" name="SoapPort">
@@ -86,4 +74,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

@@ -17,34 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
     <!-- -->
     <!-- Any services listening on port 9009 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
@@ -67,50 +47,36 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-
-    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
- 
-    <bean id="trustedAuthorityValidator"
-        class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
-        <constructor-arg ref="certificateRepo" />
+    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator"/>
+    <bean id="trustedAuthorityValidator" class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
+        <constructor-arg ref="certificateRepo"/>
     </bean>
- 
     <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">
-        <constructor-arg ref="certificateRepo" />
+        <constructor-arg ref="certificateRepo"/>
     </bean>
- 
     <!-- File based implementation -->
-    <bean id="certificateRepo"
-        class="org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo">
-        <constructor-arg value="src/test/resources/certs/xkms" />
+    <bean id="certificateRepo" class="org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo">
+        <constructor-arg value="src/test/resources/certs/xkms"/>
     </bean>
-    
     <bean id="xkmsProviderBean" class="org.apache.cxf.xkms.service.XKMSService">
         <property name="validators">
             <list>
-                <ref bean="dateValidator" />
-                <ref bean="trustedAuthorityValidator" />
+                <ref bean="dateValidator"/>
+                <ref bean="trustedAuthorityValidator"/>
             </list>
         </property>
         <property name="locators">
             <list>
-                <ref bean="x509Locator" />
+                <ref bean="x509Locator"/>
             </list>
         </property>
     </bean>
- 
-    <bean id="additionalClasses"
-          class="org.apache.cxf.xkms.model.extensions.AdditionalClassesFactory" />
-        
-    <jaxws:endpoint id="XKMSService"
-        xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl"
-        serviceName="serviceNamespace:XKMSService" endpointName="serviceNamespace:XKMSPort"
-        implementor="#xkmsProviderBean" address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
+    <bean id="additionalClasses" class="org.apache.cxf.xkms.model.extensions.AdditionalClassesFactory"/>
+    <jaxws:endpoint xmlns:serviceNamespace="http://www.w3.org/2002/03/xkms#wsdl" id="XKMSService" serviceName="serviceNamespace:XKMSService" endpointName="serviceNamespace:XKMSPort" implementor="#xkmsProviderBean" address="https://localhost:${testutil.ports.XKMSServer}/XKMS">
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">
-                 <bean factory-bean="additionalClasses" factory-method="create" />
+                <bean factory-bean="additionalClasses" factory-method="create"/>
             </entry>
         </jaxws:properties>
     </jaxws:endpoint>
-    
 </beans>

@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="GreeterService" targetNamespace="http://apache.org/xml_bare" xmlns:tns="http://apache.org/xml_bare" xmlns:ns1="http://apache.org/xml_bare/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:tns="http://apache.org/xml_bare" xmlns:ns1="http://apache.org/xml_bare/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="GreeterService" targetNamespace="http://apache.org/xml_bare">
     <wsdl:types>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/xml_bare/types" elementFormDefault="qualified" targetNamespace="http://apache.org/xml_bare/types" version="1.0">
             <xs:element name="myComplexStruct" type="tns:myComplexStructType"/>

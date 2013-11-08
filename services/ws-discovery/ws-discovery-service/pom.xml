@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -24,19 +25,16 @@
     <name>Apache CXF WS-Discovery Service</name>
     <description>Apache CXF WS-Discovery Service</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    
     <properties>
         <cxf.osgi.import>org.apache.cxf.ws.discovery.listeners</cxf.osgi.import>
     </properties>
-
-	<dependencies>
+    <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -57,8 +55,6 @@
             <artifactId>cxf-services-ws-discovery-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-    
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
@@ -66,5 +62,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

@@ -17,32 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:sec="http://cxf.apache.org/configuration/security"
-  xmlns:http="http://cxf.apache.org/transports/http/configuration"
-  xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-  xmlns:jaxws="http://cxf.apache.org/jaxws"
-  xsi:schemaLocation="
-  		   http://cxf.apache.org/configuration/security
-  		      http://cxf.apache.org/schemas/configuration/security.xsd
-           http://cxf.apache.org/transports/http/configuration
-              http://cxf.apache.org/schemas/configuration/http-conf.xsd
-           http://cxf.apache.org/transports/http-jetty/configuration
-              http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-           http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
- 
-
-	<import resource="classpath:org/apache/cxf/systest/http/resources/BethalClientConfig.cxf" />
-    
-    <jaxws:client id="Bethal" 
-    serviceClass="org.apache.hello_world.Greeter"
-    serviceName="s:SOAPService"
-    endpointName="s:Bethal"
-    xmlns:s="http://apache.org/hello_world"
-    address="https://localhost:${testutil.ports.BusServer.2}/Bethal"/>
-   
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="                    http://cxf.apache.org/configuration/security                       http://cxf.apache.org/schemas/configuration/security.xsd            http://cxf.apache.org/transports/http/configuration               http://cxf.apache.org/schemas/configuration/http-conf.xsd            http://cxf.apache.org/transports/http-jetty/configuration               http://cxf.apache.org/schemas/configuration/http-jetty.xsd            http://www.springframework.org/schema/beans               http://www.springframework.org/schema/beans/spring-beans.xsd            http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <import resource="classpath:org/apache/cxf/systest/http/resources/BethalClientConfig.cxf"/>
+    <jaxws:client xmlns:s="http://apache.org/hello_world" id="Bethal" serviceClass="org.apache.hello_world.Greeter" serviceName="s:SOAPService" endpointName="s:Bethal" address="https://localhost:${testutil.ports.BusServer.2}/Bethal"/>
 </beans>

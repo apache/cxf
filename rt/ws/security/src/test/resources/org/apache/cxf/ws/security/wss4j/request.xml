@@ -17,10 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<soapenv:Envelope xmlns="http://somenamespace.pl"
-	xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<soapenv:Body>
-		<testMethod xmlns="http://cxf.apache.org/BookService" />	</soapenv:Body>
+<soapenv:Envelope xmlns="http://somenamespace.pl" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soapenv:Body>
+        <testMethod xmlns="http://cxf.apache.org/BookService"/>
+    </soapenv:Body>
 </soapenv:Envelope>

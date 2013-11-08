@@ -17,73 +17,73 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/included" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/included" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/included/typemap">
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/included" repositoryID="IDL:yoko/Employee:1.0" type="yoko.Employee" name="yoko.Employee">
-      <corba:member name="name" idltype="corba:string" />
-      <corba:member name="dept" idltype="corba:string" />
-    </corba:struct>
-  </corba:typeMapping>
-  <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/included" xmlns="http://cxf.apache.org/bindings/corba/idl/included" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <xs:complexType name="yoko.Employee">
-        <xs:sequence>
-          <xs:element name="name" type="xs:string">
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/bindings/corba/idl/included" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/included">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/included/typemap">
+        <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/included" repositoryID="IDL:yoko/Employee:1.0" type="yoko.Employee" name="yoko.Employee">
+            <corba:member name="name" idltype="corba:string"/>
+            <corba:member name="dept" idltype="corba:string"/>
+        </corba:struct>
+    </corba:typeMapping>
+    <wsdl:types>
+        <xs:schema xmlns="http://cxf.apache.org/bindings/corba/idl/included" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/included">
+            <xs:complexType name="yoko.Employee">
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string">
           </xs:element>
-          <xs:element name="dept" type="xs:string">
+                    <xs:element name="dept" type="xs:string">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:element name="add">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="emp" type="yoko.Employee">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="add">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="emp" type="yoko.Employee">
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="addResponse">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="return" type="xs:boolean">
+                    </xs:sequence>
+                </xs:complexType>
             </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:schema>
-  </wsdl:types>
-  <wsdl:message name="addResponse">
-    <wsdl:part name="outparameter" element="tns:addResponse">
+            <xs:element name="addResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="xs:boolean">
+            </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="addResponse">
+        <wsdl:part name="outparameter" element="tns:addResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="add">
-    <wsdl:part name="inparameter" element="tns:add">
+    </wsdl:message>
+    <wsdl:message name="add">
+        <wsdl:part name="inparameter" element="tns:add">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="yoko.org.EmployeeTest">
-    <wsdl:operation name="add">
-      <wsdl:input name="addRequest" message="tns:add">
+    </wsdl:message>
+    <wsdl:portType name="yoko.org.EmployeeTest">
+        <wsdl:operation name="add">
+            <wsdl:input name="addRequest" message="tns:add">
     </wsdl:input>
-      <wsdl:output name="addResponse" message="tns:addResponse">
+            <wsdl:output name="addResponse" message="tns:addResponse">
     </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="yoko.org.EmployeeTestCORBABinding" type="tns:yoko.org.EmployeeTest">
-    <corba:binding repositoryID="IDL:yoko/org/EmployeeTest:1.0" />
-    <wsdl:operation name="add">
-      <corba:operation name="add">
-        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/included/typemap" mode="in" name="emp" idltype="yoko.Employee" />
-        <corba:return name="return" idltype="corba:boolean" />
-      </corba:operation>
-      <wsdl:input name="addRequest">
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="yoko.org.EmployeeTestCORBABinding" type="tns:yoko.org.EmployeeTest">
+        <corba:binding repositoryID="IDL:yoko/org/EmployeeTest:1.0"/>
+        <wsdl:operation name="add">
+            <corba:operation name="add">
+                <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/included/typemap" mode="in" name="emp" idltype="yoko.Employee"/>
+                <corba:return name="return" idltype="corba:boolean"/>
+            </corba:operation>
+            <wsdl:input name="addRequest">
       </wsdl:input>
-      <wsdl:output name="addResponse">
+            <wsdl:output name="addResponse">
       </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="yoko.org.EmployeeTestCORBAService">
-    <wsdl:port name="yoko.org.EmployeeTestCORBAPort" binding="tns:yoko.org.EmployeeTestCORBABinding">
-      <corba:address location="IOR:" />
-    </wsdl:port>
-  </wsdl:service>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="yoko.org.EmployeeTestCORBAService">
+        <wsdl:port name="yoko.org.EmployeeTestCORBAPort" binding="tns:yoko.org.EmployeeTestCORBABinding">
+            <corba:address location="IOR:"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

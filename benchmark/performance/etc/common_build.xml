@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,41 +18,33 @@
   under the License.
 -->
 <project name="CXF common build file" default="build">
-
-
     <property environment="env"/>
-    <property name="build.dir" location ="${basedir}/build"/>
-    <property name="testbase.classes.dir" location ="${basedir}/../base/build/classes"/>
-    <property name="build.classes.dir" location ="${build.dir}/classes"/>
-    <property name="build.src.dir" location ="${build.dir}/src"/>
-    <property name="build.var.dir" location ="${build.dir}/var"/>
+    <property name="build.dir" location="${basedir}/build"/>
+    <property name="testbase.classes.dir" location="${basedir}/../base/build/classes"/>
+    <property name="build.classes.dir" location="${build.dir}/classes"/>
+    <property name="build.src.dir" location="${build.dir}/src"/>
+    <property name="build.var.dir" location="${build.dir}/var"/>
     <property name="codegen.timestamp.file" value="${build.src.dir}/.CODEGEN_DONE"/>
     <property name="wsdl.dir" location="${basedir}/wsdl"/>
     <property name="war.dir" location="${build.dir}/war"/>
-
-
     <!-- Setup for building in a source build -->
-    <condition property="srcbuild_paths.file" value="./srcbuild_paths.xml"> 
+    <condition property="srcbuild_paths.file" value="./srcbuild_paths.xml">
         <available file="../../lib/cxf-manifest.jar"/>
-    </condition> 
-    <!-- default setting --> 
-    <property name="srcbuild_paths.file" location="../../../distribution/target/srcbuild_env.ant"/> 
+    </condition>
+    <!-- default setting -->
+    <property name="srcbuild_paths.file" location="../../../distribution/target/srcbuild_env.ant"/>
     <loadfile property="srcbuild.classpath" srcFile="${srcbuild_paths.file}" failonerror="false"/>
-    <property name="srcbuild.classpath" value=""/>    
-
+    <property name="srcbuild.classpath" value=""/>
     <uptodate property="codegen.notrequired" value="true">
         <srcfiles dir="${wsdl.dir}" includes="*.wsdl"/>
         <srcfiles dir="${wsdl.dir}" includes="*.xsd"/>
         <mapper type="merge" to="${codegen.timestamp.file}"/>
     </uptodate>
-        
     <!-- find the tools jar, which on darwin, tools.jar does not exist -->
-    <available property="tools.jar" value="$${env.JAVA_HOME}/lib/tools.jar"
-       file="${env.JAVA_HOME}/lib/tools.jar"/>
+    <available property="tools.jar" value="$${env.JAVA_HOME}/lib/tools.jar" file="${env.JAVA_HOME}/lib/tools.jar"/>
     <path id="jdk.tools.classpath">
         <pathelement location="${tools.jar}"/>
     </path>
-
     <!-- Determine cxf.home, either from the environment variable CXF_HOME
        - or using ../..
        -->
@@ -61,23 +54,21 @@
     <property name="cxf.home" location="../.."/>
     <property name="activemq.home" location="${cxf.home}/lib/activemq/3.2"/>
     <property name="cxf.etc.dir" location="${cxf.home}/etc"/>
-
-
     <path id="cxf.classpath">
         <pathelement location="${build.classes.dir}"/>
         <pathelement path="${srcbuild.classpath}"/>
         <pathelement location="${cxf.home}/lib/cxf-manifest.jar"/>
-	<pathelement location="${testbase.classes.dir}"/>
+        <pathelement location="${testbase.classes.dir}"/>
     </path>
     <condition property="thirdparty.classpath" value="">
-        <not> <isset property="thirdparty.classpath"/> </not>
+        <not>
+            <isset property="thirdparty.classpath"/>
+        </not>
     </condition>
-
     <target name="maybe.generate.code" unless="codegen.notrequired">
         <antcall target="generate.code"/>
         <touch file="${codegen.timestamp.file}"/>
     </target>
-
     <target name="compile" depends="maybe.generate.code">
         <mkdir dir="${build.classes.dir}"/>
         <mkdir dir="${build.src.dir}"/>
@@ -89,13 +80,11 @@
                 <pathelement path="${thirdparty.classpath}"/>
             </classpath>
         </javac>
-
         <copy todir="${build.classes.dir}">
-            <fileset dir="${basedir}/src" includes="**/*.xml" />
-            <fileset dir="${build.src.dir}" includes="**/*.xml" />
+            <fileset dir="${basedir}/src" includes="**/*.xml"/>
+            <fileset dir="${build.src.dir}" includes="**/*.xml"/>
         </copy>
     </target>
-
     <target name="checkstyle">
         <checkstyle config="${checkstyle.config.file}">
             <fileset dir="${basedir}/src" includes="**/*.java"/>
@@ -105,7 +94,6 @@
             </classpath>
         </checkstyle>
     </target>
-
     <target name="clean">
         <delete dir="${build.classes.dir}"/>
         <delete dir="${build.src.dir}"/>
@@ -116,29 +104,25 @@
         <delete dir="${activemq.home}/var"/>
         <delete dir="${build.dir}"/>
     </target>
-
-            
-    <target name="build"  depends="compile" description="build demo client and server"/>
-
+    <target name="build" depends="compile" description="build demo client and server"/>
     <macrodef name="cxf.server.run">
         <attribute name="classname"/>
         <attribute name="argline" default=""/>
         <sequential>
-            <java classname="@{classname}" fork="yes" maxMemory="512M" >
+            <java classname="@{classname}" fork="yes" maxMemory="512M">
                 <jvmarg value="-Xms512M"/>
                 <classpath refid="cxf.classpath"/>
                 <arg line="@{argline}"/>
                 <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
-		<sysproperty key="log4j.configuration" value="file:///${cxf.etc.dir}/log4j.properties"/>
+                <sysproperty key="log4j.configuration" value="file:///${cxf.etc.dir}/log4j.properties"/>
             </java>
         </sequential>
     </macrodef>
-
     <macrodef name="cxf.client.run">
         <attribute name="classname"/>
         <attribute name="argline" default=""/>
-         <sequential>
-            <java classname="@{classname}" fork="yes" maxMemory="512M" >
+        <sequential>
+            <java classname="@{classname}" fork="yes" maxMemory="512M">
                 <jvmarg value="-Xms256M"/>
                 <classpath refid="cxf.classpath"/>
                 <arg line="@{argline}"/>
@@ -147,7 +131,6 @@
             </java>
         </sequential>
     </macrodef>
-
     <macrodef name="cxfrun">
         <attribute name="logging-properties-file" default="${cxf.etc.dir}/logging.properties"/>
         <attribute name="classname"/>
@@ -185,14 +168,13 @@
             </java>
         </sequential>
     </macrodef>
-        
     <macrodef name="wsdl2java">
         <attribute name="srcdestdir" default="${build.src.dir}"/>
         <attribute name="destdir" default="${build.classes.dir}"/>
         <attribute name="file"/>
         <attribute name="bindingfile" default=""/>
         <attribute name="dir" default="${wsdl.dir}"/>
-        <attribute name="package" default="NOT_SPECIFIED"/>           
+        <attribute name="package" default="NOT_SPECIFIED"/>
         <sequential>
             <mkdir dir="@{destdir}"/>
             <mkdir dir="@{srcdestdir}"/>
@@ -208,10 +190,9 @@
                 </not>
             </condition>
             <property name="binding.arg" value=""/>
-
             <java failonerror="true" classname="org.apache.cxf.tools.wsdlto.WSDLToJava" fork="yes">
                 <classpath>
-                    <path refid="cxf.classpath" />
+                    <path refid="cxf.classpath"/>
                 </classpath>
                 <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
                 <arg line="${package.arg.@{file}}"/>
@@ -220,10 +201,9 @@
                 <arg value="-d"/>
                 <arg value="@{srcdestdir}"/>
                 <arg value="@{dir}/@{file}"/>
-            </java>  
+            </java>
         </sequential>
-    </macrodef>    
-        
+    </macrodef>
     <macrodef name="cxfwar">
         <attribute name="filename"/>
         <attribute name="wsdl"/>
@@ -242,5 +222,4 @@
             </war>
         </sequential>
     </macrodef>
-    
 </project>

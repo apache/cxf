@@ -20,16 +20,16 @@ under the License.
 <test-data xmlns:sec="http://cxf.apache.org/configuration/security">
     <datum id="subject-CN-bethal">
         <sec:certConstraints>
-	        <sec:SubjectDNConstraints>
-	            <sec:RegularExpression>.*CN=Bethal.*</sec:RegularExpression>
-	        </sec:SubjectDNConstraints>
+            <sec:SubjectDNConstraints>
+                <sec:RegularExpression>.*CN=Bethal.*</sec:RegularExpression>
+            </sec:SubjectDNConstraints>
         </sec:certConstraints>
     </datum>
     <datum id="subject-CN-gordy">
         <sec:certConstraints>
-	        <sec:SubjectDNConstraints>
-	            <sec:RegularExpression>.*CN=Gordy.*</sec:RegularExpression>
-	        </sec:SubjectDNConstraints>
+            <sec:SubjectDNConstraints>
+                <sec:RegularExpression>.*CN=Gordy.*</sec:RegularExpression>
+            </sec:SubjectDNConstraints>
         </sec:certConstraints>
     </datum>
     <datum id="subject-O-apache">
@@ -71,5 +71,4 @@ under the License.
             </sec:IssuerDNConstraints>
         </sec:certConstraints>
     </datum>
-    
 </test-data>

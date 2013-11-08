@@ -17,15 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http"
-    xmlns:x1="http://apache.org/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://apache.org/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http" xmlns:x1="http://apache.org/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/types" targetNamespace="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -51,19 +45,19 @@
                 </complexType>
             </element>
             <element name="greetMeSometime">
-				<complexType>
-					<sequence>
-						<element name="requestType" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="greetMeSometimeResponse">
-				<complexType>
-					<sequence>
-						<element name="responseType" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeSometimeResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
             <element name="greetMeOneWay">
                 <complexType>
                     <sequence>
@@ -124,7 +118,7 @@
                     </sequence>
                     <attribute name="id" type="xsd:int"/>
                 </complexType>
-            </element>      
+            </element>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
@@ -165,7 +159,7 @@
     </wsdl:message>
     <wsdl:message name="testDocLitBareResponse">
         <wsdl:part name="out" element="x1:BareDocumentResponse"/>
-    </wsdl:message> 
+    </wsdl:message>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
@@ -175,7 +169,7 @@
             <wsdl:input name="greetMeRequest" message="tns:greetMeRequest"/>
             <wsdl:output name="greetMeResponse" message="tns:greetMeResponse"/>
         </wsdl:operation>
-       <wsdl:operation name="greetMeSometime">
+        <wsdl:operation name="greetMeSometime">
             <wsdl:input name="greetMeSometimeRequest" message="tns:greetMeSometimeRequest"/>
             <wsdl:output name="greetMeSometimeResponse" message="tns:greetMeSometimeResponse"/>
         </wsdl:operation>
@@ -191,7 +185,7 @@
         <wsdl:operation name="testDocLitBare">
             <wsdl:input name="testDocLitBareRequest" message="tns:testDocLitBareRequest"/>
             <wsdl:output name="testDocLitBareResponse" message="tns:testDocLitBareResponse"/>
-        </wsdl:operation>       
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <!--soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/-->
@@ -214,14 +208,14 @@
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="greetMeSometime">
-			<soap:operation style="document"/>
-			<wsdl:input>
-				<soap:body use="literal"/>
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal"/>
-			</wsdl:output>
-		</wsdl:operation>
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="greetMeOneWay">
             <soap:operation style="document"/>
             <wsdl:input>
@@ -268,4 +262,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

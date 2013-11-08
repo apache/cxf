@@ -17,42 +17,25 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://cxf.apache.org/xmlbeans/wsdltest" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/xmlbeans/wsdltest"
-    xmlns:x1="http://cxf.apache.org/xmlbeans/wsdltest"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-
-
-    <wsdl:types>        
-        <schema xmlns="http://www.w3.org/2001/XMLSchema"
-	        targetNamespace="http://cxf.apache.org/xmlbeans/wsdltest"
-	        xmlns:x1="http://cxf.apache.org/xmlbeans/wsdltest"
-	        elementFormDefault="qualified">
-	
-	        <complexType name="StringListType">
-	                <all>
-	                        <element minOccurs="1" maxOccurs="1" name="myname" type="string" />
-	                        <element minOccurs="1" maxOccurs="1" name="myaddress" type="string" />
-	                </all>
-	        </complexType>
-	
-	        <element name="sayHi2Message" type="x1:StringListType" />
-	
-        </schema> 
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/xmlbeans/wsdltest" xmlns:x1="http://cxf.apache.org/xmlbeans/wsdltest" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://cxf.apache.org/xmlbeans/wsdltest">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/xmlbeans/wsdltest" targetNamespace="http://cxf.apache.org/xmlbeans/wsdltest" elementFormDefault="qualified">
+            <complexType name="StringListType">
+                <all>
+                    <element minOccurs="1" maxOccurs="1" name="myname" type="string"/>
+                    <element minOccurs="1" maxOccurs="1" name="myaddress" type="string"/>
+                </all>
+            </complexType>
+            <element name="sayHi2Message" type="x1:StringListType"/>
+        </schema>
     </wsdl:types>
-
-  <wsdl:message name="sayHiRequest2">
-    <wsdl:part element="x1:sayHi2Message" name="in"/>
-  </wsdl:message> 
-    
+    <wsdl:message name="sayHiRequest2">
+        <wsdl:part element="x1:sayHi2Message" name="in"/>
+    </wsdl:message>
     <wsdl:portType name="GreeterMine">
         <wsdl:operation name="sayHi2">
-             <wsdl:input message="tns:sayHiRequest2" name="sayHiRequest2"/>
+            <wsdl:input message="tns:sayHiRequest2" name="sayHiRequest2"/>
         </wsdl:operation>
-        
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:GreeterMine">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -61,7 +44,7 @@
             <wsdl:input name="sayHiRequest2">
                 <soap:body use="literal"/>
             </wsdl:input>
-        </wsdl:operation>        
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SOAPMineService">
         <wsdl:port binding="tns:Greeter_SOAPBinding" name="SoapPort">
@@ -69,4 +52,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

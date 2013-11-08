@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReissueRequest xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
-    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="I3a682dfb94cc8e9b3b648026783a8094"
-    Service="http://www.example.org/XKMS" xmlns="http://www.w3.org/2002/03/xkms#">
+<ReissueRequest xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns="http://www.w3.org/2002/03/xkms#" Id="I3a682dfb94cc8e9b3b648026783a8094" Service="http://www.example.org/XKMS">
     <RespondWith>http://www.w3.org/2002/03/xkms#X509Cert</RespondWith>
     <RespondWith>http://www.w3.org/2002/03/xkms#X509Chain</RespondWith>
     <ReissueKeyBinding Id="I518fc89b03369bccec3d1ee9d985c436">
@@ -23,27 +21,21 @@
                 </ds:X509Certificate>
             </ds:X509Data>
         </ds:KeyInfo>
-        <Status StatusValue="http://www.w3.org/2002/03/xkms#Valid" />
+        <Status StatusValue="http://www.w3.org/2002/03/xkms#Valid"/>
     </ReissueKeyBinding>
     <Authentication>
         <KeyBindingAuthentication>
             <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
                 <SignedInfo>
-                    <CanonicalizationMethod
-                        Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
-                    <SignatureMethod
-                        Algorithm="http://www.w3.org/2000/09/xmldsig#hmac-sha1" />
+                    <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                    <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#hmac-sha1"/>
                     <Reference URI="#I518fc89b03369bccec3d1ee9d985c436">
                         <Transforms>
-                            <Transform
-                                Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
-                                <ec:InclusiveNamespaces
-                                    PrefixList="ds xenc #default"
-                                    xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                            <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+                                <ec:InclusiveNamespaces xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="ds xenc #default"/>
                             </Transform>
                         </Transforms>
-                        <DigestMethod
-                            Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                        <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
                         <DigestValue>qnhsUF9RMxxGydG/5KdJjWhtBFE=
                         </DigestValue>
                     </Reference>
@@ -56,21 +48,15 @@
     <ProofOfPossession>
         <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
             <SignedInfo>
-                <CanonicalizationMethod
-                    Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
-                <SignatureMethod
-                    Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+                <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
                 <Reference URI="#I518fc89b03369bccec3d1ee9d985c436">
                     <Transforms>
-                        <Transform
-                            Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
-                            <ec:InclusiveNamespaces
-                                PrefixList="ds xenc #default"
-                                xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                        <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+                            <ec:InclusiveNamespaces xmlns:ec="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="ds xenc #default"/>
                         </Transform>
                     </Transforms>
-                    <DigestMethod
-                        Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                    <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
                     <DigestValue>qnhsUF9RMxxGydG/5KdJjWhtBFE=
                     </DigestValue>
                 </Reference>

@@ -17,12 +17,7 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-      xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-      xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-      xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd">
     <annotation>
         Examples :
 
@@ -30,7 +25,6 @@ under the License.
         wsdl2java -p com.iona.greeting Greeting.wsdl
         wsdl2java -client HelloWorld.wsdl
     </annotation>
-
     <usage>
         <optionGroup id="options">
             <option id="frontend" maxOccurs="1">
@@ -41,7 +35,6 @@ under the License.
                     <annotation>front-end-name</annotation>
                 </associatedArgument>
             </option>
-
             <option id="databinding" maxOccurs="1">
                 <annotation>Specify the databinding name.  (default use jaxb)</annotation>
                 <switch>db</switch>
@@ -50,7 +43,6 @@ under the License.
                     <annotation>data-binding-name</annotation>
                 </associatedArgument>
             </option>
-
             <option id="packagename" maxOccurs="unbounded">
                 <annotation>
                     Specifies the java package name to use for the generated code.
@@ -63,7 +55,6 @@ under the License.
                     <annotation>[wsdl-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
-
             <!--
             <option id="binding" maxOccurs="unbounded">
             <annotation>
@@ -76,7 +67,6 @@ under the License.
             </associatedArgument>
             </option>
             -->
-
             <option id="outputdir" maxOccurs="1">
                 <annotation>Specify the directory into which the code is placed.</annotation>
                 <switch>d</switch>
@@ -84,12 +74,10 @@ under the License.
                     <annotation>output-directory</annotation>
                 </associatedArgument>
             </option>
-
             <option id="compile" maxOccurs="1">
                 <annotation>Specifies that the generated code is compiled by the tool.</annotation>
                 <switch>compile</switch>
             </option>
-
             <option id="classdir" maxOccurs="1">
                 <annotation>Specifies the directory into which compiled class files are placed.</annotation>
                 <switch>classdir</switch>
@@ -97,7 +85,6 @@ under the License.
                     <annotation>compile-classes-directory</annotation>
                 </associatedArgument>
             </option>
-
             <!--
             <option id="impl" maxOccurs="1">
             <annotation>
@@ -132,7 +119,6 @@ under the License.
             <switch>ant</switch>
             </option>
             -->
-
             <option id="nexclude" maxOccurs="unbounded">
                 <annotation>
                     Specifies a WSDL namespace to exclude when generating code. This
@@ -144,7 +130,6 @@ under the License.
                     <annotation>schema-namespace [= java-package-name]</annotation>
                 </associatedArgument>
             </option>
-
             <option id="exsoapheader" maxOccurs="1">
                 <annotation>Enables the processing of extended SOAP header message binding.
                 </annotation>
@@ -154,7 +139,6 @@ under the License.
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
-
             <option id="defaultns" maxOccurs="1">
                 <annotation>Enables loading the default namespace package name mapping. The default is true.
                 </annotation>
@@ -164,7 +148,6 @@ under the License.
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
-
             <option id="defaultex" maxOccurs="1">
                 <annotation> Enable loading the default excludes namespace mapping. The default is true.</annotation>
                 <switch>dex</switch>
@@ -173,12 +156,10 @@ under the License.
                     <valueenum>true|false</valueenum>
                 </associatedArgument>
             </option>
-            
             <option id="notypes" maxOccurs="1">
                 <annotation>Turns off generating types</annotation>
                 <switch>noTypes</switch>
             </option>
-
             <option id="validate" maxOccurs="1">
                 <annotation>
                     Specifies that the WSDL is validated before generating the code. Using 
@@ -186,7 +167,6 @@ under the License.
                 </annotation>
                 <switch>validate</switch>
             </option>
-
             <option id="wsdlLocation" maxOccurs="1">
                 <annotation>
                     Specifies the value of the @WebServiceClient annotation's wsdlLocation property.
@@ -195,7 +175,6 @@ under the License.
                     <annotation>wsdlLocation</annotation>
                 </associatedArgument>
             </option>
-
             <option id="faultSerialVersionUID" maxOccurs="1">
                 <annotation>
                     Specifies how to generate fault Exception's SUID, can use NONE|TIMESTAMP|FQCN|####", the default is NONE.
@@ -207,7 +186,6 @@ under the License.
                     <annotation>fault-serialVersionUID</annotation>
                 </associatedArgument>
             </option>
-
             <option id="exceptionSuper" maxOccurs="1">
                 <annotation>
                     Specifies the superclass to use for generated exceptions, the default is java.lang.Exception.
@@ -217,7 +195,6 @@ under the License.
                     <annotation>exceptionSuper</annotation>
                 </associatedArgument>
             </option>
-
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
@@ -226,26 +203,22 @@ under the License.
                 <switch>?</switch>
                 <switch>help</switch>
             </option>
-
             <option id="version">
                 <annotation>Display the version of the tool.</annotation>
                 <switch>version</switch>
                 <switch>v</switch>
             </option>
-
             <option id="verbose">
                 <annotation>Verbose mode</annotation>
                 <switch>verbose</switch>
                 <switch>V</switch>
             </option>
-
             <option id="quiet">
                 <annotation>Quiet mode</annotation>
                 <switch>quiet</switch>
                 <switch>q</switch>
                 <switch>Q</switch>
             </option>
-
         </optionGroup>
         <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
             <annotation>wsdl-url</annotation>

@@ -30,7 +30,6 @@
     <name>Apache CXF Transport System Tests JMS</name>
     <description>Apache CXF Transport System Tests JMS</description>
     <url>http://cxf.apache.org</url>
-
     <build>
         <plugins>
             <plugin>
@@ -89,7 +88,6 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -132,12 +130,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        	<groupId>org.eclipse.jetty</groupId>
-        	<artifactId>jetty-servlet</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
         </dependency>
         <dependency>
-        	<groupId>org.eclipse.jetty</groupId>
-        	<artifactId>jetty-webapp</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -145,9 +143,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -198,10 +196,10 @@
             <version>${cxf.spring.version}</version>
         </dependency>
         <dependency>
-        	<groupId>org.springframework</groupId>
-        	<artifactId>spring-jms</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
             <scope>test</scope>
-        	<version>${cxf.spring.version}</version>
+            <version>${cxf.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -286,7 +284,6 @@
             <artifactId>${cxf.spring.mock}</artifactId>
             <version>${cxf.spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -297,16 +294,14 @@
             <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
-         </dependency>
-
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
         <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
@@ -317,7 +312,5 @@
             <artifactId>commons-httpclient</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
 </project>

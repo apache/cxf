@@ -17,69 +17,52 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="HelloWorldService" 
-    targetNamespace="http://cxf.apache.org/test/hello_world" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:test="http://cxf.apache.org/abc/test" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/test/hello_world" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:test="http://cxf.apache.org/abc/test" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/test/hello_world" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldService" targetNamespace="http://cxf.apache.org/test/hello_world">
     <test:newService name="testDefinitionExtensibility">
         <test:struct name="testString1">
-            <test:member name="x" />
-            <test:member name="y" />
-            <test:member name="z" />
+            <test:member name="x"/>
+            <test:member name="y"/>
+            <test:member name="z"/>
         </test:struct>
         <test:struct name="testString2">
-            <test:member name="x" />
-            <test:member name="y" />
-            <test:member name="z" />
+            <test:member name="x"/>
+            <test:member name="y"/>
+            <test:member name="z"/>
             <test:struct name="innerTestString1">
-                <test:member name="x" />
-                <test:member name="y" />
-                <test:member name="z" />
+                <test:member name="x"/>
+                <test:member name="y"/>
+                <test:member name="z"/>
             </test:struct>
         </test:struct>
     </test:newService>
-
     <message name="greetMe">
         <part name="stringParam0" type="xsd:string"/>
     </message>
     <message name="greetMeResponse">
         <part name="return" type="xsd:string"/>
     </message>
-    
     <portType name="HelloWorldPortType">
         <operation name="greetMe">
             <input message="tns:greetMe" name="greetMe"/>
             <output message="tns:greetMeResponse" name="greetMeResponse"/>
         </operation>
     </portType>
-       
     <binding name="HelloWorldBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
-                <soap:body 
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </input>
             <output name="greetMeResponse">
-                <soap:body  
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </output>
         </operation>
-    </binding>    
-        
+    </binding>
     <service name="HelloWorldService">
         <port binding="tns:HelloWorldBinding" name="HelloWorldPort">
-            <test:testPolicy
-                intAttr="30" stringAttr="hello"/>
+            <test:testPolicy intAttr="30" stringAttr="hello"/>
             <test:anotherPolicy/>
         </port>
     </service>
-       
 </definitions>
-
-

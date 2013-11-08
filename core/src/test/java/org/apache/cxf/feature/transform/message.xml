@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-	<soap:Body>
-		<cus:getCustomersByName xmlns:cus="http://customerservice.example.com/">
-			<name xmlns:ns2="http://customerservice.example.com/">Smith</name>
-		</cus:getCustomersByName>
-	</soap:Body>
+    <soap:Body>
+        <cus:getCustomersByName xmlns:cus="http://customerservice.example.com/">
+            <name xmlns:ns2="http://customerservice.example.com/">Smith</name>
+        </cus:getCustomersByName>
+    </soap:Body>
 </soap:Envelope>

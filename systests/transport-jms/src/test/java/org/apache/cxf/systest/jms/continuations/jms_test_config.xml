@@ -17,58 +17,27 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ct="http://cxf.apache.org/configuration/types"
-    xmlns:jms="http://cxf.apache.org/transports/jms"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="
-http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ct="http://cxf.apache.org/configuration/types" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation=" http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <jms:conduit name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-conduit">
-      <jms:clientConfig clientReceiveTimeout="10000" messageTimeToLive="10000"/>
-      <jms:address jndiConnectionFactoryName="ConnectionFactory" 
-                   jndiDestinationName="dynamicQueues/test.jmstransport.text">
-                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="${EmbeddedBrokerURL}"/>
-               </jms:address>
-      <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
+        <jms:clientConfig clientReceiveTimeout="10000" messageTimeToLive="10000"/>
+        <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text">
+            <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <jms:JMSNamingProperty name="java.naming.provider.url" value="${EmbeddedBrokerURL}"/>
+        </jms:address>
+        <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
-    
-   <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-  	p:brokerURL="${EmbeddedBrokerURL}"/>
-  
-  <bean id="singleConnectionFactory"
-    class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
-    <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
-  </bean>
-    
-  <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration"
-    p:connectionFactory-ref="singleConnectionFactory" 
-  	p:concurrentConsumers="1"
-  	p:maxConcurrentConsumers="1"/>
-
-  <jms:destination name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-destination">     
-      <jms:address jndiConnectionFactoryName="ConnectionFactory" 
-                   jndiDestinationName="dynamicQueues/test.jmstransport.text">
-                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="${EmbeddedBrokerURL}"/>
-               </jms:address>
-      <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>  
-  </jms:destination>
-
-  <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration"
-  	p:connectionFactory-ref="jmsConnectionFactory"
-  	p:timeToLive="10000"
-  	p:concurrentConsumers="1"
-  	p:maxConcurrentConsumers="1"
-  	p:maxSuspendedContinuations="1"
-  	p:cacheLevel="2"
-  />  
-
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" p:brokerURL="${EmbeddedBrokerURL}"/>
+    <bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
+        <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
+    </bean>
+    <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="singleConnectionFactory" p:concurrentConsumers="1" p:maxConcurrentConsumers="1"/>
+    <jms:destination name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-destination">
+        <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text">
+            <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <jms:JMSNamingProperty name="java.naming.provider.url" value="${EmbeddedBrokerURL}"/>
+        </jms:address>
+        <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>
+    </jms:destination>
+    <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="jmsConnectionFactory" p:timeToLive="10000" p:concurrentConsumers="1" p:maxConcurrentConsumers="1" p:maxSuspendedContinuations="1" p:cacheLevel="2"/>
 </beans>

@@ -18,7 +18,7 @@
   under the License.
 -->
 <mappings xmlns:nt="urn:aegis:demo">
-        <mapping name="nt:Zoo">
-        <property name='founder' mappedName='nt:Founder' nillable='false'/>
-        </mapping>
+    <mapping name="nt:Zoo">
+        <property name="founder" mappedName="nt:Founder" nillable="false"/>
+    </mapping>
 </mappings>

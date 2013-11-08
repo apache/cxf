@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <!--
 
         Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,20 +17,16 @@
         See the License for the specific language governing permissions and
         limitations under the License.
     -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.apache.cxf.karaf</groupId>
         <artifactId>karaf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>apache-cxf</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF Karaf Features</name>
     <description>Apache CXF Karaf Features</description>
-    
     <!-- The validate plugin will export these provided dependencies bundles' export packages first -->
     <dependencies>
         <dependency>
@@ -78,7 +73,6 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -124,7 +118,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>validate</id>
@@ -153,5 +146,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

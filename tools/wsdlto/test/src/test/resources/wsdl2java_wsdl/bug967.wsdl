@@ -17,44 +17,29 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<wsdl:definitions name="Voidint" targetNamespace="http://cxf.apache.org/w2j/hello_world_rpclit/voidint" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:http-conf="http://schemas.iona.com/transports/http/configuration"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_rpclit/voidint"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_rpclit/voidint/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_rpclit/voidint" xmlns:x1="http://cxf.apache.org/w2j/hello_world_rpclit/voidint/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Voidint" targetNamespace="http://cxf.apache.org/w2j/hello_world_rpclit/voidint">
     <wsdl:message name="sayHiRequest">
-	<wsdl:part name="inInt" type="xsd:int"/>
+        <wsdl:part name="inInt" type="xsd:int"/>
     </wsdl:message>
-
     <wsdl:message name="sayHiResponse"/>
-    
     <wsdl:portType name="GreeterRPCLit">
         <wsdl:operation name="sayHi" parameterOrder="inInt">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-    
     <wsdl:binding name="Greeter_SOAPBinding_RPCLit" type="tns:GreeterRPCLit">
         <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
-        
         <wsdl:operation name="sayHi">
             <soap:operation soapAction="" style="rpc"/>
-	    <wsdl:input>
+            <wsdl:input>
                 <soap:body namespace="http://cxf.apache.org/w2j/hello_world_rpclit/voidint" use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body namespace="http://cxf.apache.org/w2j/hello_world_rpclit/voidint" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
     </wsdl:binding>
-    
     <wsdl:service name="SOAPServiceRPCLit">
         <wsdl:port binding="tns:Greeter_SOAPBinding_RPCLit" name="SoapPortRPCLit">
             <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>

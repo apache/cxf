@@ -17,31 +17,25 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-   xmlns:ns1="http://superbooks">
-
- <grammars>
-    <include href="../schemas/book.xsd"/>
- </grammars>
- <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore" id="{wadl.model.jaxrs.cxf.apache.org}BookStore">
-    
-    <resource path="/books/{bookid}">
-     <param name="bookid" style="template" type="xs:int"/>
-     
-     <method name="POST" id="addBook">
-      <request>
-       <representation mediaType="application/xml" element="ns1:thebook"/>
-      </request>
-     </method>
-     
-     <method name="POST" id="addChapter">
-      <request>
-       <representation mediaType="application/xml" element="ns1:thechapter"/>
-      </request>
-     </method>
-    </resource>
-   </resource>
-</resources>
-
+<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://superbooks">
+    <grammars>
+        <include href="../schemas/book.xsd"/>
+    </grammars>
+    <resources base="http://localhost:8080/baz">
+        <resource path="/bookstore" id="{wadl.model.jaxrs.cxf.apache.org}BookStore">
+            <resource path="/books/{bookid}">
+                <param name="bookid" style="template" type="xs:int"/>
+                <method name="POST" id="addBook">
+                    <request>
+                        <representation mediaType="application/xml" element="ns1:thebook"/>
+                    </request>
+                </method>
+                <method name="POST" id="addChapter">
+                    <request>
+                        <representation mediaType="application/xml" element="ns1:thechapter"/>
+                    </request>
+                </method>
+            </resource>
+        </resource>
+    </resources>
 </application>

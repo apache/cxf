@@ -20,13 +20,13 @@
 <mappings>
     <mapping name="FlatArrayService">
         <method name="submitStringArray">
-            <parameter index="0" mappedName='array' minOccurs='2' maxOccurs='50' nillable='false' flat='true' />
+            <parameter index="0" mappedName="array" minOccurs="2" maxOccurs="50" nillable="false" flat="true"/>
         </method>
         <method name="takeBeanWithFlatArray">
-        	<parameter index="0" mappedName="bwfa"/>
+            <parameter index="0" mappedName="bwfa"/>
         </method>
-         <method name="getStringArrayValue">
-            <return-type flat='true' />
+        <method name="getStringArrayValue">
+            <return-type flat="true"/>
         </method>
     </mapping>
 </mappings>

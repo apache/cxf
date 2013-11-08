@@ -1,106 +1,68 @@
-<wsdl:definitions
-  targetNamespace='http://www.w3.org/2011/03/ws-evt'
-  xmlns:wsa='http://www.w3.org/2005/08/addressing'
-  xmlns:wsam='http://www.w3.org/2007/05/addressing/metadata'
-  xmlns:wse='http://www.w3.org/2011/03/ws-evt' 
-  xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/' 
-  xmlns:xs='http://www.w3.org/2001/XMLSchema' >
-
-  <wsdl:types>
-    <xs:schema>
-       <xs:import
-         namespace='http://www.w3.org/2011/03/ws-evt'
-         schemaLocation=
-  'http://www.w3.org/2011/03/ws-evt/eventing.xsd' />
-    </xs:schema>
-  </wsdl:types>
-  
-  <wsdl:message name='SubscribeMsg' >
-    <wsdl:part name='body' element='wse:Subscribe' />
-  </wsdl:message>
-  <wsdl:message name='SubscribeResponseMsg' >
-    <wsdl:part name='body' element='wse:SubscribeResponse' />
-  </wsdl:message>
-  
-  <wsdl:message name='RenewMsg' >
-    <wsdl:part name='body' element='wse:Renew' />
-  </wsdl:message>
-  <wsdl:message name='RenewResponseMsg' >
-    <wsdl:part name='body' element='wse:RenewResponse' />
-  </wsdl:message>
-  
-  <wsdl:message name='GetStatusMsg' >
-    <wsdl:part name='body' element='wse:GetStatus' />
-  </wsdl:message>
-  <wsdl:message name='GetStatusResponseMsg' >
-    <wsdl:part name='body' element='wse:GetStatusResponse' />
-  </wsdl:message>
-  
-  <wsdl:message name='UnsubscribeMsg' >
-    <wsdl:part name='body' element='wse:Unsubscribe' />
-  </wsdl:message>
-  <wsdl:message name='UnsubscribeResponseMsg' >
-    <wsdl:part name='body' element='wse:UnsubscribeResponse' />
-  </wsdl:message>
- 
-  <wsdl:message name='SubscriptionEnd' >
-    <wsdl:part name='body' element='wse:SubscriptionEnd' />
-  </wsdl:message>
-
-  <wsdl:message name='notifyEvent'>
-    <wsdl:part name='parameter' element='wse:Notify'/>
-  </wsdl:message>
-  
-  <wsdl:portType name='EventSource' >
-    <wsdl:operation name='SubscribeOp' >
-      <wsdl:input 
-        message='wse:SubscribeMsg'
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/Subscribe'/>
-      <wsdl:output 
-        message='wse:SubscribeResponseMsg' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/SubscribeResponse'/>
-    </wsdl:operation>
-  </wsdl:portType>
-  
-  <wsdl:portType name='SubscriptionEndPortType' >
-    <wsdl:operation name='SubscriptionEnd' >
-      <wsdl:input 
-        message='wse:SubscriptionEnd' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/SubscriptionEnd'/>
-    </wsdl:operation>
-  </wsdl:portType>
-  
-  <wsdl:portType name='SubscriptionManager' >
-    <wsdl:operation name='RenewOp' >
-      <wsdl:input 
-        message='wse:RenewMsg' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/Renew'/>
-      <wsdl:output 
-        message='wse:RenewResponseMsg' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/RenewResponse'/>
-    </wsdl:operation>
-    <wsdl:operation name='GetStatusOp' >
-      <wsdl:input 
-        message='wse:GetStatusMsg'
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/GetStatus'/>
-      <wsdl:output 
-        message='wse:GetStatusResponseMsg' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/GetStatusResponse'/>
-    </wsdl:operation>
-    <wsdl:operation name='UnsubscribeOp' >
-      <wsdl:input 
-        message='wse:UnsubscribeMsg' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/Unsubscribe'/>
-      <wsdl:output 
-        message='wse:UnsubscribeResponseMsg' 
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/UnsubscribeResponse'/>
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <wsdl:portType name='WrappedSinkPortType'>
-    <wsdl:operation name='NotifyEvent'>
-      <wsdl:input message='wse:notifyEvent'
-        wsam:Action='http://www.w3.org/2011/03/ws-evt/WrappedSinkPortType/NotifyEvent'/>
-    </wsdl:operation>
-  </wsdl:portType>
+<?xml version="1.0"?>
+<wsdl:definitions xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wse="http://www.w3.org/2011/03/ws-evt" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.w3.org/2011/03/ws-evt">
+    <wsdl:types>
+        <xs:schema>
+            <xs:import namespace="http://www.w3.org/2011/03/ws-evt" schemaLocation="http://www.w3.org/2011/03/ws-evt/eventing.xsd"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="SubscribeMsg">
+        <wsdl:part name="body" element="wse:Subscribe"/>
+    </wsdl:message>
+    <wsdl:message name="SubscribeResponseMsg">
+        <wsdl:part name="body" element="wse:SubscribeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="RenewMsg">
+        <wsdl:part name="body" element="wse:Renew"/>
+    </wsdl:message>
+    <wsdl:message name="RenewResponseMsg">
+        <wsdl:part name="body" element="wse:RenewResponse"/>
+    </wsdl:message>
+    <wsdl:message name="GetStatusMsg">
+        <wsdl:part name="body" element="wse:GetStatus"/>
+    </wsdl:message>
+    <wsdl:message name="GetStatusResponseMsg">
+        <wsdl:part name="body" element="wse:GetStatusResponse"/>
+    </wsdl:message>
+    <wsdl:message name="UnsubscribeMsg">
+        <wsdl:part name="body" element="wse:Unsubscribe"/>
+    </wsdl:message>
+    <wsdl:message name="UnsubscribeResponseMsg">
+        <wsdl:part name="body" element="wse:UnsubscribeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="SubscriptionEnd">
+        <wsdl:part name="body" element="wse:SubscriptionEnd"/>
+    </wsdl:message>
+    <wsdl:message name="notifyEvent">
+        <wsdl:part name="parameter" element="wse:Notify"/>
+    </wsdl:message>
+    <wsdl:portType name="EventSource">
+        <wsdl:operation name="SubscribeOp">
+            <wsdl:input message="wse:SubscribeMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/Subscribe"/>
+            <wsdl:output message="wse:SubscribeResponseMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/SubscribeResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="SubscriptionEndPortType">
+        <wsdl:operation name="SubscriptionEnd">
+            <wsdl:input message="wse:SubscriptionEnd" wsam:Action="http://www.w3.org/2011/03/ws-evt/SubscriptionEnd"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="SubscriptionManager">
+        <wsdl:operation name="RenewOp">
+            <wsdl:input message="wse:RenewMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/Renew"/>
+            <wsdl:output message="wse:RenewResponseMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/RenewResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetStatusOp">
+            <wsdl:input message="wse:GetStatusMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/GetStatus"/>
+            <wsdl:output message="wse:GetStatusResponseMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/GetStatusResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="UnsubscribeOp">
+            <wsdl:input message="wse:UnsubscribeMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/Unsubscribe"/>
+            <wsdl:output message="wse:UnsubscribeResponseMsg" wsam:Action="http://www.w3.org/2011/03/ws-evt/UnsubscribeResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="WrappedSinkPortType">
+        <wsdl:operation name="NotifyEvent">
+            <wsdl:input message="wse:notifyEvent" wsam:Action="http://www.w3.org/2011/03/ws-evt/WrappedSinkPortType/NotifyEvent"/>
+        </wsdl:operation>
+    </wsdl:portType>
 </wsdl:definitions>

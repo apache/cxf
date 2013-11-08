@@ -19,18 +19,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="JMSGreeterService"
-    targetNamespace="http://cxf.apache.org/jms_greeter" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:jms="http://cxf.apache.org/transports/jms" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/jms_greeter"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:x1="http://cxf.apache.org/jms_greeter/types">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/jms_greeter" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:x1="http://cxf.apache.org/jms_greeter/types" name="JMSGreeterService" targetNamespace="http://cxf.apache.org/jms_greeter">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/jms_greeter/types" 
-            xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/jms_greeter/types" elementFormDefault="qualified">
             <element name="greetMeOneWay">
                 <complexType>
                     <sequence>
@@ -40,21 +31,16 @@
             </element>
         </schema>
     </wsdl:types>
-    
     <wsdl:message name="greetMeOneWayRequest">
         <wsdl:part element="x1:greetMeOneWay" name="in"/>
     </wsdl:message>
-    
     <wsdl:portType name="JMSGreeterPortType">
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
-
     </wsdl:portType>
-    
     <wsdl:binding name="JMSGreeterPortBinding" type="tns:JMSGreeterPortType">
         <soap:binding style="document" transport="http://cxf.apache.org/transports/jms"/>
-       
         <wsdl:operation name="greetMeOneWay">
             <soap:operation style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
@@ -62,20 +48,12 @@
             </wsdl:input>
         </wsdl:operation>
     </wsdl:binding>
-    
     <wsdl:service name="JMSGreeterService">
-           <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort">
-               <jms:address
-                   destinationStyle="topic"
-                   jndiConnectionFactoryName="ConnectionFactory" 
-                   jndiDestinationName="dynamicTopics/test.cxf.jmstransport.topic"
-                   >
-                   
-                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
-                   
-                   
-                </jms:address>
-           </wsdl:port>
+        <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort">
+            <jms:address destinationStyle="topic" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicTopics/test.cxf.jmstransport.topic">
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61616"/>
+            </jms:address>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

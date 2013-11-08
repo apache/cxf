@@ -17,34 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:wsa="http://cxf.apache.org/ws/addressing"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
-       xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
-       xsi:schemaLocation="
-       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-       http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-       http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd
-       http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
- 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:wsa="http://cxf.apache.org/ws/addressing" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager" xsi:schemaLocation="        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd        http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd        http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd        http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
             <wsa:addressing/>
             <wsrm-mgr:reliableMessaging>
                 <wsrm-policy:RMAssertion>
-                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="4000"/>           
-                    <wsrm-policy:AcknowledgementInterval Milliseconds="2000"/>          
+                    <wsrm-policy:BaseRetransmissionInterval Milliseconds="4000"/>
+                    <wsrm-policy:AcknowledgementInterval Milliseconds="2000"/>
                 </wsrm-policy:RMAssertion>
                 <wsrm-mgr:destinationPolicy>
-                    <wsrm-mgr:acksPolicy intraMessageThreshold="0" />
+                    <wsrm-mgr:acksPolicy intraMessageThreshold="0"/>
                 </wsrm-mgr:destinationPolicy>
             </wsrm-mgr:reliableMessaging>
         </cxf:features>
     </cxf:bus>
-    
 </beans>

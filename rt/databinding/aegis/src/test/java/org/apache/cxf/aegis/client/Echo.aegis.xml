@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!-- 
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -16,13 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
  * -->
- <mappings>
-  <mapping>
-    <method name="echo" xmlns:e="urn:echo:header">
-      <parameter index="1" componentType="java.lang.String"/>
-    </method>
-    <method name="simpleEcho" xmlns:e="urn:echo:header">
-      <parameter index="0" mappedName="e:narcissus" />
-    </method>
-  </mapping>
+<mappings>
+    <mapping>
+        <method xmlns:e="urn:echo:header" name="echo">
+            <parameter index="1" componentType="java.lang.String"/>
+        </method>
+        <method xmlns:e="urn:echo:header" name="simpleEcho">
+            <parameter index="0" mappedName="e:narcissus"/>
+        </method>
+    </mapping>
 </mappings>

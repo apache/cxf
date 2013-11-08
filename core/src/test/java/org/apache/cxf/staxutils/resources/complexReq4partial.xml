@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,16 +18,13 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Header>
-    <ns2:SoapHeaderIn xmlns="http://cxf.apache.org/transform/test" 
-      xmlns:ns2="http://cxf.apache.org/transform/header" 
-      xmlns:ns4="http://cxf.apache.org/transform/fault" 
-      xmlns:ps1="http://cxf.apache.org/transform/header/element">
-      <ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>
-      <ns2:SomeComplexHeaderType>
-        <ps1:CallerCorrelationId>SomeComplexValue</ps1:CallerCorrelationId>
-      </ns2:SomeComplexHeaderType>
-    </ns2:SoapHeaderIn>
-  </soap:Header>
-  <soap:Body/>
+    <soap:Header>
+        <ns2:SoapHeaderIn xmlns="http://cxf.apache.org/transform/test" xmlns:ns2="http://cxf.apache.org/transform/header" xmlns:ns4="http://cxf.apache.org/transform/fault" xmlns:ps1="http://cxf.apache.org/transform/header/element">
+            <ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>
+            <ns2:SomeComplexHeaderType>
+                <ps1:CallerCorrelationId>SomeComplexValue</ps1:CallerCorrelationId>
+            </ns2:SomeComplexHeaderType>
+        </ns2:SoapHeaderIn>
+    </soap:Header>
+    <soap:Body/>
 </soap:Envelope>

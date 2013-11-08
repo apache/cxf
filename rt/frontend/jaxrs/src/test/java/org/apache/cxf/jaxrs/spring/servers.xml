@@ -17,70 +17,46 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxrs="http://cxf.apache.org/jaxrs"     
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
-http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-	
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
-      <property name="transportIds">
-          <list>
-              <value>http://cxf.apache.org/transports/local</value>
-              <value>http://cxf.apache.org/transports/http</value>
-          </list>
-      </property>
-      <property name="uriPrefixes">
-          <list>
-              <value>http</value>
-              <value>local</value>
-          </list>
-      </property>
-  </bean>
-  
-  <jaxrs:server xmlns:s="http://books.com" serviceName="s:BookService" 
-        id="simple" 
-        serviceClass="org.apache.cxf.jaxrs.resources.BookStore"         
-        address="http://localhost:9090/rs"/>
-  
-  <jaxrs:server id="inlineServiceBeans" 
-                address="http://localhost:9090/simpleWithAddress10">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.jaxrs.resources.BookStore"/>
-      <bean class="org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly"/>      
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
-  
-  <jaxrs:server id="inlineProvider"
-    serviceClass="org.apache.cxf.jaxrs.resources.BookStore"
-    address="http://localhost:9090/simpleWithAddress"
-    bus="cxf" staticSubresourceResolution="false">
-    <jaxrs:providers>
-        <ref bean="dataBinding"/>
-        <ref bean="jaxb"/>
-    </jaxrs:providers>	
-    <jaxrs:extensionMappings>
-      <entry key="json" value="application/json"/>
-    </jaxrs:extensionMappings>    
-  </jaxrs:server>
-  
-  <bean id="dataBinding" class="org.apache.cxf.jaxrs.provider.DataBindingProvider"/>
-  <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="singleJaxbContext" value="true"/>
-      <property name="extraClass">
-         <list>
-           <value>org.apache.cxf.jaxrs.resources.SuperBook</value>
-         </list>
-      </property>
-  </bean>
-  
-  <jaxrs:server id="moduleServer"
-    modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
-    address="http://localhost:9090/simpleWithAddress2"
-    bus="cxf"/>
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+        <property name="transportIds">
+            <list>
+                <value>http://cxf.apache.org/transports/local</value>
+                <value>http://cxf.apache.org/transports/http</value>
+            </list>
+        </property>
+        <property name="uriPrefixes">
+            <list>
+                <value>http</value>
+                <value>local</value>
+            </list>
+        </property>
+    </bean>
+    <jaxrs:server xmlns:s="http://books.com" serviceName="s:BookService" id="simple" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9090/rs"/>
+    <jaxrs:server id="inlineServiceBeans" address="http://localhost:9090/simpleWithAddress10">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.jaxrs.resources.BookStore"/>
+            <bean class="org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxrs:server id="inlineProvider" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9090/simpleWithAddress" bus="cxf" staticSubresourceResolution="false">
+        <jaxrs:providers>
+            <ref bean="dataBinding"/>
+            <ref bean="jaxb"/>
+        </jaxrs:providers>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json"/>
+        </jaxrs:extensionMappings>
+    </jaxrs:server>
+    <bean id="dataBinding" class="org.apache.cxf.jaxrs.provider.DataBindingProvider"/>
+    <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+        <property name="singleJaxbContext" value="true"/>
+        <property name="extraClass">
+            <list>
+                <value>org.apache.cxf.jaxrs.resources.SuperBook</value>
+            </list>
+        </property>
+    </bean>
+    <jaxrs:server id="moduleServer" modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml" address="http://localhost:9090/simpleWithAddress2" bus="cxf"/>
 </beans>

@@ -17,20 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-          http://www.springframework.org/schema/beans/spring-beans.xsd
-          http://cxf.apache.org/jaxws
-          http://cxf.apache.org/schemas/jaxws.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws           http://cxf.apache.org/schemas/jaxws.xsd">
     <!-- 
          Client-side endpoint.  For this example, Alice is the client
          and Bob is the service.
     -->
-    <jaxws:client name="{http://apache.org/hello_world_soap_http}TimestampSignEncryptPort" 
-        createdFromAPI="true">
+    <jaxws:client name="{http://apache.org/hello_world_soap_http}TimestampSignEncryptPort" createdFromAPI="true">
         <jaxws:features>
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
         </jaxws:features>
@@ -41,15 +33,12 @@
             <ref bean="TimestampSignEncrypt_Response"/>
         </jaxws:inInterceptors>
     </jaxws:client>
-
     <!-- 
         This bean is an Out interceptor which will add a timestamp, 
         sign the timestamp and body, and then encrypt the timestamp 
         and body.  It uses 3DES as the symmetric key algorithm.
     -->
-    <bean 
-        class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor"
-        id="TimestampSignEncrypt_Request">
+    <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor" id="TimestampSignEncrypt_Request">
         <constructor-arg>
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
@@ -70,14 +59,11 @@
             </map>
         </constructor-arg>
     </bean>
-    
     <!--    
         This bean is an In interceptor which will validate a signed,    
          encrypted response, and timestamp it.    
     -->
-    <bean 
-        class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
-        id="TimestampSignEncrypt_Response">
+    <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor" id="TimestampSignEncrypt_Response">
         <constructor-arg>
             <map>
                 <entry key="action" value="Timestamp Signature Encrypt"/>
@@ -87,5 +73,4 @@
             </map>
         </constructor-arg>
     </bean>
-
 </beans>

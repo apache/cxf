@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,37 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
-    <bean id="GreeterImpl"
-          class="org.apache.cxf.xmlbeans.GreeterMineImpl"
-          scope="prototype" />
-    
+    <bean id="GreeterImpl" class="org.apache.cxf.xmlbeans.GreeterMineImpl" scope="prototype"/>
     <!--bean id="xmlBeansBean"
           class="org.apache.cxf.jaxb.JAXBDataBinding" 
           scope="prototype" /-->
-          
-    <bean id="xmlBeansBean"
-	  class="org.apache.cxf.xmlbeans.XmlBeansDataBinding" 
-          scope="prototype"/>
-
-    <bean id="testServiceFactory"
-          class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean"
-          scope="singleton">
-      <property name="dataBinding" ref="xmlBeansBean" />
-      <property name="wrapped" value="false"/>
+    <bean id="xmlBeansBean" class="org.apache.cxf.xmlbeans.XmlBeansDataBinding" scope="prototype"/>
+    <bean id="testServiceFactory" class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean" scope="singleton">
+        <property name="dataBinding" ref="xmlBeansBean"/>
+        <property name="wrapped" value="false"/>
     </bean>
-
-    <jaxws:endpoint id="greeterMineEndpoint"
-                    address="http://localhost:${testutil.ports.XmlBeansTest}/SoapContext/SoapPort"
-                    implementor="org.apache.cxf.xmlbeans.GreeterMineImpl">
+    <jaxws:endpoint id="greeterMineEndpoint" address="http://localhost:${testutil.ports.XmlBeansTest}/SoapContext/SoapPort" implementor="org.apache.cxf.xmlbeans.GreeterMineImpl">
         <jaxws:serviceFactory>
             <ref bean="testServiceFactory"/>
         </jaxws:serviceFactory>

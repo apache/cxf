@@ -17,17 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:cxf="http://cxf.apache.org/core"
-      xmlns:jms="http://cxf.apache.org/transports/jms"
-      xsi:schemaLocation="
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:jms="http://cxf.apache.org/transports/jms" xsi:schemaLocation=" http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <cxf:bus>
         <cxf:features>
             <bean class="org.apache.cxf.feature.LoggingFeature"/>
@@ -35,7 +25,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 <property name="jmsConfig">
                     <bean class="org.apache.cxf.transport.jms.JMSConfiguration">
                         <property name="connectionFactory">
-                            <ref bean="jmsConnectionFactory" />
+                            <ref bean="jmsConnectionFactory"/>
                         </property>
                         <property name="targetDestination">
                             <value>routertest.SOAPService2Q.text</value>
@@ -45,14 +35,11 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
             </bean>
         </cxf:features>
     </cxf:bus>
-    
     <bean id="jmsConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
-	<property name="targetConnectionFactory">
-		<bean class="org.apache.activemq.ActiveMQConnectionFactory">
-			<property name="brokerURL" value="vm://JMSClientServerSoap12Test" />
-		</bean>
-	</property>
+        <property name="targetConnectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="vm://JMSClientServerSoap12Test"/>
+            </bean>
+        </property>
     </bean>
- 
 </beans>
-

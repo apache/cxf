@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,7 +18,6 @@
   under the License.
 -->
 <a:foo xmlns:a="urn:abc" xmlns:a2="urn:x">
-  <bar xmlns="urn:abc">text</bar>
-  <a2:foobar xmlns:a2="urn:a">a2:text</a2:foobar>
+    <bar xmlns="urn:abc">text</bar>
+    <a2:foobar xmlns:a2="urn:a">a2:text</a2:foobar>
 </a:foo>
-

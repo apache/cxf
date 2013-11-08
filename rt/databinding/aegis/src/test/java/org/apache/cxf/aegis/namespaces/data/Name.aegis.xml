@@ -18,8 +18,8 @@
   under the License.
 -->
 <mappings xmlns:nt="urn:aegis:namespace:test">
-	<mapping name="nt:Name">
-	<!-- without this, the XML must contain an array, even if the array is zero-length. -->
-	<property name='data' mappedName='nt:Data' minOccurs='1' nillable='true'/>
-	</mapping>
+    <mapping name="nt:Name">
+        <!-- without this, the XML must contain an array, even if the array is zero-length. -->
+        <property name="data" mappedName="nt:Data" minOccurs="1" nillable="true"/>
+    </mapping>
 </mappings>

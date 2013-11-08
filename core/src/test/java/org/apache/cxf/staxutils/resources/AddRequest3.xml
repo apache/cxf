@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,4 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<ps1:Envelope xmlns:ps1="http://www.w3.org/2003/05/soap-envelope"><ps1:Body><ps2:add xmlns:ps2="http://apache.org/cxf/calculator/types"><ps2:arg0>1</ps2:arg0><ps2:arg1>2</ps2:arg1></ps2:add></ps1:Body></ps1:Envelope>
+<ps1:Envelope xmlns:ps1="http://www.w3.org/2003/05/soap-envelope">
+    <ps1:Body>
+        <ps2:add xmlns:ps2="http://apache.org/cxf/calculator/types">
+            <ps2:arg0>1</ps2:arg0>
+            <ps2:arg1>2</ps2:arg1>
+        </ps2:add>
+    </ps1:Body>
+</ps1:Envelope>

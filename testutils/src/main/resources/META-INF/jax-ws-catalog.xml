@@ -18,9 +18,7 @@
     under the License.
 -->
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-
     <rewriteSystem systemIdStartString="doesnotexist" rewritePrefix="../wsdl/catalog"/>
     <rewriteSystem systemIdStartString="nopath" rewritePrefix="../wsdl"/>
-
     <rewriteSystem systemIdStartString="testutils" rewritePrefix="classpath:/wsdl"/>
 </catalog>

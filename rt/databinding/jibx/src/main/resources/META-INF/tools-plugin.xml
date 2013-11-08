@@ -17,7 +17,6 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<plugin name="jibx" version="" provider="cxf.apache.org" xmlns="http://cxf.apache.org/tools/plugin">
+<plugin xmlns="http://cxf.apache.org/tools/plugin" name="jibx" version="" provider="cxf.apache.org">
     <databinding name="jibx" package="org.apache.cxf.jibx.tools" profile="JibxToolingDataBinding"/>
 </plugin>

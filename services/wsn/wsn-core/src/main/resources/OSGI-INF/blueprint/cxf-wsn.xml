@@ -17,58 +17,49 @@
     limitations under the License.
 
 -->
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
-
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
     <!-- AdminConfig property place holder for the org.apache.cxf.wsn  -->
     <cm:property-placeholder persistent-id="org.apache.cxf.wsn" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="cxf.wsn.activemq" value="vm:localhost"/>
-            <cm:property name="cxf.wsn.rootUrl" value="http://0.0.0.0:8182" />
-            <cm:property name="cxf.wsn.context" value="/wsn" />
-            <cm:property name="cxf.wsn.activemq.username" value="user" />
-            <cm:property name="cxf.wsn.activemq.password" value="password" />
+            <cm:property name="cxf.wsn.rootUrl" value="http://0.0.0.0:8182"/>
+            <cm:property name="cxf.wsn.context" value="/wsn"/>
+            <cm:property name="cxf.wsn.activemq.username" value="user"/>
+            <cm:property name="cxf.wsn.activemq.password" value="password"/>
         </cm:default-properties>
     </cm:property-placeholder>
-
     <!-- ActiveMQ connection factory -->
     <bean id="activemq" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${cxf.wsn.activemq}" />
-        <property name="userName" value="${cxf.wsn.activemq.username}" />
-        <property name="password" value="${cxf.wsn.activemq.password}" />
+        <property name="brokerURL" value="${cxf.wsn.activemq}"/>
+        <property name="userName" value="${cxf.wsn.activemq.username}"/>
+        <property name="password" value="${cxf.wsn.activemq.password}"/>
     </bean>
-    
-    <bean id="JaxwsEndpointManager" 
-    	class="org.apache.cxf.wsn.services.OSGiJaxwsEndpointManager"
-    	destroy-method="destroy">
+    <bean id="JaxwsEndpointManager" class="org.apache.cxf.wsn.services.OSGiJaxwsEndpointManager" destroy-method="destroy">
         <property name="bundleContext" ref="blueprintBundleContext"/>
         <property name="blueprintContainer" ref="blueprintContainer"/>
     </bean>
-
     <!-- NotificationBroker -->
     <bean id="notificationBroker" class="org.apache.cxf.wsn.services.JaxwsNotificationBroker" init-method="init" destroy-method="destroy">
-        <argument value="NotificationBroker" />
-        <argument ref="activemq" />
+        <argument value="NotificationBroker"/>
+        <argument ref="activemq"/>
         <argument ref="JaxwsEndpointManager"/>
-        <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker" />
+        <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker"/>
     </bean>
     <service ref="notificationBroker" interface="org.oasis_open.docs.wsn.brw_2.NotificationBroker">
         <service-properties>
-            <entry key="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker" />
+            <entry key="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker"/>
         </service-properties>
     </service>
-
     <!-- CreatePullPoint -->
     <bean id="createPullPoint" class="org.apache.cxf.wsn.services.JaxwsCreatePullPoint" init-method="init" destroy-method="destroy">
-        <argument value="org.apache.cxf.wsn.client.CreatePullPoint" />
-        <argument ref="activemq" />
+        <argument value="org.apache.cxf.wsn.client.CreatePullPoint"/>
+        <argument ref="activemq"/>
         <argument ref="JaxwsEndpointManager"/>
-        <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint" />
+        <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint"/>
     </bean>
     <service ref="createPullPoint" interface="org.oasis_open.docs.wsn.bw_2.CreatePullPoint">
         <service-properties>
-            <entry key="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint" />
+            <entry key="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint"/>
         </service-properties>
     </service>
-
 </blueprint>

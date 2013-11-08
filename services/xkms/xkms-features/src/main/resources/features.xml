@@ -18,20 +18,18 @@
   under the License.
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
-	<repository>mvn:org.apache.cxf.karaf/apache-cxf/${project.version}/xml/features</repository>
-
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/${project.version}/xml/features</repository>
     <feature name="cxf-xkms-client" version="${project.version}">
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>
         <feature>wss4j</feature>
-        <bundle start-level='40' dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
+        <bundle start-level="40" dependency="true">mvn:net.sf.ehcache/ehcache/${cxf.ehcache.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-common/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-client/${project.version}</bundle>
         <configfile finalname="/etc/org.apache.cxf.xkms.client.cfg">
             mvn:${project.groupId}/cxf-services-xkms-features/${project.version}/cfg/org.apache.cxf.xkms.client
         </configfile>
     </feature>
-
     <feature name="cxf-xkms-service" version="${project.version}">
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>
@@ -43,5 +41,4 @@
             mvn:${project.groupId}/cxf-services-xkms-features/${project.version}/cfg/org.apache.cxf.xkms
         </configfile>
     </feature>
-
 </features>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,19 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<multiParamRootReq
-	xmlns="http://apache.org/hello_world_xml_http/bare">
-	<requestType
-		xmlns="http://apache.org/hello_world_xml_http/bare/types"
-		xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl"
-		xmlns:xs="http://www.w3.org/2001/XMLSchema">
-		tli
-	</requestType>
-	<myComplexStruct
-		xmlns="http://apache.org/hello_world_xml_http/bare/types"
-		xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl">
-		<elem1>this is element 1</elem1>
-		<elem2>this is element 2</elem2>
-		<elem3>42</elem3>
-	</myComplexStruct>
+<multiParamRootReq xmlns="http://apache.org/hello_world_xml_http/bare">
+    <requestType xmlns="http://apache.org/hello_world_xml_http/bare/types" xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                tli
+        </requestType>
+    <myComplexStruct xmlns="http://apache.org/hello_world_xml_http/bare/types" xmlns:ns2="http://www.w3.org/2005/02/addressing/wsdl">
+        <elem1>this is element 1</elem1>
+        <elem2>this is element 2</elem2>
+        <elem3>42</elem3>
+    </myComplexStruct>
 </multiParamRootReq>

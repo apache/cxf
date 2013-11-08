@@ -17,12 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns:tns="urn:build.cxf.com"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-	name="build"
-	targetNamespace="urn:build.aepona.com"
-	xmlns:wsdl1="http://apache.org/hello_world_soap_http">
-	<wsdl:import 
-		namespace="http://apache.org/hello_world_soap_http"
-		location="./hello_world.wsdl"/>
+<wsdl:definitions xmlns:tns="urn:build.cxf.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl1="http://apache.org/hello_world_soap_http" name="build" targetNamespace="urn:build.aepona.com">
+    <wsdl:import namespace="http://apache.org/hello_world_soap_http" location="./hello_world.wsdl"/>
 </wsdl:definitions>

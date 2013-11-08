@@ -17,330 +17,303 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<wsdl:definitions name="DoubleIt"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt"
-  targetNamespace="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy"
-  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-  xmlns:wsaws="http://www.w3.org/2005/08/addressing" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
-  xmlns:wspp="http://java.sun.com/xml/ns/wsit/policy">
-  
-    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" 
-                 namespace="http://www.example.org/contract/DoubleIt"/>
-
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsaws="http://www.w3.org/2005/08/addressing" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" xmlns:wspp="http://java.sun.com/xml/ns/wsit/policy" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
+    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" namespace="http://www.example.org/contract/DoubleIt"/>
     <wsdl:binding name="DoubleItBinding" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItBindingPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItBindingPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingEncryptThenSign" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItEncryptThenSignPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItEncryptThenSignPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingSignThenEncrypt" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItSignThenEncryptPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItSignThenEncryptPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal"  name="DoubleItFault"/>
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingSign" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItSignPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItSignPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingXPath" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItEncryptXPathPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItEncryptXPathPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingSignedOnly" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItSignedOnlyPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItSignedOnlyPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <wsp:PolicyReference URI="#SignedOnlyMsgPolicy" />
-                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#SignedOnlyMsgPolicy"/>
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <wsp:PolicyReference URI="#EncrBody" />
-                <soap:body use="literal" name="DoubleItFault" />
+                <wsp:PolicyReference URI="#EncrBody"/>
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingTimestampOnly" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#DoubleItTimestampOnlyPolicy" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#DoubleItTimestampOnlyPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-
     <wsdl:binding name="DoubleItBindingCXF3041" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#CXF3041"/>
-        <soap:binding style="document"
-      transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <wsp:PolicyReference URI="#SignBody"/>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingCXF3042" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#CXF3042"/>
-        <soap:binding style="document"
-            transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
                 <wsp:PolicyReference URI="#EncrBody"/>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingCXF3452" type="tns:DoubleItPortTypeHeader">
         <wsp:PolicyReference URI="#CXF3452"/>
-        <soap:binding style="document"
-            transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
                 <wsp:PolicyReference URI="#EncrSignBodyAndHeader"/>
-                <soap:header use="literal" message="tns:DoubleItRequestHeader" part="header" />
-                <soap:body use="literal" />
+                <soap:header use="literal" message="tns:DoubleItRequestHeader" part="header"/>
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingCXF4119" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#CXF4119" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#CXF4119"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="DoubleItBindingCXF4122" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#CXF4122" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#CXF4122"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-
     <wsdl:binding name="DoubleItBindingCXF5325" type="tns:DoubleItPortType">
-        <wsp:PolicyReference URI="#CXF5325" />
-        <soap:binding style="document"
-          transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsp:PolicyReference URI="#CXF5325"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItPortHttps" binding="tns:DoubleItBinding">
-            <soap:address location="https://localhost:9009/SecPolTest" />
+            <soap:address location="https://localhost:9009/SecPolTest"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortHttp" binding="tns:DoubleItBinding">
-            <soap:address location="http://localhost:9010/SecPolTest" />
+            <soap:address location="http://localhost:9010/SecPolTest"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortEncryptThenSign" binding="tns:DoubleItBindingEncryptThenSign">
-            <soap:address location="http://localhost:9010/SecPolTestEncryptThenSign" />
+            <soap:address location="http://localhost:9010/SecPolTestEncryptThenSign"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortSignThenEncrypt" binding="tns:DoubleItBindingSignThenEncrypt">
-            <soap:address location="http://localhost:9010/SecPolTestSignThenEncrypt" />
+            <soap:address location="http://localhost:9010/SecPolTestSignThenEncrypt"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortSign" binding="tns:DoubleItBindingSign">
-            <soap:address location="http://localhost:9010/SecPolTestSign" />
+            <soap:address location="http://localhost:9010/SecPolTestSign"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortXPath" binding="tns:DoubleItBindingXPath">
-            <soap:address location="http://localhost:9010/SecPolTestXPath" />
+            <soap:address location="http://localhost:9010/SecPolTestXPath"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortSignedOnly" binding="tns:DoubleItBindingSignedOnly">
-            <soap:address location="http://localhost:9010/SecPolTestSignedOnly" />
+            <soap:address location="http://localhost:9010/SecPolTestSignedOnly"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortTimestampOnly" binding="tns:DoubleItBindingTimestampOnly">
-            <soap:address location="http://localhost:9010/SecPolTestTimestampOnly" />
+            <soap:address location="http://localhost:9010/SecPolTestTimestampOnly"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF3041" binding="tns:DoubleItBindingCXF3041">
-            <soap:address location="http://localhost:9010/SecPolTestCXF3041" />
+            <soap:address location="http://localhost:9010/SecPolTestCXF3041"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF3042" binding="tns:DoubleItBindingCXF3042">
-            <soap:address location="http://localhost:9010/SecPolTestCXF3042" />
+            <soap:address location="http://localhost:9010/SecPolTestCXF3042"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF3452" binding="tns:DoubleItBindingCXF3452">
-            <soap:address location="http://localhost:9010/SecPolTestCXF3452" />
+            <soap:address location="http://localhost:9010/SecPolTestCXF3452"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF4119" binding="tns:DoubleItBindingCXF4119">
-            <soap:address location="http://localhost:9010/SecPolTestCXF4119" />
+            <soap:address location="http://localhost:9010/SecPolTestCXF4119"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF4122" binding="tns:DoubleItBindingCXF4122">
-            <soap:address location="http://localhost:9010/SecPolTestCXF4122" />
+            <soap:address location="http://localhost:9010/SecPolTestCXF4122"/>
         </wsdl:port>
         <wsdl:port name="DoubleItPortCXF5325" binding="tns:DoubleItBindingCXF5325">
-            <soap:address location="https://localhost:9009/SecPolTestCXF5325" />
+            <soap:address location="https://localhost:9009/SecPolTestCXF5325"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsp:Policy wsu:Id="DoubleItBindingPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
-                <foo:unknownPolicy xmlns:foo="http://cxf.apache.org/not/a/policy" />
+                <foo:unknownPolicy xmlns:foo="http://cxf.apache.org/not/a/policy"/>
             </wsp:All>
             <wsp:All>
-                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
+                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl"/>
                 <sp:TransportBinding>
                     <wsp:Policy>
                         <sp:TransportToken>
                             <wsp:Policy>
-                                <sp:HttpsToken RequireClientCertificate="false" />
+                                <sp:HttpsToken RequireClientCertificate="false"/>
                             </wsp:Policy>
                         </sp:TransportToken>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
+                        <sp:IncludeTimestamp/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:Basic128 />
+                                <sp:Basic128/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
                 </sp:TransportBinding>
                 <sp:Wss10>
                     <wsp:Policy>
-                        <sp:MustSupportRefKeyIdentifier />
+                        <sp:MustSupportRefKeyIdentifier/>
                     </wsp:Policy>
                 </sp:Wss10>
                 <sp:SignedSupportingTokens>
                     <wsp:Policy>
-                        <sp:UsernameToken
-                          sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                        <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                             <wsp:Policy>
-                                <sp:WssUsernameToken10 />
+                                <sp:WssUsernameToken10/>
                             </wsp:Policy>
                         </sp:UsernameToken>
                     </wsp:Policy>
@@ -351,57 +324,52 @@
     <wsp:Policy wsu:Id="DoubleItEncryptThenSignPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
-                <sp:AsymmetricBinding
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:InitiatorToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:InitiatorToken>
                         <sp:RecipientToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:TripleDesRsa15 />
+                                <sp:TripleDesRsa15/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
-                        <sp:EncryptSignature />
-                        <sp:OnlySignEntireHeadersAndBody />
-                        <sp:EncryptBeforeSigning />
+                        <sp:IncludeTimestamp/>
+                        <sp:EncryptSignature/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:EncryptBeforeSigning/>
                     </wsp:Policy>
                 </sp:AsymmetricBinding>
-                <sp:SignedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:SignedParts>
-                <sp:EncryptedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <!-- sp:MustSupportRefKeyIdentifier/-->
-                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefIssuerSerial/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>
@@ -410,182 +378,67 @@
     <wsp:Policy wsu:Id="DoubleItSignThenEncryptPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
-                <sp:AsymmetricBinding
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:InitiatorToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:InitiatorToken>
                         <sp:RecipientToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:TripleDesRsa15 />
+                                <sp:TripleDesRsa15/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
-                        <sp:EncryptSignature />
-                        <sp:OnlySignEntireHeadersAndBody />
-                        <sp:SignBeforeEncrypting />
+                        <sp:IncludeTimestamp/>
+                        <sp:EncryptSignature/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:SignBeforeEncrypting/>
                     </wsp:Policy>
                 </sp:AsymmetricBinding>
-                <sp:SignedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:SignedParts>
-                <sp:EncryptedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <!-- sp:MustSupportRefKeyIdentifier/-->
-                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefIssuerSerial/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-
-
-    <wsp:Policy wsu:Id="DoubleItSignPolicy"
-      xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:AsymmetricBinding
-                  xmlns:sp='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy'>
-                    <wsp:Policy>
-                        <sp:InitiatorToken>
-                            <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient'>
-                                    <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
-                                    </wsp:Policy>
-                                </sp:X509Token>
-                            </wsp:Policy>
-                        </sp:InitiatorToken>
-                        <sp:RecipientToken>
-                            <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always'>
-                                    <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
-                                    </wsp:Policy>
-                                </sp:X509Token>
-                            </wsp:Policy>
-                        </sp:RecipientToken>
-                        <sp:AlgorithmSuite>
-                            <wsp:Policy>
-                                <sp:Basic256 />
-                            </wsp:Policy>
-                        </sp:AlgorithmSuite>
-                        <sp:Layout>
-                            <wsp:Policy>
-                                <sp:Strict />
-                            </wsp:Policy>
-                        </sp:Layout>
-                        <sp:OnlySignEntireHeadersAndBody />
-                    </wsp:Policy>
-                </sp:AsymmetricBinding>
-                <sp:Wss10 xmlns:sp='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy'>
-                    <wsp:Policy>
-                        <sp:MustSupportRefEmbeddedToken />
-                    </wsp:Policy>
-                </sp:Wss10>
-                <sp:SignedParts
-                  xmlns:sp='http://schemas.xmlsoap.org/ws/2005/07/securitypolicy'>
-                    <sp:Body />
-                </sp:SignedParts>
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
-    <wsp:Policy wsu:Id="DoubleItEncryptXPathPolicy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:SymmetricBinding
-                  xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <sp:ProtectionToken>
-                            <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                    <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
-                                    </wsp:Policy>
-                                </sp:X509Token>
-                            </wsp:Policy>
-                        </sp:ProtectionToken>
-                        <sp:AlgorithmSuite>
-                            <wsp:Policy>
-                                <sp:TripleDesRsa15 />
-                            </wsp:Policy>
-                        </sp:AlgorithmSuite>
-                        <sp:Layout>
-                            <wsp:Policy>
-                                <sp:Lax />
-                            </wsp:Policy>
-                        </sp:Layout>
-                        <sp:IncludeTimestamp />
-                    </wsp:Policy>
-                </sp:SymmetricBinding>
-                <sp:EncryptedElements
-                  xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
-                </sp:EncryptedElements>
-                <sp:SignedElements
-                  xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
-                </sp:SignedElements>
-                <sp:RequiredElements
-                  xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:XPath xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">wsse:Security</sp:XPath>
-                </sp:RequiredElements>
-                <sp:RequiredParts
-                  xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:Header Name="Security" Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
-                </sp:RequiredParts>
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
-
-
-
-    <wsp:Policy  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-              xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
-              xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-              wsu:Id="DoubleItSignedOnlyPolicy">
+    <wsp:Policy xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" wsu:Id="DoubleItSignPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
                 <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:InitiatorToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
-                                        <sp:RequireThumbprintReference/> <!-- needed for V1 certs -->
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
@@ -594,7 +447,98 @@
                             <wsp:Policy>
                                 <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:RecipientToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic256/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                    </wsp:Policy>
+                </sp:AsymmetricBinding>
+                <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:MustSupportRefEmbeddedToken/>
+                    </wsp:Policy>
+                </sp:Wss10>
+                <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
+                </sp:SignedParts>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItEncryptXPathPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssX509V1Token11/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:TripleDesRsa15/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:EncryptedElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
+                </sp:EncryptedElements>
+                <sp:SignedElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
+                </sp:SignedElements>
+                <sp:RequiredElements xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:XPath xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">wsse:Security</sp:XPath>
+                </sp:RequiredElements>
+                <sp:RequiredParts xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <sp:Header Name="Security" Namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+                </sp:RequiredParts>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" wsu:Id="DoubleItSignedOnlyPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:InitiatorToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssX509V1Token11/>
+                                        <sp:RequireThumbprintReference/>
+                                        <!-- needed for V1 certs -->
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:InitiatorToken>
+                        <sp:RecipientToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always">
+                                    <wsp:Policy>
+                                        <sp:WssX509V1Token11/>
                                         <sp:RequireThumbprintReference/>
                                     </wsp:Policy>
                                 </sp:X509Token>
@@ -602,80 +546,66 @@
                         </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:TripleDesRsa15 />
+                                <sp:TripleDesRsa15/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Strict />
+                                <sp:Strict/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
-                        <sp:OnlySignEntireHeadersAndBody />
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
                     </wsp:Policy>
                 </sp:AsymmetricBinding>
                 <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
-                        <sp:MustSupportRefKeyIdentifier />
-                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefKeyIdentifier/>
+                        <sp:MustSupportRefIssuerSerial/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-
-    <wsp:Policy
-       xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-       xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
-       xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-       wsu:Id="SignedOnlyMsgPolicy">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" wsu:Id="SignedOnlyMsgPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
                 <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                    <sp:Body/>
                 </sp:SignedParts>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-    <wsp:Policy  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-              xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
-              xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-              wsu:Id="DoubleItTimestampOnlyPolicy">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" wsu:Id="DoubleItTimestampOnlyPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
-                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
+                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl"/>
                 <sp:TransportBinding>
                     <wsp:Policy>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
+                        <sp:IncludeTimestamp/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:Basic128 />
+                                <sp:Basic128/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
                 </sp:TransportBinding>
                 <sp:Wss10>
                     <wsp:Policy>
-                        <sp:MustSupportRefKeyIdentifier />
+                        <sp:MustSupportRefKeyIdentifier/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-  
-
-
     <!-- Policy for asymmetric binding with the certificate included in the message from
      client to server but only a thumbprint on messages from the server to the client. -->
-    <wsp:Policy wsu:Id="AsymmBinding" xmlns:wsu=
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="AsymmBinding">
         <sp:AsymmetricBinding>
             <wsp:Policy>
                 <sp:InitiatorToken>
@@ -704,32 +634,21 @@
             </wsp:Policy>
         </sp:AsymmetricBinding>
     </wsp:Policy>
-  
     <!-- Policy for signing the message body. -->
-    <wsp:Policy wsu:Id="SignBody" xmlns:wsu=
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="SignBody">
         <sp:SignedParts>
             <sp:Body/>
         </sp:SignedParts>
     </wsp:Policy>
     <!-- Policy for encrypting the message body. -->
-    <wsp:Policy wsu:Id="EncrBody" xmlns:wsu=
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="EncrBody">
         <sp:EncryptedParts>
             <sp:Body/>
         </sp:EncryptedParts>
     </wsp:Policy>
-
     <!-- Policy for asymmetric binding with the certificate included in the message from
      client to server but only a thumbprint on messages from the server to the client. -->
-    <wsp:Policy wsu:Id="CXF3041" xmlns:wsu=
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="CXF3041">
         <sp:AsymmetricBinding>
             <wsp:Policy>
                 <sp:InitiatorToken>
@@ -758,16 +677,10 @@
             </wsp:Policy>
         </sp:AsymmetricBinding>
     </wsp:Policy>
-
-
-
     <!-- Policy for symmetric binding, using an ephemeral key generated by the client and
    sent to the server as part of the request, using asymmetric encryption with the server
    public key to secure the symmetric key. -->
-    <wsp:Policy wsu:Id="CXF3042"
-        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-        xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="CXF3042">
         <sp:SymmetricBinding>
             <wsp:Policy>
                 <sp:ProtectionToken>
@@ -797,12 +710,7 @@
             </wsp:Policy>
         </sp:Wss11>
     </wsp:Policy>
-
-
-    <wsp:Policy wsu:Id="CXF3452"
-        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-        xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="CXF3452">
         <sp:SymmetricBinding>
             <wsp:Policy>
                 <sp:ProtectionToken>
@@ -832,72 +740,64 @@
             </wsp:Policy>
         </sp:Wss11>
     </wsp:Policy>
-    <wsp:Policy wsu:Id="EncrSignBodyAndHeader" xmlns:wsu=
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy"
-        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="EncrSignBodyAndHeader">
         <sp:EncryptedParts>
             <sp:Body/>
             <sp:Header Namespace="http://cxf.apache.org/policytest/DoubleIt"/>
         </sp:EncryptedParts>
         <sp:SignedParts>
-            <sp:Body />
+            <sp:Body/>
             <sp:Header Namespace="http://cxf.apache.org/policytest/DoubleIt"/>
         </sp:SignedParts>
     </wsp:Policy>
     <wsp:Policy wsu:Id="CXF4119">
         <wsp:ExactlyOne>
             <wsp:All>
-                <sp:AsymmetricBinding
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:InitiatorToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:InitiatorToken>
                         <sp:RecipientToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:TripleDesRsa15 />
+                                <sp:TripleDesRsa15/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
-                        <sp:EncryptSignature />
-                        <sp:OnlySignEntireHeadersAndBody />
-                        <sp:EncryptBeforeSigning />
+                        <sp:IncludeTimestamp/>
+                        <sp:EncryptSignature/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:EncryptBeforeSigning/>
                     </wsp:Policy>
                 </sp:AsymmetricBinding>
-                <sp:SignedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:SignedParts>
-                <sp:EncryptedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
-                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefIssuerSerial/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>
@@ -906,95 +806,80 @@
     <wsp:Policy wsu:Id="CXF4122">
         <wsp:ExactlyOne>
             <wsp:All>
-                <sp:AsymmetricBinding
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:InitiatorToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:InitiatorToken>
                         <sp:RecipientToken>
                             <wsp:Policy>
-                                <sp:X509Token
-                                  sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
+                                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Never">
                                     <wsp:Policy>
-                                        <sp:WssX509V1Token11 />
+                                        <sp:WssX509V1Token11/>
                                     </wsp:Policy>
                                 </sp:X509Token>
                             </wsp:Policy>
                         </sp:RecipientToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp:TripleDesRsa15 />
+                                <sp:TripleDesRsa15/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:Lax />
+                                <sp:Lax/>
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
-                        <sp:EncryptSignature />
-                        <sp:OnlySignEntireHeadersAndBody />
-                        <sp:EncryptBeforeSigning />
+                        <sp:IncludeTimestamp/>
+                        <sp:EncryptSignature/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:EncryptBeforeSigning/>
                     </wsp:Policy>
                 </sp:AsymmetricBinding>
-                <sp:SignedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:SignedParts>
-                <sp:EncryptedParts
-                  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-                    <sp:Body />
+                <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <sp:Body/>
                 </sp:EncryptedParts>
                 <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
-                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefIssuerSerial/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-    
-    
     <wsp:Policy wsu:Id="CXF5325">
         <wsp:ExactlyOne>
             <wsp:All>
-                <wsaw:UsingAddressing
-                    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-                    wsp:Optional="true" />
+                <wsaw:UsingAddressing xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="true"/>
                 <wsp:All>
-                    <sp:TransportBinding
-                        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-                        xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy"
-                        xmlns:wsa="http://www.w3.org/2005/08/addressing"
-                        xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
-                        xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility"
-                        xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
+                    <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
                         <wsp:Policy>
                             <sp:TransportToken>
                                 <wsp:Policy>
                                     <sp:HttpsToken>
                                         <wsp:Policy>
-                                            <sp:HttpBasicAuthentication />
+                                            <sp:HttpBasicAuthentication/>
                                         </wsp:Policy>
                                     </sp:HttpsToken>
                                 </wsp:Policy>
                             </sp:TransportToken>
                             <sp:AlgorithmSuite>
                                 <wsp:Policy>
-                                    <sp:Basic128Rsa15 />
+                                    <sp:Basic128Rsa15/>
                                 </wsp:Policy>
                             </sp:AlgorithmSuite>
                             <sp:Layout>
                                 <wsp:Policy>
-                                    <sp:Strict />
+                                    <sp:Strict/>
                                 </wsp:Policy>
                             </sp:Layout>
                         </wsp:Policy>
@@ -1002,35 +887,27 @@
                 </wsp:All>
             </wsp:All>
             <wsp:All>
-                <wsaw:UsingAddressing
-                    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-                    wsp:Optional="true" />
+                <wsaw:UsingAddressing xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="true"/>
                 <wsp:All>
-                    <sp:TransportBinding
-                        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-                        xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy"
-                        xmlns:wsa="http://www.w3.org/2005/08/addressing"
-                        xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512"
-                        xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility"
-                        xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
+                    <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex">
                         <wsp:Policy>
                             <sp:TransportToken>
                                 <wsp:Policy>
                                     <sp:HttpsToken>
                                         <wsp:Policy>
-                                            <sp:RequireClientCertificate />
+                                            <sp:RequireClientCertificate/>
                                         </wsp:Policy>
                                     </sp:HttpsToken>
                                 </wsp:Policy>
                             </sp:TransportToken>
                             <sp:AlgorithmSuite>
                                 <wsp:Policy>
-                                    <sp:Basic128Rsa15 />
+                                    <sp:Basic128Rsa15/>
                                 </wsp:Policy>
                             </sp:AlgorithmSuite>
                             <sp:Layout>
                                 <wsp:Policy>
-                                    <sp:Strict />
+                                    <sp:Strict/>
                                 </wsp:Policy>
                             </sp:Layout>
                         </wsp:Policy>
@@ -1039,5 +916,4 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
-    
 </wsdl:definitions>

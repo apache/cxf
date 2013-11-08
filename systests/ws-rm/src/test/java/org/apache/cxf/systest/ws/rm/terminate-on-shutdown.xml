@@ -17,28 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
-       xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
-       xsi:schemaLocation="
-http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd
-http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager" xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" xsi:schemaLocation=" http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <import resource="rminterceptors.xml"/>
-    
     <wsrm-mgr:rmManager id="org.apache.cxf.ws.rm.RMManager">
-      <wsrm-policy:RMAssertion>         
-          <wsrm-policy:BaseRetransmissionInterval Milliseconds="10000"/>           
-          <wsrm-policy:AcknowledgementInterval Milliseconds="10000"/>                                                        
-      </wsrm-policy:RMAssertion>      
-      <wsrm-mgr:sourcePolicy>
-          <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="true"/>                    
-      </wsrm-mgr:sourcePolicy>
-      <wsrm-mgr:destinationPolicy>
-          <wsrm-mgr:acksPolicy intraMessageThreshold="0"/>                    
-      </wsrm-mgr:destinationPolicy>      
+        <wsrm-policy:RMAssertion>
+            <wsrm-policy:BaseRetransmissionInterval Milliseconds="10000"/>
+            <wsrm-policy:AcknowledgementInterval Milliseconds="10000"/>
+        </wsrm-policy:RMAssertion>
+        <wsrm-mgr:sourcePolicy>
+            <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="true"/>
+        </wsrm-mgr:sourcePolicy>
+        <wsrm-mgr:destinationPolicy>
+            <wsrm-mgr:acksPolicy intraMessageThreshold="0"/>
+        </wsrm-mgr:destinationPolicy>
     </wsrm-mgr:rmManager>
-    
 </beans>

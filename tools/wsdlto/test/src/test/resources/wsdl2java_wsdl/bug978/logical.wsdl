@@ -17,25 +17,15 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<wsdl:definitions name="voidInt" targetNamespace="http://tempuri.org" 
-		  xmlns="http://schemas.xmlsoap.org/wsdl/" 
-		  xmlns:http-conf="http://schemas.iona.com/transports/http/configuration"
-		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-		  xmlns:tns="http://tempuri.org"
-		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-		  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http-conf="http://schemas.iona.com/transports/http/configuration" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://tempuri.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="voidInt" targetNamespace="http://tempuri.org">
     <wsdl:message name="sayHiRequest">
-	<wsdl:part name="inInt" type="xsd:int"/>
+        <wsdl:part name="inInt" type="xsd:int"/>
     </wsdl:message>
-    
-    <wsdl:message name="sayHiResponse" />
-    
+    <wsdl:message name="sayHiResponse"/>
     <wsdl:portType name="GreeterRPCLit">
-	<wsdl:operation name="sayHi" parameterOrder="inInt">
-	    <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
-	    <wsdl:output message="tns:sayHiResponse" name="sayHiResponse" />
-	</wsdl:operation>
+        <wsdl:operation name="sayHi" parameterOrder="inInt">
+            <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
+            <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </wsdl:operation>
     </wsdl:portType>
 </wsdl:definitions>

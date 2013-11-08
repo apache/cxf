@@ -17,25 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:wsrm-mgmt="http://cxf.apache.org/ws/rm/manager"
-       xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xsi:schemaLocation="
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
-    <import resource="classpath:META-INF/cxf/cxf.xml" />
-    
-   <cxf:bus>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:wsrm-mgmt="http://cxf.apache.org/ws/rm/manager" xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" xmlns:http="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation=" http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema/transports/http.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <cxf:bus>
         <cxf:outInterceptors>
-        <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
-
     <bean class="org.apache.cxf.ws.policy.IgnorablePolicyInterceptorProvider">
         <constructor-arg>
             <!-- the list of assertion types that can be ignored -->
@@ -50,6 +38,5 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                 </bean>
             </list>
         </constructor-arg>
-     </bean>
-
+    </bean>
 </beans>

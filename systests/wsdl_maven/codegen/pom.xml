@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -53,7 +54,7 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
-                                <asyncMethods />
+                                <asyncMethods/>
                             </defaultOptions>
                         </configuration>
                     </execution>
@@ -95,11 +96,10 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
-                                <asyncMethods />
+                                <asyncMethods/>
                             </defaultOptions>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
             <!--
@@ -132,8 +132,6 @@
             -->
         </plugins>
     </build>
-    
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
@@ -149,11 +147,9 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.xjc-utils</groupId>
-             <artifactId>cxf-xjc-runtime</artifactId>
+            <artifactId>cxf-xjc-runtime</artifactId>
             <version>${cxf.xjc-utils.version}</version>
         </dependency>
-        
-
         <dependency>
             <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
             <artifactId>cxf-systests-java2ws</artifactId>

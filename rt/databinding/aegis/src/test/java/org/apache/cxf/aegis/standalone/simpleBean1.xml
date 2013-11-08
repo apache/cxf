@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,9 +18,7 @@
   under the License.
 -->
 <!--  namespace goes with SimpleBean.aegis.xml -->
-<b:bean xmlns:b="urn:beanz" 
-        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-        xsi:type='b:SimpleBean'>
-  <b:bleh>bleh</b:bleh>
-  <b:howdy>howdy</b:howdy>
+<b:bean xmlns:b="urn:beanz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="b:SimpleBean">
+    <b:bleh>bleh</b:bleh>
+    <b:howdy>howdy</b:howdy>
 </b:bean>

@@ -17,15 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"              
-             xmlns:tns="http://schemas.apache.org/tests/type_test" 
-             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-             targetNamespace="http://schemas.apache.org/tests/type_test">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/tests/type_test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.apache.org/tests/type_test">
     <types>
-        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" 
-                    targetNamespace="http://schemas.apache.org/tests/type_test" 
-                    elementFormDefault="unqualified" attributeFormDefault="unqualified">
-             
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.apache.org/tests/type_test" elementFormDefault="unqualified" attributeFormDefault="unqualified">
             <complexType name="ComplexRestriction">
                 <simpleContent>
                     <restriction base="string">
@@ -33,14 +27,13 @@
                         <minLength value="5"/>
                     </restriction>
                 </simpleContent>
-            </complexType>        
+            </complexType>
             <xsd:element name="ComplexRestriction_x" type="tns:ComplexRestriction"/>
             <xsd:element name="ComplexRestriction_y" type="tns:ComplexRestriction"/>
             <xsd:element name="ComplexRestriction_z" type="tns:ComplexRestriction"/>
             <xsd:element name="ComplexRestriction_return" type="tns:ComplexRestriction"/>
         </xsd:schema>
     </types>
-    
     <message name="test_ComplexRestriction">
         <part name="x" element="tns:ComplexRestriction_x"/>
         <part name="y" element="tns:ComplexRestriction_y"/>
@@ -50,14 +43,10 @@
         <part name="y" element="tns:ComplexRestriction_y"/>
         <part name="z" element="tns:ComplexRestriction_z"/>
     </message>
-    
     <portType name="TypeTestPortType">
         <operation name="test_ComplexRestriction">
             <input name="test_ComplexRestriction" message="tns:test_ComplexRestriction"/>
             <output name="test_ComplexRestriction_response" message="tns:test_ComplexRestriction_response"/>
         </operation>
     </portType>
-    
 </definitions>
-    
-     

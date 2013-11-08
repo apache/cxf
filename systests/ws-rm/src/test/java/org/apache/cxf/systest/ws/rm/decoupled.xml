@@ -17,42 +17,30 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xsi:schemaLocation="
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:http="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation=" http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-  
     <http:conduit name="{http://cxf.apache.org/greeter_control}GreeterPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.DecoupledClientServerTest}/decoupled_endpoint"/>
+        <http:client DecoupledEndpoint="http://localhost:${testutil.ports.DecoupledClientServerTest}/decoupled_endpoint"/>
     </http:conduit>
-    
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
-
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
-
     <cxf:bus>
         <cxf:inInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
         </cxf:inInterceptors>
         <cxf:inFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
         </cxf:inFaultInterceptors>
         <cxf:outInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
         </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
-                <ref bean="mapAggregator"/>
-                <ref bean="mapCodec"/>
+            <ref bean="mapAggregator"/>
+            <ref bean="mapCodec"/>
         </cxf:outFaultInterceptors>
     </cxf:bus>
-
 </beans>

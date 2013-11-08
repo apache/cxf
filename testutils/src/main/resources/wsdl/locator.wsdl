@@ -17,44 +17,29 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<definitions targetNamespace="http://apache.org/locator" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:ls="http://apache.org/locator" 
-    xmlns:query="http://apache.org/locator/query" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/locator/types" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:ls="http://apache.org/locator" xmlns:query="http://apache.org/locator/query" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/locator/types" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/locator">
     <types>
-        <xs:schema attributeFormDefault="unqualified" blockDefault="#all" 
-            elementFormDefault="qualified" finalDefault="" 
-            targetNamespace="http://www.w3.org/2005/08/addressing" 
-            xmlns:tns="http://www.w3.org/2005/08/addressing">
+        <xs:schema xmlns:tns="http://www.w3.org/2005/08/addressing" attributeFormDefault="unqualified" blockDefault="#all" elementFormDefault="qualified" finalDefault="" targetNamespace="http://www.w3.org/2005/08/addressing">
             <xs:element name="EndpointReference" type="tns:EndpointReferenceType"/>
             <xs:complexType mixed="false" name="EndpointReferenceType">
                 <xs:sequence>
                     <xs:element name="Address" type="tns:AttributedURIType"/>
-                    <xs:element minOccurs="0" name="ReferenceParameters" 
-                        type="tns:ReferenceParametersType"/>
+                    <xs:element minOccurs="0" name="ReferenceParameters" type="tns:ReferenceParametersType"/>
                     <xs:element minOccurs="0" ref="tns:Metadata"/>
-                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" 
-                        processContents="lax"/>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
                 </xs:sequence>
                 <xs:anyAttribute namespace="##other" processContents="lax"/>
             </xs:complexType>
             <xs:complexType mixed="false" name="ReferenceParametersType">
                 <xs:sequence>
-                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" 
-                        processContents="lax"/>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
                 </xs:sequence>
                 <xs:anyAttribute namespace="##other" processContents="lax"/>
             </xs:complexType>
             <xs:element name="Metadata" type="tns:MetadataType"/>
             <xs:complexType mixed="false" name="MetadataType">
                 <xs:sequence>
-                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" 
-                        processContents="lax"/>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/>
                 </xs:sequence>
                 <xs:anyAttribute namespace="##other" processContents="lax"/>
             </xs:complexType>
@@ -63,8 +48,7 @@
             <xs:complexType mixed="false" name="RelatesToType">
                 <xs:simpleContent>
                     <xs:extension base="xs:anyURI">
-                        <xs:attribute name="RelationshipType" 
-                            type="tns:RelationshipTypeOpenEnum" use="optional"/>
+                        <xs:attribute name="RelationshipType" type="tns:RelationshipTypeOpenEnum" use="optional"/>
                         <xs:anyAttribute namespace="##other" processContents="lax"/>
                     </xs:extension>
                 </xs:simpleContent>
@@ -127,8 +111,7 @@
             <xs:element name="ProblemHeader" type="tns:AttributedAnyType"/>
             <xs:complexType mixed="false" name="AttributedAnyType">
                 <xs:sequence>
-                    <xs:any maxOccurs="1" minOccurs="1" namespace="##any" 
-                        processContents="lax"/>
+                    <xs:any maxOccurs="1" minOccurs="1" namespace="##any" processContents="lax"/>
                 </xs:sequence>
                 <xs:anyAttribute namespace="##other" processContents="lax"/>
             </xs:complexType>
@@ -142,9 +125,7 @@
                 <xs:anyAttribute namespace="##other" processContents="lax"/>
             </xs:complexType>
         </xs:schema>
-        <xs:schema elementFormDefault="qualified" 
-            targetNamespace="http://apache.org/locator/query" 
-            xmlns:tns="http://apache.org/locator/query">
+        <xs:schema xmlns:tns="http://apache.org/locator/query" elementFormDefault="qualified" targetNamespace="http://apache.org/locator/query">
             <xs:simpleType name="FieldEnumeratedType">
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="GROUP"/>
@@ -161,15 +142,13 @@
             <xs:complexType name="FilterType">
                 <xs:simpleContent>
                     <xs:extension base="xs:string">
-                        <xs:attribute name="field" type="tns:FilterFieldType" 
-                            use="required"/>
+                        <xs:attribute name="field" type="tns:FilterFieldType" use="required"/>
                     </xs:extension>
                 </xs:simpleContent>
             </xs:complexType>
             <xs:complexType name="QuerySelectType">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="filter" 
-                        type="tns:FilterType"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="filter" type="tns:FilterType"/>
                     <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
                 </xs:sequence>
             </xs:complexType>
@@ -191,13 +170,12 @@
                 <xs:sequence>
                     <xs:element name="node_id" type="xs:string"/>
                     <xs:element name="service_qname" type="xs:QName"/>
-                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" 
-                        processContents="lax"/>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:element name="registerPeerManager">
                 <xs:annotation>
-                    <xs:documentation>Input message element for &quot;registerPeerManager&quot; operation.</xs:documentation>
+                    <xs:documentation>Input message element for "registerPeerManager" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
@@ -207,19 +185,18 @@
             </xs:element>
             <xs:element name="registerPeerManagerResponse">
                 <xs:annotation>
-                    <xs:documentation>Output message element for &quot;registerPeerManager&quot; operation.</xs:documentation>
+                    <xs:documentation>Output message element for "registerPeerManager" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="peer_manager_reference" 
-                            type="wsa:EndpointReferenceType"/>
+                        <xs:element name="peer_manager_reference" type="wsa:EndpointReferenceType"/>
                         <xs:element name="node_id" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="deregisterPeerManager">
                 <xs:annotation>
-                    <xs:documentation>Input message element for &quot;deregisterPeerManager&quot; operation.</xs:documentation>
+                    <xs:documentation>Input message element for "deregisterPeerManager" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
@@ -230,33 +207,31 @@
             <xs:element name="deregisterPeerManagerResponse" type="tns:EmptyMessage"/>
             <xs:element name="registerEndpoint">
                 <xs:annotation>
-                    <xs:documentation>Input message element for &quot;registerEndpoint&quot; operation.</xs:documentation>
+                    <xs:documentation>Input message element for "registerEndpoint" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="endpoint_id" type="tns:EndpointIdentity"/>
-                        <xs:element name="endpoint_reference" 
-                            type="wsa:EndpointReferenceType"/>
+                        <xs:element name="endpoint_reference" type="wsa:EndpointReferenceType"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="registerEndpointResponse" type="tns:EmptyMessage"/>
             <xs:element name="deregisterEndpoint">
                 <xs:annotation>
-                    <xs:documentation>Input message element for &quot;deregisterEndpoint&quot; operation.</xs:documentation>
+                    <xs:documentation>Input message element for "deregisterEndpoint" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="endpoint_id" type="tns:EndpointIdentity"/>
-                        <xs:element name="endpoint_reference" 
-                            type="wsa:EndpointReferenceType"/>
+                        <xs:element name="endpoint_reference" type="wsa:EndpointReferenceType"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="deregisterEndpointResponse" type="tns:EmptyMessage"/>
             <xs:element name="lookupEndpoint">
                 <xs:annotation>
-                    <xs:documentation>Input message element for &quot;lookupEndpoint&quot; operation.</xs:documentation>
+                    <xs:documentation>Input message element for "lookupEndpoint" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
@@ -266,29 +241,26 @@
             </xs:element>
             <xs:element name="lookupEndpointResponse">
                 <xs:annotation>
-                    <xs:documentation>Output message element for &quot;lookupEndpoint&quot; operation.</xs:documentation>
+                    <xs:documentation>Output message element for "lookupEndpoint" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="service_endpoint" 
-                            type="wsa:EndpointReferenceType"/>
+                        <xs:element name="service_endpoint" type="wsa:EndpointReferenceType"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="listEndpoints" type="tns:EmptyMessage"/>
             <xs:element name="listEndpointsResponse">
                 <xs:annotation>
-                    <xs:documentation>Output message element for &quot;listEndpoints&quot; operation.</xs:documentation>
+                    <xs:documentation>Output message element for "listEndpoints" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="endpoint">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="endpoint_id" 
-                                        type="tns:EndpointIdentity"/>
-                                    <xs:element name="endpoint_reference" 
-                                        type="wsa:EndpointReferenceType"/>
+                                    <xs:element name="endpoint_id" type="tns:EndpointIdentity"/>
+                                    <xs:element name="endpoint_reference" type="wsa:EndpointReferenceType"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -297,7 +269,7 @@
             </xs:element>
             <xs:element name="queryEndpoints">
                 <xs:annotation>
-                    <xs:documentation>Input message element for &quot;queryEndpoints&quot; operation.</xs:documentation>
+                    <xs:documentation>Input message element for "queryEndpoints" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
@@ -307,17 +279,15 @@
             </xs:element>
             <xs:element name="queryEndpointsResponse">
                 <xs:annotation>
-                    <xs:documentation>Output message element for &quot;queryEndpoints&quot; operation.</xs:documentation>
+                    <xs:documentation>Output message element for "queryEndpoints" operation.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="endpoint">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="endpoint_id" 
-                                        type="tns:EndpointIdentity"/>
-                                    <xs:element name="endpoint_reference" 
-                                        type="wsa:EndpointReferenceType"/>
+                                    <xs:element name="endpoint_id" type="tns:EndpointIdentity"/>
+                                    <xs:element name="endpoint_reference" type="wsa:EndpointReferenceType"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -332,8 +302,7 @@
                     <xs:element name="error" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
-            <xs:element name="EndpointNotExistFault" 
-                type="tns:EndpointNotExistFaultException"/>
+            <xs:element name="EndpointNotExistFault" type="tns:EndpointNotExistFaultException"/>
         </xs:schema>
     </types>
     <message name="registerPeerManagerInput">
@@ -401,7 +370,7 @@
         <operation name="registerEndpoint">
             <xs:documentation>
         Register an endpoint to become available in the locator.  Once registered, an  
-        endpoint will be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints&quot; operations.
+        endpoint will be returned in response to the "list_endpoints" and "query_endpoints" operations.
       </xs:documentation>
             <input message="ls:registerEndpointInput"/>
             <output message="ls:registerEndpointOutput"/>
@@ -409,7 +378,7 @@
         <operation name="deregisterEndpoint">
             <xs:documentation>
         Deregister an endpoint from the locator. Once deregistered an endpoint will
-        no longer be returned in response to the &quot;list_endpoints&quot; and &quot;query_endpoints operations.
+        no longer be returned in response to the "list_endpoints" and "query_endpoints operations.
       </xs:documentation>
             <input message="ls:deregisterEndpointInput"/>
             <output message="ls:deregisterEndpointOutput"/>

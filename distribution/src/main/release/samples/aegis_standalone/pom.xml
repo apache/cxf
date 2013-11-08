@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>aegis-standalone</artifactId>
     <name>CXF sample using the Aegis Binding without any webservice</name>
     <description>CXF sample using the Aegis Binding without any webservice</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

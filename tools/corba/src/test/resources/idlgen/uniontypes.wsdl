@@ -17,28 +17,14 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="multipart.idl" 
-    targetNamespace="http://schemas.apache.org/idl/multipart.idl" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:corba="http://cxf.apache.org/bindings/corba" 
-    xmlns:corbatm="http://cxf.apache.org/bindings/corba/typemap" 
-    xmlns:ns1="http://schemas.apache.org/idl/multipart.idl/corba/typemap/" 
-    xmlns:tns="http://schemas.apache.org/idl/multipart.idl" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl">
-    <corba:typeMapping 
-        targetNamespace="http://schemas.apache.org/idl/multipart.idl/corba/typemap/">
-        <corba:enum name="Test.MultiPart.Colour" 
-            repositoryID="IDL:Test/MultiPart/Colour:1.0" 
-            type="xsd1:Test.MultiPart.Colour">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:corbatm="http://cxf.apache.org/bindings/corba/typemap" xmlns:ns1="http://schemas.apache.org/idl/multipart.idl/corba/typemap/" xmlns:tns="http://schemas.apache.org/idl/multipart.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl" name="multipart.idl" targetNamespace="http://schemas.apache.org/idl/multipart.idl">
+    <corba:typeMapping targetNamespace="http://schemas.apache.org/idl/multipart.idl/corba/typemap/">
+        <corba:enum name="Test.MultiPart.Colour" repositoryID="IDL:Test/MultiPart/Colour:1.0" type="xsd1:Test.MultiPart.Colour">
             <corba:enumerator value="RED"/>
             <corba:enumerator value="GREEN"/>
             <corba:enumerator value="BLUE"/>
         </corba:enum>
-        <corba:union discriminator="ns1:Test.MultiPart.Colour" 
-            name="Test.MultiPart.Description" 
-            repositoryID="IDL:Test/MultiPart/Description:1.0" 
-            type="xsd1:Test.MultiPart.Description">
+        <corba:union discriminator="ns1:Test.MultiPart.Colour" name="Test.MultiPart.Description" repositoryID="IDL:Test/MultiPart/Description:1.0" type="xsd1:Test.MultiPart.Description">
             <corba:unionbranch idltype="corba:string" name="x">
                 <corba:case label="RED"/>
             </corba:unionbranch>
@@ -51,9 +37,7 @@
         </corba:union>
     </corba:typeMapping>
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/multipart.idl" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/multipart.idl">
             <simpleType name="Test.MultiPart.Colour">
                 <restriction base="string">
                     <enumeration value="RED"/>
@@ -63,8 +47,7 @@
             </simpleType>
             <complexType name="Test.MultiPart.Description">
                 <sequence>
-                    <element maxOccurs="1" minOccurs="1" name="discriminator" 
-                        type="xsd1:Test.MultiPart.Colour"/>
+                    <element maxOccurs="1" minOccurs="1" name="discriminator" type="xsd1:Test.MultiPart.Colour"/>
                     <choice>
                         <element name="x" type="string"/>
                         <element name="y" type="int"/>
@@ -75,16 +58,11 @@
             <element name="Test.MultiPart.test_enum.x" type="xsd1:Test.MultiPart.Colour"/>
             <element name="Test.MultiPart.test_enum.y" type="xsd1:Test.MultiPart.Colour"/>
             <element name="Test.MultiPart.test_enum.z" type="xsd1:Test.MultiPart.Colour"/>
-            <element name="Test.MultiPart.test_enum.return" 
-                type="xsd1:Test.MultiPart.Colour"/>
-            <element name="Test.MultiPart.test_union.x" 
-                type="xsd1:Test.MultiPart.Description"/>
-            <element name="Test.MultiPart.test_union.y" 
-                type="xsd1:Test.MultiPart.Description"/>
-            <element name="Test.MultiPart.test_union.z" 
-                type="xsd1:Test.MultiPart.Description"/>
-            <element name="Test.MultiPart.test_union.return" 
-                type="xsd1:Test.MultiPart.Description"/>
+            <element name="Test.MultiPart.test_enum.return" type="xsd1:Test.MultiPart.Colour"/>
+            <element name="Test.MultiPart.test_union.x" type="xsd1:Test.MultiPart.Description"/>
+            <element name="Test.MultiPart.test_union.y" type="xsd1:Test.MultiPart.Description"/>
+            <element name="Test.MultiPart.test_union.z" type="xsd1:Test.MultiPart.Description"/>
+            <element name="Test.MultiPart.test_union.return" type="xsd1:Test.MultiPart.Description"/>
         </schema>
     </types>
     <message name="Test.MultiPart.test_union">
@@ -99,8 +77,7 @@
     <portType name="Test.MultiPart">
         <operation name="test_union">
             <input message="tns:Test.MultiPart.test_union" name="test_union"/>
-            <output message="tns:Test.MultiPart.test_unionResponse" 
-                name="test_unionResponse"/>
+            <output message="tns:Test.MultiPart.test_unionResponse" name="test_unionResponse"/>
         </operation>
     </portType>
     <binding name="Test.MultiPartCORBABinding" type="tns:Test.MultiPart">
@@ -108,13 +85,12 @@
         <operation name="test_union">
             <corba:operation name="test_union">
                 <corba:param idltype="ns1:Test.MultiPart.Description" mode="in" name="x"/>
-                <corba:param idltype="ns1:Test.MultiPart.Description" mode="inout" 
-                    name="y"/>
+                <corba:param idltype="ns1:Test.MultiPart.Description" mode="inout" name="y"/>
                 <corba:param idltype="ns1:Test.MultiPart.Description" mode="out" name="z"/>
                 <corba:return idltype="ns1:Test.MultiPart.Description" name="return"/>
             </corba:operation>
             <input name="test_union"/>
             <output name="test_unionResponse"/>
         </operation>
-    </binding>    
+    </binding>
 </definitions>

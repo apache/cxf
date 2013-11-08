@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -18,25 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions
-    name="BaseService"
-    targetNamespace="http://schemas.apache.org/tests"
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:tns="http://schemas.apache.org/tests"
-    xmlns:xsd1="http://schemas.apache.org/tests"
-    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"     
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/tests" xmlns:xsd1="http://schemas.apache.org/tests" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BaseService" targetNamespace="http://schemas.apache.org/tests">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/tests" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-	    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">	   
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/tests">
             <simpleType name="StringEnum1">
                 <restriction base="xsd:string">
                     <enumeration value="RED"/>
-                    <enumeration value="BLUE" />
+                    <enumeration value="BLUE"/>
                 </restriction>
             </simpleType>
             <simpleType name="StringList">
@@ -48,25 +35,21 @@
                         <restriction base="xsd:string"/>
                     </simpleType>
                 </list>
-            </simpleType>            
-
+            </simpleType>
         </schema>
     </types>
-
     <message name="echoString">
         <part name="x" type="xsd1:StringEnum1"/>
         <part name="y" type="xsd1:StringList"/>
-        <part name="z" type="xsd1:AnonList"/>        
+        <part name="z" type="xsd1:AnonList"/>
     </message>
     <message name="echoStringResponse">
         <part name="return" type="xsd:string"/>
     </message>
-    
     <portType name="BasePortType">
         <operation name="echoString">
             <input message="tns:echoString" name="echoString"/>
             <output message="tns:echoStringResponse" name="echoStringResponse"/>
         </operation>
     </portType>
-       
 </definitions>

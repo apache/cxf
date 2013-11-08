@@ -17,19 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"      
-      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
-  
-  <bean id="greeterServerFactory"
-    class="org.apache.cxf.js.rhino.JsServiceFactoryBean" init-method="create">
-    <property name="js" value="/org/apache/cxf/systest/servlet/hello_world.js" />
-    <property name="isBaseAddr" value="false" />     
-    <property name="address" value="/Greeter"/>
-    <property name="bus" ref="cxf"/>    
-  </bean>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean id="greeterServerFactory" class="org.apache.cxf.js.rhino.JsServiceFactoryBean" init-method="create">
+        <property name="js" value="/org/apache/cxf/systest/servlet/hello_world.js"/>
+        <property name="isBaseAddr" value="false"/>
+        <property name="address" value="/Greeter"/>
+        <property name="bus" ref="cxf"/>
+    </bean>
 </beans>

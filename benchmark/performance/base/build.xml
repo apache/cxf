@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,20 +19,19 @@
 -->
 <project name="cxf-performance-testcase-base" default="base.compile" basedir=".">
     <import file="../etc/common_build.xml"/>
-    <property name="jar.name"  value="performance_base.jar"/>
+    <property name="jar.name" value="performance_base.jar"/>
     <target name="init">
         <mkdir dir="${basedir}/build/classes"/>
     </target>
     <target name="base.compile" depends="init">
-        <javac srcdir="${basedir}/src/main/java/" destdir="${basedir}/build/classes"
-           debug="true">
+        <javac srcdir="${basedir}/src/main/java/" destdir="${basedir}/build/classes" debug="true">
             <classpath refid="cxf.classpath"/>
         </javac>
     </target>
     <target name="base.deploy" depends="compile">
-        <jar destfile="${jar.name}" >
+        <jar destfile="${jar.name}">
             <fileset dir="${build.classes.dir}">
-                <include name="**/*.class" />
+                <include name="**/*.class"/>
             </fileset>
         </jar>
     </target>
@@ -39,4 +39,3 @@
         <delete dir="${basedir}/build"/>
     </target>
 </project>
-

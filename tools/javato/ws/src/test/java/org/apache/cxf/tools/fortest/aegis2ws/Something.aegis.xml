@@ -1,5 +1,6 @@
+<?xml version="1.0"?>
 <mappings xmlns:smt="urn:something">
-	<mapping name="smt:Something">
-    	<property name='singular' mappedName='smt:singular' minOccurs='1' nillable='true' />
-	</mapping>
+    <mapping name="smt:Something">
+        <property name="singular" mappedName="smt:singular" minOccurs="1" nillable="true"/>
+    </mapping>
 </mappings>

@@ -17,33 +17,33 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/OptionsPT" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/OptionsPT" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd1="http://cxf.apache.org/bindings/corba/idl/OptionsPT-types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap">
-    <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT-types" repositoryID="IDL:foo/bar/Employee:1.0" type="foo.bar.Employee" name="foo.bar.Employee">
-      <corba:member name="name" idltype="corba:string" />
-      <corba:member name="number" idltype="corba:long" />
-    </corba:struct>
-  </corba:typeMapping>
-  <wsdl:import namespace="http://cxf.apache.org/bindings/corba/idl/OptionsPT" location="@LOCATION@">
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/bindings/corba/idl/OptionsPT" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd1="http://cxf.apache.org/bindings/corba/idl/OptionsPT-types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/OptionsPT">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap">
+        <corba:struct xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT-types" repositoryID="IDL:foo/bar/Employee:1.0" type="foo.bar.Employee" name="foo.bar.Employee">
+            <corba:member name="name" idltype="corba:string"/>
+            <corba:member name="number" idltype="corba:long"/>
+        </corba:struct>
+    </corba:typeMapping>
+    <wsdl:import namespace="http://cxf.apache.org/bindings/corba/idl/OptionsPT" location="@LOCATION@">
     </wsdl:import>
-  <wsdl:binding name="foo.barCORBABinding" type="tns:foo.bar">
-    <corba:binding repositoryID="IDL:foo/bar:1.0" />
-    <wsdl:operation name="getEmployee">
-      <corba:operation name="getEmployee">
-        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" mode="in" name="inEmp" idltype="foo.bar.Employee" />
-        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" mode="out" name="outEmp" idltype="foo.bar.Employee" />
-        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" mode="inout" name="inoutEmp" idltype="foo.bar.Employee" />
-        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" name="return" idltype="foo.bar.Employee" />
-      </corba:operation>
-      <wsdl:input name="getEmployeeRequest">
+    <wsdl:binding name="foo.barCORBABinding" type="tns:foo.bar">
+        <corba:binding repositoryID="IDL:foo/bar:1.0"/>
+        <wsdl:operation name="getEmployee">
+            <corba:operation name="getEmployee">
+                <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" mode="in" name="inEmp" idltype="foo.bar.Employee"/>
+                <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" mode="out" name="outEmp" idltype="foo.bar.Employee"/>
+                <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" mode="inout" name="inoutEmp" idltype="foo.bar.Employee"/>
+                <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/OptionsPT/typemap" name="return" idltype="foo.bar.Employee"/>
+            </corba:operation>
+            <wsdl:input name="getEmployeeRequest">
       </wsdl:input>
-      <wsdl:output name="getEmployeeResponse">
+            <wsdl:output name="getEmployeeResponse">
       </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="foo.barCORBAService">
-    <wsdl:port name="foo.barCORBAPort" binding="tns:foo.barCORBABinding">
-      <corba:address location="IOR:" />
-    </wsdl:port>
-  </wsdl:service>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="foo.barCORBAService">
+        <wsdl:port name="foo.barCORBAPort" binding="tns:foo.barCORBABinding">
+            <corba:address location="IOR:"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

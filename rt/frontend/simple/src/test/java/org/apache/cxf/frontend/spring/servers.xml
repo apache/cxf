@@ -17,83 +17,46 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:simple="http://cxf.apache.org/simple"
-      xmlns:soap="http://cxf.apache.org/bindings/soap"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
-http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" 
-    lazy-init="false">
-      <property name="transportIds">
-          <list>
-              <value>http://cxf.apache.org/transports/local</value>
-              <value>http://cxf.apache.org/transports/http</value>
-              <value>http://schemas.xmlsoap.org/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-          </list>
-      </property>
-  </bean>
-
-  <simple:server id="simple" serviceBean="#greeter"/>
-
-  <bean id="greeter" class="org.apache.cxf.service.factory.HelloServiceImpl"/>
-
-  <simple:server id="simpleWithAddress"
-    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"/>
-
-  <simple:server id="simpleWithWSDL"
-    serviceBean="#greeter"
-    wsdlLocation="org/apache/cxf/frontend/spring/simple.wsdl"
-    address="http://localhost:8080/simpleWithWSDL"/>
-
-  <simple:server id="simpleWithBindingId"
-    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"
-    bindingId="http://cxf.apache.org/bindings/xformat"/>
-
-  <simple:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress">
-    <simple:serviceBean>
-      <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
-    </simple:serviceBean>
-  </simple:server>
-
-  <simple:server id="inlineInvoker"
-    serviceClass="org.apache.cxf.service.factory.HelloServiceImpl"
-    address="http://localhost:8080/simpleWithAddress">
-    <simple:invoker>
-      <bean class="org.apache.cxf.service.invoker.BeanInvoker">
-        <constructor-arg>
-          <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
-        </constructor-arg>
-      </bean>
-    </simple:invoker>
-
-  </simple:server>
-
-  <simple:server id="inlineSoapBinding"
-    serviceClass="org.apache.cxf.service.factory.HelloService"
-    serviceBean="#greeter"
-    address="http://localhost:8080/test"
-    serviceName="t:HelloService"
-    xmlns:t="http://apache.org/hello_world_soap_http"
-    endpointName="t:HelloPort"
-    >
-    <simple:binding>
-      <soap:soapBinding mtomEnabled="true" version="1.2"/>
-    </simple:binding>
-  </simple:server>
-  
-  <simple:server id="proxyBean" 
-    serviceClass="org.apache.cxf.service.factory.HelloService"
-    address="http://localhost:8080/proxyBean" >
-    <simple:serviceBean>
-      <bean class="org.apache.cxf.service.factory.HelloServiceProxyFactory"/> 
-    </simple:serviceBean>
-  </simple:server>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:simple="http://cxf.apache.org/simple" xmlns:soap="http://cxf.apache.org/bindings/soap" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+        <property name="transportIds">
+            <list>
+                <value>http://cxf.apache.org/transports/local</value>
+                <value>http://cxf.apache.org/transports/http</value>
+                <value>http://schemas.xmlsoap.org/soap/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
+            </list>
+        </property>
+    </bean>
+    <simple:server id="simple" serviceBean="#greeter"/>
+    <bean id="greeter" class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+    <simple:server id="simpleWithAddress" serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress"/>
+    <simple:server id="simpleWithWSDL" serviceBean="#greeter" wsdlLocation="org/apache/cxf/frontend/spring/simple.wsdl" address="http://localhost:8080/simpleWithWSDL"/>
+    <simple:server id="simpleWithBindingId" serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress" bindingId="http://cxf.apache.org/bindings/xformat"/>
+    <simple:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress">
+        <simple:serviceBean>
+            <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+        </simple:serviceBean>
+    </simple:server>
+    <simple:server id="inlineInvoker" serviceClass="org.apache.cxf.service.factory.HelloServiceImpl" address="http://localhost:8080/simpleWithAddress">
+        <simple:invoker>
+            <bean class="org.apache.cxf.service.invoker.BeanInvoker">
+                <constructor-arg>
+                    <bean class="org.apache.cxf.service.factory.HelloServiceImpl"/>
+                </constructor-arg>
+            </bean>
+        </simple:invoker>
+    </simple:server>
+    <simple:server xmlns:t="http://apache.org/hello_world_soap_http" id="inlineSoapBinding" serviceClass="org.apache.cxf.service.factory.HelloService" serviceBean="#greeter" address="http://localhost:8080/test" serviceName="t:HelloService" endpointName="t:HelloPort">
+        <simple:binding>
+            <soap:soapBinding mtomEnabled="true" version="1.2"/>
+        </simple:binding>
+    </simple:server>
+    <simple:server id="proxyBean" serviceClass="org.apache.cxf.service.factory.HelloService" address="http://localhost:8080/proxyBean">
+        <simple:serviceBean>
+            <bean class="org.apache.cxf.service.factory.HelloServiceProxyFactory"/>
+        </simple:serviceBean>
+    </simple:server>
 </beans>

@@ -1,16 +1,5 @@
+<?xml version="1.0"?>
 <ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true">
-
     <diskStore path="java.io.tmpdir"/>
-
-    <defaultCache
-            maxEntriesLocalHeap="5000"
-            eternal="false"
-            timeToIdleSeconds="3600"
-            timeToLiveSeconds="3600"
-            overflowToDisk="true"
-            maxElementsOnDisk="10000000"
-            diskPersistent="false"
-            diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU"
-            />
+    <defaultCache maxEntriesLocalHeap="5000" eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600" overflowToDisk="true" maxElementsOnDisk="10000000" diskPersistent="false" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU"/>
 </ehcache>

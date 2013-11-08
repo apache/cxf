@@ -1,6 +1,7 @@
+<?xml version="1.0"?>
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Header/>
- <env:Body>
-  <getDTO xmlns="http://dto.java5.type.aegis.cxf.apache.org"/>
- </env:Body>
+    <env:Header/>
+    <env:Body>
+        <getDTO xmlns="http://dto.java5.type.aegis.cxf.apache.org"/>
+    </env:Body>
 </env:Envelope>

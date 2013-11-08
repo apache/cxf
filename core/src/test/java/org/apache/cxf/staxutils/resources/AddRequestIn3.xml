@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,9 +18,15 @@
   under the License.
 -->
 <payload>
-  <params>
-    <param><i1>1</i1></param>
-    <param><i2>2</i2></param>
-    <param><i3 a3="v3">3</i3></param>
-  </params>
+    <params>
+        <param>
+            <i1>1</i1>
+        </param>
+        <param>
+            <i2>2</i2>
+        </param>
+        <param>
+            <i3 a3="v3">3</i3>
+        </param>
+    </params>
 </payload>

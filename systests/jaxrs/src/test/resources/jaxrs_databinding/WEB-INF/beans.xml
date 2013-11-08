@@ -24,89 +24,65 @@
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:util="http://www.springframework.org/schema/util"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:cxf="http://cxf.apache.org/core"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd
-http://cxf.apache.org/core
-http://cxf.apache.org/schemas/core.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
-  <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
-  
-  <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource" id="sdoBean"/>
-  <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource2" id="sdoBean2"/>
-  
-  <jaxrs:server id="jaxbbook" address="/jaxb">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:dataBinding> 
-      <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
-    </jaxrs:dataBinding> 
-  </jaxrs:server>
-  <jaxrs:server id="jibx" address="/jibx">
-    <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.jibx.JibxResource" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:dataBinding> 
-      <bean class="org.apache.cxf.jibx.JibxDataBinding"/>
-    </jaxrs:dataBinding> 
-  </jaxrs:server>
-  
-  <jaxrs:server id="aegisbook" address="/aegis">
-    <jaxrs:serviceBeans>
-      <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:dataBinding> 
-      <bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-          <property name="aegisContext">
-              <bean class="org.apache.cxf.aegis.AegisContext">
-                  <property name="writeXsiTypes" value="true"/>
-              </bean>
-          </property>    
-        </bean> 
-    </jaxrs:dataBinding> 
-  </jaxrs:server>
-  
-  
-  <jaxrs:server id="sdo" address="/sdo">
-    <jaxrs:serviceBeans>
-      <ref bean="sdoBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:dataBinding> 
-      <ref bean="sdoDatabinding"/>
-    </jaxrs:dataBinding> 
-    <jaxrs:providers>
-      <ref bean="jsonSdoBean" />
-    </jaxrs:providers>
-  </jaxrs:server>
-
-  <jaxrs:server id="sdo2" address="/sdo2">
-    <jaxrs:serviceBeans>
-      <ref bean="sdoBean2" />
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-
-  <bean id="sdoDatabinding" class="org.apache.cxf.sdo.SDODataBinding"/>
-  <bean id="jsonSdoBean" class="org.apache.cxf.jaxrs.provider.json.DataBindingJSONProvider">
-      <property name="dataBinding" ref="sdoDatabinding"/>
-      <property name="namespaceMap" ref="jsonNamespaceMap"/>
-  </bean>
-
-  <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
-       <entry key="http://apache.org/structure/types" value="p0"/>
-  </util:map>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
+    <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource" id="sdoBean"/>
+    <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource2" id="sdoBean2"/>
+    <jaxrs:server id="jaxbbook" address="/jaxb">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:dataBinding>
+            <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
+        </jaxrs:dataBinding>
+    </jaxrs:server>
+    <jaxrs:server id="jibx" address="/jibx">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.jibx.JibxResource"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:dataBinding>
+            <bean class="org.apache.cxf.jibx.JibxDataBinding"/>
+        </jaxrs:dataBinding>
+    </jaxrs:server>
+    <jaxrs:server id="aegisbook" address="/aegis">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:dataBinding>
+            <bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+                <property name="aegisContext">
+                    <bean class="org.apache.cxf.aegis.AegisContext">
+                        <property name="writeXsiTypes" value="true"/>
+                    </bean>
+                </property>
+            </bean>
+        </jaxrs:dataBinding>
+    </jaxrs:server>
+    <jaxrs:server id="sdo" address="/sdo">
+        <jaxrs:serviceBeans>
+            <ref bean="sdoBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:dataBinding>
+            <ref bean="sdoDatabinding"/>
+        </jaxrs:dataBinding>
+        <jaxrs:providers>
+            <ref bean="jsonSdoBean"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="sdo2" address="/sdo2">
+        <jaxrs:serviceBeans>
+            <ref bean="sdoBean2"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <bean id="sdoDatabinding" class="org.apache.cxf.sdo.SDODataBinding"/>
+    <bean id="jsonSdoBean" class="org.apache.cxf.jaxrs.provider.json.DataBindingJSONProvider">
+        <property name="dataBinding" ref="sdoDatabinding"/>
+        <property name="namespaceMap" ref="jsonNamespaceMap"/>
+    </bean>
+    <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
+        <entry key="http://apache.org/structure/types" value="p0"/>
+    </util:map>
 </beans>
 <!-- END SNIPPET: beans -->

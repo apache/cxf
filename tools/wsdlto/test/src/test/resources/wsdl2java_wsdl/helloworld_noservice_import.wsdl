@@ -17,23 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorldImport"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world/messages"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world">
-
-
-    <wsdl:import
-            namespace="http://cxf.apache.org/w2j/hello_world1"
-        location="./helloworld_noservice_imported1.wsdl"/>
-        
-    <wsdl:import
-	    namespace="http://cxf.apache.org/w2j/hello_world2"
-        location="./helloworld_noservice_imported2.wsdl"/>
-    
-   
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world" xmlns:x1="http://cxf.apache.org/w2j/hello_world/messages" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldImport" targetNamespace="http://cxf.apache.org/w2j/hello_world">
+    <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world1" location="./helloworld_noservice_imported1.wsdl"/>
+    <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world2" location="./helloworld_noservice_imported2.wsdl"/>
 </wsdl:definitions>

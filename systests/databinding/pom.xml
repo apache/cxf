@@ -30,13 +30,10 @@
     <name>Apache CXF Databinding System Tests</name>
     <description>Apache CXF Databinding System Tests</description>
     <url>http://cxf.apache.org</url>
-
-
     <properties>
         <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
         <doc.lit.bare.binding.file>doc_lit_bare.xml</doc.lit.bare.binding.file>
     </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -84,7 +81,6 @@
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
                             </defaultOptions>
-
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/hello_world.wsdl</wsdl>
@@ -221,12 +217,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-server</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
-          <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-webapp</artifactId>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -234,9 +230,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -273,7 +269,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -294,22 +289,20 @@
             <artifactId>${cxf.spring.mock}</artifactId>
             <version>${cxf.spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
-         </dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
         <dependency>
-             <groupId>org.apache.cxf</groupId>
-             <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-             <version>${project.version}</version>
-         </dependency>
-
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
@@ -320,13 +313,12 @@
             <artifactId>jettison</artifactId>
             <scope>test</scope>
         </dependency>
-       	<dependency>
-       		<groupId>commons-io</groupId>
-       		<artifactId>commons-io</artifactId>
-       		<version>2.0</version>
-       	    <scope>test</scope>
-       	</dependency>
-
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.jibx</groupId>
             <artifactId>jibx-bind</artifactId>
@@ -355,5 +347,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

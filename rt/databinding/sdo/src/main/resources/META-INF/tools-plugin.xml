@@ -17,8 +17,8 @@
     * specific language governing permissions and limitations
     * under the License.
 -->
-<plugin name="sdo" version="" provider="tuscany.apache.org" xmlns="http://cxf.apache.org/tools/plugin">
-    <databinding name="sdo" package="org.apache.cxf.sdo.tools" profile="SDODatabinding" />
-    <databinding name="sdo-dynamic" package="org.apache.cxf.sdo.tools" profile="SDODatabinding" />
-    <databinding name="sdo-static" package="org.apache.cxf.sdo.tools" profile="SDODatabinding" />
+<plugin xmlns="http://cxf.apache.org/tools/plugin" name="sdo" version="" provider="tuscany.apache.org">
+    <databinding name="sdo" package="org.apache.cxf.sdo.tools" profile="SDODatabinding"/>
+    <databinding name="sdo-dynamic" package="org.apache.cxf.sdo.tools" profile="SDODatabinding"/>
+    <databinding name="sdo-static" package="org.apache.cxf.sdo.tools" profile="SDODatabinding"/>
 </plugin>

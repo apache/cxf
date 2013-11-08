@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,8 +18,8 @@
   under the License.
 -->
 <payload>
-  <add xmlns="http://apache.org/cxf/calculator/types">
-    <arg0>1</arg0>
-    <arg1>2</arg1>
-  </add>
+    <add xmlns="http://apache.org/cxf/calculator/types">
+        <arg0>1</arg0>
+        <arg1>2</arg1>
+    </add>
 </payload>

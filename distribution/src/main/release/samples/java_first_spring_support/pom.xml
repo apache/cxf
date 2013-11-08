@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -22,7 +23,6 @@
     <name>Spring HTTP Sample</name>
     <description>Spring HTTP Sample</description>
     <packaging>war</packaging>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

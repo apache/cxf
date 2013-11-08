@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -17,15 +18,14 @@
     under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
- <soap:Body>
-  <soap:Fault>
-   <faultcode>soap:Server</faultcode>
-   <faultstring>This is a fault string</faultstring>
-   <detail>
-    <errorcode>3</errorcode>
-    <errorstring>This is a fault detail error string</errorstring>
-   </detail>
-  </soap:Fault>
- </soap:Body>
+    <soap:Body>
+        <soap:Fault>
+            <faultcode>soap:Server</faultcode>
+            <faultstring>This is a fault string</faultstring>
+            <detail>
+                <errorcode>3</errorcode>
+                <errorstring>This is a fault detail error string</errorstring>
+            </detail>
+        </soap:Fault>
+    </soap:Body>
 </soap:Envelope>
-

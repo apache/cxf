@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>wsdl_first_pure_xml</artifactId>
     <name>WSDL first demo using BARE Style in XML Binding (pure XML over HTTP)</name>
     <description>WSDL first demo using BARE Style in XML Binding (pure XML over HTTP)</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

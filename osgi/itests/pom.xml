@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <!--
 
         Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,28 +17,23 @@
         See the License for the specific language governing permissions and
         limitations under the License.
     -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>2.6.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
-
     <groupId>org.apache.cxf.osgi.itests</groupId>
     <artifactId>org.apache.cxf.osgi.itests</artifactId>
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
-
     <properties>
         <pax.exam.version>2.3.0.M1</pax.exam.version>
         <pax.exam.karaf.version>0.4.0</pax.exam.karaf.version>
         <pax.url.version>1.2.8</pax.url.version>
         <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
@@ -74,15 +68,12 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <!-- generate dependencies versions -->
@@ -99,7 +90,7 @@
                         <phase>compile</phase>
                     </execution>
                 </executions>
-            </plugin> 
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -125,5 +116,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

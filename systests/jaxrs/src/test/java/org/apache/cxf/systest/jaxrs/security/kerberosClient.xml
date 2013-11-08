@@ -17,31 +17,19 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
-        ">
-
-	<!-- -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+    <!-- -->
     <!-- HTTP/S configuration for proxy clients -->
     <!-- -->
     <http:conduit name="{http://jaxrs.systest.cxf.apache.org/}BookStore.http-conduit">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:authorization>
-          <sec:UserName>alice</sec:UserName>
-          <sec:Password>alice</sec:Password>
-          <sec:AuthorizationType>Negotiate</sec:AuthorizationType>
-          <sec:Authorization>KerberosClient</sec:Authorization>
+            <sec:UserName>alice</sec:UserName>
+            <sec:Password>alice</sec:Password>
+            <sec:AuthorizationType>Negotiate</sec:AuthorizationType>
+            <sec:Authorization>KerberosClient</sec:Authorization>
         </http:authorization>
     </http:conduit>
-    
     <!-- -->
     <!-- HTTP/S configuration for web clients -->
     <!--

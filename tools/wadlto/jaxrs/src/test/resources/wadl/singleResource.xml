@@ -18,34 +18,32 @@
   under the License.
 -->
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
-
- <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore/{id}">
-     <param name="theid" style="template" type="xs:string">
-       <option value="one"/>
-       <option value="two"/>
-     </param>
-     <method name="GET">
-      <request/>
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-    <resource path="/books">
-       <method name="GET">
-	      <response status="200 201">
-	       <representation mediaType="text/plain">
-	        <param name="result" style="plain" type="xs:string"/>
-	       </representation>
-	      </response>
-	      <response status="400">
-	        <representation mediaType="application/json"/>
-	      </response>
-	   </method>
-     </resource>
-    
-   </resource>
- </resources>  
+    <resources base="http://localhost:8080/baz">
+        <resource path="/bookstore/{id}">
+            <param name="theid" style="template" type="xs:string">
+                <option value="one"/>
+                <option value="two"/>
+            </param>
+            <method name="GET">
+                <request/>
+                <response>
+                    <representation mediaType="text/plain">
+                        <param name="result" style="plain" type="xs:string"/>
+                    </representation>
+                </response>
+            </method>
+            <resource path="/books">
+                <method name="GET">
+                    <response status="200 201">
+                        <representation mediaType="text/plain">
+                            <param name="result" style="plain" type="xs:string"/>
+                        </representation>
+                    </response>
+                    <response status="400">
+                        <representation mediaType="application/json"/>
+                    </response>
+                </method>
+            </resource>
+        </resource>
+    </resources>
 </application>

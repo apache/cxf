@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,10 +18,10 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <StringDefaultInputElem xmlns="http://cxf.apache.org/wsdl-first/types">foo</StringDefaultInputElem>
-    <IntParamInElem xmlns="http://cxf.apache.org/wsdl-first/types">0</IntParamInElem>
-    <IntParamInElem2 xmlns="http://cxf.apache.org/wsdl-first/types">0</IntParamInElem2>
-    <IntParamInElem3 xmlns="http://cxf.apache.org/wsdl-first/types">0</IntParamInElem3>
-  </soap:Body>
+    <soap:Body>
+        <StringDefaultInputElem xmlns="http://cxf.apache.org/wsdl-first/types">foo</StringDefaultInputElem>
+        <IntParamInElem xmlns="http://cxf.apache.org/wsdl-first/types">0</IntParamInElem>
+        <IntParamInElem2 xmlns="http://cxf.apache.org/wsdl-first/types">0</IntParamInElem2>
+        <IntParamInElem3 xmlns="http://cxf.apache.org/wsdl-first/types">0</IntParamInElem3>
+    </soap:Body>
 </soap:Envelope>

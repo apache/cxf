@@ -17,15 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http/import"
-    xmlns:x0="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/import" name="HelloWorldImport">
-    
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http/import" xmlns:x0="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/import" name="HelloWorldImport">
     <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http" location="hello_world_recursive.wsdl"/>
-    
     <wsdl:binding name="Greeter_SOAPBinding" type="x0:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="sayHi">
@@ -86,6 +79,4 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-    
 </wsdl:definitions>
-

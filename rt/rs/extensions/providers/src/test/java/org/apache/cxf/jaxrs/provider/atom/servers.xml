@@ -17,75 +17,53 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:util="http://www.springframework.org/schema/util"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util.xsd">
-
-  <bean id="atom" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
-    <property name="atomWriters" ref="atomWriters"/>
-    <property name="atomBuilders" ref="atomBuilders"/>
-  </bean>
-  
-  <bean id="atomNoJaxb" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
-    <property name="atomWriters" ref="atomWriters"/>
-    <property name="atomBuilders" ref="atomBuilders"/>
-    <property name="useJaxbForContent" value="false"/>
-    <property name="entryContentMethodName" value="getXMLContent"/>
-  </bean>
-  
-  <bean id="atom2" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
-    <property name="atomWriters" ref="atomWriters2"/>
-    <property name="atomBuilders" ref="atomBuilders2"/>
-  </bean>
-  
-  <bean id="atom3" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
-    <property name="atomWriters" ref="atomWriters2"/>
-    <property name="atomReaders" ref="atomReaders2"/>
-  </bean>
-  
-  <bean id="atom4" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
-    <property name="atomWriters" ref="atomWriters"/>
-    <property name="atomReaders" ref="atomReaders"/>
-  </bean>
-  
-  <util:map id="atomWriters">
-     <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Books" value-ref="feedWriter"/>
-     <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="entryWriter"/>
-  </util:map>  
-  
-  <util:map id="atomWriters2">
-     <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="entryWriter"/>
-  </util:map>  
-  
-  <util:map id="atomReaders">
-     <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Books" value-ref="feedReader"/>
-  </util:map>
-  
-  <util:map id="atomReaders2">
-     <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="entryReader"/>
-  </util:map>
-  
-  <bean id="feedWriter" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomFeedWriter"/>
-  <bean id="entryWriter" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomEntryWriter"/>
-  <bean id="entryReader" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomEntryReader"/>
-  <bean id="feedReader" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomFeedReader"/>
-  
-  <util:map id="atomBuilders">
-    <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Books" value-ref="simpleFeedBuilder"/>
-    <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="simpleEntryBuilder"/>
-  </util:map>  
-  
-  <bean id="simpleFeedBuilder" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomFeedBuilder"/>
-  
-  <util:map id="atomBuilders2">
-    <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="simpleEntryBuilder"/>
-  </util:map>  
-  
-  <bean id="simpleEntryBuilder" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomEntryBuilder"/>
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd">
+    <bean id="atom" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
+        <property name="atomWriters" ref="atomWriters"/>
+        <property name="atomBuilders" ref="atomBuilders"/>
+    </bean>
+    <bean id="atomNoJaxb" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
+        <property name="atomWriters" ref="atomWriters"/>
+        <property name="atomBuilders" ref="atomBuilders"/>
+        <property name="useJaxbForContent" value="false"/>
+        <property name="entryContentMethodName" value="getXMLContent"/>
+    </bean>
+    <bean id="atom2" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
+        <property name="atomWriters" ref="atomWriters2"/>
+        <property name="atomBuilders" ref="atomBuilders2"/>
+    </bean>
+    <bean id="atom3" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
+        <property name="atomWriters" ref="atomWriters2"/>
+        <property name="atomReaders" ref="atomReaders2"/>
+    </bean>
+    <bean id="atom4" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
+        <property name="atomWriters" ref="atomWriters"/>
+        <property name="atomReaders" ref="atomReaders"/>
+    </bean>
+    <util:map id="atomWriters">
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Books" value-ref="feedWriter"/>
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="entryWriter"/>
+    </util:map>
+    <util:map id="atomWriters2">
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="entryWriter"/>
+    </util:map>
+    <util:map id="atomReaders">
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Books" value-ref="feedReader"/>
+    </util:map>
+    <util:map id="atomReaders2">
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="entryReader"/>
+    </util:map>
+    <bean id="feedWriter" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomFeedWriter"/>
+    <bean id="entryWriter" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomEntryWriter"/>
+    <bean id="entryReader" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomEntryReader"/>
+    <bean id="feedReader" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomFeedReader"/>
+    <util:map id="atomBuilders">
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Books" value-ref="simpleFeedBuilder"/>
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="simpleEntryBuilder"/>
+    </util:map>
+    <bean id="simpleFeedBuilder" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomFeedBuilder"/>
+    <util:map id="atomBuilders2">
+        <entry key="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$Book" value-ref="simpleEntryBuilder"/>
+    </util:map>
+    <bean id="simpleEntryBuilder" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProviderTest$CustomEntryBuilder"/>
 </beans>

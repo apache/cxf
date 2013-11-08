@@ -17,80 +17,80 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap">
-    <corba:anonsequence xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" elemtype="BasicTest" bound="0" name="_1_BasicTest" type="ns4:_1_BasicTest" />
-    <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" repositoryID="IDL:BasicTest:1.0" name="BasicTest" type="ns4:BasicTest">
-      <corba:member name="member1" idltype="corba:string" />
-      <corba:member name="member2" idltype="_1_BasicTest" />
-    </corba:struct>
-    <corba:anonsequence xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" elemtype="ForwardTest" bound="0" name="_1_ForwardTest" type="ns4:_1_ForwardTest"/>
-    <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" repositoryID="IDL:ForwardTest:1.0" name="ForwardTest" type="ns4:ForwardTest">
-      <corba:member name="member1" idltype="corba:string" />
-      <corba:member name="member2" idltype="_1_ForwardTest" />
-    </corba:struct>
-    <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" elemtype="ForwardSeqTest" bound="0" repositoryID="IDL:ForwardSeqTestSeq:1.0" name="ForwardSeqTestSeq" type="ns4:ForwardSeqTestSeq" />
-    <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" repositoryID="IDL:ForwardSeqTest:1.0" name="ForwardSeqTest" type="ns4:ForwardSeqTest">
-      <corba:member name="member1" idltype="corba:string" />
-      <corba:member name="member2" idltype="ForwardSeqTestSeq" />
-    </corba:struct>
-  </corba:typeMapping>
-  <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap">
+        <corba:anonsequence xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" elemtype="BasicTest" bound="0" name="_1_BasicTest" type="ns4:_1_BasicTest"/>
+        <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" repositoryID="IDL:BasicTest:1.0" name="BasicTest" type="ns4:BasicTest">
+            <corba:member name="member1" idltype="corba:string"/>
+            <corba:member name="member2" idltype="_1_BasicTest"/>
+        </corba:struct>
+        <corba:anonsequence xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" elemtype="ForwardTest" bound="0" name="_1_ForwardTest" type="ns4:_1_ForwardTest"/>
+        <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" repositoryID="IDL:ForwardTest:1.0" name="ForwardTest" type="ns4:ForwardTest">
+            <corba:member name="member1" idltype="corba:string"/>
+            <corba:member name="member2" idltype="_1_ForwardTest"/>
+        </corba:struct>
+        <corba:sequence xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" elemtype="ForwardSeqTest" bound="0" repositoryID="IDL:ForwardSeqTestSeq:1.0" name="ForwardSeqTestSeq" type="ns4:ForwardSeqTestSeq"/>
+        <corba:struct xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct/typemap" repositoryID="IDL:ForwardSeqTest:1.0" name="ForwardSeqTest" type="ns4:ForwardSeqTest">
+            <corba:member name="member1" idltype="corba:string"/>
+            <corba:member name="member2" idltype="ForwardSeqTestSeq"/>
+        </corba:struct>
+    </corba:typeMapping>
+    <wsdl:types>
+        <xs:schema xmlns="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/RecursiveStruct">
+            <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
       </xs:import>
-      <xs:complexType name="_1_BasicTest">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="BasicTest">
+            <xs:complexType name="_1_BasicTest">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="BasicTest">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="BasicTest">
-        <xs:sequence>
-          <xs:element name="member1" type="xs:string">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BasicTest">
+                <xs:sequence>
+                    <xs:element name="member1" type="xs:string">
           </xs:element>
-          <xs:element name="member2" type="_1_BasicTest">
+                    <xs:element name="member2" type="_1_BasicTest">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="_1_ForwardTest">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ForwardTest">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="_1_ForwardTest">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ForwardTest">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ForwardTest">
-        <xs:sequence>
-          <xs:element name="member1" type="xs:string">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ForwardTest">
+                <xs:sequence>
+                    <xs:element name="member1" type="xs:string">
           </xs:element>
-          <xs:element name="member2" type="_1_ForwardTest">
+                    <xs:element name="member2" type="_1_ForwardTest">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ForwardSeqTestSeq">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ForwardSeqTest">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ForwardSeqTestSeq">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="ForwardSeqTest">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ForwardSeqTest">
-        <xs:sequence>
-          <xs:element name="member1" type="xs:string">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ForwardSeqTest">
+                <xs:sequence>
+                    <xs:element name="member1" type="xs:string">
           </xs:element>
-          <xs:element name="member2" type="ForwardSeqTestSeq">
+                    <xs:element name="member2" type="ForwardSeqTestSeq">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:schema>
-  </wsdl:types>
-  <wsdl:portType name="TestInterface">
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:portType name="TestInterface">
   </wsdl:portType>
-  <wsdl:binding name="TestInterfaceCORBABinding" type="tns:TestInterface">
-    <corba:binding repositoryID="IDL:TestInterface:1.0" />
-  </wsdl:binding>
-  <wsdl:service name="TestInterfaceCORBAService">
-    <wsdl:port name="TestInterfaceCORBAPort" binding="tns:TestInterfaceCORBABinding">
-      <corba:address location="IOR:" />
-    </wsdl:port>
-  </wsdl:service>
+    <wsdl:binding name="TestInterfaceCORBABinding" type="tns:TestInterface">
+        <corba:binding repositoryID="IDL:TestInterface:1.0"/>
+    </wsdl:binding>
+    <wsdl:service name="TestInterfaceCORBAService">
+        <wsdl:port name="TestInterfaceCORBAPort" binding="tns:TestInterfaceCORBABinding">
+            <corba:address location="IOR:"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

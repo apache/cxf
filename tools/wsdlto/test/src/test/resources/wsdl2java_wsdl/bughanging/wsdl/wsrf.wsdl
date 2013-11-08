@@ -18,20 +18,8 @@
   under the License.
 -->
 <!-- Single entry point for the WS-Resource Framework WSDL.  -->
-<wsdl:definitions
-    name="Tandoori-WSRF"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://tandoori.iona.com/wsrf">
-
-  <wsdl:import
-      namespace="http://docs.oasis-open.org/wsrf/rpw-2"
-      location="rpw-2.wsdl"/>
-  <wsdl:import
-      namespace="http://docs.oasis-open.org/wsrf/rlw-2"
-      location="rlw-2.wsdl"/>
-  <wsdl:import
-      namespace="http://docs.oasis-open.org/wsrf/bfw-2"
-      location="bfw-2.wsdl"/>
-
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Tandoori-WSRF" targetNamespace="http://tandoori.iona.com/wsrf">
+    <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rpw-2" location="rpw-2.wsdl"/>
+    <wsdl:import namespace="http://docs.oasis-open.org/wsrf/rlw-2" location="rlw-2.wsdl"/>
+    <wsdl:import namespace="http://docs.oasis-open.org/wsrf/bfw-2" location="bfw-2.wsdl"/>
 </wsdl:definitions>

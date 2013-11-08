@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <foo xmlns="urn:bleh" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <bar xsi:type="xsd:string"/>
+    <bar xsi:type="xsd:string"/>
 </foo>

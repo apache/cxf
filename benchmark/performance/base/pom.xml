@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -28,9 +29,8 @@
     <properties>
         <cxf.version>2.7.1-SNAPSHOT</cxf.version>
     </properties>
-
     <build>
-      <defaultGoal>install</defaultGoal>
+        <defaultGoal>install</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -44,7 +44,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

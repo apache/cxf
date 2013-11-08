@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,7 +24,6 @@
     <name>Apache CXF Runtime HTTP Transport</name>
     <description>Apache CXF Runtime HTTP Transport</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
@@ -38,7 +38,6 @@
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -107,7 +106,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -141,13 +139,12 @@
                     </execution>
                 </executions>
                 <configuration>
-                     <extensions>
-                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-pl:${cxf.xjc-utils.version}</extension>
-                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
-                     </extensions>
-                 </configuration>
+                    <extensions>
+                        <extension>org.apache.cxf.xjcplugins:cxf-xjc-pl:${cxf.xjc-utils.version}</extension>
+                        <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                    </extensions>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

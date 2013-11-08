@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,7 +24,6 @@
     <name>Apache CXF Runtime HTTP Async Transport</name>
     <description>Apache CXF Runtime HTTP Async Transport</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
@@ -32,16 +32,15 @@
     </parent>
     <properties>
         <cxf.osgi.import>
-	    org.apache.http.nio.conn;version="${cxf.httpcomponents.asyncclient.version.range}",
-	    org.apache.http.nio.conn.scheme;version="${cxf.httpcomponents.asyncclient.version.range}",
-	    org.apache.http.nio.conn.ssl;version="${cxf.httpcomponents.asyncclient.version.range}",
+            org.apache.http.nio.conn;version="${cxf.httpcomponents.asyncclient.version.range}",
+            org.apache.http.nio.conn.scheme;version="${cxf.httpcomponents.asyncclient.version.range}",
+            org.apache.http.nio.conn.ssl;version="${cxf.httpcomponents.asyncclient.version.range}",
             org.apache.http.impl.nio.client;version="${cxf.httpcomponents.asyncclient.version.range}",
             org.apache.http.impl.nio.conn;version="${cxf.httpcomponents.asyncclient.version.range}",
             org.apache.http.*;version="${cxf.httpcomponents.core.version.range}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
         </cxf.osgi.import>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -103,8 +102,5 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
-
-
 </project>

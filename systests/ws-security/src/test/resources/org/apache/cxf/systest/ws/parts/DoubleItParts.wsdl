@@ -17,85 +17,71 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<wsdl:definitions name="DoubleIt"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt"
-    targetNamespace="http://www.example.org/contract/DoubleIt" 
-    xmlns:wsp="http://www.w3.org/ns/ws-policy"
-    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-    xmlns:wsaws="http://www.w3.org/2005/08/addressing" 
-    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-    xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802">
-    
-    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" 
-                 namespace="http://www.example.org/contract/DoubleIt"/>
-                 
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsaws="http://www.w3.org/2005/08/addressing" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
+    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" namespace="http://www.example.org/contract/DoubleIt"/>
     <wsdl:binding name="DoubleItStandardBinding" type="tns:DoubleItPortType">
-        <soap:binding style="document"
-            transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItRequiredPartsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItRequiredParts" />
+            <soap:address location="http://localhost:9010/DoubleItRequiredParts"/>
         </wsdl:port>
         <wsdl:port name="DoubleItRequiredPartsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItRequiredParts2" />
+            <soap:address location="http://localhost:9010/DoubleItRequiredParts2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItRequiredElementsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItRequiredElements" />
+            <soap:address location="http://localhost:9010/DoubleItRequiredElements"/>
         </wsdl:port>
         <wsdl:port name="DoubleItRequiredElementsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItRequiredElements2" />
+            <soap:address location="http://localhost:9010/DoubleItRequiredElements2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedPartsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedParts" />
+            <soap:address location="http://localhost:9010/DoubleItSignedParts"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedPartsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedParts2" />
+            <soap:address location="http://localhost:9010/DoubleItSignedParts2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedPartsPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedParts3" />
+            <soap:address location="http://localhost:9010/DoubleItSignedParts3"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedElementsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedElements" />
+            <soap:address location="http://localhost:9010/DoubleItSignedElements"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedElementsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedElements2" />
+            <soap:address location="http://localhost:9010/DoubleItSignedElements2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedPartsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedParts" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedParts"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedPartsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedParts2" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedParts2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedPartsPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedParts3" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedParts3"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedElementsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedElements" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedElements"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedElementsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedElements2" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedElements2"/>
         </wsdl:port>
-         <wsdl:port name="DoubleItContentEncryptedElementsPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements" />
+        <wsdl:port name="DoubleItContentEncryptedElementsPort" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements"/>
         </wsdl:port>
         <wsdl:port name="DoubleItContentEncryptedElementsPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements2" />
+            <soap:address location="http://localhost:9010/DoubleItContentEncryptedElements2"/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>

@@ -17,30 +17,17 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorldImport"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world/messages"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world">
-
-    <wsdl:import
-        namespace="http://cxf.apache.org/w2j/hello_world/messages"
-        location="hello_world_messages.wsdl"/>
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world" xmlns:x1="http://cxf.apache.org/w2j/hello_world/messages" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldImport" targetNamespace="http://cxf.apache.org/w2j/hello_world">
+    <wsdl:import namespace="http://cxf.apache.org/w2j/hello_world/messages" location="hello_world_messages.wsdl"/>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input message="x1:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="x1:sayHiResponse" name="sayHiResponse"/>
         </wsdl:operation>
-
         <wsdl:operation name="greetMe">
             <wsdl:input message="x1:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="x1:greetMeResponse" name="greetMeResponse"/>
         </wsdl:operation>
-
         <wsdl:operation name="pingMe">
             <wsdl:input name="pingMeRequest" message="x1:pingMeRequest"/>
             <wsdl:output name="pingMeResponse" message="x1:pingMeResponse"/>

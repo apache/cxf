@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <name>Apache CXF Core</name>
     <description>Apache CXF Core</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
-        
     <properties>
         <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
         <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
@@ -62,7 +61,6 @@
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*
         </cxf.osgi.dynamic.import>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -75,8 +73,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-        	<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${cxf.asm.groupId}</groupId>
@@ -88,7 +86,6 @@
             <artifactId>xml-resolver</artifactId>
             <optional>true</optional>
         </dependency>
-        
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
@@ -116,17 +113,15 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-             <groupId>org.codehaus.woodstox</groupId>
-             <artifactId>woodstox-core-asl</artifactId>
-         </dependency>
-
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+        </dependency>
         <dependency>
             <!-- this is probably not quite what we want in terms of the behavior of the other tests
                  than the schema surgery test. -->
@@ -134,7 +129,6 @@
             <artifactId>xercesImpl</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -171,7 +165,6 @@
             <artifactId>FastInfoset</artifactId>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
@@ -199,9 +192,7 @@
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
-        
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -211,9 +202,9 @@
                 <executions>
                     <execution>
                         <id>create-noncanonicalrev</id>
-                            <goals>
-                                <goal>create-timestamp</goal>
-                            </goals>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
                         <configuration>
                             <timestampFormat>'NON-CANONICAL_'yyyy-MM-dd_HH-mm_'${user.name}'</timestampFormat>
                             <timestampPropertyName>nonCanonicalRevision</timestampPropertyName>
@@ -221,15 +212,15 @@
                     </execution>
                     <execution>
                         <id>create-buildnumber</id>
-                            <goals>
-                                <goal>create</goal>
-                            </goals>
-                            <configuration>
-                                <doCheck>false</doCheck>
-                                <doUpdate>false</doUpdate>
-                                <urlScm>${buildnumber.connection.url}</urlScm>
-                                <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
-                            </configuration>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                        <configuration>
+                            <doCheck>false</doCheck>
+                            <doUpdate>false</doUpdate>
+                            <urlScm>${buildnumber.connection.url}</urlScm>
+                            <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -300,7 +291,6 @@
                         </configuration>
                     </execution>
                 </executions>
-
                 <configuration>
                     <extensions>
                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
@@ -308,7 +298,6 @@
                 </configuration>
             </plugin>
         </plugins>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -352,7 +341,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
     <profiles>
         <profile>
             <id>fastinstall</id>
@@ -411,5 +399,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

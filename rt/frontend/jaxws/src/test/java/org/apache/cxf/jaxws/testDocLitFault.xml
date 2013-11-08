@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,16 +18,15 @@
   under the License.
 -->
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-	<soap:Body>
-	  <soap:Fault>
-	    <faultstring>Hadrian did it.</faultstring>
-	    <faultcode>soap:Server</faultcode>
-	    <detail>
-	      <BadRecordLit xmlns="http://apache.org/hello_world_soap_http/types">
-	        foo
-	      </BadRecordLit>
-	    </detail>
-	  </soap:Fault>
-	</soap:Body>
-
+    <soap:Body>
+        <soap:Fault>
+            <faultstring>Hadrian did it.</faultstring>
+            <faultcode>soap:Server</faultcode>
+            <detail>
+                <BadRecordLit xmlns="http://apache.org/hello_world_soap_http/types">
+                foo
+              </BadRecordLit>
+            </detail>
+        </soap:Fault>
+    </soap:Body>
 </soap:Envelope>

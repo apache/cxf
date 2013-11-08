@@ -17,12 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/header_test" xmlns:x1="http://apache.org/header_test/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/header_test" name="TestHeaderWSDL"
-    xmlns:all="http://apache.org/tests/type_test/all"
-    xmlns:chc="http://apache.org/tests/type_test/choice"
-    xmlns:seq="http://apache.org/tests/type_test/sequence">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/header_test" xmlns:x1="http://apache.org/header_test/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:all="http://apache.org/tests/type_test/all" xmlns:chc="http://apache.org/tests/type_test/choice" xmlns:seq="http://apache.org/tests/type_test/sequence" targetNamespace="http://apache.org/header_test" name="TestHeaderWSDL">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/header_test/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/header_test/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/header_test/types" targetNamespace="http://apache.org/header_test/types" elementFormDefault="qualified">
             <element name="testHeader1">
                 <complexType/>
             </element>
@@ -106,8 +103,6 @@
                     </sequence>
                 </complexType>
             </element>
-
-
             <element name="testHeader7">
                 <complexType>
                     <sequence>
@@ -121,10 +116,8 @@
                     </sequence>
                 </complexType>
             </element>
-
         </schema>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-            targetNamespace="http://apache.org/tests/type_test/all">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/tests/type_test/all">
             <element name="test_all" type="all:SimpleAll"/>
             <complexType name="SimpleAll">
                 <all>
@@ -135,8 +128,7 @@
                 <attribute name="varAttrString" type="string"/>
             </complexType>
         </schema>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-            targetNamespace="http://apache.org/tests/type_test/sequence">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/tests/type_test/sequence">
             <element name="test_seq" type="seq:SimpleStruct"/>
             <complexType name="SimpleStruct">
                 <sequence>
@@ -147,8 +139,7 @@
                 <attribute name="varAttrString" type="string"/>
             </complexType>
         </schema>
-        <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-            targetNamespace="http://apache.org/tests/type_test/choice">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/tests/type_test/choice">
             <element name="test_chc" type="chc:SimpleChoice"/>
             <complexType name="SimpleChoice">
                 <choice>
@@ -241,12 +232,9 @@
             <wsdl:output name="testHeader5Response" message="tns:testHeader5Response"/>
         </wsdl:operation>
         <wsdl:operation name="testHeaderPartBeforeBodyPart" parameterOrder="inoutHeader in">
-            <wsdl:input name="testHeaderPartBeforeBodyPart" 
-                message="tns:testHeaderPartBeforeBodyPart"/>
-            <wsdl:output name="testHeaderPartBeforeBodyPartResponse" 
-                message="tns:testHeaderPartBeforeBodyPartResponse"/>
+            <wsdl:input name="testHeaderPartBeforeBodyPart" message="tns:testHeaderPartBeforeBodyPart"/>
+            <wsdl:output name="testHeaderPartBeforeBodyPartResponse" message="tns:testHeaderPartBeforeBodyPartResponse"/>
         </wsdl:operation>
-
         <operation name="send_receive_any_type">
             <input name="send_receive_any_type_request" message="tns:AnyTypeRequest"/>
             <output name="send_receive_any_type_response" message="tns:AnyTypeResponse"/>
@@ -314,13 +302,11 @@
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body parts="in" use="literal"/>
-                <soap:header message="tns:testHeaderPartBeforeBodyPart" 
-                    part="inoutHeader" use="literal"/>
+                <soap:header message="tns:testHeaderPartBeforeBodyPart" part="inoutHeader" use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body parts="out" use="literal"/>
-                <soap:header message="tns:testHeaderPartBeforeBodyPartResponse" 
-                    part="inoutHeader" use="literal"/>
+                <soap:header message="tns:testHeaderPartBeforeBodyPartResponse" part="inoutHeader" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
         <operation name="send_receive_any_type">

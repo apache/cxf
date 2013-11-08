@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"  xmlns:wsam="http://cxf.apache.org/test">
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://cxf.apache.org/test">
     <wsp:ExactlyOne>
         <wsp:All/>
         <wsp:All>

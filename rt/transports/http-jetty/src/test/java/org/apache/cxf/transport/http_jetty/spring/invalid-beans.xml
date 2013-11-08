@@ -17,20 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:beans="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:h="http://cxf.apache.org/transports/http/configuration"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd"
->
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
     <h:destination id="{urn:test:ns}Foo.http-destination">
-      <h:server ContentEncoding="foobar"/>
+        <h:server ContentEncoding="foobar"/>
     </h:destination>
-    
     <h:conduit id="{urn:test:ns}Foo.http-conduit">
-      <h:client ConnectionTimeout="97"/>
+        <h:client ConnectionTimeout="97"/>
     </h:conduit>
 </beans>

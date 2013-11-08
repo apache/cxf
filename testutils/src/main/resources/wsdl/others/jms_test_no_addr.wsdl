@@ -17,12 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="HelloWorldService" targetNamespace="http://cxf.apache.org/jms_conf_test" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:jms="http://cxf.apache.org/transports/jms" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/jms_conf_test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://cxf.apache.org/jms_conf_test/xsd">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/jms_conf_test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://cxf.apache.org/jms_conf_test/xsd" name="HelloWorldService" targetNamespace="http://cxf.apache.org/jms_conf_test">
     <message name="greetMe">
         <part name="stringParam0" type="xsd:string"/>
     </message>
@@ -36,7 +31,6 @@
     <message name="greetMeOneWay">
         <part name="stringParam0" type="xsd:string"/>
     </message>
-    
     <portType name="HelloWorldPortType">
         <operation name="greetMe">
             <input message="tns:greetMe" name="greetMe"/>
@@ -50,44 +44,35 @@
             <input message="tns:greetMeOneWay" name="greetMeOneWay"/>
         </operation>
     </portType>
-
     <binding name="HelloWorldQueueBinMsgBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
-                <soap:body 
-                    namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
             </input>
             <output name="greetMeResponse">
-                <soap:body  
-                    namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
             </output>
         </operation>
         <operation name="sayHi">
             <soap:operation soapAction="" style="rpc"/>
             <input name="sayHi">
-                <soap:body 
-                    namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
             </input>
             <output name="sayHiResponse">
-                <soap:body 
-                    namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
             </output>
         </operation>
         <operation name="greetMeOneWay">
             <soap:operation style="rpc"/>
             <input name="greetMeOneWay">
-                <soap:body 
-                    namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/jms_conf_test" use="literal"/>
             </input>
         </operation>
     </binding>
-    
     <service name="HelloWorldQueueBinMsgService">
         <port binding="tns:HelloWorldQueueBinMsgBinding" name="HelloWorldQueueBinMsgPort">
         </port>
-    </service>    
+    </service>
 </definitions>
-
-

@@ -18,34 +18,33 @@
   under the License.
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_doc_lit" xmlns:x1="http://apache.org/hello_world_doc_lit/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_doc_lit" name="HelloWorld">
-
-	<wsdl:message name="sayHiRequest">
-		<wsdl:part name="in" type="xsd:string"/>
-	</wsdl:message>
-	<wsdl:message name="sayHiResponse">
-		<wsdl:part name="out" type="xsd:int"/>
-	</wsdl:message>
-	<wsdl:portType name="Greeter">
-		<wsdl:operation name="sayHi">
-			<wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
-			<wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
-		</wsdl:operation>
-	</wsdl:portType>
-	<wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
-		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-		<wsdl:operation name="sayHi">
-			<soap:operation style="document"/>
-			<wsdl:input>
-				<soap:body use="literal"/>
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal"/>
-			</wsdl:output>
-		</wsdl:operation>
-	</wsdl:binding>
-	<wsdl:service name="SOAPService">
-		<wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
-			<soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
-		</wsdl:port>
-	</wsdl:service>
+    <wsdl:message name="sayHiRequest">
+        <wsdl:part name="in" type="xsd:string"/>
+    </wsdl:message>
+    <wsdl:message name="sayHiResponse">
+        <wsdl:part name="out" type="xsd:int"/>
+    </wsdl:message>
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="sayHi">
+            <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
+            <wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="sayHi">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SOAPService">
+        <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

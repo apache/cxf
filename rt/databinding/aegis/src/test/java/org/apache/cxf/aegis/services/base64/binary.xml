@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements. See the NOTICE file
@@ -16,7 +17,10 @@
    specific language governing permissions and limitations
    under the License.
 -->
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><verifyDataIntegrity xmlns="http://base64.services.aegis.cxf.apache.org"><data>J6VE/+XTWDdheT9/uzjDAuYjKQQgoASUwV0fBlLHg/7Gslna3pIAlrGWYpcYnkPqVh7AwB4UN4ag
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <verifyDataIntegrity xmlns="http://base64.services.aegis.cxf.apache.org">
+            <data>J6VE/+XTWDdheT9/uzjDAuYjKQQgoASUwV0fBlLHg/7Gslna3pIAlrGWYpcYnkPqVh7AwB4UN4ag
 rz2Hs1HlmfVBuQjf6CRUIpJTij5seyMaNbAzB8PgsXvSOi5UeOJfsMii1+U6Cm35b
 J6LwK1IMzMabX6hsZIyYQeNDK72/6mw9Nl2yqQ+4CpCOpolVPDNiQb7OQtjvf41b3bdrP2/A2z028zT0miO3IxU
 X3f3DQ0Wv4On+sWdTDbbQFsuYDMsgzYuMHkk+reebF1/D16GPWJpxux6FwimVo6W+JENYHtZJ9xBydyT8sXLCY5oHjzXVA
@@ -30,4 +34,9 @@ avJ5mF9aFp5sTg290IMKiFLtc1hi60fPf9AIJZP8rWhePmFgW4zt12RwpAeEgp0iiay211JXDH6q
 qhiOUfEKb6ClX5IhqizF/5vz8UY/S/0z5pvmRdYWBjLjtbF0X4ZzZjVm3iMKAN+A8Ni2ZBo3al4a
 W2pWJCnKj1hfPvV6UaAVgIsR2GzaKOW7ZVT9X6IYq0tSWQMbHEILnE/Kq8LqBp84oOOOJZHyQDOF
 mr7VzC+1R5KpJ/ec+WNJBjwcD3wj0V+1xb6/iYW5YBjPloKENc8gFGQvQN6nm6d/RR5U1jG2Yshe
-IAdw9r0M8MbfzGPhxNBt/A==</data><length>757</length><crc32>2247389156</crc32></verifyDataIntegrity></soap:Body></soap:Envelope>
+IAdw9r0M8MbfzGPhxNBt/A==</data>
+            <length>757</length>
+            <crc32>2247389156</crc32>
+        </verifyDataIntegrity>
+    </soap:Body>
+</soap:Envelope>

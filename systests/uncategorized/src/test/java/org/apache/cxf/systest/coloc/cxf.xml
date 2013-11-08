@@ -17,48 +17,29 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jms="http://cxf.apache.org/transports/jms"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:cxf="http://cxf.apache.org/core"
-       
-       xsi:schemaLocation="
-       http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
-http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!--JMS Client Receive Timeout-->
     <!--hello_world.wsdl-->
     <jms:conduit name="{http://apache.org/hello_world_soap_http}SoapPortJms.jms-conduit" abstract="true">
         <jms:clientConfig clientReceiveTimeout="90000"/>
     </jms:conduit>
-
     <jms:conduit name="{http://apache.org/hello_world_soap_http}XMLPortJms.jms-conduit" abstract="true">
         <jms:clientConfig clientReceiveTimeout="90000"/>
     </jms:conduit>
-
     <!--header_rpc_lit.wsdl-->
     <jms:conduit name="{http://apache.org/headers/rpc_lit}SoapPortJms.jms-conduit" abstract="true">
         <jms:clientConfig clientReceiveTimeout="90000"/>
     </jms:conduit>
-
     <jms:conduit name="{http://apache.org/headers/rpc_lit}XMLPortJms.jms-conduit" abstract="true">
         <jms:clientConfig clientReceiveTimeout="90000"/>
     </jms:conduit>
-
     <!--soap_header.wsdl-->
     <jms:conduit name="{http://apache.org/headers}SoapPortJms.jms-conduit" abstract="true">
         <jms:clientConfig clientReceiveTimeout="90000"/>
     </jms:conduit>
-
     <jms:conduit name="{http://apache.org/headers}XMLPortJms.jms-conduit" abstract="true">
         <jms:clientConfig clientReceiveTimeout="90000"/>
     </jms:conduit>
-
     <!--HTTP Connection Receive Timeout -->
     <!--Enable to avoid Connection Timeout during debugging-->
     <!--
@@ -66,32 +47,26 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <http:client ConnectionTimeout="300000" ReceiveTimeout="300000"/>
     </http:conduit>
     -->
-
     <!-- Coloc Interceptor-->
     <bean id="colocOutbound" class="org.apache.cxf.binding.coloc.ColocOutInterceptor"/>
     <bean id="faultOutbound" class="org.apache.cxf.systest.coloc.ThrowFaultInterceptor"/>
-
     <!-- Adding interceptors to the bus will add it to all services/endpoints-->
     <cxf:bus>
         <cxf:outInterceptors>
-                <ref bean="colocOutbound"/>
-                <ref bean="faultOutbound"/>
+            <ref bean="colocOutbound"/>
+            <ref bean="faultOutbound"/>
         </cxf:outInterceptors>
     </cxf:bus>
-
     <!-- Avoid upfront Conduit creation, as client-side transport resources
          are not required in the coloc case -->
-    <jaxws:client name="{http://apache.org/headers/rpc_lit}SoapPort"
-                  createdFromAPI="true">
+    <jaxws:client name="{http://apache.org/headers/rpc_lit}SoapPort" createdFromAPI="true">
         <jaxws:conduitSelector>
             <bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </jaxws:conduitSelector>
     </jaxws:client>
-    <jaxws:client name="{http://apache.org/headers/doc_lit}SoapPort9000"
-                  createdFromAPI="true">
+    <jaxws:client name="{http://apache.org/headers/doc_lit}SoapPort9000" createdFromAPI="true">
         <jaxws:conduitSelector>
             <bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </jaxws:conduitSelector>
     </jaxws:client>
-
 </beans>

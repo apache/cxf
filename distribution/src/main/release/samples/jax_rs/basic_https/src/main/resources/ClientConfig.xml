@@ -17,19 +17,8 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
-        ">
-   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <!-- -->
     <!-- HTTP/S configuration for proxy & web clients -->
     <!-- -->
@@ -44,6 +33,4 @@ under the License.
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
-
 </beans>
-

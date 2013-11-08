@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -25,14 +25,13 @@
             </wsa:EndpointReference>
         </wsp:AppliesTo>
         <wsp:Policy>
-          <wsp:ExactlyOne>
-            <wsp:All>
-              <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
-                <wsp:Policy/>
-              </wsam:Addressing>
-            </wsp:All>
-          </wsp:ExactlyOne>  
+            <wsp:ExactlyOne>
+                <wsp:All>
+                    <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
+                        <wsp:Policy/>
+                    </wsam:Addressing>
+                </wsp:All>
+            </wsp:ExactlyOne>
         </wsp:Policy>
-    </wsp:PolicyAttachment>    
+    </wsp:PolicyAttachment>
 </attachments>
-

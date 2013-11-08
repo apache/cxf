@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,28 +17,20 @@
   specific language governing permissions and limitations
   under the License.
   -->
-
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'
-             xmlns:logbrowser='urn:import:org.apache.cxf.management.web.browser.client.ui.browser'>
-
-    <ui:with field='res'
-             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
-        
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:logbrowser="urn:import:org.apache.cxf.management.web.browser.client.ui.browser">
+    <ui:with field="res" type="org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources"/>
     <g:SplitLayoutPanel>
-        <g:north size='200'>
-            <g:DockLayoutPanel styleName='{res.css.browserTabToolBar}'
-                               unit='EM'>
-                <g:north size='2.2'>
-
+        <g:north size="200">
+            <g:DockLayoutPanel styleName="{res.css.browserTabToolBar}" unit="EM">
+                <g:north size="2.2">
                     <g:HTMLPanel>
-                        <table cellspacing="0" cellpadding="0" class='{res.css.browserTabEntryTableHeaders}'>
+                        <table cellspacing="0" cellpadding="0" class="{res.css.browserTabEntryTableHeaders}">
                             <colgroup>
-                                 <!--TODO move this values to constans-->
-                                 <col  width="160px"/>
-                                 <col  width="128px"/>
-                                 <col />
-                                 <col width="350px"/>
+                                <!--TODO move this values to constans-->
+                                <col width="160px"/>
+                                <col width="128px"/>
+                                <col/>
+                                <col width="350px"/>
                             </colgroup>
                             <tbody>
                                 <tr>
@@ -51,52 +44,37 @@
                                         Message
                                     </td>
                                     <td style="text-align:right;">
-                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
-                                                  ui:field='firstButton' href='javascript:;'>
-                                            &#171; first
+                                        <g:Anchor styleName="{res.css.browserTabNavigationLink}" ui:field="firstButton" href="javascript:;">
+                                            &#xAB; first
                                         </g:Anchor>
-
-                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
-                                                  ui:field='olderButton' href='javascript:;'>
-                                            &#8249; previous
+                                        <g:Anchor styleName="{res.css.browserTabNavigationLink}" ui:field="olderButton" href="javascript:;">
+                                            &#x2039; previous
                                         </g:Anchor>
-
-                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
-                                                  ui:field='refreshButton' href='javascript:;'>
+                                        <g:Anchor styleName="{res.css.browserTabNavigationLink}" ui:field="refreshButton" href="javascript:;">
                                             refresh
                                         </g:Anchor>
-
-                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
-                                                  ui:field='newerButton' href='javascript:;'>
-                                            next &#8250;
+                                        <g:Anchor styleName="{res.css.browserTabNavigationLink}" ui:field="newerButton" href="javascript:;">
+                                            next &#x203A;
                                         </g:Anchor>
-
-                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
-                                                  ui:field='lastButton' href='javascript:;'>
-                                            last &#187;
+                                        <g:Anchor styleName="{res.css.browserTabNavigationLink}" ui:field="lastButton" href="javascript:;">
+                                            last &#xBB;
                                         </g:Anchor>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-
                     </g:HTMLPanel>
                 </g:north>
-
                 <g:center>
-                    <logbrowser:EntryTable ui:field='entryTable'
-                                           styleName='{res.css.browserTabEntrySelectableTable}'/>
+                    <logbrowser:EntryTable ui:field="entryTable" styleName="{res.css.browserTabEntrySelectableTable}"/>
                 </g:center>
             </g:DockLayoutPanel>
         </g:north>
-
-        <g:center size='200'>
-            <g:DockLayoutPanel styleName='{res.css.browserTabEntryDetailsSection}'
-                               unit='EM'>
+        <g:center size="200">
+            <g:DockLayoutPanel styleName="{res.css.browserTabEntryDetailsSection}" unit="EM">
                 <g:center>
                     <g:ScrollPanel>
-                        <g:HTML ui:field='entryDetails'
-                                styleName='{res.css.browserTabEntryDetailsContent}'/>
+                        <g:HTML ui:field="entryDetails" styleName="{res.css.browserTabEntryDetailsContent}"/>
                     </g:ScrollPanel>
                 </g:center>
             </g:DockLayoutPanel>

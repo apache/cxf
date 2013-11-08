@@ -17,98 +17,83 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<wsdl:definitions name="DoubleIt"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt"
-    targetNamespace="http://www.example.org/contract/DoubleIt" 
-    xmlns:wsp="http://www.w3.org/ns/ws-policy"
-    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-    xmlns:wsaws="http://www.w3.org/2005/08/addressing" 
-    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-    xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802">
-    
-    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" 
-                 namespace="http://www.example.org/contract/DoubleIt"/>
-                 
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsaws="http://www.w3.org/2005/08/addressing" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:sp13="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
+    <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" namespace="http://www.example.org/contract/DoubleIt"/>
     <wsdl:binding name="DoubleItStandardBinding" type="tns:DoubleItPortType">
-        <soap:binding style="document"
-            transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
                 <wsp:PolicyReference URI="#SignEncryptBodyPolicy"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
                 <wsp:PolicyReference URI="#SignEncryptBodyPolicy"/>
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
+                <soap:body use="literal" name="DoubleItFault"/>
                 <wsp:PolicyReference URI="#SignEncryptBodyPolicy"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSignedSupportingPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedSupporting" />
+            <soap:address location="http://localhost:9010/DoubleItSignedSupporting"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedSupportingPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedSupporting2" />
+            <soap:address location="http://localhost:9010/DoubleItSignedSupporting2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedSupportingPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedSupporting3" />
+            <soap:address location="http://localhost:9010/DoubleItSignedSupporting3"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedSupportingPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedSupportingPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting2" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEncryptedSupportingPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting3" />
+            <soap:address location="http://localhost:9010/DoubleItEncryptedSupporting3"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEncryptedSupportingPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting" />
+            <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEncryptedSupportingPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting2" />
+            <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEncryptedSupportingPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting3" />
+            <soap:address location="http://localhost:9010/DoubleItSignedEncryptedSupporting3"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEndorsingSupportingPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEndorsingSupporting" />
+            <soap:address location="http://localhost:9010/DoubleItEndorsingSupporting"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEndorsingSupportingPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEndorsingSupporting2" />
+            <soap:address location="http://localhost:9010/DoubleItEndorsingSupporting2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItEndorsingSupportingPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItEndorsingSupporting3" />
+            <soap:address location="http://localhost:9010/DoubleItEndorsingSupporting3"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEndorsingSupportingPort" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting" />
+            <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEndorsingSupportingPort2" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting2" />
+            <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting2"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSignedEndorsingSupportingPort3" binding="tns:DoubleItStandardBinding">
-            <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting3" />
+            <soap:address location="http://localhost:9010/DoubleItSignedEndorsingSupporting3"/>
         </wsdl:port>
     </wsdl:service>
-    
-   <wsp:Policy wsu:Id="SignEncryptBodyPolicy">
-      <wsp:ExactlyOne>
-         <wsp:All>
-            <sp:EncryptedParts>
-               <sp:Body/>
-            </sp:EncryptedParts>
-            <sp:SignedParts>
-               <sp:Body/>
-            </sp:SignedParts>
-         </wsp:All>
-      </wsp:ExactlyOne>
-   </wsp:Policy>
-
+    <wsp:Policy wsu:Id="SignEncryptBodyPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:EncryptedParts>
+                    <sp:Body/>
+                </sp:EncryptedParts>
+                <sp:SignedParts>
+                    <sp:Body/>
+                </sp:SignedParts>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
 </wsdl:definitions>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!-- 
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -17,7 +18,7 @@
  * under the License.
  * -->
 <mappings>
-	<mapping>
-		<property name="values" flat='true' nillable='false' minOccurs='1' />
-	</mapping>
-</mappings> 
+    <mapping>
+        <property name="values" flat="true" nillable="false" minOccurs="1"/>
+    </mapping>
+</mappings>

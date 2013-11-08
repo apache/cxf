@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,5 +18,5 @@
   under the License.
 -->
 <h:conduit xmlns:h="http://cxf.apache.org/transports/http/configuration">
-  <h:client ConnectionTimeout="97"/>
+    <h:client ConnectionTimeout="97"/>
 </h:conduit>

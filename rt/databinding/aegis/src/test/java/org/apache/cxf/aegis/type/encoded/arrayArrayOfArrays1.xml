@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,44 +17,33 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<strings
-    xmlns:b="urn:Bean"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
-    soapenc:arrayType="xsd:string[,][2]">
-
-  <arrayOfArrays soapenc:arrayType="xsd:string[3,4]">
-    <item>row1 col1 dep1</item>
-    <item>row1 col1 dep2</item>
-    <item>row1 col1 dep3</item>
-    <item>row1 col1 dep4</item>
-
-    <item>row1 col2 dep1</item>
-    <item>row1 col2 dep2</item>
-    <item>row1 col2 dep3</item>
-    <item>row1 col2 dep4</item>
-
-    <item>row1 col3 dep1</item>
-    <item>row1 col3 dep2</item>
-    <item>row1 col3 dep3</item>
-    <item>row1 col3 dep4</item>
-  </arrayOfArrays>
-
-  <arrayOfArrays soapenc:arrayType="xsd:string[3,4]">
-    <item>row2 col1 dep1</item>
-    <item>row2 col1 dep2</item>
-    <item>row2 col1 dep3</item>
-    <item>row2 col1 dep4</item>
-
-    <item>row2 col2 dep1</item>
-    <item>row2 col2 dep2</item>
-    <item>row2 col2 dep3</item>
-    <item>row2 col2 dep4</item>
-
-    <item>row2 col3 dep1</item>
-    <item>row2 col3 dep2</item>
-    <item>row2 col3 dep3</item>
-    <item>row2 col3 dep4</item>
-  </arrayOfArrays>
+<strings xmlns:b="urn:Bean" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" soapenc:arrayType="xsd:string[,][2]">
+    <arrayOfArrays soapenc:arrayType="xsd:string[3,4]">
+        <item>row1 col1 dep1</item>
+        <item>row1 col1 dep2</item>
+        <item>row1 col1 dep3</item>
+        <item>row1 col1 dep4</item>
+        <item>row1 col2 dep1</item>
+        <item>row1 col2 dep2</item>
+        <item>row1 col2 dep3</item>
+        <item>row1 col2 dep4</item>
+        <item>row1 col3 dep1</item>
+        <item>row1 col3 dep2</item>
+        <item>row1 col3 dep3</item>
+        <item>row1 col3 dep4</item>
+    </arrayOfArrays>
+    <arrayOfArrays soapenc:arrayType="xsd:string[3,4]">
+        <item>row2 col1 dep1</item>
+        <item>row2 col1 dep2</item>
+        <item>row2 col1 dep3</item>
+        <item>row2 col1 dep4</item>
+        <item>row2 col2 dep1</item>
+        <item>row2 col2 dep2</item>
+        <item>row2 col2 dep3</item>
+        <item>row2 col2 dep4</item>
+        <item>row2 col3 dep1</item>
+        <item>row2 col3 dep2</item>
+        <item>row2 col3 dep3</item>
+        <item>row2 col3 dep4</item>
+    </arrayOfArrays>
 </strings>

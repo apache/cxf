@@ -17,18 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/cxf/tests/inherit"
-    xmlns:x1="http://apache.org/cxf/tests/inherit/types"
-    targetNamespace="http://apache.org/cxf/tests/inherit" name="Inherit">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/cxf/tests/inherit" xmlns:x1="http://apache.org/cxf/tests/inherit/types" targetNamespace="http://apache.org/cxf/tests/inherit" name="Inherit">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/cxf/tests/inherit/objects"
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:x1="http://apache.org/cxf/tests/inherit/objects"
-             elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/cxf/tests/inherit/objects" targetNamespace="http://apache.org/cxf/tests/inherit/objects" elementFormDefault="qualified">
             <complexType name="BaseType">
                 <sequence>
                     <element name="name" type="string"/>
@@ -53,11 +44,7 @@
                 </complexContent>
             </complexType>
         </schema>
-        <schema targetNamespace="http://apache.org/cxf/tests/inherit/types"
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:x1="http://apache.org/cxf/tests/inherit/types"
-            xmlns:x2="http://apache.org/cxf/tests/inherit/objects"
-             elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/cxf/tests/inherit/types" xmlns:x2="http://apache.org/cxf/tests/inherit/objects" targetNamespace="http://apache.org/cxf/tests/inherit/types" elementFormDefault="qualified">
             <import namespace="http://apache.org/cxf/tests/inherit/objects"/>
             <complexType name="ObjectInfo">
                 <sequence>
@@ -81,21 +68,18 @@
             </element>
         </schema>
     </wsdl:types>
-
     <wsdl:message name="getObject">
         <wsdl:part name="in" element="x1:getObject"/>
     </wsdl:message>
     <wsdl:message name="getObjectResponse">
         <wsdl:part name="out" element="x1:getObjectResponse"/>
     </wsdl:message>
-
     <wsdl:portType name="Inherit">
         <wsdl:operation name="getObject">
             <wsdl:input name="getObjectRequest" message="tns:getObject"/>
             <wsdl:output name="getObjectResponse" message="tns:getObjectResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-
     <wsdl:binding name="InheritSOAPBinding" type="tns:Inherit">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="getObject">
@@ -108,13 +92,9 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-
-
     <wsdl:service name="InheritService">
         <wsdl:port name="InheritPort" binding="tns:InheritSOAPBinding">
             <soap:address location="http://localhost:9000/InheritContext/InheritPort"/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>
-

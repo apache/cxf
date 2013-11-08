@@ -17,13 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:tns="http://reportincident.example.camel.apache.org"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	targetNamespace="http://reportincident.example.camel.apache.org">
-
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://reportincident.example.camel.apache.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://reportincident.example.camel.apache.org">
     <!-- Type definitions for input- and output parameters for webservice -->
     <wsdl:types>
         <xs:schema targetNamespace="http://reportincident.example.camel.apache.org">
@@ -50,7 +44,6 @@
             </xs:element>
         </xs:schema>
     </wsdl:types>
-
     <!-- Message definitions for input and output -->
     <wsdl:message name="inputReportIncident">
         <wsdl:part name="in" element="tns:inputReportIncident"/>
@@ -58,7 +51,6 @@
     <wsdl:message name="outputReportIncident">
         <wsdl:part name="out" element="tns:outputReportIncident"/>
     </wsdl:message>
-
     <!-- Port (interface) definitions -->
     <wsdl:portType name="ReportIncidentEndpoint">
         <wsdl:operation name="ReportIncident">
@@ -66,14 +58,11 @@
             <wsdl:output message="tns:outputReportIncident"/>
         </wsdl:operation>
     </wsdl:portType>
-
     <!-- Port bindings to transports and encoding - HTTP, document literal encoding is used -->
     <wsdl:binding name="ReportIncidentBinding">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="ReportIncident">
-            <soap:operation
-                    soapAction="http://reportincident.example.camel.apache.org/ReportIncident"
-                    style="document"/>
+            <soap:operation soapAction="http://reportincident.example.camel.apache.org/ReportIncident" style="document"/>
             <wsdl:input>
                 <soap:body parts="in" use="literal"/>
             </wsdl:input>
@@ -82,12 +71,10 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-
     <!-- Service definition -->
     <wsdl:service name="ReportIncidentEndpointService">
         <wsdl:port name="ReportIncidentService" binding="tns:ReportIncidentBinding">
             <soap:address location="http://localhost:8080/part-five/webservices/incident"/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>

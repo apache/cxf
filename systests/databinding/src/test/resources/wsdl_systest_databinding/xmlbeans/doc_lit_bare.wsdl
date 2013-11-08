@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/xmlbeans/doc_lit_bare"
-     xmlns:x1="http://cxf.apache.org/xmlbeans/doc_lit_bare/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/xmlbeans/doc_lit_bare" name="DocLitBare">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/xmlbeans/doc_lit_bare" xmlns:x1="http://cxf.apache.org/xmlbeans/doc_lit_bare/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/xmlbeans/doc_lit_bare" name="DocLitBare">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/xmlbeans/doc_lit_bare/types" 
-            xmlns:tns="http://cxf.apache.org/xmlbeans/doc_lit_bare/types" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            elementFormDefault="qualified">
+        <schema xmlns:tns="http://cxf.apache.org/xmlbeans/doc_lit_bare/types" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/xmlbeans/doc_lit_bare/types" elementFormDefault="qualified">
             <complexType name="TradePriceData">
                 <sequence>
                     <element name="tickerSymbol" type="xsd:string"/>
@@ -36,8 +29,8 @@
             <element name="in" type="tns:TradePriceData"/>
             <element name="inout" type="tns:TradePriceData"/>
             <element name="stringRespType" type="xsd:string"/>
-            <element name="inDecimal" nillable="true" type="xsd:decimal" />
-            <element name="outString" nillable="true" type="xsd:string" />
+            <element name="inDecimal" nillable="true" type="xsd:decimal"/>
+            <element name="outString" nillable="true" type="xsd:string"/>
         </schema>
     </wsdl:types>
     <message name="PutLastTradedPriceInput">
@@ -55,10 +48,10 @@
         <part element="x1:stringRespType" name="theResponse"/>
     </message>
     <message name="nillableRequest">
-        <part name="theRequest" element="x1:inDecimal" />
+        <part name="theRequest" element="x1:inDecimal"/>
     </message>
     <message name="nillableResponse">
-        <part name="theResponse" element="x1:outString" />
+        <part name="theResponse" element="x1:outString"/>
     </message>
     <portType name="PutLastTradedPricePortType">
         <operation name="SayHi">
@@ -74,8 +67,8 @@
             <output message="tns:bareNoParamResponse"/>
         </operation>
         <operation name="nillableParameter">
-            <input message="tns:nillableRequest" />
-            <output message="tns:nillableResponse" />
+            <input message="tns:nillableRequest"/>
+            <output message="tns:nillableResponse"/>
         </operation>
     </portType>
     <binding name="PutLastTradedPriceSoapBinding" type="tns:PutLastTradedPricePortType">
@@ -106,10 +99,10 @@
         </operation>
         <operation name="nillableParameter">
             <input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </input>
             <output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </output>
         </operation>
     </binding>

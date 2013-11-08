@@ -17,21 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-          xmlns:tns="http://cxf.apache.org/cxf/performance"
-          xmlns:x1="http://cxf.apache.org/cxf/performance/types"
-          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-          xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-          xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-          targetNamespace="http://cxf.apache.org/cxf/performance">
-
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/cxf/performance" xmlns:x1="http://cxf.apache.org/cxf/performance/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" targetNamespace="http://cxf.apache.org/cxf/performance">
     <wsdl:import location="perf_policy.wsdl" namespace="http://cxf.apache.org/cxf/performance/policy"/>
-
     <types>
-        <schema targetNamespace="http://cxf.apache.org/cxf/performance/types"
-                xmlns="http://www.w3.org/2001/XMLSchema"
-                elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/cxf/performance/types" elementFormDefault="qualified">
             <complexType name="SimpleStruct">
                 <sequence>
                     <element name="varFloat" type="xsd:float"/>
@@ -69,7 +58,6 @@
                     <element maxOccurs="unbounded" minOccurs="0" name="item" type="x1:NestedComplexType"/>
                 </sequence>
             </complexType>
-
             <element name="echoStringDoc">
                 <complexType>
                     <sequence>
@@ -98,7 +86,6 @@
                     </sequence>
                 </complexType>
             </element>
-
             <element name="echoComplexTypeDoc">
                 <complexType>
                     <sequence>
@@ -115,10 +102,8 @@
                     </sequence>
                 </complexType>
             </element>
-
         </schema>
     </types>
-
     <message name="echoStringRPCRequest">
         <part name="in" type="xsd:string"/>
     </message>
@@ -131,7 +116,6 @@
     <message name="echoBase64RPCResponse">
         <part name="out" type="xsd:base64Binary"/>
     </message>
-
     <message name="echoStringDoc">
         <part name="in" element="x1:echoStringDoc"/>
     </message>
@@ -150,14 +134,12 @@
     <message name="echoComplexTypeDocResponse">
         <part name="parameters" element="x1:echoComplexTypeDocResponse"/>
     </message>
-
     <message name="echoComplexTypeRPCRequest">
         <part name="in" type="x1:NestedComplexTypeSeq"/>
     </message>
     <message name="echoComplexTypeRPCResponse">
         <part name="out" type="x1:NestedComplexTypeSeq"/>
     </message>
-
     <portType name="RPCPortType">
         <operation name="echoStringRPC">
             <input name="echoStringRPCRequest" message="tns:echoStringRPCRequest"/>
@@ -172,7 +154,6 @@
             <output name="echoComplexTypeRPCResponse" message="tns:echoComplexTypeRPCResponse"/>
         </operation>
     </portType>
-
     <portType name="DocPortType">
         <operation name="echoStringDoc">
             <input name="echoStringDoc" message="tns:echoStringDoc"/>
@@ -187,7 +168,6 @@
             <output name="echoComplexTypeDocResponse" message="tns:echoComplexTypeDocResponse"/>
         </operation>
     </portType>
-
     <portType name="DocPortTypeWrapped">
         <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
             <jaxws:enableWrapperStyle>false</jaxws:enableWrapperStyle>
@@ -205,7 +185,6 @@
             <output name="echoComplexTypeDocResponse" message="tns:echoComplexTypeDocResponse"/>
         </operation>
     </portType>
-
     <binding name="SoapBindingRPCLit" type="tns:RPCPortType">
         <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="echoStringRPC">
@@ -236,10 +215,8 @@
             </output>
         </operation>
     </binding>
-
     <binding name="SoapBindingDocLit" type="tns:DocPortType">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <operation name="echoStringDoc">
             <soap:operation style="document"/>
             <input>
@@ -268,11 +245,9 @@
             </output>
         </operation>
     </binding>
-
     <binding name="SoapBindingDocLitSec" type="tns:DocPortType">
         <wsp:PolicyReference URI="#SymD_policy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <operation name="echoStringDoc">
             <soap:operation style="document"/>
             <input>
@@ -301,10 +276,8 @@
             </output>
         </operation>
     </binding>
-
     <binding name="SoapBindingDocLitWrapped" type="tns:DocPortTypeWrapped">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <operation name="echoStringDoc">
             <soap:operation style="document"/>
             <input>
@@ -333,7 +306,6 @@
             </output>
         </operation>
     </binding>
-
     <service name="PerfService">
         <port name="SoapHttpDocLitPort" binding="tns:SoapBindingDocLit">
             <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitPort"/>
@@ -348,5 +320,4 @@
             <soap:address location="http://localhost:8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitWrappedPort"/>
         </port>
     </service>
-
 </definitions>

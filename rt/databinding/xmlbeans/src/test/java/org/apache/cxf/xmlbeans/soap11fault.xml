@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <SOAP-ENV:Fault xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
     <faultcode>SOAP-ENV:Server</faultcode>
     <faultstring>Server Error</faultstring>

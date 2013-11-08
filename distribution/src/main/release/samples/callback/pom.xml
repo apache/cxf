@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>callback</artifactId>
     <name>CXF sample using a callback object</name>
     <description>CXF sample using a callback object</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -64,8 +64,6 @@
             </plugin>
         </plugins>
     </build>
-    
-
     <profiles>
         <profile>
             <id>server</id>
@@ -111,7 +109,7 @@
                                     <executable>java</executable>
                                     <arguments>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.callback.client.Client</argument>
                                         <argument>${wsdl.file}</argument>
                                     </arguments>

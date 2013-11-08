@@ -19,7 +19,7 @@
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_holder" xmlns:x1="http://cxf.apache.org/w2j/hello_world_holder/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_holder" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_holder/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_holder/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType>
                     <sequence>
@@ -51,15 +51,15 @@
             <element name="testInOut">
                 <complexType>
                     <sequence>
-                        <element minOccurs='0' name='val' type='xsd:int'/>
-                        <element name='num' type='xsd:int'/>
+                        <element minOccurs="0" name="val" type="xsd:int"/>
+                        <element name="num" type="xsd:int"/>
                     </sequence>
                 </complexType>
             </element>
             <element name="testInOutResponse">
                 <complexType>
                     <sequence>
-                        <element minOccurs='0' name='val' type='xsd:int'/>
+                        <element minOccurs="0" name="val" type="xsd:int"/>
                     </sequence>
                 </complexType>
             </element>

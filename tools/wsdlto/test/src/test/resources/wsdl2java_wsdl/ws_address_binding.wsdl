@@ -17,27 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<bindings 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    wsdlLocation="hello_world_addr.wsdl"
-    xmlns="http://java.sun.com/xml/ns/jaxws">    
-  <bindings node="wsdl:definitions" xmlns:jws="http://java.sun.com/xml/ns/javaee">
-    <jws:handler-chains>
-      <jws:handler-chain>
-	<jws:handler>
-	  <jws:handler-class>org.apache.cxf.bus.ws.addressing.MAPAggregator</jws:handler-class>
-	</jws:handler>
-	<jws:handler>
-          <jws:handler-class>org.apache.cxf.bus.ws.addressing.soap.MAPCodec</jws:handler-class>
-	</jws:handler>
-	<jws:handler>
-          <jws:handler-class>demo.ws_addressing.common.HeaderSnooper</jws:handler-class>
-	</jws:handler>
-      </jws:handler-chain>
-    </jws:handler-chains>
-  </bindings>
+<bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://java.sun.com/xml/ns/jaxws" wsdlLocation="hello_world_addr.wsdl">
+    <bindings xmlns:jws="http://java.sun.com/xml/ns/javaee" node="wsdl:definitions">
+        <jws:handler-chains>
+            <jws:handler-chain>
+                <jws:handler>
+                    <jws:handler-class>org.apache.cxf.bus.ws.addressing.MAPAggregator</jws:handler-class>
+                </jws:handler>
+                <jws:handler>
+                    <jws:handler-class>org.apache.cxf.bus.ws.addressing.soap.MAPCodec</jws:handler-class>
+                </jws:handler>
+                <jws:handler>
+                    <jws:handler-class>demo.ws_addressing.common.HeaderSnooper</jws:handler-class>
+                </jws:handler>
+            </jws:handler-chain>
+        </jws:handler-chains>
+    </bindings>
 </bindings>
-

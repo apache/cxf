@@ -18,28 +18,15 @@
   under the License.
 -->
 <!-- START SNIPPET: beans -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:simple="http://cxf.apache.org/simple"
-  xmlns:lang="http://www.springframework.org/schema/lang"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
-http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
-
-    <import resource="classpath:META-INF/cxf/cxf.xml" />
-    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:simple="http://cxf.apache.org/simple" xmlns:lang="http://www.springframework.org/schema/lang" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     <lang:jruby id="helloworldImpl" script-source="classpath:HelloWorldImpl.rb" script-interfaces="demo.spring.service.HelloWorld" scope="prototype">
     </lang:jruby>
-
-    <simple:server id="pojoservice"  serviceClass="demo.spring.service.HelloWorld"  address="/HelloWorld">
-
+    <simple:server id="pojoservice" serviceClass="demo.spring.service.HelloWorld" address="/HelloWorld">
         <simple:serviceBean>
-            <ref bean="helloworldImpl" />
+            <ref bean="helloworldImpl"/>
         </simple:serviceBean>
     </simple:server>
-  
-
 </beans>
 <!-- END SNIPPET: beans -->

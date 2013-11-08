@@ -18,10 +18,10 @@
   under the License.
 -->
 <jws:handler-chains xmlns:jws="http://java.sun.com/xml/ns/javaee">
-  <jws:handler-chain>
-    <jws:handler>
-      <jws:handler-name>TrivialSOAPHandler</jws:handler-name>
-      <jws:handler-class>org.apache.cxf.testutil.handler.TrivialSOAPHandler</jws:handler-class>
-    </jws:handler>
-  </jws:handler-chain>
+    <jws:handler-chain>
+        <jws:handler>
+            <jws:handler-name>TrivialSOAPHandler</jws:handler-name>
+            <jws:handler-class>org.apache.cxf.testutil.handler.TrivialSOAPHandler</jws:handler-class>
+        </jws:handler>
+    </jws:handler-chain>
 </jws:handler-chains>

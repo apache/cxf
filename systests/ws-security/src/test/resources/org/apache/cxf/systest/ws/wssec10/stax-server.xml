@@ -17,33 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:interop="http://WSSec/wssec10"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:interop="http://WSSec/wssec10" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-
     <!-- -->
     <!-- Any services listening on port 9001 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
@@ -56,8 +37,7 @@
                 </sec:keyManagers>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="password" resource="certs/alice.jks"/>
-                </sec:trustManagers> 
-
+                </sec:trustManagers>
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_EXPORT_.*</sec:include>
                     <sec:include>.*_EXPORT1024_.*</sec:include>
@@ -72,51 +52,27 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    
     <!-- -->
     <!-- Scenario 3.1 -->
     <!-- -->
-    <jaxws:endpoint 
-       id="UserNameOverTransport"
-       address="https://localhost:${testutil.ports.StaxServer.1}/UserNameOverTransport" 
-       serviceName="interop:PingService"
-       endpointName="interop:UserNameOverTransport_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport"
-       depends-on="tls-settings">
-        
-       <jaxws:properties>
+    <jaxws:endpoint id="UserNameOverTransport" address="https://localhost:${testutil.ports.StaxServer.1}/UserNameOverTransport" serviceName="interop:PingService" endpointName="interop:UserNameOverTransport_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport" depends-on="tls-settings">
+        <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
-        </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    <jaxws:endpoint 
-       id="UserName"
-       address="http://localhost:${testutil.ports.StaxServer}/UserName" 
-       serviceName="interop:PingService"
-       endpointName="interop:UserName_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport">
-        
-       <jaxws:properties>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="UserName" address="http://localhost:${testutil.ports.StaxServer}/UserName" serviceName="interop:PingService" endpointName="interop:UserName_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport">
+        <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
-        </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-
+        </jaxws:properties>
+    </jaxws:endpoint>
     <!-- -->
     <!-- Scenario 3.3 -->
     <!-- -->
-    <jaxws:endpoint 
-       name="{http://WSSec/wssec10}MutualCertificate10SignEncrypt_IPingService"
-       id="MutualCertificate10SignEncrypt"
-       address="http://localhost:${testutil.ports.StaxServer}/MutualCertificate10SignEncrypt" 
-       serviceName="interop:PingService"
-       endpointName="interop:MutualCertificate10SignEncrypt_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncrypt">
-        
+    <jaxws:endpoint name="{http://WSSec/wssec10}MutualCertificate10SignEncrypt_IPingService" id="MutualCertificate10SignEncrypt" address="http://localhost:${testutil.ports.StaxServer}/MutualCertificate10SignEncrypt" serviceName="interop:PingService" endpointName="interop:MutualCertificate10SignEncrypt_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncrypt">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -124,22 +80,12 @@
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
-        </jaxws:properties> 
-
-    </jaxws:endpoint> 
-    
-
+        </jaxws:properties>
+    </jaxws:endpoint>
     <!-- -->
     <!-- Scenario 3.4 -->
     <!-- -->
-    <jaxws:endpoint 
-       name="{http://WSSec/wssec10}MutualCertificate10SignEncryptRsa15TripleDes_IPingService"
-       id="MutualCertificate10SignEncryptRsa15TripleDes"
-       address="http://localhost:${testutil.ports.StaxServer}/MutualCertificate10SignEncryptRsa15TripleDes" 
-       serviceName="interop:PingService"
-       endpointName="interop:MutualCertificate10SignEncryptRsa15TripleDes_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRsa15TripleDes">
-        
+    <jaxws:endpoint name="{http://WSSec/wssec10}MutualCertificate10SignEncryptRsa15TripleDes_IPingService" id="MutualCertificate10SignEncryptRsa15TripleDes" address="http://localhost:${testutil.ports.StaxServer}/MutualCertificate10SignEncryptRsa15TripleDes" serviceName="interop:PingService" endpointName="interop:MutualCertificate10SignEncryptRsa15TripleDes_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRsa15TripleDes">
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.signature.properties" value="bob.properties"/>
@@ -147,9 +93,6 @@
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
-        </jaxws:properties> 
-
-    </jaxws:endpoint> 
-
-    
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>

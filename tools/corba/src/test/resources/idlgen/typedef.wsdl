@@ -17,69 +17,40 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="typedef" targetNamespace="http://schemas.apache.org/idl/typedef.idl" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:corba="http://cxf.apache.org/bindings/corba" 
-    xmlns:corbatm="http://schemas.apache.org/typemap/corba/typedef.idl" 
-    xmlns:tns="http://schemas.apache.org/idl/typedef.idl" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/idltypes/typedef.idl">
-    <corba:typeMapping 
-        targetNamespace="http://schemas.apache.org/typemap/corba/typedef.idl">
-        <corba:anonsequence bound="0" elemtype="corba:long" name="X._3_A" 
-            type="xsd1:X._3_A"/>
-        <corba:anonsequence bound="0" elemtype="corbatm:X._3_A" name="X._2_A" 
-            type="xsd1:X._2_A"/>
-        <corba:anonsequence bound="0" elemtype="corbatm:X._2_A" name="X._1_A" 
-            type="xsd1:X._1_A"/>
-        <corba:anonarray bound="3" elemtype="corbatm:X._1_A" name="X._20_A" 
-            type="xsd1:X._20_A"/>
-        <corba:anonarray bound="2" elemtype="corbatm:X._20_A" name="X._21_A" 
-            type="xsd1:X._21_A"/>
-        <corba:array bound="1" elemtype="corbatm:X._21_A" name="X.A" 
-            repositoryID="IDL:X/A:1.0" type="xsd1:X.A"/>
-        <corba:alias basetype="corba:long" name="X.MyLong" 
-            repositoryID="IDL:X/MyLong:1.0" type="xsd:int"/>
-        <corba:anonarray bound="6" elemtype="corba:string" name="X._22_B" 
-            type="xsd1:X._22_B"/>
-        <corba:anonarray bound="5" elemtype="corbatm:X._22_B" name="X._23_B" 
-            type="xsd1:X._23_B"/>
-        <corba:array bound="4" elemtype="corbatm:X._23_B" name="X.B" 
-            repositoryID="IDL:X/B:1.0" type="xsd1:X.B"/>
-        <corba:alias basetype="corba:string" name="X.C" repositoryID="IDL:X/C:1.0" 
-            type="xsd:string"/>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/typemap/corba/typedef.idl" xmlns:tns="http://schemas.apache.org/idl/typedef.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/typedef.idl" name="typedef" targetNamespace="http://schemas.apache.org/idl/typedef.idl">
+    <corba:typeMapping targetNamespace="http://schemas.apache.org/typemap/corba/typedef.idl">
+        <corba:anonsequence bound="0" elemtype="corba:long" name="X._3_A" type="xsd1:X._3_A"/>
+        <corba:anonsequence bound="0" elemtype="corbatm:X._3_A" name="X._2_A" type="xsd1:X._2_A"/>
+        <corba:anonsequence bound="0" elemtype="corbatm:X._2_A" name="X._1_A" type="xsd1:X._1_A"/>
+        <corba:anonarray bound="3" elemtype="corbatm:X._1_A" name="X._20_A" type="xsd1:X._20_A"/>
+        <corba:anonarray bound="2" elemtype="corbatm:X._20_A" name="X._21_A" type="xsd1:X._21_A"/>
+        <corba:array bound="1" elemtype="corbatm:X._21_A" name="X.A" repositoryID="IDL:X/A:1.0" type="xsd1:X.A"/>
+        <corba:alias basetype="corba:long" name="X.MyLong" repositoryID="IDL:X/MyLong:1.0" type="xsd:int"/>
+        <corba:anonarray bound="6" elemtype="corba:string" name="X._22_B" type="xsd1:X._22_B"/>
+        <corba:anonarray bound="5" elemtype="corbatm:X._22_B" name="X._23_B" type="xsd1:X._23_B"/>
+        <corba:array bound="4" elemtype="corbatm:X._23_B" name="X.B" repositoryID="IDL:X/B:1.0" type="xsd1:X.B"/>
+        <corba:alias basetype="corba:string" name="X.C" repositoryID="IDL:X/C:1.0" type="xsd:string"/>
         <corba:anonstring bound="20" name="X._11_D" type="xsd1:X._11_D"/>
-        <corba:anonsequence bound="0" elemtype="corbatm:X._11_D" name="X._10_D" 
-            type="xsd1:X._10_D"/>
-        <corba:anonsequence bound="0" elemtype="corbatm:X._10_D" name="X._9_D" 
-            type="xsd1:X._9_D"/>
-        <corba:array bound="2" elemtype="corbatm:X._9_D" name="X.D" 
-            repositoryID="IDL:X/D:1.0" type="xsd1:X.D"/>
+        <corba:anonsequence bound="0" elemtype="corbatm:X._11_D" name="X._10_D" type="xsd1:X._10_D"/>
+        <corba:anonsequence bound="0" elemtype="corbatm:X._10_D" name="X._9_D" type="xsd1:X._9_D"/>
+        <corba:array bound="2" elemtype="corbatm:X._9_D" name="X.D" repositoryID="IDL:X/D:1.0" type="xsd1:X.D"/>
         <corba:anonstring bound="10" name="X._24_String10" type="xsd1:X.String10"/>
-        <corba:alias basetype="corbatm:X._24_String10" name="X.String10" 
-            repositoryID="IDL:X/String10:1.0" type="xsd1:X.String10"/>
-        <corba:anonsequence bound="0" elemtype="corbatm:X.String10" name="X._12_E" 
-            type="xsd1:X._12_E"/>
-        <corba:sequence bound="0" elemtype="corbatm:X._12_E" name="X.E" 
-            repositoryID="IDL:X/E:1.0" type="xsd1:X.E"/>
+        <corba:alias basetype="corbatm:X._24_String10" name="X.String10" repositoryID="IDL:X/String10:1.0" type="xsd1:X.String10"/>
+        <corba:anonsequence bound="0" elemtype="corbatm:X.String10" name="X._12_E" type="xsd1:X._12_E"/>
+        <corba:sequence bound="0" elemtype="corbatm:X._12_E" name="X.E" repositoryID="IDL:X/E:1.0" type="xsd1:X.E"/>
         <corba:anonstring bound="1" name="X.op_f._13_p1" type="xsd1:X.op_f._13_p1"/>
         <corba:anonstring bound="2" name="X.op_f._14_p2" type="xsd1:X.op_f._14_p2"/>
         <corba:anonstring bound="3" name="X.op_f._15_p3" type="xsd1:X.op_f._15_p3"/>
         <corba:anonstring bound="4" name="X._16_op_f" type="xsd1:X._16_op_f"/>
         <corba:anonstring bound="20" name="X._17_op_g" type="xsd1:X._17_op_g"/>
         <corba:anonfixed digits="4" name="X._18_H" scale="2" type="xsd:decimal"/>
-        <corba:sequence bound="0" elemtype="corbatm:X._18_H" name="X.H" 
-            repositoryID="IDL:X/H:1.0" type="xsd1:X.H"/>
-        <corba:struct name="X.myStruct" repositoryID="IDL:X/myStruct:1.0" 
-            type="xsd1:X.myStruct">
+        <corba:sequence bound="0" elemtype="corbatm:X._18_H" name="X.H" repositoryID="IDL:X/H:1.0" type="xsd1:X.H"/>
+        <corba:struct name="X.myStruct" repositoryID="IDL:X/myStruct:1.0" type="xsd1:X.myStruct">
             <corba:member idltype="corba:long" name="l"/>
             <corba:member idltype="corba:short" name="o"/>
         </corba:struct>
-        <corba:alias basetype="corbatm:X.myStruct" name="X.Z" repositoryID="IDL:X/Z:1.0" 
-            type="xsd1:X.myStruct"/>
-        <corba:union discriminator="corba:long" name="X.myUnion" 
-            repositoryID="IDL:X/myUnion:1.0" type="xsd1:X.myUnion">
+        <corba:alias basetype="corbatm:X.myStruct" name="X.Z" repositoryID="IDL:X/Z:1.0" type="xsd1:X.myStruct"/>
+        <corba:union discriminator="corba:long" name="X.myUnion" repositoryID="IDL:X/myUnion:1.0" type="xsd1:X.myUnion">
             <corba:unionbranch idltype="corba:long" name="l">
                 <corba:case label="0"/>
             </corba:unionbranch>
@@ -91,32 +62,24 @@
             </corba:unionbranch>
             <corba:unionbranch default="true" idltype="corba:octet" name="o"/>
         </corba:union>
-        <corba:alias basetype="corbatm:X.myUnion" name="X.U" repositoryID="IDL:X/U:1.0" 
-            type="xsd1:X.myUnion"/>       
+        <corba:alias basetype="corbatm:X.myUnion" name="X.U" repositoryID="IDL:X/U:1.0" type="xsd1:X.myUnion"/>
         <corba:const idltype="corba:short" name="X.P" type="xsd:short" value="5"/>
-        <corba:sequence bound="5" elemtype="corba:string" name="X.strSeq" 
-            repositoryID="IDL:X/strSeq:1.0" type="xsd1:X.strSeq"/>
+        <corba:sequence bound="5" elemtype="corba:string" name="X.strSeq" repositoryID="IDL:X/strSeq:1.0" type="xsd1:X.strSeq"/>
         <corba:enum name="X.myEnum" repositoryID="IDL:X/myEnum:1.0" type="xsd1:X.myEnum">
             <corba:enumerator value="AA"/>
             <corba:enumerator value="BB"/>
             <corba:enumerator value="CC"/>
         </corba:enum>
-        <corba:alias basetype="corbatm:X.myEnum" name="X.tEnum" 
-            repositoryID="IDL:X/tEnum:1.0" type="xsd1:X.myEnum"/>
-        <corba:alias basetype="corba:any" name="X.tAny" repositoryID="IDL:X/tAny:1.0" 
-            type="xsd:anyType"/>
-        <corba:exception name="X.eNotFound" repositoryID="IDL:X/eNotFound:1.0" 
-            type="xsd1:X.eNotFound">
+        <corba:alias basetype="corbatm:X.myEnum" name="X.tEnum" repositoryID="IDL:X/tEnum:1.0" type="xsd1:X.myEnum"/>
+        <corba:alias basetype="corba:any" name="X.tAny" repositoryID="IDL:X/tAny:1.0" type="xsd:anyType"/>
+        <corba:exception name="X.eNotFound" repositoryID="IDL:X/eNotFound:1.0" type="xsd1:X.eNotFound">
             <corba:member idltype="corba:string" name="reason"/>
             <corba:member idltype="corba:string" name="type"/>
         </corba:exception>
-        <corba:alias basetype="corba:char" name="X.tChar" repositoryID="IDL:X/tChar:1.0" 
-            type="xsd:byte"/>
+        <corba:alias basetype="corba:char" name="X.tChar" repositoryID="IDL:X/tChar:1.0" type="xsd:byte"/>
     </corba:typeMapping>
     <types>
-     <schema targetNamespace="http://schemas.apache.org/idltypes/typedef.idl" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/typedef.idl">
             <complexType name="X._3_A">
                 <sequence>
                     <element maxOccurs="unbounded" minOccurs="0" name="item" type="int"/>
@@ -124,14 +87,12 @@
             </complexType>
             <complexType name="X._2_A">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="xsd1:X._3_A"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:X._3_A"/>
                 </sequence>
             </complexType>
             <complexType name="X._1_A">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="xsd1:X._2_A"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:X._2_A"/>
                 </sequence>
             </complexType>
             <complexType name="X._4_A">
@@ -171,14 +132,12 @@
             </simpleType>
             <complexType name="X._10_D">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="xsd1:X._11_D"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:X._11_D"/>
                 </sequence>
             </complexType>
             <complexType name="X._9_D">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="xsd1:X._10_D"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:X._10_D"/>
                 </sequence>
             </complexType>
             <complexType name="X.D">
@@ -193,14 +152,12 @@
             </simpleType>
             <complexType name="X._12_E">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="xsd1:X.String10"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:X.String10"/>
                 </sequence>
             </complexType>
             <complexType name="X.E">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="xsd1:X._12_E"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd1:X._12_E"/>
                 </sequence>
             </complexType>
             <simpleType name="X.op_f._13_p1">
@@ -230,8 +187,7 @@
             </simpleType>
             <complexType name="X.H">
                 <sequence>
-                    <element maxOccurs="unbounded" minOccurs="0" name="item" 
-                        type="decimal"/>
+                    <element maxOccurs="unbounded" minOccurs="0" name="item" type="decimal"/>
                 </sequence>
             </complexType>
             <complexType name="X.myStruct">
@@ -829,5 +785,5 @@
         <port binding="tns:XCORBABinding" name="XCORBAPort">
             <corba:address location="IOR:"/>
         </port>
-    </service>        
+    </service>
 </definitions>

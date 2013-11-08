@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <name>Apache CXF Command Line Tools WSDLTo JAXWS Frontend</name>
     <description>Apache CXF Command Line Tools WSDLTo JAXWS Frontend</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -42,23 +41,19 @@
             <artifactId>cxf-tools-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>                                                      
-             <groupId>xml-resolver</groupId>                               
-             <artifactId>xml-resolver</artifactId>
-         </dependency> 
+        <dependency>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-wsdlto-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
-
-
 </project>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,9 +18,9 @@
   under the License.
 -->
 <a xmlns="urn:foo">
- <z:b xmlns:z="urn:z">
+    <z:b xmlns:z="urn:z">
    foo
  </z:b>
- <c>
+    <c>
  </c>
 </a>

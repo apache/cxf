@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>java_first_jaxws_factory_bean</artifactId>
     <name>Java First demo service using the JAXWSFactoryBeans</name>
     <description>Java First demo service using the JAXWSFactoryBeans</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

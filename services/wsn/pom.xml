@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,18 +24,15 @@
     <packaging>pom</packaging>
     <name>Apache CXF WSN service</name>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf.services</groupId>
         <artifactId>cxf-services</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <modules>
         <module>wsn-api</module>
         <module>wsn-core</module>
         <module>wsn-osgi</module>
     </modules>
-
 </project>

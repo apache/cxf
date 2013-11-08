@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,15 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://cxf.apache.org/bugs/oobh" xmlns:intf="http://cxf.apache.org/bugs/oobh" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
-xmlns:wsa="http://www.w3.org/2005/08/addressing"
-xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://cxf.apache.org/bugs/oobh" xmlns:intf="http://cxf.apache.org/bugs/oobh" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/bugs/oobh">
     <wsdl:types>
-
-        <schema targetNamespace="http://cxf.apache.org/bugs/oobh" xmlns="http://www.w3.org/2001/XMLSchema">
-            <import namespace="http://www.w3.org/2005/08/addressing"
-				schemaLocation="classpath:/schemas/wsdl/ws-addr.xsd" />
-
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/bugs/oobh">
+            <import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="classpath:/schemas/wsdl/ws-addr.xsd"/>
             <!--  type defined for soap header  -->
             <complexType name="SessionHeader">
                 <sequence>
@@ -33,7 +28,6 @@ xmlns:xsd="http://www.w3.org/2001/XMLSchema">
                 </sequence>
             </complexType>
             <element name="SessionHeader" type="impl:SessionHeader"/>
-
             <!--  elements for Login operation messages  -->
             <complexType name="LoginRequest">
                 <sequence>
@@ -57,7 +51,6 @@ xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <wsdl:message name="LoginResponse">
         <wsdl:part name="param" element="impl:LoginReturn"/>
     </wsdl:message>
-
     <wsdl:portType name="LoginInterface">
         <wsdl:operation name="Login">
             <wsdl:input name="LoginRequest" message="impl:LoginRequest"/>
@@ -78,11 +71,9 @@ xmlns:xsd="http://www.w3.org/2001/XMLSchema">
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-
     <wsdl:service name="LoginService">
         <wsdl:port name="Login" binding="impl:LoginServiceSoapBinding">
             <wsdlsoap:address location="http://localhost:9999/Login"/>
         </wsdl:port>
-    </wsdl:service  >
+    </wsdl:service>
 </wsdl:definitions>
-

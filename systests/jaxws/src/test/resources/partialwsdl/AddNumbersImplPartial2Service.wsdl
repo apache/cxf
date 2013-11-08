@@ -14,7 +14,6 @@
                 License for the * specific language governing permissions and
                 limitations * under the License.
         -->
-
 <!--
                 * Licensed to the Apache Software Foundation (ASF) under one * or more
                 contributor license agreements. See the NOTICE file * distributed with
@@ -29,12 +28,5 @@
                 License for the * specific language governing permissions and
                 limitations * under the License.
         -->
-
-<definitions targetNamespace="http://jaxws.systest.cxf.apache.org/" 
-             name="WebResultCheckService" 
-             xmlns:tns="http://jaxws.systest.cxf.apache.org/"
-             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-             xmlns="http://schemas.xmlsoap.org/wsdl/">
+<definitions xmlns:tns="http://jaxws.systest.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://jaxws.systest.cxf.apache.org/" name="WebResultCheckService">
 </definitions>
-

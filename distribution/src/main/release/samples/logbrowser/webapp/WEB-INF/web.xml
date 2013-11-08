@@ -17,11 +17,7 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee           http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <servlet>
         <servlet-name>CustomerService</servlet-name>
         <display-name>CustomerService</display-name>
@@ -44,7 +40,6 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet>
         <servlet-name>BrowserServlet</servlet-name>
         <display-name>BrowserServlet</display-name>
@@ -55,12 +50,10 @@
         </init-param>
         <load-on-startup>2</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>BrowserServlet</servlet-name>
         <url-pattern>/log/*</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>CustomerService</servlet-name>
         <url-pattern>/service/*</url-pattern>

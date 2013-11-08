@@ -17,29 +17,29 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Octet/typemap">
-    <corba:alias basetype="corba:octet" repositoryID="IDL:TpOctet:1.0" name="TpOctet" />
-    <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" basetype="TpOctet" repositoryID="IDL:myOctet:1.0" name="myOctet" />
-    <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:TpOctet" elemname="item" bound="0" repositoryID="IDL:TpOctetSet:1.0" type="xs:base64Binary" name="TpOctetSet" />
-    <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:myOctet" elemname="item" bound="0" repositoryID="IDL:TpOctetSet2:1.0" type="xs:base64Binary" name="TpOctetSet2" />
-    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:TpOctet" elemname="item" bound="6" repositoryID="IDL:TpArrayOctet:1.0" type="ns5:TpArrayOctet" name="TpArrayOctet" />
-    <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:myOctet" elemname="item" bound="6" repositoryID="IDL:TpArrayOctet2:1.0" type="ns5:TpArrayOctet2" name="TpArrayOctet2" />
-  </corba:typeMapping>
-  <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <xs:complexType name="TpArrayOctet">
-        <xs:sequence>
-          <xs:element maxOccurs="6" minOccurs="6" name="item" type="xs:unsignedByte">
+<wsdl:definitions xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Octet">
+    <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Octet/typemap">
+        <corba:alias basetype="corba:octet" repositoryID="IDL:TpOctet:1.0" name="TpOctet"/>
+        <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" basetype="TpOctet" repositoryID="IDL:myOctet:1.0" name="myOctet"/>
+        <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:TpOctet" elemname="item" bound="0" repositoryID="IDL:TpOctetSet:1.0" type="xs:base64Binary" name="TpOctetSet"/>
+        <corba:sequence xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:myOctet" elemname="item" bound="0" repositoryID="IDL:TpOctetSet2:1.0" type="xs:base64Binary" name="TpOctetSet2"/>
+        <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:TpOctet" elemname="item" bound="6" repositoryID="IDL:TpArrayOctet:1.0" type="ns5:TpArrayOctet" name="TpArrayOctet"/>
+        <corba:array xmlns:ns5="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:ns4="http://cxf.apache.org/bindings/corba/idl/Octet/typemap" xmlns="" elemtype="ns4:myOctet" elemname="item" bound="6" repositoryID="IDL:TpArrayOctet2:1.0" type="ns5:TpArrayOctet2" name="TpArrayOctet2"/>
+    </corba:typeMapping>
+    <wsdl:types>
+        <xs:schema xmlns="http://cxf.apache.org/bindings/corba/idl/Octet" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Octet">
+            <xs:complexType name="TpArrayOctet">
+                <xs:sequence>
+                    <xs:element maxOccurs="6" minOccurs="6" name="item" type="xs:unsignedByte">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="TpArrayOctet2">
-        <xs:sequence>
-          <xs:element maxOccurs="6" minOccurs="6" name="item" type="xs:unsignedByte">
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TpArrayOctet2">
+                <xs:sequence>
+                    <xs:element maxOccurs="6" minOccurs="6" name="item" type="xs:unsignedByte">
           </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:schema>
-  </wsdl:types>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
 </wsdl:definitions>

@@ -17,10 +17,6 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
-    prefer="system">
-
-    <system systemId="http://example.org/wsdl"
-          uri="classpath:wsdl2java_wsdl/addNumbers.wsdl"/>
-
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://example.org/wsdl" uri="classpath:wsdl2java_wsdl/addNumbers.wsdl"/>
 </catalog>

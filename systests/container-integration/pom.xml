@@ -32,15 +32,14 @@
     <packaging>pom</packaging>
     <url>http://cxf.apache.org</url>
     <modules>
-      <module>webapp</module>
+        <module>webapp</module>
     </modules>
-
     <profiles>
-      <profile>
-        <id>jaxws22</id>
-        <modules>
-          <module>grizzly</module>
-        </modules>
-      </profile>
+        <profile>
+            <id>jaxws22</id>
+            <modules>
+                <module>grizzly</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

@@ -17,15 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions name="BaseService" targetNamespace="http://www.apache.org/bus/demos/bank" xmlns:tns="http://www.apache.org/bus/demos/bank" xmlns:bank="http://www.apache.org/bus/demos/bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://www.apache.org/corba/typemap/BasePortType.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.apache.org/bus/demos/bank/corba/typemap/" xmlns:xsd1="http://soapinterop.org/xsd" xmlns="http://schemas.xmlsoap.org/wsdl/">
-  <corba:typeMapping targetNamespace="http://www.apache.org/bus/demos/bank/corba/typemap/">
-    <corba:sequence xmlns:tns="http://www.apache.org/bus/demos/bank" elemtype="corba:string" bound="0" repositoryID="IDL:AccountNames:1.0" type="tns:AccountNames" name="AccountNames" />
-    <corba:object xmlns:wsa="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="wsa:EndpointReferenceType" name="Object" />
-  </corba:typeMapping>
-  <types>
-    <schema elementFormDefault="qualified" targetNamespace="http://www.apache.org/bus/demos/bank" xmlns="http://www.w3.org/2001/XMLSchema">
-            
+<definitions xmlns:tns="http://www.apache.org/bus/demos/bank" xmlns:bank="http://www.apache.org/bus/demos/bank" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:ns1="http://www.apache.org/corba/typemap/BasePortType.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.apache.org/bus/demos/bank/corba/typemap/" xmlns:xsd1="http://soapinterop.org/xsd" xmlns="http://schemas.xmlsoap.org/wsdl/" name="BaseService" targetNamespace="http://www.apache.org/bus/demos/bank">
+    <corba:typeMapping targetNamespace="http://www.apache.org/bus/demos/bank/corba/typemap/">
+        <corba:sequence xmlns:tns="http://www.apache.org/bus/demos/bank" elemtype="corba:string" bound="0" repositoryID="IDL:AccountNames:1.0" type="tns:AccountNames" name="AccountNames"/>
+        <corba:object xmlns:wsa="http://www.w3.org/2005/08/addressing" repositoryID="IDL:omg.org/CORBA/Object/1.0" type="wsa:EndpointReferenceType" name="Object"/>
+    </corba:typeMapping>
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.apache.org/bus/demos/bank">
             <import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
             <complexType name="AccountNames">
                 <sequence>
@@ -38,86 +36,86 @@
                 </xsd:annotation>
             </xsd:element>
         </schema>
-  </types>
-  <message name="get_balanceResponse">
-    <part name="balance" type="xsd:float"/>
+    </types>
+    <message name="get_balanceResponse">
+        <part name="balance" type="xsd:float"/>
+    </message>
+    <message name="list_accountsResponse">
+        <part name="return" type="tns:AccountNames"/>
+    </message>
+    <message name="delete_accountResponse">
   </message>
-  <message name="list_accountsResponse">
-    <part name="return" type="tns:AccountNames"/>
+    <message name="depositResponse">
   </message>
-  <message name="delete_accountResponse">
+    <message name="deposit">
+        <part name="addition" type="xsd:float"/>
+    </message>
+    <message name="get_balance">
   </message>
-  <message name="depositResponse">
+    <message name="create_account">
+        <part name="account_name" type="xsd:string"/>
+    </message>
+    <message name="get_account">
+        <part name="account_name" type="xsd:string"/>
+    </message>
+    <message name="create_accountResponse">
+        <part name="return" element="tns:AccountRef"/>
+    </message>
+    <message name="list_accounts">
   </message>
-  <message name="deposit">
-    <part name="addition" type="xsd:float"/>
-  </message>
-  <message name="get_balance">
-  </message>
-  <message name="create_account">
-    <part name="account_name" type="xsd:string"/>
-  </message>
-  <message name="get_account">
-    <part name="account_name" type="xsd:string"/>
-  </message>
-  <message name="create_accountResponse">
-    <part name="return" element="tns:AccountRef"/>
-  </message>
-  <message name="list_accounts">
-  </message>
-  <message name="delete_account">
-    <part name="account_name" type="xsd:string"/>
-  </message>
-  <message name="get_accountResponse">
-    <part name="return" element="tns:AccountRef"/>
-  </message>
-  <portType name="Bank">
-    <operation name="list_accounts">
-      <input name="list_accounts" message="tns:create_account"/>
-      <output name="list_accountsResponse" message="tns:list_accountsResponse"/>
-    </operation>
-    <operation name="create_account">
-      <input name="create_account" message="tns:create_account"/>
-      <output name="create_accountResponse" message="tns:create_accountResponse"/>
-    </operation>
-    <operation name="get_account">
-      <input name="get_account" message="tns:get_account"/>
-      <output name="get_accountResponse" message="tns:get_accountResponse"/>
-    </operation>
-    <operation name="delete_account">
-      <input name="delete_account" message="tns:delete_account"/>
-      <output name="delete_accountResponse" message="tns:delete_accountResponse"/>
-    </operation>
-  </portType>
-  <portType name="Account">
-    <operation name="get_balance">
-      <input name="get_balance" message="tns:get_balance"/>
-      <output name="get_balanceResponse" message="tns:get_balanceResponse"/>
-    </operation>
-    <operation name="deposit">
-      <input name="deposit" message="tns:deposit"/>
-      <output name="depositResponse" message="tns:depositResponse"/>
-    </operation>
-  </portType>
-  <binding name="AccountCORBABinding" type="tns:Account">
-    <corba:binding repositoryID="IDL:Account:1.0" />
-    <operation name="get_balance">
-      <corba:operation name="get_balance">
-        <corba:return name="balance" idltype="corba:float" />
-      </corba:operation>
-      <input name="get_balance">
+    <message name="delete_account">
+        <part name="account_name" type="xsd:string"/>
+    </message>
+    <message name="get_accountResponse">
+        <part name="return" element="tns:AccountRef"/>
+    </message>
+    <portType name="Bank">
+        <operation name="list_accounts">
+            <input name="list_accounts" message="tns:create_account"/>
+            <output name="list_accountsResponse" message="tns:list_accountsResponse"/>
+        </operation>
+        <operation name="create_account">
+            <input name="create_account" message="tns:create_account"/>
+            <output name="create_accountResponse" message="tns:create_accountResponse"/>
+        </operation>
+        <operation name="get_account">
+            <input name="get_account" message="tns:get_account"/>
+            <output name="get_accountResponse" message="tns:get_accountResponse"/>
+        </operation>
+        <operation name="delete_account">
+            <input name="delete_account" message="tns:delete_account"/>
+            <output name="delete_accountResponse" message="tns:delete_accountResponse"/>
+        </operation>
+    </portType>
+    <portType name="Account">
+        <operation name="get_balance">
+            <input name="get_balance" message="tns:get_balance"/>
+            <output name="get_balanceResponse" message="tns:get_balanceResponse"/>
+        </operation>
+        <operation name="deposit">
+            <input name="deposit" message="tns:deposit"/>
+            <output name="depositResponse" message="tns:depositResponse"/>
+        </operation>
+    </portType>
+    <binding name="AccountCORBABinding" type="tns:Account">
+        <corba:binding repositoryID="IDL:Account:1.0"/>
+        <operation name="get_balance">
+            <corba:operation name="get_balance">
+                <corba:return name="balance" idltype="corba:float"/>
+            </corba:operation>
+            <input name="get_balance">
       </input>
-      <output name="get_balanceResponse">
+            <output name="get_balanceResponse">
       </output>
-    </operation>
-    <operation name="deposit">
-      <corba:operation name="deposit">
-        <corba:param mode="in" name="addition" idltype="corba:float" />
-      </corba:operation>
-      <input name="deposit">
+        </operation>
+        <operation name="deposit">
+            <corba:operation name="deposit">
+                <corba:param mode="in" name="addition" idltype="corba:float"/>
+            </corba:operation>
+            <input name="deposit">
       </input>
-      <output name="depositResponse">
+            <output name="depositResponse">
       </output>
-    </operation>
-  </binding>
+        </operation>
+    </binding>
 </definitions>

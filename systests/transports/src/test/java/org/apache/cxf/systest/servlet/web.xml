@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-    
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -22,29 +18,24 @@
   specific language governing permissions and limitations
   under the License.
 -->
-    
 <web-app>
-
-  <servlet>
-    <servlet-name>CXFServlet</servlet-name>
-    <display-name>CXF Servlet</display-name>
-    <servlet-class>
+    <servlet>
+        <servlet-name>CXFServlet</servlet-name>
+        <display-name>CXF Servlet</display-name>
+        <servlet-class>
         org.apache.cxf.transport.servlet.CXFServlet
     </servlet-class>
-    <init-param> 
-      <param-name>config-location</param-name> 
-      <param-value>classpath:/org/apache/cxf/systest/servlet/cxf-servlet.xml</param-value> 
-    </init-param> 
-    <!--init-param> 
+        <init-param>
+            <param-name>config-location</param-name>
+            <param-value>classpath:/org/apache/cxf/systest/servlet/cxf-servlet.xml</param-value>
+        </init-param>
+        <!--init-param> 
       <param-name>bus.id</param-name> 
       <param-value>servlet.systest.bus.id</param-value> 
-    </init-param--> 
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>CXFServlet</servlet-name>
-    <url-pattern>/services/*</url-pattern>
-  </servlet-mapping>
-
-
+    </init-param-->
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CXFServlet</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
 </web-app>

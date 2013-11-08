@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,27 +17,16 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jaxws="http://cxf.apache.org/jaxws"
-	xmlns:cxf="http://cxf.apache.org/core"
-	xsi:schemaLocation="
-		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-	
-	<jaxws:server address="http://localhost:${testutil.ports.org.apache.cxf.systest.jaxws.CXF5061Test}/cxf5061"
-		serviceClass="org.apache.cxf.systest.jaxws.TestService">
-		<jaxws:serviceBean>
-			<bean class="org.apache.cxf.systest.jaxws.TestServiceImpl" />
-		</jaxws:serviceBean>
-	</jaxws:server>
-	<jaxws:server address="#{'http://localhost:${testutil.ports.org.apache.cxf.systest.jaxws.CXF5061Test}/cxf5061b' + T(java.lang.Math).random()}"
-		serviceClass="org.apache.cxf.systest.jaxws.TestService">
-		<jaxws:serviceBean>
-			<bean class="org.apache.cxf.systest.jaxws.TestServiceImpl" />
-		</jaxws:serviceBean>
-	</jaxws:server>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="                 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <jaxws:server address="http://localhost:${testutil.ports.org.apache.cxf.systest.jaxws.CXF5061Test}/cxf5061" serviceClass="org.apache.cxf.systest.jaxws.TestService">
+        <jaxws:serviceBean>
+            <bean class="org.apache.cxf.systest.jaxws.TestServiceImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>
+    <jaxws:server address="#{'http://localhost:${testutil.ports.org.apache.cxf.systest.jaxws.CXF5061Test}/cxf5061b' + T(java.lang.Math).random()}" serviceClass="org.apache.cxf.systest.jaxws.TestService">
+        <jaxws:serviceBean>
+            <bean class="org.apache.cxf.systest.jaxws.TestServiceImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>
 </beans>

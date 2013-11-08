@@ -22,14 +22,12 @@
     <artifactId>oauth_demo-server</artifactId>
     <name>OAuth 1.0a server</name>
     <packaging>war</packaging>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
     <build>
         <finalName>oauth_1.0a_server</finalName>
         <plugins>
@@ -52,14 +50,12 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-oauth</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
@@ -78,7 +74,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -116,8 +111,6 @@
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
         </dependency>
-
-
         <dependency>
             <artifactId>standard</artifactId>
             <groupId>taglibs</groupId>
@@ -126,5 +119,4 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
-
 </project>

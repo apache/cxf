@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,6 +18,6 @@
   under the License.
 -->
 <Customer>
-  <name>John</name>
-  <id>123456</id>
-</Customer> 
+    <name>John</name>
+    <id>123456</id>
+</Customer>

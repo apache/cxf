@@ -17,17 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-    <bean id="AegisDatabindingBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding"  >
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="AegisDatabindingBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding">
         <property name="configuration">
             <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
                 <property name="defaultMinOccurs" value="50"/>
             </bean>
         </property>
     </bean>
-
 </beans>

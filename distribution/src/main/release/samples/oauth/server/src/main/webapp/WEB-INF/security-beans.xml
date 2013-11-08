@@ -17,31 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans:beans xmlns="http://www.springframework.org/schema/security"
-             xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:context="http://www.springframework.org/schema/context"
-             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
-                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
-    <beans:bean id="authenticationSuccHandler"
-                class="demo.oauth.server.spring.AuthenticationSuccessfullHandler">
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <beans:bean id="authenticationSuccHandler" class="demo.oauth.server.spring.AuthenticationSuccessfullHandler">
         <beans:property name="defaultTargetUrl" value="/app/newClientForm.jsp"/>
         <beans:property name="confirmationUrl" value="/auth/oauth/authorize/decision"/>
     </beans:bean>
-
-    <beans:bean id="authenticationFailHandler"
-                class="demo.oauth.server.spring.AuthenticationFailureHandler">
+    <beans:bean id="authenticationFailHandler" class="demo.oauth.server.spring.AuthenticationFailureHandler">
         <beans:property name="authorizeUrl" value="/auth/oauth/authorize"/>
     </beans:bean>
-
     <global-method-security secured-annotations="enabled" jsr250-annotations="enabled"/>
-
     <beans:bean id="entryPoint" class="demo.oauth.server.CustomAuth">
         <beans:property name="loginFormUrl" value="/index.jsp"/>
     </beans:bean>
-
     <http auto-config="false" entry-point-ref="entryPoint">
         <intercept-url pattern="/oAuthLogin.jsp" filters="none"/>
         <intercept-url pattern="/index.jsp" filters="none"/>
@@ -50,17 +37,9 @@
         <intercept-url pattern="/auth/oauth/**" filters="none"/>
         <intercept-url pattern="/auth/resources/**" filters="none"/>
         <intercept-url pattern="/**" access="ROLE_USER"/>
-
-        <form-login authentication-success-handler-ref="authenticationSuccHandler"
-                    authentication-failure-handler-ref="authenticationFailHandler" login-page="/index.jsp"
-                    authentication-failure-url="/auth/oauth/authorize"
-                    default-target-url="/app/newClientForm.jsp"/>
-
-        <logout invalidate-session="true" logout-url="/logout.htm"
-                logout-success-url="/login.jsp?loggedout=true"/>
+        <form-login authentication-success-handler-ref="authenticationSuccHandler" authentication-failure-handler-ref="authenticationFailHandler" login-page="/index.jsp" authentication-failure-url="/auth/oauth/authorize" default-target-url="/app/newClientForm.jsp"/>
+        <logout invalidate-session="true" logout-url="/logout.htm" logout-success-url="/login.jsp?loggedout=true"/>
     </http>
-
-
     <authentication-manager>
         <authentication-provider>
             <user-service>
@@ -69,5 +48,4 @@
             </user-service>
         </authentication-provider>
     </authentication-manager>
-
 </beans:beans>

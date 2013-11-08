@@ -48,8 +48,7 @@
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
                                 <frontEnd>cxf</frontEnd>
-                             </defaultOptions>
-
+                            </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest/hello_world_corba.wsdl</wsdl>
@@ -66,7 +65,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-corbatools-maven-plugin</artifactId>
@@ -103,7 +101,6 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -171,9 +168,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -310,7 +307,6 @@
             <artifactId>geronimo-javamail_1.4_spec</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-acl</artifactId>
@@ -331,14 +327,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-             <groupId>xerces</groupId>
-             <artifactId>xercesImpl</artifactId>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
         </dependency>
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
-         </dependency>
-
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
         <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
@@ -371,7 +366,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <profiles>
         <profile>
             <id>async</id>

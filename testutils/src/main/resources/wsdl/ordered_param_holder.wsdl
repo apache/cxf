@@ -19,54 +19,49 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/ordered_param_holder/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ordered_param_holder"
-    targetNamespace="http://cxf.apache.org/ordered_param_holder/">
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/ordered_param_holder/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ordered_param_holder" targetNamespace="http://cxf.apache.org/ordered_param_holder/">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/ordered_param_holder/"
-            xmlns:x1="http://cxf.apache.org/ordered_param_holder/"
-            xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns:x1="http://cxf.apache.org/ordered_param_holder/" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/ordered_param_holder/" elementFormDefault="qualified">
             <complexType name="ComplexStruct">
                 <sequence>
-                    <element name="elem1" type="string" />
-                    <element name="elem2" type="string" />
-                    <element name="elem3" type="int" />
+                    <element name="elem1" type="string"/>
+                    <element name="elem2" type="string"/>
+                    <element name="elem3" type="int"/>
                 </sequence>
             </complexType>
         </schema>
     </wsdl:types>
     <wsdl:message name="OrderedParamHolderResponse">
-        <wsdl:part name="Part1" type="xsd:string" />
-        <wsdl:part name="Part2" type="xsd:int" />
-        <wsdl:part name="Part3" type="tns:ComplexStruct" />
+        <wsdl:part name="Part1" type="xsd:string"/>
+        <wsdl:part name="Part2" type="xsd:int"/>
+        <wsdl:part name="Part3" type="tns:ComplexStruct"/>
     </wsdl:message>
     <wsdl:message name="OrderedParamHolderRequest">
-        <wsdl:part name="Part1" type="xsd:string" />
-        <wsdl:part name="Part2" type="xsd:int" />
-        <wsdl:part name="Part3" type="tns:ComplexStruct" />
+        <wsdl:part name="Part1" type="xsd:string"/>
+        <wsdl:part name="Part2" type="xsd:int"/>
+        <wsdl:part name="Part3" type="tns:ComplexStruct"/>
     </wsdl:message>
     <wsdl:portType name="ordered_param_holder">
         <wsdl:operation name="OrderedParamHolder" parameterOrder="Part3 Part2 Part1">
-            <wsdl:input message="tns:OrderedParamHolderRequest" />
-            <wsdl:output message="tns:OrderedParamHolderResponse" />
+            <wsdl:input message="tns:OrderedParamHolderRequest"/>
+            <wsdl:output message="tns:OrderedParamHolderResponse"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="ordered_param_holderSOAP" type="tns:ordered_param_holder">
-        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="OrderedParamHolder">
-            <soap:operation soapAction="http://cxf.apache.org/ordered_param_holder/OrderedParamHolder" />
+            <soap:operation soapAction="http://cxf.apache.org/ordered_param_holder/OrderedParamHolder"/>
             <wsdl:input>
-                <soap:body namespace="http://cxf.apache.org/ordered_param_holder/" use="literal" />
+                <soap:body namespace="http://cxf.apache.org/ordered_param_holder/" use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body namespace="http://cxf.apache.org/ordered_param_holder/" use="literal" />
+                <soap:body namespace="http://cxf.apache.org/ordered_param_holder/" use="literal"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="ordered_param_holder">
         <wsdl:port binding="tns:ordered_param_holderSOAP" name="ordered_param_holderSOAP">
-            <soap:address location="http://localhost:9002/ordered_param_holder/" />
+            <soap:address location="http://localhost:9002/ordered_param_holder/"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

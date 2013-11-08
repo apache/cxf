@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <!--
 
         Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,20 +17,16 @@
         See the License for the specific language governing permissions and
         limitations under the License.
     -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.apache.cxf.karaf</groupId>
         <artifactId>karaf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>cxf-karaf-commands</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Karaf Commands</name>
     <description>Apache CXF Karaf Commands</description>
-
     <dependencies>
         <!-- cxf -->
         <dependency>
@@ -39,7 +34,6 @@
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <!-- karaf -->
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
@@ -52,8 +46,6 @@
             <version>${cxf.karaf.version}</version>
         </dependency>
     </dependencies>
-
-
     <build>
         <plugins>
             <plugin>

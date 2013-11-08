@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -26,7 +27,6 @@
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <properties>
         <cxf.version>${project.version}</cxf.version>
     </properties>
@@ -40,7 +40,7 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>

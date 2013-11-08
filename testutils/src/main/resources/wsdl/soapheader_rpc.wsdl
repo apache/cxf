@@ -19,24 +19,23 @@
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/header_test/rpc" xmlns:x1="http://apache.org/header_test/rpc/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/header_test/rpc" name="TestHeaderWSDL">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/header_test/rpc/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/header_test/rpc/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/header_test/rpc/types" targetNamespace="http://apache.org/header_test/rpc/types" elementFormDefault="qualified">
             <element name="headerMessage">
                 <complexType>
-		    <sequence>
+                    <sequence>
                         <element name="headerVal" type="string"/>
-		    </sequence>
-		</complexType>
+                    </sequence>
+                </complexType>
             </element>
         </schema>
     </wsdl:types>
     <wsdl:message name="testHeader1Request">
         <wsdl:part name="inHeader" element="x1:headerMessage"/>
-        <wsdl:part name="in" type="xsd:string"/>       
+        <wsdl:part name="in" type="xsd:string"/>
     </wsdl:message>
     <wsdl:message name="testHeader1Response">
         <wsdl:part name="out" type="xsd:string"/>
     </wsdl:message>
-
     <wsdl:message name="testInOutHeaderRequest">
         <wsdl:part name="in" type="xsd:string"/>
         <wsdl:part name="inOutHeader" element="x1:headerMessage"/>
@@ -45,7 +44,6 @@
         <wsdl:part name="out" type="xsd:string"/>
         <wsdl:part name="inOutHeader" element="x1:headerMessage"/>
     </wsdl:message>
-
     <wsdl:portType name="TestRPCHeader">
         <wsdl:operation name="testHeader1">
             <wsdl:input name="testHeader1Request" message="tns:testHeader1Request"/>

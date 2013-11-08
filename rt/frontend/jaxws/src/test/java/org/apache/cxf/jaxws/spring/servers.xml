@@ -17,121 +17,78 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xmlns:soap="http://cxf.apache.org/bindings/soap"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory"
-    lazy-init="false">
-      <property name="transportIds">
-          <list>
-              <value>http://cxf.apache.org/transports/http</value>
-              <value>http://cxf.apache.org/transports/local</value>
-              <value>http://schemas.xmlsoap.org/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-          </list>
-      </property>
-  </bean>
-  <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
-
-  <jaxws:server id="simple" serviceBean="#greeter" 
-        xmlns:test="urn:foo" xmlns="urn:foo"
-        address="http://localhost:8080/testrpc1"/>
-
-
-  <jaxws:server id="simpleWithAddress"
-    serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress1"/>
-
-  <jaxws:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress10">
-    <jaxws:serviceBean>
-      <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
-    </jaxws:serviceBean>
-  </jaxws:server>
-  <jaxws:server id="inlineInvoker"
-    serviceClass="org.apache.hello_world_soap_http.GreeterImpl"
-    address="http://localhost:8080/simpleWithAddress"
-    bus="cxf"
-    endpointName="e:SoapPort_Test1"
-    serviceName="s:SOAPService_Test1"
-    xmlns:e="http://apache.org/hello_world_soap_http"
-    xmlns:s="http://apache.org/hello_world_soap_http">
-    <jaxws:invoker>
-      <bean class="org.apache.cxf.service.invoker.BeanInvoker">
-        <constructor-arg>
-          <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
-        </constructor-arg>
-      </bean>
-    </jaxws:invoker>
-    <jaxws:dataBinding>
-      <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
-    </jaxws:dataBinding>
-  </jaxws:server>
-
-  <jaxws:server id="bookServer"
-  	serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl"
-    address="http://localhost:8080/act"
-    bus="cxf">
-    <jaxws:invoker>
-      <bean class="org.apache.cxf.service.invoker.BeanInvoker">
-        <constructor-arg>
-          <bean class="org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl"/>
-        </constructor-arg>
-      </bean>
-    </jaxws:invoker>
-     <jaxws:dataBinding>
-      <bean class="org.apache.cxf.jaxb.JAXBDataBinding">
-        <property name="namespaceMap">
-    		<map>
-   			<entry>
-      			<key><value>http://cxf.apache.org/anonymous_complex_type/</value></key>
-      			<value>BeepBeep</value>
-   			</entry>
-      		</map>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:soap="http://cxf.apache.org/bindings/soap" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+        <property name="transportIds">
+            <list>
+                <value>http://cxf.apache.org/transports/http</value>
+                <value>http://cxf.apache.org/transports/local</value>
+                <value>http://schemas.xmlsoap.org/soap/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+            </list>
         </property>
-      </bean>
-      </jaxws:dataBinding>
+    </bean>
+    <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
+    <jaxws:server xmlns:test="urn:foo" xmlns="urn:foo" id="simple" serviceBean="#greeter" address="http://localhost:8080/testrpc1"/>
+    <jaxws:server id="simpleWithAddress" serviceBean="#greeter" address="http://localhost:8080/simpleWithAddress1"/>
+    <jaxws:server id="inlineImplementor" address="http://localhost:8080/simpleWithAddress10">
+        <jaxws:serviceBean>
+            <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>
+    <jaxws:server xmlns:e="http://apache.org/hello_world_soap_http" xmlns:s="http://apache.org/hello_world_soap_http" id="inlineInvoker" serviceClass="org.apache.hello_world_soap_http.GreeterImpl" address="http://localhost:8080/simpleWithAddress" bus="cxf" endpointName="e:SoapPort_Test1" serviceName="s:SOAPService_Test1">
+        <jaxws:invoker>
+            <bean class="org.apache.cxf.service.invoker.BeanInvoker">
+                <constructor-arg>
+                    <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
+                </constructor-arg>
+            </bean>
+        </jaxws:invoker>
+        <jaxws:dataBinding>
+            <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
+        </jaxws:dataBinding>
+    </jaxws:server>
+    <jaxws:server id="bookServer" serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl" address="http://localhost:8080/act" bus="cxf">
+        <jaxws:invoker>
+            <bean class="org.apache.cxf.service.invoker.BeanInvoker">
+                <constructor-arg>
+                    <bean class="org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl"/>
+                </constructor-arg>
+            </bean>
+        </jaxws:invoker>
+        <jaxws:dataBinding>
+            <bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+                <property name="namespaceMap">
+                    <map>
+                        <entry>
+                            <key>
+                                <value>http://cxf.apache.org/anonymous_complex_type/</value>
+                            </key>
+                            <value>BeepBeep</value>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </jaxws:dataBinding>
+    </jaxws:server>
+    <jaxws:client id="bookClient" serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexType" address="http://localhost:8080/act"/>
+    <jaxws:server id="inlineSoapBinding" serviceClass="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test">
+        <jaxws:binding>
+            <soap:soapBinding mtomEnabled="true" version="1.2"/>
+        </jaxws:binding>
+    </jaxws:server>
+    <jaxws:server id="inlineWsdlLocation" serviceClass="org.apache.cxf.jaxws.service.GreeterImplDoc" address="http://localhost:8080/wsdl" wsdlLocation="wsdl/hello_world_doc_lit.wsdl">
   </jaxws:server>
-
-  <jaxws:client id="bookClient"
-    serviceClass="org.apache.cxf.anonymous_complex_type.AnonymousComplexType"
-    address="http://localhost:8080/act"/>
-
-  <jaxws:server id="inlineSoapBinding"
-    serviceClass="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test">
-    <jaxws:binding>
-      <soap:soapBinding mtomEnabled="true" version="1.2"/>
-    </jaxws:binding>
-  </jaxws:server>
-
-  <jaxws:server id="inlineWsdlLocation"
-    serviceClass="org.apache.cxf.jaxws.service.GreeterImplDoc"
-    address="http://localhost:8080/wsdl"
-    wsdlLocation="wsdl/hello_world_doc_lit.wsdl">
-  </jaxws:server>
-
-  <jaxws:server id="inlineSoapBindingRPC"
-    serviceClass="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/testrpc">
-    <jaxws:binding>
-      <soap:soapBinding style="rpc"/>
-    </jaxws:binding>
-  </jaxws:server>
-
-  <jaxws:server id="inlineDataBinding"
-    serviceClass="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test1">
-    <jaxws:dataBinding>
-      <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
-    </jaxws:dataBinding>
-  </jaxws:server>
-
-  <jaxws:server serviceBean="#greeter" address="http://localhost:8080/test3"/>
+    <jaxws:server id="inlineSoapBindingRPC" serviceClass="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/testrpc">
+        <jaxws:binding>
+            <soap:soapBinding style="rpc"/>
+        </jaxws:binding>
+    </jaxws:server>
+    <jaxws:server id="inlineDataBinding" serviceClass="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test1">
+        <jaxws:dataBinding>
+            <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
+        </jaxws:dataBinding>
+    </jaxws:server>
+    <jaxws:server serviceBean="#greeter" address="http://localhost:8080/test3"/>
 </beans>

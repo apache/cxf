@@ -17,20 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
     </bean>
-    
-    <jaxws:endpoint 
-        name="{http://cxf.apache.org/greeter_control}GreeterPort" 
-        createdFromAPI="true"
-        wsdlLocation="org/apache/cxf/systest/ws/policy/http_server_greeter_addr.wsdl"/>        
+    <jaxws:endpoint name="{http://cxf.apache.org/greeter_control}GreeterPort" createdFromAPI="true" wsdlLocation="org/apache/cxf/systest/ws/policy/http_server_greeter_addr.wsdl"/>
 </beans>

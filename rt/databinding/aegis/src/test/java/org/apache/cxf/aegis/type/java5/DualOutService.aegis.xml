@@ -1,7 +1,8 @@
+<?xml version="1.0"?>
 <mappings>
-  <mapping>
-    <method name="getValues">
-     <parameter index="0" componentType="java.lang.String"/>
-    </method>
-  </mapping>
+    <mapping>
+        <method name="getValues">
+            <parameter index="0" componentType="java.lang.String"/>
+        </method>
+    </mapping>
 </mappings>

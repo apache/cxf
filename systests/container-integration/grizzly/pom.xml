@@ -28,15 +28,13 @@
     <artifactId>cxf-systests-ci-grizzly</artifactId>
     <name>Apache CXF Container Integration Test Grizzly</name>
     <description>Apache CXF Container Integration Test Grizzly</description>
-
     <repositories>
         <repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven 2</name>
             <url>http://download.java.net/maven/2/</url>
         </repository>
-     </repositories>
-
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -73,10 +71,10 @@
             <version>1.1</version>
             <scope>test</scope>
             <exclusions>
-              <exclusion>
-                <groupId>javax.xml.ws</groupId>
-                <artifactId>jaxws-api</artifactId>
-              </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.ws</groupId>
+                    <artifactId>jaxws-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -95,31 +93,31 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
-                     <execution>
-                         <id>create-endorsed-dir</id>
-                         <phase>validate</phase>
-                         <goals>
-                             <goal>copy</goal>
-                         </goals>
-                         <configuration>
-                             <artifactItems>
-                                 <artifactItem>
-                                     <groupId>org.apache.geronimo.specs</groupId>
-                                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                                     <outputDirectory>${basedir}/target/endorsed</outputDirectory>
-                                 </artifactItem>
-                             </artifactItems>
-                         </configuration>
-                     </execution>
-                 </executions>
-           </plugin>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-surefire-plugin</artifactId>
-               <configuration>
-                   <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
-               </configuration>
-           </plugin> 
+                    <execution>
+                        <id>create-endorsed-dir</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.geronimo.specs</groupId>
+                                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                                    <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>

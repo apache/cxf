@@ -1,40 +1,39 @@
-<application xmlns="http://wadl.dev.java.net/2009/02" 
-             xmlns:xs="http://www.w3.org/2001/XMLSchema">
- 
-  <resources base="http://localhost:8080/baz">
-       <resource path="/TestRs">
-          <param name="id" style="template" type="xs:int"/>
-          <resource path="/helloWorld/{id}/{id2}">
-           <param name="id2" style="template" type="xs:int"/>
-           <method name="GET">
-           <response>
-             <representation mediaType="application/octet-stream">
-               <param name="result" style="plain" type="xs:string"/>
-             </representation></response>
-           </method>
-           
-           <resource path="sub">
-	           <method name="POST"/>
-	       </resource>
-          </resource>
-          <resource path="/helloWorld2">
-           <method name="GET">
-            <response>
-              <representation mediaType="application/octet-stream">
-                <param name="result" style="plain" type="xs:string"/>
-              </representation>
-            </response>
-           </method>
-          </resource>
-          <resource path="/helloWorld3">
-           <method name="GET" id="get">
-            <response>
-              <representation mediaType="application/octet-stream">
-                <param name="result" style="plain" type="xs:string"/>
-              </representation>
-            </response>
-           </method>
-          </resource>
+<?xml version="1.0"?>
+<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <resources base="http://localhost:8080/baz">
+        <resource path="/TestRs">
+            <param name="id" style="template" type="xs:int"/>
+            <resource path="/helloWorld/{id}/{id2}">
+                <param name="id2" style="template" type="xs:int"/>
+                <method name="GET">
+                    <response>
+                        <representation mediaType="application/octet-stream">
+                            <param name="result" style="plain" type="xs:string"/>
+                        </representation>
+                    </response>
+                </method>
+                <resource path="sub">
+                    <method name="POST"/>
+                </resource>
+            </resource>
+            <resource path="/helloWorld2">
+                <method name="GET">
+                    <response>
+                        <representation mediaType="application/octet-stream">
+                            <param name="result" style="plain" type="xs:string"/>
+                        </representation>
+                    </response>
+                </method>
+            </resource>
+            <resource path="/helloWorld3">
+                <method name="GET" id="get">
+                    <response>
+                        <representation mediaType="application/octet-stream">
+                            <param name="result" style="plain" type="xs:string"/>
+                        </representation>
+                    </response>
+                </method>
+            </resource>
         </resource>
-  </resources>
+    </resources>
 </application>

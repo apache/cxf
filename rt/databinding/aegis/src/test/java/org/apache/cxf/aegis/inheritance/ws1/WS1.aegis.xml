@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!-- 
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -17,10 +18,10 @@
  * under the License.
  * -->
 <mappings xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<mapping>
-	<method name="echoMap">
-      <return-type keyType="java.lang.String" valueType="java.lang.String" />
-      <parameter index="0" keyType="java.lang.String" valueType="java.lang.String" />
-    </method>
-	</mapping>
-</mappings> 
+    <mapping>
+        <method name="echoMap">
+            <return-type keyType="java.lang.String" valueType="java.lang.String"/>
+            <parameter index="0" keyType="java.lang.String" valueType="java.lang.String"/>
+        </method>
+    </mapping>
+</mappings>

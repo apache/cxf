@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,44 +17,34 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions
-        name="PizzaService"
-        targetNamespace="http://mypizzaco.com/pizza"
-        xmlns:tns="http://mypizzaco.com/pizza"
-        xmlns:types="http://mypizzaco.com/pizza/types"
-        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-
-  <wsdl:import namespace="http://mypizzaco.com/pizza"  location="pizza_messages.wsdl"/>
-
-  <wsdl:binding name="PizzaPortBinding" type="tns:PizzaPortType">
-    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-    <wsdl:operation name="OrderPizzaBroken">
-      <soap:operation soapAction=""/>
-      <wsdl:input>
-        <soap:header message="tns:CallerIDHeader" part="callerID" use="literal" />
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="OrderPizza">
-      <soap:operation soapAction=""/>
-      <wsdl:input>
-        <soap:header message="tns:OrderPizzaRequest" part="callerID" use="literal" />
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-
-  <wsdl:service name="PizzaService">
-    <wsdl:port name="PizzaPort" binding="tns:PizzaPortBinding">
-      <soap:address location="http://localhost:8080/pizza_service/services/PizzaService"/>
-    </wsdl:port>
-  </wsdl:service>
-
+<wsdl:definitions xmlns:tns="http://mypizzaco.com/pizza" xmlns:types="http://mypizzaco.com/pizza/types" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="PizzaService" targetNamespace="http://mypizzaco.com/pizza">
+    <wsdl:import namespace="http://mypizzaco.com/pizza" location="pizza_messages.wsdl"/>
+    <wsdl:binding name="PizzaPortBinding" type="tns:PizzaPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="OrderPizzaBroken">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:header message="tns:CallerIDHeader" part="callerID" use="literal"/>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="OrderPizza">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:header message="tns:OrderPizzaRequest" part="callerID" use="literal"/>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PizzaService">
+        <wsdl:port name="PizzaPort" binding="tns:PizzaPortBinding">
+            <soap:address location="http://localhost:8080/pizza_service/services/PizzaService"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

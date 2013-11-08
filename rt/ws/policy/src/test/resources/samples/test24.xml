@@ -1,1 +1,7 @@
-<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext"><!-- 2C --><sec:Integrity wsp:Optional="false"><sec:MessageParts Dialect="http://schemas.xmlsoap.org/ws/2002/12/wsse#soap" >wsp:Body()</sec:MessageParts></sec:Integrity></wsp:Policy>
+<?xml version="1.0"?>
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:sec="http://schemas.xmlsoap.org/ws/2002/12/secext">
+    <!-- 2C -->
+    <sec:Integrity wsp:Optional="false">
+        <sec:MessageParts Dialect="http://schemas.xmlsoap.org/ws/2002/12/wsse#soap">wsp:Body()</sec:MessageParts>
+    </sec:Integrity>
+</wsp:Policy>

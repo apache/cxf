@@ -17,14 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorldMessage">
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorldMessage">
     <wsdl:message name="sayHiRequest">
         <wsdl:part name="in" element="x1:sayHi"/>
     </wsdl:message>
@@ -37,11 +30,9 @@
     <wsdl:message name="greetMeResponse">
         <wsdl:part name="out" element="x1:greetMeResponse"/>
     </wsdl:message>
-
     <wsdl:message name="greetMeOneWayRequest">
         <wsdl:part name="in" element="x1:greetMeOneWay"/>
     </wsdl:message>
-   
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
@@ -51,11 +42,9 @@
             <wsdl:input name="greetMeRequest" message="tns:greetMeRequest"/>
             <wsdl:output name="greetMeResponse" message="tns:greetMeResponse"/>
         </wsdl:operation>
-
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input name="greetMeOneWayRequest" message="tns:greetMeOneWayRequest"/>
         </wsdl:operation>
-        
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -77,13 +66,11 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-       
         <wsdl:operation name="greetMeOneWay">
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        
     </wsdl:binding>
-  </wsdl:definitions>
+</wsdl:definitions>

@@ -17,26 +17,14 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jaxws="http://cxf.apache.org/jaxws"
-	xmlns:http="http://cxf.apache.org/transports/http/configuration"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-						http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-						http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
-  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-	<!-- CXF -->
-	<import resource="classpath:META-INF/cxf/cxf.xml" />
-
-   <bean id="attribute-test-proxy-factory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean" >
-    <property name="serviceClass" value="org.apache.cxf.javascript.fortest.AttributeTestService"/>
-    <property name="address" value="local://AttributeTestService"/>
-   </bean>
-	
-	<jaxws:server id="AttributeTestServerBean" 
-                   serviceClass="org.apache.cxf.javascript.fortest.AttributeTestServiceImpl" 
-	               address="local://AttributeTestService">
-	</jaxws:server>
-	
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                                                 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd                                                 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <!-- CXF -->
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean id="attribute-test-proxy-factory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+        <property name="serviceClass" value="org.apache.cxf.javascript.fortest.AttributeTestService"/>
+        <property name="address" value="local://AttributeTestService"/>
+    </bean>
+    <jaxws:server id="AttributeTestServerBean" serviceClass="org.apache.cxf.javascript.fortest.AttributeTestServiceImpl" address="local://AttributeTestService">
+        </jaxws:server>
 </beans>

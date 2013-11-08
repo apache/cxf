@@ -1,17 +1,18 @@
+<?xml version="1.0"?>
 <model xmlns="http://cxf.apache.org/jaxrs">
- <resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotationsInterface" path="bookstore2">
-    <operation name="getBook" verb="GET" path="/books/{id}">
-       <param name="id" type="PATH"/>
-    </operation>
-    <operation name="getBooks" verb="POST" path="/books">
-       <param name="thebooks" type="REQUEST_BODY"/>
-    </operation> 
-    <operation name="getBookChapter" path="/books/{id}/chapter">
-        <param name="id" type="PATH"/>
-    </operation>
-    <operation name="pingBookStore" path="/oneway" verb="POST" oneway="true"/>
- </resource>
- <resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
-    <operation name="getItself" verb="GET"/>
- </resource>
+    <resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotationsInterface" path="bookstore2">
+        <operation name="getBook" verb="GET" path="/books/{id}">
+            <param name="id" type="PATH"/>
+        </operation>
+        <operation name="getBooks" verb="POST" path="/books">
+            <param name="thebooks" type="REQUEST_BODY"/>
+        </operation>
+        <operation name="getBookChapter" path="/books/{id}/chapter">
+            <param name="id" type="PATH"/>
+        </operation>
+        <operation name="pingBookStore" path="/oneway" verb="POST" oneway="true"/>
+    </resource>
+    <resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
+        <operation name="getItself" verb="GET"/>
+    </resource>
 </model>

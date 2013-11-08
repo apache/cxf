@@ -17,36 +17,33 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="anon.idl"
-    targetNamespace="http://schemas.apache.org/idl/anon.idl"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:tns="http://schemas.apache.org/idl/anon.idl"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsd1="http://schemas.apache.org/idltypes/anon.idl"
-    xmlns:corba="http://schemas.apache.org/bindings/corba"
-    xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/idl/anon.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/anon.idl" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap" name="anon.idl" targetNamespace="http://schemas.apache.org/idl/anon.idl">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/anon.idl"
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/anon.idl">
             <complexType name="ArrayType">
                 <sequence>
-                    <element name="p1" type="xsd:string"/>  <!-- This is a single part -->
-                    <element name="p2" type="xsd:string" minOccurs="0"/> <!-- This is mapped to a bound
+                    <element name="p1" type="xsd:string"/>
+                    <!-- This is a single part -->
+                    <element name="p2" type="xsd:string" minOccurs="0"/>
+                    <!-- This is mapped to a bound
 ed sequence with bound 1 -->
-                    <element name="p3" type="xsd:string" minOccurs="5" maxOccurs="5"/> <!-- This should
+                    <element name="p3" type="xsd:string" minOccurs="5" maxOccurs="5"/>
+                    <!-- This should
  be mapped to a corba array -->
-                    <element name="p4" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/> <!-- Thi
+                    <element name="p4" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                    <!-- Thi
 s should be mapped to a corba sequence -->
-                    <element name="p5" type="xsd:string" minOccurs="0" maxOccurs="15"/> <!-- This is cu
+                    <element name="p5" type="xsd:string" minOccurs="0" maxOccurs="15"/>
+                    <!-- This is cu
 rrently mapped to a corba sequence -->
-                    <element name="p6" type="xsd:string" minOccurs="2" maxOccurs="unbounded"/>  <!-- Th
+                    <element name="p6" type="xsd:string" minOccurs="2" maxOccurs="unbounded"/>
+                    <!-- Th
 is is currently mapped to a corba sequence -->
-                    <element name="p7" type="xsd:string" minOccurs="3" maxOccurs="10"/> <!-- This is cu
+                    <element name="p7" type="xsd:string" minOccurs="3" maxOccurs="10"/>
+                    <!-- This is cu
 rrently mapped to a corba sequence -->
                 </sequence>
             </complexType>
-
         </schema>
     </types>
     <message name="X.op_a">
@@ -55,7 +52,6 @@ rrently mapped to a corba sequence -->
     <message name="X.op_aResponse">
         <part name="return" type="xsd:string"/>
     </message>
-
     <portType name="X">
         <operation name="op_a">
             <input message="tns:X.op_a" name="op_a"/>

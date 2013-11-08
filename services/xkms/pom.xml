@@ -19,30 +19,26 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.apache.cxf.services.xkms</groupId>
     <artifactId>cxf-services-xkms</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF XKMS</name>
     <description>Apache CXF XKMS service</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf.services</groupId>
         <artifactId>cxf-services</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <modules>
-      <module>xkms-common</module>
-      <module>xkms-x509-handlers</module>
-      <module>xkms-service</module>
-      <module>xkms-client</module>
-      <module>xkms-features</module>
-      <module>xkms-osgi</module>
-      <module>xkms-war</module>
-      <module>xkms-itests</module>
+        <module>xkms-common</module>
+        <module>xkms-x509-handlers</module>
+        <module>xkms-service</module>
+        <module>xkms-client</module>
+        <module>xkms-features</module>
+        <module>xkms-osgi</module>
+        <module>xkms-war</module>
+        <module>xkms-itests</module>
     </modules>
-    
 </project>

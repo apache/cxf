@@ -17,39 +17,28 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="HelloWorldService" 
-    targetNamespace="http://cxf.apache.org/hello_world_jms" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:jms="http://cxf.apache.org/transports/jms" 
-    xmlns:x1="http://cxf.apache.org/hello_world_jms/types"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://cxf.apache.org/hello_world_jms" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:x1="http://cxf.apache.org/hello_world_jms/types" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/hello_world_jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldService" targetNamespace="http://cxf.apache.org/hello_world_jms">
     <types>
-        <schema targetNamespace="http://cxf.apache.org/hello_world_jms/types"      
-		xmlns="http://www.w3.org/2001/XMLSchema" 
-		xmlns:x1="http://cxf.apache.org/hello_world_jms/types" 
-		elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/hello_world_jms/types" targetNamespace="http://cxf.apache.org/hello_world_jms/types" elementFormDefault="qualified">
             <complexType name="ErrorCode">
-                 <sequence>
+                <sequence>
                     <element name="minor" type="short"/>
                     <element name="major" type="short"/>
                 </sequence>
             </complexType>
-                <complexType name="testRpcLitFault">
-                    <sequence>
-                        <element name="faultType" type="string"/>
-                    </sequence>
-                </complexType>
-                <complexType name="testRpcLitFaultResponse">
-                    <sequence/>
-                </complexType>
-
-                <complexType name="NoSuchCodeLit">
-                    <sequence>
-                        <element name="code" type="x1:ErrorCode"/>
-                    </sequence>
-                </complexType>
+            <complexType name="testRpcLitFault">
+                <sequence>
+                    <element name="faultType" type="string"/>
+                </sequence>
+            </complexType>
+            <complexType name="testRpcLitFaultResponse">
+                <sequence/>
+            </complexType>
+            <complexType name="NoSuchCodeLit">
+                <sequence>
+                    <element name="code" type="x1:ErrorCode"/>
+                </sequence>
+            </complexType>
             <complexType name="BadRecord">
                 <sequence>
                     <element name="reason" type="string"/>
@@ -58,7 +47,6 @@
             </complexType>
         </schema>
     </types>
-
     <message name="greetMe">
         <part name="stringParam0" type="xsd:string"/>
     </message>
@@ -72,7 +60,6 @@
     <message name="greetMeOneWay">
         <part name="stringParam0" type="xsd:string"/>
     </message>
-    
     <message name="testRpcLitFaultRequest">
         <part name="in" type="xsd:string"/>
     </message>
@@ -85,7 +72,6 @@
     <message name="BadRecordLitFault">
         <part name="BadRecordLit" type="xsd:string"/>
     </message>
-    
     <portType name="HelloWorldPortType">
         <operation name="greetMe">
             <input message="tns:greetMe" name="greetMe"/>
@@ -105,46 +91,39 @@
             <fault name="BadRecordLitFault" message="tns:BadRecordLitFault"/>
         </operation>
     </portType>
-
     <binding name="HelloWorldPortBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
-                <soap:body 
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </input>
             <output name="greetMeResponse">
-                <soap:body  
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </output>
         </operation>
         <operation name="sayHi">
             <soap:operation soapAction="" style="rpc"/>
             <input name="sayHi">
-                <soap:body 
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </input>
             <output name="sayHiResponse">
-                <soap:body 
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </output>
         </operation>
         <operation name="greetMeOneWay">
             <soap:operation style="rpc"/>
             <input name="greetMeOneWay">
-                <soap:body 
-                    namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </input>
         </operation>
-
-         <operation name="testRpcLitFault">
+        <operation name="testRpcLitFault">
             <soap:operation style="rpc"/>
             <input>
-                <soap:body namespace="http://cxf.apache.org/hello_world_jms"  use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </input>
             <output>
-                <soap:body namespace="http://cxf.apache.org/hello_world_jms"  use="literal"/>
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
             </output>
             <fault name="NoSuchCodeLitFault">
                 <soap:fault name="NoSuchCodeLitFault" use="literal"/>
@@ -154,19 +133,13 @@
             </fault>
         </operation>
     </binding>
-
     <service name="HelloWorldService">
-           <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
-               <jms:address
-                   jndiConnectionFactoryName="ConnectionFactory" 
-                   jndiDestinationName="dynamicQueues/test.jmstransport.text">
-                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-               </jms:address>
-            
-               <jms:server durableSubscriberName="CXF_subscriber"/>
-           </port>
+        <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
+            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text">
+                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+            </jms:address>
+            <jms:server durableSubscriberName="CXF_subscriber"/>
+        </port>
     </service>
 </definitions>
-
-

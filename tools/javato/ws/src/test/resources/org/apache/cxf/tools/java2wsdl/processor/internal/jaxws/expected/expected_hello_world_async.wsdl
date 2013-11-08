@@ -17,56 +17,56 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="GreeterAsyncService" targetNamespace="http://apache.org/hello_world_async_soap_http" xmlns:tns="http://apache.org/hello_world_async_soap_http" xmlns:ns1="http://apache.org/hello_world_async_soap_http/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://apache.org/hello_world_async_soap_http/types" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/hello_world_async_soap_http/types">
-<xs:element name="greetMeSometime">
-<xs:complexType>
-<xs:sequence>
-<xs:element form="qualified" name="requestType" type="xs:string"/>
-</xs:sequence>
-</xs:complexType>
-</xs:element>
-<xs:element name="greetMeSometimeResponse">
-<xs:complexType>
-<xs:sequence>
-<xs:element form="qualified" name="responseType" type="xs:string"/>
-</xs:sequence>
-</xs:complexType>
-</xs:element>
-</xs:schema>
-  </wsdl:types>
-  <wsdl:message name="greetMeSometime">
-    <wsdl:part name="parameters" element="ns1:greetMeSometime">
+<wsdl:definitions xmlns:tns="http://apache.org/hello_world_async_soap_http" xmlns:ns1="http://apache.org/hello_world_async_soap_http/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="GreeterAsyncService" targetNamespace="http://apache.org/hello_world_async_soap_http">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://apache.org/hello_world_async_soap_http/types" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/hello_world_async_soap_http/types">
+            <xs:element name="greetMeSometime">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element form="qualified" name="requestType" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="greetMeSometimeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element form="qualified" name="responseType" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="greetMeSometime">
+        <wsdl:part name="parameters" element="ns1:greetMeSometime">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="greetMeSometimeResponse">
-    <wsdl:part name="parameters" element="ns1:greetMeSometimeResponse">
+    </wsdl:message>
+    <wsdl:message name="greetMeSometimeResponse">
+        <wsdl:part name="parameters" element="ns1:greetMeSometimeResponse">
     </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="GreeterAsync">
-    <wsdl:operation name="greetMeSometime">
-      <wsdl:input name="greetMeSometime" message="tns:greetMeSometime">
+    </wsdl:message>
+    <wsdl:portType name="GreeterAsync">
+        <wsdl:operation name="greetMeSometime">
+            <wsdl:input name="greetMeSometime" message="tns:greetMeSometime">
     </wsdl:input>
-      <wsdl:output name="greetMeSometimeResponse" message="tns:greetMeSometimeResponse">
+            <wsdl:output name="greetMeSometimeResponse" message="tns:greetMeSometimeResponse">
     </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="GreeterAsyncServiceSoapBinding" type="tns:GreeterAsync">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="greetMeSometime">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="greetMeSometime">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="greetMeSometimeResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="GreeterAsyncService">
-    <wsdl:port name="GreeterAsyncPort" binding="tns:GreeterAsyncServiceSoapBinding">
-      <soap:address location="http://localhost:9090"/>
-    </wsdl:port>
-  </wsdl:service>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="GreeterAsyncServiceSoapBinding" type="tns:GreeterAsync">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="greetMeSometime">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="greetMeSometime">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="greetMeSometimeResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="GreeterAsyncService">
+        <wsdl:port name="GreeterAsyncPort" binding="tns:GreeterAsyncServiceSoapBinding">
+            <soap:address location="http://localhost:9090"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

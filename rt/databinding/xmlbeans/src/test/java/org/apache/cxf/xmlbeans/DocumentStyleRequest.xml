@@ -1,11 +1,12 @@
+<?xml version="1.0"?>
 <env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Header/>
- <env:Body xmlns="urn:TestService">
- 	<mixedRequest>
-	    <string>foo</string>
-	    <request xmlns="http://cxf.apache.org/xmlbeans">
-	      <sessionId>foo</sessionId>
-	    </request>
-    </mixedRequest>
- </env:Body>
+    <env:Header/>
+    <env:Body xmlns="urn:TestService">
+        <mixedRequest>
+            <string>foo</string>
+            <request xmlns="http://cxf.apache.org/xmlbeans">
+                <sessionId>foo</sessionId>
+            </request>
+        </mixedRequest>
+    </env:Body>
 </env:Envelope>

@@ -21,11 +21,10 @@
     <import file="../performance/etc/common_build.xml"/>
     <property name="wsdl.dir" location="${basedir}/wsdl"/>
     <property name="wsdl.file" value="Benchmark.wsdl"/>
-
     <target name="client" description="run Benchmark client">
-         <java maxmemory="512m" fork="true" classname="org.apache.cxf.performance.client.BenchClient">
+        <java maxmemory="512m" fork="true" classname="org.apache.cxf.performance.client.BenchClient">
             <jvmarg line="-server -Xmx512m -Dtest.setup=LINUX_PENTIUM_M -Dserver.name=CXF"/>
-           <!--file:${basedir}/wsdl/${wsdl.file} wsldlocation 
+            <!--file:${basedir}/wsdl/${wsdl.file} wsldlocation 
                 200    totalelementtosend
                 aa     to invoke all method
                 1,10   the arraysize for eacho call  -->
@@ -34,17 +33,12 @@
             <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
             <sysproperty key="log4j.configuration" value="file:///${cxf.etc.dir}/log4j.properties"/>
         </java>
-
     </target>
-
     <target name="server" description="run Benchmark server">
         <cxf.server.run classname="org.apache.cxf.performance.server.BenchmarkServer" argline="${basedir}/wsdl/${wsdl.file}"/>
     </target>
-
-     <target name="generate.code">
+    <target name="generate.code">
         <echo level="info" message="Generating code using wsdl2java..."/>
         <wsdl2java file="Benchmark.wsdl"/>
     </target>
-  
-
 </project>

@@ -17,51 +17,43 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:foo="http://cxf.apache.org/configuration/foo"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:foo="http://cxf.apache.org/configuration/foo" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="cxf" class="org.apache.cxf.bus.extension.ExtensionManagerBus">
         <property name="inInterceptors">
-           <list>
-              <ref bean="in-a"/>
-              <ref bean="in-b"/>
-           </list>
+            <list>
+                <ref bean="in-a"/>
+                <ref bean="in-b"/>
+            </list>
         </property>
         <property name="inFaultInterceptors">
-           <list>
-              <ref bean="in-fault"/>
-           </list>
+            <list>
+                <ref bean="in-fault"/>
+            </list>
         </property>
         <property name="outInterceptors">
-           <list>
-              <ref bean="out"/>
-           </list>
+            <list>
+                <ref bean="out"/>
+            </list>
         </property>
         <property name="outFaultInterceptors">
-           <list>
-              <ref bean="out-fault"/>
-           </list>
+            <list>
+                <ref bean="out-fault"/>
+            </list>
         </property>
-        
     </bean>
-    
-    <bean id ="in-a" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
+    <bean id="in-a" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
         <property name="name" value="in-a"/>
     </bean>
-    <bean id ="in-b" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
+    <bean id="in-b" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
         <property name="name" value="in-b"/>
     </bean>
-    <bean id ="out" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
+    <bean id="out" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
         <property name="name" value="out"/>
     </bean>
-    <bean id ="in-fault" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
+    <bean id="in-fault" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
         <property name="name" value="in-fault"/>
     </bean>
-    <bean id ="out-fault" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
+    <bean id="out-fault" class="org.apache.cxf.bus.spring.SpringBusFactoryTest$TestInterceptor">
         <property name="name" value="out-fault"/>
     </bean>
-
 </beans>

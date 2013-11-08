@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,14 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<b:numbers
-    xmlns:b="urn:Bean"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
-    soapenc:arrayType="xsd:ur-type[3]">
-
-  <thing xsi:type="xsd:int">42</thing>
-  <thing xsi:type="xsd:float">42.42</thing>
-  <thing xsi:type="xsd:string">Forty Two</thing>
+<b:numbers xmlns:b="urn:Bean" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" soapenc:arrayType="xsd:ur-type[3]">
+    <thing xsi:type="xsd:int">42</thing>
+    <thing xsi:type="xsd:float">42.42</thing>
+    <thing xsi:type="xsd:string">Forty Two</thing>
 </b:numbers>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
    Licensed to the Apache Software Foundation (ASF) under one
    or more contributor license agreements. See the NOTICE file
@@ -16,4 +17,12 @@
    specific language governing permissions and limitations
    under the License.
 -->
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><soap:Body><verifyDataIntegrity xmlns="http://base64.services.aegis.cxf.apache.org"><data/><length>0</length><crc32>0</crc32></verifyDataIntegrity></soap:Body></soap:Envelope>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <verifyDataIntegrity xmlns="http://base64.services.aegis.cxf.apache.org">
+            <data/>
+            <length>0</length>
+            <crc32>0</crc32>
+        </verifyDataIntegrity>
+    </soap:Body>
+</soap:Envelope>

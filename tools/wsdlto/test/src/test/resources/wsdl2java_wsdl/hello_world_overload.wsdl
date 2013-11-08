@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -83,4 +76,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

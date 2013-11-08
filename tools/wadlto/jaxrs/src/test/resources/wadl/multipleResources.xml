@@ -18,25 +18,24 @@
   under the License.
 -->
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
-
- <resources base="http://localhost:8080/baz">
-   <resource path="/bookstore">
-     <method name="GET">
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-   </resource>
-   <resource path="/books">
-     <method name="GET">
-      <response>
-       <representation mediaType="text/plain">
-        <param name="result" style="plain" type="xs:string"/>
-       </representation>
-      </response>
-    </method>
-   </resource>
- </resources>  
+    <resources base="http://localhost:8080/baz">
+        <resource path="/bookstore">
+            <method name="GET">
+                <response>
+                    <representation mediaType="text/plain">
+                        <param name="result" style="plain" type="xs:string"/>
+                    </representation>
+                </response>
+            </method>
+        </resource>
+        <resource path="/books">
+            <method name="GET">
+                <response>
+                    <representation mediaType="text/plain">
+                        <param name="result" style="plain" type="xs:string"/>
+                    </representation>
+                </response>
+            </method>
+        </resource>
+    </resources>
 </application>

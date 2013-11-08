@@ -17,36 +17,24 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<definitions name="HelloWorld"
-	     xmlns="http://schemas.xmlsoap.org/wsdl/"
-	     xmlns:tns="http://cxf.apache.org/hello_world/discovery"
-	     xmlns:x1="http://cxf.apache.org/hello_world/discovery/types"
-	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	     targetNamespace="http://cxf.apache.org/hello_world/discovery"
-	     xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/hello_world/discovery" xmlns:x1="http://cxf.apache.org/hello_world/discovery/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" name="HelloWorld" targetNamespace="http://cxf.apache.org/hello_world/discovery">
     <wsdl:types>
-	<schema targetNamespace="http://cxf.apache.org/hello_world/discovery/types" 
-		xmlns="http://www.w3.org/2001/XMLSchema" 
-		xmlns:x1="http://cxf.apache.org/hello_world/discovery/types" 
-		elementFormDefault="qualified">
-	    <simpleType name="MyStringType">
-		<restriction base="string">
-		    <maxLength value="30" />
-		</restriction>
-	    </simpleType>
-
-	    <element name="sayHi">
-		<complexType/>
-	    </element>
-	    <element name="sayHiResponse">
-		<complexType>
-		    <sequence>
-			<element name="responseType" type="string"/>
-		    </sequence>
-		</complexType>
-	    </element>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/hello_world/discovery/types" targetNamespace="http://cxf.apache.org/hello_world/discovery/types" elementFormDefault="qualified">
+            <simpleType name="MyStringType">
+                <restriction base="string">
+                    <maxLength value="30"/>
+                </restriction>
+            </simpleType>
+            <element name="sayHi">
+                <complexType/>
+            </element>
+            <element name="sayHiResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
             <element name="greetMe">
                 <complexType>
                     <sequence>
@@ -68,23 +56,22 @@
                     </sequence>
                 </complexType>
             </element>
-	    <element name="pingMe">
-		<complexType/>
-	    </element>
-	    <element name="pingMeResponse">
-		<complexType/>
-	    </element>
-	    <element name="faultDetail">
-		<complexType>
-		    <sequence>
-			<element name="minor" type="short"/>
-			<element name="major" type="short"/>
-		    </sequence>
+            <element name="pingMe">
+                <complexType/>
+            </element>
+            <element name="pingMeResponse">
+                <complexType/>
+            </element>
+            <element name="faultDetail">
+                <complexType>
+                    <sequence>
+                        <element name="minor" type="short"/>
+                        <element name="major" type="short"/>
+                    </sequence>
                 </complexType>
-	    </element>
+            </element>
         </schema>
     </wsdl:types>
-
     <wsdl:message name="sayHiRequest">
         <wsdl:part name="in" element="x1:sayHi"/>
     </wsdl:message>
@@ -101,15 +88,14 @@
         <wsdl:part element="x1:greetMeOneWay" name="in"/>
     </wsdl:message>
     <wsdl:message name="pingMeRequest">
-	<wsdl:part name="in" element="x1:pingMe"/>
+        <wsdl:part name="in" element="x1:pingMe"/>
     </wsdl:message>
     <wsdl:message name="pingMeResponse">
         <wsdl:part name="out" element="x1:pingMeResponse"/>
-    </wsdl:message>		
-    <wsdl:message name="pingMeFault">
-	<wsdl:part name="faultDetail" element="x1:faultDetail"/>
     </wsdl:message>
-
+    <wsdl:message name="pingMeFault">
+        <wsdl:part name="faultDetail" element="x1:faultDetail"/>
+    </wsdl:message>
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input name="sayHiRequest" message="tns:sayHiRequest"/>
@@ -119,28 +105,26 @@
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
-	<wsdl:operation name="pingMe">
-	    <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
-	    <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
-	    <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
-        </wsdl:operation> 
+        <wsdl:operation name="pingMe">
+            <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
+            <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
+            <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
+        </wsdl:operation>
     </wsdl:portType>
-
     <wsdl:binding name="GreeterBinding" type="tns:Greeter">
-	<soap12:binding transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" style="document" />
-	<operation name="sayHi">
-	    <soap12:operation style="document" soapAction=""/>
-	    <input>
-		<soap12:body use="literal" />
-	    </input>
-	    <output>
-		<soap12:body use="literal" />
-	    </output>
-	</operation>
+        <soap12:binding transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" style="document"/>
+        <operation name="sayHi">
+            <soap12:operation style="document" soapAction=""/>
+            <input>
+                <soap12:body use="literal"/>
+            </input>
+            <output>
+                <soap12:body use="literal"/>
+            </output>
+        </operation>
         <wsdl:operation name="greetMe">
             <soap12:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeRequest">
@@ -150,16 +134,15 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMeOneWay">
             <soap12:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
                 <soap12:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-	<operation name="pingMe">
-	    <soap12:operation style="document"/>
-	    <input>
+        <operation name="pingMe">
+            <soap12:operation style="document"/>
+            <input>
                 <soap12:body use="literal"/>
             </input>
             <output>
@@ -170,7 +153,6 @@
             </fault>
         </operation>
     </wsdl:binding>
-
     <wsdl:service name="GreeterService">
         <wsdl:port name="GreeterPort" binding="tns:GreeterBinding">
             <soap12:address location="http://localhost:9000/GreeterURL"/>

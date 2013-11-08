@@ -17,20 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http"
-    xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_soap_http" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType>
-                	<sequence>
-                	    <element name="cдмРДпЎ" type="string"/>
-                	</sequence>
+                    <sequence>
+                        <element name="cдмРДпЎ" type="string"/>
+                    </sequence>
                 </complexType>
             </element>
             <element name="sayHiResponse">
@@ -48,14 +42,13 @@
     <wsdl:message name="saЏHiResponse">
         <wsdl:part name="out" element="x1:sayHiResponse"/>
     </wsdl:message>
-
     <wsdl:portType name="Greeter">
         <wsdl:documentation>porttype documntation</wsdl:documentation>
         <wsdl:operation name="saЏHi">
             <wsdl:documentation>porttype op docs in сўяїГѓїС</wsdl:documentation>
             <wsdl:input name="saЏHiRequest" message="tns:saЏHiRequest"/>
             <wsdl:output name="saЏHiResponse" message="tns:saЏHiResponse"/>
-        </wsdl:operation>      
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -76,4 +69,3 @@
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
-

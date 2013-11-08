@@ -1,9 +1,7 @@
+<?xml version="1.0"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
-        <ns2:LocateResult xmlns="http://www.w3.org/2000/09/xmldsig#"
-            xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#"
-            ResultMajor="http://www.w3.org/2002/03/xkms#Success" Id="3bcbb1d6-3215-41aa-aafe-8192e324d283"
-            Service="http://services.sopera.org/xkms/v2.0">
+        <ns2:LocateResult xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#" ResultMajor="http://www.w3.org/2002/03/xkms#Success" Id="3bcbb1d6-3215-41aa-aafe-8192e324d283" Service="http://services.sopera.org/xkms/v2.0">
             <ns2:UnverifiedKeyBinding>
                 <KeyInfo>
                     <X509Data>

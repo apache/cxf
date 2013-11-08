@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -22,13 +23,11 @@
     <name>JAX-WS Asynchronous Demo using Document/Literal Style</name>
     <description>JAX-WS Asynchronous Demo using Document/Literal Style</description>
     <packaging>war</packaging>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <wsdl.location>${basedir}/wsdl/hello_world_async.wsdl</wsdl.location>

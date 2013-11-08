@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Licensed to the v Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,7 +18,7 @@
   under the License.
 -->
 <ns1:items xmlns:ns1="urn:borghes">
-<ns2:string xmlns:ns2="urn:org.apache.cxf.aegis.types">cat</ns2:string>
-<ns2:string xmlns:ns2="urn:org.apache.cxf.aegis.types">dog</ns2:string>
-<ns2:string xmlns:ns2="urn:org.apache.cxf.aegis.types">hailstorm</ns2:string>
+    <ns2:string xmlns:ns2="urn:org.apache.cxf.aegis.types">cat</ns2:string>
+    <ns2:string xmlns:ns2="urn:org.apache.cxf.aegis.types">dog</ns2:string>
+    <ns2:string xmlns:ns2="urn:org.apache.cxf.aegis.types">hailstorm</ns2:string>
 </ns1:items>

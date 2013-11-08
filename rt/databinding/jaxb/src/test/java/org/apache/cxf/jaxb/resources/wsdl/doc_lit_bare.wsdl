@@ -19,7 +19,7 @@
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_doc_lit_bare" xmlns:x1="http://apache.org/hello_world_doc_lit_bare/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_doc_lit_bare" name="DocLitBare" elementFormDefault="qualified">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_doc_lit_bare/types" xmlns:tns="http://apache.org/hello_world_doc_lit_bare/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns:tns="http://apache.org/hello_world_doc_lit_bare/types" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_doc_lit_bare/types" elementFormDefault="qualified">
             <complexType name="TradePriceData">
                 <sequence>
                     <element name="tickerSymbol" type="xsd:string"/>
@@ -35,42 +35,32 @@
         <part name="body" element="x1:in"/>
     </message>
     <message name="PutLastTradedPriceOutput"/>
-
     <message name="SayHiInput">
         <part name="body" element="x1:inout"/>
     </message>
     <message name="SayHiOutput">
         <part name="body" element="x1:inout"/>
     </message>
-    
     <message name="bareNoParamRequest"/>
-    
     <message name="bareNoParamResponse">
         <part element="x1:stringRespType" name="theResponse"/>
     </message>
-
     <portType name="PutLastTradedPricePortType">
-
         <operation name="SayHi">
             <input message="tns:SayHiInput"/>
             <output message="tns:SayHiOutput"/>
         </operation>
-    
         <operation name="PutLastTradedPrice">
             <input message="tns:PutLastTradedPriceInput"/>
             <output message="tns:PutLastTradedPriceOutput"/>
         </operation>
-    
         <operation name="bareNoParam">
             <input message="tns:bareNoParamRequest"/>
             <output message="tns:bareNoParamResponse"/>
         </operation>
-        
     </portType>
-    
     <binding name="PutLastTradedPriceSoapBinding" type="tns:PutLastTradedPricePortType">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <operation name="SayHi">
             <input>
                 <soap:body use="literal"/>
@@ -79,7 +69,6 @@
                 <soap:body use="literal"/>
             </output>
         </operation>
-        
         <operation name="PutLastTradedPrice">
             <input>
                 <soap:body use="literal"/>
@@ -88,7 +77,6 @@
                 <soap:body use="literal"/>
             </output>
         </operation>
-        
         <operation name="bareNoParam">
             <input>
                 <soap:body use="literal"/>
@@ -96,7 +84,7 @@
             <output>
                 <soap:body use="literal"/>
             </output>
-        </operation>        
+        </operation>
     </binding>
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="tns:PutLastTradedPriceSoapBinding">

@@ -17,19 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
-       xsi:schemaLocation="
-http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-	<import resource="rminterceptors.xml" />
-
-	<wsrm-mgr:rmManager id="org.apache.cxf.ws.rm.RMManager">
-		<wsrm-mgr:sourcePolicy>
-			<wsrm-mgr:sequenceTerminationPolicy maxLength="1" />
-		</wsrm-mgr:sourcePolicy>
-	</wsrm-mgr:rmManager>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager" xsi:schemaLocation=" http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="rminterceptors.xml"/>
+    <wsrm-mgr:rmManager id="org.apache.cxf.ws.rm.RMManager">
+        <wsrm-mgr:sourcePolicy>
+            <wsrm-mgr:sequenceTerminationPolicy maxLength="1"/>
+        </wsrm-mgr:sourcePolicy>
+    </wsrm-mgr:rmManager>
 </beans>

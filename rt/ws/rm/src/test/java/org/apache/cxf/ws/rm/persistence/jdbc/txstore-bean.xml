@@ -17,29 +17,12 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"       
-       xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
-       xsi:schemaLocation="
-http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
-http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd
-
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-   
-    <import resource="classpath:/org/apache/cxf/ws/rm/rmmanager.xml"/>  
-   
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf-beans="http://cxf.apache.org/configuration/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager" xmlns:wsrm-policy="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" xsi:schemaLocation=" http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd http://schemas.xmlsoap.org/ws/2005/02/rm/policy http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:/org/apache/cxf/ws/rm/rmmanager.xml"/>
     <wsrm-mgr:rmManager>
         <wsrm-mgr:store>
             <ref bean="testStore"/>
         </wsrm-mgr:store>
     </wsrm-mgr:rmManager>
-    
-    <wsrm-mgr:jdbcStore id="testStore"
-        userName="scott"
-        password="tiger"
-        url="jdbc:derby://localhost:1527/rmdb;create=true"
-        driverClassName="org.apache.derby.jdbc.NoDriver"/>
-        
+    <wsrm-mgr:jdbcStore id="testStore" userName="scott" password="tiger" url="jdbc:derby://localhost:1527/rmdb;create=true" driverClassName="org.apache.derby.jdbc.NoDriver"/>
 </beans>

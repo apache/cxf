@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -18,21 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-
-<definitions name="multipart.idl"
- targetNamespace="http://schemas.apache.org/idl/multipart.idl"
- xmlns="http://schemas.xmlsoap.org/wsdl/"
- xmlns:tns="http://schemas.apache.org/idl/multipart.idl"
- xmlns:xsd="http://www.w3.org/2001/XMLSchema"
- xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl"
- xmlns:corba="http://schemas.apache.org/bindings/corba"
- xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap">
-
-   <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/multipart.idl"
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-     
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.apache.org/idl/multipart.idl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/multipart.idl" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/bindings/corba/typemap" name="multipart.idl" targetNamespace="http://schemas.apache.org/idl/multipart.idl">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/multipart.idl">
             <xsd:simpleType name="Test.MultiPart.Colour">
                 <xsd:restriction base="xsd:string">
                     <xsd:enumeration value="RED"/>
@@ -40,11 +27,9 @@
                     <xsd:enumeration value="BLUE"/>
                 </xsd:restriction>
             </xsd:simpleType>
-     
             <xsd:complexType name="Test.MultiPart.Description">
                 <xsd:sequence>
-                    <xsd:element minOccurs="1" maxOccurs="1" name="discriminator" 
-                    type="xsd1:Test.MultiPart.Colour"/>
+                    <xsd:element minOccurs="1" maxOccurs="1" name="discriminator" type="xsd1:Test.MultiPart.Colour"/>
                     <xsd:choice>
                         <xsd:element name="x" type="xsd:string"/>
                         <xsd:element name="y" type="xsd:int"/>
@@ -52,19 +37,16 @@
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:complexType>
-            
             <xsd:element name="Test.MultiPart.test_enum.x" type="xsd1:Test.MultiPart.Colour"/>
             <xsd:element name="Test.MultiPart.test_enum.y" type="xsd1:Test.MultiPart.Colour"/>
             <xsd:element name="Test.MultiPart.test_enum.z" type="xsd1:Test.MultiPart.Colour"/>
             <xsd:element name="Test.MultiPart.test_enum.return" type="xsd1:Test.MultiPart.Colour"/>
-            
             <xsd:element name="Test.MultiPart.test_union.x" type="xsd1:Test.MultiPart.Description"/>
             <xsd:element name="Test.MultiPart.test_union.y" type="xsd1:Test.MultiPart.Description"/>
             <xsd:element name="Test.MultiPart.test_union.z" type="xsd1:Test.MultiPart.Description"/>
             <xsd:element name="Test.MultiPart.test_union.return" type="xsd1:Test.MultiPart.Description"/>
         </schema>
     </types>
-            
     <message name="Test.MultiPart.test_union">
         <part name="x" element="xsd1:Test.MultiPart.test_union.x"/>
         <part name="y" element="xsd1:Test.MultiPart.test_union.y"/>
@@ -74,9 +56,8 @@
         <part name="y" element="xsd1:Test.MultiPart.test_union.y"/>
         <part name="z" element="xsd1:Test.MultiPart.test_union.z"/>
     </message>
-            
     <portType name="Test.MultiPart">
-         <operation name="test_union">
+        <operation name="test_union">
             <input message="tns:Test.MultiPart.test_union" name="test_union"/>
             <output message="tns:Test.MultiPart.test_unionResponse" name="test_unionResponse"/>
         </operation>

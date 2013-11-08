@@ -26,7 +26,6 @@
         <format>tar.gz</format>
         <format>zip</format>
     </formats>
-
     <fileSets>
         <fileSet>
             <directory>src/main/release</directory>
@@ -136,7 +135,6 @@
                 <include>cxf-utils.js</include>
             </includes>
         </fileSet>
-
     </fileSets>
     <dependencySets>
         <dependencySet>
@@ -145,5 +143,4 @@
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
-
 </assembly>

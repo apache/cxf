@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<plugin name="test" version="2.0" provider="apache cxf" xmlns="http://cxf.apache.org/tools/plugin">
+<plugin xmlns="http://cxf.apache.org/tools/plugin" name="test" version="2.0" provider="apache cxf">
     <frontend name="jaxws" package="org.apache.cxf.tools.wsdlto.frontend.jaxws" profile="JAXWSProfile">
         <container name="DummyContainer" toolspec="dummy.toolspec" package="org.apache.cxf.tools.wsdlto.core"/>
         <builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
@@ -28,4 +28,3 @@
     </frontend>
     <databinding name="jaxb" package="org.apache.cxf.tools.wsdlto.databinding.jaxb" profile="JAXBBindingGenerator"/>
 </plugin>
-

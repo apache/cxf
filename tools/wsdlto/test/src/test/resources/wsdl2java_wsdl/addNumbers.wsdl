@@ -17,78 +17,65 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions
-    name="AddNumbers"
-    targetNamespace="http://www.apache.org/handlers"
-    xmlns:tns="http://www.apache.org/handlers"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:x1="http://www.apache.org/handlers/types">
+<definitions xmlns:tns="http://www.apache.org/handlers" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:x1="http://www.apache.org/handlers/types" name="AddNumbers" targetNamespace="http://www.apache.org/handlers">
     <types>
-        <xsd:schema
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.apache.org/handlers/types"
-            elementFormDefault="qualified">
-
+        <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.apache.org/handlers/types" elementFormDefault="qualified">
             <complexType name="addNumbersResponse">
                 <sequence>
-                    <element name="return" type="xsd:int" />
+                    <element name="return" type="xsd:int"/>
                 </sequence>
             </complexType>
             <element name="addNumbersResponse" type="x1:addNumbersResponse"/>
-
             <complexType name="addNumbers">
                 <sequence>
-                    <element name="arg0" type="xsd:int" />
-                    <element name="arg1" type="xsd:int" />
+                    <element name="arg0" type="xsd:int"/>
+                    <element name="arg1" type="xsd:int"/>
                 </sequence>
             </complexType>
             <element name="addNumbers" type="x1:addNumbers"/>
-
-            <element name="FaultDetail" type="x1:FaultDetail" />
+            <element name="FaultDetail" type="x1:FaultDetail"/>
             <complexType name="FaultDetail">
                 <sequence>
-                    <element name="faultInfo" type="xsd:string" />
-                    <element name="message" type="xsd:string" />
+                    <element name="faultInfo" type="xsd:string"/>
+                    <element name="message" type="xsd:string"/>
                 </sequence>
             </complexType>
         </xsd:schema>
     </types>
     <message name="addNumbers">
-        <part name="parameters" element="x1:addNumbers" />
+        <part name="parameters" element="x1:addNumbers"/>
     </message>
     <message name="addNumbersResponse">
-        <part name="result" element="x1:addNumbersResponse" />
+        <part name="result" element="x1:addNumbersResponse"/>
     </message>
     <message name="addNumbersFault">
-        <part name="AddNumbersFault" element="x1:FaultDetail" />
+        <part name="AddNumbersFault" element="x1:FaultDetail"/>
     </message>
     <portType name="AddNumbers">
         <operation name="addNumbers">
-            <input message="tns:addNumbers" />
-            <output message="tns:addNumbersResponse" />
+            <input message="tns:addNumbers"/>
+            <output message="tns:addNumbersResponse"/>
             <fault name="addNumbersFault" message="tns:addNumbersFault"/>
         </operation>
     </portType>
     <binding name="AddNumbersBinding" type="tns:AddNumbers">
-        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
         <operation name="addNumbers">
-            <soap:operation soapAction="" />
+            <soap:operation soapAction=""/>
             <input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </input>
             <output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
             </output>
             <fault name="addNumbersFault">
-                <soap:fault name="addNumbersFault" use="literal" />
+                <soap:fault name="addNumbersFault" use="literal"/>
             </fault>
         </operation>
     </binding>
     <service name="AddNumbersService">
         <port name="AddNumbersPort" binding="tns:AddNumbersBinding">
-            <soap:address location="http://localhost:9000/handlers/AddNumbersService/AddNumbersPort" />
+            <soap:address location="http://localhost:9000/handlers/AddNumbersService/AddNumbersPort"/>
         </port>
     </service>
 </definitions>

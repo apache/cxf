@@ -1,1 +1,4 @@
-<test><ok/></test>
+<?xml version="1.0"?>
+<test>
+    <ok/>
+</test>

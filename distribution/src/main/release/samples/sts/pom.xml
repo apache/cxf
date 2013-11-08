@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,14 +22,12 @@
     <artifactId>sts</artifactId>
     <name>CXF STS Demo</name>
     <description>CXF STS Demo</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-
     <properties>
         <cxf.version>${project.version}</cxf.version>
     </properties>
@@ -97,9 +96,9 @@
                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
-                                 </configuration>
-                             </execution>
-                         </executions>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -123,7 +122,7 @@
                                     <arguments>
                                         <argument>-Djava.endorsed.dirs=${basedir}/target/endorsed</argument>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.wssec.sts.Server</argument>
                                     </arguments>
                                 </configuration>
@@ -159,7 +158,7 @@
                                     <arguments>
                                         <argument>-Djava.endorsed.dirs=${basedir}/target/endorsed</argument>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.wssec.server.Server</argument>
                                     </arguments>
                                 </configuration>
@@ -226,6 +225,5 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-
     </dependencies>
 </project>

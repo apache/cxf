@@ -17,19 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="nested_complex" 
-    targetNamespace="http://schemas.apache.org/idl/nested_complex.idl" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:corba="http://schemas.apache.org/bindings/corba" 
-    xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_complex.idl" 
-    xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested_complex.idl" xmlns:tns="http://schemas.apache.org/idl/nested_complex.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/nested_complex.idl" name="nested_complex" targetNamespace="http://schemas.apache.org/idl/nested_complex.idl">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/nested_complex.idl" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/nested_complex.idl" elementFormDefault="qualified">
             <complexType name="obj">
                 <sequence>
                     <element name="s" type="string"/>

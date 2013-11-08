@@ -17,10 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<S:Envelope xmlns:S12="http://www.w3.org/2003/05/soap-envelope"
-xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm"
-xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+<S:Envelope xmlns:S12="http://www.w3.org/2003/05/soap-envelope" xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
     <S:Header>
         <wsa:MessageID>http://fabrikam123.com/guid/0baaf88d-483b-4ecf-a6d8-a7c2eb546810</wsa:MessageID>
         <wsa:To>http://Business456.com/serviceA/789</wsa:To>
@@ -28,10 +25,11 @@ xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
             <wsa:Address>http://fabrikam123.com/serviceB/123</wsa:Address>
         </wsa:From>
         <wsa:Action>http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</wsa:Action>
-        <wsrm:SequenceAcknowledgement> <wsrm:Identifier>http://Business456.com/RM/ABC</wsrm:Identifier>
+        <wsrm:SequenceAcknowledgement>
+            <wsrm:Identifier>http://Business456.com/RM/ABC</wsrm:Identifier>
             <wsrm:AcknowledgementRange Upper="1" Lower="1"/>
             <wsrm:AcknowledgementRange Upper="3" Lower="3"/>
         </wsrm:SequenceAcknowledgement>
-        </S:Header>
+    </S:Header>
     <S:Body/>
 </S:Envelope>

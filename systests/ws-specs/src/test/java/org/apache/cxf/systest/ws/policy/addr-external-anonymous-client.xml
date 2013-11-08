@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -25,24 +25,21 @@
             </wsa:EndpointReference>
         </wsp:AppliesTo>
         <wsp:Policy>
-          <wsp:ExactlyOne>
-            <!-- TODO 
+            <wsp:ExactlyOne>
+                <!-- TODO 
                 if you put a NonAnonymous on top here
                 then it will fail by defaul unless a client is using 
                 a different type of selector.
                 This should not be the case, the client should
                 be able to pick up the right alternative dynamically -->
-                
-          
-            <wsp:All>
-              <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
-                <wsp:Policy>
-                   <wsam:AnonymousResponses/>
-                </wsp:Policy>
-              </wsam:Addressing>
-            </wsp:All> 
-          </wsp:ExactlyOne>  
+                <wsp:All>
+                    <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
+                        <wsp:Policy>
+                            <wsam:AnonymousResponses/>
+                        </wsp:Policy>
+                    </wsam:Addressing>
+                </wsp:All>
+            </wsp:ExactlyOne>
         </wsp:Policy>
-    </wsp:PolicyAttachment>    
+    </wsp:PolicyAttachment>
 </attachments>
-

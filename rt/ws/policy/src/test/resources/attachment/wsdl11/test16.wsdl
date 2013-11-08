@@ -17,55 +17,36 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<definitions name="Calculator"  
-    targetNamespace="http://apache.org/cxf/calculator"
-    xmlns:tns="http://apache.org/cxf/calculator"
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:x1="http://apache.org/cxf/calculator/types"
-    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
-    xmlns:ta="http://cxf.apache.org/test/assertions"
-    xmlns:rmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
-    xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
-    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" >
-
+<definitions xmlns:tns="http://apache.org/cxf/calculator" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/cxf/calculator/types" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ta="http://cxf.apache.org/test/assertions" xmlns:rmp="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" name="Calculator" targetNamespace="http://apache.org/cxf/calculator">
     <wsp:Policy wsu:Id="PolicyA">
         <ta:A>A</ta:A>
-        <ta:B>B></ta:B>
+        <ta:B>B&gt;</ta:B>
     </wsp:Policy>
-    
     <wsp:Policy wsu:Id="PolicyC">
         <ta:C>C</ta:C>
     </wsp:Policy>
-    
-    <import namespace="http://apache.org/cxf/calculator"
-       location="calculator-abstract.wsdl" />
-
+    <import namespace="http://apache.org/cxf/calculator" location="calculator-abstract.wsdl"/>
     <binding name="CalculatorBinding" type="tns:CalculatorPortType">
-	<soap12:binding transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" style="document" />
-	<operation name="add">
-	    <soap12:operation soapAction="" />
-	    <input>
-		<soap12:body use="literal" />
-	    </input>
-	    <output>
-		<soap12:body use="literal" />
-	    </output>
-	    <fault name="addNumbersFault">
-		<soap12:fault name="addNumbersFault" use="literal" />
-	    </fault>
-	</operation>
-	<wsp:PolicyReference URI="test16-ext.wsdl#PolicyC"/>
+        <soap12:binding transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" style="document"/>
+        <operation name="add">
+            <soap12:operation soapAction=""/>
+            <input>
+                <soap12:body use="literal"/>
+            </input>
+            <output>
+                <soap12:body use="literal"/>
+            </output>
+            <fault name="addNumbersFault">
+                <soap12:fault name="addNumbersFault" use="literal"/>
+            </fault>
+        </operation>
+        <wsp:PolicyReference URI="test16-ext.wsdl#PolicyC"/>
     </binding>
-
     <service name="CalculatorService">
         <wsp:PolicyReference URI="#PolicyA"/>
         <port name="CalculatorPort" binding="tns:CalculatorBinding">
             <wsp:PolicyReference URI="#PolicyB"/>
-	        <soap12:address location="http://localhost:9000/CalculatorService/SoapPort" />            
-	    </port>
+            <soap12:address location="http://localhost:9000/CalculatorService/SoapPort"/>
+        </port>
     </service>
-
 </definitions>

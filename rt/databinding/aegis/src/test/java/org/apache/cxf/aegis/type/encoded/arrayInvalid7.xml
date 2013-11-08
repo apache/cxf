@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,15 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<b:numbers
-    xmlns:b="urn:Bean"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
-    soapenc:arrayType="xsd:string[2,3,4]">
-
-  <item soapenc:position="[1,2,1]">row2 col3 dep2</item>
-  <item soapenc:position="[0,1,2]">row1 col2 dep3</item>
-  <item soapenc:position="[1,2,1]">row2 col3 dep2</item>
-
+<b:numbers xmlns:b="urn:Bean" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" soapenc:arrayType="xsd:string[2,3,4]">
+    <item soapenc:position="[1,2,1]">row2 col3 dep2</item>
+    <item soapenc:position="[0,1,2]">row1 col2 dep3</item>
+    <item soapenc:position="[1,2,1]">row2 col3 dep2</item>
 </b:numbers>

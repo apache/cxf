@@ -24,16 +24,14 @@
     <name>Apache CXF Compatibility Bundle Jar</name>
     <description>Apache CXF Compatibility Bundle Jar</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
     <properties>
-         <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
-     </properties>
-
+        <cxf.osgi.symbolic.name>${project.groupId}.bundle</cxf.osgi.symbolic.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -125,31 +123,26 @@
             <artifactId>cxf-tools-wsdlto-frontend-javascript</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-java2ws</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-management</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
@@ -160,15 +153,12 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>wsdl_first_xmlbeans</artifactId>
     <name>WSDL first demo using Document/Literal Style and XMLBeans DataBinding</name>
     <description>WSDL first demo using Document/Literal Style and XMLBeans DataBinding</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -30,51 +30,51 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
     </properties>
-	<build>
-		<resources>
-		  <resource>
-		    <targetPath>schemaorg_apache_xmlbeans</targetPath>
-		    <directory>target/generated-sources/cxf/schemaorg_apache_xmlbeans</directory>
-		    <includes>
-              <include> **/*.xsb </include>
-              <include> **/*.class </include>
-            </includes>		    
-		  </resource>
-		</resources> 
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>					
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-codegen-plugin</artifactId>
-				<version>${project.version}</version>
-				<executions>
-					<execution>
-						<id>generate-sources</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<wsdlOptions>
-								<wsdlOption>
-									<wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
-									<dataBinding>xmlbeans</dataBinding>
-									<frontEnd>jaxws21</frontEnd>
-									<faultSerialVersionUID>1</faultSerialVersionUID>
-								</wsdlOption>
-							</wsdlOptions>
-						</configuration>
-						<goals>
-							<goal>wsdl2java</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>   
+    <build>
+        <resources>
+            <resource>
+                <targetPath>schemaorg_apache_xmlbeans</targetPath>
+                <directory>target/generated-sources/cxf/schemaorg_apache_xmlbeans</directory>
+                <includes>
+                    <include> **/*.xsb </include>
+                    <include> **/*.class </include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
+                                    <dataBinding>xmlbeans</dataBinding>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -125,7 +125,7 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>    
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

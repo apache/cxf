@@ -17,40 +17,34 @@
   specific language governing permissions and limitations
   under the License.
   -->
-
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-	xmlns:g='urn:import:com.google.gwt.user.client.ui'
-    xmlns:dp="urn:import:com.google.gwt.user.datepicker.client" >
-
-    <ui:with field='res'
-             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
-
-	<g:HTMLPanel>
-		<table cellspacing="6">
-			<tr>
-				<td>
-					<g:Label>Phrase:</g:Label>
-				</td>
-             <td>
-                <g:TextBox ui:field="phraseTextBox" addStyleDependentNames="clear"/>
-				</td>
-         </tr>
-			<tr>
-				<td>
-					<g:Label>From:</g:Label>
-				</td>
-             <td>
-					<dp:DateBox ui:field="fromDateBox"/>
-				</td>
-         </tr>
-         <tr>
-				<td>
-					<g:Label>To:</g:Label>
-				</td>
-             <td>
-					<dp:DateBox ui:field="toDateBox"/>
-				</td>
-			</tr>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:dp="urn:import:com.google.gwt.user.datepicker.client">
+    <ui:with field="res" type="org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources"/>
+    <g:HTMLPanel>
+        <table cellspacing="6">
+            <tr>
+                <td>
+                    <g:Label>Phrase:</g:Label>
+                </td>
+                <td>
+                    <g:TextBox ui:field="phraseTextBox" addStyleDependentNames="clear"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <g:Label>From:</g:Label>
+                </td>
+                <td>
+                    <dp:DateBox ui:field="fromDateBox"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <g:Label>To:</g:Label>
+                </td>
+                <td>
+                    <dp:DateBox ui:field="toDateBox"/>
+                </td>
+            </tr>
             <tr>
                 <td valign="top">
                     <g:Label>Levels:</g:Label>
@@ -64,17 +58,14 @@
                     </g:VerticalPanel>
                 </td>
             </tr>
-		</table>
-
-		<g:FlowPanel addStyleNames="{res.css.editFeedDialogButtons}">
-			<g:Button ui:field="cancelButton">
+        </table>
+        <g:FlowPanel addStyleNames="{res.css.editFeedDialogButtons}">
+            <g:Button ui:field="cancelButton">
                 Cancel
             </g:Button>
-			<g:Button ui:field="saveButton" addStyleNames="{res.css.editFeedDialogAddButton}">
+            <g:Button ui:field="saveButton" addStyleNames="{res.css.editFeedDialogAddButton}">
                 Save
-			</g:Button>
-		</g:FlowPanel>
-
-	</g:HTMLPanel>
-
+                        </g:Button>
+        </g:FlowPanel>
+    </g:HTMLPanel>
 </ui:UiBinder>

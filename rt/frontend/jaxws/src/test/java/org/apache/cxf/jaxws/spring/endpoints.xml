@@ -17,133 +17,80 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xmlns:soap="http://cxf.apache.org/bindings/soap"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" 
-    lazy-init="false">
-      <property name="transportIds">
-          <list>
-              <value>http://cxf.apache.org/transports/local</value>
-              <value>http://cxf.apache.org/transports/http</value>
-              <value>http://schemas.xmlsoap.org/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-              <value>http://schemas.xmlsoap.org/wsdl/http/</value>              
-          </list>
-      </property>
-  </bean>
-  
-  <jaxws:endpoint id="simple" implementor="#greeter"/>
-
-  <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
-
-  <jaxws:endpoint id="simpleWithAddress" 
-    implementor="#greeter" address="http://localhost:8080/simpleWithAddress"/>
-  
-    <jaxws:endpoint id="simpleWithBindingUri" 
-    implementor="#greeter" address="http://localhost:8080/simpeWithHttpBinding"
-    bindingUri="http://cxf.apache.org/bindings/xformat"
-    transportId="http://cxf.apache.org/transports/local"/>
-    
-  <jaxws:endpoint id="inlineImplementor" address="http://localhost:8080/simpleWithAddress2">
-    <jaxws:implementor>
-      <bean class="org.apache.hello_world_soap_http.GreeterImpl">
-         <property name="prefix" value="hello"/>
-      </bean>   
-    </jaxws:implementor>
-  </jaxws:endpoint>
-  
-  <jaxws:endpoint id="simpleWithBinding" 
-    implementor="#greeter" address="http://localhost:8080/simpleWithAddress3">
-  	<jaxws:binding>
-  	   <soap:soapBinding mtomEnabled="true" version="1.2"/>
-  	</jaxws:binding>
-  </jaxws:endpoint>	  
-  
-  <jaxws:endpoint id="inlineInvoker" address="http://localhost:8080/simpleWithAddress4">
-    <jaxws:implementor>
-      <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
-    </jaxws:implementor>
-    <jaxws:invoker>
-      <bean class="org.apache.cxf.jaxws.spring.NullInvoker"/>
-    </jaxws:invoker>
-  </jaxws:endpoint>
-  
-  <jaxws:endpoint id="epWithProps" 
-    implementor="#greeter"
-    address="http://localhost:8080/test">
-    <jaxws:properties>
-      <entry key="foo" value="bar"/>
-    </jaxws:properties>
-  </jaxws:endpoint>
-  
-  <jaxws:endpoint id="classImpl" 
-    implementor="org.apache.cxf.jaxws.service.Hello"
-    endpointName="e:HelloEndpointCustomized"
-    serviceName="s:HelloServiceCustomized"
-    address="http://localhost:8080/test0"
-    xmlns:e="http://service.jaxws.cxf.apache.org/endpoint"
-    xmlns:s="http://service.jaxws.cxf.apache.org/service"/>
-    
-  <jaxws:endpoint id="wsdlLocation" 
-    implementor="#greeter" address="http://localhost:8080/simpleWithAddress5"
-    wsdlLocation="wsdl/hello_world.wsdl"/>
-    
-  <bean id="saajIn" class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
-  <bean id="saajOut" class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
-      
-  <jaxws:endpoint id="epWithInterceptors" 
-    implementor="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test1">
-	<jaxws:inInterceptors>
-	  <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-	  <ref bean="saajIn"/>
-	</jaxws:inInterceptors>
-	<jaxws:outInterceptors>
-	  <ref bean="saajOut"/>
-	  <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-	</jaxws:outInterceptors>
-  </jaxws:endpoint>
-
-  <jaxws:endpoint id="epWithDataBinding" implementor="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test2">
-    <jaxws:dataBinding>
-      <bean class="org.apache.cxf.jaxb.JAXBDataBinding">
-        <property name="namespaceMap">
-    		<map>
-   			<entry>
-      			<key><value>http://cxf.apache.org/anonymous_complex_type/</value></key>
-      			<value>BeepBeep</value>
-   			</entry>
-      		</map>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:soap="http://cxf.apache.org/bindings/soap" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+        <property name="transportIds">
+            <list>
+                <value>http://cxf.apache.org/transports/local</value>
+                <value>http://cxf.apache.org/transports/http</value>
+                <value>http://schemas.xmlsoap.org/soap/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
+            </list>
         </property>
-      </bean>
-      </jaxws:dataBinding>
-  </jaxws:endpoint>
-    
-  <jaxws:endpoint implementor="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/testx"/>
-    
-  <jaxws:endpoint id="implementorClass"
-    implementor="java.lang.Object"
-    implementorClass="org.apache.cxf.jaxws.service.Hello"
-    address="http://localhost:8080/test3"/>
-    
-  <jaxws:endpoint id="publishedEndpointUrl"
-    implementor="#greeter"
-    address="http://localhost:8080/publishedEndpointUrl"
-    publishedEndpointUrl="http://cxf.apache.org/Greeter"/>
-
-  <jaxws:endpoint id="unpublishedEndpoint"
-    implementor="#greeter"
-    address="http://localhost:8080/unpublished"
-    publish="false"/>
+    </bean>
+    <jaxws:endpoint id="simple" implementor="#greeter"/>
+    <bean id="greeter" class="org.apache.hello_world_soap_http.GreeterImpl"/>
+    <jaxws:endpoint id="simpleWithAddress" implementor="#greeter" address="http://localhost:8080/simpleWithAddress"/>
+    <jaxws:endpoint id="simpleWithBindingUri" implementor="#greeter" address="http://localhost:8080/simpeWithHttpBinding" bindingUri="http://cxf.apache.org/bindings/xformat" transportId="http://cxf.apache.org/transports/local"/>
+    <jaxws:endpoint id="inlineImplementor" address="http://localhost:8080/simpleWithAddress2">
+        <jaxws:implementor>
+            <bean class="org.apache.hello_world_soap_http.GreeterImpl">
+                <property name="prefix" value="hello"/>
+            </bean>
+        </jaxws:implementor>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="simpleWithBinding" implementor="#greeter" address="http://localhost:8080/simpleWithAddress3">
+        <jaxws:binding>
+            <soap:soapBinding mtomEnabled="true" version="1.2"/>
+        </jaxws:binding>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="inlineInvoker" address="http://localhost:8080/simpleWithAddress4">
+        <jaxws:implementor>
+            <bean class="org.apache.hello_world_soap_http.GreeterImpl"/>
+        </jaxws:implementor>
+        <jaxws:invoker>
+            <bean class="org.apache.cxf.jaxws.spring.NullInvoker"/>
+        </jaxws:invoker>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="epWithProps" implementor="#greeter" address="http://localhost:8080/test">
+        <jaxws:properties>
+            <entry key="foo" value="bar"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:e="http://service.jaxws.cxf.apache.org/endpoint" xmlns:s="http://service.jaxws.cxf.apache.org/service" id="classImpl" implementor="org.apache.cxf.jaxws.service.Hello" endpointName="e:HelloEndpointCustomized" serviceName="s:HelloServiceCustomized" address="http://localhost:8080/test0"/>
+    <jaxws:endpoint id="wsdlLocation" implementor="#greeter" address="http://localhost:8080/simpleWithAddress5" wsdlLocation="wsdl/hello_world.wsdl"/>
+    <bean id="saajIn" class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
+    <bean id="saajOut" class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
+    <jaxws:endpoint id="epWithInterceptors" implementor="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test1">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <ref bean="saajIn"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="saajOut"/>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="epWithDataBinding" implementor="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test2">
+        <jaxws:dataBinding>
+            <bean class="org.apache.cxf.jaxb.JAXBDataBinding">
+                <property name="namespaceMap">
+                    <map>
+                        <entry>
+                            <key>
+                                <value>http://cxf.apache.org/anonymous_complex_type/</value>
+                            </key>
+                            <value>BeepBeep</value>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </jaxws:dataBinding>
+    </jaxws:endpoint>
+    <jaxws:endpoint implementor="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/testx"/>
+    <jaxws:endpoint id="implementorClass" implementor="java.lang.Object" implementorClass="org.apache.cxf.jaxws.service.Hello" address="http://localhost:8080/test3"/>
+    <jaxws:endpoint id="publishedEndpointUrl" implementor="#greeter" address="http://localhost:8080/publishedEndpointUrl" publishedEndpointUrl="http://cxf.apache.org/Greeter"/>
+    <jaxws:endpoint id="unpublishedEndpoint" implementor="#greeter" address="http://localhost:8080/unpublished" publish="false"/>
 </beans>

@@ -18,14 +18,5 @@
   under the License.
 -->
 <endpoints>
-
-    <endpoint
-        name="basic_type"
-        interface="org.apache.cxf.performance.basic_type.BasicPortType"
-        implementation="org.apache.cxf.performance.basic_type.server.ServerImpl"
-        wsdl="WEB-INF/wsdl/basic_type.wsdl"
-        service="{http://cxf.apache.org/performance/basic_type}BasicService"
-        port="{http://cxf.apache.org/performance/basic_type}SoapHttpPort"
-        url-pattern="/basic_type" />
-
+    <endpoint name="basic_type" interface="org.apache.cxf.performance.basic_type.BasicPortType" implementation="org.apache.cxf.performance.basic_type.server.ServerImpl" wsdl="WEB-INF/wsdl/basic_type.wsdl" service="{http://cxf.apache.org/performance/basic_type}BasicService" port="{http://cxf.apache.org/performance/basic_type}SoapHttpPort" url-pattern="/basic_type"/>
 </endpoints>

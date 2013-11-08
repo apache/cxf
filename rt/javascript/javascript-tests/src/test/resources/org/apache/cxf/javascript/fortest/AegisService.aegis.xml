@@ -18,17 +18,16 @@
   under the License.
 -->
 <mappings xmlns:ns="http://fortest.cxf.apache.org">
-  <mapping name="ns:AegisService">
-    <method name="acceptAny">
-      <parameter index="0" mappedName="before"/>
-      <parameter index="1" mappedName="anything"/>
-    </method>
-    <method name="acceptObjects">
-      <parameter index="0" mappedName="anything"/>
-    </method>
-    <method name="acceptStrings">
-      <parameter index="0" mappedName="anything"/>
-    </method>
-  </mapping>
+    <mapping name="ns:AegisService">
+        <method name="acceptAny">
+            <parameter index="0" mappedName="before"/>
+            <parameter index="1" mappedName="anything"/>
+        </method>
+        <method name="acceptObjects">
+            <parameter index="0" mappedName="anything"/>
+        </method>
+        <method name="acceptStrings">
+            <parameter index="0" mappedName="anything"/>
+        </method>
+    </mapping>
 </mappings>
-

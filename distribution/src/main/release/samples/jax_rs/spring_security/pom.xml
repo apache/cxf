@@ -23,7 +23,6 @@
     <name>JAX-RS Spring Security Demo</name>
     <description>JAX-RS Spring Security Demo</description>
     <packaging>war</packaging>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -36,7 +35,7 @@
     </properties>
     <build>
         <finalName>JAXRSSpringSecurity</finalName>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -110,39 +109,30 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
-
         <dependency>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-core</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
         </dependency>
- 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
-
         <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-context</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
-
-         
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-dao</artifactId>
-        </dependency> 
-
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
         </dependency>
-
         <dependency>
-           <groupId>org.springframework.security</groupId>
-           <artifactId>spring-security-core-tiger</artifactId>
-        </dependency> 
-
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core-tiger</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>

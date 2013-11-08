@@ -20,58 +20,57 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>codegen-it-parent</artifactId>
-      <version>1-SNAPSHOT</version>
-      <relativePath>../it-parent/pom.xml</relativePath>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>codegen-it-parent</artifactId>
+        <version>1-SNAPSHOT</version>
+        <relativePath>../it-parent/pom.xml</relativePath>
     </parent>
     <artifactId>cxf-4004-it</artifactId>
-
     <build>
-      <plugins>
-	<plugin>
-	  <groupId>org.apache.cxf</groupId>
-	  <artifactId>cxf-codegen-plugin</artifactId>
-	  <dependencies>
-	    <dependency>
-	      <groupId>org.apache.cxf.xjcplugins</groupId>
-	      <artifactId>cxf-xjc-ts</artifactId>
-	      <version>2.4.0</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>net.java.dev.jaxb2-commons</groupId>
-	      <artifactId>jaxb-fluent-api</artifactId>
-	      <version>2.1.8</version>
-	    </dependency>
-	  </dependencies>
-	  <configuration>
-	    <defaultOptions>
-	      <packagenames>
-		<packagename>http://edb.com/ws/WSCommon_v21=com.edb.finance.common.cxf.utils.generated</packagename>
-		<packagename>http://ping.monapp.finance.edb.com=com.edb.finance.common.cxf.utils.generated.monapp.ping</packagename>
-		<packagename>http://ping.ws.monapp.finance.edb.com=com.edb.finance.common.cxf.utils.generated.monapp.ws.ping</packagename>
-	      </packagenames>
-	      <validateWsdl>true</validateWsdl>
-	      <extraargs>
-		<extraarg>-xjc-Xfluent-api</extraarg>
-	      </extraargs>
-	      <bindingFiles>
-		<bindingFile>${basedir}/src/main/resources/wsdl/binding.xml</bindingFile>
-	      </bindingFiles>
-	    </defaultOptions>
-	  </configuration>
-	  <executions>
-	    <execution>
-	      <goals>
-		<goal>wsdl2java</goal>
-	      </goals>
-	    </execution>
-	  </executions>
-	</plugin>
-      </plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-ts</artifactId>
+                        <version>2.4.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.java.dev.jaxb2-commons</groupId>
+                        <artifactId>jaxb-fluent-api</artifactId>
+                        <version>2.1.8</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <defaultOptions>
+                        <packagenames>
+                            <packagename>http://edb.com/ws/WSCommon_v21=com.edb.finance.common.cxf.utils.generated</packagename>
+                            <packagename>http://ping.monapp.finance.edb.com=com.edb.finance.common.cxf.utils.generated.monapp.ping</packagename>
+                            <packagename>http://ping.ws.monapp.finance.edb.com=com.edb.finance.common.cxf.utils.generated.monapp.ws.ping</packagename>
+                        </packagenames>
+                        <validateWsdl>true</validateWsdl>
+                        <extraargs>
+                            <extraarg>-xjc-Xfluent-api</extraarg>
+                        </extraargs>
+                        <bindingFiles>
+                            <bindingFile>${basedir}/src/main/resources/wsdl/binding.xml</bindingFile>
+                        </bindingFiles>
+                    </defaultOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
     <dependencies>
-  <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${cxf.version}</version>
@@ -83,5 +82,3 @@
         </dependency>
     </dependencies>
 </project>
-
-    

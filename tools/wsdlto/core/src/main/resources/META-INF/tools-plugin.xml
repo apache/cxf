@@ -17,8 +17,7 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<plugin name="source" version="" provider="cxf.apache.org" xmlns="http://cxf.apache.org/tools/plugin">
+<plugin xmlns="http://cxf.apache.org/tools/plugin" name="source" version="" provider="cxf.apache.org">
     <databinding name="source" package="org.apache.cxf.tools.wsdlto.databinding.source" profile="SourceDatabindingProfile"/>
     <databinding name="domsource" package="org.apache.cxf.tools.wsdlto.databinding.source" profile="SourceDatabindingProfile"/>
     <databinding name="staxsource" package="org.apache.cxf.tools.wsdlto.databinding.source" profile="SourceDatabindingProfile"/>

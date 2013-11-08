@@ -17,13 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<handler-chains xmlns="http://java.sun.com/xml/ns/javaee" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="http://java.sun.com/xml/ns/javaee">
+<handler-chains xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee">
     <handler-chain>
-	<handler>
-		<handler-name>LoggingHandler</handler-name>
-		<handler-class>demo.handlers.common.LoggingHandler</handler-class>
-	</handler>
+        <handler>
+            <handler-name>LoggingHandler</handler-name>
+            <handler-class>demo.handlers.common.LoggingHandler</handler-class>
+        </handler>
     </handler-chain>
 </handler-chains>

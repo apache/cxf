@@ -30,32 +30,30 @@
     <name>Apache CXF JAX-RS System Tests</name>
     <description>Apache CXF JAX-RS System Tests</description>
     <url>http://cxf.apache.org</url>
-    
     <properties>
-          <cxf.el.api.version>3.0-b02</cxf.el.api.version>
-          <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
-          <cxf.hibernate.validator.version>5.0.1.Final</cxf.hibernate.validator.version> 
+        <cxf.el.api.version>3.0-b02</cxf.el.api.version>
+        <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
+        <cxf.hibernate.validator.version>5.0.1.Final</cxf.hibernate.validator.version>
     </properties>
-    
     <dependencies>
         <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.hibernate</groupId>
-		   <artifactId>hibernate-validator</artifactId>
-		   <version>${cxf.hibernate.validator.version}</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${cxf.hibernate.validator.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.el</groupId>
-	        <artifactId>javax.el-api</artifactId>
+            <artifactId>javax.el-api</artifactId>
             <version>${cxf.el.api.version}</version>
         </dependency>
         <dependency>
-           <groupId>org.glassfish</groupId>
-           <artifactId>javax.el</artifactId>
-           <version>${cxf.glassfish.el.version}</version>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>${cxf.glassfish.el.version}</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
@@ -76,33 +74,33 @@
             <artifactId>abdera-extensions-json</artifactId>
             <version>${cxf.abdera.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.apache.ant</groupId>
-          <artifactId>ant</artifactId>
-        </dependency>
-         <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-server</artifactId>
-        </dependency>
-         <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-plus</artifactId>
-       		 <version>${cxf.jetty.version}</version>
-        </dependency>
-          <dependency>
-       		<groupId>org.eclipse.jetty</groupId>
-       		<artifactId>jetty-webapp</artifactId>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-jsp</artifactId>
-           <version>${cxf.jetty.version}</version>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-plus</artifactId>
+            <version>${cxf.jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jsp</artifactId>
+            <version>${cxf.jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -154,12 +152,12 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-clustering</artifactId>
             <version>${project.version}</version>
@@ -180,10 +178,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-jdk14</artifactId>
-             <scope>test</scope>
-         </dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-local</artifactId>
@@ -233,21 +231,18 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-hc</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-          <version>1.0</version>
-          <scope>test</scope>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -319,7 +314,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>2.0.6.RELEASE</version> 
+            <version>2.0.6.RELEASE</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -368,17 +363,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>com.fasterxml.jackson.jaxrs</groupId>
-          <artifactId>jackson-jaxrs-json-provider</artifactId>
-          <version>2.2.1</version>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>2.2.1</version>
         </dependency>
         <dependency>
-         <groupId>org.apache.httpcomponents</groupId>
-         <artifactId>httpclient</artifactId>
-         <scope>test</scope>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-    
     <build>
         <plugins>
             <plugin>
@@ -393,40 +387,40 @@
                 </executions>
             </plugin>
             <plugin>
-        <groupId>org.jibx</groupId>
-        <artifactId>jibx-maven-plugin</artifactId>
-        <version>${cxf.jibx.version}</version>
-        <executions>
-            <execution>
-                <id>generate-java-code-from-schema</id>
-                <goals>
-                    <goal>schema-codegen</goal>
-                </goals>
-                <configuration>
-                    <schemaLocation>src/test/resources/jibx</schemaLocation>
-                    <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
-                    <options>
-                        <package>org.apache.cxf.systest.jaxrs.codegen.jibx</package>
-                    </options>
-                </configuration>
-            </execution>
-            <execution>
-                <id>compile-binding</id>
-                <goals>
-                    <goal>bind</goal>
-                </goals>
-                <configuration>
-                    <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
-                    <includeSchemaBindings>
-                      <includeSchemaBindings>binding.xml</includeSchemaBindings>
-                    </includeSchemaBindings>
-                    <load>true</load>
-                    <validate>true</validate>
-                    <verify>true</verify>
-                </configuration>
-            </execution>
-        </executions>
-    </plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>jibx-maven-plugin</artifactId>
+                <version>${cxf.jibx.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-java-code-from-schema</id>
+                        <goals>
+                            <goal>schema-codegen</goal>
+                        </goals>
+                        <configuration>
+                            <schemaLocation>src/test/resources/jibx</schemaLocation>
+                            <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
+                            <options>
+                                <package>org.apache.cxf.systest.jaxrs.codegen.jibx</package>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-binding</id>
+                        <goals>
+                            <goal>bind</goal>
+                        </goals>
+                        <configuration>
+                            <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
+                            <includeSchemaBindings>
+                                <includeSchemaBindings>binding.xml</includeSchemaBindings>
+                            </includeSchemaBindings>
+                            <load>true</load>
+                            <validate>true</validate>
+                            <verify>true</verify>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-wadl2java-plugin</artifactId>
@@ -441,12 +435,10 @@
                                 <wadlOption>
                                     <wadl>${basedir}/src/test/resources/wadl/bookstoreImport.xml</wadl>
                                     <impl>true</impl>
-                                    
                                     <packagename>org.apache.cxf.systest.jaxrs.codegen.service</packagename>
                                     <schemaPackagenames>
-                                       <schemaPackagename>http://superbooks=org.apache.cxf.systest.jaxrs.codegen.schema</schemaPackagename>
+                                        <schemaPackagename>http://superbooks=org.apache.cxf.systest.jaxrs.codegen.schema</schemaPackagename>
                                     </schemaPackagenames>
-                                    
                                 </wadlOption>
                             </wadlOptions>
                         </configuration>

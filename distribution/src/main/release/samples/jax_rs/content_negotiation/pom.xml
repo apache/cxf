@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>jax_rs_content_negotiation</artifactId>
     <name>JAX-RS Content Negotiation Demo</name>
     <description>JAX-RS Content Negotiation Demo</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -114,9 +114,9 @@
             <version>3.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-	   <groupId>org.codehaus.jettison</groupId>
-	   <artifactId>jettison</artifactId>
-	</dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+        </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>

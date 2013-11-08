@@ -80,9 +80,9 @@
     </binding>
 
     <service name="CalculatorService">
-	<port name="CalculatorPort" binding="tns:CalculatorBinding">
-	    <soap12:address location="http://localhost:9000/CalculatorService/SoapPort" />
-	</port>
+        <port name="CalculatorPort" binding="tns:CalculatorBinding">
+            <soap12:address location="http://localhost:9000/CalculatorService/SoapPort" />
+        </port>
     </service>
 
 </definitions>

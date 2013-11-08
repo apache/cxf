@@ -17,34 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxws="http://cxf.apache.org/jaxws"
-  xsi:schemaLocation="
-           http://cxf.apache.org/jaxws                                 
-              http://cxf.apache.org/schemas/jaxws.xsd
-           http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd">
-              
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-              
- <jaxws:server id="mtom-service-endpoint" 
-    address="http://localhost:${testutil.ports.TestPort}/mtom" >
-    <jaxws:serviceBean>
-      <bean class='org.apache.cxf.javascript.fortest.MtoMImpl'/>
-    </jaxws:serviceBean>
- </jaxws:server>
- 
- <jaxws:client id="mtom-client" 
- 			   address="http://localhost:${testutil.ports.TestPort}/mtom" 
- 			   serviceClass="org.apache.cxf.javascript.fortest.MtoM">
-    <jaxws:inInterceptors>
-			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-		</jaxws:inInterceptors>
-		<jaxws:outInterceptors>
-			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-		</jaxws:outInterceptors>
-	</jaxws:client>
- 
- </beans>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="            http://cxf.apache.org/jaxws                                                http://cxf.apache.org/schemas/jaxws.xsd            http://www.springframework.org/schema/beans               http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <jaxws:server id="mtom-service-endpoint" address="http://localhost:${testutil.ports.TestPort}/mtom">
+        <jaxws:serviceBean>
+            <bean class="org.apache.cxf.javascript.fortest.MtoMImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>
+    <jaxws:client id="mtom-client" address="http://localhost:${testutil.ports.TestPort}/mtom" serviceClass="org.apache.cxf.javascript.fortest.MtoM">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+</beans>

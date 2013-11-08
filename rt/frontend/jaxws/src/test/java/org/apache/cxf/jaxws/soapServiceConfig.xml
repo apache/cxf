@@ -17,21 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
-
-  
-  <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
-     <jaxws:properties>
-      <entry key="foo" value="bar"/>
-    </jaxws:properties>
-    <jaxws:conduitSelector>
-      <bean class="org.apache.cxf.endpoint.NullConduitSelector"/>
-    </jaxws:conduitSelector>
-  </jaxws:client>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="foo" value="bar"/>
+        </jaxws:properties>
+        <jaxws:conduitSelector>
+            <bean class="org.apache.cxf.endpoint.NullConduitSelector"/>
+        </jaxws:conduitSelector>
+    </jaxws:client>
 </beans>

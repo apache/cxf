@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,7 +22,6 @@
     <artifactId>ws_rm</artifactId>
     <name>WS-RM Demo</name>
     <description>WS-RM Demo</description>
-
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -51,8 +51,8 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/hello_world_rm.wsdl</wsdl>
-									<frontEnd>jaxws21</frontEnd>
-									<faultSerialVersionUID>1</faultSerialVersionUID>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -138,6 +138,5 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-
     </dependencies>
 </project>

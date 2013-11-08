@@ -1,77 +1,69 @@
-<wsp:Policy wsu:Id="Transport_policy"
-        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-        xmlns:wsp="http://www.w3.org/ns/ws-policy"
-        xmlns:wsap10="http://www.w3.org/2006/05/addressing/wsdl">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <wsap10:UsingAddressing />
-                <sp:TransportBinding
-                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <sp:TransportToken>
+<?xml version="1.0"?>
+<wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsap10="http://www.w3.org/2006/05/addressing/wsdl" wsu:Id="Transport_policy">
+    <wsp:ExactlyOne>
+        <wsp:All>
+            <wsap10:UsingAddressing/>
+            <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <sp:TransportToken>
+                        <wsp:Policy>
+                            <sp:HttpsToken>
+                                <wsp:Policy/>
+                            </sp:HttpsToken>
+                        </wsp:Policy>
+                    </sp:TransportToken>
+                    <sp:AlgorithmSuite>
+                        <wsp:Policy>
+                            <sp:Basic128/>
+                        </wsp:Policy>
+                    </sp:AlgorithmSuite>
+                    <sp:Layout>
+                        <wsp:Policy>
+                            <sp:Lax/>
+                        </wsp:Policy>
+                    </sp:Layout>
+                    <sp:IncludeTimestamp/>
+                </wsp:Policy>
+            </sp:TransportBinding>
+            <sp:SignedSupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <wsp:ExactlyOne>
+                        <wsp:All>
                             <wsp:Policy>
-                                <sp:HttpsToken>
-                                    <wsp:Policy />
-                                </sp:HttpsToken>
+                                <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssUsernameToken10/>
+                                    </wsp:Policy>
+                                </sp:UsernameToken>
                             </wsp:Policy>
-                        </sp:TransportToken>
-                        <sp:AlgorithmSuite>
+                        </wsp:All>
+                        <wsp:All>
                             <wsp:Policy>
-                                <sp:Basic128 />
+                                <sp:SamlToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssSamlV20Token11/>
+                                    </wsp:Policy>
+                                </sp:SamlToken>
                             </wsp:Policy>
-                        </sp:AlgorithmSuite>
-                        <sp:Layout>
-                            <wsp:Policy>
-                                <sp:Lax />
-                            </wsp:Policy>
-                        </sp:Layout>
-                        <sp:IncludeTimestamp />
-                    </wsp:Policy>
-                </sp:TransportBinding>
-                <sp:SignedSupportingTokens
-                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <wsp:ExactlyOne>
-                            <wsp:All>
-                                <wsp:Policy>
-                                    <sp:UsernameToken
-                                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                        <wsp:Policy>
-                                            <sp:WssUsernameToken10 />
-                                        </wsp:Policy>
-                                    </sp:UsernameToken>
-                                </wsp:Policy>
-                            </wsp:All>
-                            <wsp:All>
-                                <wsp:Policy>
-                                    <sp:SamlToken
-                                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
-                                        <wsp:Policy>
-                                            <sp:WssSamlV20Token11 />
-                                        </wsp:Policy>
-                                    </sp:SamlToken>
-                                </wsp:Policy>
-                            </wsp:All>
-                        </wsp:ExactlyOne>
-                    </wsp:Policy>
-                </sp:SignedSupportingTokens>
-                <sp:Wss11
-                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <sp:MustSupportRefKeyIdentifier />
-                        <sp:MustSupportRefIssuerSerial />
-                        <sp:MustSupportRefThumbprint />
-                        <sp:MustSupportRefEncryptedKey />
-                    </wsp:Policy>
-                </sp:Wss11>
-                <sp:Trust13
-                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <wsp:Policy>
-                        <sp:MustSupportIssuedTokens />
-                        <sp:RequireClientEntropy />
-                        <sp:RequireServerEntropy />
-                    </wsp:Policy>
-                </sp:Trust13>
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
+                        </wsp:All>
+                    </wsp:ExactlyOne>
+                </wsp:Policy>
+            </sp:SignedSupportingTokens>
+            <sp:Wss11 xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <sp:MustSupportRefKeyIdentifier/>
+                    <sp:MustSupportRefIssuerSerial/>
+                    <sp:MustSupportRefThumbprint/>
+                    <sp:MustSupportRefEncryptedKey/>
+                </wsp:Policy>
+            </sp:Wss11>
+            <sp:Trust13 xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                <wsp:Policy>
+                    <sp:MustSupportIssuedTokens/>
+                    <sp:RequireClientEntropy/>
+                    <sp:RequireServerEntropy/>
+                </wsp:Policy>
+            </sp:Trust13>
+        </wsp:All>
+    </wsp:ExactlyOne>
+</wsp:Policy>

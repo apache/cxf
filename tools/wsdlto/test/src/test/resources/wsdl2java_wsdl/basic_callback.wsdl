@@ -17,85 +17,68 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="basic_callback" targetNamespace="http://apache.org/callback"
-		  xmlns="http://schemas.xmlsoap.org/wsdl/" 
-		  xmlns:references="http://www.w3.org/2005/08/addressing" 
-		  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-		  xmlns:tns="http://apache.org/callback" 
-		  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-		  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-		  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0">
-    
-
-
-    <wsdl:types> 
-
-	<schema targetNamespace="http://apache.org/callback" 
-		xmlns="http://www.w3.org/2001/XMLSchema" 
-		xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-		xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
-		jaxb:version="2.0"
-		elementFormDefault="qualified">
-
-	    <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
-	    <element name="callback_message" type="xsd:string"/>
-	    <element name="RegisterCallback" type="references:EndpointReferenceType"/>
-	    <element name="returnType" type="xsd:string"/>
-	</schema>
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:references="http://www.w3.org/2005/08/addressing" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/callback" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" name="basic_callback" targetNamespace="http://apache.org/callback" jaxb:version="2.0">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://apache.org/callback" jaxb:version="2.0" elementFormDefault="qualified">
+            <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
+            <element name="callback_message" type="xsd:string"/>
+            <element name="RegisterCallback" type="references:EndpointReferenceType"/>
+            <element name="returnType" type="xsd:string"/>
+        </schema>
     </wsdl:types>
     <wsdl:message name="server_sayHi">
-	<wsdl:part element="tns:callback_message" name="return_message"/>
+        <wsdl:part element="tns:callback_message" name="return_message"/>
     </wsdl:message>
     <wsdl:message name="register_callback">
-	<wsdl:part element="tns:RegisterCallback" name="callback_object"/>
+        <wsdl:part element="tns:RegisterCallback" name="callback_object"/>
     </wsdl:message>
     <wsdl:message name="returnMessage">
-	<wsdl:part element="tns:returnType" name="the_return"/>
+        <wsdl:part element="tns:returnType" name="the_return"/>
     </wsdl:message>
     <wsdl:portType name="CallbackPortType">
-	<wsdl:operation name="ServerSayHi">
-	    <wsdl:input message="tns:server_sayHi" name="ServerSayHiRequest"/>
-	    <wsdl:output message="tns:returnMessage" name="ServerSayHiResponse"/>
-	</wsdl:operation>
+        <wsdl:operation name="ServerSayHi">
+            <wsdl:input message="tns:server_sayHi" name="ServerSayHiRequest"/>
+            <wsdl:output message="tns:returnMessage" name="ServerSayHiResponse"/>
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:portType name="ServerPortType">
-	<wsdl:operation name="RegisterCallback">
-	    <wsdl:input message="tns:register_callback" name="RegisterCallbackRequest"/>
-	    <wsdl:output message="tns:returnMessage" name="RegisterCallbackResponse"/>
-	</wsdl:operation>
+        <wsdl:operation name="RegisterCallback">
+            <wsdl:input message="tns:register_callback" name="RegisterCallbackRequest"/>
+            <wsdl:output message="tns:returnMessage" name="RegisterCallbackResponse"/>
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="CallbackPortType_SOAPBinding" type="tns:CallbackPortType">
-	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-	<wsdl:operation name="ServerSayHi">
-	    <soap:operation soapAction="" style="document"/>
-	    <wsdl:input name="ServerSayHiRequest">
-		<soap:body use="literal"/>
-	    </wsdl:input>
-	    <wsdl:output name="ServerSayHiResponse">
-		<soap:body use="literal"/>
-	    </wsdl:output>
-	</wsdl:operation>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="ServerSayHi">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="ServerSayHiRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="ServerSayHiResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="ServerPortType_SOAPBinding" type="tns:ServerPortType">
-	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-	<wsdl:operation name="RegisterCallback">
-	    <soap:operation soapAction="" style="document"/>
-	    <wsdl:input name="RegisterCallbackRequest">
-		<soap:body use="literal"/>
-	    </wsdl:input>
-	    <wsdl:output name="RegisterCallbackResponse">
-		<soap:body use="literal"/>
-	    </wsdl:output>
-	</wsdl:operation>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="RegisterCallback">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="RegisterCallbackRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="RegisterCallbackResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="CallbackService">
-	<wsdl:port binding="tns:CallbackPortType_SOAPBinding" name="CallbackPort">
-	    <soap:address location="http://localhost:9005/CallbackContext/CallbackPort"/>
-	</wsdl:port>
+        <wsdl:port binding="tns:CallbackPortType_SOAPBinding" name="CallbackPort">
+            <soap:address location="http://localhost:9005/CallbackContext/CallbackPort"/>
+        </wsdl:port>
     </wsdl:service>
     <wsdl:service name="SOAPService">
-	<wsdl:port binding="tns:ServerPortType_SOAPBinding" name="SOAPPort">
-	    <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
-	</wsdl:port>
+        <wsdl:port binding="tns:ServerPortType_SOAPBinding" name="SOAPPort">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

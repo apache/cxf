@@ -17,44 +17,32 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns:jaxws="http://cxf.apache.org/jaxws"
- xsi:schemaLocation="
-           http://cxf.apache.org/jaxws                                 
-              http://cxf.apache.org/schemas/jaxws.xsd
-           http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd">
-
- <import resource="classpath:META-INF/cxf/cxf.xml" />
-  	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-
-
- <jaxws:server id="hwg-service-endpoint"
-  address="http://localhost:${testutil.ports.TestPort}/HelloWorldGreeter">
-  <jaxws:serviceBean>
-   <bean class='org.apache.hello_world.GreeterImpl' />
-  </jaxws:serviceBean>
-  <jaxws:features>
-   <bean class="org.apache.cxf.javascript.JavascriptOptionsFeature">
-    <property name="namespacePrefixMap">
-     <map>
-      <entry>
-       <key>
-        <value>http://apache.org/hello_world</value>
-       </key>
-       <value>hg</value>
-      </entry>
-      <entry>
-       <key>
-        <value>http://apache.org/hello_world/types</value>
-       </key>
-       <value>hgt</value>
-      </entry>
-     </map>
-    </property>
-   </bean>
-  </jaxws:features>
- </jaxws:server>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xsi:schemaLocation="            http://cxf.apache.org/jaxws                                                http://cxf.apache.org/schemas/jaxws.xsd            http://www.springframework.org/schema/beans               http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <jaxws:server id="hwg-service-endpoint" address="http://localhost:${testutil.ports.TestPort}/HelloWorldGreeter">
+        <jaxws:serviceBean>
+            <bean class="org.apache.hello_world.GreeterImpl"/>
+        </jaxws:serviceBean>
+        <jaxws:features>
+            <bean class="org.apache.cxf.javascript.JavascriptOptionsFeature">
+                <property name="namespacePrefixMap">
+                    <map>
+                        <entry>
+                            <key>
+                                <value>http://apache.org/hello_world</value>
+                            </key>
+                            <value>hg</value>
+                        </entry>
+                        <entry>
+                            <key>
+                                <value>http://apache.org/hello_world/types</value>
+                            </key>
+                            <value>hgt</value>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </jaxws:features>
+    </jaxws:server>
 </beans>

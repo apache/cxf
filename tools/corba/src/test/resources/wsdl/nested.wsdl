@@ -17,19 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
 -->
-<definitions name="nested" 
-    targetNamespace="http://schemas.apache.org/idl/nested.idl" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:corba="http://schemas.apache.org/bindings/corba" 
-    xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested.idl" 
-    xmlns:tns="http://schemas.apache.org/idl/nested.idl" 
-    xmlns:wsa="http://www.w3.org/2005/08/addressing" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:corba="http://schemas.apache.org/bindings/corba" xmlns:corbatm="http://schemas.apache.org/typemap/corba/nested.idl" xmlns:tns="http://schemas.apache.org/idl/nested.idl" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://schemas.apache.org/idltypes/nested.idl" name="nested" targetNamespace="http://schemas.apache.org/idl/nested.idl">
     <types>
-        <schema targetNamespace="http://schemas.apache.org/idltypes/nested.idl" 
-            xmlns="http://www.w3.org/2001/XMLSchema" 
-            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://schemas.apache.org/idltypes/nested.idl">
             <complexType name="base">
                 <sequence>
                     <element name="attr1" type="string"/>
@@ -115,8 +105,7 @@
             <complexType name="typeSequenceStruct2">
                 <sequence>
                     <element name="attrib1" nillable="true" type="int"/>
-                    <element name="attrib2" nillable="true" 
-                        type="xsd1:_1_attrib2Type_nil"/>
+                    <element name="attrib2" nillable="true" type="xsd1:_1_attrib2Type_nil"/>
                     <element name="simpleTypeValue" type="short"/>
                 </sequence>
             </complexType>
@@ -223,18 +212,15 @@
     <portType name="TypeInheritancePortType">
         <operation name="echoObject">
             <input message="tns:TypeInheritancePortType.echoObject" name="echoObject"/>
-            <output message="tns:TypeInheritancePortType.echoObjectResponse" 
-                name="echoObjectResponse"/>
+            <output message="tns:TypeInheritancePortType.echoObjectResponse" name="echoObjectResponse"/>
         </operation>
         <operation name="echoObject2">
             <input message="tns:TypeInheritancePortType.echoObject2" name="echoObject2"/>
-            <output message="tns:TypeInheritancePortType.echoObject2Response" 
-                name="echoObject2Response"/>
+            <output message="tns:TypeInheritancePortType.echoObject2Response" name="echoObject2Response"/>
         </operation>
         <operation name="echoObject3">
             <input message="tns:TypeInheritancePortType.echoObject3" name="echoObject3"/>
-            <output message="tns:TypeInheritancePortType.echoObject3Response" 
-                name="echoObject3Response"/>
+            <output message="tns:TypeInheritancePortType.echoObject3Response" name="echoObject3Response"/>
         </operation>
     </portType>
 </definitions>

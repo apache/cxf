@@ -19,89 +19,67 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="SwAService" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-  xmlns:tns="http://cxf.apache.org/swa" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
-  xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:types="http://cxf.apache.org/swa/types"
-  xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/swa"
-  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
-
-  <wsdl:types>
-    <xsd:schema targetNamespace="http://ws-i.org/profiles/basic/1.1/xsd"
-      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-      <xsd:simpleType name="swaRef">
-        <xsd:restriction base="xsd:anyURI" />
-      </xsd:simpleType>
-    </xsd:schema>
-  
-    <xsd:schema xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
-      targetNamespace="http://cxf.apache.org/swa/types">
-      <xsd:import namespace="http://ws-i.org/profiles/basic/1.1/xsd"/>
-      <xsd:element name="DataStruct">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="DataRef" type="wsi:swaRef"
-        xmime:expectedContentTypes="application/octet-stream" />
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      
-    </xsd:schema>
-
-  </wsdl:types>
-
-  <wsdl:message name="echoDataRequest">
-    <wsdl:part name="text" element="types:DataStruct" />
-    <wsdl:part name="data" type="xsd:base64Binary"/>
-  </wsdl:message>
-
-  <wsdl:message name="echoDataResponse">
-    <wsdl:part name="text" element="types:DataStruct" />
-    <wsdl:part name="data" type="xsd:base64Binary" />
-  </wsdl:message>
-
-  <wsdl:portType name="SwAServiceInterface">
-
-    <wsdl:operation name="echoData">
-      <wsdl:input message="tns:echoDataRequest" />
-      <wsdl:output message="tns:echoDataResponse" />
-    </wsdl:operation>
-
-  </wsdl:portType>
-
-  <wsdl:binding name="SwAServiceBinding" type="tns:SwAServiceInterface">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-
-    <wsdl:operation name="echoData">
-      <soap:operation soapAction=""/>
-      <wsdl:input>
-        <mime:multipartRelated>
-          <mime:part>
-            <soap:body parts="text" use="literal" />
-          </mime:part>
-          <mime:part>
-            <mime:content part="data" type="application/octet-stream" />
-          </mime:part>
-        </mime:multipartRelated>
-      </wsdl:input>
-      <wsdl:output>
-        <mime:multipartRelated>
-          <mime:part>
-            <soap:body parts="text" use="literal" />
-          </mime:part>
-          <mime:part>
-            <mime:content part="data" type="application/octet-stream" />
-          </mime:part>
-        </mime:multipartRelated>
-      </wsdl:output>
-    </wsdl:operation>
-
-  </wsdl:binding>
-
-  <wsdl:service name="SwAService">
-    <wsdl:port name="SwAServiceHttpPort" binding="tns:SwAServiceBinding">
-      <soap:address location="http://localhost:9036/swa" />
-    </wsdl:port>
-  </wsdl:service>
-
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/swa" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:types="http://cxf.apache.org/swa/types" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" name="SwAService" targetNamespace="http://cxf.apache.org/swa">
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ws-i.org/profiles/basic/1.1/xsd">
+            <xsd:simpleType name="swaRef">
+                <xsd:restriction base="xsd:anyURI"/>
+            </xsd:simpleType>
+        </xsd:schema>
+        <xsd:schema xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/swa/types">
+            <xsd:import namespace="http://ws-i.org/profiles/basic/1.1/xsd"/>
+            <xsd:element name="DataStruct">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="DataRef" type="wsi:swaRef" xmime:expectedContentTypes="application/octet-stream"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="echoDataRequest">
+        <wsdl:part name="text" element="types:DataStruct"/>
+        <wsdl:part name="data" type="xsd:base64Binary"/>
+    </wsdl:message>
+    <wsdl:message name="echoDataResponse">
+        <wsdl:part name="text" element="types:DataStruct"/>
+        <wsdl:part name="data" type="xsd:base64Binary"/>
+    </wsdl:message>
+    <wsdl:portType name="SwAServiceInterface">
+        <wsdl:operation name="echoData">
+            <wsdl:input message="tns:echoDataRequest"/>
+            <wsdl:output message="tns:echoDataResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="SwAServiceBinding" type="tns:SwAServiceInterface">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="echoData">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <mime:multipartRelated>
+                    <mime:part>
+                        <soap:body parts="text" use="literal"/>
+                    </mime:part>
+                    <mime:part>
+                        <mime:content part="data" type="application/octet-stream"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:multipartRelated>
+                    <mime:part>
+                        <soap:body parts="text" use="literal"/>
+                    </mime:part>
+                    <mime:part>
+                        <mime:content part="data" type="application/octet-stream"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SwAService">
+        <wsdl:port name="SwAServiceHttpPort" binding="tns:SwAServiceBinding">
+            <soap:address location="http://localhost:9036/swa"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

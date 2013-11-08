@@ -17,12 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:foo="http://cxf.apache.org/configuration/foo"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:foo="http://cxf.apache.org/configuration/foo" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="complex" class="org.apache.cxf.configuration.spring.JaxbPropertyEditorTest$FooBean" lazy-init="true">
         <property name="name">
             <value>foam</value>

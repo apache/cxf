@@ -17,33 +17,26 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http/any"
-    xmlns:x1="http://apache.org/hello_world_soap_http/any_types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://apache.org/hello_world_soap_http/any" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http/any" xmlns:x1="http://apache.org/hello_world_soap_http/any_types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http/any" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/any_types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/any_types" xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/any_types" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" targetNamespace="http://apache.org/hello_world_soap_http/any_types" elementFormDefault="qualified">
             <element name="sayHi">
-		<xs:complexType>
+                <xs:complexType>
                     <xs:sequence>
                         <xs:element name="port" minOccurs="0" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:any namespace="##other" processContents="lax"><!-- minOccurs="0" maxOccurs="unbounded"-->
+                                    <xs:any namespace="##other" processContents="lax">
+                                        <!-- minOccurs="0" maxOccurs="unbounded"-->
                                     </xs:any>
-				    <!--element name="requestType" type="string"/-->
+                                    <!--element name="requestType" type="string"/-->
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
-                
                 </xs:complexType>
             </element>
-	    <element name="sayHi1">
+            <element name="sayHi1">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="port" minOccurs="0" maxOccurs="unbounded">
@@ -54,12 +47,8 @@
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
-
                 </xs:complexType>
             </element>
-	    
-
-
             <element name="sayHiResponse">
                 <complexType>
                     <sequence>
@@ -75,7 +64,6 @@
     <wsdl:message name="sayHi1Request">
         <wsdl:part name="in" element="x1:sayHi1"/>
     </wsdl:message>
-
     <wsdl:message name="sayHiResponse">
         <wsdl:part name="out" element="x1:sayHiResponse"/>
     </wsdl:message>
@@ -89,7 +77,6 @@
             <wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="sayHi">
@@ -101,7 +88,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-	<wsdl:operation name="sayHi1">
+        <wsdl:operation name="sayHi1">
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
@@ -110,13 +97,10 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-
     </wsdl:binding>
-
     <wsdl:service name="SOAPService">
-	<wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+        <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
             <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>

@@ -17,23 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld"
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world/messages"
-    xmlns:x1="http://apache.org/hello_world/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://apache.org/hello_world/messages">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world/messages" xmlns:x1="http://apache.org/hello_world/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorld" targetNamespace="http://apache.org/hello_world/messages">
     <wsdl:types>
-        <schema
-            xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:x1="http://apache.org/hello_world/types"
-            targetNamespace="http://apache.org/hello_world/types"
-            elementFormDefault="qualified">
-
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world/types" targetNamespace="http://apache.org/hello_world/types" elementFormDefault="qualified">
             <import namespace="http://cxf.apache.org/courseware/Invoice" schemaLocation="nopath/Invoice.xsd"/>
-
             <element name="sayHi">
                 <complexType/>
             </element>

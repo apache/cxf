@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -23,14 +24,12 @@
     <name>Apache CXF Command Line Tools WADLTo JAXRS Frontend</name>
     <description>Apache CXF Command Line Tools WADLTo JAXRS Frontend</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -52,23 +51,19 @@
             <artifactId>cxf-rt-rs-service-description</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>                                                      
-             <groupId>xml-resolver</groupId>                               
-             <artifactId>xml-resolver</artifactId>
-         </dependency>
         <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-        </dependency>  
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>jaxb2-basics</artifactId>
             <version>0.6.4</version>
             <scope>test</scope>
         </dependency>
-
-        
     </dependencies>
-
-
 </project>

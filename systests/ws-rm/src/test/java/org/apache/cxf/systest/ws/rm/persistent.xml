@@ -17,32 +17,20 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:wsa="http://cxf.apache.org/ws/addressing"
-       xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
-       xsi:schemaLocation="
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core" xmlns:wsa="http://cxf.apache.org/ws/addressing" xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager" xsi:schemaLocation=" http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <wsa:addressing/>
             <wsrm-mgr:reliableMessaging>
                 <wsrm-mgr:sourcePolicy>
-                    <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>                    
+                    <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>
                 </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:store>
-                   <ref bean="testStore"/>
+                    <ref bean="testStore"/>
                 </wsrm-mgr:store>
             </wsrm-mgr:reliableMessaging>
         </cxf:features>
     </cxf:bus>
-    
     <wsrm-mgr:jdbcStore id="testStore" url="jdbc:derby:${db.name};create=true"/>
-    
 </beans>

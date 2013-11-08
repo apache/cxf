@@ -17,7 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<templates><template autoinsert="true" context="xml_new" deleted="false" description="xml declaration" enabled="true" id="org.eclipse.wst.xml.ui.internal.templates.xmldeclaration" name="xml declaration">&lt;?xml version="1.0" encoding="${encoding}"?&gt;
+<templates>
+    <template autoinsert="true" context="xml_new" deleted="false" description="xml declaration" enabled="true" id="org.eclipse.wst.xml.ui.internal.templates.xmldeclaration" name="xml declaration">&lt;?xml version="1.0" encoding="${encoding}"?&gt;
 &lt;!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -35,4 +36,5 @@
   KIND, either express or implied. See the License for the
   specific language governing permissions and limitations
   under the License.
---&gt;</template></templates>
+--&gt;</template>
+</templates>

@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="mapping.wsdl" targetNamespace="http://apache.org/mapping" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-    xmlns:tns="http://apache.org/mapping" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/mapping" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="mapping.wsdl" targetNamespace="http://apache.org/mapping">
     <types>
-        <schema targetNamespace="http://apache.org/mapping" 
-            xmlns="http://www.w3.org/2001/XMLSchema">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/mapping">
             <element name="doSomething">
                 <complexType>
                     <sequence>
@@ -44,32 +37,30 @@
                     </sequence>
                 </complexType>
             </element>
-
-	    <element name="gdocsRequest">
-		<complexType>
-		    <sequence>
-			<element name="foo1" type="string"/>
-			<element name="foo2" type="int"/>				
-		    </sequence>
-		</complexType>
-	    </element>
-	    <element name="gdocsResponse">
-		<complexType>
-		    <sequence>
-			<element name="foo2" type="int"/>
-			<element name="foo3" type="long"/>				
-		    </sequence>
-		</complexType>
-	    </element>
+            <element name="gdocsRequest">
+                <complexType>
+                    <sequence>
+                        <element name="foo1" type="string"/>
+                        <element name="foo2" type="int"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="gdocsResponse">
+                <complexType>
+                    <sequence>
+                        <element name="foo2" type="int"/>
+                        <element name="foo3" type="long"/>
+                    </sequence>
+                </complexType>
+            </element>
         </schema>
     </types>
     <message name="gdocsRequest">
-	<part element="tns:gdocsRequest" name="parameters"/>
+        <part element="tns:gdocsRequest" name="parameters"/>
     </message>
     <message name="gdocsResponse">
-	<part element="tns:gdocsResponse" name="parameters"/>
+        <part element="tns:gdocsResponse" name="parameters"/>
     </message>
-
     <message name="doSomething">
         <part element="tns:doSomething" name="parameters"/>
     </message>
@@ -81,12 +72,10 @@
             <input message="tns:doSomething" name="doSomething"/>
             <output message="tns:doSomethingResponse" name="doSomethingResponse"/>
         </operation>
-
         <operation name="gdocsRequest">
             <input message="tns:gdocsRequest" name="gdocsRequest"/>
             <output message="tns:gdocsResponse" name="gdocsResponse"/>
         </operation>
-
     </portType>
     <binding name="SomethingServerSOAPBinding" type="tns:SomethingServer">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>

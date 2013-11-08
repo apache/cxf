@@ -21,7 +21,7 @@
     <ns:SubscriptionId>1E5AY4ZG53H4AMC8QH82</ns:SubscriptionId>
     <ns:AssociateTag>dandiephosblo-20</ns:AssociateTag>
     <ns:Request>
-	<ns:IdType>ASIN</ns:IdType>
-	<ns:ItemId>0486411214</ns:ItemId>
+        <ns:IdType>ASIN</ns:IdType>
+        <ns:ItemId>0486411214</ns:ItemId>
     </ns:Request>
 </ns:ItemLookup>

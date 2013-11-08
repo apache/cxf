@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,7 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy"
-	xmlns:mtom="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization">
-	<mtom:OptimizedMimeSerialization wsp:Optional="true" />
+<wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy" xmlns:mtom="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization">
+    <mtom:OptimizedMimeSerialization wsp:Optional="true"/>
 </wsp:Policy>

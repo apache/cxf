@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -21,21 +22,18 @@
         <artifactId>cxf</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
     <name>Apache CXF Parent</name>
     <description>Apache CXF Parent POM</description>
     <url>http://cxf.apache.org</url>
-
     <packaging>pom</packaging>
-
     <properties>
         <cxf.protect-xmlschema-collections>false</cxf.protect-xmlschema-collections>
         <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
         <cxf.surefire.format>brief</cxf.surefire.format>
         <cxf.surefire.usefile>false</cxf.surefire.usefile>
-        <cxf.surefire.parallel.mode />
+        <cxf.surefire.parallel.mode/>
         <cxf.surefire.fork.vmargs>-ea</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
         <cxf.surefire.enable.assertions>true</cxf.surefire.enable.assertions>
@@ -46,11 +44,9 @@
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
         <cxf.saaj.impl.version>1.3.19</cxf.saaj.impl.version>
-
         <extra.saaj.dep.groupId>${cxf.saaj.impl.groupId}</extra.saaj.dep.groupId>
         <extra.saaj.dep.artifactId>${cxf.saaj.impl.artifactId}</extra.saaj.dep.artifactId>
         <extra.saaj.dep.version>${cxf.saaj.impl.version}</extra.saaj.dep.version>
-
         <!-- stuff related to ASM -->
         <!-- use asm 3.x for now to avoid breaking 3rd party components -->
         <cxf.asm.groupId>asm</cxf.asm.groupId>
@@ -58,13 +54,12 @@
         <cxf.asm.version>3.3.1</cxf.asm.version>
         <cxf.asm.bundle.version>3.3.1_1</cxf.asm.bundle.version>
         <cxf.osgi.asm.version>[2.0,5)</cxf.osgi.asm.version>
-
         <!-- OSGi related properties -->
-        <cxf.fragment.host />
-        <cxf.bundle.activator />
-        <cxf.osgi.import />
+        <cxf.fragment.host/>
+        <cxf.bundle.activator/>
+        <cxf.osgi.import/>
         <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
-        <cxf.osgi.dynamic.import />
+        <cxf.osgi.dynamic.import/>
         <cxf.osgi.spring.version>[3.1,4)</cxf.osgi.spring.version>
         <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
         <cxf.osgi.slf4j.version>[1.5,2)</cxf.osgi.slf4j.version>
@@ -75,7 +70,6 @@
         <cxf.osgi.javax.mail.version>[0.0,2)</cxf.osgi.javax.mail.version>
         <cxf.osgi.javax.servlet.version>[0.0,4)</cxf.osgi.javax.servlet.version>
         <cxf.osgi.javax.xml.ws.version>[0.0,3)</cxf.osgi.javax.xml.ws.version>
-
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
         <cxf.activemq.version>5.8.0</cxf.activemq.version>
@@ -159,14 +153,12 @@
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
-
-        <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version> 
+        <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
         <!-- various OSGi related versions -->
         <cxf.aries.version>1.0.0</cxf.aries.version>
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
         <cxf.karaf.version>2.2.9</cxf.karaf.version>
-
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
@@ -186,21 +178,13 @@
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
-
-
-        <cxf.checkstyle.extension />
+        <cxf.checkstyle.extension/>
         <cxf.jaxb.context.class/>
-
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
-
         <cxf.downloadSources>true</cxf.downloadSources>
-
         <cxf.pmd.eclipse.ruleset.ext/>
-
-        <cxf.resources.base.path />
+        <cxf.resources.base.path/>
     </properties>
-
-
     <build>
         <resources>
             <resource>
@@ -368,7 +352,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -424,7 +407,6 @@
                         </archive>
                     </configuration>
                 </plugin>
-
             </plugins>
         </pluginManagement>
         <plugins>
@@ -477,7 +459,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -521,10 +502,8 @@
                 </configuration>
             </plugin>
         </plugins>
-
         <defaultGoal>install</defaultGoal>
     </build>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -570,8 +549,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
-
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -769,14 +746,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>${cxf.validation.api.version}</version>
-                <optional>true</optional>                  
+                <optional>true</optional>
             </dependency>
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-jdk14</artifactId>
@@ -897,7 +872,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
@@ -1185,13 +1159,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>${cxf.spring.mock}</artifactId>
                 <version>${cxf.spring.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
@@ -1393,7 +1365,6 @@
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${cxf.bcprov.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.abdera</groupId>
                 <artifactId>abdera-core</artifactId>
@@ -1553,7 +1524,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
@@ -1624,7 +1594,6 @@
 
         </dependencies>
     </dependencyManagement>
-
     <profiles>
         <profile>
             <id>jdk17</id>
@@ -1672,7 +1641,6 @@
                 <cxf.saaj.impl.version>1.4.1</cxf.saaj.impl.version>
             </properties>
         </profile>
-
         <profile>
             <id>fastinstall</id>
             <properties>
@@ -1706,19 +1674,21 @@
                     <id>oss.sonatype.org</id>
                     <name>OSS Sonatype Staging</name>
                     <url>https://oss.sonatype.org/content/groups/staging</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
                 </repository>
-            </repositories>            
+            </repositories>
         </profile>
-        
         <profile>
             <id>nospringvalidation</id>
             <properties>
                 <cxf.spring.validation.mode>VALIDATION_NONE</cxf.spring.validation.mode>
             </properties>
         </profile>
-
         <profile>
             <id>nochecks</id>
             <properties>
@@ -1726,7 +1696,6 @@
                 <checkstyle.skip>true</checkstyle.skip>
             </properties>
         </profile>
-
         <profile>
             <!-- default profile enables checkstyle and Xlint stuff -->
             <id>sourcecheck</id>
@@ -1761,7 +1730,6 @@
                 <cxf.eclipse.outputDirectory>${basedir}/eclipse-classes</cxf.eclipse.outputDirectory>
             </properties>
         </profile>
-
         <profile>
             <!-- pmd and checkstyle, no tests. -->
             <id>justsourcecheck</id>
@@ -1817,7 +1785,6 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
             <id>ibmjdk</id>
             <activation>
@@ -1883,6 +1850,3 @@
         </profile>
     </profiles>
 </project>
-
-
-

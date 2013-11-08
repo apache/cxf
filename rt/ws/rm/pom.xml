@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,22 +24,18 @@
     <name>Apache CXF Runtime WS Reliable Messaging</name>
     <description>Apache CXF Runtime WS Reliable Messaging</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <properties>
         <cxf.osgi.import>
             org.apache.aries*;version="${cxf.aries.version.range}",
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
     </properties>
-
-
     <dependencies>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
@@ -96,7 +93,6 @@
             <artifactId>wss4j-policy</artifactId>
             <version>${cxf.wss4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -131,7 +127,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -177,7 +172,7 @@
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
-                                 </xsdOption>
+                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>

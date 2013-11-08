@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,18 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="BaseService" targetNamespace="http://cxf.apache.org/performance/basic_type"
-         xmlns="http://schemas.xmlsoap.org/wsdl/"
-         xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
-         xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-         xmlns:tns="http://cxf.apache.org/performance/basic_type"
-         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-         xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-         xmlns:x1="http://cxf.apache.org/performance/basic_type/types"
-         >
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/performance/basic_type" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:x1="http://cxf.apache.org/performance/basic_type/types" name="BaseService" targetNamespace="http://cxf.apache.org/performance/basic_type">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/performance/basic_type/types"
-            xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/performance/basic_type/types" elementFormDefault="qualified">
             <element name="echoString">
                 <complexType>
                     <sequence>
@@ -65,27 +56,22 @@
     <message name="echoBase64Response">
         <part name="out" element="x1:echoBase64Response"/>
     </message>
-
     <message name="echoStringRequest">
         <part name="in" element="x1:echoString"/>
     </message>
     <message name="echoStringResponse">
         <part name="out" element="x1:echoStringResponse"/>
     </message>
-
     <portType name="BasicPortType">
         <operation name="echoBase64">
             <input message="tns:echoBase64Request" name="echoBase64"/>
             <output message="tns:echoBase64Response" name="echoBase64Response"/>
         </operation>
-
         <operation name="echoString">
             <input message="tns:echoStringRequest" name="echoString"/>
             <output message="tns:echoStringResponse" name="echoStringResponse"/>
         </operation>
-
     </portType>
-
     <binding name="BasicPortBinding" type="tns:BasicPortType">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <operation name="echoBase64">
@@ -97,7 +83,6 @@
                 <soap:body use="literal"/>
             </output>
         </operation>
-
         <operation name="echoString">
             <soap:operation soapAction="" style="document"/>
             <input name="echoString">
@@ -108,27 +93,9 @@
             </output>
         </operation>
     </binding>
-  
-
     <service name="BasicService">
         <port binding="tns:BasicPortBinding" name="SoapHttpPort">
-            <soap:address
-            location="http://localhost:20000/performance/basic_type/SoapPort"/>
+            <soap:address location="http://localhost:20000/performance/basic_type/SoapPort"/>
         </port>
     </service>
-
 </definitions>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

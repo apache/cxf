@@ -17,31 +17,23 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:tns="http://apache.org/hello_world_soap_http/types" 
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-    targetNamespace="http://apache.org/hello_world_soap_http/types">
-
-  <wsdl:types>
-    <schema targetNamespace="http://apache.org/hello_world_soap_http/types"
-        xmlns="http://www.w3.org/2001/XMLSchema"
-        elementFormDefault="qualified">
-      <element name="greetMe">
-        <complexType>
-          <sequence>
-            <element name="requestType" type="string"/>
-          </sequence>
-        </complexType>
-      </element>
-      <element name="greetMeResponse">
-        <complexType>
-          <sequence>
-            <element name="responseType" type="string"/>
-          </sequence>
-        </complexType>
-      </element>
-    </schema>
-  </wsdl:types>
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://apache.org/hello_world_soap_http/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http/types">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
+            <element name="greetMe">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </wsdl:types>
 </wsdl:definitions>

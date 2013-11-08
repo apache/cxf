@@ -17,83 +17,59 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jaxws="http://cxf.apache.org/jaxws"
-	xmlns:http="http://cxf.apache.org/transports/http/configuration"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-						http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-						http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
-						
-
-		
-	<!-- CXF -->
-	<import resource="classpath:META-INF/cxf/cxf.xml" />
-
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-
-	<!-- Services -->
-	<jaxws:server id="testServer" serviceClass="org.apache.cxf.systest.jaxb.service.TestService"
-		 address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService">
-	
-		<jaxws:properties>
-			<entry key="jaxb.additionalContextClasses">
-				<bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
-					<property name="classNames">
-						<list>
-							<value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
-						</list>
-					</property>
-				</bean>
-			</entry>
-		</jaxws:properties>
-		
-		<jaxws:serviceBean>
-			<bean class="org.apache.cxf.systest.jaxb.service.TestServiceImpl" autowire="byName" />
-		</jaxws:serviceBean>
-		
-	</jaxws:server>
-	
-	<!-- Endpoint -->
-	<jaxws:endpoint id="testEndpoint" 
-		implementor="org.apache.cxf.systest.jaxb.service.TestServiceImpl" 
-		address="http://localhost:${testutil.ports.TestServiceTest}/service/TestEndpoint">
-	
-		<jaxws:properties>
-			<entry key="jaxb.additionalContextClasses">
-				<bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
-					<property name="classNames">
-						<list>
-							<value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
-						</list>
-					</property>
-				</bean>
-			</entry>
-		</jaxws:properties>
-	</jaxws:endpoint>
-	
-	
-	<!-- Client Proxy -->
-	<jaxws:client id="testClient" address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService" serviceClass="org.apache.cxf.systest.jaxb.service.TestService">
-		<jaxws:inInterceptors>
-			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-		</jaxws:inInterceptors>
-		<jaxws:outInterceptors>
-			<bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-		</jaxws:outInterceptors>
-	    <jaxws:properties>
-			<entry key="jaxb.additionalContextClasses">
-				<bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
-					<property name="classNames">
-						<list>
-							<value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
-						</list>
-					</property>
-				</bean>
-			</entry>
-        </jaxws:properties>	
-	</jaxws:client>
-	
-				
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd                                                 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd                                                 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+    <!-- CXF -->
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <!-- Services -->
+    <jaxws:server id="testServer" serviceClass="org.apache.cxf.systest.jaxb.service.TestService" address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService">
+        <jaxws:properties>
+            <entry key="jaxb.additionalContextClasses">
+                <bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
+                    <property name="classNames">
+                        <list>
+                            <value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
+                        </list>
+                    </property>
+                </bean>
+            </entry>
+        </jaxws:properties>
+        <jaxws:serviceBean>
+            <bean class="org.apache.cxf.systest.jaxb.service.TestServiceImpl" autowire="byName"/>
+        </jaxws:serviceBean>
+    </jaxws:server>
+    <!-- Endpoint -->
+    <jaxws:endpoint id="testEndpoint" implementor="org.apache.cxf.systest.jaxb.service.TestServiceImpl" address="http://localhost:${testutil.ports.TestServiceTest}/service/TestEndpoint">
+        <jaxws:properties>
+            <entry key="jaxb.additionalContextClasses">
+                <bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
+                    <property name="classNames">
+                        <list>
+                            <value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
+                        </list>
+                    </property>
+                </bean>
+            </entry>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <!-- Client Proxy -->
+    <jaxws:client id="testClient" address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService" serviceClass="org.apache.cxf.systest.jaxb.service.TestService">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+        <jaxws:properties>
+            <entry key="jaxb.additionalContextClasses">
+                <bean class="org.apache.cxf.systest.jaxb.util.ClassArrayFactoryBean">
+                    <property name="classNames">
+                        <list>
+                            <value>org.apache.cxf.systest.jaxb.model.ExtendedWidget</value>
+                        </list>
+                    </property>
+                </bean>
+            </entry>
+        </jaxws:properties>
+    </jaxws:client>
 </beans>
-

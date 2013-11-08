@@ -17,20 +17,8 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
-">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-
-
     <!-- -->
     <!-- HTTP/S configuration for clients -->
     <!-- -->
@@ -38,12 +26,10 @@
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-               <sec:keyStore type="JKS" password="password" 
-                    file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
-               </sec:keyManagers>
+                <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
+            </sec:keyManagers>
             <sec:trustManagers>
-               <sec:keyStore type="JKS" password="password"
-                   file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

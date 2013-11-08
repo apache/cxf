@@ -17,25 +17,19 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
- 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean name="{http://apache.org/type_test/doc}SOAPService" abstract="true">
         <property name="properties">
-          	<map>
-          		<entry key="schema-validation-enabled" value="true" />
-          	</map>
+            <map>
+                <entry key="schema-validation-enabled" value="true"/>
+            </map>
         </property>
     </bean>
-
     <bean name="{http://apache.org/type_test/xml}XMLService" abstract="true">
         <property name="properties">
-          	<map>
-          		<entry key="schema-validation-enabled" value="true" />
-          	</map>
+            <map>
+                <entry key="schema-validation-enabled" value="true"/>
+            </map>
         </property>
     </bean>
-    
 </beans>

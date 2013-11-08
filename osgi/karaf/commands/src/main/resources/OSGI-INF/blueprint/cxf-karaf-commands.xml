@@ -16,7 +16,6 @@
     limitations under the License.
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" default-activation="lazy">
-
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="cxf/list-busses">
             <action class="org.apache.cxf.karaf.commands.ListBussesCommand">
@@ -39,11 +38,9 @@
             </action>
         </command>
     </command-bundle>
-
-    <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"  />
+    <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
     <bean id="cxfController" class="org.apache.cxf.karaf.commands.internal.CXFControllerImpl">
         <property name="bundleContext" ref="blueprintBundleContext"/>
         <property name="configAdmin" ref="configAdmin"/>
     </bean>
-
 </blueprint>

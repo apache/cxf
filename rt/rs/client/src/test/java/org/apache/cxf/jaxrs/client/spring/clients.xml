@@ -17,57 +17,32 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxrs="http://cxf.apache.org/jaxrs-client"
-      xmlns:soap="http://cxf.apache.org/bindings/soap"
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
-http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">
-  <import resource="classpath:META-INF/cxf/cxf.xml"/>
-     
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
-      <property name="transportIds">
-          <list>
-              <value>http://cxf.apache.org/transports/local</value>
-              <value>http://cxf.apache.org/transports/http</value>
-          </list>
-      </property>
-  </bean>
-   
-  <jaxrs:client id="client1" 
-    serviceClass="org.apache.cxf.jaxrs.resources.BookStore"
-    address="http://localhost:9000/foo" >
-    <jaxrs:inInterceptors>
-	  <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>	  
-	</jaxrs:inInterceptors>
-	<jaxrs:outInterceptors>
-	  <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>	  
-	</jaxrs:outInterceptors>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs-client" xmlns:soap="http://cxf.apache.org/bindings/soap" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+        <property name="transportIds">
+            <list>
+                <value>http://cxf.apache.org/transports/local</value>
+                <value>http://cxf.apache.org/transports/http</value>
+            </list>
+        </property>
+    </bean>
+    <jaxrs:client id="client1" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9000/foo">
+        <jaxrs:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxrs:outInterceptors>
     </jaxrs:client>
-   
-  <jaxrs:client id="setHeaderClient" 
-    xmlns:s="http://books.com" serviceName="s:BookService"
-    serviceClass="org.apache.cxf.jaxrs.resources.BookStore"
-    address="http://localhost:8080/simpleWithAddress"
-    username="username"
-    password="password">
-    <jaxrs:headers>
-       <entry key="Accept" value="text/xml"/>
-    </jaxrs:headers>
-  </jaxrs:client>
-  
-  <jaxrs:client id="ModelClient" 
-    modelRef="classpath:/org/apache/cxf/jaxrs/client/spring/resources.xml"
-    serviceClass="org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations"
-    address="http://localhost:8080/simpleWithAddress"
-    username="username"
-    password="password">
-    <jaxrs:headers>
-       <entry key="Accept" value="text/xml"/>
-    </jaxrs:headers>    
-  </jaxrs:client>
-  
-   
-  </beans>
+    <jaxrs:client xmlns:s="http://books.com" id="setHeaderClient" serviceName="s:BookService" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:8080/simpleWithAddress" username="username" password="password">
+        <jaxrs:headers>
+            <entry key="Accept" value="text/xml"/>
+        </jaxrs:headers>
+    </jaxrs:client>
+    <jaxrs:client id="ModelClient" modelRef="classpath:/org/apache/cxf/jaxrs/client/spring/resources.xml" serviceClass="org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations" address="http://localhost:8080/simpleWithAddress" username="username" password="password">
+        <jaxrs:headers>
+            <entry key="Accept" value="text/xml"/>
+        </jaxrs:headers>
+    </jaxrs:client>
+</beans>

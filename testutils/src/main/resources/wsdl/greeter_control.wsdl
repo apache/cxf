@@ -17,16 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://cxf.apache.org/greeter_control"
-    xmlns:x1="http://cxf.apache.org/greeter_control/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://cxf.apache.org/greeter_control" name="HelloWorld">
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/greeter_control" xmlns:x1="http://cxf.apache.org/greeter_control/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/greeter_control" name="HelloWorld">
     <wsdl:types>
-        <schema targetNamespace="http://cxf.apache.org/greeter_control/types" 
-            xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/greeter_control/types" elementFormDefault="qualified">
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -72,7 +65,6 @@
                     </sequence>
                 </complexType>
             </element>
-            
             <element name="startGreeter">
                 <complexType>
                     <sequence>
@@ -113,9 +105,7 @@
             <element name="robustInOnlyMode" type="xsd:boolean"/>
         </schema>
     </wsdl:types>
-
-   
-   <wsdl:message name="sayHiRequest">
+    <wsdl:message name="sayHiRequest">
         <wsdl:part element="x1:sayHi" name="in"/>
     </wsdl:message>
     <wsdl:message name="sayHiResponse">
@@ -131,21 +121,20 @@
         <wsdl:part element="x1:greetMeOneWay" name="in"/>
     </wsdl:message>
     <wsdl:message name="pingMeRequest">
-    <wsdl:part name="in" element="x1:pingMe"/>
+        <wsdl:part name="in" element="x1:pingMe"/>
     </wsdl:message>
     <wsdl:message name="pingMeResponse">
         <wsdl:part name="out" element="x1:pingMeResponse"/>
-    </wsdl:message>        
+    </wsdl:message>
     <wsdl:message name="pingMeFault">
         <wsdl:part name="faultDetail" element="x1:faultDetail"/>
-    </wsdl:message> 
-    
+    </wsdl:message>
     <wsdl:message name="startGreeterRequest">
         <wsdl:part element="x1:startGreeter" name="in"/>
     </wsdl:message>
     <wsdl:message name="startGreeterResponse">
         <wsdl:part element="x1:startGreeterResponse" name="out"/>
-    </wsdl:message>    
+    </wsdl:message>
     <wsdl:message name="stopGreeterRequest">
         <wsdl:part element="x1:stopGreeter" name="in"/>
     </wsdl:message>
@@ -162,54 +151,44 @@
     </wsdl:message>
     <wsdl:message name="setRobustInOnlyModeResponse">
     </wsdl:message>
-    
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMe">
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
-
         <wsdl:operation name="pingMe">
             <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
             <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
             <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
-        </wsdl:operation> 
+        </wsdl:operation>
     </wsdl:portType>
-    
     <wsdl:portType name="Control">
         <wsdl:operation name="startGreeter">
             <wsdl:input message="tns:startGreeterRequest" name="startGreeterRequest"/>
             <wsdl:output message="tns:startGreeterResponse" name="startGreeterResponse"/>
         </wsdl:operation>
-        
         <wsdl:operation name="stopGreeter">
             <wsdl:input message="tns:stopGreeterRequest" name="stopGreeterRequest"/>
             <wsdl:output message="tns:stopGreeterResponse" name="stopGreeterResponse"/>
         </wsdl:operation>
-
         <wsdl:operation name="setFaultLocation">
             <wsdl:input message="tns:setFaultLocationRequest" name="setFaultLocationRequest"/>
             <wsdl:output message="tns:setFaultLocationResponse" name="setFaultLocationResponse"/>
         </wsdl:operation>
-
         <wsdl:operation name="setRobustInOnlyMode">
             <wsdl:input message="tns:setRobustInOnlyModeRequest" name="setRobustInOnlyModeRequest"/>
             <wsdl:output message="tns:setRobustInOnlyModeResponse" name="setRobustInOnlyModeResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-
     <wsdl:binding name="GreeterSOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        
         <wsdl:operation name="sayHi">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="sayHiRequest">
@@ -219,7 +198,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMe">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeRequest">
@@ -229,15 +207,13 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        
         <wsdl:operation name="greetMeOneWay">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-
-            <wsdl:operation name="pingMe">
+        <wsdl:operation name="pingMe">
             <soap:operation style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
@@ -249,9 +225,7 @@
                 <soap:fault name="pingMeFault" use="literal"/>
             </wsdl:fault>
         </wsdl:operation>
-        
     </wsdl:binding>
-  
     <wsdl:binding name="ControlSOAPBinding" type="tns:Control">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="startGreeter">
@@ -291,20 +265,17 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-
     <wsdl:service name="ControlService">
         <wsdl:port binding="tns:ControlSOAPBinding" name="ControlPort">
             <soap:address location="http://localhost:9001/SoapContext/ControlPort"/>
         </wsdl:port>
     </wsdl:service>
-    
     <wsdl:service name="GreeterService">
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://localhost:9020/SoapContext/GreeterPort"/>
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>
-    
     <wsdl:service name="ReliableGreeterService">
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://localhost:9020/SoapContext/GreeterPort"/>
@@ -316,7 +287,7 @@
                     <wsrmp:BaseRetransmissionInterval Milliseconds="30000"/>
                 </wsrmp:RMAssertion>
             </wsp:Policy>
-        </wsdl:port> 
+        </wsdl:port>
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort2">
             <soap:address location="http://localhost:9020/SoapContext/GreeterPort2"/>
             <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
@@ -325,32 +296,30 @@
                 </wsam:Addressing>
             </wsp:Policy>
         </wsdl:port>
-        
     </wsdl:service>
-    
     <wsdl:service name="Reliable12GreeterService">
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://localhost:9020/SoapContext/GreeterPort"/>
             <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
-              <wsp:ExactlyOne>
-                <wsp:All>
-                  <wsrmp:RMAssertion xmlns:wsrmp="http://docs.oasis-open.org/ws-rx/wsrmp/200702">
-                    <wsp:Policy>
-                      <wsrmp:DeliveryAssurance>
-                        <wsp:Policy>
-                          <wsrmp:ExactlyOnce/>
-                          <wsrmp:InOrder/>
-                        </wsp:Policy>
-                      </wsrmp:DeliveryAssurance>
-                    </wsp:Policy>
-                  </wsrmp:RMAssertion>
-                  <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
-                      <wsp:Policy/>
-                  </wsam:Addressing>
-                </wsp:All>
-              </wsp:ExactlyOne>
+                <wsp:ExactlyOne>
+                    <wsp:All>
+                        <wsrmp:RMAssertion xmlns:wsrmp="http://docs.oasis-open.org/ws-rx/wsrmp/200702">
+                            <wsp:Policy>
+                                <wsrmp:DeliveryAssurance>
+                                    <wsp:Policy>
+                                        <wsrmp:ExactlyOnce/>
+                                        <wsrmp:InOrder/>
+                                    </wsp:Policy>
+                                </wsrmp:DeliveryAssurance>
+                            </wsp:Policy>
+                        </wsrmp:RMAssertion>
+                        <wsam:Addressing xmlns:wsam="http://www.w3.org/2007/02/addressing/metadata">
+                            <wsp:Policy/>
+                        </wsam:Addressing>
+                    </wsp:All>
+                </wsp:ExactlyOne>
             </wsp:Policy>
-        </wsdl:port> 
+        </wsdl:port>
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort2">
             <soap:address location="http://localhost:9020/SoapContext/GreeterPort2"/>
             <wsp:Policy xmlns:wsp="http://www.w3.org/2006/07/ws-policy">
@@ -359,15 +328,12 @@
                 </wsam:Addressing>
             </wsp:Policy>
         </wsdl:port>
-        
     </wsdl:service>
-   
     <wsdl:service name="BasicGreeterService">
         <wsdl:port binding="tns:GreeterSOAPBinding" name="GreeterPort">
             <soap:address location="http://localhost:9020/SoapContext/GreeterPort"/>
         </wsdl:port>
     </wsdl:service>
-
     <wsdl:service name="ClusteredGreeterService">
         <wsdl:port binding="tns:GreeterSOAPBinding" name="ReplicatedPortA">
             <soap:address location="http://localhost:9051/SoapContext/ReplicatedPortA"/>
@@ -382,8 +348,5 @@
         <wsdl:port binding="tns:ControlSOAPBinding" name="ReplicatedPortD">
             <soap:address location="http://localhost:9054/SoapContext/ReplicatedPortD"/>
         </wsdl:port>
-        
     </wsdl:service>
-
 </wsdl:definitions>
-

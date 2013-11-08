@@ -17,26 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:aop="http://www.springframework.org/schema/aop"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/aop 
-http://www.springframework.org/schema/aop/spring-aop.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
- 
-  <jaxrs:server id="bookservice"
-		        address="/">
-    <jaxrs:serviceBeans>
-      <ref bean="bookstore"/>
-      <ref bean="bookstoreInterface"/>
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-  <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
-  <bean id="bookstoreInterface" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
-   
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <jaxrs:server id="bookservice" address="/">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore"/>
+            <ref bean="bookstoreInterface"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
+    <bean id="bookstoreInterface" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
 </beans>

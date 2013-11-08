@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements. See the NOTICE file
@@ -17,49 +17,36 @@ KIND, either express or implied. See the License for the
  specific language governing permissions and limitations
  under the License.
  -->
-
-<wsdl:definitions
-    name="PizzaService"
-    targetNamespace="http://mypizzaco.com/pizza"
-    xmlns:tns="http://mypizzaco.com/pizza"
-    xmlns:types="http://mypizzaco.com/pizza/types"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:types>
-    <xsd:schema targetNamespace="http://mypizzaco.com/pizza/types"
-               xmlns:tns="http://mypizzaco.com/pizza/types"
-                           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                           elementFormDefault="qualified"
-                           version="1.0">
-      <xsd:import schemaLocation="pizza_schema.xml" namespace="http://mypizzaco.com/pizza/types"/>
-    </xsd:schema>
-  </wsdl:types>
-
-  <wsdl:portType name="PizzaPortType">
-    <wsdl:operation name="OrderPizzaBroken">
-      <wsdl:input message="tns:OrderPizzaBrokenRequest" />
-      <wsdl:output message="tns:OrderPizzaBrokenResponse" />
-    </wsdl:operation>
-    <wsdl:operation name="OrderPizza">
-      <wsdl:input message="tns:OrderPizzaRequest" />
-      <wsdl:output message="tns:OrderPizzaResponse" />
-    </wsdl:operation>
-  </wsdl:portType>
-
-  <wsdl:message name="CallerIDHeader">
-    <wsdl:part name="callerID" element="types:CallerIDHeader"/>
-  </wsdl:message>
-  <wsdl:message name="OrderPizzaBrokenRequest">
-    <wsdl:part name="body" element="types:OrderPizza"/>
-  </wsdl:message>
-  <wsdl:message name="OrderPizzaBrokenResponse">
-    <wsdl:part name="body" element="types:OrderPizzaResponse"/>
-  </wsdl:message>
-  <wsdl:message name="OrderPizzaRequest">
-    <wsdl:part name="body" element="types:OrderPizza"/>
-    <wsdl:part name="callerID" element="types:CallerIDHeader"/>
-  </wsdl:message>
-  <wsdl:message name="OrderPizzaResponse">
-    <wsdl:part name="body" element="types:OrderPizzaResponse"/>
-  </wsdl:message>
+<wsdl:definitions xmlns:tns="http://mypizzaco.com/pizza" xmlns:types="http://mypizzaco.com/pizza/types" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="PizzaService" targetNamespace="http://mypizzaco.com/pizza">
+    <wsdl:types>
+        <xsd:schema xmlns:tns="http://mypizzaco.com/pizza/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://mypizzaco.com/pizza/types" elementFormDefault="qualified" version="1.0">
+            <xsd:import schemaLocation="pizza_schema.xml" namespace="http://mypizzaco.com/pizza/types"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:portType name="PizzaPortType">
+        <wsdl:operation name="OrderPizzaBroken">
+            <wsdl:input message="tns:OrderPizzaBrokenRequest"/>
+            <wsdl:output message="tns:OrderPizzaBrokenResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="OrderPizza">
+            <wsdl:input message="tns:OrderPizzaRequest"/>
+            <wsdl:output message="tns:OrderPizzaResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:message name="CallerIDHeader">
+        <wsdl:part name="callerID" element="types:CallerIDHeader"/>
+    </wsdl:message>
+    <wsdl:message name="OrderPizzaBrokenRequest">
+        <wsdl:part name="body" element="types:OrderPizza"/>
+    </wsdl:message>
+    <wsdl:message name="OrderPizzaBrokenResponse">
+        <wsdl:part name="body" element="types:OrderPizzaResponse"/>
+    </wsdl:message>
+    <wsdl:message name="OrderPizzaRequest">
+        <wsdl:part name="body" element="types:OrderPizza"/>
+        <wsdl:part name="callerID" element="types:CallerIDHeader"/>
+    </wsdl:message>
+    <wsdl:message name="OrderPizzaResponse">
+        <wsdl:part name="body" element="types:OrderPizzaResponse"/>
+    </wsdl:message>
 </wsdl:definitions>

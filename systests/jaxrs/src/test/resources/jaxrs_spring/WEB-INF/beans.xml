@@ -17,31 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-  
-  <bean class="org.apache.cxf.systest.jaxrs.Book"/>
-  
-  <jaxrs:server id="bookservice"
-		        address="/rest">
-    <jaxrs:serviceBeans>
-      <ref bean="petstore"/>	
-      <ref bean="bookstore"/>
-      <ref bean="bookstoreSimple"/>
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-  <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
-  <bean id="petstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.PetStore"/>
-  <bean id="bookstoreSimple" class="org.apache.cxf.systest.jaxrs.BookStoreSimple"/>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean class="org.apache.cxf.systest.jaxrs.Book"/>
+    <jaxrs:server id="bookservice" address="/rest">
+        <jaxrs:serviceBeans>
+            <ref bean="petstore"/>
+            <ref bean="bookstore"/>
+            <ref bean="bookstoreSimple"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
+    <bean id="petstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.PetStore"/>
+    <bean id="bookstoreSimple" class="org.apache.cxf.systest.jaxrs.BookStoreSimple"/>
 </beans>
-

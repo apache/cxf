@@ -17,79 +17,60 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions name="soap_header" targetNamespace="http://org.apache.cxf/headers"
-	     xmlns:m="http://travelcompany.example.org/reservation"
-	     xmlns:n="http://mycompany.example.com/employees"
-	     xmlns="http://schemas.xmlsoap.org/wsdl/"
-	     xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
-	     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	     xmlns:tns="http://org.apache.cxf/headers"
-	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<types>
-		<schema targetNamespace="http://org.apache.cxf/headers"
-			xmlns="http://www.w3.org/2001/XMLSchema"
-			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-			<element name="inHeader">
-				<complexType>
-					<sequence>
-						<!--  every element must have a name or a ref -->
-						<element name="dummy" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="inHeaderResponse">
-			 <complexType/>
-			</element>
-		</schema>
-
-		<schema targetNamespace="http://mycompany.example.com/employees"
-			xmlns="http://www.w3.org/2001/XMLSchema"
-			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-			<element name="passenger">
-				<complexType>
-					<sequence>
-						<element name="name" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-		</schema>
-
-	</types>
-
+<definitions xmlns:m="http://travelcompany.example.org/reservation" xmlns:n="http://mycompany.example.com/employees" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://org.apache.cxf/headers" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="soap_header" targetNamespace="http://org.apache.cxf/headers">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://org.apache.cxf/headers">
+            <element name="inHeader">
+                <complexType>
+                    <sequence>
+                        <!--  every element must have a name or a ref -->
+                        <element name="dummy" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="inHeaderResponse">
+                <complexType/>
+            </element>
+        </schema>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://mycompany.example.com/employees">
+            <element name="passenger">
+                <complexType>
+                    <sequence>
+                        <element name="name" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
     <message name="inHeaderRequest">
-	<part element="tns:inHeader" name="me"/>
-	<part element="n:passenger" name="passenger"/>
+        <part element="tns:inHeader" name="me"/>
+        <part element="n:passenger" name="passenger"/>
     </message>
     <message name="inHeaderResponse">
-	<part element="tns:inHeaderResponse" name="the_response"/>
+        <part element="tns:inHeaderResponse" name="the_response"/>
     </message>
-
     <portType name="headerTester">
-	<operation name="inHeader">
-	    <input message="tns:inHeaderRequest" name="inHeaderRequest"/>
-	    <output message="tns:inHeaderResponse" name="inHeaderResponse"/>
-	</operation>
+        <operation name="inHeader">
+            <input message="tns:inHeaderRequest" name="inHeaderRequest"/>
+            <output message="tns:inHeaderResponse" name="inHeaderResponse"/>
+        </operation>
     </portType>
-
     <binding name="headerTesterSOAPBinding" type="tns:headerTester">
-	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-	<operation name="inHeader">
-	    <soap:operation soapAction="" style="document"/>
-	    <input name="inHeaderRequest">
-		<soap:body parts="me" use="literal"/>
-		<soap:header message="tns:inHeaderRequest" part="passenger"
-			     use="literal"/>
-	    </input>
-	    <output name="inHeaderResponse">
-		<soap:body use="literal"/>
-	    </output>
-	</operation>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="inHeader">
+            <soap:operation soapAction="" style="document"/>
+            <input name="inHeaderRequest">
+                <soap:body parts="me" use="literal"/>
+                <soap:header message="tns:inHeaderRequest" part="passenger" use="literal"/>
+            </input>
+            <output name="inHeaderResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
     </binding>
-
     <service name="HeaderService">
-	<port binding="tns:headerTesterSOAPBinding" name="SoapPort">
-	    <soap:address location="http://org.apache.cxf/headers"/>
-	</port>
+        <port binding="tns:headerTesterSOAPBinding" name="SoapPort">
+            <soap:address location="http://org.apache.cxf/headers"/>
+        </port>
     </service>
 </definitions>

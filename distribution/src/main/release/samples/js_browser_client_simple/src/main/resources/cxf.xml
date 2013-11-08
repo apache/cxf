@@ -17,29 +17,18 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:jaxws="http://cxf.apache.org/jaxws"
-      xmlns:cxf="http://cxf.apache.org/core"
-      xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-
-      xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd ">
     <httpj:engine-factory bus="cxf">
         <!-- The server runs on port 9000 -->
         <httpj:engine port="9000">
             <httpj:handlers>
                 <bean class="org.eclipse.jetty.server.handler.ContextHandler">
-                    <property name="contextPath" value="/" />
+                    <property name="contextPath" value="/"/>
                     <property name="handler">
                         <bean class="org.eclipse.jetty.server.handler.ResourceHandler">
                             <property name="baseResource">
                                 <bean class="org.eclipse.jetty.util.resource.FileResource">
-                                    <constructor-arg value="file:src/main/resources/staticContent" />
+                                    <constructor-arg value="file:src/main/resources/staticContent"/>
                                 </bean>
                             </property>
                         </bean>
@@ -49,23 +38,15 @@ http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/
             </httpj:handlers>
         </httpj:engine>
     </httpj:engine-factory>
-
     <!-- comment this bean to disable schema validation in the client -->
-
-    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort"
-        createdFromAPI="true">
+    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="schema-validation-enabled" value="true" />
+            <entry key="schema-validation-enabled" value="true"/>
         </jaxws:properties>
     </jaxws:client>
-
-    <jaxws:endpoint name="{http://apache.org/hello_world_soap_http}SoapPort"
-        wsdlLocation="wsdl/hello_world.wsdl"
-        createdFromAPI="true">
+    <jaxws:endpoint name="{http://apache.org/hello_world_soap_http}SoapPort" wsdlLocation="wsdl/hello_world.wsdl" createdFromAPI="true">
         <jaxws:properties>
-            <entry key="schema-validation-enabled" value="true" />
+            <entry key="schema-validation-enabled" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-
 </beans>
-

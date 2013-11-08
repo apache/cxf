@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!-- 
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -17,7 +18,7 @@
  * under the License.
  * -->
 <mappings xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<mapping>
-		<property name="fig" type="org.apache.cxf.aegis.type.basic.DateType" typeName="xsd:date" />
-	</mapping>
-</mappings> 
+    <mapping>
+        <property name="fig" type="org.apache.cxf.aegis.type.basic.DateType" typeName="xsd:date"/>
+    </mapping>
+</mappings>

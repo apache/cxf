@@ -17,9 +17,9 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<definitions name="soap_header" targetNamespace="http://apache.org/headers/rpc_lit" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xformat="http://cxf.apache.org/bindings/xformat" xmlns:tns="http://apache.org/headers/rpc_lit" xmlns:x1="http://apache.org/headers/coloc/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xformat="http://cxf.apache.org/bindings/xformat" xmlns:tns="http://apache.org/headers/rpc_lit" xmlns:x1="http://apache.org/headers/coloc/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="soap_header" targetNamespace="http://apache.org/headers/rpc_lit">
     <types>
-        <schema targetNamespace="http://apache.org/headers/rpc_lit" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/headers/rpc_lit" elementFormDefault="qualified">
             <xsd:import namespace="http://apache.org/headers/coloc/types" schemaLocation="./header.xsd"/>
         </schema>
     </types>

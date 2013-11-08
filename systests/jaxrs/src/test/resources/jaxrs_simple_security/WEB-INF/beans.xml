@@ -17,113 +17,79 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:util="http://www.springframework.org/schema/util"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util 
-http://www.springframework.org/schema/util/spring-util.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
-  <jaxrs:server id="bookservice"
-		        address="/security1">
-    <jaxrs:serviceBeans>
-       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:inInterceptors>
-        <ref bean="authorizationInterceptor"/>
-    </jaxrs:inInterceptors>
-    <jaxrs:outFaultInterceptors>
-        <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
-    </jaxrs:outFaultInterceptors>
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookservice2"
-		        address="/security2">
-    <jaxrs:serviceBeans>
-       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:providers>
-        <ref bean="authorizationFilter"/>
-    </jaxrs:providers>
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookservice3"
-		        address="/security3">
-    <jaxrs:serviceBeans>
-       <ref bean="securedObject"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:inInterceptors>
-        <ref bean="annotationsInterceptor"/>
-    </jaxrs:inInterceptors>
-    <jaxrs:outFaultInterceptors>
-        <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
-    </jaxrs:outFaultInterceptors>
-  </jaxrs:server>
-  
-  <jaxrs:server id="bookservice4"
-		        address="/security4">
-    <jaxrs:serviceBeans>
-       <ref bean="securedObject"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:providers>
-        <ref bean="annotationsFilter"/>
-    </jaxrs:providers>
-  </jaxrs:server>
-  
-  
-  <jaxrs:server id="bookservice5"
-		        address="/security5">
-    <jaxrs:serviceBeans>
-       <ref bean="securedObjectWithInterface"/>
-    </jaxrs:serviceBeans>		   
-    <jaxrs:inInterceptors>
-        <ref bean="annotationsInterceptor2"/>
-    </jaxrs:inInterceptors>
-    <jaxrs:outFaultInterceptors>
-        <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
-    </jaxrs:outFaultInterceptors>
-  </jaxrs:server>
-  
-  <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <jaxrs:server id="bookservice" address="/security1">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="authorizationInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
+        </jaxrs:outFaultInterceptors>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice2" address="/security2">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="authorizationFilter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice3" address="/security3">
+        <jaxrs:serviceBeans>
+            <ref bean="securedObject"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="annotationsInterceptor"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
+        </jaxrs:outFaultInterceptors>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice4" address="/security4">
+        <jaxrs:serviceBeans>
+            <ref bean="securedObject"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="annotationsFilter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice5" address="/security5">
+        <jaxrs:serviceBeans>
+            <ref bean="securedObjectWithInterface"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="annotationsInterceptor2"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outFaultInterceptors>
+            <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
+        </jaxrs:outFaultInterceptors>
+    </jaxrs:server>
+    <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
         <property name="methodRolesMap" ref="rolesMap"/>
-  </bean>
-  
-  <bean id="annotationsInterceptor" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
-       <property name="securedObject" ref="securedObject"/>
-  </bean>
-  
-  <bean id="annotationsInterceptor2" 
-        class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
-        <property name="annotationClassName" 
-                  value="org.springframework.security.annotation.Secured"/>
+    </bean>
+    <bean id="annotationsInterceptor" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
+        <property name="securedObject" ref="securedObject"/>
+    </bean>
+    <bean id="annotationsInterceptor2" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
+        <property name="annotationClassName" value="org.springframework.security.annotation.Secured"/>
         <property name="securedObject" ref="securedObjectWithInterface"/>
-  </bean>
-  
-  <bean id="securedObject" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoInterface"/>
-  <bean id="securedObjectWithInterface" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
-  
-  <bean id="authorizationFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
+    </bean>
+    <bean id="securedObject" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoInterface"/>
+    <bean id="securedObjectWithInterface" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
+    <bean id="authorizationFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
         <property name="interceptor" ref="authorizationInterceptor"/>
-  </bean>
-  
-  <bean id="annotationsFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
+    </bean>
+    <bean id="annotationsFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
         <property name="interceptor" ref="annotationsInterceptor"/>
-  </bean>
-  
-  <util:map id="rolesMap">
-     <entry key="getThatBook" value="ROLE_BOOK_OWNER"/>
-     <entry key="getBook" value="ROLE_BOOK_OWNER"/>
-  </util:map>
-  
+    </bean>
+    <util:map id="rolesMap">
+        <entry key="getThatBook" value="ROLE_BOOK_OWNER"/>
+        <entry key="getBook" value="ROLE_BOOK_OWNER"/>
+    </util:map>
 </beans>
 <!-- END SNIPPET: beans -->
-

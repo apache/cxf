@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,65 +17,36 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:test="http://apache.org/hello_world_soap_http"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="
-        http://cxf.apache.org/core
-        http://cxf.apache.org/schemas/core.xsd
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-        http://cxf.apache.org/jaxws                                     
-        http://cxf.apache.org/schemas/jaxws.xsd
-        http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://cxf.apache.org/core         http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd         http://cxf.apache.org/jaxws                                              http://cxf.apache.org/schemas/jaxws.xsd         http://www.springframework.org/schema/util         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <bean id="loggerListener" class="org.apache.cxf.sts.event.LoggerListener" />
-
-	<bean id="transportSTSProviderBean"
-	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
-	    <property name="services" ref="transportService" />
-		<property name="stsProperties" ref="transportSTSProperties" />
+    <bean id="loggerListener" class="org.apache.cxf.sts.event.LoggerListener"/>
+    <bean id="transportSTSProviderBean" class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
+        <property name="services" ref="transportService"/>
+        <property name="stsProperties" ref="transportSTSProperties"/>
         <property name="eventListener" ref="loggerListener"/>
     </bean>
-
-	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
-		<property name="endpoints" ref="transportEndpoints" />
-	</bean>
-
-	<util:list id="transportEndpoints">
-		<value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
-		</value>
-	</util:list>
-
-	<bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
-		<property name="signatureUsername" value="mystskey" />
-		<property name="callbackHandlerClass"
-			value="org.apache.cxf.sts.war.PasswordCallbackHandler" />
-		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
-		<property name="issuer" value="DoubleItSTSIssuer" />
-		<property name="encryptionUsername" value="myservicekey" />
-	</bean>
-
-	<jaxws:endpoint id="transportSTS" implementor="#transportSTSProviderBean"
-		address="/Transport" wsdlLocation="/WEB-INF/wsdl/ws-trust-1.4-service.wsdl"
-		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
-		serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
-		<jaxws:properties>
-			<entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler" />
-		</jaxws:properties>
-	</jaxws:endpoint>
-        
+    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints" ref="transportEndpoints"/>
+    </bean>
+    <util:list id="transportEndpoints">
+        <value>https://localhost:(\d)*/doubleit/services/doubleittransport.*
+                </value>
+    </util:list>
+    <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureUsername" value="mystskey"/>
+        <property name="callbackHandlerClass" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
+        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
+        <property name="issuer" value="DoubleItSTSIssuer"/>
+        <property name="encryptionUsername" value="myservicekey"/>
+    </bean>
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="transportSTS" implementor="#transportSTSProviderBean" address="/Transport" wsdlLocation="/WEB-INF/wsdl/ws-trust-1.4-service.wsdl" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.sts.war.PasswordCallbackHandler"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
 </beans>
-

@@ -17,61 +17,30 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xmlns:p="http://cxf.apache.org/policy"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-          http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
-          http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
-          http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
-          http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
-          http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-          http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd"
->
-    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <bean id="doubleitClient" class="org.example.contract.doubleit.DoubleItPortType"
-        factory-bean="doubleitClientFactory" factory-method="create">
+    <bean id="doubleitClient" class="org.example.contract.doubleit.DoubleItPortType" factory-bean="doubleitClientFactory" factory-method="create">
     </bean>
-
     <bean id="doubleitClientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
         <property name="serviceClass" value="org.example.contract.doubleit.DoubleItPortType"/>
         <property name="address" value="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"/>
-        <property name="bus" ref="cxf" />
+        <property name="bus" ref="cxf"/>
     </bean>
-    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
-    </http:conduit>  
-    
-    <jaxws:endpoint 
-       id="NoSecurity"
-       address="http://localhost:${testutil.ports.Intermediary}/DoubleItX509" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.x509.DoubleItIntermediaryImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItIntermediary.wsdl">
-        
-       <jaxws:properties>
-       </jaxws:properties> 
-     
-    </jaxws:endpoint> 
-    
+    </http:conduit>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NoSecurity" address="http://localhost:${testutil.ports.Intermediary}/DoubleItX509" serviceName="s:DoubleItService" endpointName="s:DoubleItPort" implementor="org.apache.cxf.systest.ws.x509.DoubleItIntermediaryImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItIntermediary.wsdl">
+        <jaxws:properties>
+       </jaxws:properties>
+    </jaxws:endpoint>
 </beans>

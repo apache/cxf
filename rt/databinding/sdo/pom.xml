@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,22 +24,18 @@
     <name>Apache CXF Runtime SDO DataBinding</name>
     <description>Apache CXF Runtime SDO DataBinding</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
     <properties>
         <cxf.pmd.eclipse.ruleset.ext>-generated</cxf.pmd.eclipse.ruleset.ext>
         <cxf.compile.flags>-Xlint:unchecked,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>false</cxf.compile.show.deprecation>
     </properties>
-
     <dependencies>
-
         <dependency>
             <groupId>org.apache.tuscany.sdo</groupId>
             <artifactId>tuscany-sdo-impl</artifactId>
@@ -57,21 +54,17 @@
             <version>1.1.1</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-wsdlto-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -108,7 +101,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <repositories>
         <!--  temporary add the apache snapshot repo so tuscany folks can just grab this module and build it -->
         <repository>
@@ -123,27 +115,25 @@
             </releases>
         </repository>
     </repositories>
-
     <build>
         <plugins>
             <plugin>
-                 <groupId>org.apache.cxf</groupId>
-                 <artifactId>cxf-codegen-plugin</artifactId>
-                 <version>${project.version}</version>
-                 <executions>
-                     <execution>
-                         <id>generate-test-sources-static</id>
-                         <phase>generate-test-sources</phase>
-                         <configuration>
-                             <fork>${cxf.codegenplugin.forkmode}</fork>
-                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                             <testWsdlRoot>${basedir}/src/test/resources/wsdl_sdo</testWsdlRoot>
-                             <defaultOptions>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-test-sources-static</id>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
+                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
+                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_sdo</testWsdlRoot>
+                            <defaultOptions>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
-                             </defaultOptions>
-
-                             <wsdlOptions>
+                            </defaultOptions>
+                            <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_sdo/HelloService_static.wsdl</wsdl>
                                     <extraargs>
@@ -165,16 +155,15 @@
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
-                         </configuration>
-                         <goals>
-                             <goal>wsdl2java</goal>
-                         </goals>
-                     </execution>
-                 </executions>
-             </plugin>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>setup.eclipse</id>
@@ -189,16 +178,16 @@
                                 <id>setup.eclipse.project.sdo</id>
                                 <phase>process-test-sources</phase>
                                 <configuration>
-                                     <target>
-                                         <!-- SDO generated code is Java1.4 based and thus uses raw List types -->
-                                         <!-- It also generates code with unused imports -->
-                                         <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
-                                             <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
-                                             <entry key="org.eclipse.jdt.core.compiler.problem.unusedImport" value="ignore" />
-                                             <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore" />
-                                             <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore" />
-                                         </propertyfile>
-                                     </target>
+                                    <target>
+                                        <!-- SDO generated code is Java1.4 based and thus uses raw List types -->
+                                        <!-- It also generates code with unused imports -->
+                                        <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedImport" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore"/>
+                                        </propertyfile>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>

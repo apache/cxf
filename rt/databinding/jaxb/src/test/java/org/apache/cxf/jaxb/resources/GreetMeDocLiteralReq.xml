@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -16,4 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<ns4:greetMe xmlns:ns4="http://apache.org/hello_world_soap_http/types"><ns4:requestType>TestSOAPInputPMessage</ns4:requestType></ns4:greetMe>
+<ns4:greetMe xmlns:ns4="http://apache.org/hello_world_soap_http/types">
+    <ns4:requestType>TestSOAPInputPMessage</ns4:requestType>
+</ns4:greetMe>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements. See the NOTICE file
@@ -16,41 +17,33 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<wsdl:definitions name="DoubleIt"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:di="http://www.example.org/schema/DoubleIt"
-	xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy"
-	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-	xmlns:t="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsaw="http://www.w3.org/2005/08/addressing"
-	xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" targetNamespace="http://www.example.org/contract/DoubleIt">
-	<!-- Replaced for wsp: http://schemas.xmlsoap.org/ws/2004/09/policy -->
-	
-	<wsdl:types>
-		<xsd:schema targetNamespace="http://www.example.org/schema/DoubleIt">
-			<xsd:element name="DoubleIt">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="numberToDouble" type="xsd:int" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-            <xsd:element name="DoubleIt2">
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:di="http://www.example.org/schema/DoubleIt" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:t="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsaw="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
+    <!-- Replaced for wsp: http://schemas.xmlsoap.org/ws/2004/09/policy -->
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://www.example.org/schema/DoubleIt">
+            <xsd:element name="DoubleIt">
                 <xsd:complexType>
                     <xsd:sequence>
-                        <xsd:element name="numberToDouble" type="xsd:int" />
+                        <xsd:element name="numberToDouble" type="xsd:int"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-			<xsd:element name="DoubleItResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="doubledNumber" type="xsd:int" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="DoubleItHeader" type="xsd:int"/>
-		    <xsd:element name="DoubleItFault">
+            <xsd:element name="DoubleIt2">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="numberToDouble" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="DoubleItResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="doubledNumber" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="DoubleItHeader" type="xsd:int"/>
+            <xsd:element name="DoubleItFault">
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="minor" type="xsd:short"/>
@@ -58,51 +51,49 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-		</xsd:schema>
-	</wsdl:types>
-	<wsdl:message name="DoubleItRequest">
-		<wsdl:part element="di:DoubleIt" name="parameters" />
-	</wsdl:message>
-    <wsdl:message name="DoubleIt2Request">
-        <wsdl:part element="di:DoubleIt2" name="parameters" />
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="DoubleItRequest">
+        <wsdl:part element="di:DoubleIt" name="parameters"/>
     </wsdl:message>
-	<wsdl:message name="DoubleItRequestHeader">
-        <wsdl:part element="di:DoubleIt" name="parameters" />
-        <wsdl:part element="di:DoubleItHeader" name="header" />
+    <wsdl:message name="DoubleIt2Request">
+        <wsdl:part element="di:DoubleIt2" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="DoubleItRequestHeader">
+        <wsdl:part element="di:DoubleIt" name="parameters"/>
+        <wsdl:part element="di:DoubleItHeader" name="header"/>
     </wsdl:message>
     <wsdl:message name="DoubleItResponse">
-        <wsdl:part element="di:DoubleItResponse" name="parameters" />
+        <wsdl:part element="di:DoubleItResponse" name="parameters"/>
     </wsdl:message>
-	<wsdl:message name="DoubleIt2Response">
-		<wsdl:part element="di:DoubleItResponse" name="parameters" />
-	</wsdl:message>
-	<wsdl:message name="DoubleItFault">
-		<wsdl:part element="di:DoubleItFault" name="DoubleItFault" />
-	</wsdl:message>
-	<wsdl:portType name="DoubleItPortType">
-		<wsdl:operation name="DoubleIt">
-			<wsdl:input message="tns:DoubleItRequest" />
-			<wsdl:output message="tns:DoubleItResponse" />
-			<wsdl:fault message="tns:DoubleItFault" name="DoubleItFault" />
-		</wsdl:operation>
-	</wsdl:portType>
+    <wsdl:message name="DoubleIt2Response">
+        <wsdl:part element="di:DoubleItResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="DoubleItFault">
+        <wsdl:part element="di:DoubleItFault" name="DoubleItFault"/>
+    </wsdl:message>
+    <wsdl:portType name="DoubleItPortType">
+        <wsdl:operation name="DoubleIt">
+            <wsdl:input message="tns:DoubleItRequest"/>
+            <wsdl:output message="tns:DoubleItResponse"/>
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
     <wsdl:portType name="DoubleItPortTypeHeader">
         <wsdl:operation name="DoubleIt">
-            <wsdl:input message="tns:DoubleItRequestHeader" />
-            <wsdl:output message="tns:DoubleItResponse" />
+            <wsdl:input message="tns:DoubleItRequestHeader"/>
+            <wsdl:output message="tns:DoubleItResponse"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:portType name="DoubleItPortType2">
         <wsdl:operation name="DoubleIt">
-            <wsdl:input message="tns:DoubleItRequest" />
-            <wsdl:output message="tns:DoubleItResponse" />
-            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault" />
+            <wsdl:input message="tns:DoubleItRequest"/>
+            <wsdl:output message="tns:DoubleItResponse"/>
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
         </wsdl:operation>
         <wsdl:operation name="DoubleIt2">
-            <wsdl:input message="tns:DoubleIt2Request" />
-            <wsdl:output message="tns:DoubleIt2Response" />
+            <wsdl:input message="tns:DoubleIt2Request"/>
+            <wsdl:output message="tns:DoubleIt2Response"/>
         </wsdl:operation>
     </wsdl:portType>
-	
-	
 </wsdl:definitions>

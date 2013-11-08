@@ -20,10 +20,10 @@
 <mappings>
     <mapping name="NillableService">
         <method name="submitStringArray">
-            <parameter index="0" minOccurs='2' maxOccurs='50' nillable='false' />
+            <parameter index="0" minOccurs="2" maxOccurs="50" nillable="false"/>
         </method>
-         <method name="takeNotNillableString">
-            <parameter index="0" minOccurs="1" nillable='false' />
+        <method name="takeNotNillableString">
+            <parameter index="0" minOccurs="1" nillable="false"/>
         </method>
     </mapping>
 </mappings>

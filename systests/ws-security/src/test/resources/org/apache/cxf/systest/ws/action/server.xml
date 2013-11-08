@@ -17,178 +17,111 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:util="http://www.springframework.org/schema/util"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:http="http://cxf.apache.org/transports/http/configuration"
-    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:sec="http://cxf.apache.org/configuration/security"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:p="http://cxf.apache.org/policy"
-    xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
-        http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
-        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-        http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
-        http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd
-        http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
-    ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <jaxws:endpoint 
-       id="TripleDESEncryption"
-       address="http://localhost:${testutil.ports.Server}/DoubleIt3DESEncryption" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleIt3DESEncryptionPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
-       <jaxws:outInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Encrypt"/> 
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TripleDESEncryption" address="http://localhost:${testutil.ports.Server}/DoubleIt3DESEncryption" serviceName="s:DoubleItService" endpointName="s:DoubleIt3DESEncryptionPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.action.SecretKeyPasswordCallback"/>
                         <entry key="encryptSymmetricEncryptionKey" value="false"/>
-                        <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/> 
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:outInterceptors>
-       <jaxws:inInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Encrypt"/> 
+                        <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.action.SecretKeyPasswordCallback"/>
-                        <entry key="isBSPCompliant" value="false"/> 
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:inInterceptors>
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="UsernameToken"
-       address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItUsernameTokenPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
-       <jaxws:inInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="UsernameToken"/> 
+                        <entry key="isBSPCompliant" value="false"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UsernameToken" address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken" serviceName="s:DoubleItService" endpointName="s:DoubleItUsernameTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="UsernameToken"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:inInterceptors>
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="UsernameToken2"
-       address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken2" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItUsernameTokenPort2"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
-       <jaxws:inInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="UsernameToken"/> 
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UsernameToken2" address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken2" serviceName="s:DoubleItService" endpointName="s:DoubleItUsernameTokenPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="UsernameToken"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:inInterceptors>
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="EncryptedPassword"
-       address="http://localhost:${testutil.ports.Server}/DoubleItEncryptedPassword" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItEncryptedPasswordPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
-       <jaxws:outInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Encrypt"/> 
-                        <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedPassword" address="http://localhost:${testutil.ports.Server}/DoubleItEncryptedPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                         <entry key="encryptionPropFile" value="alice-enc.properties"/>
                         <entry key="encryptionUser" value="alice"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:outInterceptors>
-       <jaxws:inInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Encrypt"/> 
-                        <entry key="passwordCallbackClass" 
-                               value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                         <entry key="decryptionPropFile" value="bob-enc.properties"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:inInterceptors>
-     
-    </jaxws:endpoint> 
-    
-    <jaxws:endpoint 
-       id="SignedTimestamp"
-       address="http://localhost:${testutil.ports.Server}/DoubleItSignedTimestamp" 
-       serviceName="s:DoubleItService"
-       endpointName="s:DoubleItSignedTimestampPort"
-       xmlns:s="http://www.example.org/contract/DoubleIt"
-       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
-       <jaxws:outInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Signature"/> 
-                        <entry key="signatureUser" value="bob"/> 
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedTimestamp" address="http://localhost:${testutil.ports.Server}/DoubleItSignedTimestamp" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedTimestampPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Signature"/>
+                        <entry key="signatureUser" value="bob"/>
                         <entry key="signaturePropFile" value="bob.properties"/>
                         <entry key="signatureKeyIdentifier" value="DirectReference"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:outInterceptors>
-       <jaxws:inInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Signature Timestamp"/> 
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:outInterceptors>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Signature Timestamp"/>
                         <entry key="signatureVerificationPropFile" value="bob.properties"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:inInterceptors>
-     
-    </jaxws:endpoint> 
-    
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
 </beans>

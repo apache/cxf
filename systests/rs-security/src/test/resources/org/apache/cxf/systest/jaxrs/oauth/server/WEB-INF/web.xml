@@ -17,27 +17,21 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<!DOCTYPE web-app
-        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-        "http://java.sun.com/dtd/web-app_2_3.dtd">
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
-
     <context-param>
         <param-name>oauth.data.provider-class</param-name>
         <param-value>org.apache.cxf.systest.jaxrs.security.oauth.MemoryOAuthDataProvider</param-value>
     </context-param>
-
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/*-beans.xml</param-value>
     </context-param>
-
     <listener>
         <listener-class>
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
-
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
@@ -45,11 +39,8 @@ under the License.
         </servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/a/*</url-pattern>
     </servlet-mapping>
-
 </web-app>
-

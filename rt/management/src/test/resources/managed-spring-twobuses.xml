@@ -17,24 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:im="http://cxf.apache.org/management"
-       xmlns:cxf="http://cxf.apache.org/core"
-       xsi:schemaLocation="
-       http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-    <import resource="classpath:META-INF/cxf/cxf.xml" />
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:im="http://cxf.apache.org/management" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <cxf:bus bus="cxf1"/>
     <cxf:bus bus="cxf2"/>
-
     <bean id="CounterRepository1" class="org.apache.cxf.management.counters.CounterRepository">
-        <property name="bus" ref="cxf1" />
+        <property name="bus" ref="cxf1"/>
     </bean>
     <bean id="CounterRepository2" class="org.apache.cxf.management.counters.CounterRepository">
-        <property name="bus" ref="cxf2" />
+        <property name="bus" ref="cxf2"/>
     </bean>
-
 </beans>

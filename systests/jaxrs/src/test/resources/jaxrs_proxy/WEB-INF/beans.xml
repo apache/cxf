@@ -24,119 +24,79 @@
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-  xmlns:aop="http://www.springframework.org/schema/aop"
-  xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/aop 
-http://www.springframework.org/schema/aop/spring-aop.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
-
-  <import resource="classpath:META-INF/cxf/cxf.xml" />
-  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-
-  <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
-
-  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
-  
-  <bean id="bookstoreInterface" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
-  <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
-      <property name="toHandle" value="true"/>
-  </bean>   
-
-  <jaxrs:server id="bookservice"
-		        address="/">
-    <jaxrs:serviceBeans>
-      <ref bean="bookstore"/>
-      <ref bean="bookstoreInterface"/>
-    </jaxrs:serviceBeans>
-    <jaxrs:providers>
-      <ref bean="exceptionMapper"/>
-    </jaxrs:providers>		   
-  </jaxrs:server>
-
-  <jaxrs:server id="bookservice2" address="/2"
-    modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml">
-    <jaxrs:serviceBeans>
-      <ref bean="bookstore2"/>
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations"/>
-  
-  
-  <jaxrs:server id="bookservice3" address="/3"
-    modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml">
-    <jaxrs:serviceBeans>
-      <ref bean="bookstore3"/>
-    </jaxrs:serviceBeans>		   
-  </jaxrs:server>
-
-  <jaxrs:server id="bookservice4" address="/4">
-    <jaxrs:serviceFactories>
-      <ref bean="sfactory1"/>
-      <ref bean="sfactory2"/>
-    </jaxrs:serviceFactories>		   
-  </jaxrs:server>
-    
-  <jaxrs:server id="bookservice5" address="/5"
-     beanNames="bookstorePrototype bookstoreInterfacePrototype"/>
-  
-  <jaxrs:server id="bookservice6" address="/6">
-    <jaxrs:serviceFactories>
-      <ref bean="sfactory5"/>
-    </jaxrs:serviceFactories>		
-    <jaxrs:properties>
-         <entry key="org.apache.cxf.service.scope" value="request"/>
-     </jaxrs:properties>
-       
-  </jaxrs:server>
-
-
-  <jaxrs:server id="requestScopeEndpoint" address="/request">
-     <jaxrs:serviceFactories>
-		<bean class="org.apache.cxf.systest.jaxrs.RequestScopeResourceFactory">
-             <property name="beanId" value="requestScopeBean"/>
-        </bean>
-     </jaxrs:serviceFactories>
-  </jaxrs:server>
-
-  <bean id="requestScopeBean" class="org.apache.cxf.systest.jaxrs.BookStore" scope="request">
-      <aop:scoped-proxy />
-  </bean>
-
-  <bean id="sfactory1" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">  
-      <property name="beanId" value="bookstore"/>
-  </bean>
-  
-  <bean id="sfactory2" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">  
-      <property name="beanId" value="bookstoreInterface"/>
-  </bean>
-  
-  <bean id="sfactory5" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">  
-      <property name="beanId" value="bookstoreInterface2Prototype"/>
-  </bean>
-  <bean id="bookstorePrototype" class="org.apache.cxf.systest.jaxrs.BookStore" scope="prototype"/>
-  <bean id="bookstoreInterface2Prototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface2" scope="prototype"/>
-  <bean id="bookstore3" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotationsImpl"/>
-
-  <bean id="bookstoreInterfacePrototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface" scope="prototype"/>
-  <aop:config>
-		<aop:aspect id="loggingAspect" ref="simpleLogger">
-			<aop:before
-			      method="logBefore"
-			      pointcut="execution(* org.apache.cxf.systest.jaxrs.Book*.*(..))"/>
-			<aop:after-returning
-			      method="logAfter"
-			      pointcut="execution(* org.apache.cxf.systest.jaxrs.Book*.*(..))"/>
-		</aop:aspect>
-	</aop:config>
-
-	<bean id="simpleLogger" class="org.apache.cxf.systest.jaxrs.SimpleLoggingAspect"/>
-
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+    <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
+    <bean id="bookstoreInterface" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>
+    <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
+        <property name="toHandle" value="true"/>
+    </bean>
+    <jaxrs:server id="bookservice" address="/">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore"/>
+            <ref bean="bookstoreInterface"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="exceptionMapper"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice2" address="/2" modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore2"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations"/>
+    <jaxrs:server id="bookservice3" address="/3" modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore3"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice4" address="/4">
+        <jaxrs:serviceFactories>
+            <ref bean="sfactory1"/>
+            <ref bean="sfactory2"/>
+        </jaxrs:serviceFactories>
+    </jaxrs:server>
+    <jaxrs:server id="bookservice5" address="/5" beanNames="bookstorePrototype bookstoreInterfacePrototype"/>
+    <jaxrs:server id="bookservice6" address="/6">
+        <jaxrs:serviceFactories>
+            <ref bean="sfactory5"/>
+        </jaxrs:serviceFactories>
+        <jaxrs:properties>
+            <entry key="org.apache.cxf.service.scope" value="request"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server id="requestScopeEndpoint" address="/request">
+        <jaxrs:serviceFactories>
+            <bean class="org.apache.cxf.systest.jaxrs.RequestScopeResourceFactory">
+                <property name="beanId" value="requestScopeBean"/>
+            </bean>
+        </jaxrs:serviceFactories>
+    </jaxrs:server>
+    <bean id="requestScopeBean" class="org.apache.cxf.systest.jaxrs.BookStore" scope="request">
+        <aop:scoped-proxy/>
+    </bean>
+    <bean id="sfactory1" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">
+        <property name="beanId" value="bookstore"/>
+    </bean>
+    <bean id="sfactory2" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">
+        <property name="beanId" value="bookstoreInterface"/>
+    </bean>
+    <bean id="sfactory5" class="org.apache.cxf.jaxrs.spring.SpringResourceFactory">
+        <property name="beanId" value="bookstoreInterface2Prototype"/>
+    </bean>
+    <bean id="bookstorePrototype" class="org.apache.cxf.systest.jaxrs.BookStore" scope="prototype"/>
+    <bean id="bookstoreInterface2Prototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface2" scope="prototype"/>
+    <bean id="bookstore3" class="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotationsImpl"/>
+    <bean id="bookstoreInterfacePrototype" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface" scope="prototype"/>
+    <aop:config>
+        <aop:aspect id="loggingAspect" ref="simpleLogger">
+            <aop:before method="logBefore" pointcut="execution(* org.apache.cxf.systest.jaxrs.Book*.*(..))"/>
+            <aop:after-returning method="logAfter" pointcut="execution(* org.apache.cxf.systest.jaxrs.Book*.*(..))"/>
+        </aop:aspect>
+    </aop:config>
+    <bean id="simpleLogger" class="org.apache.cxf.systest.jaxrs.SimpleLoggingAspect"/>
 </beans>
 <!-- END SNIPPET: beans -->
-

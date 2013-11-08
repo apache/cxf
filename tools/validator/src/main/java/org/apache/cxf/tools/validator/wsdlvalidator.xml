@@ -17,99 +17,80 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	  xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-	  xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-	  xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-	  xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd">
     <annotation>
 Examples :
 
 wsdlvalidator HelloWorld.wsdl
 wsdlvalidator -s http://cxf.apache.org/schemas -s http://mycompany/schemas Greeting.wsdl
     </annotation>
-
-	<usage>
-		<optionGroup id="options">				
-			<!--option id="schemaDir" minOccurs="1" maxOccurs="1">
-		         <annotation>
-		            The Directory used to search for schemas
-		         </annotation>
-				<switch>d</switch>
-				<associatedArgument placement="afterSpace">
-					<annotation>schema-directory</annotation>
-				</associatedArgument>
-			</option-->
-			
-			<option id="schemaURL" maxOccurs="unbounded">
-			<annotation>
-			    Specify the schema URL to validate against.  (This option can be specified multiple times.)
-			</annotation>
-				<switch>s</switch>
-				<associatedArgument placement="afterSpace">
-					<annotation>schema-url</annotation>
-				</associatedArgument>
-			</option>
-
-			<option id="suppressWarnings">
-			    <annotation>
-				Suppress warnings
-			    </annotation>
-			    <switch>w</switch>
-			</option>
-
-			
-			<!--option id="deep" maxOccurs="1">
-		      <annotation>Deep level validation like wsdl imports validation and wsdl semantics check.</annotation>
-		      <switch>deep</switch>
-	        </option-->	
-		</optionGroup>
-		
-		<optionGroup id="common_options">
-		
-		    <option id="help" maxOccurs="1">
-			<annotation>
-			    Display detailed information for options.
-			</annotation>
-				<switch>h</switch>
-				<switch>?</switch>
-				<switch>help</switch>
-		    </option>
-		    
-		    <option id="version">
-			<annotation>
-			    Display the version of the tool.
-			</annotation>
-			    <switch>version</switch>
-				<switch>v</switch>
-		    </option>
-	
-		    <option id="verbose">
-			<annotation>
-			    Verbose mode
-			</annotation>
-				<switch>verbose</switch>
-				<switch>V</switch>
-		    </option>
-	
-		    <option id="quiet">
-			<annotation>
-			    Quiet mode
-			</annotation>
-				<switch>quiet</switch>
-				<switch>q</switch>
-				<switch>Q</switch>
-		    </option>
-
-		</optionGroup>
-		
-		<argument id="wsdlurl" minOccurs="1" maxOccurs="1">
-		        <annotation>
-		            WSDL URL
-		         </annotation>
-		</argument>
-	</usage>    
-
+    <usage>
+        <optionGroup id="options">
+            <!--option id="schemaDir" minOccurs="1" maxOccurs="1">
+                         <annotation>
+                            The Directory used to search for schemas
+                         </annotation>
+                                <switch>d</switch>
+                                <associatedArgument placement="afterSpace">
+                                        <annotation>schema-directory</annotation>
+                                </associatedArgument>
+                        </option-->
+            <option id="schemaURL" maxOccurs="unbounded">
+                <annotation>
+                            Specify the schema URL to validate against.  (This option can be specified multiple times.)
+                        </annotation>
+                <switch>s</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>schema-url</annotation>
+                </associatedArgument>
+            </option>
+            <option id="suppressWarnings">
+                <annotation>
+                                Suppress warnings
+                            </annotation>
+                <switch>w</switch>
+            </option>
+            <!--option id="deep" maxOccurs="1">
+                      <annotation>Deep level validation like wsdl imports validation and wsdl semantics check.</annotation>
+                      <switch>deep</switch>
+                </option-->
+        </optionGroup>
+        <optionGroup id="common_options">
+            <option id="help" maxOccurs="1">
+                <annotation>
+                            Display detailed information for options.
+                        </annotation>
+                <switch>h</switch>
+                <switch>?</switch>
+                <switch>help</switch>
+            </option>
+            <option id="version">
+                <annotation>
+                            Display the version of the tool.
+                        </annotation>
+                <switch>version</switch>
+                <switch>v</switch>
+            </option>
+            <option id="verbose">
+                <annotation>
+                            Verbose mode
+                        </annotation>
+                <switch>verbose</switch>
+                <switch>V</switch>
+            </option>
+            <option id="quiet">
+                <annotation>
+                            Quiet mode
+                        </annotation>
+                <switch>quiet</switch>
+                <switch>q</switch>
+                <switch>Q</switch>
+            </option>
+        </optionGroup>
+        <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
+            <annotation>
+                            WSDL URL
+                         </annotation>
+        </argument>
+    </usage>
 </toolspec>

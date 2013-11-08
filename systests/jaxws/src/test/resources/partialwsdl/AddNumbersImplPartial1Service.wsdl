@@ -14,30 +14,23 @@
                 License for the * specific language governing permissions and
                 limitations * under the License.
         -->
-
-<definitions 
-targetNamespace="http://jaxws.systest.cxf.apache.org/" 
-name="AddNumbersImplPartial1Service" 
-xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
-xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-xmlns:tns="http://jaxws.systest.cxf.apache.org/"
-xmlns="http://schemas.xmlsoap.org/wsdl/">
-  <types>
-    <xsd:schema>
-      <xsd:import namespace="http://jaxws.systest.cxf.apache.org/" schemaLocation="AddNumbersImplPartial1Service_schema1.xsd"/>
-    </xsd:schema>
-  </types>
-  <message name="addTwoNumbers">
-    <part name="parameters" element="tns:addTwoNumbers"/>
-  </message>
-  <message name="addTwoNumbersResponse">
-    <part name="parameters" element="tns:addTwoNumbersResponse"/>
-  </message>
-  <portType name="AddNumbersImplPartial1">
-    <operation name="addTwoNumbers">
-      <input message="tns:addTwoNumbers"/>
-      <output message="tns:addTwoNumbersResponse"/>
-    </operation>
-  </portType>
-  <!-- end here -->
+<definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://jaxws.systest.cxf.apache.org/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://jaxws.systest.cxf.apache.org/" name="AddNumbersImplPartial1Service">
+    <types>
+        <xsd:schema>
+            <xsd:import namespace="http://jaxws.systest.cxf.apache.org/" schemaLocation="AddNumbersImplPartial1Service_schema1.xsd"/>
+        </xsd:schema>
+    </types>
+    <message name="addTwoNumbers">
+        <part name="parameters" element="tns:addTwoNumbers"/>
+    </message>
+    <message name="addTwoNumbersResponse">
+        <part name="parameters" element="tns:addTwoNumbersResponse"/>
+    </message>
+    <portType name="AddNumbersImplPartial1">
+        <operation name="addTwoNumbers">
+            <input message="tns:addTwoNumbers"/>
+            <output message="tns:addTwoNumbersResponse"/>
+        </operation>
+    </portType>
+    <!-- end here -->
 </definitions>

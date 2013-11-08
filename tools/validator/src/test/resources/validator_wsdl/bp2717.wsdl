@@ -18,29 +18,23 @@
   under the License.
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_doc_lit_bare" xmlns:x1="http://apache.org/hello_world_doc_lit_bare/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://apache.org/hello_world_doc_lit_bare" name="DocLitBare">
-
     <message name="pingMeRequest">
         <part name="intRequest" element="xsd:int"/>
-        <part name="intInOutRequest" element="xsd:int" />
+        <part name="intInOutRequest" element="xsd:int"/>
     </message>
-    
     <message name="pingMeResponse">
         <part name="outStringResponse" element="xsd:string"/>
-        <part name="outIntResponse" element="xsd:int" />
-        <part name="intInOutRequest" element="xsd:int" />
-
+        <part name="outIntResponse" element="xsd:int"/>
+        <part name="intInOutRequest" element="xsd:int"/>
     </message>
-
     <portType name="pingMePortType">
         <operation name="pingMe">
             <input message="tns:pingMeRequest"/>
             <output message="tns:pingMeResponse"/>
-        </operation>        
+        </operation>
     </portType>
-    
     <binding name="pingMeSoapBinding" type="tns:pingMePortType">
         <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
-
         <operation name="pingMe">
             <input>
                 <soap:body use="literal"/>
@@ -48,10 +42,8 @@
             <output>
                 <soap:body use="literal"/>
             </output>
-        </operation>       
+        </operation>
     </binding>
-
-    
     <wsdl:service name="SOAPService">
         <wsdl:port name="SoapPort" binding="tns:pingMeSoapBinding">
             <soap:address location="http://localhost:9107/soapContext"/>

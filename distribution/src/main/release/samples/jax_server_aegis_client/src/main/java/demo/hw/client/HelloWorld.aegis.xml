@@ -20,7 +20,7 @@
 <mappings>
     <mapping name="HelloWorld">
         <method name="sayHi">
-            <parameter index="0" name="greeting" />
+            <parameter index="0" name="greeting"/>
         </method>
     </mapping>
 </mappings>

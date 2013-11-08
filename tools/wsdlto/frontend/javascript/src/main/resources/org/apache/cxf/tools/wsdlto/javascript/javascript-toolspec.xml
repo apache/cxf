@@ -17,17 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict"
-      xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd"
-      xmlns="http://cxf.apache.org/Xutil/ToolSpecification"
-      xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
-
+<toolspec xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/TR/xhtml1/strict" xmlns="http://cxf.apache.org/Xutil/ToolSpecification" xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification" xsi:schemaLocation="http://cxf.apache.org/Xutil/ToolSpecification http://cxf.apache.org/schema/xutil/tool-specification.xsd">
     <annotation>
 Examples:
         wsdl2js HelloWorld.wsdl
     </annotation>
-
     <usage>
         <optionGroup id="options">
             <option id="wsdlversion" maxOccurs="unbounded">
@@ -39,12 +33,11 @@ Examples:
                     <annotation>[wsdl version]</annotation>
                 </associatedArgument>
             </option>
-
             <option id="jspackageprefix" maxOccurs="unbounded">
                 <annotation>
                     The JavaScript function name prefix to use for the generated code.
-					Specify each prefix mapping with with the format
-					URI=prefix.
+                                        Specify each prefix mapping with with the format
+                                        URI=prefix.
                 </annotation>
                 <switch>p</switch>
                 <associatedArgument placement="afterSpace">
@@ -52,7 +45,6 @@ Examples:
                     <annotation>[wsdl namespace =]prefix</annotation>
                 </associatedArgument>
             </option>
-
             <option id="catalog" maxOccurs="1">
                 <annotation>
                     Specify catalog file to map the imported wsdl/schema
@@ -62,7 +54,6 @@ Examples:
                     <annotation>catalog-file-name</annotation>
                 </associatedArgument>
             </option>
-
             <option id="outputdir" maxOccurs="1">
                 <annotation>
                     The directory in which the code is placed</annotation>
@@ -71,7 +62,6 @@ Examples:
                     <annotation>output-directory</annotation>
                 </associatedArgument>
             </option>
-
             <option id="validate" maxOccurs="1">
                 <annotation>
                     To validate the wsdl before generating the code.  Usage of 
@@ -79,7 +69,6 @@ Examples:
                 </annotation>
                 <switch>validate</switch>
             </option>
-
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
@@ -89,21 +78,18 @@ Examples:
                 <switch>?</switch>
                 <switch>help</switch>
             </option>
-
             <option id="version">
                 <annotation>
                     Display the version of the tool.</annotation>
                 <switch>version</switch>
                 <switch>v</switch>
             </option>
-
             <option id="verbose">
                 <annotation>
                     Verbose mode</annotation>
                 <switch>verbose</switch>
                 <switch>V</switch>
             </option>
-
             <option id="quiet">
                 <annotation>
                     Quiet mode</annotation>
@@ -111,7 +97,6 @@ Examples:
                 <switch>q</switch>
                 <switch>Q</switch>
             </option>
-
         </optionGroup>
         <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
             <annotation>

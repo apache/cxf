@@ -17,79 +17,52 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:beans="http://www.springframework.org/schema/beans"    
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:h="http://cxf.apache.org/transports/http/configuration"
-       xmlns:hn="http://cxf.apache.org/transports/http-netty-server/configuration"
-       xmlns:sec="http://cxf.apache.org/configuration/security"
-       xsi:schemaLocation="
-		http://www.springframework.org/schema/beans 
-		    http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://cxf.apache.org/configuration/security 
-		    http://cxf.apache.org/schemas/configuration/security.xsd
-		http://cxf.apache.org/transports/http/configuration 
-		    http://cxf.apache.org/schemas/configuration/http-conf.xsd
-		http://cxf.apache.org/transports/http-netty-server/configuration 
-		    http://cxf.apache.org/schemas/configuration/http-netty-server.xsd"
->
-	<bean id="placeholderConfig"
-	      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	  <property name="location" value="org/apache/cxf/transport/http/netty/server/spring/bean.properties"/>
-	</bean>
-	<bean id="placeholderConfig2"
-	      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	  <property name="location" value="org/apache/cxf/transport/http/netty/server/spring/bean.properties"/>
-	  <property name="placeholderPrefix" value="$("/>
-	  <property name="placeholderSuffix" value=")"/>
-	</bean>
-	<bean id="placeholderConfig3"
-	      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	  <property name="location" value="org/apache/cxf/transport/http/netty/server/spring/bean.properties"/>
-	  <property name="placeholderPrefix" value="#["/>
-	  <property name="placeholderSuffix" value="]"/>
-	</bean>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://cxf.apache.org/transports/http/configuration" xmlns:hn="http://cxf.apache.org/transports/http-netty-server/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="                 http://www.springframework.org/schema/beans                      http://www.springframework.org/schema/beans/spring-beans.xsd                 http://cxf.apache.org/configuration/security                      http://cxf.apache.org/schemas/configuration/security.xsd                 http://cxf.apache.org/transports/http/configuration                      http://cxf.apache.org/schemas/configuration/http-conf.xsd                 http://cxf.apache.org/transports/http-netty-server/configuration                      http://cxf.apache.org/schemas/configuration/http-netty-server.xsd">
+    <bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="org/apache/cxf/transport/http/netty/server/spring/bean.properties"/>
+    </bean>
+    <bean id="placeholderConfig2" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="org/apache/cxf/transport/http/netty/server/spring/bean.properties"/>
+        <property name="placeholderPrefix" value="$("/>
+        <property name="placeholderSuffix" value=")"/>
+    </bean>
+    <bean id="placeholderConfig3" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="org/apache/cxf/transport/http/netty/server/spring/bean.properties"/>
+        <property name="placeholderPrefix" value="#["/>
+        <property name="placeholderSuffix" value="]"/>
+    </bean>
     <h:destination name="{urn:test:ns}Foo.http-destination">
-      <h:server ContentEncoding="foobar"/>
+        <h:server ContentEncoding="foobar"/>
     </h:destination>
-    
     <h:conduit name="{urn:test:ns}Foo.http-conduit">
-      <h:client ConnectionTimeout="${foo.connection.timeout}"/>
+        <h:client ConnectionTimeout="${foo.connection.timeout}"/>
     </h:conduit>
-
     <h:conduit name="*Bar.http-conduit">
-      <h:client ConnectionTimeout="${bar.connection.timeout}"/>
+        <h:client ConnectionTimeout="${bar.connection.timeout}"/>
     </h:conduit>
-
     <hn:engine-factory bus="cxf">
-       <hn:identifiedTLSServerParameters id="sample1">
-         <hn:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
-            <sec:clientAuthentication want="false" required="false"/>
-        </hn:tlsServerParameters>
-       </hn:identifiedTLSServerParameters>
-       
-       <hn:identifiedThreadingParameters id="sampleThreading1">
-	      <hn:threadingParameters threadPoolSize="120"/>
-	   </hn:identifiedThreadingParameters>
-	   
-	   <hn:engine port="${engine.port.nine.zero}">
-	      <hn:threadingParametersRef id="sampleThreading1"/>	      
-	   </hn:engine>
-       
-	   <hn:engine port="$(engine.port.nine.one)" readIdleTime="$(engine.port.nine.one.readIdle)" maxChunkContentSize="${engine.port.nine.one.maxChunkContentSize}">
-	     <hn:threadingParameters threadPoolSize="$(engine.port.nine.one.threadPoolSize)" />	
-         <hn:sessionSupport>true</hn:sessionSupport>
-	  </hn:engine> 
-	  
-	  <hn:engine port="${engine.port.nine.two}">
-        <hn:tlsServerParameters>
-           <sec:clientAuthentication want="true" required="true"/>
-        </hn:tlsServerParameters>
-      </hn:engine>
-      
-      <hn:engine port="${engine.port.nine.three}">
-         <hn:tlsServerParametersRef id="sample1"/>
-      </hn:engine>
-      
-	</hn:engine-factory>
+        <hn:identifiedTLSServerParameters id="sample1">
+            <hn:tlsServerParameters jsseProvider="SUN" secureSocketProtocol="TLS">
+                <sec:clientAuthentication want="false" required="false"/>
+            </hn:tlsServerParameters>
+        </hn:identifiedTLSServerParameters>
+        <hn:identifiedThreadingParameters id="sampleThreading1">
+            <hn:threadingParameters threadPoolSize="120"/>
+        </hn:identifiedThreadingParameters>
+        <hn:engine port="${engine.port.nine.zero}">
+            <hn:threadingParametersRef id="sampleThreading1"/>
+        </hn:engine>
+        <hn:engine port="$(engine.port.nine.one)" readIdleTime="$(engine.port.nine.one.readIdle)" maxChunkContentSize="${engine.port.nine.one.maxChunkContentSize}">
+            <hn:threadingParameters threadPoolSize="$(engine.port.nine.one.threadPoolSize)"/>
+            <hn:sessionSupport>true</hn:sessionSupport>
+        </hn:engine>
+        <hn:engine port="${engine.port.nine.two}">
+            <hn:tlsServerParameters>
+                <sec:clientAuthentication want="true" required="true"/>
+            </hn:tlsServerParameters>
+        </hn:engine>
+        <hn:engine port="${engine.port.nine.three}">
+            <hn:tlsServerParametersRef id="sample1"/>
+        </hn:engine>
+    </hn:engine-factory>
 </beans>

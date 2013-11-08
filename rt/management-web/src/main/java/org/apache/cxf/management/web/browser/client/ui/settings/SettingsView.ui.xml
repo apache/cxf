@@ -17,14 +17,9 @@
   specific language governing permissions and limitations
   under the License.
   -->
-
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-
-   <ui:with field='res'
-            type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
-
-   <ui:style>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:with field="res" type="org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources"/>
+    <ui:style>
       .content {
          margin: 0.5em 1em;
          padding: 3px;
@@ -51,40 +46,37 @@
          text-decoration: underline;
       }
    </ui:style>
-
-   <g:ScrollPanel>
-      <g:HTMLPanel>
-         <g:FlowPanel ui:field="navigationHeaderSlot"/>
-         <div class="{style.content}">
-            <table class="{style.header}">
-               <tbody>
-                  <tr>
-                     <td>
-                        <g:Label addStyleNames="{style.title}">
+    <g:ScrollPanel>
+        <g:HTMLPanel>
+            <g:FlowPanel ui:field="navigationHeaderSlot"/>
+            <div class="{style.content}">
+                <table class="{style.header}">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <g:Label addStyleNames="{style.title}">
                            Settings
                         </g:Label>
-                     </td>
-                     <td>
-                        <g:Hyperlink ui:field="backHyperlink" addStyleNames="{style.backLink}">
-                           &#171; Back to Explorer
+                            </td>
+                            <td>
+                                <g:Hyperlink ui:field="backHyperlink" addStyleNames="{style.backLink}">
+                           « Back to Explorer
                         </g:Hyperlink>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-            <g:DecoratedTabPanel ui:field="tabPanel" addStyleDependentNames="settings">
-               <g:Tab text="Endpoints">
-                  <g:HTMLPanel>
-                     <g:Button ui:field="addSubscriptionButton">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <g:DecoratedTabPanel ui:field="tabPanel" addStyleDependentNames="settings">
+                    <g:Tab text="Endpoints">
+                        <g:HTMLPanel>
+                            <g:Button ui:field="addSubscriptionButton">
                         Add endpoint
                      </g:Button>
-
-                     <g:FlexTable ui:field="subscriptionsTable"/>
-                  </g:HTMLPanel>
-               </g:Tab>
-            </g:DecoratedTabPanel>
-         </div>
-
-      </g:HTMLPanel>
-   </g:ScrollPanel>
+                            <g:FlexTable ui:field="subscriptionsTable"/>
+                        </g:HTMLPanel>
+                    </g:Tab>
+                </g:DecoratedTabPanel>
+            </div>
+        </g:HTMLPanel>
+    </g:ScrollPanel>
 </ui:UiBinder>

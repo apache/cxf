@@ -24,13 +24,11 @@
     <name>Apache CXF Maven Archetypes</name>
     <description>Apache CXF Maven Archetypes</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-maven-plugins</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-maven-plugins</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
-
     <modules>
         <module>cxf-jaxws-javafirst</module>
         <module>cxf-jaxrs-service</module>

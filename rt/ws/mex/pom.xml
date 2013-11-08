@@ -24,15 +24,12 @@
     <name>Apache CXF Runtime WS MetadataExchange</name>
     <description>Apache CXF Runtime WS MetadataExchange</description>
     <url>http://cxf.apache.org</url>
-
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -59,7 +56,6 @@
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -72,37 +68,35 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-xjc-plugin</artifactId>
-            <version>${cxf.xjc-utils.version}</version>
-            <executions>
-                <execution>
-                    <id>generate-sources</id>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>xsdtojava</goal>
-                    </goals>
-                    <configuration>
-                        <extensions>
-                            <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
-                        </extensions>
-                        <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
-                        <xsdOptions>
-                            <xsdOption>
-                                <extension>true</extension>
-                                <xsd>${basedir}/src/main/model/metadataexchange-2004-09.xsd</xsd>
-                                <bindingFile>${basedir}/src/main/model/binding-2004.xjb</bindingFile>
-                            </xsdOption>
-                        </xsdOptions>
-                    </configuration>
-                </execution>
-            </executions>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>${cxf.xjc-utils.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
+                        <configuration>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                            </extensions>
+                            <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <extension>true</extension>
+                                    <xsd>${basedir}/src/main/model/metadataexchange-2004-09.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/model/binding-2004.xjb</bindingFile>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>

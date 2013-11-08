@@ -17,4 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><addNumbers xmlns="http://apache.org/cxf/systest/ws/addr_feature/"><number1>-1</number1><number2>-2</number2></addNumbers></soap:Body></soap:Envelope>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <addNumbers xmlns="http://apache.org/cxf/systest/ws/addr_feature/">
+            <number1>-1</number1>
+            <number2>-2</number2>
+        </addNumbers>
+    </soap:Body>
+</soap:Envelope>

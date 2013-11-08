@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -17,10 +17,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
-    xmlns:foo="http://cxf.apache.org/test/assertions/foo">
-	<foo:foo>
-	    <foo:name>CXF</foo:name>
-	    <foo:number>2</foo:number>
-	</foo:foo>
+<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:foo="http://cxf.apache.org/test/assertions/foo">
+    <foo:foo>
+        <foo:name>CXF</foo:name>
+        <foo:number>2</foo:number>
+    </foo:foo>
 </wsp:Policy>

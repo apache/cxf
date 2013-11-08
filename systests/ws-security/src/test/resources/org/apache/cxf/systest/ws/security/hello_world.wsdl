@@ -17,37 +17,15 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions 
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:tns="http://apache.org/hello_world_soap_http"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    targetNamespace="http://apache.org/hello_world_soap_http" 
-    name="WSSecurity"
-    >
-
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://apache.org/hello_world_soap_http" name="WSSecurity">
     <!-- Imported hello_world.wsdl is located in CXF's testutils module -->
-    <wsdl:import 
-        namespace="http://apache.org/hello_world_soap_http"
-        location="wsdl/hello_world.wsdl"
-    />
-
+    <wsdl:import namespace="http://apache.org/hello_world_soap_http" location="wsdl/hello_world.wsdl"/>
     <wsdl:service name="GreeterService">
-        <wsdl:port 
-            name="TimestampSignEncryptPort" 
-            binding="tns:Greeter_SOAPBinding">
-            <soap:address
-                location="http://localhost:9000/GreeterService/TimestampSignEncryptPort"
-            />
+        <wsdl:port name="TimestampSignEncryptPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9000/GreeterService/TimestampSignEncryptPort"/>
         </wsdl:port>
-        <wsdl:port 
-            name="UsernameTokenPort" 
-            binding="tns:Greeter_SOAPBinding">
-            <soap:address
-                location="http://localhost:9000/GreeterService/UsernameTokenPort"
-            />
+        <wsdl:port name="UsernameTokenPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9000/GreeterService/UsernameTokenPort"/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>
-

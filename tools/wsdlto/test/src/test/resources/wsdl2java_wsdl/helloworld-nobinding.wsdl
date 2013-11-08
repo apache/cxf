@@ -32,32 +32,28 @@
   See the License for the specific language governing permissions and
   limitations under the License.
  -->
-<wsdl:definitions targetNamespace="http://helloworldaxis.samples.tuscany.apache.org" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://helloworldaxis.samples.tuscany.apache.org" xmlns:intf="http://helloworldaxis.samples.tuscany.apache.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="helloworld">
+<wsdl:definitions xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://helloworldaxis.samples.tuscany.apache.org" xmlns:intf="http://helloworldaxis.samples.tuscany.apache.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://helloworldaxis.samples.tuscany.apache.org" name="helloworld">
     <!--WSDL created by Apache Axis version: 1.2.1
 Built on Jun 14, 2005 (09:15:57 EDT)-->
     <wsdl:types>
-        <schema elementFormDefault="qualified" targetNamespace="http://helloworldaxis.samples.tuscany.apache.org" xmlns="http://www.w3.org/2001/XMLSchema">
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://helloworldaxis.samples.tuscany.apache.org">
             <element name="getGreetings" type="xsd:string"/>
             <element name="getGreetingsResponse" type="xsd:string"/>
         </schema>
     </wsdl:types>
-
     <wsdl:message name="getGreetingsRequest">
         <wsdl:part element="impl:getGreetings" name="request"/>
     </wsdl:message>
-
     <wsdl:message name="getGreetingsResponse">
         <wsdl:part element="impl:getGreetingsResponse" name="response"/>
     </wsdl:message>
-
     <wsdl:portType name="HelloWorldServiceImpl">
         <wsdl:operation name="getGreetings">
             <wsdl:input message="impl:getGreetingsRequest" name="getGreetingsRequest"/>
             <wsdl:output message="impl:getGreetingsResponse" name="getGreetingsResponse"/>
         </wsdl:operation>
     </wsdl:portType>
-
-<!--
+    <!--
     <wsdl:binding name="helloworldSoapBinding" type="impl:HelloWorldServiceImpl">
         <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="getGreetings">

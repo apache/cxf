@@ -1,5 +1,6 @@
+<?xml version="1.0"?>
 <mappings xmlns:ex="http://cxf.apache.org/xmlbeans/exception">
-  <mapping name="ex:CustomFault">
-    <property name="extraInfo" style="attribute" />
-  </mapping>
+    <mapping name="ex:CustomFault">
+        <property name="extraInfo" style="attribute"/>
+    </mapping>
 </mappings>
