@@ -241,10 +241,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         MediaType responseMediaType = 
             getResponseMediaType(responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE));
         
-        Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
         Class<?> serviceCls = invoked != null ? ori.getClassResourceInfo().getServiceClass() : null;
+        Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
         Type genericType = InjectionUtils.getGenericResponseType(invoked, serviceCls, 
                                                                  response.getActualEntity(), targetType, exchange);
+        targetType = InjectionUtils.updateParamClassToTypeIfNeeded(targetType, genericType);
         annotations = response.getEntityAnnotations();        
         
         List<WriterInterceptor> writers = providerFactory
@@ -253,9 +254,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         OutputStream outOriginal = message.getContent(OutputStream.class);
         if (writers == null || writers.isEmpty()) {
-            message.put(Message.CONTENT_TYPE, "text/plain");
-            message.put(Message.RESPONSE_CODE, 500);
-            writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType, responseMediaType);
+            writeResponseErrorMessage(message, outOriginal, "NO_MSG_WRITER", targetType, responseMediaType);
             return;
         }
         responseMediaType = checkFinalContentType(responseMediaType, writers);
@@ -400,7 +399,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     
-    private void writeResponseErrorMessage(OutputStream out, String name, Class<?> cls, MediaType ct) {
+    private void writeResponseErrorMessage(Message message, OutputStream out, 
+                                           String name, Class<?> cls, MediaType ct) {
+        message.put(Message.CONTENT_TYPE, "text/plain");
+        message.put(Message.RESPONSE_CODE, 500);
         try {
             String errorMessage = JAXRSUtils.logMessageHandlerProblem(name, cls, ct);
             if (out != null) {

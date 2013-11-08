@@ -27,27 +27,27 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
-@XmlRootElement(name = "Book")
-@XmlSeeAlso(SuperBook.class)
-public class Book {
+@XmlType(name = "Book")
+@XmlSeeAlso(SuperBook2.class)
+public class BookType {
     private String name;
     private long id;
     private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
     
-    public Book() {
+    public BookType() {
         init();
         //System.out.println("----chapters: " + chapters.size());
     }
     
-    public Book(String name, long id) {
+    public BookType(String name, long id) {
         this.name = name;
         this.id = id;
     }
@@ -68,13 +68,13 @@ public class Book {
     }
     
     @PUT
-    public void cloneState(Book book) {
+    public void cloneState(BookType book) {
         id = book.getId();
         name = book.getName();
     }
     
     @GET
-    public Book retrieveState() {
+    public BookType retrieveState() {
         return this;
     }
     

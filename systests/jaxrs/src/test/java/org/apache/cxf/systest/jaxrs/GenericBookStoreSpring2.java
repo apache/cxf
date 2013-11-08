@@ -31,13 +31,13 @@ import javax.ws.rs.WebApplicationException;
 import org.apache.cxf.annotations.Logging;
 
 @Path("/")
-@Produces("application/json")
-@Consumes("application/json")
+@Consumes({"application/json", "application/xml" })
+@Produces({"application/json", "application/xml" })
 @Logging
 public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
     @POST
     @Path("/books/superbook")
-    public <T extends Book> T echoSuperBookJson(T book) {
+    public <T extends Book> T echoSuperBook(T book) {
         if (((SuperBook)book).isSuperBook()) {
             return book;
         }
@@ -46,8 +46,26 @@ public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
     
     @POST
     @Path("/books/superbooks")
-    public <T extends Book> List<T> echoSuperBookCollectionJson(List<T> book) {
+    public <T extends Book> List<T> echoSuperBookCollection(List<T> book) {
         if (((SuperBook)book.get(0)).isSuperBook()) {
+            return book;
+        }
+        throw new WebApplicationException(400);
+    }
+    
+    @POST
+    @Path("/books/superbooktype")
+    public <T extends BookType> T echoSuperBookType(T book) {
+        if (((SuperBook2)book).isSuperBook()) {
+            return book;
+        }
+        throw new WebApplicationException(400);
+    }
+    
+    @POST
+    @Path("/books/superbooktypes")
+    public <T extends BookType> List<T> echoSuperBookTypeCollection(List<T> book) {
+        if (((SuperBook2)book.get(0)).isSuperBook()) {
             return book;
         }
         throw new WebApplicationException(400);

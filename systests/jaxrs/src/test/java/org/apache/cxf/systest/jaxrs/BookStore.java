@@ -572,7 +572,8 @@ public class BookStore {
     @Path("/collections2")
     @Produces({"application/xml", "application/json" })
     @Consumes({"application/xml", "application/json" })
-    public List<BookNoXmlRootElement> getBookCollection2(List<BookNoXmlRootElement> bs) throws Exception {
+    public List<JAXBElement<BookNoXmlRootElement>> getBookCollection2(
+        List<JAXBElement<BookNoXmlRootElement>> bs) throws Exception {
         if (bs == null || bs.size() != 2) {
             throw new RuntimeException();
         }

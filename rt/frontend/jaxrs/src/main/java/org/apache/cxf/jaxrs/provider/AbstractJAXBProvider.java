@@ -65,6 +65,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
 
+import org.w3c.dom.Element;
+
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -122,6 +124,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
     private List<String> jaxbElementClassNames;
+    private boolean xmlRootAsJaxbElement;
     private Map<String, Object> cProperties;
     private Map<String, Object> uProperties;
     
@@ -138,6 +141,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     private Marshaller.Listener marshallerListener;
     private DocumentDepthProperties depthProperties;
     private String namespaceMapperPropertyName;
+    
+    public void setXmlRootAsJaxbElement(boolean xmlRootAsJaxbElement) {
+        this.xmlRootAsJaxbElement = xmlRootAsJaxbElement;
+    }
+
     
     protected void setNamespaceMapper(Marshaller ms, 
                                       Map<String, String> map) throws Exception {
@@ -259,7 +267,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         
         Class<?> jaxbElementCls = jaxbElementClassNames == null ? null : getJaxbElementClass(cls);
         boolean asJaxbElement = jaxbElementCls != null;
-        if (!asJaxbElement && isXmlRoot(cls)) {
+        if (!asJaxbElement && isXmlRoot(cls) && !xmlRootAsJaxbElement) {
             return obj;
         }
         if (jaxbElementCls == null) {
@@ -839,12 +847,23 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
         
         @SuppressWarnings("unchecked")
-        public <T> Object getCollectionOrArray(Class<T> type, Class<?> origType,
-                                               XmlJavaTypeAdapter adapter) {
+        public <T> Object getCollectionOrArray(Unmarshaller unm, Class<T> type, Class<?> origType,
+                                               XmlJavaTypeAdapter adapter) throws JAXBException {
             List<?> theList = getList();
             boolean adapterChecked = false;
             if (theList.size() > 0) {
                 Object first = theList.get(0);
+                
+                if (first instanceof Element) {
+                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    for (Object o : theList) {
+                        newList.add(unm.unmarshal((Element)o));
+                    }
+                    theList = newList;
+                }
+                
+                first = theList.get(0);
+                
                 if (first instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
                     adapterChecked = true;
                     List<Object> newList = new ArrayList<Object>(theList.size());

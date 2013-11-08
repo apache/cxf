@@ -236,7 +236,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 response = ((JAXBElement<?>)response).getValue();    
             }
             if (isCollection) {
-                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type, 
+                response = ((CollectionWrapper)response).getCollectionOrArray(
+                               unmarshaller, theType, type, 
                                org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns)); 
             } else {
                 response = checkAdapter(response, type, anns, false);

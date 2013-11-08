@@ -1283,8 +1283,12 @@ public final class InjectionUtils {
         return type;
     }
     public static Class<?> updateParamClassToTypeIfNeeded(Class<?> paramCls, Type type) {
-        if (type instanceof Class && paramCls.isAssignableFrom((Class<?>)type)) {
-            paramCls = (Class<?>)type; 
+        if (paramCls != type && type instanceof Class) {
+            Class<?> clsType = (Class<?>)type;
+            if (paramCls.isAssignableFrom(clsType) 
+                || clsType != Object.class && !clsType.isInterface() && clsType.isAssignableFrom(paramCls)) {
+                paramCls = clsType;
+            }
         }
         return paramCls;
     }
