@@ -19,57 +19,10 @@
 
 package org.apache.cxf.jaxrs.ext.multipart;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.apache.cxf.common.util.StringUtils;
-
-public class ContentDisposition {
-
-    private List<String> values;
+public class ContentDisposition extends org.apache.cxf.attachment.ContentDisposition {
     
     public ContentDisposition(String value) {
-        values = Arrays.asList(StringUtils.split(value, ";"));
-    }
-    
-    public String getType() {
-        return values.get(0).trim();
-    }
-    
-    public String getParameter(String name) {
-        for (int i = 1; i < values.size(); i++) {
-            String v = values.get(i).trim();
-            if (v.startsWith(name)) {
-                String[] parts = StringUtils.split(v, "=");
-                return parts.length == 2 ? parts[1].trim().replace("\"", "").replace("'", "") : ""; 
-            }
-        }
-        return null;
-    }
-    
-    public Map<String, String> getParameters() {
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        for (int i = 1; i < values.size(); i++) {
-            String[] parts = StringUtils.split(values.get(i), "=");
-            map.put(parts[0].trim(), parts.length == 2 
-                    ? parts[1].trim().replace("\"", "").replace("'", "") : ""); 
-        }
-        return map;
-    }
-    
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.size(); i++) {
-            if (values.get(i).length() == 0) {
-                continue;
-            }
-            sb.append(values.get(i));
-            if (i + 1 < values.size()) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
+        super(value);
     }
 }

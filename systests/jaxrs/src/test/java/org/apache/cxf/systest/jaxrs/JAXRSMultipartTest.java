@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.awt.Image;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -665,6 +666,23 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("attachment;filename=java.jpg", cd2.toString());
         assertEquals("java.jpg", cd2.getParameter("filename"));
         assertEquals("http://host/location", body2.getRootAttachment().getHeader("Content-Location"));
+    }
+    
+    @Test
+    public void testUploadFileWithSemicolonName() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/file/semicolon";
+        WebClient client = WebClient.create(address);
+        client.type("multipart/form-data").accept("text/plain");
+        
+        ContentDisposition cd = new ContentDisposition("attachment;name=\"a\";filename=\"a;txt\"");
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Disposition", cd.toString());
+        Attachment att = new Attachment(new ByteArrayInputStream("file name with semicolon".getBytes()), 
+                                        headers);
+        
+        MultipartBody body = new MultipartBody(att);
+        String partContent = client.post(body, String.class);
+        assertEquals("file name with semicolon, filename:" + "a;txt", partContent);
     }
     
     @Test

@@ -140,6 +140,15 @@ public class MultipartStore {
         return image;
     }
     
+    @Path("/books/file/semicolon")
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    @POST
+    public String addBookFileNameSemicolon(@Multipart("a") Attachment att) {
+        return att.getObject(String.class) 
+            + ", filename:" + att.getContentDisposition().getParameter("filename");
+    }
+    
     @POST
     @Path("/books/formimage")
     @Consumes("multipart/form-data")
