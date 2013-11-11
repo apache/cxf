@@ -35,7 +35,6 @@
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.apache.aries*;version="${cxf.aries.version.range}",
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            com.wordnik.swagger.jaxrs*;resolution:="optional";version="[1.3.0, 1.4.0)",
             javax.ws.rs.client;version="[2.0,3)",
             javax.ws.rs*;version="[1.0,3)",
         </cxf.osgi.import>
@@ -155,11 +154,6 @@
                 </exclusion>
             </exclusions>
         </dependency> 
-        <dependency>
-            <groupId>com.wordnik</groupId>
-            <artifactId>swagger-jaxrs_2.10</artifactId>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
     <build>
         <pluginManagement>
