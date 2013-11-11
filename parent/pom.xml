@@ -1659,7 +1659,7 @@
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>org.eclipse.persistence.moxy</artifactId>
-                    <version>2.5.1-SNAPSHOT</version>
+                    <version>2.5.1</version>
                     <scope>provided</scope>
                     <optional>true</optional>
                 </dependency>
