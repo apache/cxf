@@ -67,6 +67,7 @@
         <module>ws_security/ut</module>
         <module>ws_security/ut_sign</module>
         <module>ws_security/sign_enc</module>
+        <module>ws_security/stax_sign_enc</module>
         <module>ws_security/ut_policy</module>
         <module>mtom</module>
         <module>jaxws_async</module>
