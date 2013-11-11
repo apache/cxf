@@ -845,10 +845,11 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(nd.getAttribute("type").endsWith(":myData"));
         
         
-        nd = (Element)util.getValueNode("//xsd:element[@name='address']", doc);
-        StaxUtils.print(nd);
+        nd = (Element)util.getValueNode("//xsd:complexType[@name='ListException2']"
+                                        + "/xsd:sequence/xsd:element[@name='address']", doc);
         assertNotNull(nd);
         assertEquals("0", nd.getAttribute("minOccurs"));
+        assertEquals("unbounded", nd.getAttribute("maxOccurs"));
         assertTrue(nd.getAttribute("type").endsWith(":myData"));
     }
     
