@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.activation.CommandInfo;
@@ -318,23 +317,7 @@ public final class AttachmentUtil {
         
         final String ct = getHeader(headers, "Content-Type");
         String cd = getHeader(headers, "Content-Disposition");
-        String fileName = null;
-        if (!StringUtils.isEmpty(cd)) {
-            StringTokenizer token = new StringTokenizer(cd, ";");
-            while (token.hasMoreElements()) {
-                fileName = token.nextToken();
-                if (fileName.startsWith("name=")) {
-                    break;
-                }
-            }
-            if (!StringUtils.isEmpty(fileName)) {
-                if (fileName.contains("\"")) {
-                    fileName = fileName.substring(fileName.indexOf("\"") + 1, fileName.lastIndexOf("\""));
-                } else {
-                    fileName = fileName.substring(fileName.indexOf("=") + 1);
-                }
-            }
-        }
+        String fileName = getContentDispositionFileName(cd);
         
         String encoding = null;
         
@@ -360,6 +343,13 @@ public final class AttachmentUtil {
         return att;
     }
     
+    static String getContentDispositionFileName(String cd) {
+        if (StringUtils.isEmpty(cd)) {
+            return null;
+        }
+        //TODO: save ContentDisposition directly 
+        return new ContentDisposition(cd).getParameter("filename");
+    }
     
     public static InputStream decode(InputStream in, String encoding) throws IOException {
         encoding = encoding.toLowerCase();

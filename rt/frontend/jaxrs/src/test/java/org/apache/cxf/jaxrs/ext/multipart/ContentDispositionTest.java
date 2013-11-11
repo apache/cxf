@@ -32,5 +32,19 @@ public class ContentDispositionTest extends Assert {
         assertEquals("foo", cd.getParameter("bar"));
         assertEquals("baz1", cd.getParameter("baz"));
     }
+    @Test
+    public void testContentDispositionWithQuotes() {
+        ContentDisposition cd = new ContentDisposition(" attachment ; bar=\"foo.txt\" ; baz = baz1");
+        assertEquals("attachment", cd.getType());
+        assertEquals("foo.txt", cd.getParameter("bar"));
+        assertEquals("baz1", cd.getParameter("baz"));
+    }
+    @Test
+    public void testContentDispositionWithQuotesAndSemicolon() {
+        ContentDisposition cd = new ContentDisposition(" attachment ; bar=\"foo;txt\" ; baz = baz1");
+        assertEquals("attachment", cd.getType());
+        assertEquals("foo;txt", cd.getParameter("bar"));
+        assertEquals("baz1", cd.getParameter("baz"));
+    }
     
 }
