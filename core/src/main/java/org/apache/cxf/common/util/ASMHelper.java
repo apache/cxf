@@ -125,6 +125,9 @@ public class ASMHelper {
         public static int ACC_INTERFACE = 0;
         public static int ACC_SYNTHETIC = 0;
         public static int ILOAD = 0;
+        public static int ISTORE = 0;
+        public static int AALOAD = 0;
+        public static int ARRAYLENGTH = 0;
         public static int IRETURN = 0;
         public static int NEW = 0;
         public static int ANEWARRAY = 0;
@@ -138,9 +141,12 @@ public class ASMHelper {
         public static int SIPUSH = 0;
         public static int INVOKESTATIC = 0;
         public static int ICONST_0;
+        public static int ICONST_1;
         public static int LCONST_0;
         public static int FCONST_0;
         public static int DCONST_0;
+        public static int IF_ICMPLT = 0;
+        public static java.lang.Integer INTEGER;
         
         //CHECKSTYLE:ON
         static {
@@ -454,6 +460,7 @@ public class ASMHelper {
         void visitMethodInsn(int invokevirtual, String periodToSlashes,
                              String name, String methodSignature);
         void visitIntInsn(int sipush, int x);
+        void visitIincInsn(int i, int j);
         void visitFieldInsn(int getfield, String periodToSlashes,
                             String string, String string2);
         void visitJumpInsn(int ifnonnull, @UnwrapParam(typeMethodName = "realType") Label nonNullLabel);

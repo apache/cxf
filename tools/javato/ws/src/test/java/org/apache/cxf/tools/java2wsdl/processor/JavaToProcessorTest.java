@@ -22,7 +22,9 @@ package org.apache.cxf.tools.java2wsdl.processor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
@@ -31,9 +33,11 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -644,17 +648,36 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "exception.wsdl");
         assertTrue(wsdlFile.exists());
         // schema element
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        assertTrue(wsdlContent.indexOf("<xs:complexType name=\"Exception\">") != -1);
-        assertTrue(wsdlContent.indexOf("<xs:element name=\"Exception\" type=\"tns:Exception\"/>") != -1);
-        assertTrue(wsdlContent.indexOf("<xs:element minOccurs=\"0\" name=\"message\" type=\"xs:string\"/>") 
-                   != -1);
-        assertTrue(wsdlContent.indexOf("<xs:element minOccurs=\"0\" name=\"message\" type=\"xs:string\"/>") 
-                   != -1);
-        assertTrue(wsdlContent.indexOf("<wsdl:part name=\"Exception\" element=\"tns:Exception\">") != -1);
-        assertTrue(wsdlContent.indexOf("<wsdl:fault name=\"Exception\" message=\"tns:Exception\">") != -1);
-        assertTrue(wsdlContent.indexOf("<soap:fault name=\"Exception\" use=\"literal\"/>") != -1);
+        
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
+        
+        assertNotNull(util.getValueNode("//xsd:complexType[@name='Exception']", doc));
 
+        Element nd = (Element)util.getValueNode("//xsd:element[@name='Exception']", doc);
+        assertNotNull(nd);
+        assertTrue(nd.getAttribute("type").contains("Exception"));
+        
+        nd = (Element)util.getValueNode("//xsd:element[@name='message']", doc);
+        assertNotNull(nd);
+        assertTrue(nd.getAttribute("type").contains("string"));
+        assertTrue(nd.getAttribute("minOccurs").contains("0"));
+        
+        nd = (Element)util.getValueNode("//wsdl:part[@name='Exception']", doc);
+        assertNotNull(nd);
+        assertTrue(nd.getAttribute("element").contains(":Exception"));
+
+        nd = (Element)util.getValueNode("//wsdl:fault[@name='Exception']", doc);
+        assertNotNull(nd);
+        assertTrue(nd.getAttribute("message").contains(":Exception"));
+
+        nd = (Element)util.getValueNode("//soap:fault[@name='Exception']", doc);
+        assertNotNull(nd);
+        assertTrue(nd.getAttribute("use").contains("literal"));
     }
     
     //CXF-1509
@@ -718,15 +741,35 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "exception_prop_order.wsdl");
         assertTrue(wsdlFile.exists());
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        int summaryIndex = wsdlContent.indexOf("<xs:element name=\"summary\"");
-        int fromIndex = wsdlContent.indexOf("<xs:element name=\"from\"");
-        int idIndex = wsdlContent.indexOf("<xs:element name=\"id\"");
         
-        assertTrue(summaryIndex > -1);
-        assertTrue(fromIndex > -1);
-        assertTrue(idIndex > -1);
-        assertTrue(fromIndex > summaryIndex && idIndex > fromIndex);        
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
+
+        Element summary = (Element)util.getValueNode("//xsd:element[@name='summary']", doc);
+        Element from = (Element)util.getValueNode("//xsd:element[@name='from']", doc);
+        Element id = (Element)util.getValueNode("//xsd:element[@name='id']", doc);
+        assertNotNull(summary);
+        assertNotNull(from);
+        assertNotNull(id);
+        
+        Node nd = summary.getNextSibling();
+        while (nd != null) {
+            if (nd == from) {
+                from = null;
+            } else if (nd == id) {
+                if (from != null) {
+                    fail("id before from");
+                }
+                id = null;
+            }
+            nd = nd.getNextSibling();
+        }
+        assertNull(id);
+        assertNull(from);
     }
     
     @Test
@@ -742,17 +785,35 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "exception_order.wsdl");
         assertTrue(wsdlFile.exists());
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
 
-        int fromIndex = wsdlContent.indexOf("<xs:element name=\"from\"");
-        int idIndex = wsdlContent.indexOf("<xs:element name=\"id\"");
-        int summaryIndex = wsdlContent.indexOf("<xs:element name=\"summary\"");
+        Element summary = (Element)util.getValueNode("//xsd:element[@name='summary']", doc);
+        Element from = (Element)util.getValueNode("//xsd:element[@name='from']", doc);
+        Element id = (Element)util.getValueNode("//xsd:element[@name='id']", doc);
+        assertNotNull(summary);
+        assertNotNull(from);
+        assertNotNull(id);
         
-        
-        assertTrue(fromIndex > -1);
-        assertTrue(idIndex > -1);
-        assertTrue(summaryIndex > -1);
-        assertTrue(summaryIndex > idIndex && idIndex > fromIndex);        
+        Node nd = from.getNextSibling();
+        while (nd != null) {
+            if (nd == id) {
+                from = null;
+            } else if (nd == summary) {
+                if (from != null) {
+                    fail("from before summary");
+                }
+                id = null;
+            }
+            nd = nd.getNextSibling();
+        }
+        assertNull(id);
+        assertNull(from);
     }
     
     @Test
@@ -769,13 +830,26 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         
         File wsdlFile = new File(output, "exception_list.wsdl");
         assertTrue(wsdlFile.exists());
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        int unboundIndex = wsdlContent
-            .indexOf("<xs:element maxOccurs=\"unbounded\" minOccurs=\"0\" name=\"names\" type=\"tns:myData\"/>");
-        assertTrue(unboundIndex > -1);
-        unboundIndex = wsdlContent
-            .indexOf("<xs:element maxOccurs=\"unbounded\" minOccurs=\"0\" name=\"address\" type=\"tns:myData\"/>");
-        assertTrue(unboundIndex > -1);
+        
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        XPathUtils util = new XPathUtils(map);
+
+        Element nd = (Element)util.getValueNode("//xsd:element[@name='names']", doc);
+        assertNotNull(nd);
+        assertEquals("0", nd.getAttribute("minOccurs"));
+        assertEquals("unbounded", nd.getAttribute("maxOccurs"));
+        assertTrue(nd.getAttribute("type").endsWith(":myData"));
+        
+        
+        nd = (Element)util.getValueNode("//xsd:element[@name='address']", doc);
+        StaxUtils.print(nd);
+        assertNotNull(nd);
+        assertEquals("0", nd.getAttribute("minOccurs"));
+        assertTrue(nd.getAttribute("type").endsWith(":myData"));
     }
     
     @Test
@@ -792,10 +866,18 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         
         File wsdlFile = new File(output, "exception-ref-nillable.wsdl");
         assertTrue(wsdlFile.exists());
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        int refElement = wsdlContent.indexOf("<xs:element ref=\"tns:item\"/>");
-        assertTrue(refElement > -1);
-
+        
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
+        map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
+        map.put("tns", "http://cxf.apache.org/test/HelloService");
+        XPathUtils util = new XPathUtils(map);
+        
+        Element el = (Element)util.getValueNode("//xsd:element[@ref]", doc);
+        assertNotNull(el);
+        assertTrue(el.getAttribute("ref").contains("item"));
     }
     
     @Test
@@ -812,12 +894,19 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         
         File wsdlFile = new File(output, "exception-type-adapter.wsdl");
         assertTrue(wsdlFile.exists());
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        int class2Element = wsdlContent.indexOf("<xs:complexType name=\"myClass2\">");
-        assertTrue(class2Element > -1);
-        int refElement = wsdlContent.indexOf("<xs:element name=\"adapted\" nillable=\"true\" type=\"tns:myClass2\"/>");
-        assertTrue(refElement > -1);
-
+        Document doc = StaxUtils.read(wsdlFile);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("xsd", "http://www.w3.org/2001/XMLSchema");
+        XPathUtils util = new XPathUtils(map);
+        Node nd = util.getValueNode("//xsd:complexType[@name='myClass2']", doc);
+        assertNotNull(nd);
+        
+        nd = util.getValueNode("//xsd:element[@name='adapted']", doc);
+        assertNotNull(nd); 
+        
+        String at = ((Element)nd).getAttribute("type");
+        assertTrue(at.contains("myClass2"));
+        assertEquals("true", ((Element)nd).getAttribute("nillable"));
     }
     
     
