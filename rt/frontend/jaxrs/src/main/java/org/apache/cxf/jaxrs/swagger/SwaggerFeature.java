@@ -43,9 +43,9 @@ public class SwaggerFeature extends AbstractFeature {
     public void initialize(Server server, Bus bus) {
         List<Object> serviceBeans = new ArrayList<Object>();
         serviceBeans.add(new com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON());
-        calulateDefaultResourcePackage(bus);
+        calulateDefaultResourcePackage(server);
         calulateDefaultBasePath(server);
-        ((JAXRSServiceFactoryBean)bus.getProperty(JAXRSServiceFactoryBean.class.getName())).
+        ((JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName())).
             setResourceClassesFromBeans(serviceBeans);
         List<Object> providers = new ArrayList<Object>();
         providers.add(new com.wordnik.swagger.jaxrs.listing.ResourceListingProvider());
@@ -63,9 +63,9 @@ public class SwaggerFeature extends AbstractFeature {
         beanConfig.setScan(isScan());
         initializeProvider(server.getEndpoint(), bus);
     }
-    private void calulateDefaultResourcePackage(Bus bus) {
+    private void calulateDefaultResourcePackage(Server server) {
         JAXRSServiceFactoryBean serviceFactoryBean = 
-            (JAXRSServiceFactoryBean)bus.getProperty(JAXRSServiceFactoryBean.class.getName());
+            (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
         AbstractResourceInfo resourceInfo = serviceFactoryBean.getClassResourceInfo().get(0);
         
         if ((resourceInfo != null) 
@@ -76,13 +76,7 @@ public class SwaggerFeature extends AbstractFeature {
     
     private void calulateDefaultBasePath(Server server) {
         String address = server.getEndpoint().getEndpointInfo().getAddress();
-        if (getBasePath() == null || getBasePath().length() == 0) {
-            if (address.startsWith("http")) {
-                setBasePath(address + "/api-docs");
-            } else {
-                setBasePath("http://localhost:8181/cxf" + address + "/api-docs");
-            }
-        }
+        setBasePath(address + "/api-docs");
     }
     public String getResourcePackage() {
         return resourcePackage;
