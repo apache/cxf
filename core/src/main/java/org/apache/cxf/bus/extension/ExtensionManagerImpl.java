@@ -28,10 +28,10 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -55,7 +55,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     
     private final ClassLoader loader;
     private ResourceManager resourceManager;
-    private Map<String, Extension> all = new LinkedHashMap<String, Extension>();
+    private Map<String, Extension> all = new ConcurrentHashMap<String, Extension>();
     private final Map<Class<?>, Object> activated;
     private final Bus bus;
 
@@ -88,8 +88,14 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         resourceManager.addResourceResolver(new ObjectTypeResolver(this));
 
         load(resources);
+        for (Map.Entry<String, Extension> ext : ExtensionRegistry.getRegisteredExtensions().entrySet()) {
+            if (!all.containsKey(ext.getKey())) {
+                all.put(ext.getKey(), ext.getValue());
+            }
+        }
     }
-    public final synchronized void load(String resources[]) {
+    
+    final void load(String resources[]) {
         if (resources == null) {
             return;
         }
@@ -99,19 +105,13 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             }
         } catch (IOException ex) {
             throw new ExtensionException(ex);
-        }
-        
-        for (Map.Entry<String, Extension> ext : ExtensionRegistry.getRegisteredExtensions().entrySet()) {
-            if (!all.containsKey(ext.getKey())) {
-                all.put(ext.getKey(), ext.getValue());
-            }
-        }
+        }        
     }
-    public synchronized void add(Extension ex) {
+    public void add(Extension ex) {
         all.put(ex.getName(), ex);
     }
     
-    public synchronized void initialize() {
+    public void initialize() {
         for (Extension e : all.values()) {
             if (!e.isDeferred() && e.getLoadedObject() == null) {
                 loadAndRegister(e);
@@ -119,24 +119,26 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }        
     }
 
-    public synchronized void removeBeansOfNames(List<String> names) {
+    public void removeBeansOfNames(List<String> names) {
         for (String s : names) {
             all.remove(s);
         }
     }
-    public synchronized void activateAll() {
+    public void activateAll() {
         for (Extension e : all.values()) {
             if (e.getLoadedObject() == null) {
                 loadAndRegister(e);
             }
         }        
     }
-    public synchronized <T> void activateAllByType(Class<T> type) {
+    public <T> void activateAllByType(Class<T> type) {
         for (Extension e : all.values()) {
             if (e.getLoadedObject() == null) {
-                Class<?> cls = e.getClassObject(loader);
-                if (cls != null && type.isAssignableFrom(cls)) {
-                    loadAndRegister(e);
+                synchronized (e) {
+                    Class<?> cls = e.getClassObject(loader);
+                    if (cls != null && type.isAssignableFrom(cls)) {
+                        loadAndRegister(e);
+                    }
                 }
             }
         }        
@@ -187,70 +189,77 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
 
     final void loadAndRegister(Extension e) {
-        Class<?> cls = null;
-        if (null != e.getInterfaceName() && !"".equals(e.getInterfaceName())) {
-            cls = e.loadInterface(loader);
-        }
-
-        if (null != activated && null != cls && null != activated.get(cls)) {
-            return;
-        }
- 
-        Object obj = e.load(loader, bus);
-        if (obj == null) {
-            return;
-        }
-        
-        if (null != activated) {
-            Configurer configurer = (Configurer)(activated.get(Configurer.class));
-            if (null != configurer) {
-                configurer.configureBean(obj);
+        synchronized (e) {
+            Class<?> cls = null;
+            if (null != e.getInterfaceName() && !"".equals(e.getInterfaceName())) {
+                cls = e.loadInterface(loader);
             }
-        }
-        
-        // let the object know for which namespaces it has been activated
-        ResourceResolver namespacesResolver = null;
-        if (null != e.getNamespaces()) {            
-            namespacesResolver = new SinglePropertyResolver(ACTIVATION_NAMESPACES_PROPERTY_NAME, 
-                                                            e.getNamespaces());
-            resourceManager.addResourceResolver(namespacesResolver);
-        }
-        
-        // Since we need to support spring2.5 by removing @Resource("activationNamespaces")
-        // Now we call the setActivationNamespaces method directly here
-        if (e.getNamespaces() != null && !e.getNamespaces().isEmpty()) {
-            invokeSetterActivationNSMethod(obj, e.getNamespaces());
-        }
-        
-        ResourceInjector injector = new ResourceInjector(resourceManager);
-        
-        try {            
-            injector.inject(obj);
-            injector.construct(obj);
-        } finally {
-            if (null != namespacesResolver) {
-                resourceManager.removeResourceResolver(namespacesResolver);
+    
+            if (null != activated && null != cls && null != activated.get(cls)) {
+                return;
             }
-        }
-        
-        if (null != activated) {
-            if (cls == null) {
-                cls = obj.getClass();
-            }   
-            activated.put(cls, obj);
+     
+            Object obj = e.load(loader, bus);
+            if (obj == null) {
+                return;
+            }
+            
+            if (null != activated) {
+                Configurer configurer = (Configurer)(activated.get(Configurer.class));
+                if (null != configurer) {
+                    configurer.configureBean(obj);
+                }
+            }
+            
+            // let the object know for which namespaces it has been activated
+            ResourceResolver namespacesResolver = null;
+            if (null != e.getNamespaces()) {            
+                namespacesResolver = new SinglePropertyResolver(ACTIVATION_NAMESPACES_PROPERTY_NAME, 
+                                                                e.getNamespaces());
+                resourceManager.addResourceResolver(namespacesResolver);
+            }
+            
+            // Since we need to support spring2.5 by removing @Resource("activationNamespaces")
+            // Now we call the setActivationNamespaces method directly here
+            if (e.getNamespaces() != null && !e.getNamespaces().isEmpty()) {
+                invokeSetterActivationNSMethod(obj, e.getNamespaces());
+            }
+            
+            ResourceInjector injector = new ResourceInjector(resourceManager);
+            
+            try {            
+                injector.inject(obj);
+                injector.construct(obj);
+            } finally {
+                if (null != namespacesResolver) {
+                    resourceManager.removeResourceResolver(namespacesResolver);
+                }
+            }
+            
+            if (null != activated) {
+                if (cls == null) {
+                    cls = obj.getClass();
+                }   
+                activated.put(cls, obj);
+            }
         }
     }
 
-    public synchronized <T> T getExtension(String name, Class<T> type) {
+    public <T> T getExtension(String name, Class<T> type) {
+        if (name == null) {
+            return null;
+        }
         Extension e = all.get(name);
         if (e != null) {
-            Class<?> cls = e.getClassObject(loader);
-        
-            if (cls != null && type.isAssignableFrom(e.getClassObject(loader))) {
-                if (e.getLoadedObject() == null) {
-                    loadAndRegister(e);
+            synchronized (e) {
+                Class<?> cls = e.getClassObject(loader);
+            
+                if (cls != null && type.isAssignableFrom(e.getClassObject(loader))) {
+                    if (e.getLoadedObject() == null) {
+                        loadAndRegister(e);
+                    }
+                    return type.cast(e.getLoadedObject());
                 }
-                return type.cast(e.getLoadedObject());
             }
         }
         return null;
@@ -282,14 +291,19 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     public List<String> getBeanNamesOfType(Class<?> type) {
         List<String> ret = new LinkedList<String>();
         for (Extension ex : all.values()) {
-            Class<?> cls = ex.getClassObject(loader);
-            if (cls != null && type.isAssignableFrom(cls)) {
-                ret.add(ex.getName());
+            synchronized (ex) {
+                Class<?> cls = ex.getClassObject(loader);
+                if (cls != null && type.isAssignableFrom(cls)) {
+                    ret.add(ex.getName());
+                }
             }            
         }
         return ret;
     }
-    public synchronized <T> T getBeanOfType(String name, Class<T> type) {
+    public <T> T getBeanOfType(String name, Class<T> type) {
+        if (name == null) {
+            return null;
+        }
         Extension ex = all.get(name); 
         if (ex != null) {
             if (ex.getLoadedObject() == null) {
@@ -299,43 +313,50 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         return null;
     }
-    public synchronized <T> Collection<? extends T> getBeansOfType(Class<T> type) {
+    public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
         List<T> ret = new LinkedList<T>();
         for (Extension ex : all.values()) {
-            Class<?> cls = ex.getClassObject(loader);
-            if (cls != null && type.isAssignableFrom(cls)) {
-                if (ex.getLoadedObject() == null) {
-                    loadAndRegister(ex);
-                }
-                ret.add(type.cast(ex.getLoadedObject()));
-            }            
+            synchronized (ex) {
+                Class<?> cls = ex.getClassObject(loader);
+                if (cls != null && type.isAssignableFrom(cls)) {
+                    if (ex.getLoadedObject() == null) {
+                        loadAndRegister(ex);
+                    }
+                    ret.add(type.cast(ex.getLoadedObject()));
+                }                
+            }
         }
         return ret;
     }
-    public synchronized <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
+    public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
         boolean loaded = false;
         for (Extension ex : all.values()) {
-            Class<?> cls = ex.getClassObject(loader);
-            if (cls != null 
-                && type.isAssignableFrom(cls)
-                && listener.loadBean(ex.getName(), cls.asSubclass(type))) {
-                if (ex.getLoadedObject() == null) {
-                    loadAndRegister(ex);
+            synchronized (ex) {
+                Class<?> cls = ex.getClassObject(loader);
+                if (cls != null 
+                    && type.isAssignableFrom(cls)
+                    && listener.loadBean(ex.getName(), cls.asSubclass(type))) {
+                    if (ex.getLoadedObject() == null) {
+                        loadAndRegister(ex);
+                    }
+                    if (listener.beanLoaded(ex.getName(), type.cast(ex.getLoadedObject()))) {
+                        return true;
+                    }
+                    loaded = true;
                 }
-                if (listener.beanLoaded(ex.getName(), type.cast(ex.getLoadedObject()))) {
-                    return true;
-                }
-                loaded = true;
-            }            
+            }
         }
         return loaded;
     }
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
+        if (beanName == null) {
+            return false;
+        }
         Extension ex = all.get(beanName);
         return ex != null && ex.getNamespaces() != null
             && ex.getNamespaces().contains(value);
     }
-    public synchronized void destroyBeans() {
+    public void destroyBeans() {
         for (Extension ex : all.values()) {
             if (ex.getLoadedObject() != null) {
                 ResourceInjector injector = new ResourceInjector(resourceManager);
