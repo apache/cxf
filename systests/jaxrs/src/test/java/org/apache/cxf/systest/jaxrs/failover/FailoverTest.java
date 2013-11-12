@@ -111,6 +111,26 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testSequentialStrategyWith404() throws Exception {
+        FailoverFeature feature = getFeature(false, false, Server.ADDRESS3);
+        feature.getTargetSelector().setSupportNotAvailableErrorsOnly(true);
+        strategyTestWebClient(Server.ADDRESS2 + "/new", feature, Server.ADDRESS3, null, false, false);
+    }
+    
+    @Test
+    public void testSequentialStrategyWith406() throws Exception {
+        FailoverFeature feature = getFeature(false, false, Server.ADDRESS3);
+        strategyTestWebClientHttpError(Server.ADDRESS2, feature, Server.ADDRESS3, false);
+    }
+    
+    @Test
+    public void testSequentialStrategyWith406NoFailover() throws Exception {
+        FailoverFeature feature = getFeature(false, false, Server.ADDRESS3);
+        feature.getTargetSelector().setSupportNotAvailableErrorsOnly(true);
+        strategyTestWebClientHttpError(Server.ADDRESS2, feature, Server.ADDRESS3, true);
+    }
+    
+    @Test
     public void testRandomStrategyWebClient() throws Exception {
         FailoverFeature feature = 
             getFeature(false, true, Server.ADDRESS3, Server.ADDRESS2); 
@@ -340,6 +360,23 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         assertEquals("unexpected random/sequential distribution of failovers",
                      expectRandom,
                      randomized);
+    }
+    
+    protected void strategyTestWebClientHttpError(String currentReplica,
+                                 FailoverFeature feature,
+                                 String newReplica,
+                                 boolean notAvailableOnly) throws Exception {
+        WebClient bookStore = getWebClient(currentReplica, feature);
+        verifyStrategy(bookStore, SequentialStrategy.class);
+        bookStore.path("bookstore/webappexceptionXML");
+        Response r = bookStore.get();
+        assertEquals(406, r.getStatus());
+        String currEndpoint = getCurrentEndpointAddress(bookStore);
+        if (notAvailableOnly) {
+            assertTrue(currEndpoint.equals(currentReplica));
+        } else {
+            assertTrue(currEndpoint.equals(newReplica));
+        }
     }
 
     

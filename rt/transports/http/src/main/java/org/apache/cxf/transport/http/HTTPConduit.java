@@ -1551,8 +1551,13 @@ public abstract class HTTPConduit
             // This property should be set in case the exceptions should not be handled here
             // For example jax rs uses this
             boolean noExceptions = MessageUtils.isTrue(outMessage.getContextualProperty(
-                "org.apache.cxf.http.no_io_exceptions"));
+                "org.apache.cxf.transport.no_io_exceptions"));
+            
             if (responseCode >= 400 && responseCode != 500 && !noExceptions) {
+                
+                if (responseCode == 404 || responseCode == 503) {
+                    exchange.put("org.apache.cxf.transport.service_not_available", true);
+                }
                 throw new HTTPException(responseCode, getResponseMessage(), url.toURL());
             }
 
