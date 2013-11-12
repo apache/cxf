@@ -51,9 +51,33 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     public OverlayW3CDOMStreamWriter(Document doc, Element e) {
         super(doc, e);
     }
-    
+
+    @Override
+    protected void createAndAddElement(String prefix, String local, String namespace) {
+        super.createAndAddElement(prefix, local, namespace);
+        if (isOverlaid) {
+            try {
+                //mark this as new so we don't consider this for overlaying
+                getCurrentNode().setUserData("new", "new", null);
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+    }
+
     @Override
     public void writeEndElement() throws XMLStreamException {
+        if (isOverlaid) {
+            Node nd = getCurrentNode().getFirstChild();
+            while (nd != null) {
+                try {
+                    getCurrentNode().setUserData("new", null, null);
+                } catch (Throwable t) {
+                    //ignore
+                }
+                nd = nd.getNextSibling();
+            }
+        }
         isOverlaid = isOverlaidStack.remove(0);
         super.writeEndElement();
     }
@@ -68,18 +92,29 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 nd2 = nd.getFirstChild();
             }
             while (nd2 != null) {
+                Object userData = null;
+                try {
+                    userData = nd2.getUserData("new");
+                } catch (Throwable t) {
+                    //ignore - non DOM level 3
+                }
                 if (nd2.getNodeType() == Node.ELEMENT_NODE 
                     && local.equals(nd2.getLocalName())
-                    && StringUtils.isEmpty(nd2.getNamespaceURI())) {
+                    && StringUtils.isEmpty(nd2.getNamespaceURI())
+                    && userData != null) {
                     adjustOverlaidNode(nd2, null);
                     setChild((Element)nd2, false);
+                    if (nd2.getFirstChild() == null) {
+                        //optimize a case where we KNOW anything added cannot be an overlay
+                        isOverlaid = false;
+                    }
                     return;
                 }
                 nd2 = nd2.getNextSibling();
             }
         }
-        isOverlaid = false;
         super.writeStartElement(local);
+        isOverlaid = false;
     }
 
     protected void adjustOverlaidNode(Node nd2, String pfx) {
@@ -96,18 +131,29 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 nd2 = nd.getFirstChild();
             }
             while (nd2 != null) {
+                Object userData = null;
+                try {
+                    userData = nd2.getUserData("new");
+                } catch (Throwable t) {
+                    //ignore - non DOM level 3
+                }
                 if (nd2.getNodeType() == Node.ELEMENT_NODE 
                     && local.equals(nd2.getLocalName())
-                    && namespace.equals(nd2.getNamespaceURI())) {
+                    && namespace.equals(nd2.getNamespaceURI())
+                    && userData == null) {
                     adjustOverlaidNode(nd2, "");
                     setChild((Element)nd2, false);
+                    if (nd2.getFirstChild() == null) {
+                        //optimize a case where we KNOW anything added cannot be an overlay
+                        isOverlaid = false;
+                    }
                     return;
                 }
                 nd2 = nd2.getNextSibling();
             }
         }
-        isOverlaid = false;
         super.writeStartElement(namespace, local);
+        isOverlaid = false;
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
@@ -116,7 +162,6 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         } else {
             isOverlaidStack.add(0, isOverlaid);
             if (isOverlaid) {
-    
                 Element nd = getCurrentNode();
                 Node nd2 = null;
                 if (nd == null) {
@@ -126,18 +171,30 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 }
                 
                 while (nd2 != null) {
+                    Object userData = null;
+                    try {
+                        userData = nd2.getUserData("new");
+                    } catch (Throwable t) {
+                        //ignore - non DOM level 3
+                    }
+
                     if (nd2.getNodeType() == Node.ELEMENT_NODE 
                         && local.equals(nd2.getLocalName())
-                        && namespace.equals(nd2.getNamespaceURI())) {
+                        && namespace.equals(nd2.getNamespaceURI())
+                        && userData == null) {
                         adjustOverlaidNode(nd2, prefix);
                         setChild((Element)nd2, false);
+                        if (nd2.getFirstChild() == null) {
+                            //optimize a case where we KNOW anything added cannot be an overlay
+                            isOverlaid = false;
+                        }
                         return;
                     }
                     nd2 = nd2.getNextSibling();
                 }
             }
-            isOverlaid = false;
             super.writeStartElement(prefix, local, namespace);
+            isOverlaid = false;
         }
     }
     
