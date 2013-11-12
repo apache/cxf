@@ -92,6 +92,7 @@ public class DigestAuthSupplierTest {
         expectedParams.put("realm", "MyCompany realm.");
         expectedParams.put("qop", "auth");
         expectedParams.put("uri", "");
+        expectedParams.put("algorithm", "MD5");
         assertEquals(expectedParams, params);
         control.verify();
     }
