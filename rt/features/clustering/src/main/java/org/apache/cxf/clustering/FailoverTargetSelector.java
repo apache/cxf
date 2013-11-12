@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.AbstractConduitSelector;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
@@ -51,7 +52,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     protected ConcurrentHashMap<InvocationKey, InvocationContext> inProgress 
         = new ConcurrentHashMap<InvocationKey, InvocationContext>();;
     protected FailoverStrategy failoverStrategy;
-    
+    private boolean supportNotAvailableErrorsOnly;
     /**
      * Normal constructor.
      */
@@ -78,6 +79,8 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             return;
         }
         Exchange exchange = message.getExchange();
+        setupExchangeExceptionProperties(exchange);
+        
         InvocationKey key = new InvocationKey(exchange);
         if (!inProgress.containsKey(key)) {
             Endpoint endpoint = exchange.get(Endpoint.class);
@@ -95,6 +98,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         }
     }
 
+    protected void setupExchangeExceptionProperties(Exchange ex) {
+        ex.remove("org.apache.cxf.transport.no_io_exceptions");
+    }
+    
     /**
      * Called when a Conduit is actually required.
      * 
@@ -121,7 +128,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             invocation = inProgress.get(key);
         }
         boolean failover = false;
-        if (requiresFailover(exchange)) {
+        if (invocation != null && requiresFailover(exchange)) {
             Conduit old = (Conduit)exchange.getOutMessage().remove(Conduit.class.getName());
             
             Endpoint failoverTarget = getFailoverTarget(exchange, invocation);
@@ -242,6 +249,12 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                             "CHECK_FAILURE_IN_TRANSPORT",
                             new Object[] {ex, failover});
         }
+        if (failover 
+            && isSupportNotAvailableErrorsOnly()
+            && exchange.get(Message.RESPONSE_CODE) != null
+            && !PropertyUtils.isTrue(exchange.get("org.apache.cxf.transport.service_not_available"))) { 
+            failover = false;
+        }
         return failover;
     }
     
@@ -342,6 +355,14 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         return false;
     }
             
+    public boolean isSupportNotAvailableErrorsOnly() {
+        return supportNotAvailableErrorsOnly;
+    }
+
+    public void setSupportNotAvailableErrorsOnly(boolean support) {
+        this.supportNotAvailableErrorsOnly = support;
+    }
+
     /**
      * Used to wrap an Exchange for usage as a Map key. The raw Exchange
      * is not a suitable key type, as the hashCode is computed from its

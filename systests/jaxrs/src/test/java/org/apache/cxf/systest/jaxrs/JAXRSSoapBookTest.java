@@ -911,7 +911,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
-        WebClient.getConfig(proxy).getRequestContext().put("org.apache.cxf.http.no_io_exceptions", false);
+        WebClient.getConfig(proxy).getRequestContext().put("org.apache.cxf.transport.no_io_exceptions", false);
         try {
             //321 is special case - causes error code of 525
             proxy.getBook(new Long(param));

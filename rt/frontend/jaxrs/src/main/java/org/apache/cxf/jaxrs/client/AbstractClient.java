@@ -973,7 +973,7 @@ public abstract class AbstractClient implements Client, Retryable {
         exchange.put(Bus.class, cfg.getBus());
         exchange.put(MessageObserver.class, new ClientMessageObserver(cfg));
         exchange.put(Endpoint.class, cfg.getConduitSelector().getEndpoint());
-        exchange.put("org.apache.cxf.http.no_io_exceptions", true);
+        exchange.put("org.apache.cxf.transport.no_io_exceptions", true);
         //REVISIT - when response handling is actually put onto the in chain, this will likely not be needed
         exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
         m.setExchange(exchange);
