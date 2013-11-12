@@ -348,7 +348,12 @@ public final class AttachmentUtil {
             return null;
         }
         //TODO: save ContentDisposition directly 
-        return new ContentDisposition(cd).getParameter("filename");
+        ContentDisposition c = new ContentDisposition(cd);
+        String s = c.getParameter("filename");
+        if (s == null) {
+            s = c.getParameter("name");
+        }
+        return s;
     }
     
     public static InputStream decode(InputStream in, String encoding) throws IOException {
