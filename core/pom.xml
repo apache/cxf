@@ -76,6 +76,7 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>${cxf.asm.groupId}</groupId>
