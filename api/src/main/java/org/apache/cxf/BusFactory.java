@@ -73,8 +73,8 @@ public abstract class BusFactory {
         volatile boolean stale;
     }
     
-    protected static Map<Thread, BusHolder> threadBusses = new WeakHashMap<Thread, BusHolder>();
-    protected static ThreadLocal<BusHolder> threadBus = new ThreadLocal<BusHolder>();
+    protected static final Map<Thread, BusHolder> THREAD_BUSSES = new WeakHashMap<Thread, BusHolder>();
+    protected static final ThreadLocal<BusHolder> THREAD_BUS = new ThreadLocal<BusHolder>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class);
 
@@ -114,21 +114,21 @@ public abstract class BusFactory {
     }
     
     private static BusHolder getThreadBusHolder(boolean set) {
-        BusHolder h = threadBus.get();
+        BusHolder h = THREAD_BUS.get();
         if (h == null || h.stale) {
             Thread cur = Thread.currentThread();
-            synchronized (threadBusses) {
-                h = threadBusses.get(cur);
+            synchronized (THREAD_BUSSES) {
+                h = THREAD_BUSSES.get(cur);
             }
             if (h == null || h.stale) {
                 h = new BusHolder();
             
-                synchronized (threadBusses) {
-                    threadBusses.put(cur, h);
+                synchronized (THREAD_BUSSES) {
+                    THREAD_BUSSES.put(cur, h);
                 }
             }
             if (set) {
-                threadBus.set(h);
+                THREAD_BUS.set(h);
             }
         }
         return h;
@@ -146,7 +146,7 @@ public abstract class BusFactory {
         b.bus = bus;
         if (bus == null) {
             b.stale = true;
-            threadBus.remove();
+            THREAD_BUS.remove();
         }
     }
 
@@ -157,17 +157,17 @@ public abstract class BusFactory {
      */
     public static void setThreadDefaultBus(Bus bus) {
         if (bus == null) {
-            BusHolder h = threadBus.get();
+            BusHolder h = THREAD_BUS.get();
             if (h == null) {
                 Thread cur = Thread.currentThread();
-                synchronized (threadBusses) {
-                    h = threadBusses.get(cur);
+                synchronized (THREAD_BUSSES) {
+                    h = THREAD_BUSSES.get(cur);
                 }
             }
             if (h != null) {
                 h.bus = null;
                 h.stale = true;
-                threadBus.remove();
+                THREAD_BUS.remove();
             }
         } else {
             BusHolder b = getThreadBusHolder(true);
@@ -183,18 +183,18 @@ public abstract class BusFactory {
      */
     public static Bus getAndSetThreadDefaultBus(Bus bus) {
         if (bus == null) {
-            BusHolder b = threadBus.get();
+            BusHolder b = THREAD_BUS.get();
             if (b == null) {
                 Thread cur = Thread.currentThread();
-                synchronized (threadBusses) {
-                    b = threadBusses.get(cur);
+                synchronized (THREAD_BUSSES) {
+                    b = THREAD_BUSSES.get(cur);
                 }
             }
             if (b != null) {
                 Bus orig = b.bus;
                 b.bus = null;
                 b.stale = true;
-                threadBus.remove();
+                THREAD_BUS.remove();
                 return orig;
             }
             return null;
@@ -228,11 +228,11 @@ public abstract class BusFactory {
             }
             return b.bus;
         }
-        BusHolder h = threadBus.get();
+        BusHolder h = THREAD_BUS.get();
         if (h == null || h.stale) {
             Thread cur = Thread.currentThread();
-            synchronized (threadBusses) {
-                h = threadBusses.get(cur);
+            synchronized (THREAD_BUSSES) {
+                h = THREAD_BUSSES.get(cur);
             }
         }
         return h == null || h.stale ? null : h.bus;
@@ -254,8 +254,8 @@ public abstract class BusFactory {
      * @param bus the bus to remove
      */
     public static void clearDefaultBusForAnyThread(final Bus bus) {
-        synchronized (threadBusses) {
-            for (final Iterator<BusHolder> iterator = threadBusses.values().iterator();
+        synchronized (THREAD_BUSSES) {
+            for (final Iterator<BusHolder> iterator = THREAD_BUSSES.values().iterator();
                 iterator.hasNext();) {
                 BusHolder itBus = iterator.next();
                 if (bus == null || itBus == null || itBus.bus == null
