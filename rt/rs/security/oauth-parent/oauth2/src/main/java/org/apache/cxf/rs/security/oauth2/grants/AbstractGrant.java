@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  */
 public abstract class AbstractGrant implements AccessTokenGrant {
     
+    private static final long serialVersionUID = 3586571576928674560L;
     private String grantType;
     private String scope;
     private String audience;

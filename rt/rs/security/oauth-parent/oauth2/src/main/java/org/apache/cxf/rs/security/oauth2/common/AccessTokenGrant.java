@@ -18,12 +18,14 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.io.Serializable;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * Access Token Grant  
  */
-public interface AccessTokenGrant {
+public interface AccessTokenGrant extends Serializable {
     /**
      * Returns the token grant type, example, "authorization_code"
      * @return the grant type
