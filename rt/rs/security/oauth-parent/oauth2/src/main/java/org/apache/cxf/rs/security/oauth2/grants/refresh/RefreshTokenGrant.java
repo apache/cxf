@@ -25,6 +25,7 @@ import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class RefreshTokenGrant implements AccessTokenGrant {
+    private static final long serialVersionUID = -4855594852737940210L;
     private String refreshToken;
     private String scope;
     

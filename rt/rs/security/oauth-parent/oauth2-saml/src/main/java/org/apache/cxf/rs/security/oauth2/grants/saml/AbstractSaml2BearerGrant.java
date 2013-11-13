@@ -27,6 +27,7 @@ import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public abstract class AbstractSaml2BearerGrant implements AccessTokenGrant {
+    private static final long serialVersionUID = 5754722119855372511L;
     private String assertion;
     private String scope;
     private boolean encoded; 

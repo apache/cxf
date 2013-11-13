@@ -33,6 +33,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * and the redirect URI this code has been returned to, visible to the client
  */
 public class AuthorizationCodeGrant implements AccessTokenGrant {
+    private static final long serialVersionUID = -3738825769770411453L;
     private String code;
     private String redirectUri;
     
