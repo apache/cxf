@@ -29,6 +29,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.workqueue.WorkQueue;
@@ -138,8 +139,13 @@ public class JMSContinuation implements Continuation {
         if (isPending) {
             return false;
         }
-        // Need to get the right message which is handled in the interceptor chain
-        inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+        if (PhaseInterceptorChain.getCurrentMessage() == null) {
+            // the current thread is different to the one which holds a lock on PhaseInterceptorChain 
+            inMessage.getExchange().put(Message.SUSPENDED_INVOCATION, true);
+        } else {
+            // Need to get the right message which is handled in the interceptor chain
+            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+        }
         updateContinuations(false);
                 
         isNew = false;
