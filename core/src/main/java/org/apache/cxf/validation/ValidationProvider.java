@@ -78,7 +78,7 @@ public class ValidationProvider {
     public <T extends Configuration<T>> ValidationProvider(
         ValidationProviderResolver resolver,
         Class<javax.validation.spi.ValidationProvider<T>> providerType) {
-        this(resolver, null, null);
+        this(resolver, providerType, null);
     }
     
     public <T extends Configuration<T>> ValidationProvider(
