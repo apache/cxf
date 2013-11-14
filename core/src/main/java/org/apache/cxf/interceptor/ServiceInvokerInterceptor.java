@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 
-import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -32,6 +31,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 
@@ -89,45 +89,51 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
         
         Executor executor = getExecutor(endpoint);
         Executor executor2 = exchange.get(Executor.class);
-        if (executor2 == executor || executor == null) {
+        if (executor2 == executor || executor == null
+            || !(message.getInterceptorChain() instanceof PhaseInterceptorChain)) {
             // already executing on the appropriate executor
             invocation.run();
         } else {
             exchange.put(Executor.class, executor);
-            FutureTask<Object> o = new FutureTask<Object>(invocation, null) {
+            // The current thread holds the lock on PhaseInterceptorChain.
+            // In order to avoid the executor threads deadlocking on any of
+            // synchronized PhaseInterceptorChain methods the current thread
+            // needs to release the chain lock and re-acquire it after the
+            // executor thread is done
+            
+            final PhaseInterceptorChain chain = (PhaseInterceptorChain)message.getInterceptorChain();
+            final FutureTask<Object> o = new FutureTask<Object>(invocation, null) {
                 @Override
                 protected void done() {
                     super.done();
-                    synchronized (this) {
-                        this.notifyAll();
+                    chain.releaseChain();
+                }
+                
+                @Override
+                public void run() {
+                    synchronized (chain) {
+                        super.run();
                     }
                 }
             };
-            synchronized (o) {
+            synchronized (chain) {
                 executor.execute(o);
-                if (!o.isDone()) {
-                    try {
-                        o.wait();
-                    } catch (InterruptedException e) {
-                        //IGNORE
-                    }
-                }
-                try {
-                    o.get();
-                } catch (InterruptedException e) {
-                    throw new Fault(e);
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof RuntimeException) {
-                        throw (RuntimeException)e.getCause();
-                    } else {
-                        throw new Fault(e.getCause());
-                    }
-                } finally {
-                    if (PropertyUtils.isTrue(exchange.remove(Message.SUSPENDED_INVOCATION))) {    
-                        message.getInterceptorChain().suspend();
-                    }
+                // the task will already be done if the executor uses the current thread
+                // but the chain lock status still needs to be re-set
+                chain.releaseAndAcquireChain();
+            }
+            try {
+                o.get();
+            } catch (InterruptedException e) {
+                throw new Fault(e);
+            } catch (ExecutionException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException)e.getCause();
+                } else {
+                    throw new Fault(e.getCause());
                 }
             }
+            
         }
     }
     

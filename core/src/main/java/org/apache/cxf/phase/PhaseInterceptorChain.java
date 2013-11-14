@@ -93,7 +93,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     // to avoid duplicate fault processing on nested calling of
     // doIntercept(), which will throw same fault multi-times
     private boolean faultOccurred;
-    
+    private boolean chainReleased;
     
     
     private PhaseInterceptorChain(PhaseInterceptorChain src) {
@@ -159,6 +159,22 @@ public class PhaseInterceptorChain implements InterceptorChain {
     
     public synchronized State getState() {
         return state;
+    }
+    
+    public synchronized void releaseAndAcquireChain() {
+        while (!chainReleased) {
+            try {
+                this.wait();
+            } catch (InterruptedException ex) {
+                // ignore
+            }
+        }
+        chainReleased = false;
+    }
+    
+    public synchronized void releaseChain() {
+        this.chainReleased = true;
+        this.notifyAll();
     }
     
     public PhaseInterceptorChain cloneChain() {
