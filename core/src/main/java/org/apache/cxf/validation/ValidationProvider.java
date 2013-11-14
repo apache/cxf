@@ -19,12 +19,14 @@
 package org.apache.cxf.validation;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ParameterNameProvider;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
@@ -42,29 +44,22 @@ public class ValidationProvider {
         try {
             factory = Validation.buildDefaultValidatorFactory();
         } catch (final ValidationException ex) {
-            LOG.severe("Bean Validation provider could be found, no validation will be performed");
+            LOG.severe("Bean Validation provider can not be found, no validation will be performed");
             throw ex;
         }
     }
     
-    public ValidationProvider(ValidationProviderResolver resolver) {
-        try {
-            Configuration<?> cfg = Validation.byDefaultProvider().providerResolver(resolver).configure();
-            factory = cfg.buildValidatorFactory();
-        } catch (final ValidationException ex) {
-            LOG.severe("Bean Validation provider could be found, no validation will be performed");
-            throw ex;
-        }
+    public ValidationProvider(ParameterNameProvider parameterNameProvider) {
+        this(new ValidationConfiguration(parameterNameProvider));
     }
     
-    public <T extends Configuration<T>> ValidationProvider(
-        Class<javax.validation.spi.ValidationProvider<T>> providerType, 
-        ValidationProviderResolver resolver) {
+    public ValidationProvider(ValidationConfiguration cfg) {
         try {
-            Configuration<?> cfg = Validation.byProvider(providerType).providerResolver(resolver).configure();
-            factory = cfg.buildValidatorFactory();
+            Configuration<?> factoryCfg = Validation.byDefaultProvider().configure();
+            initFactoryConfig(factoryCfg, cfg);
+            factory = factoryCfg.buildValidatorFactory();
         } catch (final ValidationException ex) {
-            LOG.severe("Bean Validation provider could be found, no validation will be performed");
+            LOG.severe("Bean Validation provider can not be found, no validation will be performed");
             throw ex;
         }
     }
@@ -74,6 +69,44 @@ public class ValidationProvider {
             throw new NullPointerException("Factory is null");
         }
         this.factory = factory;
+    }
+    
+    public ValidationProvider(ValidationProviderResolver resolver) {
+        this(resolver, null);
+    }
+    
+    public <T extends Configuration<T>> ValidationProvider(
+        ValidationProviderResolver resolver,
+        Class<javax.validation.spi.ValidationProvider<T>> providerType) {
+        this(resolver, null, null);
+    }
+    
+    public <T extends Configuration<T>> ValidationProvider(
+        ValidationProviderResolver resolver,
+        Class<javax.validation.spi.ValidationProvider<T>> providerType,
+        ValidationConfiguration cfg) {
+        try {
+            Configuration<?> factoryCfg = providerType != null 
+                ? Validation.byProvider(providerType).providerResolver(resolver).configure()
+                : Validation.byDefaultProvider().providerResolver(resolver).configure();   
+            initFactoryConfig(factoryCfg, cfg);
+            factory = factoryCfg.buildValidatorFactory();
+        } catch (final ValidationException ex) {
+            LOG.severe("Bean Validation provider can not be found, no validation will be performed");
+            throw ex;
+        }
+    }
+    
+    private static void initFactoryConfig(Configuration<?> factoryCfg, ValidationConfiguration cfg) {
+        if (cfg != null) {
+            factoryCfg.parameterNameProvider(cfg.getParameterNameProvider());
+            factoryCfg.messageInterpolator(cfg.getMessageInterpolator());
+            factoryCfg.traversableResolver(cfg.getTraversableResolver());
+            factoryCfg.constraintValidatorFactory(cfg.getConstraintValidatorFactory());
+            for (Map.Entry<String, String> entry : cfg.getProperties().entrySet()) {
+                factoryCfg.addProperty(entry.getKey(), entry.getValue());
+            }
+        }
     }
     
     public< T > void validateParameters(final T instance, final Method method, final Object[] arguments) {
