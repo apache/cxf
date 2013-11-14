@@ -120,13 +120,13 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     @Test
     public void testSequentialStrategyWith406() throws Exception {
         FailoverFeature feature = getFeature(false, false, Server.ADDRESS3);
+        feature.getTargetSelector().setSupportNotAvailableErrorsOnly(false);
         strategyTestWebClientHttpError(Server.ADDRESS2, feature, Server.ADDRESS3, false);
     }
     
     @Test
     public void testSequentialStrategyWith406NoFailover() throws Exception {
         FailoverFeature feature = getFeature(false, false, Server.ADDRESS3);
-        feature.getTargetSelector().setSupportNotAvailableErrorsOnly(true);
         strategyTestWebClientHttpError(Server.ADDRESS2, feature, Server.ADDRESS3, true);
     }
     

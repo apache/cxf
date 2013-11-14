@@ -52,7 +52,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     protected ConcurrentHashMap<InvocationKey, InvocationContext> inProgress 
         = new ConcurrentHashMap<InvocationKey, InvocationContext>();;
     protected FailoverStrategy failoverStrategy;
-    private boolean supportNotAvailableErrorsOnly;
+    private boolean supportNotAvailableErrorsOnly = true;
     /**
      * Normal constructor.
      */
