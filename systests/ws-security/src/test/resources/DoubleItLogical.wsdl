@@ -35,6 +35,13 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="DoubleIt3">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="numberToDouble" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="DoubleItResponse">
                 <xsd:complexType>
                     <xsd:sequence>
@@ -59,6 +66,10 @@
     <wsdl:message name="DoubleIt2Request">
         <wsdl:part element="di:DoubleIt2" name="parameters"/>
     </wsdl:message>
+    <wsdl:message name="DoubleIt3Request">
+        <wsdl:part element="di:DoubleIt3" name="parameters"/>
+        <wsdl:part name="attachment" type="xsd:base64Binary"/>
+    </wsdl:message>
     <wsdl:message name="DoubleItRequestHeader">
         <wsdl:part element="di:DoubleIt" name="parameters"/>
         <wsdl:part element="di:DoubleItHeader" name="header"/>
@@ -67,6 +78,9 @@
         <wsdl:part element="di:DoubleItResponse" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleIt2Response">
+        <wsdl:part element="di:DoubleItResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="DoubleIt3Response">
         <wsdl:part element="di:DoubleItResponse" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleItFault">
@@ -94,6 +108,13 @@
         <wsdl:operation name="DoubleIt2">
             <wsdl:input message="tns:DoubleIt2Request"/>
             <wsdl:output message="tns:DoubleIt2Response"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="DoubleItSwaPortType">
+        <wsdl:operation name="DoubleIt3">
+            <wsdl:input message="tns:DoubleIt3Request"/>
+            <wsdl:output message="tns:DoubleIt3Response"/>
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
         </wsdl:operation>
     </wsdl:portType>
 </wsdl:definitions>
