@@ -138,14 +138,7 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                 } else {
                     throw new Fault(e.getCause());
                 }
-            } catch (Exception e) {
-                if (e.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException)e.getCause();
-                } else {
-                    throw new Fault(e.getCause());
-                }
             }
-            
         }
     }
     
