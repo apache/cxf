@@ -64,7 +64,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
         assertTrue("server failed", passed);
     }
     
-    public static boolean launchServer(AbstractTestServerBase base) {
+    public static boolean launchServer(AbstractTestServerBase base, boolean inProcess) {
         boolean ok = false;
         try { 
             ServerLauncher sl = new ServerLauncher(base);
@@ -77,6 +77,10 @@ public abstract class AbstractClientServerTestBase extends Assert {
         }
         
         return ok;
+    }
+    
+    public static boolean launchServer(AbstractTestServerBase base) {
+        return launchServer(base, false);
     }
     
     public static boolean launchServer(Class<?> clz) {
