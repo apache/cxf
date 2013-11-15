@@ -1584,7 +1584,7 @@ public final class JAXRSUtils {
     
     public static void setMessageContentType(Message message, Response response) {
         if (response != null) {
-            Object ct = response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+            Object ct = response.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE);
             if (ct != null) {
                 Exchange ex = message.getExchange();
                 if (ex.getInMessage() == message) {
