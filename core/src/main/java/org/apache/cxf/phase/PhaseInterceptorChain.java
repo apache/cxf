@@ -167,9 +167,14 @@ public class PhaseInterceptorChain implements InterceptorChain {
             if (chain.iterator.next() instanceof ServiceInvokerInterceptor) {
                 CURRENT_MESSAGE.set(m);
                 return true;
+            } else {
+                String error = "Only ServiceInvokerInterceptor can update the current chain message";
+                LOG.warning(error);
+                throw new IllegalStateException(error);   
             }
         }
-        throw new IllegalStateException("Only ServiceInvokerInterceptor can update the current chain message");
+        return false;
+        
     }
     
     public synchronized State getState() {
