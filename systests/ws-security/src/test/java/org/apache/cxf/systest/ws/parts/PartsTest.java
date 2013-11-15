@@ -28,9 +28,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
+import org.example.contract.doubleit.DoubleItSwaPortType;
+import org.example.schema.doubleit.DoubleIt3;
 import org.junit.BeforeClass;
 
 /**
@@ -455,6 +455,126 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             String error = "EncryptedElements";
             assertTrue(ex.getMessage().contains(error));
         }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // TODO - re-enable once we move off WSS4J 2.0-beta
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSignedAttachments() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedAttachmentsPort");
+        DoubleItSwaPortType port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        // SecurityTestUtil.enableStreaming(port);
+        // port.doubleIt(25);
+        
+        // This should fail, as the service requires that the Attachments must be signed
+        portQName = new QName(NAMESPACE, "DoubleItSignedAttachmentsPort2");
+        port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        try {
+            doubleIt = new DoubleIt3();
+            doubleIt.setNumberToDouble(25);
+            port.doubleIt3(doubleIt, "12345".getBytes());
+            fail("Failure expected on an attachment which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "SignedParts";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        /*
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on a body which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SignedParts";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        */
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // TODO - re-enable once we move off WSS4J 2.0-beta
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testEncryptedAttachments() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedAttachmentsPort");
+        DoubleItSwaPortType port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        // SecurityTestUtil.enableStreaming(port);
+        // port.doubleIt(25);
+        
+        // This should fail, as the service requires that the Attachments must be encrypted
+        portQName = new QName(NAMESPACE, "DoubleItEncryptedAttachmentsPort2");
+        port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        try {
+            doubleIt = new DoubleIt3();
+            doubleIt.setNumberToDouble(25);
+            port.doubleIt3(doubleIt, "12345".getBytes());
+            fail("Failure expected on an attachment which isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "EncryptedParts";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        /*
+        // Streaming
+        try {
+            SecurityTestUtil.enableStreaming(port);
+            port.doubleIt(25);
+            fail("Failure expected on a body which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SignedParts";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        */
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
