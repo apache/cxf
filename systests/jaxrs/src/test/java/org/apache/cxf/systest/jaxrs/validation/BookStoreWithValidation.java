@@ -49,6 +49,7 @@ public class BookStoreWithValidation extends AbstractBookStoreWithValidation imp
     @GET
     @Path("/books/{bookId}")
     @Override
+    @NotNull 
     public BookWithValidation getBook(@PathParam("bookId") String id) {
         return books.get(id);
     }

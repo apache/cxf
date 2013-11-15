@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.ws.rs.core.Response;
 
@@ -31,6 +30,7 @@ import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.validation.ValidationProvider;
 
 
@@ -59,14 +59,16 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
         
         Object response = super.invoke(exchange, serviceObject, m, params);
         
-        if (response != null) {
-            if (response instanceof Response) {
-                Object entity = ((Response)response).getEntity();
-                if (entity != null && m.getAnnotation(Valid.class) != null) {
-                    theProvider.validateReturnValue(entity);    
+        if (response instanceof MessageContentsList) {
+            MessageContentsList list = (MessageContentsList)response;
+            if (list.size() == 1) {
+                Object entity = ((MessageContentsList)list).get(0);
+                
+                if (entity instanceof Response) {
+                    theProvider.validateReturnValue(m, ((Response)entity).getEntity());    
+                } else {                
+                    theProvider.validateReturnValue(serviceObject, m, entity);
                 }
-            } else {
-                theProvider.validateReturnValue(serviceObject, m, response);
             }
         }
         

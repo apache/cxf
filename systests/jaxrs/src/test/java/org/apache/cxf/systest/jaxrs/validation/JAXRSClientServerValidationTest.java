@@ -22,13 +22,11 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutExceptionMapperInterceptor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -37,7 +35,6 @@ import org.apache.cxf.jaxrs.validation.JAXRSValidationInInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSValidationOutInterceptor;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.validation.ValidationProvider;
 
@@ -46,9 +43,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class JAXRSClientServerValidationTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-
+public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest {
+    public static final String PORT = allocatePort(JAXRSClientServerValidationTest.class);
     @Ignore
     public static class Server extends AbstractBusTestServerBase {        
         @SuppressWarnings("unchecked")
@@ -90,7 +86,7 @@ public class JAXRSClientServerValidationTest extends AbstractBusClientServerTest
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(Server.class));
         createStaticBus();
     }
     
@@ -167,6 +163,24 @@ public class JAXRSClientServerValidationTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testThatResponseValidationForOneBookNotFails()  {
+        Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+
+        r = createWebClient("/bookstore/books/1234").get();
+        assertEquals(200, r.getStatus());
+    }
+    
+    @Test
+    public void testThatResponseValidationForNullBookFails()  {
+        Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+
+        r = createWebClient("/bookstore/books/1235").get();
+        assertEquals(500, r.getStatus());
+    }
+    
+    @Test
     public void testThatResponseValidationForOneResponseBookFails()  {
         Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
         assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
@@ -183,13 +197,12 @@ public class JAXRSClientServerValidationTest extends AbstractBusClientServerTest
         r = createWebClient("/bookstore/books").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
+
+    @Override
+    protected String getPort() {
+        return PORT;
+    }   
     
-    private WebClient createWebClient(final String url) {
-        WebClient wc = WebClient
-            .create("http://localhost:" + PORT + url)
-            .accept(MediaType.APPLICATION_JSON);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        return wc;
-    }
+    
 }
 
