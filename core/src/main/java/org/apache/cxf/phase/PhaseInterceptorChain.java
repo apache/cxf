@@ -37,6 +37,7 @@ import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
@@ -155,6 +156,20 @@ public class PhaseInterceptorChain implements InterceptorChain {
     
     public static Message getCurrentMessage() {
         return CURRENT_MESSAGE.get();
+    }
+    
+    public static boolean setCurrentMessage(PhaseInterceptorChain chain, Message m) {
+        if (getCurrentMessage() == m) { 
+            return false;
+        }
+        if (chain.iterator.hasPrevious()) {
+            chain.iterator.previous();
+            if (chain.iterator.next() instanceof ServiceInvokerInterceptor) {
+                CURRENT_MESSAGE.set(m);
+                return true;
+            }
+        }
+        throw new IllegalStateException("Only ServiceInvokerInterceptor can update the current chain message");
     }
     
     public synchronized State getState() {

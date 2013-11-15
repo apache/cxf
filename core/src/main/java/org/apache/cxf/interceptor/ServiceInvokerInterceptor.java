@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -102,15 +103,20 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             // executor thread is done
             
             final PhaseInterceptorChain chain = (PhaseInterceptorChain)message.getInterceptorChain();
+            final AtomicBoolean contextSwitched = new AtomicBoolean(); 
             final FutureTask<Object> o = new FutureTask<Object>(invocation, null) {
                 @Override
                 protected void done() {
                     super.done();
+                    if (contextSwitched.get()) {
+                        PhaseInterceptorChain.setCurrentMessage(chain, null);
+                    }
                     chain.releaseChain();
                 }
                 
                 @Override
                 public void run() {
+                    contextSwitched.getAndSet(PhaseInterceptorChain.setCurrentMessage(chain, message));
                     synchronized (chain) {
                         super.run();
                     }
@@ -127,6 +133,12 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             } catch (InterruptedException e) {
                 throw new Fault(e);
             } catch (ExecutionException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException)e.getCause();
+                } else {
+                    throw new Fault(e.getCause());
+                }
+            } catch (Exception e) {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException)e.getCause();
                 } else {

@@ -37,6 +37,8 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.TimeoutHandler;
 
+import org.apache.cxf.phase.PhaseInterceptorChain;
+
 @Path("/bookstore")
 public class BookContinuationStore {
 
@@ -65,6 +67,7 @@ public class BookContinuationStore {
     @GET
     @Path("/books/cancel")
     public void getBookDescriptionWithCancel(@PathParam("id") String id, AsyncResponse async) {
+        PhaseInterceptorChain.getCurrentMessage().getClass();
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
         async.setTimeoutHandler(new CancelTimeoutHandlerImpl());
     }
@@ -116,6 +119,15 @@ public class BookContinuationStore {
     public void handleContinuationRequestNotFoundUnmapped(AsyncResponse response) {
         response.register(new CallbackImpl());
         resumeSuspendedNotFoundUnmapped(response);
+    }
+    
+    @GET
+    @Path("books/suspend/unmapped")
+    @Produces("text/plain")
+    public void handleNotMappedAfterSuspend(AsyncResponse response) throws BookNotFoundFault {
+        response.setTimeout(2000, TimeUnit.MILLISECONDS);
+        response.setTimeoutHandler(new CancelTimeoutHandlerImpl());
+        throw new BookNotFoundFault("");
     }
     
     
