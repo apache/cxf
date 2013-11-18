@@ -402,7 +402,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                               List<SecurePart> encrParts,
                               boolean externalRef) throws SOAPException {
         //Do encryption
-        if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
+        if (recToken != null && recToken.getToken() != null) {
             AbstractToken encrToken = recToken.getToken();
             AlgorithmSuite algorithmSuite = sbinding.getAlgorithmSuite();
 
@@ -440,10 +440,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
             }
 
-            for (SecurePart part : encrParts) {
-                QName name = part.getName();
-                parts += "{" + part.getModifier() + "}{"
-                    +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            if (encrParts != null) {
+                for (SecurePart part : encrParts) {
+                    QName name = part.getName();
+                    parts += "{" + part.getModifier() + "}{"
+                        +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+                }
             }
 
             config.put(ConfigurationConstants.ENCRYPTION_PARTS, parts);
@@ -624,6 +626,23 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             for (SecurityEvent incomingEvent : incomingEventList) {
                 if (WSSecurityEventConstants.EncryptedPart == incomingEvent.getSecurityEventType()
                     || WSSecurityEventConstants.EncryptedElement 
+                        == incomingEvent.getSecurityEventType()) {
+                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                        ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
+                    if (token.getKeyWrappingToken() != null && token.getKeyWrappingToken().getSecretKey() != null 
+                        && token.getKeyWrappingToken().getSha1Identifier() != null) {
+                        return token.getKeyWrappingToken();
+                    } else if (token != null && token.getSecretKey() != null 
+                        && token.getSha1Identifier() != null) {
+                        return token;
+                    }
+                }
+            }
+            
+            // Fall back to a Signature in case there was no encrypted Element in the request
+            for (SecurityEvent incomingEvent : incomingEventList) {
+                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
+                    || WSSecurityEventConstants.SignedElement 
                         == incomingEvent.getSecurityEventType()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken token = 
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();

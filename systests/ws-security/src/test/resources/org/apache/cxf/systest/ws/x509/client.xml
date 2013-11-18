@@ -318,6 +318,13 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSignaturePort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.encryption.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="bob"/>
+        </jaxws:properties>
+    </jaxws:client>
+    
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
