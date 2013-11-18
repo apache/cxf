@@ -49,7 +49,7 @@ public class ServletController {
         
     protected boolean isHideServiceList;
     protected boolean isAuthServiceListPage;
-    protected boolean disableAddressUpdates;
+    protected boolean disableAddressUpdates = true;
     protected String authServiceListPageRealm;
     protected String forcedBaseAddress;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
