@@ -224,6 +224,71 @@ public class XMLStreamDataWriterTest extends Assert {
         assertEquals("TESTOUTPUTMESSAGE", reader.getText());
     }
 
+    @Test
+    public void testWriteWithNamespacePrefixMapping() throws Exception {
+        JAXBDataBinding db = getTestWriterFactory(GreetMe.class);
+        Map<String, String> nspref = new HashMap<String, String>();
+        nspref.put("http://apache.org/hello_world_soap_http/types", "x");
+        db.setNamespaceMap(nspref);
+        
+        // use the output stream instead of XMLStreamWriter to test
+        DataWriter<OutputStream> dw = db.createWriter(OutputStream.class);
+        assertNotNull(dw);
+
+        GreetMe val = new GreetMe();
+        val.setRequestType("Hello");
+        dw.write(val, baos);
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        XMLStreamReader xr = inFactory.createXMLStreamReader(bais);
+        DepthXMLStreamReader reader = new DepthXMLStreamReader(xr);
+        StaxUtils.toNextElement(reader);
+        QName qname = reader.getName(); 
+        assertEquals(new QName("http://apache.org/hello_world_soap_http/types", "greetMe"), qname);
+        assertEquals("x", qname.getPrefix());
+        
+        assertEquals(1, reader.getNamespaceCount());
+        assertEquals("http://apache.org/hello_world_soap_http/types", reader.getNamespaceURI(0));
+        assertEquals("x", reader.getNamespacePrefix(0));
+        
+        StaxUtils.nextEvent(reader);
+        StaxUtils.toNextElement(reader);
+        qname = reader.getName();
+        assertEquals(new QName("http://apache.org/hello_world_soap_http/types", "requestType"), qname);
+        assertEquals("x", qname.getPrefix());
+        
+        StaxUtils.nextEvent(reader);
+        StaxUtils.toNextText(reader);
+        assertEquals("Hello", reader.getText());
+    }
+
+    @Test
+    public void testWriteWithContextualNamespaceDecls() throws Exception {
+        JAXBDataBinding db = getTestWriterFactory(GreetMe.class);
+        Map<String, String> nspref = new HashMap<String, String>();
+        nspref.put("http://apache.org/hello_world_soap_http/types", "x");
+        db.setNamespaceMap(nspref);
+        db.setContextualNamespaceMap(nspref);
+        
+        // use the output stream instead of XMLStreamWriter to test
+        DataWriter<OutputStream> dw = db.createWriter(OutputStream.class);
+        assertNotNull(dw);
+
+        GreetMe val = new GreetMe();
+        val.setRequestType("Hello");
+        dw.write(val, baos);
+        
+        String xstr = new String(baos.toByteArray());
+        
+        // there should be no namespace decls
+        if (!db.getContext().getClass().getName().contains("eclipse")) {
+            //bug in eclipse moxy
+            //https://bugs.eclipse.org/bugs/show_bug.cgi?id=421463
+            
+            assertEquals("<x:greetMe><x:requestType>Hello</x:requestType></x:greetMe>", xstr);
+        }
+    }
+
     private JAXBDataBinding getTestWriterFactory(Class<?>... clz) throws Exception {
         JAXBContext ctx = JAXBContext.newInstance(clz);
         return new JAXBDataBinding(ctx);
