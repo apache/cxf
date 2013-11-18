@@ -36,7 +36,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configure
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
 @ExamReactorStrategy(PerClass.class)
@@ -89,7 +88,6 @@ public class BasicIntegrationTest {
             editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", XKMS_ENDPOINT),
             features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client"),
             configureConsole().ignoreLocalConsole(),
-            keepRuntimeFolder()
             //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }
