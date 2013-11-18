@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.continuation.ContinuationSupport;
@@ -100,8 +101,13 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         }
         isNew = false;
         
-        // Need to get the right message which is handled in the interceptor chain
-        message.getExchange().getInMessage().getInterceptorChain().suspend();
+        if (PhaseInterceptorChain.getCurrentMessage() == null) {
+            // the current thread is different to the one which holds a lock on PhaseInterceptorChain 
+            message.getExchange().put(Message.SUSPENDED_INVOCATION, true);
+        } else {
+            // Need to get the right message which is handled in the interceptor chain
+            message.getExchange().getInMessage().getInterceptorChain().suspend();
+        }
         continuation.setTimeout(pendingTimeout);
         if (!isPending) {
             continuation.suspend();

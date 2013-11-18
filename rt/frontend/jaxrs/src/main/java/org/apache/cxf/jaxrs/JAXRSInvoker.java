@@ -43,6 +43,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain.State;
@@ -106,7 +107,8 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             return handleFault(ex, exchange.getInMessage());
         } finally {
-            boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
+            boolean suspended = PropertyUtils.isTrue(exchange.get(Message.SUSPENDED_INVOCATION))
+                || exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
             if (exchange.isOneWay() || suspended) {
                 ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
             }

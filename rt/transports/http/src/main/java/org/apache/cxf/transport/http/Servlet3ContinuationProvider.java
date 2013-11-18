@@ -31,6 +31,7 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 /**
  * 
@@ -98,9 +99,14 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             }
             isNew = false;
             
-            // Need to get the right message which is handled in the interceptor chain
             context.setTimeout(timeout);
-            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+            if (PhaseInterceptorChain.getCurrentMessage() == null) {
+                // the current thread is different to the one which holds a lock on PhaseInterceptorChain 
+                inMessage.getExchange().put(Message.SUSPENDED_INVOCATION, true);
+            } else {
+                // Need to get the right message which is handled in the interceptor chain
+                inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+            }
             
             return true;
         }

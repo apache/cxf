@@ -139,6 +139,7 @@ public interface Message extends StringMap {
     String WSDL_INTERFACE = "javax.xml.ws.wsdl.interface";
     String WSDL_OPERATION = "javax.xml.ws.wsdl.operation";
 
+    String SUSPENDED_INVOCATION = "org.apache.cxf.suspended.invocation";
     /**
      * Some properties to allow adding interceptors to the chain
      * on a per-request basis.  All are a Collection<Interceptor> 

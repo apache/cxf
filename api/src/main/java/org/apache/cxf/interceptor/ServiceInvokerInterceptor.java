@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -121,7 +122,12 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                     } else {
                         throw new Fault(e.getCause());
                     }
+                } finally {
+                    if (PropertyUtils.isTrue(exchange.remove(Message.SUSPENDED_INVOCATION))) {    
+                        message.getInterceptorChain().suspend();
+                    }
                 }
+                
             }
         }
     }
