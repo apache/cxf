@@ -414,6 +414,17 @@ public class ASMHelper {
         }
     }
     
+    public boolean is3x() {
+        try {
+            final Class<?> cls = ClassLoaderUtils.loadClass(cwClass.getPackage().getName() + ".MethodVisitor", cwClass);
+            final Method m = cls.getMethod("visitFrame", Integer.TYPE, String.class,
+                                           String.class, String.class);            
+            return m != null;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+    
     public interface ClassWriter {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean t);

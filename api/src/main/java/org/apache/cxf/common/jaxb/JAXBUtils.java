@@ -1334,7 +1334,7 @@ public final class JAXBUtils {
         mv.visitInsn(Opcodes.ARETURN);
         mv.visitLabel(l2);
         mv.visitLineNumber(43, l2);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {"java/lang/String"}, 0, null);
+        //mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {"java/lang/String"}, 0, null);
         mv.visitVarInsn(Opcodes.ALOAD, 2);
         mv.visitInsn(Opcodes.ARETURN);
         l4 = helper.createLabel();
