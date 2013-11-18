@@ -104,6 +104,11 @@
             <version>${cxf.xjc-utils.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}.xjcplugins</groupId>
+            <artifactId>cxf-xjc-javadoc</artifactId>
+            <version>${cxf.xjc-utils.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}.xjc-utils</groupId>
             <artifactId>cxf-xjc-runtime</artifactId>
             <version>${cxf.xjc-utils.version}</version>
