@@ -26,6 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -95,8 +96,9 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             // optional - otherwise; lets always report it for now if it is non-empty 
             List<OAuthPermission> perms = token.getScopes();
             if (!perms.isEmpty()) {
-                sb.append("&").append(OAuthConstants.SCOPE)
-                    .append("=").append(OAuthUtils.convertPermissionsToScope(perms));
+                String scope = OAuthUtils.convertPermissionsToScope(perms);
+                sb.append("&").append(OAuthConstants.SCOPE).append("=")
+                    .append(HttpUtils.queryEncode(scope));
             }
             //TODO: also report other token parameters if any if needed  
         }
