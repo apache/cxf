@@ -48,8 +48,7 @@
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
-        <cxf.saaj.impl.version>1.3.19</cxf.saaj.impl.version>
-
+        <cxf.saaj.impl.version>1.3.23</cxf.saaj.impl.version>
         <extra.saaj.dep.groupId>${cxf.saaj.impl.groupId}</extra.saaj.dep.groupId>
         <extra.saaj.dep.artifactId>${cxf.saaj.impl.artifactId}</extra.saaj.dep.artifactId>
         <extra.saaj.dep.version>${cxf.saaj.impl.version}</extra.saaj.dep.version>
@@ -89,13 +88,13 @@
         <cxf.bcprov.version>1.49</cxf.bcprov.version>
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
         <cxf.cglib.osgi.version>[2.1.3,3.0.0)</cxf.cglib.osgi.version>
-        <cxf.commons-codec.version>1.7</cxf.commons-codec.version>
+        <cxf.commons-codec.version>1.8</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
         <cxf.ehcache.version>2.5.1</cxf.ehcache.version>
         <cxf.ehcache.bundle.version>2.5.1_1</cxf.ehcache.bundle.version>
-        <cxf.fastinfoset.bundle.version>1.2.7_4</cxf.fastinfoset.bundle.version>
+        <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
         <cxf.httpcomponents.asyncclient.version>4.0-beta3</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0-beta3,4.1)</cxf.httpcomponents.asyncclient.version.range>
@@ -126,9 +125,9 @@
         <cxf.joda.time.version>2.1</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.4</cxf.jettison.version>
-        <cxf.jetty.version>8.1.12.v20130726</cxf.jetty.version>
-        <cxf.jetty.osgi.version>[7.2,8.2)</cxf.jetty.osgi.version>
-        <cxf.jibx.version>1.2.4.5</cxf.jibx.version>
+        <cxf.jetty.version>8.1.14.v20131031</cxf.jetty.version>
+        <cxf.jetty.osgi.version>[7.6,8.2)</cxf.jetty.osgi.version>
+        <cxf.jibx.version>1.2.5</cxf.jibx.version>
         <cxf.junit.version>4.11</cxf.junit.version>
         <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
         <cxf.msv.version>2011.1</cxf.msv.version>
@@ -139,7 +138,7 @@
         <cxf.opensaml.xmltooling.version>1.3.4-1</cxf.opensaml.xmltooling.version>
         <cxf.opensamlws.version>1.4.4-1</cxf.opensamlws.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
-        <cxf.saaj-api.version>1.3.4</cxf.saaj-api.version>
+        <cxf.saaj-api.version>1.3.5</cxf.saaj-api.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
@@ -568,7 +567,7 @@
             <dependency>
                 <groupId>com.sun.xml.fastinfoset</groupId>
                 <artifactId>FastInfoset</artifactId>
-                <version>1.2.12</version>
+                <version>1.2.13</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.xml</groupId>
