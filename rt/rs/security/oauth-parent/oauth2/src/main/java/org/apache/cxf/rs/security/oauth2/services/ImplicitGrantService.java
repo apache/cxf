@@ -78,18 +78,17 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
    
        // return the code by appending it as a fragment parameter to the redirect URI
         
+        StringBuilder sb = getUriWithFragment(redirectUri);
+        
+        sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
         String state = params.getFirst(OAuthConstants.STATE);
-        StringBuilder sb = getUriWithFragment(state, redirectUri);
         if (state != null) {
             sb.append("&");
+            sb.append(OAuthConstants.STATE).append("=").append(state);   
         }
-        sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
         sb.append("&")
             .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(token.getTokenType());
-        if (reportClientId) {
-            sb.append("&")
-                .append(OAuthConstants.CLIENT_ID).append("=").append(client.getClientId());
-        }
+        
         if (isWriteOptionalParameters()) {
             sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
                 .append("=").append(token.getExpiresIn());
@@ -103,6 +102,10 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             }
             //TODO: also report other token parameters if any if needed  
         }
+        if (reportClientId) {
+            sb.append("&")
+                .append(OAuthConstants.CLIENT_ID).append("=").append(client.getClientId());
+        }
         
         return Response.seeOther(URI.create(sb.toString())).build();
     }
@@ -110,22 +113,21 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String redirectUri,
                                            String error) {
+        StringBuilder sb = getUriWithFragment(redirectUri);
+        sb.append(OAuthConstants.ERROR_KEY).append("=").append(error);
         String state = params.getFirst(OAuthConstants.STATE);
-        StringBuilder sb = getUriWithFragment(state, redirectUri);
         if (state != null) {
             sb.append("&");
+            sb.append(OAuthConstants.STATE).append("=").append(state);   
         }
-        sb.append(OAuthConstants.ERROR_KEY).append("=").append(error);
+        
         return Response.seeOther(URI.create(sb.toString())).build();
     }
     
-    private StringBuilder getUriWithFragment(String state, String redirectUri) {
+    private StringBuilder getUriWithFragment(String redirectUri) {
         StringBuilder sb = new StringBuilder();
         sb.append(redirectUri);
         sb.append("#");
-        if (state != null) {
-            sb.append(OAuthConstants.STATE).append("=").append(state);   
-        }
         return sb;
     }
 
