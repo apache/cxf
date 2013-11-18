@@ -31,8 +31,8 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -344,7 +344,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         boolean loaded = false;
         for (Extension ex : all.values()) {
             synchronized (ex) {
-            Class<?> cls = ex.getClassObject(loader);
+                Class<?> cls = ex.getClassObject(loader);
                 if (cls != null
                     && ex.getLoadedObject() == null
                     && type.isAssignableFrom(cls)

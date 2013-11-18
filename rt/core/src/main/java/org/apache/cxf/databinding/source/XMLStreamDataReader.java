@@ -224,8 +224,8 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                                     message.getExchange().getService().getServiceInfos().get(0))) {
                 XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
                 XMLStreamReader filteredReader =
-                StaxUtils.createFilteredReader(reader,
-                                               new StaxStreamFilter(new QName[] {XOP}));
+                    StaxUtils.createFilteredReader(reader,
+                                                   new StaxStreamFilter(new QName[] {XOP}));
                 StaxUtils.copy(filteredReader, nullWriter);
                 stax = true;
             }
