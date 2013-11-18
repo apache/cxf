@@ -69,7 +69,13 @@ public class ASMHelper {
     private static void tryClass(String s) {
         if (cwClass == null) {
             try {
-                cwClass = ClassLoaderUtils.loadClass(s, ASMHelper.class);
+                Class<?> c2 = ClassLoaderUtils.loadClass(s, ASMHelper.class);
+                
+                //old versions don't have this, but we need it
+                Class<?> cls = ClassLoaderUtils.loadClass(c2.getPackage().getName() + ".MethodVisitor", c2);
+                cls.getMethod("visitFrame", Integer.TYPE, String.class,
+                              String.class, String.class);
+                cwClass = c2;
             } catch (Throwable t) {
                 //ignore
             }
@@ -413,7 +419,7 @@ public class ASMHelper {
             throw new RuntimeException(e);
         }
     }
-    
+        
     public interface ClassWriter {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean t);
