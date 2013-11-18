@@ -22,18 +22,22 @@ package org.apache.cxf.systest.ws.swa;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for the SwA specification (SOAP with Attachments) via WS-SecurityPolicy
+ * A set of tests for the SwA specification (SOAP with Attachments) via WS-SecurityPolicy.
+ * 
+ * It tests both DOM + StAX clients against the DOM server
  */
 //TODO Wait until we move off the WSS4J 2.0 beta release
 @org.junit.Ignore
@@ -60,7 +64,7 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testSWASignatureContentAction() throws Exception {
+    public void testSWASignatureContentPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SWAPolicyTest.class.getResource("policy-client.xml");
@@ -76,7 +80,14 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
         
+        // DOM
         DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
         
@@ -101,7 +112,14 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
         
+        // DOM
         DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
         
@@ -126,7 +144,14 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
         
+        // DOM
         DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
         
@@ -151,7 +176,14 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
         
+        // DOM
         DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
         
@@ -176,11 +208,28 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
         
+        // DOM
         DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    static void enableStreaming(DoubleItSwaPortType port) {
+        ((BindingProvider)port).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)port).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+    }
+    
 }
