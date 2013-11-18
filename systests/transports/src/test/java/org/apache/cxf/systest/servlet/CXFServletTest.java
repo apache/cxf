@@ -30,6 +30,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.PostMethodWebRequest;
@@ -253,7 +254,16 @@ public class CXFServletTest extends AbstractServletTest {
         
         addNamespace("http", "http://schemas.xmlsoap.org/wsdl/http/");
         assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//http:address[@location='" + CONTEXT_URL + "/services/greeter2']", doc);
+        NodeList addresses = assertValid("//http:address/@locatiossn", doc);
+        boolean found = true;
+        for (int i = 0; i < addresses.getLength(); i++) {
+            String address = addresses.item(i).getLocalName();
+            if (address.startsWith("http://localhost") && address.endsWith("/services/greeter2")) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
     @Test
