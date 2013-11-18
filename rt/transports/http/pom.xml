@@ -126,6 +126,7 @@
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>
                                         <extensionArg>-Xproperty-listener</extensionArg>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                     </extensionArgs>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
@@ -141,6 +142,7 @@
                 <configuration>
                     <extensions>
                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-pl:${cxf.xjc-utils.version}</extension>
+                        <extension>org.apache.cxf.xjcplugins:cxf-xjc-javadoc:${cxf.xjc-utils.version}</extension>
                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                     </extensions>
                 </configuration>

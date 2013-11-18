@@ -239,6 +239,7 @@
                         </goals>
                         <configuration>
                             <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-javadoc:${cxf.xjc-utils.version}</extension>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                             </extensions>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
@@ -249,12 +250,14 @@
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/ws-addr.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.addressing</packagename>
                                     <extensionArgs>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                         <extensionArg>-npa</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
@@ -263,6 +266,7 @@
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/addressing.xjb</bindingFile>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -272,6 +276,7 @@
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
                                         <extensionArg>-Xdv</extensionArg>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -280,12 +285,14 @@
                                     <extension>true</extension>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/addressing200403.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/addressing200403.xjb</bindingFile>
                                     <extensionArgs>
+                                        <extensionArg>-Xjavadoc</extensionArg>
                                         <extensionArg>-npa</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
@@ -293,11 +300,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <extensions>
-                        <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
-                    </extensions>
-                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
