@@ -27,6 +27,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -74,6 +75,24 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             }
         }
         
+    }
+    
+    @Test
+    public void testInvalidSAMLTokenAsHeader() throws Exception {
+        String address = "https://localhost:" + PORT + "/samlheader/bookstore/books/123";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSSamlTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        WebClient wc = bean.createWebClient();
+        wc.header("Authorization", "SAML invalid_grant");
+        Response r = wc.get();
+        assertEquals(401, r.getStatus());
     }
     
     @Test
