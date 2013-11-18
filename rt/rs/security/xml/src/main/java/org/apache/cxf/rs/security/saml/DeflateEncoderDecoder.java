@@ -38,6 +38,15 @@ public class DeflateEncoderDecoder {
         while (!inflater.finished()) {
             inputLen = inflater.inflate(input);
             if (!inflater.finished()) {
+                
+                if (inputLen == 0) {
+                    if (inflater.needsInput()) {
+                        throw new DataFormatException("Inflater can not inflate all the token bytes");
+                    } else {
+                        break;
+                    }
+                }
+                
                 inflatedToken = new byte[input.length + inflatedLen];
                 System.arraycopy(input, 0, inflatedToken, inflatedLen, inputLen);
                 inflatedLen += inputLen;
@@ -57,9 +66,10 @@ public class DeflateEncoderDecoder {
         compresser.setInput(tokenBytes);
         compresser.finish();
         
-        byte[] output = new byte[tokenBytes.length];
+        byte[] output = new byte[tokenBytes.length * 2];
         
         int compressedDataLength = compresser.deflate(output);
+        
         byte[] result = new byte[compressedDataLength];
         System.arraycopy(output, 0, result, 0, compressedDataLength);
         return result;
