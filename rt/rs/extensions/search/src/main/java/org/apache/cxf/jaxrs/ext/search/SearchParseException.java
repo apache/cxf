@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-public class SearchParseException extends Exception {
+public class SearchParseException extends RuntimeException {
 
     private static final long serialVersionUID = 1182999957472822704L;
 

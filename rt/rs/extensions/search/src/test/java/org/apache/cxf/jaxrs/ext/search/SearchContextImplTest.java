@@ -39,6 +39,21 @@ public class SearchContextImplTest extends Assert {
     }
     
     @Test
+    public void testWrongQueryNoException() {
+        Message m = new MessageImpl();
+        m.put(Message.QUERY_STRING, "_s=ab");
+        assertNull(new SearchContextImpl(m).getCondition(Book.class));
+    }
+    
+    @Test(expected = SearchParseException.class)
+    public void testWrongQueryException() {
+        Message m = new MessageImpl();
+        m.put("search.block.search.exception", false); 
+        m.put(Message.QUERY_STRING, "_s=ab");
+        new SearchContextImpl(m).getCondition(Book.class);
+    }
+    
+    @Test
     public void testPlainQuery2() {
         Message m = new MessageImpl();
         m.put("search.use.plain.queries", true);
