@@ -65,6 +65,35 @@ public class XMLStreamDataWriterTest extends Assert {
     public void tearDown() throws Exception {
         baos.close();
     }
+    
+    @Test
+    public void testSetProperty() throws Exception {
+        JAXBDataBinding db = getTestWriterFactory();
+               
+        DataWriterImpl<XMLStreamWriter> dw = (DataWriterImpl)db.createWriter(XMLStreamWriter.class);
+        assertNotNull(dw);
+        
+        // Build message to set custom event handler
+        org.apache.cxf.message.Message message = new org.apache.cxf.message.MessageImpl();
+        message.put("jaxb-writer-validation-event-handler", new MyCustomHandler());
+    
+        dw.setProperty("org.apache.cxf.message.Message", message);     
+        
+        // Write Stuff
+        TradePriceData val = new TradePriceData();
+        val.setTickerSymbol("This is a symbol");
+        val.setTickerPrice(1.0f);
+        
+        QName elName = new QName("http://apache.org/hello_world_doc_lit_bare/types", "inout");
+        MessagePartInfo part = new MessagePartInfo(elName, null);
+        part.setElement(true);
+        part.setElementQName(elName);
+        dw.write(val, part, streamWriter);
+        streamWriter.flush();
+        
+        // Test MyCustomHandler
+        assertTrue(((MyCustomHandler)dw.veventHandler).getUsed());       
+    }
 
     @Test
     public void testWriteRPCLit1() throws Exception {

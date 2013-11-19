@@ -85,7 +85,10 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             unwrapJAXBElement = Boolean.TRUE.equals(value);
         } else if (prop.equals(org.apache.cxf.message.Message.class.getName())) {
             org.apache.cxf.message.Message m = (org.apache.cxf.message.Message)value;
-            veventHandler = (ValidationEventHandler)m.getContextualProperty("jaxb-validation-event-handler");
+            veventHandler = (ValidationEventHandler)m.getContextualProperty("jaxb-reader-validation-event-handler");
+            if (veventHandler == null) {
+                veventHandler = (ValidationEventHandler)m.getContextualProperty("jaxb-validation-event-handler");
+            }
             if (veventHandler == null) {
                 veventHandler = databinding.getValidationEventHandler();
             }

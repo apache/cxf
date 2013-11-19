@@ -46,12 +46,15 @@ import org.apache.cxf.jaxb.JAXBDataBase;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
 
+    ValidationEventHandler veventHandler;
+    boolean setEventHandler = true;
     private JAXBDataBinding databinding;
     
     public DataWriterImpl(JAXBDataBinding binding) {
@@ -62,6 +65,19 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     public void write(Object obj, T output) {
         write(obj, null, output);
     }
+    
+    public void setProperty(String prop, Object value) {
+        if (prop.equals(org.apache.cxf.message.Message.class.getName())) {
+            org.apache.cxf.message.Message m = (org.apache.cxf.message.Message)value;
+            veventHandler = (ValidationEventHandler)m.getContextualProperty(
+                    "jaxb-writer-validation-event-handler");
+            if (veventHandler == null) {
+                veventHandler = databinding.getValidationEventHandler();
+            }      
+            setEventHandler = MessageUtils.getContextualBoolean(m, "set-jaxb-validation-event-handler", true);
+        }
+    }
+    
     private static class MtomValidationHandler implements ValidationEventHandler {
         ValidationEventHandler origHandler;
         JAXBAttachmentMarshaller marshaller;
@@ -106,8 +122,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
-            if (databinding.getValidationEventHandler() != null) {
-                marshaller.setEventHandler(databinding.getValidationEventHandler());
+            if (setEventHandler) {
+                marshaller.setEventHandler(veventHandler);
             }
             
             final Map<String, String> nspref = databinding.getDeclaredNamespaceMappings();
