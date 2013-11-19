@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -80,7 +82,24 @@ public class LocalConduit extends AbstractConduit {
                     ex.setInMessage(inMsg);
                     inMsg.setExchange(ex);
                     ex.put(IN_EXCHANGE, exchange);
-                    destination.getMessageObserver().onMessage(inMsg);
+                    try {
+                        destination.getMessageObserver().onMessage(inMsg);
+                    } catch (Throwable t) {
+                        Message m = inMsg.getExchange().getOutFaultMessage();
+                        if (m == null) {
+                            m = inMsg.getExchange().getOutMessage();
+                        }
+                        if (m != null) {
+                            try {
+                                m.put(Message.RESPONSE_CODE, 500);
+                                m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
+                                m.getExchange().put(Message.RESPONSE_CODE, 500);
+                                m.getContent(OutputStream.class).close();
+                            } catch (IOException e) {
+                                //ignore
+                            }
+                        }
+                    }
                 }
             };
             Executor ex = message.getExchange() != null
