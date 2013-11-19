@@ -110,6 +110,15 @@ public abstract class AbstractClient implements Client {
     protected AbstractClient(ClientState initialState) {
         this.state = initialState;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Client query(String name, Object ...values) {
+        addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.QUERY, values);
+        return this;
+    }
+    
     /**
      * {@inheritDoc}
      */

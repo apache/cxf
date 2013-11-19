@@ -616,15 +616,9 @@ public class WebClient extends AbstractClient {
         return path(u.getRawPath());
     }
     
-    /**
-     * Updates the current URI query parameters
-     * @param name query name
-     * @param values query values
-     * @return updated WebClient
-     */
+    @Override
     public WebClient query(String name, Object ...values) {
-        addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.QUERY, values);
-        return this;
+        return (WebClient)super.query(name, values);
     }
     
     /**

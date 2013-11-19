@@ -113,6 +113,14 @@ public interface Client {
     Client cookie(Cookie cookie);
     
     /**
+     * Updates the current URI query parameters
+     * @param name query name
+     * @param values query values
+     * @return updated WebClient
+     */
+    Client query(String name, Object ...values);
+    
+    /**
      * Sets arbitrary HTTP Header
      * @param name header name
      * @param values list of header values
