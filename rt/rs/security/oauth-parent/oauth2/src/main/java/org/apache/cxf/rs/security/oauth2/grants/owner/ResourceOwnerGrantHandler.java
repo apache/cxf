@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.owner;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
@@ -43,14 +44,17 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
         String ownerName = params.getFirst(OAuthConstants.RESOURCE_OWNER_NAME);
         String ownerPassword = params.getFirst(OAuthConstants.RESOURCE_OWNER_PASSWORD);
         if (ownerName == null || ownerPassword == null) {
-            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
+            throw new OAuthServiceException(
+                 new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
         
         UserSubject subject = null;
         try {
             subject = loginHandler.createSubject(ownerName, ownerPassword);
+        } catch (RuntimeException ex) { 
+            throw ex;
         } catch (Exception ex) { 
-            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT, ex);
         }
         
         return doCreateAccessToken(client, 
