@@ -321,6 +321,8 @@ public final class WrapperClassGenerator extends ASMHelper {
                         fieldDescriptor = getClassCode(genericType);
                     } else if (types[0] instanceof GenericArrayType) {
                         fieldDescriptor = getClassCode(genericType);
+                    } else if (Collection.class.isAssignableFrom(clz)) {
+                        fieldDescriptor = getClassCode(genericType);
                     } else if (types[0] instanceof ParameterizedType) {
                         classCode = getClassCode(((ParameterizedType)types[0]).getRawType());
                         fieldDescriptor = getClassCode(genericType);
