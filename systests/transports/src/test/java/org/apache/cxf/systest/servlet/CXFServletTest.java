@@ -254,7 +254,7 @@ public class CXFServletTest extends AbstractServletTest {
         
         addNamespace("http", "http://schemas.xmlsoap.org/wsdl/http/");
         assertValid("//wsdl:operation[@name='greetMe']", doc);
-        NodeList addresses = assertValid("//http:address/@locatiossn", doc);
+        NodeList addresses = assertValid("//http:address/@location", doc);
         boolean found = true;
         for (int i = 0; i < addresses.getLength(); i++) {
             String address = addresses.item(i).getLocalName();
