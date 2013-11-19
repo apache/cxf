@@ -57,6 +57,32 @@ public class XMLStreamDataReaderTest extends Assert {
     }
 
     @Test
+    public void testSetProperty() throws Exception {
+        JAXBDataBinding db = getDataBinding(GreetMe.class);
+    
+        reader = getTestReader("../resources/SetPropertyValidationFailureReq.xml");
+        assertNotNull(reader);
+        
+        DataReaderImpl<XMLStreamReader> dr = (DataReaderImpl)db.createReader(XMLStreamReader.class);
+        assertNotNull(dr);
+        
+        // Build message to set custom event handler
+        org.apache.cxf.message.Message message = new org.apache.cxf.message.MessageImpl();
+        message.put("jaxb-validation-event-handler", new MyCustomHandler());
+        message.put("unwrap.jaxb.element", true);
+    
+        dr.setProperty("org.apache.cxf.message.Message", message);        
+        
+        // Should fail if custom handler doesn't skip formatting error
+        Object val = dr.read(reader);
+        assertTrue(val instanceof GreetMe);
+        assertEquals("TestSOAPInputPMessage", ((GreetMe)val).getRequestType());
+        
+        // Check handler used
+        assertTrue(((MyCustomHandler)dr.veventHandler).getUsed());
+    }
+    
+    @Test
     public void testReadWrapper() throws Exception {
         JAXBDataBinding db = getDataBinding(GreetMe.class);
         
