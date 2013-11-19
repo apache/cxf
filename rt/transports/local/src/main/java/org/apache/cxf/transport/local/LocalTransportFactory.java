@@ -95,6 +95,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         messageIncludeProperties.add(Message.ACCEPT_CONTENT_TYPE);
         messageIncludeProperties.add(Message.RESPONSE_CODE);
         messageIncludeProperties.add(Message.REQUEST_URI);
+        messageIncludeProperties.add(Message.ENDPOINT_ADDRESS);
         messageIncludeProperties.add(Message.HTTP_REQUEST_METHOD);
         
         bus = b;

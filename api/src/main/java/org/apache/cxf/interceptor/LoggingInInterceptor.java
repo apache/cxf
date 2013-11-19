@@ -118,6 +118,15 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         String uri = (String)message.get(Message.REQUEST_URL);
         if (uri == null) {
             uri = (String)message.get(Message.REQUEST_URI);
+            if (uri != null && uri.startsWith("/")) {
+                String address = (String)message.get(Message.ENDPOINT_ADDRESS);
+                if (address != null && !address.startsWith(uri)) {
+                    if (address.endsWith("/") && address.length() > 1) {
+                        address = address.substring(0, address.length()); 
+                    }
+                    uri = address + uri;
+                }
+            }
         } 
         if (uri != null) {
             buffer.getAddress().append(uri);

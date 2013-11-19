@@ -115,6 +115,13 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         String address = (String)message.get(Message.ENDPOINT_ADDRESS);
         if (address != null) {
             buffer.getAddress().append(address);
+            String uri = (String)message.get(Message.REQUEST_URI);
+            if (uri != null && !address.startsWith(uri)) {
+                if (!address.endsWith("/") && !uri.startsWith("/")) {
+                    buffer.getAddress().append("/");
+                }
+                buffer.getAddress().append(uri);
+            }
         }
         String ct = (String)message.get(Message.CONTENT_TYPE);
         if (ct != null) {
