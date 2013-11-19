@@ -698,8 +698,12 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
 
         String value = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
-        if (value == null && type.isEnum()) {
-            value = "xs:string";
+        if (value == null) {
+            if (type.isEnum()) {
+                value = "xs:string";
+            } else if (type == InputStream.class) {
+                value = "xs:anyType";
+            }
         }
         if (value != null) {
             if (isJson) {
@@ -1262,7 +1266,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean isFormParameter(Parameter pm, Class<?> type, Annotation[] anns) {
         return ParameterType.FORM == pm.getType() || ParameterType.REQUEST_BODY == pm.getType()
                && AnnotationUtils.getAnnotation(anns, Multipart.class) != null
-               && InjectionUtils.isPrimitive(type);
+               && (InjectionUtils.isPrimitive(type) || type == InputStream.class);
     }
 
     // TODO : can we reuse this block with JAXBBinding somehow ?
