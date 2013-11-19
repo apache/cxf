@@ -574,11 +574,12 @@ public abstract class AbstractHTTPDestination
     private int getReponseCodeFromMessage(Message message) {
         Integer i = (Integer)message.get(Message.RESPONSE_CODE);
         if (i != null) {
-            return i.intValue();  
-        } else if (hasNoResponseContent(message)) {
-            return HttpURLConnection.HTTP_ACCEPTED;
+            return i.intValue();
         } else {
-            return HttpURLConnection.HTTP_OK;
+            int code = hasNoResponseContent(message) ? HttpURLConnection.HTTP_ACCEPTED : HttpURLConnection.HTTP_OK;
+            // put the code in the message so that others can get it
+            message.put(Message.RESPONSE_CODE, code);
+            return code;
         }
     }
 
