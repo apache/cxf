@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.search.client.CompleteCondition;
 import org.apache.cxf.jaxrs.ext.search.client.SearchConditionBuilder;
@@ -44,6 +45,7 @@ public class SearchContextImpl implements SearchContext {
     public static final String CUSTOM_SEARCH_QUERY_PARAM_NAME = "search.query.parameter.name";
     private static final String USE_PLAIN_QUERY_PARAMETERS = "search.use.plain.queries";
     private static final String USE_ALL_QUERY_COMPONENT = "search.use.all.query.component";
+    private static final String BLOCK_SEARCH_EXCEPTION = "search.block.search.exception";
     private static final Logger LOG = LogUtils.getL7dLogger(SearchContextImpl.class);
     private Message message;
     
@@ -93,7 +95,11 @@ public class SearchContextImpl implements SearchContext {
             try {
                 return parser.parse(theExpression);
             } catch (SearchParseException ex) {
-                return null;
+                if (PropertyUtils.isTrue(message.getContextualProperty(BLOCK_SEARCH_EXCEPTION))) {
+                    return null;
+                } else {
+                    throw ex;
+                }
             }
         } else {
             return null;
