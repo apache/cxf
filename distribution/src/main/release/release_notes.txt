@@ -1,4 +1,4 @@
-Apache CXF 2.6.10 Release Notes
+Apache CXF 2.6.11 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.10 fixes over 49 JIRA issues reported by users and the community.
+2.6.11 fixes over 34 JIRA issues reported by users and the community.
 
 
 
@@ -79,57 +79,40 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-4999] - publishedEndpointUrl ignored when wsdlLocation not used
-    * [CXF-5133] - CXF STS renewed token not itself renewable.
-    * [CXF-5143] - http-conf:server blueprint configuration doesn't work
-    * [CXF-5144] - JAX-RS Client Proxy-based API connection leak
-    * [CXF-5146] - JAX-RS client proxies do not unwrap TypeVariables
-    * [CXF-5161] - AbstranctGrantHandler checks against "authorization_code" instead of supplied grant type
-    * [CXF-5164] - Wrong class name in LogUtils.getL7dLogger() of org.apache.cxf.aegis.databinding.XMLStreamDataWriter class
-    * [CXF-5175] - ?_wadl generates a ClassCastException
-    * [CXF-5176] - Aegis inheritance: inherited xml attributes appear twice
-    * [CXF-5181] - Blueprint start delays with policy fragments
-    * [CXF-5184] - javax.ws.rs.NotFoundException while using LoadDistributorFeature after failover of 1st node or with single node configured
-    * [CXF-5185] - Memory leak if no addresses are specified for SequentialStrategy
-    * [CXF-5186] - SOAP 1.2 fault reason xml:lang attribute not properly parsed on client side
-    * [CXF-5191] - StaxUtils readQName does not accept leading and trailing whitespaces
-    * [CXF-5195] - Wrong schema may be returned from LSResourceResolver.resolveResource() with null system ID
-    * [CXF-5196] - Failover feature doesn't work when client uses async invocation 
-    * [CXF-5198] - FiqlParser fails to parse an expression with camel case when SearchBean is used
-    * [CXF-5199] - Using an EncryptBeforeSigning policy with no EncryptedParts/Elements results in no Signature in the request
-    * [CXF-5204] - JAX-RS runtime checks TypeVariable bounds too early
-    * [CXF-5205] - Client SSL Cache Timeout default is specified in milliseconds rather than seconds
-    * [CXF-5218] - WS-RM's destination's fault handling should distinguish protocol related faults from other faults
-    * [CXF-5219] - @XmlJavaTypeAdapter ignored for exception members
-    * [CXF-5225] - client.getConduit() does not set enough properties on message passed to ConduitSelector
-    * [CXF-5226] - OAuth public clients don't appear to work in RedirectionGrantServices
-    * [CXF-5230] - Message element is not generated for Exception class
-    * [CXF-5231] - NoSuchElementException in ClientFaultConverter when stack trace message contains line breaks
-    * [CXF-5233] - JMS Transport with Topic for Requests is not working if Response is required
-    * [CXF-5234] - Simple Frontend Client Proxy does not work with Blueprint
-    * [CXF-5237] - Schema validatation doesn't work in mtom enabled provider service 
-    * [CXF-5240] - Jsonp interceptors do not work with GZIPOutInterceptor
-    * [CXF-5242] - JMS Topic based replies can lose messages
-    * [CXF-5246] - Conflicting schema namespaces for services with same set of schema classes
-    * [CXF-5248] - Signed SAML assertion validation error w/ SupportingTokens only policy
-    * [CXF-5257] - cxf-rt-transports-jms jms expiration is not set in JMSUtils.setJMSMessageHeaderProperties()
-    * [CXF-5272] - NPE will cause the camel-cxf endpoint start error in blueprint
-    * [CXF-5275] - NullPointerException when using Kerberos Delegation
-    * [CXF-5278] - STS Renew returns incorrect lifetime
-    * [CXF-5280] - wsdl2java may fail to extract the wsma:Action attribute value
+    * [CXF-5048] - StaticSTSProperties class requires a CXF message context to initialize using configure() method
+    * [CXF-5258] - Return type list of a typed type, e.g. List<Type<Typee>>, leads to ClassCastException
+    * [CXF-5287] - NPE at org.apache.cxf.maven_plugin.ClassLoaderSwitcher.restoreClassLoader
+    * [CXF-5289] - WADLGenerator misses Description annotations if they are bound to interfaces
+    * [CXF-5294] - XMLFaultOutInterceptor only marshals first detail element
+    * [CXF-5296] - OAuth2ClientUtils can not get access token if custom params contain semicolon or no token_type param is available
+    * [CXF-5299] - FiqlParser fails to parse an expression with child properties when SearchBean is used
+    * [CXF-5306] - Soap body in header
+    * [CXF-5307] - Add DecoupledFaultHandler for request-response message when decoupled fault is supported
+    * [CXF-5326] - Hardcoded reference to com.ibm.wsdl.util.xml.DOMUtils
+    * [CXF-5328] - JAX-RS ProviderFactory ignores MBR/MBW typed on Object for primitive arrays 
+    * [CXF-5335] - Incorrect handle of ws-policy 1.1 (Incorrect inclusion value: null)
+    * [CXF-5340] - IDLToWSDL crashes with certain idl constructs
+    * [CXF-5341] - NPE in org.apache.cxf.jaxws.support.JaxWsEndpointImpl.checkRespectBindingFeature
+    * [CXF-5347] - Request routing is broken when the URL contains both jsessionid and an extension
+    * [CXF-5354] - faultTo address is ignored when fault is thrown
+    * [CXF-5357] - CORBA binding corrupts byte arrays
+    * [CXF-5361] - Attachments iterator may incorrectly handle its remove operation
+    * [CXF-5366] - Authorization header is not set correctly in CXF HTTP digest authentication 
+    * [CXF-5372] - ServerEngineFactoryHolder should release JAXB classes when it is destroyed
+    * [CXF-5381] - SAAJStreamWriter transforms DigestValue of custom signature
+    * [CXF-5383] - Trailing semi-colon in Content-Type line of header for MTOM attachments.
+    * [CXF-5386] - Multipart params of type InputStream don't show in generated WADL
+    * [CXF-5390] - AbstractSamlBase64InHandler goes into infinite loop when processing bad header value.
+    * [CXF-5391] - Response code is not logged for SOAP responses
+    * [CXF-5394] - ImplicitGrantService always redirect to broken redirect url
 
 ** Improvement
-    * [CXF-3932] - RSTR Lifetime element sets current time in Created element
-    * [CXF-5148] - can't use property place holder in http:server|http:client with blueprint
-    * [CXF-5162] - OAuth2 AccessTokenService should validate if Client supports a given grant
-    * [CXF-5165] - add a JAAS authenticator for ServiceListPage
-    * [CXF-5169] - the schema-validation-enabled property doesn't work for OUT message validation
-    * [CXF-5179] - Add optional id field to UserSubject
-    * [CXF-5180] - Adding RefreshToken as token type
-    * [CXF-5187] - Use a negative value of maxRetries to indicate unbounded retries in WS-RM
-    * [CXF-5212] - Context Injection with Spring AOP
-    * [CXF-5251] - Implement more stringent requirements on allowing OnBehalfOf/ActAs in the STS
-    * [CXF-5277] - ConditionsProvider receives limited information from SAMLTokenRenewer
+    * [CXF-4987] - org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor disables mtom silently
+    * [CXF-5301] - JSONProvider should add an array key for root if arrayKeys is not empty but top level array has to be produced  
+    * [CXF-5317] - Policy exception handler throws away useful exception stack trace
+    * [CXF-5319] - WADLGenerator should not need "ignoreMessageWriters" property disabled to produces JSON
+    * [CXF-5322] - misleading warning for @XmlType without 'propOrder' element
+    * [CXF-5323] - [cxf-rt-core] remove geronimo-javamail_1.4_spec dependency
+    * [CXF-5329] - cxf-wsn doesn't register its bus as OSGi-Service
+    * [CXF-5332] - Support spring expression language for jaxws:client address attribute
 
-** Wish
-    * [CXF-5236] - Make UserSubject, Client, AccessToken, .... Serializable
