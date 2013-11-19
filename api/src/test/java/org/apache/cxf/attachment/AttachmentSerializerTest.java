@@ -102,10 +102,10 @@ public class AttachmentSerializerTest extends Assert {
         
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
         if (xop) {
-            assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\";", 
+            assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\"", 
                          part.getHeader("Content-Type")[0]);
         } else {
-            assertEquals("text/xml; charset=UTF-8; type=\"application/soap+xml\";", 
+            assertEquals("text/xml; charset=UTF-8; type=\"application/soap+xml\"", 
                          part.getHeader("Content-Type")[0]);
         }
         
@@ -173,7 +173,7 @@ public class AttachmentSerializerTest extends Assert {
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
         
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
-        assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\";", 
+        assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\"", 
                      part.getHeader("Content-Type")[0]);
         assertEquals("binary", part.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<root.message@cxf.apache.org>", part.getHeader("Content-ID")[0]);
