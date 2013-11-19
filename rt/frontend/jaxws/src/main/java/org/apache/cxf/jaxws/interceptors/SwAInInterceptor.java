@@ -31,6 +31,7 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
@@ -43,6 +44,7 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
     public SwAInInterceptor() {
         super(Phase.PRE_INVOKE);
         getBefore().add(HolderInInterceptor.class.getName());
+        getAfter().add(StaxInEndingInterceptor.class.getName());
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
