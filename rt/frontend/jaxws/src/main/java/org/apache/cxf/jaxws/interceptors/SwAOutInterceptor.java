@@ -230,6 +230,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             AttachmentImpl att = new AttachmentImpl(id);
             att.setDataHandler(dh);
             att.setHeader("Content-Type", ct);
+            att.setHeader("Content-ID", "<" + id + ">");
             atts.add(att);
         }
     }
