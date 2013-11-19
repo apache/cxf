@@ -50,7 +50,7 @@ public class SearchContextImplTest extends Assert {
     public void testWrongQueryException() {
         Message m = new MessageImpl();
         m.put(Message.QUERY_STRING, "_s=ab");
-        assertNull(new SearchContextImpl(m).getCondition(Book.class));
+        new SearchContextImpl(m).getCondition(Book.class);
     }
     
     @Test
