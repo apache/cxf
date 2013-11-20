@@ -561,8 +561,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         reportError(message, ex, 500);
     }
     
-    private boolean isFeedRequested(MediaType mt) {
-        if ("entry".equals(mt.getParameters().get("type"))) {
+    protected boolean isFeedRequested(MediaType mt) {
+        if ("entry".equalsIgnoreCase(mt.getParameters().get("type"))) {
             return false;
         }
         return true;
@@ -603,25 +603,29 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         boolean isFeed = isFeedRequested(mt);
         
         if (isFeed) {
-            return readFromFeed(cls, mt, headers, is);
+            return readFromFeedOrEntry(cls, mt, headers, is);
         } else {
             AtomEntryProvider p = new AtomEntryProvider();
             p.setAutodetectCharset(autodetectCharset);
             Entry entry = p.readFrom(Entry.class, Entry.class, 
                                      new Annotation[]{}, mt, headers, is);
-            return readFromEntry(entry, cls, mt, headers, is);
+            return readFromEntry(entry, cls);
         }
     }
     
     @SuppressWarnings("unchecked")
-    private Object readFromFeed(Class<Object> cls, MediaType mt, 
+    private Object readFromFeedOrEntry(Class<Object> cls, MediaType mt, 
                            MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
         AtomFeedProvider p = new AtomFeedProvider();
         p.setAutodetectCharset(autodetectCharset);
-        Feed feed = p.readFrom(Feed.class, Feed.class, new Annotation[]{}, mt, headers, is);
-        
+        Object atomObject = p.readFrom(Feed.class, Feed.class, new Annotation[]{}, mt, headers, is);
+        if (atomObject instanceof Entry) {
+            return this.readFromEntry((Entry)atomObject, cls);
+        }
+            
+        Feed feed = (Feed)atomObject;
         AtomElementReader<?, ?> reader = getAtomReader(cls);
         if (reader != null) {
             return ((AtomElementReader<Feed, Object>)reader).readFrom(feed);
@@ -634,7 +638,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
                 = (Class<Object>)InjectionUtils.getActualType(m.getGenericParameterTypes()[0]);
             List<Object> objects = new ArrayList<Object>();
             for (Entry e : feed.getEntries()) {
-                objects.add(readFromEntry(e, realCls, mt, headers, is));
+                objects.add(readFromEntry(e, realCls));
             }
             instance = cls.newInstance();
             m.invoke(instance, new Object[]{objects});
@@ -646,20 +650,22 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
     
     @SuppressWarnings("unchecked")
-    private Object readFromEntry(Entry entry, Class<Object> cls, MediaType mt, 
-                            MultivaluedMap<String, String> headers, InputStream is) 
+    private Object readFromEntry(Entry entry, Class<Object> cls) 
         throws IOException {
         
         AtomElementReader<?, ?> reader = getAtomReader(cls);
         if (reader != null) {
             return ((AtomElementReader<Entry, Object>)reader).readFrom(entry);
         }
-        try {
-            Unmarshaller um = 
-                jaxbProvider.getJAXBContext(cls, cls).createUnmarshaller();
-            return cls.cast(um.unmarshal(new StringReader(entry.getContent())));
-        } catch (Exception ex) {
-            reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
+        String entryContent = entry.getContent();
+        if (entryContent != null) {
+            try {
+                Unmarshaller um = 
+                    jaxbProvider.getJAXBContext(cls, cls).createUnmarshaller();
+                return cls.cast(um.unmarshal(new StringReader(entryContent)));
+            } catch (Exception ex) {
+                reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
+            }
         }
         return null;
     }
