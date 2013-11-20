@@ -86,7 +86,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
     
@@ -182,11 +182,27 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
     
     @Test
     public void testThatResponseValidationForOneResponseBookFails()  {
-        Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
+        Response r = createWebClient("/bookstore/booksResponse/1234").get();
+        assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
+
+        r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
         assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
 
         r = createWebClient("/bookstore/booksResponse/1234").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
+    }
+    
+
+    @Test
+    public void testThatResponseValidationForBookPassesWhenNoConstraintsAreDefined()  {
+        Response r = createWebClient("/bookstore/booksResponseNoValidation/1234").get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+        
+        r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+
+        r = createWebClient("/bookstore/booksResponseNoValidation/1234").get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
     }
 
     @Test

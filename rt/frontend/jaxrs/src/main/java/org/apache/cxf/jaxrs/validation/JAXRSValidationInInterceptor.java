@@ -20,7 +20,9 @@ package org.apache.cxf.jaxrs.validation;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
@@ -29,8 +31,8 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.ValidationInInterceptor;
 
 
-public class JAXRSValidationInInterceptor extends ValidationInInterceptor 
-    implements ContainerRequestFilter {
+public class JAXRSValidationInInterceptor extends ValidationInInterceptor implements ContainerRequestFilter {
+    static final String INPUT_VALIDATION_FAILED = "input.validation.failed";
     public JAXRSValidationInInterceptor() {
     }
     public JAXRSValidationInInterceptor(String phase) {
@@ -43,13 +45,17 @@ public class JAXRSValidationInInterceptor extends ValidationInInterceptor
     }
     
     @Override
-    protected Method getServiceMethod(Message message) {
-        if (!ValidationUtils.isAnnotatedMethodAvailable(message)) {
-            return null;
-        } else {
-            return super.getServiceMethod(message);
+    protected void handleValidation(final Message message, final Object resourceInstance,
+                                    final Method method, final List<Object> arguments) {
+        try {
+            super.handleValidation(message, resourceInstance, method, arguments);
+        } catch (ValidationException ex) {
+            message.getExchange().put(INPUT_VALIDATION_FAILED, true);
+            throw ex;
         }
     }
+    
+    
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
         super.handleMessage(PhaseInterceptorChain.getCurrentMessage());

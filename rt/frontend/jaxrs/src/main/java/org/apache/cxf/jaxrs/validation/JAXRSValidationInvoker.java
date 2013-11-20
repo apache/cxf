@@ -20,12 +20,9 @@ package org.apache.cxf.jaxrs.validation;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.logging.Logger;
 
-import javax.validation.ValidationException;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -35,19 +32,12 @@ import org.apache.cxf.validation.ValidationProvider;
 
 
 public class JAXRSValidationInvoker extends JAXRSInvoker {
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSValidationInvoker.class);
     private volatile ValidationProvider provider;
     private boolean validateServiceObject = true;
     
     @Override
     public Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {
         Message message = JAXRSUtils.getCurrentMessage();
-        
-        if (!ValidationUtils.isAnnotatedMethodAvailable(message)) {
-            String error = "Resource method is not available";
-            LOG.severe(error);
-            throw new ValidationException(error);
-        }
         
         ValidationProvider theProvider = getProvider(message);
         
@@ -65,7 +55,7 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
                 Object entity = ((MessageContentsList)list).get(0);
                 
                 if (entity instanceof Response) {
-                    theProvider.validateReturnValue(m, ((Response)entity).getEntity());    
+                    theProvider.validateReturnValue(serviceObject, m, ((Response)entity).getEntity());    
                 } else {                
                     theProvider.validateReturnValue(serviceObject, m, entity);
                 }

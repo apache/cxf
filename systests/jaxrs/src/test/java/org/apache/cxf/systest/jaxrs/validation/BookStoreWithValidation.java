@@ -48,16 +48,22 @@ public class BookStoreWithValidation extends AbstractBookStoreWithValidation imp
 
     @GET
     @Path("/books/{bookId}")
-    @Override
-    @NotNull 
+    @Override    
+    @NotNull
     public BookWithValidation getBook(@PathParam("bookId") String id) {
         return books.get(id);
     }
     
     @GET
     @Path("/booksResponse/{bookId}")
-    @Valid
+    @Valid @NotNull
     public Response getBookResponse(@PathParam("bookId") String id) {
+        return Response.ok(books.get(id)).build();
+    }
+    
+    @GET
+    @Path("/booksResponseNoValidation/{bookId}")
+    public Response getBookResponseNoValidation(@PathParam("bookId") String id) {
         return Response.ok(books.get(id)).build();
     }
     

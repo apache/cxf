@@ -42,13 +42,5 @@ public final class ValidationUtils {
         }
     }
     
-    public static boolean isAnnotatedMethodAvailable(Message message) {
-        final OperationResourceInfo ori = message.getExchange().get(OperationResourceInfo.class);
-        
-        // If this is a user-model resource then no validation is possible
-        return ori.getAnnotatedMethod() != null;
-        
-    }
-    
     
 }

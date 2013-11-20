@@ -27,7 +27,6 @@ import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ParameterNameProvider;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
@@ -131,22 +130,11 @@ public class ValidationProvider {
         }                
     }
     
-    public< T > void validateReturnValue(final T returnValue) {
-        final Set<ConstraintViolation< T > > violations = doValidateBean(returnValue);
+    public< T > void validateReturnValue(final T bean) {
+        final Set<ConstraintViolation< T > > violations = doValidateBean(bean);
         if (!violations.isEmpty()) {
             throw new ResponseConstraintViolationException(violations);
         }                
-    }
-    
-    public< T > void validateReturnValue(Method m, final T returnValue) {
-        if (m.getAnnotation(Valid.class) == null) {
-            return;
-        }
-        //TODO: check Method annotations for Constraints
-        
-        if (returnValue != null) {
-            validateReturnValue(returnValue);
-        } 
     }
     
     public< T > void validateBean(final T bean) {

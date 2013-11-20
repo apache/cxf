@@ -27,6 +27,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.ValidationOutInterceptor;
@@ -41,30 +42,23 @@ public class JAXRSValidationOutInterceptor extends ValidationOutInterceptor
     }
     
     @Override
+    protected void handleValidation(final Message message, final Object resourceInstance,
+                                    final Method method, final List<Object> arguments) {
+        if (!PropertyUtils.isTrue(message.getExchange().get(JAXRSValidationInInterceptor.INPUT_VALIDATION_FAILED))) {
+            super.handleValidation(message, resourceInstance, method, arguments);
+        }
+    }
+    
+    @Override
     protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
     }
     
     @Override
-    protected Method getServiceMethod(Message message) {
-        if (!ValidationUtils.isAnnotatedMethodAvailable(message)) {
-            return null;
-        } else {
-            return super.getServiceMethod(message);
-        }
+    protected Object unwrapEntity(Object entity) {
+        return entity instanceof Response ? ((Response)entity).getEntity() : entity;
     }
     
-    @Override
-    protected void handleValidation(final Message message, final Object resourceInstance,
-                                    final Method method, final List<Object> arguments) {  
-        if (arguments.size() == 1) {
-            if (arguments.get(0) instanceof Response) {
-                getOutProvider(message).validateReturnValue(method, ((Response)arguments.get(0)).getEntity());    
-            } else {
-                super.handleValidation(message, resourceInstance, method, arguments);
-            }
-        }        
-    }
     @Override
     public void filter(ContainerRequestContext in, ContainerResponseContext out) throws IOException {
         super.handleMessage(PhaseInterceptorChain.getCurrentMessage());

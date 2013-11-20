@@ -25,6 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 public class ValidationOutInterceptor extends AbstractValidationInterceptor {
+    private boolean enforceOnlyBeanConstraints;
     public ValidationOutInterceptor() {
         super(Phase.PRE_MARSHAL);
     }
@@ -36,13 +37,30 @@ public class ValidationOutInterceptor extends AbstractValidationInterceptor {
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {  
         if (arguments.size() == 1) {
-            getOutProvider(message).validateReturnValue(resourceInstance, method, arguments.get(0));
+            Object entity = unwrapEntity(arguments.get(0));
+            ValidationProvider theProvider = getOutProvider(message);
+            if (isEnforceOnlyBeanConstraints()) {
+                theProvider.validateReturnValue(entity);    
+            } else {
+                theProvider.validateReturnValue(resourceInstance, method, entity);
+            }
         }        
+    }
+    
+    protected Object unwrapEntity(Object entity) {
+        return entity;
     }
     
     protected ValidationProvider getOutProvider(Message message) {
         ValidationProvider provider = message.getExchange().get(ValidationProvider.class);
         return provider == null ? getProvider(message) : provider;
+    }
+    
+    public boolean isEnforceOnlyBeanConstraints() {
+        return enforceOnlyBeanConstraints;
+    }
+    public void setEnforceOnlyBeanConstraints(boolean enforceOnlyBeanConstraints) {
+        this.enforceOnlyBeanConstraints = enforceOnlyBeanConstraints;
     }
         
     

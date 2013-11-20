@@ -85,8 +85,8 @@ public class JAXRSPerRequestValidationTest extends AbstractJAXRSValidationTest {
         final Response r = createWebClient("/bookstore/book").query("id", "3333").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
-    @Test
-    @Ignore
+    
+    @Test    
     public void testThatValidationConstraintsAreViolatedWhenBookDoesNotExistResponse()  {
         final Response r = createWebClient("/bookstore/bookResponse").query("id", "3333").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
