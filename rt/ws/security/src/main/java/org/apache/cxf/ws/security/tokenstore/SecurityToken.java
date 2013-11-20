@@ -134,7 +134,7 @@ public class SecurityToken implements Serializable {
     /**
      * The principal of this SecurityToken
      */
-    private transient Principal principal;
+    private Principal principal;
     /**
      * The SecurityContext originally associated with this token
      */
