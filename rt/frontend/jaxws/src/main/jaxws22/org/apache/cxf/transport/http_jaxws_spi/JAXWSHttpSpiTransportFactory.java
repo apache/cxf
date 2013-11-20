@@ -23,12 +23,13 @@ import java.io.IOException;
 import javax.xml.ws.spi.http.HttpContext;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transport.http.DestinationRegistryImpl;
 
-public class JAXWSHttpSpiTransportFactory extends HTTPTransportFactory implements DestinationFactory {
+public class JAXWSHttpSpiTransportFactory extends SoapTransportFactory implements DestinationFactory {
 
     private HttpContext context;
     private JAXWSHttpSpiDestination destination;
@@ -40,7 +41,7 @@ public class JAXWSHttpSpiTransportFactory extends HTTPTransportFactory implement
 
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
         if (destination == null) { 
-            destination = new JAXWSHttpSpiDestination(bus, registry, endpointInfo);
+            destination = new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpointInfo);
             // set handler into the provided HttpContext, our Destination hook into the server container
             HttpHandlerImpl handler = new HttpHandlerImpl(destination);
             context.setHandler(handler);

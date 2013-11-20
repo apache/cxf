@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.xml.ws.spi.http.HttpExchange;
 import javax.xml.ws.spi.http.HttpHandler;
 
+import org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.wsdl.http.AddressType;
 
@@ -53,6 +54,8 @@ public class HttpHandlerImpl extends HttpHandler {
                         ei.setAddress(contextPath + path);
                         if (ei.getExtensor(AddressType.class) != null) {
                             ei.getExtensor(AddressType.class).setLocation(contextPath + path);
+                        } else if (ei.getExtensor(SoapAddress.class) != null) {
+                            ei.getExtensor(SoapAddress.class).setLocationURI(contextPath + path);
                         }
                     }
                 }
