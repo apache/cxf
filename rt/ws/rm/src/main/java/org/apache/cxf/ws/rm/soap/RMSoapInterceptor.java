@@ -434,9 +434,10 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         // In the logical RM interceptor set it back to what it was so that the logical
         // addressing interceptor does not try to send a partial response to 
         // server originated oneway RM protocol messages.        
-        // 
+        // The actions that can appear in the response to the requestor should be excluded.
         
         if (!consts.getCreateSequenceResponseAction().equals(action)
+            && !consts.getSequenceAckAction().equals(action)
             && !RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)
             && !RM11Constants.INSTANCE.getCloseSequenceResponseAction().equals(action)) {
             LOG.fine("Changing requestor role from " + message.get(Message.REQUESTOR_ROLE)
