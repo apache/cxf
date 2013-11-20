@@ -17,7 +17,7 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:di="http://www.example.org/schema/DoubleIt" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:t="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsaw="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:di="http://www.example.org/schema/DoubleIt" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:t="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:wsaw="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
     <!-- Replaced for wsp: http://schemas.xmlsoap.org/ws/2004/09/policy -->
     <wsdl:types>
         <xsd:schema targetNamespace="http://www.example.org/schema/DoubleIt">
@@ -39,6 +39,15 @@
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="numberToDouble" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="DoubleIt4">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="numberToDouble" type="xsd:int"/>
+                        <xsd:element name="ImageData" type="xsd:base64Binary"
+                            xmime:expectedContentTypes="application/octet-stream"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -70,6 +79,9 @@
         <wsdl:part element="di:DoubleIt3" name="parameters"/>
         <wsdl:part name="attachment" type="xsd:base64Binary"/>
     </wsdl:message>
+    <wsdl:message name="DoubleIt4Request">
+        <wsdl:part element="di:DoubleIt4" name="parameters"/>
+    </wsdl:message>
     <wsdl:message name="DoubleItRequestHeader">
         <wsdl:part element="di:DoubleIt" name="parameters"/>
         <wsdl:part element="di:DoubleItHeader" name="header"/>
@@ -81,6 +93,9 @@
         <wsdl:part element="di:DoubleItResponse" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleIt3Response">
+        <wsdl:part element="di:DoubleItResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="DoubleIt4Response">
         <wsdl:part element="di:DoubleItResponse" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleItFault">
@@ -114,6 +129,13 @@
         <wsdl:operation name="DoubleIt3">
             <wsdl:input message="tns:DoubleIt3Request"/>
             <wsdl:output message="tns:DoubleIt3Response"/>
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="DoubleItMtomPortType">
+        <wsdl:operation name="DoubleIt4">
+            <wsdl:input message="tns:DoubleIt4Request"/>
+            <wsdl:output message="tns:DoubleIt4Response"/>
             <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
         </wsdl:operation>
     </wsdl:portType>
