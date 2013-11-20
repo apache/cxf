@@ -28,13 +28,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-milestone1</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <!-- bug in jaxb is causing an assertion error if -ea is turned on -->
-        <cxf.surefire.fork.vmargs/>
-        <cxf.server.launcher.vmargs/>
+        <cxf.surefire.fork.vmargs />
+        <cxf.server.launcher.vmargs />
         <cxf.surefire.enable.assertions>false</cxf.surefire.enable.assertions>
     </properties>
     <dependencies>

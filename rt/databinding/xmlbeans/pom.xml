@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-milestone1</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -200,7 +200,7 @@
                                     <target>
                                         <!-- XmlBeans generated code uses raw List types -->
                                         <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
                                         </propertyfile>
                                     </target>
                                 </configuration>

@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-milestone1</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -182,10 +182,10 @@
                                         <!-- SDO generated code is Java1.4 based and thus uses raw List types -->
                                         <!-- It also generates code with unused imports -->
                                         <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore"/>
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedImport" value="ignore"/>
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore"/>
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedImport" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore" />
                                         </propertyfile>
                                     </target>
                                 </configuration>

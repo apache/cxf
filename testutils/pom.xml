@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-milestone1</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -79,53 +79,53 @@
                         <configuration>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <tasks>
-                                <property name="generated.target" value="${basedir}/target/generated"/>
-                                <property name="generated.src.test" value="${generated.target}/src/main/java"/>
-                                <property name="generated.resources.test" value="${generated.target}/src/main/resources"/>
-                                <property name="generated.wsdl.test" value="${generated.resources.test}/"/>
-                                <property name="test.resources.dir" location="${basedir}/src/main/resources"/>
-                                <mkdir dir="${generated.resources.test}/wsdl/type_test"/>
+                                <property name="generated.target" value="${basedir}/target/generated" />
+                                <property name="generated.src.test" value="${generated.target}/src/main/java" />
+                                <property name="generated.resources.test" value="${generated.target}/src/main/resources" />
+                                <property name="generated.wsdl.test" value="${generated.resources.test}/" />
+                                <property name="test.resources.dir" location="${basedir}/src/main/resources" />
+                                <mkdir dir="${generated.resources.test}/wsdl/type_test" />
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_ID_xsd.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_1.xsd">
-                                    <param name="groupID" expression="1"/>
+                                    <param name="groupID" expression="1" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_ID_xsd.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_2.xsd">
-                                    <param name="groupID" expression="2"/>
+                                    <param name="groupID" expression="2" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_ID_xsd.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_3.xsd">
-                                    <param name="groupID" expression="3"/>
+                                    <param name="groupID" expression="3" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_wsdl.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_doclit.wsdl">
-                                    <param name="inc_xsd_path" expression="."/>
-                                    <param name="use_style" expression="document"/>
-                                    <param name="tns_suffix" expression="doc"/>
+                                    <param name="inc_xsd_path" expression="." />
+                                    <param name="use_style" expression="document" />
+                                    <param name="tns_suffix" expression="doc" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_wsdl.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_rpclit.wsdl">
-                                    <param name="inc_xsd_path" expression="."/>
-                                    <param name="use_style" expression="rpc"/>
-                                    <param name="tns_suffix" expression="rpc"/>
+                                    <param name="inc_xsd_path" expression="." />
+                                    <param name="use_style" expression="rpc" />
+                                    <param name="tns_suffix" expression="rpc" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_wsdl.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_xml_inc.wsdl">
-                                    <param name="inc_xsd_path" expression="."/>
-                                    <param name="use_style" expression="document"/>
-                                    <param name="tns_suffix" expression="xml"/>
+                                    <param name="inc_xsd_path" expression="." />
+                                    <param name="use_style" expression="document" />
+                                    <param name="tns_suffix" expression="xml" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_xml_wsdl.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_xml.wsdl">
-                                    <param name="inc_wsdl_path" expression="."/>
-                                    <param name="port" expression="9008"/>
+                                    <param name="inc_wsdl_path" expression="." />
+                                    <param name="port" expression="9008" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_soap_wsdl.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_doclit_soap.wsdl">
-                                    <param name="inc_wsdl_path" expression="."/>
-                                    <param name="use_style" expression="document"/>
-                                    <param name="port" expression="9007"/>
+                                    <param name="inc_wsdl_path" expression="." />
+                                    <param name="use_style" expression="document" />
+                                    <param name="port" expression="9007" />
                                 </xslt>
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_soap_wsdl.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_rpclit_soap.wsdl">
-                                    <param name="inc_wsdl_path" expression="."/>
-                                    <param name="use_style" expression="rpc"/>
-                                    <param name="port" expression="9006"/>
+                                    <param name="inc_wsdl_path" expression="." />
+                                    <param name="use_style" expression="rpc" />
+                                    <param name="port" expression="9006" />
                                 </xslt>
-                                <mkdir dir="${generated.src.test}/org/apache/cxf/systest/type_test"/>
-                                <xslt style="${test.resources.dir}/wsdl/type_test/type_test_impl_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestImpl.java"/>
-                                <xslt style="${test.resources.dir}/wsdl/type_test/type_test_tester_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestTester.java"/>
+                                <mkdir dir="${generated.src.test}/org/apache/cxf/systest/type_test" />
+                                <xslt style="${test.resources.dir}/wsdl/type_test/type_test_impl_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestImpl.java" />
+                                <xslt style="${test.resources.dir}/wsdl/type_test/type_test_tester_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestTester.java" />
                             </tasks>
                         </configuration>
                         <goals>
@@ -284,7 +284,7 @@
                                     <target>
                                         <!-- JAXB generated code for one of our type tests uses a raw Comparable -->
                                         <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
-                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore"/>
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.rawTypeReference" value="ignore" />
                                         </propertyfile>
                                     </target>
                                 </configuration>

@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-milestone1</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <build>
@@ -54,7 +54,7 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
-                                <asyncMethods/>
+                                <asyncMethods />
                             </defaultOptions>
                         </configuration>
                     </execution>
@@ -96,7 +96,7 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
                                 <markGenerated>true</markGenerated>
-                                <asyncMethods/>
+                                <asyncMethods />
                             </defaultOptions>
                         </configuration>
                     </execution>
