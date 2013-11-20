@@ -21,6 +21,7 @@ package org.apache.cxf.validation;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -35,8 +36,9 @@ public class ValidationOutInterceptor extends AbstractValidationInterceptor {
     
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
-                                    final Method method, final List<Object> arguments) {  
-        if (arguments.size() == 1) {
+                                    final Method method, final List<Object> arguments) {
+        if (arguments.size() == 1
+            && !PropertyUtils.isTrue(message.getExchange().get(ValidationInInterceptor.INPUT_VALIDATION_FAILED))) {
             Object entity = unwrapEntity(arguments.get(0));
             ValidationProvider theProvider = getOutProvider(message);
             if (isEnforceOnlyBeanConstraints()) {

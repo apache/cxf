@@ -56,6 +56,11 @@ public interface Message extends StringMap {
     String INVOCATION_CONTEXT = "org.apache.cxf.invocation.context";
     
     /**
+     *  Current Service Object
+     */
+    String SERVICE_OBJECT = "org.apache.cxf.service.object";
+    
+    /**
      * A Map containing the MIME headers for a SOAP message.
      */
     String MIME_HEADERS = "org.apache.cxf.mime.headers";

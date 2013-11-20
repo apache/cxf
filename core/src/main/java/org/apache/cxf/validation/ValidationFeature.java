@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.validation;
+package org.apache.cxf.validation;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 
-public class JAXRSValidationFeature extends AbstractFeature {
+public class ValidationFeature extends AbstractFeature {
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(new JAXRSValidationInInterceptor());
-        provider.getOutInterceptors().add(new JAXRSValidationOutInterceptor());
+        provider.getInInterceptors().add(new ValidationInInterceptor());
+        provider.getOutInterceptors().add(new ValidationOutInterceptor());
     }
 }

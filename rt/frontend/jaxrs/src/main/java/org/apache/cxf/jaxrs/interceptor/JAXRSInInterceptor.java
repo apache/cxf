@@ -47,6 +47,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -55,6 +56,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.logging.NoOpFaultListener;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
@@ -235,21 +237,28 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     private void setExchangeProperties(Message message, OperationResourceInfo ori, 
                                       MultivaluedMap<String, String> values,
                                       int numberOfResources) {
-        message.getExchange().put(OperationResourceInfo.class, ori);
-        message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, ori.getClassResourceInfo());
+        final Exchange exchange = message.getExchange();
+        final ClassResourceInfo cri = ori.getClassResourceInfo();
+        exchange.put(OperationResourceInfo.class, ori);
+        exchange.put(JAXRSUtils.ROOT_RESOURCE_CLASS, cri);
         message.put(RESOURCE_METHOD, ori.getMethodToInvoke());
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
         
         String plainOperationName = ori.getMethodToInvoke().getName();
         if (numberOfResources > 1) {
-            plainOperationName = ori.getClassResourceInfo().getServiceClass().getSimpleName()
-                + "#" + plainOperationName;
+            plainOperationName = cri.getServiceClass().getSimpleName() + "#" + plainOperationName;
         }
-        message.getExchange().put(RESOURCE_OPERATION_NAME, plainOperationName);
+        exchange.put(RESOURCE_OPERATION_NAME, plainOperationName);
         
-        boolean oneway = ori.isOneway() 
-            || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null));
-        message.getExchange().setOneWay(oneway);
+        if (ori.isOneway() 
+            || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {
+            exchange.setOneWay(true);        
+        }
+        ResourceProvider rp = cri.getResourceProvider(); 
+        if (rp instanceof SingletonResourceProvider) {
+            //cri.isSingleton is not guaranteed to indicate we have a 'pure' singleton 
+            exchange.put(Message.SERVICE_OBJECT, rp.getInstance(message));
+        }
     }
     
     @Override

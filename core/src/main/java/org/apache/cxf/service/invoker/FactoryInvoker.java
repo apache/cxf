@@ -62,4 +62,8 @@ public class FactoryInvoker extends AbstractInvoker {
     public void releaseServiceObject(final Exchange ex, Object obj) {
         factory.release(ex, obj);
     }
+    
+    public boolean isSingletonFactory() {
+        return factory instanceof SingletonFactory; 
+    }
 }

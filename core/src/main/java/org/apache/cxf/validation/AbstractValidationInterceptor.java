@@ -25,11 +25,14 @@ import java.util.logging.Logger;
 import javax.validation.ValidationException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.invoker.FactoryInvoker;
+import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -75,7 +78,24 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
     }
     
     protected Object getServiceObject(Message message) {
-        return serviceObject;
+        if (serviceObject != null) {
+            return serviceObject;
+        }
+        Object current = message.getExchange().get(Message.SERVICE_OBJECT);
+        if (current != null) {
+            return current;
+        }
+        Endpoint e = message.getExchange().get(Endpoint.class);
+        if (e != null && e.getService() != null) {
+            Invoker invoker = e.getService().getInvoker();
+            if (invoker instanceof FactoryInvoker) {
+                FactoryInvoker factoryInvoker = (FactoryInvoker)invoker;
+                if (factoryInvoker.isSingletonFactory()) {
+                    return factoryInvoker.getServiceObject(message.getExchange()); 
+                }
+            }
+        }
+        return null;
     }
     
     protected Method getServiceMethod(Message message) {

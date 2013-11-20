@@ -19,15 +19,12 @@
 package org.apache.cxf.jaxrs.validation;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.List;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.ValidationOutInterceptor;
@@ -39,14 +36,6 @@ public class JAXRSValidationOutInterceptor extends ValidationOutInterceptor
     }
     public JAXRSValidationOutInterceptor(String phase) {
         super(phase);
-    }
-    
-    @Override
-    protected void handleValidation(final Message message, final Object resourceInstance,
-                                    final Method method, final List<Object> arguments) {
-        if (!PropertyUtils.isTrue(message.getExchange().get(JAXRSValidationInInterceptor.INPUT_VALIDATION_FAILED))) {
-            super.handleValidation(message, resourceInstance, method, arguments);
-        }
     }
     
     @Override
