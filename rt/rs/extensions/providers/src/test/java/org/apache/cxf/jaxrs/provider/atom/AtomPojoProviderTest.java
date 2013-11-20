@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 
 import org.junit.Assert;
@@ -38,7 +40,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 
 public class AtomPojoProviderTest extends Assert {
 
@@ -177,7 +178,71 @@ public class AtomPojoProviderTest extends Assert {
         assertTrue("a".equals(list.get(0).getName()) || "a".equals(list.get(1).getName()));
         assertTrue("b".equals(list.get(0).getName()) || "b".equals(list.get(1).getName()));        
     }
-        
+     
+    @Test
+    public void testReadEntryNoContent() throws Exception {
+        /** A sample entry without content. */
+        final String entryNoContent =
+            "<?xml version='1.0' encoding='UTF-8'?>\n" 
+            + "<entry xmlns=\"http://www.w3.org/2005/Atom\">\n" 
+            + "  <id>84297856</id>\n" 
+            + "</entry>";
+
+        AtomPojoProvider atomPojoProvider = new AtomPojoProvider();
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        JaxbDataType type = (JaxbDataType)atomPojoProvider.readFrom((Class)JaxbDataType.class,
+                                  JaxbDataType.class,
+                                  new Annotation[0],
+                                  MediaType.valueOf("application/atom+xml;type=entry"),
+                                  new MetadataMap<String, String>(),
+                                  new ByteArrayInputStream(entryNoContent.getBytes(Charset.forName("UTF-8"))));
+        assertNull(type);
+    }
+    
+    @Test
+    public void testReadEntryWithUpperCaseTypeParam() throws Exception {
+        doReadEntryWithContent("application/atom+xml;type=ENTRY");
+    }
+    
+    @Test
+    public void testReadEntryNoTypeParam() throws Exception {
+        doReadEntryWithContent("application/atom+xml");
+    }
+    
+    private void doReadEntryWithContent(String mediaType) throws Exception {
+        final String entryWithContent =
+            "<?xml version='1.0' encoding='UTF-8'?>\n" 
+            + "<entry xmlns=\"http://www.w3.org/2005/Atom\">\n" 
+            + "  <id>84297856</id>\n" 
+            + "  <content type=\"application/xml\">\n" 
+            + "    <jaxbDataType xmlns=\"\">\n" 
+            + "    </jaxbDataType>\n" 
+            + "  </content>\n" 
+            + "</entry>";
+
+        AtomPojoProvider atomPojoProvider = new AtomPojoProvider();
+        @SuppressWarnings({
+            "rawtypes", "unchecked"
+        })
+        JaxbDataType type = (JaxbDataType)atomPojoProvider.readFrom((Class)JaxbDataType.class,
+                                  JaxbDataType.class,
+                                  new Annotation[0],
+                                  MediaType.valueOf(mediaType),
+                                  new MetadataMap<String, String>(),
+                                  new ByteArrayInputStream(entryWithContent.getBytes(Charset.forName("UTF-8"))));
+        assertNotNull(type);
+    }
+    
+    /**
+     * A sample JAXB data-type to read data into.
+     */
+    @XmlRootElement
+    public static class JaxbDataType {
+        // no data
+    }
+    
     private Entry getEntry(List<Entry> entries, String title) {
         for (Entry e : entries) {
             if (title.equals(e.getTitle())) {
