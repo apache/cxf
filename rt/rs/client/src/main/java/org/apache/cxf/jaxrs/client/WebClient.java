@@ -55,6 +55,8 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.client.spec.ClientImpl.WebTargetImpl;
+import org.apache.cxf.jaxrs.client.spec.InvocationBuilderImpl;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -269,11 +271,17 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Retieves ClientConfiguration
+     * Retrieves ClientConfiguration
      * @param client proxy or http-centric Client
      * @return underlying ClientConfiguration instance 
      */
     public static ClientConfiguration getConfig(Object client) {
+        if (client instanceof WebTargetImpl) {
+            client = ((WebTargetImpl)client).getWebClient();
+        } else if (client instanceof InvocationBuilderImpl) {
+            client = ((InvocationBuilderImpl)client).getWebClient();
+        } 
+        
         if (client instanceof Client) {
             if (client instanceof WebClient) { 
                 return ((AbstractClient)client).getConfiguration();

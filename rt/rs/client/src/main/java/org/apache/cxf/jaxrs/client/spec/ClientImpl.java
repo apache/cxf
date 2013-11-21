@@ -225,6 +225,10 @@ public class ClientImpl implements Client {
             this.targetClient = targetClient;
         }
         
+        public WebClient getWebClient() {
+            return this.targetClient;
+        }
+        
         @Override
         public Builder request() {
             checkClosed();

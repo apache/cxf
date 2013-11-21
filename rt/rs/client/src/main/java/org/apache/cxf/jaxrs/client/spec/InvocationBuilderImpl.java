@@ -56,6 +56,10 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         this.sync = webClient.sync();
     }
     
+    public WebClient getWebClient() {
+        return this.webClient;
+    }
+    
     @Override
     public Response delete() {
         return sync.delete();
