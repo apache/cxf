@@ -602,7 +602,7 @@ public abstract class AbstractHTTPDestination
         // old behavior not suppressing any responses  => ow && !pr
         // suppress empty responses for oneway calls   => ow && (!pr || epr)
         // suppress additionally empty responses for decoupled twoway calls =>
-        return (ow && (!pr || epr)) || (!ow && epr);
+        return (ow && !pr) || epr;
     }
     
     private HttpServletResponse getHttpResponseFromMessage(Message message) throws IOException {
