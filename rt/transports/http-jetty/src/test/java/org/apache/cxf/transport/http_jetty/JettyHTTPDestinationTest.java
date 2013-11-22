@@ -664,6 +664,7 @@ public class JettyHTTPDestinationTest extends Assert {
                 EasyMock.expect(request.getHeader("Accept")).andReturn("*/*");  
                 EasyMock.expect(request.getContentType()).andReturn("text/xml charset=utf8").times(2);
                 EasyMock.expect(request.getAttribute("org.eclipse.jetty.ajax.Continuation")).andReturn(null);
+                EasyMock.expect(request.getAttribute("http.service.redirection")).andReturn(null).anyTimes();
                 
                 HttpFields httpFields = new HttpFields();
                 httpFields.add("content-type", "text/xml");

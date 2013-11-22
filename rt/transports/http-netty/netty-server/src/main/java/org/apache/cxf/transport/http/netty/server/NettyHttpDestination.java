@@ -36,16 +36,11 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transport.http.HTTPSession;
 
 public class NettyHttpDestination extends AbstractHTTPDestination {
 
@@ -176,7 +171,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            serviceRequest(context, req, resp);
+            invoke(null, context, req, resp);
         } finally {
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);
@@ -186,58 +181,14 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
             }
         }
     }
-
-    protected void serviceRequest(final ServletContext context,
-                                  final HttpServletRequest req,
-                                  final HttpServletResponse resp)
-        throws IOException {
-
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Service http request on thread: " + Thread.currentThread());
-        }
-        Message inMessage = retrieveFromContinuation(req);
-
-        if (inMessage == null) {
-
-            ExchangeImpl exchange = new ExchangeImpl();
-            inMessage = new MessageImpl();
-            exchange.setInMessage(inMessage);
-            setupMessage(inMessage, context, req, resp);
-
-            ((MessageImpl) inMessage).setDestination(this);
-
-            exchange.setSession(new HTTPSession(req));
-        }
-
-        try {
-            incomingObserver.onMessage(inMessage);
-
-            resp.flushBuffer();
-            ContinuationProvider p = inMessage.get(ContinuationProvider.class);
-            if (p != null) {
-                p.complete();
-            }
-        } catch (SuspendedInvocationException ex) {
-            if (ex.getRuntimeException() != null) {
-                throw ex.getRuntimeException();
-            }
-            //else nothing to do
-        } catch (Fault ex) {
-            Throwable cause = ex.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            } else {
-                throw ex;
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } finally {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
-            }
-        }
+    
+    protected void invokeComplete(final ServletContext context, 
+                                  final HttpServletRequest req, 
+                                  final HttpServletResponse resp,
+                                  Message m) throws IOException {
+        resp.flushBuffer();
+        super.invokeComplete(context, req, resp, m);
     }
-
 
     public ServerEngine getEngine() {
         return engine;

@@ -212,7 +212,7 @@ public abstract class AbstractHTTPDestination
         return ex == null ? false : ex.isOneWay();
     }
     
-    public void invoke(final ServletConfig config,
+    public void invoke(final ServletConfig config, 
                        final ServletContext context, 
                        final HttpServletRequest req, 
                        final HttpServletResponse resp) throws IOException {
@@ -238,31 +238,42 @@ public abstract class AbstractHTTPDestination
         
         try {    
             incomingObserver.onMessage(inMessage);
-            ContinuationProvider p = inMessage.get(ContinuationProvider.class);
-            if (p != null) {
-                p.complete();
-            }
+            invokeComplete(context, req, resp, inMessage);
         } catch (SuspendedInvocationException ex) {
             if (ex.getRuntimeException() != null) {
                 throw ex.getRuntimeException();
             }
             //else nothing to do, just finishing the processing
+        } catch (Fault ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException)cause;
+            } else {
+                throw ex;
+            }
+        } catch (RuntimeException ex) {
+            throw ex;
+        } finally {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
+            }
         }
-
- 
+    }
+    
+    protected void invokeComplete(final ServletContext context, 
+                                  final HttpServletRequest req, 
+                                  final HttpServletResponse resp,
+                                  Message m) throws IOException {
+        ContinuationProvider p = m.get(ContinuationProvider.class);
+        if (p != null) {
+            p.complete();
+        }
     }
 
     private void copyKnownRequestAttributes(HttpServletRequest request, Message message) {
         message.put(SERVICE_REDIRECTION, request.getAttribute(SERVICE_REDIRECTION));
     }
-    
-    protected void setupMessage(Message inMessage,
-                                final ServletContext context, 
-                                final HttpServletRequest req, 
-                                final HttpServletResponse resp) throws IOException {
-        setupMessage(inMessage, null, context, req, resp);
-    }
-    
+        
     protected void setupMessage(final Message inMessage,
                                 final ServletConfig config,
                                 final ServletContext context, 

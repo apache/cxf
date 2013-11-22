@@ -42,17 +42,13 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CopyingOutputStream;
-import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.eclipse.jetty.http.Generator;
@@ -248,7 +244,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            serviceRequest(context, req, resp);
+            invoke(null, context, req, resp);
         } finally {
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);
@@ -258,58 +254,16 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             }
         }    
     }
-
-    protected void serviceRequest(final ServletContext context, 
+    
+    protected void invokeComplete(final ServletContext context, 
                                   final HttpServletRequest req, 
-                                  final HttpServletResponse resp)
-        throws IOException {
+                                  final HttpServletResponse resp,
+                                  Message m) throws IOException {
+        resp.flushBuffer();
         Request baseRequest = (req instanceof Request) 
             ? (Request)req : getCurrentRequest();
-        
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Service http request on thread: " + Thread.currentThread());
-        }
-        Message inMessage = retrieveFromContinuation(req);
-        
-        if (inMessage == null) {
-            
-            inMessage = new MessageImpl();
-            ExchangeImpl exchange = new ExchangeImpl();
-            exchange.setInMessage(inMessage);
-            setupMessage(inMessage, context, req, resp);
-            
-            ((MessageImpl)inMessage).setDestination(this);
-    
-            exchange.setSession(new HTTPSession(req));
-        }
-        
-        try {    
-            incomingObserver.onMessage(inMessage);
-            resp.flushBuffer();
-            baseRequest.setHandled(true);
-            ContinuationProvider p = inMessage.get(ContinuationProvider.class);
-            if (p != null) {
-                p.complete();
-            }
-        } catch (SuspendedInvocationException ex) {
-            if (ex.getRuntimeException() != null) {
-                throw ex.getRuntimeException();
-            }
-            //else nothing to do
-        } catch (Fault ex) {
-            Throwable cause = ex.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException)cause;
-            } else {
-                throw ex;
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } finally {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
-            }
-        }
+        baseRequest.setHandled(true);
+        super.invokeComplete(context, req, resp, m);
     }
     
     protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {

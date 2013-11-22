@@ -85,7 +85,8 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
         Message inMessage = new MessageImpl();
         ExchangeImpl exchange = new ExchangeImpl();
         exchange.setInMessage(inMessage);
-        setupMessage(inMessage, null, req, resp);
+        
+        setupMessage(inMessage, null, req.getServletContext(), req, resp);
 
         ((MessageImpl)inMessage).setDestination(this);
 
