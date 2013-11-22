@@ -200,8 +200,12 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
      * @return WebClient instance
      */
     public WebClient createWebClient() {
-        
-        Service service = new JAXRSServiceImpl(getAddress(), getServiceName());
+        String serviceAddress = getAddress();
+        int queryIndex = serviceAddress != null ? serviceAddress.lastIndexOf('?') : -1;
+        if (queryIndex != -1) {
+            serviceAddress = serviceAddress.substring(0, queryIndex);
+        }
+        Service service = new JAXRSServiceImpl(serviceAddress, getServiceName());
         getServiceFactory().setService(service);
         
         try {
