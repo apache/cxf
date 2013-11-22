@@ -35,6 +35,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -52,7 +53,7 @@ public class BookContinuationStore {
     
     @GET
     @Path("/books/defaulttimeout")
-    public void getBookDescriptionWithTimeout(AsyncResponse async) {
+    public void getBookDescriptionWithTimeout(@Suspended AsyncResponse async) {
         async.register(new CallbackImpl());
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
     }
@@ -60,13 +61,14 @@ public class BookContinuationStore {
     @GET
     @Path("/books/resume")
     @Produces("text/plain")
-    public void getBookDescriptionImmediateResume(AsyncResponse async) {
+    public void getBookDescriptionImmediateResume(@Suspended AsyncResponse async) {
         async.resume("immediateResume");
     }
     
     @GET
     @Path("/books/cancel")
-    public void getBookDescriptionWithCancel(@PathParam("id") String id, AsyncResponse async) {
+    public void getBookDescriptionWithCancel(@PathParam("id") String id, 
+                                             @Suspended AsyncResponse async) {
         PhaseInterceptorChain.getCurrentMessage().getClass();
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
         async.setTimeoutHandler(new CancelTimeoutHandlerImpl());
@@ -74,21 +76,24 @@ public class BookContinuationStore {
     
     @GET
     @Path("/books/timeouthandler/{id}")
-    public void getBookDescriptionWithHandler(@PathParam("id") String id, AsyncResponse async) {
+    public void getBookDescriptionWithHandler(@PathParam("id") String id, 
+                                              @Suspended AsyncResponse async) {
         async.setTimeout(1000, TimeUnit.MILLISECONDS);
         async.setTimeoutHandler(new TimeoutHandlerImpl(id, false));
     }
     
     @GET
     @Path("/books/timeouthandlerresume/{id}")
-    public void getBookDescriptionWithHandlerResumeOnly(@PathParam("id") String id, AsyncResponse async) {
+    public void getBookDescriptionWithHandlerResumeOnly(@PathParam("id") String id, 
+                                                        @Suspended AsyncResponse async) {
         async.setTimeout(1000, TimeUnit.MILLISECONDS);
         async.setTimeoutHandler(new TimeoutHandlerImpl(id, true));
     }
     
     @GET
     @Path("/books/{id}")
-    public void getBookDescription(@PathParam("id") String id, AsyncResponse async) {
+    public void getBookDescription(@PathParam("id") String id, 
+                                   @Suspended AsyncResponse async) {
         handleContinuationRequest(id, async);
     }
     
@@ -101,14 +106,15 @@ public class BookContinuationStore {
     
     @GET
     @Path("{id}")
-    public void handleContinuationRequest(@PathParam("id") String id, AsyncResponse response) {
+    public void handleContinuationRequest(@PathParam("id") String id, 
+                                          @Suspended AsyncResponse response) {
         resumeSuspended(id, response);
     }
     
     @GET
     @Path("books/notfound")
     @Produces("text/plain")
-    public void handleContinuationRequestNotFound(AsyncResponse response) {
+    public void handleContinuationRequestNotFound(@Suspended AsyncResponse response) {
         response.register(new CallbackImpl());
         resumeSuspendedNotFound(response);
     }
@@ -116,7 +122,7 @@ public class BookContinuationStore {
     @GET
     @Path("books/notfound/unmapped")
     @Produces("text/plain")
-    public void handleContinuationRequestNotFoundUnmapped(AsyncResponse response) {
+    public void handleContinuationRequestNotFoundUnmapped(@Suspended AsyncResponse response) {
         response.register(new CallbackImpl());
         resumeSuspendedNotFoundUnmapped(response);
     }
@@ -124,7 +130,7 @@ public class BookContinuationStore {
     @GET
     @Path("books/suspend/unmapped")
     @Produces("text/plain")
-    public void handleNotMappedAfterSuspend(AsyncResponse response) throws BookNotFoundFault {
+    public void handleNotMappedAfterSuspend(@Suspended AsyncResponse response) throws BookNotFoundFault {
         response.setTimeout(2000, TimeUnit.MILLISECONDS);
         response.setTimeoutHandler(new CancelTimeoutHandlerImpl());
         throw new BookNotFoundFault("");

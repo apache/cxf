@@ -72,6 +72,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Cookie;
@@ -814,7 +815,8 @@ public final class JAXRSUtils {
 
         if (parameter.getType() == ParameterType.REQUEST_BODY) {
             
-            if (parameterClass == AsyncResponse.class) {
+            if (parameterClass == AsyncResponse.class 
+                && AnnotationUtils.getAnnotation(parameterAnns, Suspended.class) != null) {
                 return new AsyncResponseImpl(message);
             }
             
