@@ -107,7 +107,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             Service service = ex.get(Service.class);            
             Endpoint endpoint = ex.get(Endpoint.class);
             
-            String serviceName = "\"" + service.getName() + "\"";            
+            String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";            
             String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
             
             OperationInfo opInfo = ex.get(OperationInfo.class);
@@ -152,7 +152,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     protected String escapePatternChars(String value) {  
         // This can be replaced if really needed with pattern-based matching
         if (value.lastIndexOf(QUESTION_MARK) != -1) {
-            value.replace(QUESTION_MARK, ESCAPED_QUESTION_MARK);
+            value = value.replace(QUESTION_MARK, ESCAPED_QUESTION_MARK);
         }
         return value;
     }
