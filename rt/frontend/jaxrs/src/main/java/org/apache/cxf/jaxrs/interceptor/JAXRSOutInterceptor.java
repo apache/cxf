@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -50,7 +49,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -101,10 +99,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             if (cri != null) {
                 cri.clearThreadLocalProxies();
             }
-            AsyncResponse ar = (AsyncResponse)message.getExchange().get(AsyncResponse.class);
-            if (ar != null) {
-                ((AsyncResponseImpl)ar).reset();
-            }
+            
         }
             
 
