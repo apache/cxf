@@ -22,13 +22,17 @@ package org.apache.cxf.systest.ws.parts;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
+import org.example.contract.doubleit.DoubleItSwaPortType;
+import org.example.schema.doubleit.DoubleIt3;
 import org.junit.BeforeClass;
 
 /**
@@ -464,5 +468,140 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    // TODO - re-enable once we move off WSS4J 2.0-beta
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSignedAttachments() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedAttachmentsPort");
+        DoubleItSwaPortType port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // This should fail, as the service requires that the Attachments must be signed
+        portQName = new QName(NAMESPACE, "DoubleItSignedAttachmentsPort2");
+        port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        try {
+            doubleIt = new DoubleIt3();
+            doubleIt.setNumberToDouble(25);
+            port.doubleIt3(doubleIt, "12345".getBytes());
+            fail("Failure expected on an attachment which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "SignedParts";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            enableStreaming(port);
+            doubleIt = new DoubleIt3();
+            doubleIt.setNumberToDouble(25);
+            port.doubleIt3(doubleIt, "12345".getBytes());
+            fail("Failure expected on an attachment which isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SignedParts";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // TODO - re-enable once we move off WSS4J 2.0-beta
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testEncryptedAttachments() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PartsTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedAttachmentsPort");
+        DoubleItSwaPortType port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // Streaming
+        enableStreaming(port);
+        doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+        
+        // This should fail, as the service requires that the Attachments must be encrypted
+        portQName = new QName(NAMESPACE, "DoubleItEncryptedAttachmentsPort2");
+        port = service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // DOM
+        try {
+            doubleIt = new DoubleIt3();
+            doubleIt.setNumberToDouble(25);
+            port.doubleIt3(doubleIt, "12345".getBytes());
+            fail("Failure expected on an attachment which isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "EncryptedParts";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // Streaming
+        try {
+            enableStreaming(port);
+            doubleIt = new DoubleIt3();
+            doubleIt.setNumberToDouble(25);
+            port.doubleIt3(doubleIt, "12345".getBytes());
+            fail("Failure expected on an attachment which isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "SignedParts";
+            // assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    static void enableStreaming(DoubleItSwaPortType port) {
+        ((BindingProvider)port).getRequestContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+        ((BindingProvider)port).getResponseContext().put(
+            SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
+        );
+    }
+  
     
 }
