@@ -30,4 +30,9 @@ public interface ContinuationProvider {
      * @return transport-neutral ContinuationWrapper
      */
     Continuation getContinuation();
+    
+    /**
+     * Let the provider know that the exchange is complete
+     */
+    void complete();
 }

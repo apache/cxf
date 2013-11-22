@@ -48,6 +48,14 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         this.req = req;
         this.resp = resp;
     }
+    
+    public void complete() {
+        if (continuation != null) {
+            continuation.reset();
+            continuation = null;
+        }
+    }
+    
 
     /** {@inheritDoc}*/
     public Continuation getContinuation() {
@@ -77,7 +85,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             context = req.startAsync(req, resp);
             context.addListener(this);
         }
-        
+
         void startAsyncAgain() {
             
             AsyncContext old = context;

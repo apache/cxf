@@ -25,15 +25,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
@@ -208,7 +211,12 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
 
         try {
             incomingObserver.onMessage(inMessage);
+
             resp.flushBuffer();
+            ContinuationProvider p = inMessage.get(ContinuationProvider.class);
+            if (p != null) {
+                p.complete();
+            }
         } catch (SuspendedInvocationException ex) {
             if (ex.getRuntimeException() != null) {
                 throw ex.getRuntimeException();

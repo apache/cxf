@@ -51,6 +51,12 @@ public class JMSContinuationProvider implements ContinuationProvider {
         this.jmsListener = jmsListener;
         this.jmsConfig = jmsConfig;
     }
+    public void complete() {
+        JMSContinuation cw = inMessage.get(JMSContinuation.class);
+        if (cw != null) {
+            cw.reset();
+        }
+    }
     
     public Continuation getContinuation() {
         Message m = inMessage;
