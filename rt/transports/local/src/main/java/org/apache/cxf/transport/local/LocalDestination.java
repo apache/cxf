@@ -34,6 +34,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractDestination;
@@ -159,6 +160,13 @@ public class LocalDestination extends AbstractDestination {
 
         @Override
         public void close(Message message) throws IOException {
+            // set the pseudo status code if not set (REVISIT add this method in MessageUtils to be reused elsewhere?)
+            Integer i = (Integer)message.get(Message.RESPONSE_CODE);
+            if (i == null) {
+                int code = ((message.getExchange().isOneWay() && !MessageUtils.isPartialResponse(message)) 
+                    || MessageUtils.isEmptyPartialResponse(message)) ? 202 : 200;
+                message.put(Message.RESPONSE_CODE, code);
+            }
             if (Boolean.TRUE.equals(message.getExchange().get(LocalConduit.DIRECT_DISPATCH))) {
                 final Exchange exchange = (Exchange)message.getExchange().get(LocalConduit.IN_EXCHANGE);
                 
