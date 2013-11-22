@@ -275,12 +275,12 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         
         // DOM
-        /* TODO See WSS-482
+        /* TODO See WSS-482 - Remove comment when we move off WSS4J RC
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "SignedElements";
+            String error = "To must be signed";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -290,7 +290,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "SignedElements";
+            // String error = "To must be signed";
             // assertTrue(ex.getMessage().contains(error));
         }
         */
@@ -407,14 +407,13 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         
         /*
-         * TODO See WSS-482
+          TODO See WSS-482 - Remove comment when we move off WSS4J RC
         // DOM
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            System.out.println("ERR2: " + ex.getMessage());
-            String error = "EncryptedElements";
+            String error = "To must be encrypted";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -424,11 +423,10 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "EncryptedElements";
+            // String error = "To must be encrypted";
             // assertTrue(ex.getMessage().contains(error));
         }
         */
-        
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
