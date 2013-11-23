@@ -36,6 +36,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -44,6 +45,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 public class SoapActionInInterceptor extends AbstractSoapInterceptor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(SoapActionInInterceptor.class);
+    private static final String ALLOW_NON_MATCHING_TO_DEFAULT = "allowNonMatchingToDefaultSoapAction";
     
     public SoapActionInInterceptor() {
         super(Phase.READ);
@@ -124,10 +126,9 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             .getBinding().getOperations();
         if (bops != null) {
             for (BindingOperationInfo boi : bops) {
-                SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-                if (soi != null && action.equals(soi.getAction())) {
+                if (isActionMatch(message, boi, action)) {
                     if (bindingOp != null) {
-                        //more than one op with the same action, will need to parse normally
+                        // more than one op with the same action, will need to parse normally
                         return;
                     }
                     bindingOp = boi;
@@ -172,8 +173,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             if (StringUtils.isEmpty(action)) {
                 return;
             }
-            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-            if (soi == null || action.equals(soi.getAction())) {
+            if (isActionMatch(message, boi, action)) {
                 return;
             }
 
@@ -189,5 +189,15 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
     }
 
-
+    private static boolean isActionMatch(SoapMessage message, BindingOperationInfo boi,
+                                         String action) {
+        SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
+        boolean allowNoMatchingToDefault = MessageUtils
+            .getContextualBoolean(message,
+                                  ALLOW_NON_MATCHING_TO_DEFAULT,
+                                  false);
+        return ((soi != null) && action.equals(soi.getAction()))
+               || ((soi != null) && allowNoMatchingToDefault && StringUtils
+                   .isEmpty(soi.getAction()));
+    }
 }
