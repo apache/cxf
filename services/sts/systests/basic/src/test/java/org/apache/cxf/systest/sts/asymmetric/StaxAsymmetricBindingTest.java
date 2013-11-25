@@ -159,8 +159,7 @@ public class StaxAsymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // TODO Encrypted tokens not yet working with StAX
-    // See WSS-484
+    // TODO (WSS-484) Uncomment when we upgrade to WSS4J 2.0-SNAPSHOT again
     @org.junit.Test
     @org.junit.Ignore
     public void testUsernameTokenSAML1Encrypted() throws Exception {
