@@ -193,6 +193,10 @@ public final class ProviderFactory {
         setBusProviders();
     }
     
+    public Bus getBus() {
+        return bus;
+    } 
+
     // Not ideal but in the end seems like the simplest option compared 
     // to adding default readers/writers to existing messageReaders/Writers 
     // (due to all sort of conflicts with custom providers) and cloning 
