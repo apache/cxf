@@ -106,9 +106,8 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         if (token != null && !StringUtils.isEmpty(identifier)) {
             int parsedTTL = getTTL(token);
             if (parsedTTL > 0) {
-                Element element = new Element(identifier, token);
-                element.setTimeToLive(parsedTTL);
-                element.setTimeToIdle(parsedTTL);
+                Element element = new Element(identifier, token, parsedTTL, parsedTTL);
+                element.resetAccessStatistics();
                 cache.put(element);
             }
         }
