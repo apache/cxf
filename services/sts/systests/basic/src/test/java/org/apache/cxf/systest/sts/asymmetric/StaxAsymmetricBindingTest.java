@@ -159,9 +159,7 @@ public class StaxAsymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // TODO (WSS-484) Uncomment when we upgrade to WSS4J 2.0-SNAPSHOT again
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenSAML1Encrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

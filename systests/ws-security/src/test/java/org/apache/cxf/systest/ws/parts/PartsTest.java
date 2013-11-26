@@ -462,9 +462,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - re-enable once we move off WSS4J 2.0-beta
     @org.junit.Test
-    @org.junit.Ignore
     public void testSignedAttachments() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -525,9 +523,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - re-enable once we move off WSS4J 2.0-beta
     @org.junit.Test
-    @org.junit.Ignore
     public void testEncryptedAttachments() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

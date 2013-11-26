@@ -35,8 +35,6 @@ import org.junit.BeforeClass;
 /**
  * A set of tests for the SwA specification (SOAP with Attachments)
  */
-// TODO Wait until we move off the WSS4J 2.0 beta release
-@org.junit.Ignore
 public class SWAActionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 

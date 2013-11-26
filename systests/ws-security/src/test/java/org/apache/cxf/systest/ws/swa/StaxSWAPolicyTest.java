@@ -39,8 +39,6 @@ import org.junit.BeforeClass;
  * 
  * It tests both DOM + StAX clients against the StAX server
  */
-//TODO Wait until we move off the WSS4J 2.0 beta release
-@org.junit.Ignore
 public class StaxSWAPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(StaxPolicyServer.class);
 

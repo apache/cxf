@@ -275,7 +275,6 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         
         // DOM
-        /* TODO See WSS-482 - Remove comment when we move off WSS4J RC
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
@@ -293,7 +292,6 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             // String error = "To must be signed";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -406,8 +404,6 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
         
-        /*
-          TODO See WSS-482 - Remove comment when we move off WSS4J RC
         // DOM
         try {
             port.doubleIt(25);
@@ -426,7 +422,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
             // String error = "To must be encrypted";
             // assertTrue(ex.getMessage().contains(error));
         }
-        */
+        
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -466,9 +462,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // TODO - re-enable once we move off WSS4J 2.0-beta
     @org.junit.Test
-    @org.junit.Ignore
     public void testSignedAttachments() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -529,9 +523,7 @@ public class StaxPartsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO - re-enable once we move off WSS4J 2.0-beta
     @org.junit.Test
-    @org.junit.Ignore
     public void testEncryptedAttachments() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
