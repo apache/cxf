@@ -27,13 +27,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
-import org.apache.cxf.validation.ValidationProvider;
+import org.apache.cxf.validation.BeanValidationProvider;
 
 @Path("/bookstore/")
 public class BookStoreWithValidation {
-    private ValidationProvider provider;
+    private BeanValidationProvider provider;
      
-    public void setProvider(ValidationProvider provider) {
+    public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
     }
     

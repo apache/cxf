@@ -25,13 +25,14 @@ import javax.ws.rs.container.ContainerRequestFilter;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.validation.ValidationInInterceptor;
+import org.apache.cxf.validation.BeanValidationInInterceptor;
 
 
-public class JAXRSValidationInInterceptor extends ValidationInInterceptor implements ContainerRequestFilter {
-    public JAXRSValidationInInterceptor() {
+public class JAXRSBeanValidationInInterceptor extends BeanValidationInInterceptor 
+    implements ContainerRequestFilter {
+    public JAXRSBeanValidationInInterceptor() {
     }
-    public JAXRSValidationInInterceptor(String phase) {
+    public JAXRSBeanValidationInInterceptor(String phase) {
         super(phase);
     }
 

@@ -28,18 +28,18 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.validation.ValidationProvider;
+import org.apache.cxf.validation.BeanValidationProvider;
 
 
-public class JAXRSValidationInvoker extends JAXRSInvoker {
-    private volatile ValidationProvider provider;
+public class JAXRSBeanValidationInvoker extends JAXRSInvoker {
+    private volatile BeanValidationProvider provider;
     private boolean validateServiceObject = true;
     
     @Override
     public Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {
         Message message = JAXRSUtils.getCurrentMessage();
         
-        ValidationProvider theProvider = getProvider(message);
+        BeanValidationProvider theProvider = getProvider(message);
         
         if (isValidateServiceObject()) {
             theProvider.validateBean(serviceObject);
@@ -65,19 +65,19 @@ public class JAXRSValidationInvoker extends JAXRSInvoker {
         return response;
     }
     
-    protected ValidationProvider getProvider(Message message) {
+    protected BeanValidationProvider getProvider(Message message) {
         if (provider == null) {
-            Object prop = message.getContextualProperty(ValidationProvider.class.getName());
+            Object prop = message.getContextualProperty(BeanValidationProvider.class.getName());
             if (prop != null) {
-                provider = (ValidationProvider)prop;    
+                provider = (BeanValidationProvider)prop;    
             } else {
-                provider = new ValidationProvider();
+                provider = new BeanValidationProvider();
             }
         }
         return provider;
     }
     
-    public void setProvider(ValidationProvider provider) {
+    public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
     }
 

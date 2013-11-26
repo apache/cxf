@@ -30,13 +30,14 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutExceptionMapperInterceptor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor;
+import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor;
 import org.apache.cxf.jaxrs.validation.JAXRSParameterNameProvider;
-import org.apache.cxf.jaxrs.validation.JAXRSValidationInInterceptor;
-import org.apache.cxf.jaxrs.validation.JAXRSValidationOutInterceptor;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.validation.ValidationProvider;
+import org.apache.cxf.validation.BeanValidationInInterceptor;
+import org.apache.cxf.validation.BeanValidationProvider;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -57,14 +58,14 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
             sf.setProvider(new ValidationExceptionMapper());
 
             sf.setAddress("http://localhost:" + PORT + "/");
-            JAXRSValidationInInterceptor in = new JAXRSValidationInInterceptor();
-            in.setProvider(new ValidationProvider(new JAXRSParameterNameProvider()));
+            BeanValidationInInterceptor in = new JAXRSBeanValidationInInterceptor();
+            in.setProvider(new BeanValidationProvider(new JAXRSParameterNameProvider()));
             sf.setInInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
                 in));
              
             sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
                 new JAXRSOutExceptionMapperInterceptor(),
-                new JAXRSValidationOutInterceptor()));
+                new JAXRSBeanValidationOutInterceptor()));
 
             sf.create();
         }

@@ -44,7 +44,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:server>
     
     <bean id="exceptionMapper" class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper"/>
-    <bean id="validationProvider" class="org.apache.cxf.validation.ValidationProvider">
+    <bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider">
         <constructor-arg name="parameterNameProvider">
             <bean id="parameterNameProvider" class="org.apache.cxf.jaxrs.validation.JAXRSParameterNameProvider" />
         </constructor-arg>
@@ -53,10 +53,10 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <bean id="bookStoreWithValidation" class="org.apache.cxf.systest.jaxrs.validation.spring.BookStoreWithValidation">
        <property name="provider" ref="validationProvider" />
     </bean>       
-    <bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSValidationInInterceptor">
+    <bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
         <property name="provider" ref="validationProvider" />
     </bean>
-    <bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSValidationOutInterceptor">
+    <bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
         <property name="provider" ref="validationProvider" />
     </bean>    
 </beans>

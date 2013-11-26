@@ -25,12 +25,12 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-public class ValidationOutInterceptor extends AbstractValidationInterceptor {
+public class BeanValidationOutInterceptor extends AbstractValidationInterceptor {
     private boolean enforceOnlyBeanConstraints;
-    public ValidationOutInterceptor() {
+    public BeanValidationOutInterceptor() {
         super(Phase.PRE_MARSHAL);
     }
-    public ValidationOutInterceptor(String phase) {
+    public BeanValidationOutInterceptor(String phase) {
         super(phase);
     }
     
@@ -38,9 +38,10 @@ public class ValidationOutInterceptor extends AbstractValidationInterceptor {
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {
         if (arguments.size() == 1
-            && !PropertyUtils.isTrue(message.getExchange().get(ValidationInInterceptor.INPUT_VALIDATION_FAILED))) {
+            && !PropertyUtils.isTrue(message.getExchange().get(
+                BeanValidationInInterceptor.INPUT_VALIDATION_FAILED))) {
             Object entity = unwrapEntity(arguments.get(0));
-            ValidationProvider theProvider = getOutProvider(message);
+            BeanValidationProvider theProvider = getOutProvider(message);
             if (isEnforceOnlyBeanConstraints()) {
                 theProvider.validateReturnValue(entity);    
             } else {
@@ -53,8 +54,8 @@ public class ValidationOutInterceptor extends AbstractValidationInterceptor {
         return entity;
     }
     
-    protected ValidationProvider getOutProvider(Message message) {
-        ValidationProvider provider = message.getExchange().get(ValidationProvider.class);
+    protected BeanValidationProvider getOutProvider(Message message) {
+        BeanValidationProvider provider = message.getExchange().get(BeanValidationProvider.class);
         return provider == null ? getProvider(message) : provider;
     }
     

@@ -23,11 +23,11 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 
-public class JAXRSValidationFeature extends AbstractFeature {
+public class JAXRSBeanValidationFeature extends AbstractFeature {
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(new JAXRSValidationInInterceptor());
-        provider.getOutInterceptors().add(new JAXRSValidationOutInterceptor());
+        provider.getInInterceptors().add(new JAXRSBeanValidationInInterceptor());
+        provider.getOutInterceptors().add(new JAXRSBeanValidationOutInterceptor());
     }
 }

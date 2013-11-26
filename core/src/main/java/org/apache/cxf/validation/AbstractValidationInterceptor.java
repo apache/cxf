@@ -40,7 +40,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
     
     private Object serviceObject;
-    private volatile ValidationProvider provider;
+    private volatile BeanValidationProvider provider;
     
     public AbstractValidationInterceptor(String phase) {
         super(phase);
@@ -50,7 +50,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         this.serviceObject = object;
     }
     
-    public void setProvider(ValidationProvider provider) {
+    public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
     }
     
@@ -116,13 +116,13 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
                                              final Method method, final List<Object> arguments);
 
 
-    protected ValidationProvider getProvider(Message message) {
+    protected BeanValidationProvider getProvider(Message message) {
         if (provider == null) {
-            Object prop = message.getContextualProperty(ValidationProvider.class.getName());
+            Object prop = message.getContextualProperty(BeanValidationProvider.class.getName());
             if (prop != null) {
-                provider = (ValidationProvider)prop;    
+                provider = (BeanValidationProvider)prop;    
             } else {
-                provider = new ValidationProvider();
+                provider = new BeanValidationProvider();
             }
         }
         return provider;

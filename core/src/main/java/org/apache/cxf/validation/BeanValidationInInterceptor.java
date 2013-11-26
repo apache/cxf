@@ -26,13 +26,13 @@ import javax.validation.ValidationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-public class ValidationInInterceptor extends AbstractValidationInterceptor {
+public class BeanValidationInInterceptor extends AbstractValidationInterceptor {
     static final String INPUT_VALIDATION_FAILED = "input.validation.failed";
     
-    public ValidationInInterceptor() {
+    public BeanValidationInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
-    public ValidationInInterceptor(String phase) {
+    public BeanValidationInInterceptor(String phase) {
         super(phase);
     }
 
@@ -41,9 +41,9 @@ public class ValidationInInterceptor extends AbstractValidationInterceptor {
                                     final Method method, final List<Object> arguments) {
         if (arguments.size() > 0) {
             try {
-                ValidationProvider provider = getProvider(message);
+                BeanValidationProvider provider = getProvider(message);
                 provider.validateParameters(resourceInstance, method, unwrapArgs(arguments).toArray());
-                message.getExchange().put(ValidationProvider.class, provider);
+                message.getExchange().put(BeanValidationProvider.class, provider);
             } catch (ValidationException ex) {
                 message.getExchange().put(INPUT_VALIDATION_FAILED, true);
                 throw ex;

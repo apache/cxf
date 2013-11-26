@@ -27,14 +27,14 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.validation.ValidationOutInterceptor;
+import org.apache.cxf.validation.BeanValidationOutInterceptor;
 
 
-public class JAXRSValidationOutInterceptor extends ValidationOutInterceptor
+public class JAXRSBeanValidationOutInterceptor extends BeanValidationOutInterceptor
     implements ContainerResponseFilter {
-    public JAXRSValidationOutInterceptor() {
+    public JAXRSBeanValidationOutInterceptor() {
     }
-    public JAXRSValidationOutInterceptor(String phase) {
+    public JAXRSBeanValidationOutInterceptor(String phase) {
         super(phase);
     }
     

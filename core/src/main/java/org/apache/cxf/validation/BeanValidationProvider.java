@@ -35,12 +35,12 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-public class ValidationProvider {
-    private static final Logger LOG = LogUtils.getL7dLogger(ValidationProvider.class);
+public class BeanValidationProvider {
+    private static final Logger LOG = LogUtils.getL7dLogger(BeanValidationProvider.class);
     
     private final ValidatorFactory factory;
     
-    public ValidationProvider() {
+    public BeanValidationProvider() {
         try {
             factory = Validation.buildDefaultValidatorFactory();
         } catch (final ValidationException ex) {
@@ -49,11 +49,11 @@ public class ValidationProvider {
         }
     }
     
-    public ValidationProvider(ParameterNameProvider parameterNameProvider) {
+    public BeanValidationProvider(ParameterNameProvider parameterNameProvider) {
         this(new ValidationConfiguration(parameterNameProvider));
     }
     
-    public ValidationProvider(ValidationConfiguration cfg) {
+    public BeanValidationProvider(ValidationConfiguration cfg) {
         try {
             Configuration<?> factoryCfg = Validation.byDefaultProvider().configure();
             initFactoryConfig(factoryCfg, cfg);
@@ -64,24 +64,24 @@ public class ValidationProvider {
         }
     }
     
-    public ValidationProvider(ValidatorFactory factory) {
+    public BeanValidationProvider(ValidatorFactory factory) {
         if (factory == null) {
             throw new NullPointerException("Factory is null");
         }
         this.factory = factory;
     }
     
-    public ValidationProvider(ValidationProviderResolver resolver) {
+    public BeanValidationProvider(ValidationProviderResolver resolver) {
         this(resolver, null);
     }
     
-    public <T extends Configuration<T>> ValidationProvider(
+    public <T extends Configuration<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
         Class<javax.validation.spi.ValidationProvider<T>> providerType) {
         this(resolver, providerType, null);
     }
     
-    public <T extends Configuration<T>> ValidationProvider(
+    public <T extends Configuration<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
         Class<javax.validation.spi.ValidationProvider<T>> providerType,
         ValidationConfiguration cfg) {

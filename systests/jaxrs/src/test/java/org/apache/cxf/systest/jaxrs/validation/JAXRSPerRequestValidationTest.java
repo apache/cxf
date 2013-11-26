@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.validation.JAXRSValidationInvoker;
+import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInvoker;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -42,7 +42,7 @@ public class JAXRSPerRequestValidationTest extends AbstractJAXRSValidationTest {
             sf.setProvider(new ValidationExceptionMapper());
 
             sf.setAddress("http://localhost:" + PORT + "/");
-            sf.setInvoker(new JAXRSValidationInvoker());
+            sf.setInvoker(new JAXRSBeanValidationInvoker());
 
             sf.create();
         }
