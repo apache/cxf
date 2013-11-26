@@ -114,7 +114,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             fail("Redirect to different host is not allowed");
         } catch (ProcessingException ex) {
             Throwable cause = ex.getCause();
-            assertTrue(cause.getMessage().startsWith("Different HTTP Scheme or Host Redirect detected on"));
+            assertTrue(cause.getMessage().contains("Different HTTP Scheme or Host Redirect detected on"));
         }
     }
     
@@ -159,7 +159,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             fail("relative Redirect is not allowed");
         } catch (ProcessingException ex) {
             Throwable cause = ex.getCause();
-            assertTrue(cause.getMessage().startsWith("Relative Redirect detected on"));
+            assertTrue(cause.getMessage().contains("Relative Redirect detected on"));
         }
     }
     
