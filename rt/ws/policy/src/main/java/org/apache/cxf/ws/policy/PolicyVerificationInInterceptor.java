@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -103,6 +104,7 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
                 message.getExchange().put("ws-policy.validated.alternatives", usedAlternatives);
             }
         } catch (PolicyException ex) {
+            LOG.log(Level.SEVERE, "Inbound policy verification failed: " + ex.getMessage(), e);
             //To check if there is ws addressing policy violation and throw WSA specific 
             //exception to pass jaxws2.2 tests
             if (ex.getMessage().indexOf("Addressing") > -1) {
