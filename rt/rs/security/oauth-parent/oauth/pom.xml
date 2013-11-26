@@ -54,7 +54,6 @@
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
-            <version>${cxf.servlet-api.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
