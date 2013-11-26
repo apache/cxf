@@ -239,7 +239,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     }
     
     protected String getPassword(String userName, AbstractToken info, 
-                                 WSPasswordCallback.Usage usage, SoapMessage message) {
+                                 int usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
     
         CallbackHandler handler = getCallback(message);

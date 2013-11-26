@@ -137,6 +137,8 @@ public final class AlgorithmSuiteTranslater {
             algorithmSuite.addTransformAlgorithm(cxfAlgorithmSuite.getC14n().getValue());
             algorithmSuite.addTransformAlgorithm(SPConstants.STRT10);
             algorithmSuite.addTransformAlgorithm(WSConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE);
+            algorithmSuite.addTransformAlgorithm(WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS);
+            algorithmSuite.addTransformAlgorithm(WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS);
     
             algorithmSuite.addDerivedKeyAlgorithm(SPConstants.P_SHA1);
             algorithmSuite.addDerivedKeyAlgorithm(SPConstants.P_SHA1_L128);

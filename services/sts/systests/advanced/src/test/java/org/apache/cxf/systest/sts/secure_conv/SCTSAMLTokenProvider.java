@@ -197,7 +197,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
 
             // Get the password
             String alias = stsProperties.getSignatureUsername();
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE)};
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
             LOG.fine("Creating SAML Token");
             stsProperties.getCallbackHandler().handle(cb);
             String password = cb[0].getPassword();

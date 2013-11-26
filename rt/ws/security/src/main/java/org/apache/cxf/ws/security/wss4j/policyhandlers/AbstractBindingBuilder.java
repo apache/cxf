@@ -72,6 +72,7 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.wss4j.AttachmentOutCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
@@ -121,6 +122,7 @@ import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.Attachments;
 import org.apache.wss4j.policy.model.ContentEncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
@@ -452,7 +454,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         throw new Fault(e1);
                     }
 
-                    String password = getPassword(uname, token, WSPasswordCallback.Usage.SIGNATURE);
+                    String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
                     sig.setUserInfo(uname, password);
                     try {
                         sig.prepare(saaj.getSOAPPart(), secToken.getCrypto(), secHeader);
@@ -695,7 +697,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else {
                 String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
                 if (StringUtils.isEmpty(password)) {
-                    password = getPassword(userName, token, WSPasswordCallback.Usage.USERNAME_TOKEN);
+                    password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
                 }
             
                 if (!StringUtils.isEmpty(password)) {
@@ -747,7 +749,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                password = getPassword(userName, token, WSPasswordCallback.Usage.USERNAME_TOKEN);
+                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
             }
 
             if (!StringUtils.isEmpty(password)) {
@@ -837,7 +839,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
             String password = samlCallback.getIssuerKeyPassword();
             if (password == null) {
-                password = getPassword(issuerName, token, WSPasswordCallback.Usage.SIGNATURE);
+                password = getPassword(issuerName, token, WSPasswordCallback.SIGNATURE);
             }
             Crypto crypto = samlCallback.getIssuerCrypto();
             if (crypto == null) {
@@ -894,7 +896,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return id;
     }
     
-    public String getPassword(String userName, Assertion info, WSPasswordCallback.Usage usage) {
+    public String getPassword(String userName, Assertion info, int usage) {
         //Then try to get the password from the given callback handler
         CallbackHandler handler = getCallbackHandler();
         if (handler == null) {
@@ -1034,6 +1036,12 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                                             "Element");
                 signedParts.add(wep);
             }
+            
+            Attachments attachments = parts.getAttachments();
+            if (attachments != null) {
+                WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", "Element");
+                signedParts.add(wep);
+            }
         }
     
         // REVISIT consider catching exceptions and unassert failed assertions or
@@ -1078,6 +1086,15 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
                                                             "Element");
+                signedParts.add(wep);
+            }
+            Attachments attachments = parts.getAttachments();
+            if (attachments != null) {
+                String modifier = "Element";
+                if (attachments.isContentSignatureTransform()) {
+                    modifier = "Content";
+                }
+                WSEncryptionPart wep = new WSEncryptionPart("cid:Attachments", modifier);
                 signedParts.add(wep);
             }
         }
@@ -1199,6 +1216,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
         // Handle sign/enc parts
         for (WSEncryptionPart part : parts) {
+            if (part.getId() != null && part.getId().startsWith("cid:")) {
+                // Attachments are handled inside WSS4J via a CallbackHandler
+                result.add(part);
+                continue;
+            }
             final List<Element> elements;
             
             if (StringUtils.isEmpty(part.getName())) {
@@ -1612,6 +1634,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         AbstractTokenWrapper wrapper, AbstractToken token, boolean attached, boolean endorse
     ) throws WSSecurityException {
         WSSecSignature sig = new WSSecSignature(wssConfig);
+        sig.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
         checkForX509PkiPath(sig, token);
         boolean alsoIncludeToken = false;
         if (token instanceof IssuedToken || token instanceof SamlToken) {
@@ -1716,7 +1739,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
 
-        String password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE);
+        String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
         sig.setUserInfo(user, password);
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();

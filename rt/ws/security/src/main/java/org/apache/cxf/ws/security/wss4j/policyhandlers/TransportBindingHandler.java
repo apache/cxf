@@ -545,7 +545,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
                 uname = (String)message.getContextualProperty(userNameKey);
             }
-            String password = getPassword(uname, token, WSPasswordCallback.Usage.SIGNATURE);
+            String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
             if (password == null) {
                 password = "";
             }

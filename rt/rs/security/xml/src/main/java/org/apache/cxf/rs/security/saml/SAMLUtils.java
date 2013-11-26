@@ -118,7 +118,7 @@ public final class SAMLUtils {
                 }
         
                 String password = 
-                    SecurityUtils.getPassword(message, user, WSPasswordCallback.Usage.SIGNATURE, 
+                    SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, 
                             SAMLUtils.class);
                 
                 assertion.signAssertion(user, password, crypto, false);

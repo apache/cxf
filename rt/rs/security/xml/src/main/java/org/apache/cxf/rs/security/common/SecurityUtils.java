@@ -117,7 +117,7 @@ public final class SecurityUtils {
     }
     
     public static String getPassword(Message message, String userName, 
-                                     WSPasswordCallback.Usage type, Class<?> callingClass) {
+                                     int type, Class<?> callingClass) {
         CallbackHandler handler = getCallbackHandler(message, callingClass);
         if (handler == null) {
             return null;

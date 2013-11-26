@@ -38,7 +38,6 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.MessageUtils;
@@ -64,6 +63,7 @@ import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.Attachments;
 import org.apache.wss4j.policy.model.ContentEncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
@@ -872,6 +872,16 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 securePart.setRequired(false);
                 signedParts.add(securePart);
             }
+            Attachments attachments = parts.getAttachments();
+            if (attachments != null) {
+                Modifier modifier = Modifier.Element;
+                if (attachments.isContentSignatureTransform()) {
+                    modifier = Modifier.Content;
+                }
+                SecurePart securePart = new SecurePart("cid:Attachments", modifier);
+                securePart.setRequired(false);
+                signedParts.add(securePart);
+            }
         }
         
         if (elements != null && elements.getXPaths() != null) {
@@ -935,6 +945,13 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 }
                 QName qname = new QName(head.getNamespace(), localName);
                 SecurePart securePart = new SecurePart(qname, Modifier.Element);
+                securePart.setRequired(false);
+                encryptedParts.add(securePart);
+            }
+            
+            Attachments attachments = parts.getAttachments();
+            if (attachments != null) {
+                SecurePart securePart = new SecurePart("cid:Attachments", Modifier.Element);
                 securePart.setRequired(false);
                 encryptedParts.add(securePart);
             }

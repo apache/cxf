@@ -439,16 +439,42 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     parts += ";";
                 }
             }
+            
+            String optionalParts = "";
+            if (config.containsKey(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS)) {
+                optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
+                if (!optionalParts.endsWith(";")) {
+                    optionalParts += ";";
+                }
+            }
 
             if (encrParts != null) {
                 for (SecurePart part : encrParts) {
                     QName name = part.getName();
-                    parts += "{" + part.getModifier() + "}{"
-                        +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+                    String modifier = part.getModifier().getModifier();
+                    if (modifier == null || Modifier.Element.getModifier().equals(modifier)) {
+                        modifier = "Element";
+                    } else {
+                        modifier = "Content";
+                    }
+                    
+                    String parsedPart = "";
+                    if (name != null) {
+                        parsedPart = "{" + modifier + "}{" + name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+                    } else {
+                        parsedPart = "{" + modifier + "}" + part.getExternalReference() + ";";
+                    }
+                    
+                    if (part.isRequired()) {
+                        parts += parsedPart;
+                    } else {
+                        optionalParts += parsedPart;
+                    }
                 }
             }
 
             config.put(ConfigurationConstants.ENCRYPTION_PARTS, parts);
+            config.put(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS, optionalParts);
 
             if (isRequestor()) {
                 config.put(ConfigurationConstants.ENC_KEY_ID, 
@@ -543,10 +569,24 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         for (SecurePart part : sigParts) {
             QName name = part.getName();
-            if (part.isRequired()) {
-                parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            String modifier = part.getModifier().getModifier();
+            if (modifier == null || Modifier.Element.getModifier().equals(modifier)) {
+                modifier = "Element";
             } else {
-                optionalParts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+                modifier = "Content";
+            }
+            
+            String parsedPart = "";
+            if (name != null) {
+                parsedPart = "{" + modifier + "}{" + name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+            } else {
+                parsedPart = "{" + modifier + "}" + part.getExternalReference() + ";";
+            }
+            
+            if (part.isRequired()) {
+                parts += parsedPart;
+            } else {
+                optionalParts += parsedPart;
             }
         }
         

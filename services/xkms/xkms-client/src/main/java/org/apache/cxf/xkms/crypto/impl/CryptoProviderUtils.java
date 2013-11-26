@@ -34,7 +34,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSPasswordCallback.Usage;
 
 final class CryptoProviderUtils {
 
@@ -129,7 +128,7 @@ final class CryptoProviderUtils {
         return handler;
     }
 
-    public static String getCallbackPwdFromMessage(Message message, String userName, Usage usage) {
+    public static String getCallbackPwdFromMessage(Message message, String userName, int usage) {
         // Then try to get the password from the given callback handler
         CallbackHandler handler = getCallbackHandler(message);
         if (handler == null) {
@@ -139,7 +138,7 @@ final class CryptoProviderUtils {
         return getCallbackPwd(userName, usage, handler);
     }
 
-    public static String getCallbackPwd(String userName, Usage usage, CallbackHandler handler) {
+    public static String getCallbackPwd(String userName, int usage, CallbackHandler handler) {
         if (handler == null) {
             return null;
         }

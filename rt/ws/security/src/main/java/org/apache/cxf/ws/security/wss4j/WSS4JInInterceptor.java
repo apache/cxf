@@ -218,6 +218,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         try {
             reqData.setMsgContext(msg);
+            reqData.setAttachmentCallbackHandler(new AttachmentInCallbackHandler(msg));
+            
             setAlgorithmSuites(msg, reqData);
             
             reqData.setCallbackHandler(getCallback(reqData, utWithCallbacks));

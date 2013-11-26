@@ -489,7 +489,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 LOG.fine("Signature alias is null so using default alias: " + alias);
             }
             // Get the password
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE)};
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
             LOG.fine("Creating SAML Token");
             callbackHandler.handle(cb);
             String password = cb[0].getPassword();

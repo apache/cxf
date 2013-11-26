@@ -143,6 +143,10 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 return;
             }
             
+            if (secProps.getAttachmentCallbackHandler() == null) {
+                secProps.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(mc));
+            }
+            
             SecurityEventListener securityEventListener = 
                 configureSecurityEventListener(mc, secProps);
             
@@ -284,7 +288,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     final class WSS4JStaxOutInterceptorInternal extends AbstractPhaseInterceptor<Message> {
         public WSS4JStaxOutInterceptorInternal() {
             super(Phase.PRE_STREAM_ENDING);
-            getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
+            getBefore().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
         }
         
         public void handleMessage(Message mc) throws Fault {

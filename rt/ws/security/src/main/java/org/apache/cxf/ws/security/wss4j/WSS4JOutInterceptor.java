@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -171,6 +172,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             translateProperties(mc);
     
             reqData.setMsgContext(mc);
+            reqData.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(mc));
             
             /*
              * The overall try, just to have a finally at the end to perform some

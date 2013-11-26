@@ -34,7 +34,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -131,6 +130,47 @@ public final class CryptoCoverageUtil {
         }
     }
 
+    public static void checkAttachmentsCoverage(
+        Collection<org.apache.cxf.message.Attachment> attachments,
+        final Collection<WSDataRef> refs,
+        CoverageType type,
+        CoverageScope scope
+    ) throws WSSecurityException {
+        String requiredTransform = null;
+        if (type == CoverageType.SIGNED && scope == CoverageScope.CONTENT) {
+            requiredTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+        } else if (type == CoverageType.SIGNED) {
+            requiredTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+        }
+        
+        if (attachments != null) {
+            // For each matching attachment, check for a ref that covers it.
+            for (org.apache.cxf.message.Attachment attachment : attachments) {
+                boolean matched = false;
+                
+                for (WSDataRef r : refs) {
+                    String id = r.getWsuId();
+                    if (id != null && id.startsWith("cid:")) {
+                        id = id.substring(4);
+                    }
+                    
+                    if (r.isAttachment() && attachment.getId() != null && attachment.getId().equals(id) 
+                        && (CoverageType.ENCRYPTED == type || r.getTransformAlgorithms() != null
+                        && r.getTransformAlgorithms().contains(requiredTransform))) {
+                        matched = true;
+                        break;
+                    }
+                }
+                
+                // We looked through all of the refs, but the element was not signed/encrypted
+                if (!matched) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                            new Exception("The " + getCoverageTypeString(type)
+                            + " does not cover the required elements"));
+                }
+            }
+        }
+    }
     
     /**
      * Checks that the references provided refer to the required

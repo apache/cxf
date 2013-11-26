@@ -113,7 +113,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         }
 
         String password = 
-            SecurityUtils.getPassword(message, user, WSPasswordCallback.Usage.SIGNATURE, this.getClass());
+            SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
     
         X509Certificate[] issuerCerts = SecurityUtils.getCertificates(crypto, user);
         

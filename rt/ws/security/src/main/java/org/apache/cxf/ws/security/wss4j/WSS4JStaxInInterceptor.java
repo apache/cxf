@@ -132,6 +132,10 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 secProps = ConfigurationConverter.convert(getProperties());
             }
             
+            if (secProps.getAttachmentCallbackHandler() == null) {
+                secProps.setAttachmentCallbackHandler(new AttachmentInCallbackHandler(soapMessage));
+            }
+            
             TokenStoreCallbackHandler callbackHandler = 
                 new TokenStoreCallbackHandler(
                     secProps.getCallbackHandler(), WSS4JUtils.getTokenStore(soapMessage)

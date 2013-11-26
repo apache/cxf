@@ -139,7 +139,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         ub.queryParam(SSOConstants.SIG_ALG, URLEncoder.encode(sigAlgo, "UTF-8"));
         
         // Get the password
-        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.Usage.SIGNATURE)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.SIGNATURE)};
         callbackHandler.handle(cb);
         String password = cb[0].getPassword();
         

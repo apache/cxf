@@ -355,7 +355,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                password = getPassword(userName, token, WSPasswordCallback.Usage.USERNAME_TOKEN, message);
+                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN, message);
             }
             
             if (!StringUtils.isEmpty(password)) {

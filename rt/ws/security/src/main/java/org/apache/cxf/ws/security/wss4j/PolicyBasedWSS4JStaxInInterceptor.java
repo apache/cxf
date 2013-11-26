@@ -536,7 +536,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         
         String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
-        return new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), actor);
+        final Collection<org.apache.cxf.message.Attachment> attachments = 
+            msg.getAttachments();
+        int attachmentCount = 0;
+        if (attachments != null && !attachments.isEmpty()) {
+            attachmentCount = attachments.size();
+        }
+        return new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg), actor, attachmentCount);
     }
     
 }

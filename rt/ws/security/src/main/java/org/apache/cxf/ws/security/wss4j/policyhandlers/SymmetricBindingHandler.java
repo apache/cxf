@@ -40,6 +40,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.wss4j.AttachmentOutCallbackHandler;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -513,6 +514,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
+                    encr.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
@@ -588,13 +590,24 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         encr.prependBSTElementToHeader(secHeader);
                     }
                    
-                   
                     Element refList = encr.encryptForRef(null, encrParts);
+                    List<Element> attachments = encr.getAttachmentEncryptedDataElements();
                     if (atEnd) {
                         this.insertBeforeBottomUp(refList);
+                        if (attachments != null) {
+                            for (Element attachment : attachments) {
+                                this.insertBeforeBottomUp(attachment);
+                            }
+                        }
                     } else {
-                        this.addDerivedKeyElement(refList);                        
+                        this.addDerivedKeyElement(refList);
+                        if (attachments != null) {
+                            for (Element attachment : attachments) {
+                                this.addDerivedKeyElement(attachment);
+                            }
+                        }
                     }
+                    
                     return encr;
                 } catch (WSSecurityException e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
@@ -742,6 +755,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             return doSignatureDK(sigs, policyAbstractTokenWrapper, policyToken, tok, included);
         } else {
             WSSecSignature sig = new WSSecSignature(wssConfig);
+            sig.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 

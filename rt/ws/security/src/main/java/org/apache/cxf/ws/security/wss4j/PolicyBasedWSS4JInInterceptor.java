@@ -98,6 +98,7 @@ import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.Attachments;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.RequiredElements;
 import org.apache.wss4j.policy.model.RequiredParts;
@@ -612,6 +613,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                 CoverageScope.ELEMENT);
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + type);
+                    }
+                }
+                
+                Attachments attachments = p.getAttachments();
+                if (attachments != null) {
+                    try {
+                        CoverageScope scope = CoverageScope.ELEMENT;
+                        if (attachments.isContentSignatureTransform()) {
+                            scope = CoverageScope.CONTENT;
+                        }
+                        CryptoCoverageUtil.checkAttachmentsCoverage(msg.getAttachments(), signed, 
+                                                                type, scope);
+                    } catch (WSSecurityException e) {
+                        ai.setNotAsserted("An attachment was not signed/encrypted");
                     }
                 }
             }

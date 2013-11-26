@@ -292,7 +292,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                 password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
                 if (StringUtils.isEmpty(password)) {
                     password = 
-                        getPassword(issuerName, token, WSPasswordCallback.Usage.SIGNATURE, message);
+                        getPassword(issuerName, token, WSPasswordCallback.SIGNATURE, message);
                 }
             }
             Crypto crypto = samlCallback.getIssuerCrypto();

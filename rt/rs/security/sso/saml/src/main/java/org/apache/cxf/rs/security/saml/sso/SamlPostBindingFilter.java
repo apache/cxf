@@ -139,7 +139,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         LOG.fine("Using Signature algorithm " + sigAlgo);
         
         // Get the password
-        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.Usage.SIGNATURE)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.SIGNATURE)};
         callbackHandler.handle(cb);
         String password = cb[0].getPassword();
         

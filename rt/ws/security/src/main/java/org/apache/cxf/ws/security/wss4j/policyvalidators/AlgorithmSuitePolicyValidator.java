@@ -132,7 +132,9 @@ public class AlgorithmSuitePolicyValidator {
             }
             for (String transformAlgorithm : transformAlgorithms) {
                 if (!(algorithmPolicy.getC14n().getValue().equals(transformAlgorithm)
-                    || STRTransform.TRANSFORM_URI.equals(transformAlgorithm))) {
+                    || STRTransform.TRANSFORM_URI.equals(transformAlgorithm)
+                    || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
+                    || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {
                     ai.setNotAsserted("The transform algorithms do not match the requirement");
                     return false;
                 }
