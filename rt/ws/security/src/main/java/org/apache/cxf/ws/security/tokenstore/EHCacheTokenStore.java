@@ -95,6 +95,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
                 Element element = new Element(token.getId(), token);
                 element.setTimeToLive(parsedTTL);
                 element.setTimeToIdle(parsedTTL);
+                element.resetAccessStatistics();
                 cache.put(element);
             }
         }
@@ -107,6 +108,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
                 Element element = new Element(identifier, token);
                 element.setTimeToLive(parsedTTL);
                 element.setTimeToIdle(parsedTTL);
+                element.resetAccessStatistics();
                 cache.put(element);
             }
         }

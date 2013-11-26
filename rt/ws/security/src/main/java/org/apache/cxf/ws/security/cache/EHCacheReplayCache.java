@@ -106,7 +106,9 @@ public class EHCacheReplayCache implements ReplayCache, Closeable, BusLifeCycleL
             }
         }
         
-        cache.put(new Element(identifier, identifier, false, parsedTTL, parsedTTL));
+        Element element = new Element(identifier, identifier, false, parsedTTL, parsedTTL);
+        element.resetAccessStatistics();
+        cache.put(element);
     }
     
     /**
