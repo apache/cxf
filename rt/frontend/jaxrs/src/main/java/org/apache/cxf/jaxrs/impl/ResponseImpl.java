@@ -330,7 +330,7 @@ public final class ResponseImpl extends Response {
                         entity = null;
                     } 
                     
-                    return cls.cast(lastEntity);
+                    return castLastEntity();
                 } catch (Exception ex) {
                     throw new MessageProcessingException(ex);
                 }
@@ -339,12 +339,17 @@ public final class ResponseImpl extends Response {
             }
         } else if (entity != null && cls.isAssignableFrom(entity.getClass())) {
             lastEntity = entity;
-            return cls.cast(lastEntity);
+            return castLastEntity();
         }
         
         throw new IllegalStateException("The entity is not backed by an input stream, entity class is : "
             + entity != null ? entity.getClass().getName() : null);
         
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> T castLastEntity() {
+        return (T)lastEntity;
     }
     
     protected boolean responseStreamCanBeClosed(Class<?> cls) {

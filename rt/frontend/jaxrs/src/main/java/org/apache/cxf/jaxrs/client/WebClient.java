@@ -378,7 +378,7 @@ public class WebClient extends AbstractClient {
         @SuppressWarnings("unchecked")
         Class<T> responseClass = (Class<T>)responseType.getRawType();
         Response r = doInvoke(httpMethod, body, null, responseClass, responseType.getType());
-        return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
+        return castResponse(r, responseClass);
     }
     
 
@@ -392,7 +392,7 @@ public class WebClient extends AbstractClient {
      */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
         Response r = doInvoke(httpMethod, body, null, responseClass, responseClass);
-        return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
+        return castResponse(r, responseClass);
     }
     
     /**
@@ -406,9 +406,14 @@ public class WebClient extends AbstractClient {
      */
     public <T> T invoke(String httpMethod, Object body, Class<?> requestClass, Class<T> responseClass) {
         Response r = doInvoke(httpMethod, body, requestClass, null, responseClass, responseClass);
-        return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
+        return castResponse(r, responseClass);
     }
     
+    @SuppressWarnings("unchecked")
+    private <T> T castResponse(Response r, Class<T> responseClass) {
+        return (T)(responseClass == Response.class ? r : r.getEntity());
+    }
+
     /**
      * Does HTTP POST invocation and returns typed response object
      * @param body request body, can be null
