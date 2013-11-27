@@ -250,7 +250,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             try {
                 schema.newValidator().validate(new DOMSource(newElement));
             } catch (SAXException e) {
-                throw new XMLStreamException(e);
+                throw new XMLStreamException(e.getMessage(), e);
             }
         }
         return rootElement;        
