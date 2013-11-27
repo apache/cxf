@@ -633,7 +633,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             port.modifyFoo(foo);
             fail("Expected exception not found");
         } catch (SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("NoName is not a valid name"));
+            assertTrue(ex.getMessage(), ex.getMessage().contains("NoName is not a valid name"));
         }    
         try {
             Foo foo = new Foo();

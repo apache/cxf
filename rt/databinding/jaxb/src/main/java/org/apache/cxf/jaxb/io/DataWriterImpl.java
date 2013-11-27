@@ -127,7 +127,16 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
             if (setEventHandler) {
-                marshaller.setEventHandler(veventHandler);
+                ValidationEventHandler h = veventHandler;
+                if (veventHandler == null) {
+                    h = new ValidationEventHandler() {
+                        public boolean handleEvent(ValidationEvent event) {
+                            //continue on warnings only
+                            return event.getSeverity() == ValidationEvent.WARNING;
+                        }
+                    };
+                }
+                marshaller.setEventHandler(h);
             }
             
             final Map<String, String> nspref = databinding.getDeclaredNamespaceMappings();
