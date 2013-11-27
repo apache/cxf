@@ -20,14 +20,22 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -42,6 +50,26 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerProxySpring.class, true));
         createStaticBus();
+    }
+    
+    @Test
+    public void testGetWadlResourcesInfo() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/test/" + "?_wadl&_type=xml");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        StaxUtils.writeTo(doc.getDocumentElement(), System.out);
+        Element root = doc.getDocumentElement();
+        assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
+        assertEquals("application", root.getLocalName());
+        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
+                                                                  WadlGenerator.WADL_NS, "resources");
+        assertEquals(1, resourcesEls.size());
+        Element resourcesEl =  resourcesEls.get(0);
+        assertEquals("http://localhost:" + PORT + "/test/", resourcesEl.getAttribute("base"));
+        List<Element> resourceEls = 
+            DOMUtils.getChildrenWithName(resourcesEl, 
+                                         WadlGenerator.WADL_NS, "resource");
+        assertEquals(2, resourceEls.size());
     }
     
     @Test

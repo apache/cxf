@@ -140,7 +140,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean supportCollections = true;
     private boolean supportJaxbXmlType = true;
     private boolean supportJaxbSubstitutions = true;
-
+    private boolean checkAbsolutePathSlash;
+    
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
     private Map<String, List<String>> externalQnamesMap;
@@ -153,7 +154,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultMediaType = DEFAULT_MEDIA_TYPE;
     private Bus bus;
-    
+        
     public WadlGenerator() {
     }
     
@@ -895,7 +896,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         List<ClassResourceInfo> all = ((JAXRSServiceImpl)m.getExchange().get(Service.class))
             .getClassResourceInfos();
-        if (slash.equals(path) && !ui.getAbsolutePath().getPath().endsWith(slash)) {
+        boolean absolutePathSlashOn = checkAbsolutePathSlash && ui.getAbsolutePath().getPath().endsWith(slash);
+        if (slash.equals(path) && !absolutePathSlashOn) {
             return all;
         }
         List<ClassResourceInfo> cris = new LinkedList<ClassResourceInfo>();
@@ -1785,6 +1787,10 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setSupportJaxbSubstitutions(boolean supportJaxbSubstitutions) {
         this.supportJaxbSubstitutions = supportJaxbSubstitutions;
+    }
+
+    public void setCheckAbsolutePathSlash(boolean checkAbsolutePathSlash) {
+        this.checkAbsolutePathSlash = checkAbsolutePathSlash;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
