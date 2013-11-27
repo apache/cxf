@@ -22,16 +22,19 @@ package org.apache.cxf.feature.transform;
 
 import java.io.InputStream;
 
-import javax.xml.transform.Source;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.dom.DOMSource;
+
+import org.w3c.dom.Document;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 /**
@@ -57,12 +60,16 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
             if (xsltStream == null) {
                 throw new IllegalArgumentException("Cannot load XSLT from path: " + xsltPath);
             }
-            Source xsltSource = new StreamSource(xsltStream);
-            xsltTemplate = TRANSFORM_FACTORIY.newTemplates(xsltSource);
+            Document doc = StaxUtils.read(xsltStream);
+            xsltTemplate = TRANSFORM_FACTORIY.newTemplates(new DOMSource(doc));
         } catch (TransformerConfigurationException e) {
             throw new IllegalArgumentException(
                                                String.format("Cannot create XSLT template from path: %s, error: ",
                                                              xsltPath, e.getException()), e);
+        } catch (XMLStreamException e) {
+            throw new IllegalArgumentException(
+                                               String.format("Cannot create XSLT template from path: %s, error: ",
+                                                             xsltPath, e.getNestedException()), e);
         }        
     }
 
