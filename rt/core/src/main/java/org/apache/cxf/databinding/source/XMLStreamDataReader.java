@@ -230,8 +230,9 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         } else {
             //MSV not available, use a slower method of cloning the data, replace the xop's, validate
             LOG.fine("NO_MSV_AVAILABLE");
+            Element newElement = rootElement;
             if (DOMUtils.hasElementWithName(rootElement, "http://www.w3.org/2004/08/xop/include", "Include")) {
-                Element newElement = (Element)rootElement.cloneNode(true);
+                newElement = (Element)rootElement.cloneNode(true);
                 List<Element> elems = DOMUtils.findAllElementsByTagNameNS(newElement, 
                                                                           "http://www.w3.org/2004/08/xop/include",
                                                                           "Include");
@@ -242,11 +243,11 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                     //set the fake base64Binary to validate instead of reading the attachment from message
                     parentNode.setTextContent(javax.xml.bind.DatatypeConverter.printBase64Binary(cid.getBytes()));
                 }
-                try {
-                    schema.newValidator().validate(new DOMSource(newElement));
-                } catch (SAXException e) {
-                    throw new XMLStreamException(e);
-                }
+            }
+            try {
+                schema.newValidator().validate(new DOMSource(newElement));
+            } catch (SAXException e) {
+                throw new XMLStreamException(e.getMessage(), e);
             }
         }
         return rootElement;        

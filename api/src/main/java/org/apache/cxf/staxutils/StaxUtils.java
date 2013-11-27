@@ -599,7 +599,7 @@ public final class StaxUtils {
                         reader.parse(((SAXSource)source).getInputSource());
                         return;
                     } catch (Exception e) {
-                        throw new XMLStreamException(e);
+                        throw new XMLStreamException(e.getMessage(), e);
                     }
                 } else if (ss.getInputSource() == null) {
                     //nothing to copy, just return
@@ -1883,14 +1883,14 @@ public final class StaxUtils {
             if (allowInsecureParser) {
                 LOG.warning("INSTANCE_NOT_XMLSTREAMREADER2");
             } else {
-                throw new XMLStreamException(cce);
+                throw new XMLStreamException(cce.getMessage(), cce);
             }
         } catch (IllegalArgumentException cce) {
             //not a property supported by this version of woodstox
             if (allowInsecureParser) {
                 LOG.log(Level.WARNING, "SECURE_PROPERTY_NOT_SUPPORTED", cce.getMessage());
             } else {
-                throw new XMLStreamException(cce);
+                throw new XMLStreamException(cce.getMessage(), cce);
             }
         }
         return reader;
