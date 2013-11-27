@@ -1310,6 +1310,26 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookExistsWebClientPrimitiveBoolean() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/check/123");
+        wc.accept("text/plain");
+        assertTrue(wc.get(boolean.class));
+    }
+    
+    @Test
+    public void testBookExistsProxyPrimitiveBoolean() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        assertTrue(store.checkBook(123L));
+    }
+    
+    @Test
+    public void testBookExistsWebClientBooleanObject() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/check/123");
+        wc.accept("text/plain");
+        assertTrue(wc.get(Boolean.class));
+    }
+    
+    @Test
     public void testBookExistsMalformedMt() throws Exception {
         WebClient wc = 
             WebClient.create("http://localhost:" + PORT + "/bookstore/books/check/malformedmt/123");
