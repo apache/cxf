@@ -24,20 +24,24 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
+import org.apache.cxf.staxutils.StaxSource;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public final class XSLTUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(XSLTUtils.class);
@@ -48,7 +52,8 @@ public final class XSLTUtils {
 
     public static InputStream transform(Templates xsltTemplate, InputStream in) {
         try {
-            StreamSource beforeSource = new StreamSource(in);
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(in);
+            Source beforeSource = new StaxSource(reader);
             CachedOutputStream out = new CachedOutputStream();
 
             Transformer trans = xsltTemplate.newTransformer();
@@ -64,7 +69,8 @@ public final class XSLTUtils {
 
     public static Reader transform(Templates xsltTemplate, Reader inReader) {
         try {
-            StreamSource beforeSource = new StreamSource(inReader);
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(inReader);
+            Source beforeSource = new StaxSource(reader);
             CachedWriter outWriter = new CachedWriter();
 
             Transformer trans = xsltTemplate.newTransformer();
