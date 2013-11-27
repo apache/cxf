@@ -355,6 +355,10 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             incomingObserver.onMessage(inMessage);
             resp.flushBuffer();
             baseRequest.setHandled(true);
+            ContinuationProvider p = inMessage.get(ContinuationProvider.class);
+            if (p != null) {
+                p.complete();
+            }
         } catch (SuspendedInvocationException ex) {
             if (ex.getRuntimeException() != null) {
                 throw ex.getRuntimeException();

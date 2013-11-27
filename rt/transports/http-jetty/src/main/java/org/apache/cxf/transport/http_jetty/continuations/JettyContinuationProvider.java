@@ -40,6 +40,14 @@ public class JettyContinuationProvider implements ContinuationProvider {
         response = resp;
         this.inMessage = m;
     }
+    
+    public void complete() {
+        JettyContinuationWrapper r = getContinuation(false);
+        if (r != null) {
+            r.reset();
+        }
+        wrapper = null;
+    }
     public Continuation getContinuation() {
         return getContinuation(true);
     }    

@@ -237,6 +237,10 @@ public abstract class AbstractHTTPDestination
         
         try {    
             incomingObserver.onMessage(inMessage);
+            ContinuationProvider p = inMessage.get(ContinuationProvider.class);
+            if (p != null) {
+                p.complete();
+            }
         } catch (SuspendedInvocationException ex) {
             if (ex.getRuntimeException() != null) {
                 throw ex.getRuntimeException();
