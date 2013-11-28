@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.kerberos;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,9 +29,12 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for Kerberos Tokens. The tests are @Ignore'd, as they require a running KDC. To run the
@@ -43,19 +48,26 @@ import org.junit.BeforeClass;
  * 
  * See here for more information:
  * http://coheigea.blogspot.com/2011/10/using-kerberos-with-web-services-part.html
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
 @org.junit.Ignore
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static boolean unrestrictedPoliciesInstalled = 
             SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+    
+    final TestParam test;
+    
+    public KerberosTokenTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -65,6 +77,22 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -88,14 +116,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItKerberosTransportPort");
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(kerberosPort, portNumber);
         
-        updateAddressPort(kerberosPort, PORT2);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // DOM
-        kerberosPort.doubleIt(25);
-        
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -122,13 +152,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
 
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -155,13 +184,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
 
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -188,13 +216,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
 
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -221,13 +248,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
 
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -249,14 +275,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItKerberosTransportEndorsingPort");
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-
-        updateAddressPort(kerberosPort, PORT2);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(kerberosPort, portNumber);
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -279,9 +307,17 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
 
-        updateAddressPort(kerberosPort, PORT);
-        int result = kerberosPort.doubleIt(25);
-        assertTrue(result == 50);
+        updateAddressPort(kerberosPort, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
+        
+        // TODO Streaming support
+        if (!test.isStreaming()) {
+            int result = kerberosPort.doubleIt(25);
+            assertTrue(result == 50);
+        }
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -303,13 +339,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -332,14 +367,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
-        
-        // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
+
+        // TODO Streaming support
+        if (!test.isStreaming()) {
+            kerberosPort.doubleIt(25);
+        }
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -365,10 +402,17 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        int result = kerberosPort.doubleIt(25);
-        assertTrue(result == 50);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
+        
+        // TODO Streaming support
+        if (!test.isStreaming()) {
+            int result = kerberosPort.doubleIt(25);
+            assertTrue(result == 50);
+        }
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -394,13 +438,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(kerberosPort);
         kerberosPort.doubleIt(25);
         
         ((java.io.Closeable)kerberosPort).close();
@@ -427,14 +470,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
         
         // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        if (!test.isStreaming()) {
+            kerberosPort.doubleIt(25);
+        }
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
@@ -460,14 +505,16 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType kerberosPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         
-        updateAddressPort(kerberosPort, PORT);
+        updateAddressPort(kerberosPort, test.getPort());
         
-        // DOM
-        kerberosPort.doubleIt(25);
-        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(kerberosPort);
+        }
+
         // TODO Streaming
-        // SecurityTestUtil.enableStreaming(kerberosPort);
-        // kerberosPort.doubleIt(25);
+        if (!test.isStreaming()) {
+            kerberosPort.doubleIt(25);
+        }
         
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);

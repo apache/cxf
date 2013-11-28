@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.gcm;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,22 +29,32 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * A set of tests for GCM algorithms using custom WS-SecurityPolicy expressions. It tests both 
- * DOM + StAX clients against the DOM server
+ * A set of tests for GCM algorithms using custom WS-SecurityPolicy expressions. 
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class GCMTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static boolean unrestrictedPoliciesInstalled = 
             SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+    
+    final TestParam test;
+    
+    public GCMTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -52,6 +64,22 @@ public class GCMTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -86,13 +114,12 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItGCM128Port");
         DoubleItPortType gcmPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(gcmPort, PORT);
+        updateAddressPort(gcmPort, test.getPort());
         
-        // DOM
-        gcmPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(gcmPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(gcmPort);
         gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
@@ -129,13 +156,13 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItGCM192Port");
         DoubleItPortType gcmPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(gcmPort, PORT);
+        updateAddressPort(gcmPort, test.getPort());
         
-        // DOM
-        gcmPort.doubleIt(25);
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(gcmPort);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(gcmPort);
+        }
+
         gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();
@@ -172,13 +199,12 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItGCM256Port");
         DoubleItPortType gcmPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(gcmPort, PORT);
+        updateAddressPort(gcmPort, test.getPort());
         
-        // DOM
-        gcmPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(gcmPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(gcmPort);
         gcmPort.doubleIt(25);
         
         ((java.io.Closeable)gcmPort).close();

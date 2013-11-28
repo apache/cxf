@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
@@ -56,12 +59,16 @@ import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  *
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
+    public static final String STAX_PORT = allocatePort(StaxServer.class);
     public static final String DEC_PORT = allocatePort(WSSecurityClientTest.class);
 
     private static final java.net.URL WSDL_LOC;
@@ -76,7 +83,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         }
         WSDL_LOC = tmp;
     }
-
+    
     private static final QName GREETER_SERVICE_QNAME =
         new QName(
             "http://apache.org/hello_world_soap_http",
@@ -95,6 +102,12 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             "UsernameTokenPort"
         );
 
+    final TestParam test;
+    
+    public WSSecurityClientTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -103,7 +116,21 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
         createStaticBus();
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -117,7 +144,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         final javax.xml.ws.Service svc 
             = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
-        updateAddressPort(greeter, PORT);
+        updateAddressPort(greeter, test.getPort());
         
         Client client = ClientProxy.getClient(greeter);
         Map<String, Object> props = new HashMap<String, Object>();
@@ -165,7 +192,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         final javax.xml.ws.Service svc 
             = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
-        updateAddressPort(greeter, PORT);
+        updateAddressPort(greeter, test.getPort());
         
         Client client = ClientProxy.getClient(greeter);
         Map<String, Object> props = new HashMap<String, Object>();
@@ -231,7 +258,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             TIMESTAMP_SIGN_ENCRYPT_PORT_QNAME,
             Greeter.class
         );
-        updateAddressPort(greeter, PORT);
+        updateAddressPort(greeter, test.getPort());
 
         // Add a No-Op JAX-WS SoapHandler to the dispatch chain to
         // verify that the SoapHandlerInterceptor can peacefully co-exist
@@ -263,7 +290,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Old Created Date should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher();
+        dispatcher = createUsernameTokenDispatcher(test.getPort());
         is = getClass().getResourceAsStream(
             "test-data/UsernameTokenRequest.xml"
         );
@@ -273,7 +300,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Sending no security headers should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher();
+        dispatcher = createUsernameTokenDispatcher(test.getPort());
         is = getClass().getResourceAsStream(
             "test-data/NoHeadersRequest.xml"
         );
@@ -282,7 +309,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Sending and empty header should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher();
+        dispatcher = createUsernameTokenDispatcher(test.getPort());
         is = getClass().getResourceAsStream(
             "test-data/EmptyHeaderRequest.xml"
         );
@@ -291,7 +318,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Sending and empty security header should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher();
+        dispatcher = createUsernameTokenDispatcher(test.getPort());
         is = getClass().getResourceAsStream(
             "test-data/EmptySecurityHeaderRequest.xml"
         );
@@ -307,7 +334,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Sending no security headers should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher(true);
+        dispatcher = createUsernameTokenDispatcher(true, test.getPort());
         is = getClass().getResourceAsStream("test-data/NoHeadersRequest.xml");
         try {
             dispatcher.invoke(new StreamSource(is));
@@ -319,7 +346,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Sending and empty header should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher(true);
+        dispatcher = createUsernameTokenDispatcher(true, test.getPort());
         is = getClass().getResourceAsStream("test-data/EmptyHeaderRequest.xml");
         try {
             dispatcher.invoke(new StreamSource(is));
@@ -330,7 +357,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         //
         // Sending and empty security header should result in a Fault
         //
-        dispatcher = createUsernameTokenDispatcher(true);
+        dispatcher = createUsernameTokenDispatcher(true, test.getPort());
         is = getClass().getResourceAsStream("test-data/EmptySecurityHeaderRequest.xml");
         try {
             dispatcher.invoke(new StreamSource(is));
@@ -340,17 +367,17 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         }
 
     }
-    private static Dispatch<Source> createUsernameTokenDispatcher() {
-        return createUsernameTokenDispatcher(false);
+    private static Dispatch<Source> createUsernameTokenDispatcher(String port) {
+        return createUsernameTokenDispatcher(false, port);
     }
-    private static Dispatch<Source> createUsernameTokenDispatcher(boolean decoupled) {
+    private static Dispatch<Source> createUsernameTokenDispatcher(boolean decoupled, String port) {
         final Service service = Service.create(
             GREETER_SERVICE_QNAME
         );
         service.addPort(
             USERNAME_TOKEN_PORT_QNAME,
             decoupled ? SOAPBinding.SOAP11HTTP_BINDING : HTTPBinding.HTTP_BINDING, 
-            "http://localhost:" + PORT + "/GreeterService/UsernameTokenPort"
+            "http://localhost:" + port + "/GreeterService/UsernameTokenPort"
         );
         final Dispatch<Source> dispatcher = service.createDispatch(
             USERNAME_TOKEN_PORT_QNAME,

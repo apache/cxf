@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.spnego;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,9 +29,12 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for Spnego Tokens. The tests are @Ignore'd, as they require a running KDC. To run the
@@ -40,18 +45,24 @@ import org.junit.BeforeClass;
  *  
  * mvn test -Pnochecks -Dtest=SpnegoTokenTest 
  *     -Djava.security.auth.login.config=src/test/resources/kerberos.jaas
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
 @org.junit.Ignore
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static boolean unrestrictedPoliciesInstalled = 
             SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+    
+    final TestParam test;
+    
+    public SpnegoTokenTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -62,7 +73,23 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(Server.class, true)
             );
+            assertTrue(
+                       "Server failed to launch",
+                       // run the server in the same process
+                       // set this to false to fork
+                       launchServer(StaxServer.class, true)
+            );
         }
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -92,13 +119,12 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSpnegoSymmetricPort");
         DoubleItPortType spnegoPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(spnegoPort, PORT);
+        updateAddressPort(spnegoPort, test.getPort());
         
-        // DOM
-        spnegoPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(spnegoPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(spnegoPort);
         spnegoPort.doubleIt(25);
         
         ((java.io.Closeable)spnegoPort).close();
@@ -124,13 +150,12 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSpnegoSymmetricDerivedPort");
         DoubleItPortType spnegoPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(spnegoPort, PORT);
+        updateAddressPort(spnegoPort, test.getPort());
         
-        // DOM
-        spnegoPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(spnegoPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(spnegoPort);
         spnegoPort.doubleIt(25);
         
         ((java.io.Closeable)spnegoPort).close();
@@ -156,13 +181,12 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSpnegoSymmetricEncryptBeforeSigningPort");
         DoubleItPortType spnegoPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(spnegoPort, PORT);
+        updateAddressPort(spnegoPort, test.getPort());
         
-        // DOM
-        spnegoPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(spnegoPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(spnegoPort);
         spnegoPort.doubleIt(25);
         
         ((java.io.Closeable)spnegoPort).close();

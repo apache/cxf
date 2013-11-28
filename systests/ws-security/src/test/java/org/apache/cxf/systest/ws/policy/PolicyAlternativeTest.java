@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.policy;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,23 +29,30 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is a test for policy alternatives. The endpoint requires either a UsernameToken (insecured) OR
- * a message signature using the Asymmetric binding. It tests both DOM + StAX clients against the 
- * DOM server
+ * a message signature using the Asymmetric binding. 
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
+    
+    final TestParam test;
+    
+    public PolicyAlternativeTest(TestParam type) {
+        this.test = type;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -54,6 +63,15 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class, true)
         );
     }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+        });
+    }
+    
     
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
@@ -79,13 +97,12 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -110,19 +127,13 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItNoSecurityPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        try {
-            utPort.doubleIt(25);
-            fail("Failure expected on no Security");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(utPort);
             utPort.doubleIt(25);
             fail("Failure expected on no Security");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
@@ -151,13 +162,12 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -185,21 +195,17 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT2);
         
-        // DOM
-        try {
-            utPort.doubleIt(25);
-            fail("Failure expected because no client certificate");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("HttpsToken"));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(utPort);
             utPort.doubleIt(25);
             fail("Failure expected because no client certificate");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // assertTrue(ex.getMessage().contains("HttpsToken"));
+            if (!test.isStreaming()) {
+                assertTrue(ex.getMessage().contains("HttpsToken"));
+            }
         }
         
         ((java.io.Closeable)utPort).close();
@@ -226,22 +232,16 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT2);
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportPort);
+        }
 
-        // DOM
         try {
             transportPort.doubleIt(25);
             fail("Failure expected on not signing a wsa header");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
-        }
-        
-        // Streaming
-        try {
-            SecurityTestUtil.enableStreaming(transportPort);
-            transportPort.doubleIt(25);
-            fail("Failure expected because no client certificate");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // assertTrue(ex.getMessage().contains("HttpsToken"));
         }
         
         ((java.io.Closeable)transportPort).close();
@@ -269,18 +269,12 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         DoubleItPortType transportPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT2);
-
-        // DOM
-        try {
-            transportPort.doubleIt(25);
-            fail("Failure expected on not signing a wsa header");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
-        }
         
-        // Streaming
-        try {
+        if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportPort);
+        }
+
+        try {
             transportPort.doubleIt(25);
             fail("Failure expected on not signing a wsa header");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
