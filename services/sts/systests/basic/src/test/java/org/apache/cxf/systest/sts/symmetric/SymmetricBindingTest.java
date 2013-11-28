@@ -19,6 +19,8 @@
 package org.apache.cxf.systest.sts.symmetric;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -27,19 +29,21 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via a
  * Username Token over the symmetric binding, and then sends it to the CXF endpoint using 
  * the symmetric binding.
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
@@ -49,8 +53,15 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static final String PORT = allocatePort(Server.class);
+    private static final String STAX_PORT = allocatePort(StaxServer.class);
     
     private static boolean standalone;
+    
+    final TestParam test;
+    
+    public SymmetricBindingTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -59,6 +70,12 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             // run the server in the same process
             // set this to false to fork
             launchServer(Server.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
         );
         String deployment = System.getProperty("sts.deployment");
         if ("standalone".equals(deployment) || deployment == null) {
@@ -70,6 +87,16 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
                     launchServer(STSServer.class, true)
             );
         }
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -92,23 +119,17 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
         DoubleItPortType symmetricSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml1Port, PORT);
+        updateAddressPort(symmetricSaml1Port, test.getPort());
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
         }
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml1Port);
+        }
 
-        // DOM
         doubleIt(symmetricSaml1Port, 25);
         TokenTestUtils.verifyToken(symmetricSaml1Port);
-        
-        // Streaming
-        symmetricSaml1Port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml1Port, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT);
-        }
-        SecurityTestUtil.enableStreaming(symmetricSaml1Port);
-        doubleIt(symmetricSaml1Port, 25);
         
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
@@ -129,23 +150,17 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
         DoubleItPortType symmetricSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml2Port, PORT);
+        updateAddressPort(symmetricSaml2Port, test.getPort());
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
         }
         
-        // DOM
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        }
+        
         doubleIt(symmetricSaml2Port, 30);
         TokenTestUtils.verifyToken(symmetricSaml2Port);
-        
-        // Streaming
-        symmetricSaml2Port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml2Port, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT);
-        }
-        SecurityTestUtil.enableStreaming(symmetricSaml2Port);
-        doubleIt(symmetricSaml2Port, 25);
         
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
@@ -165,24 +180,21 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1EncryptedPort");
         DoubleItPortType symmetricSaml1Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml1Port, PORT);
+        updateAddressPort(symmetricSaml1Port, test.getPort());
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
         }
-
-        // DOM
-        doubleIt(symmetricSaml1Port, 25);
         
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml1Port);
+        }
+
         // TODO Streaming - The encrypted issued token is placed under the ReferenceList
         // and hence an error is thrown on the receiving side
-        symmetricSaml1Port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml1Port, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, STSPORT2);
+        if (!test.isStreaming()) {
+            doubleIt(symmetricSaml1Port, 25);
         }
-        SecurityTestUtil.enableStreaming(symmetricSaml1Port);
-        // doubleIt(symmetricSaml1Port, 25);
-
+        
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
@@ -202,23 +214,16 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SecureConversationPort");
         DoubleItPortType symmetricSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml2Port, PORT);
+        updateAddressPort(symmetricSaml2Port, test.getPort());
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
         }
         
-        // DOM
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        }
+        
         doubleIt(symmetricSaml2Port, 30);
-        
-        // Streaming
-        symmetricSaml2Port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(symmetricSaml2Port, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, STSPORT2);
-        }
-        SecurityTestUtil.enableStreaming(symmetricSaml2Port);
-        
-        doubleIt(symmetricSaml2Port, 25);
         
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);

@@ -19,6 +19,8 @@
 package org.apache.cxf.systest.sts.sendervouches;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -26,25 +28,35 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a CXF intermediary.
  * The intermediary validates the UsernameToken, and then inserts the username into a SAML
  * Assertion which it signs and sends to a provider (via TLS).
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SenderVouchesTest extends AbstractBusClientServerTestBase {
     
     static final String PORT2 = allocatePort(Server.class, 2);
+    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static final String PORT = allocatePort(Intermediary.class);
+    private static final String STAX_PORT = allocatePort(StaxIntermediary.class);
+    
+    final TestParam test;
+    
+    public SenderVouchesTest(TestParam type) {
+        this.test = type;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -60,6 +72,28 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Intermediary.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxIntermediary.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -83,17 +117,13 @@ public class SenderVouchesTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
         DoubleItPortType transportUTPort = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportUTPort, PORT);
+        updateAddressPort(transportUTPort, test.getPort());
         
-        // DOM
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportUTPort);
+        }
+        
         doubleIt(transportUTPort, 25);
-        
-        // Streaming
-        transportUTPort = 
-            service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportUTPort, PORT);
-        SecurityTestUtil.enableStreaming(transportUTPort);
-        doubleIt(transportUTPort, 45);
         
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
