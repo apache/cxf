@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.wssec.examples.saml;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -28,29 +30,37 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
+import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.systest.wssec.examples.sts.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for SAML Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
     static final String STS_PORT = allocatePort(STSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    final TestParam test;
+    
+    public SamlTokenTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -60,11 +70,27 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class, true)
         );
         assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+        assertTrue(
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
             launchServer(STSServer.class, true)
         );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -91,13 +117,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItBearerPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT);
+        updateAddressPort(samlPort, test.getPort());
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -122,13 +147,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT2);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(samlPort, portNumber);
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -153,13 +181,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT2);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(samlPort, portNumber);
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -184,13 +215,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignedPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT);
+        updateAddressPort(samlPort, test.getPort());
         
-        // DOM
-        samlPort.doubleIt(25);
-        
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -215,13 +241,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricInitiatorPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT);
+        updateAddressPort(samlPort, test.getPort());
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -247,13 +272,12 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSaml2BearerPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT);
+        updateAddressPort(samlPort, test.getPort());
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -278,13 +302,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesSaml2Port");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT2);
-
-        // DOM
-        samlPort.doubleIt(25);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(samlPort, portNumber);
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
+
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -309,13 +336,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingSaml2Port");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT2);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(samlPort, portNumber);
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(samlPort);
         samlPort.doubleIt(25);
         
         ((java.io.Closeable)samlPort).close();
@@ -340,14 +370,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSVPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT);
+        updateAddressPort(samlPort, test.getPort());
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
         // TODO Endorsing Streaming not supported yet Streaming
-        // SecurityTestUtil.enableStreaming(samlPort);
-        // samlPort.doubleIt(25);
+        if (!test.isStreaming()) {
+            samlPort.doubleIt(25);
+        }
         
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
@@ -371,15 +403,18 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricIssuedTokenPort");
         DoubleItPortType samlPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(samlPort, PORT);
+        updateAddressPort(samlPort, test.getPort());
         updateSTSPort((BindingProvider)samlPort, STS_PORT);
         
-        // DOM
-        samlPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(samlPort);
+        }
         
         // TODO Endorsing SAML not supported Streaming
-        // SecurityTestUtil.enableStreaming(samlPort);
-        // samlPort.doubleIt(25);
+        // TODO Problem with policy validation on the StAX Server side
+        if (!test.isStreaming() && PORT.equals(test.getPort())) {
+            samlPort.doubleIt(25);
+        }
         
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);

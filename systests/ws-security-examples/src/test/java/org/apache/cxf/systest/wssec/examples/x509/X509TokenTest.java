@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.wssec.examples.x509;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,23 +29,30 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
+import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for X509 Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class X509TokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
+    
+    final TestParam test;
+    
+    public X509TokenTest(TestParam type) {
+        this.test = type;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -53,6 +62,22 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -79,13 +104,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignEncryptPort");
         DoubleItPortType x509Port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, PORT);
+        updateAddressPort(x509Port, test.getPort());
         
-        // DOM
-        x509Port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(x509Port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(x509Port);
         x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
@@ -110,13 +134,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricProtectTokensPort");
         DoubleItPortType x509Port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, PORT);
+        updateAddressPort(x509Port, test.getPort());
         
-        // DOM
-        x509Port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(x509Port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(x509Port);
         x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
@@ -141,13 +164,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignEncryptPort");
         DoubleItPortType x509Port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, PORT);
+        updateAddressPort(x509Port, test.getPort());
         
-        // DOM
-        x509Port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(x509Port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(x509Port);
         x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
@@ -172,14 +194,16 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingPort");
         DoubleItPortType x509Port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, PORT);
+        updateAddressPort(x509Port, test.getPort());
         
-        // DOM
-        x509Port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(x509Port);
+        }
         
         // TODO - support endorsing Streaming
-        // SecurityTestUtil.enableStreaming(x509Port);
-        // x509Port.doubleIt(25);
+        if (!test.isStreaming()) {
+            x509Port.doubleIt(25);
+        }
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);

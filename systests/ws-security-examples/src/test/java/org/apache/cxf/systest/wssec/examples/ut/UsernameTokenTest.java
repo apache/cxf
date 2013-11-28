@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.wssec.examples.ut;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,25 +29,33 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
+import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for Username Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    final TestParam test;
+    
+    public UsernameTokenTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -54,6 +64,22 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -80,13 +106,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -111,13 +136,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextNoPasswordPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -142,13 +166,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItDigestPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
-        
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -173,13 +196,16 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSupportingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT2);
+        String portNumber = PORT2;
+        if (STAX_PORT.equals(test.getPort())) {
+            portNumber = STAX_PORT2;
+        }
+        updateAddressPort(utPort, portNumber);
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -204,13 +230,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSESupportingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -235,13 +260,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncrSupportingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -266,13 +290,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSESupportingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
