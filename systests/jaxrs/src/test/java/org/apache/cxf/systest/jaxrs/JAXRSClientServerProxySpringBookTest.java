@@ -54,10 +54,9 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     
     @Test
     public void testGetWadlResourcesInfo() throws Exception {
-        WebClient client = WebClient.create("http://localhost:" + PORT + "/test/" + "?_wadl&_type=xml");
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/test" + "?_wadl&_type=xml");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
         Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
-        StaxUtils.writeTo(doc.getDocumentElement(), System.out);
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
