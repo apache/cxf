@@ -973,7 +973,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testTransportSupportingSignedCertConstraints() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -1008,6 +1007,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
+        
+        x509Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, port);
         
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
             "alice.properties");
