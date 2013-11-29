@@ -438,10 +438,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
         
-        // TODO Investigate...
-        if (!test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
-        }
+        port.doubleIt(25);
         
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort2");
