@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.tokens;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,24 +29,31 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is a test for various properties associated with SupportingTokens, i.e.
  * Signed, Encrypted etc.
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    final TestParam test;
+    
+    public SupportingTokenTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -53,6 +62,22 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -77,62 +102,52 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         // This should fail, as the client is not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        try {
-            port.doubleIt(25);
-            fail("Failure expected on not signing the UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the signed supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
-        }
-        
-        // Streaming
-        try {
+        if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
+        }
+        
+        try {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the signed supporting token requirement";
-            // assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = "The received token does not match the signed supporting token requirement";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
-        
         
         // This should fail, as the client is (encrypting) but not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        try {
-            port.doubleIt(25);
-            fail("Failure expected on not signing the UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the signed supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the signed supporting token requirement";
-            // assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = "The received token does not match the signed supporting token requirement";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
         
         ((java.io.Closeable)port).close();
@@ -155,61 +170,52 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        try {
-            port.doubleIt(25);
-            fail("Failure expected on not encrypting the UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the encrypted supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the encrypted supporting token requirement";
-            // assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = "The received token does not match the encrypted supporting token requirement";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
         
         // This should fail, as the client is (signing) but not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        try {
-            port.doubleIt(25);
-            fail("Failure expected on not encrypting the UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the encrypted supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "The received token does not match the encrypted supporting token requirement";
-            // assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = "The received token does not match the encrypted supporting token requirement";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
         
         ((java.io.Closeable)port).close();
@@ -232,65 +238,54 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        try {
-            port.doubleIt(25);
-            fail("Failure expected on not encrypting the UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = 
-                "The received token does not match the signed encrypted supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = 
-            //    "The received token does not match the signed encrypted supporting token requirement";
-            // assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = 
+                    "The received token does not match the signed encrypted supporting token requirement";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
         
         // This should fail, as the client is (encrypting) but not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        try {
-            port.doubleIt(25);
-            fail("Failure expected on not encrypting the UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = 
-                "The received token does not match the signed encrypted supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
         }
         
-        // Streaming
         try {
-            SecurityTestUtil.enableStreaming(port);
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            //String error = 
-            //    "The received token does not match the signed encrypted supporting token requirement";
-            //assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = 
+                    "The received token does not match the signed encrypted supporting token requirement";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
         
         ((java.io.Closeable)port).close();

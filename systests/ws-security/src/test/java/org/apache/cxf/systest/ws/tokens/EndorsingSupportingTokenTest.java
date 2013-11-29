@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.tokens;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,24 +29,31 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is a test for various properties associated with SupportingTokens, i.e.
  * Signed, Encrypted etc.
- * 
- * It tests DOM clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(EndorsingServer.class);
+    static final String STAX_PORT = allocatePort(StaxEndorsingServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    final TestParam test;
+    
+    public EndorsingSupportingTokenTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -53,6 +62,20 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
             // set this to false to fork
             launchServer(EndorsingServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxEndorsingServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(STAX_PORT, false)},
+        });
     }
     
     @org.junit.AfterClass
@@ -77,13 +100,14 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEndorsingSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
+        
         port.doubleIt(25);
         
         // This should fail, as the client is signing (but not endorsing) the X.509 Token
         portQName = new QName(NAMESPACE, "DoubleItEndorsingSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
         try {
             port.doubleIt(25);
@@ -91,13 +115,14 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = 
                 "The received token does not match the endorsing supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("EncryptedKey must sign the main signature"));
         }
         
         // This should fail, as the client is not endorsing the X.509 Token
         portQName = new QName(NAMESPACE, "DoubleItEndorsingSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
         try {
             port.doubleIt(25);
@@ -105,7 +130,8 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = 
                 "The received token does not match the endorsing supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("X509Token not satisfied"));
         }
         
         ((java.io.Closeable)port).close();
@@ -128,13 +154,14 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
+        
         port.doubleIt(25);
         
         // This should fail, as the client is signing (but not endorsing) the X.509 Token
         portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
         try {
             port.doubleIt(25);
@@ -142,13 +169,14 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = 
                 "The received token does not match the signed endorsing supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("EncryptedKey must sign the main signature"));
         }
         
         // This should fail, as the client is endorsing but not signing the X.509 Token
         portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
         try {
             port.doubleIt(25);
@@ -156,7 +184,8 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = 
                 "The received token does not match the signed endorsing supporting token requirement";
-            assertTrue(ex.getMessage().contains(error));
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("X509Token not satisfied"));
         }
         
         ((java.io.Closeable)port).close();

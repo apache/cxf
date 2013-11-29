@@ -24,7 +24,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssec11.RestrictedAlgorithmSuiteLoader;
 
 public class Server12Restricted extends AbstractServerRestricted {
-    static final String PORT = allocatePort(Server12.class);
+    public static final String PORT = allocatePort(Server12.class);
 
     public Server12Restricted() throws Exception {
         super("http://localhost:" + PORT);

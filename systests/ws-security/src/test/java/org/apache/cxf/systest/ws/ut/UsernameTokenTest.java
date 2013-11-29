@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.ut;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -30,21 +32,31 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * A set of tests for Username Tokens over the Transport Binding. It tests both DOM + StAX clients against the 
- * DOM server
+ * A set of tests for Username Tokens over the Transport Binding. 
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
+    static final String STAX_PORT = allocatePort(StaxServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    final TestParam test;
+    
+    public UsernameTokenTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -53,6 +65,22 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -76,13 +104,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -104,13 +131,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextCreatedPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -132,13 +158,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextSupportingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -160,13 +185,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItHashedPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -188,13 +212,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItNoPasswordPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -216,13 +239,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -244,13 +266,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -272,13 +293,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        utPort.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         utPort.doubleIt(25);
         
         ((java.io.Closeable)utPort).close();
@@ -300,26 +320,23 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItInlinePolicyPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+        
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "The received token does not match the token inclusion requirement";
-            assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = "The received token does not match the token inclusion requirement";
+                assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
+            }
         }
 
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
-        try {
-            utPort.doubleIt(25);
-            fail("Failure expected on no UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("PolicyViolationException"));
-        }
-        
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -340,21 +357,25 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItHashedPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        Client cxfClient = ClientProxy.getClient(utPort);
-        SecurityHeaderCacheInterceptor cacheInterceptor =
-            new SecurityHeaderCacheInterceptor();
-        cxfClient.getOutInterceptors().add(cacheInterceptor);
-        
-        // Make two invocations with the same UsernameToken
-        utPort.doubleIt(25);
-        try {
+        if (!test.isStreaming()) {
+            Client cxfClient = ClientProxy.getClient(utPort);
+            SecurityHeaderCacheInterceptor cacheInterceptor =
+                new SecurityHeaderCacheInterceptor();
+            cxfClient.getOutInterceptors().add(cacheInterceptor);
+            
+            // Make two invocations with the same UsernameToken
             utPort.doubleIt(25);
-            fail("Failure expected on a replayed UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error));
+            try {
+                utPort.doubleIt(25);
+                fail("Failure expected on a replayed UsernameToken");
+            } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+                String error = "A replay attack has been detected";
+                assertTrue(ex.getMessage().contains(error)
+                           || ex.getMessage().contains(
+                               "The security token could not be authenticated or authorized"));
+            }
         }
         
         ((java.io.Closeable)utPort).close();
@@ -379,21 +400,23 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItDigestNoBindingPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        Client cxfClient = ClientProxy.getClient(utPort);
-        SecurityHeaderCacheInterceptor cacheInterceptor =
-            new SecurityHeaderCacheInterceptor();
-        cxfClient.getOutInterceptors().add(cacheInterceptor);
-        
-        // Make two invocations with the same UsernameToken
-        utPort.doubleIt(25);
-        try {
+        if (!test.isStreaming() && PORT.equals(test.getPort())) {
+            Client cxfClient = ClientProxy.getClient(utPort);
+            SecurityHeaderCacheInterceptor cacheInterceptor =
+                new SecurityHeaderCacheInterceptor();
+            cxfClient.getOutInterceptors().add(cacheInterceptor);
+            
+            // Make two invocations with the same UsernameToken
             utPort.doubleIt(25);
-            fail("Failure expected on a replayed UsernameToken");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error));
+            try {
+                utPort.doubleIt(25);
+                fail("Failure expected on a replayed UsernameToken");
+            } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+                String error = "A replay attack has been detected";
+                assertTrue(ex.getMessage().contains(error));
+            }
         }
         
         ((java.io.Closeable)utPort).close();
@@ -415,23 +438,12 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPrincipalPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        updateAddressPort(utPort, test.getPort());
         
-        // DOM
-        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
-        utPort.doubleIt(25);
-        
-        try {
-            ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
-            utPort.doubleIt(30);
-            fail("Failure expected on a user with the wrong role");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "Unauthorized";
-            assertTrue(ex.getMessage().contains(error));
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
         }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(utPort);
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
         utPort.doubleIt(25);
         
@@ -440,8 +452,10 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             utPort.doubleIt(30);
             fail("Failure expected on a user with the wrong role");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "Unauthorized";
-            // assertTrue(ex.getMessage().contains(error));
+            if (!test.isStreaming()) {
+                String error = "Unauthorized";
+                assertTrue(ex.getMessage().contains(error));
+            }
         }
         
         ((java.io.Closeable)utPort).close();

@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.xkms;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -27,23 +29,31 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests that uses XKMS with WS-Security to locate + validate X.509 tokens.
- * 
- * It tests both DOM + StAX clients against the DOM server
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class XKMSTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
-    static final String PORT3 = allocatePort(XKMSServer.class);
-
+    public static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String PORT2 = allocatePort(XKMSServer.class);
+    
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
+    final TestParam test;
+    
+    public XKMSTest(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -56,8 +66,24 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
                    launchServer(XKMSServer.class, true)
         );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(STAX_PORT, true)},
+        });
     }
     
     @org.junit.AfterClass
@@ -83,13 +109,12 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         ((java.io.Closeable)port).close();
@@ -114,13 +139,12 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
+        updateAddressPort(port, test.getPort());
         
-        // DOM
-        port.doubleIt(25);
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
         
-        // Streaming
-        SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
         
         ((java.io.Closeable)port).close();

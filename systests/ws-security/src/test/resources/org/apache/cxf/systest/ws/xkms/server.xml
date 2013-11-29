@@ -25,28 +25,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <!-- -->
-    <!-- Any services listening on port 9009 must use the following -->
-    <!-- Transport Layer Security (TLS) settings -->
-    <!-- -->
-    <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.Server.2}">
-            <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
-                </sec:keyManagers>
-                <sec:cipherSuitesFilter>
-                    <sec:include>.*_EXPORT_.*</sec:include>
-                    <sec:include>.*_EXPORT1024_.*</sec:include>
-                    <sec:include>.*_WITH_DES_.*</sec:include>
-                    <sec:include>.*_WITH_AES_.*</sec:include>
-                    <sec:include>.*_WITH_NULL_.*</sec:include>
-                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
-                </sec:cipherSuitesFilter>
-                <sec:clientAuthentication want="true" required="false"/>
-            </httpj:tlsServerParameters>
-        </httpj:engine>
-    </httpj:engine-factory>
+
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.Server}/DoubleItXKMSSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/xkms/DoubleItXKMS.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
