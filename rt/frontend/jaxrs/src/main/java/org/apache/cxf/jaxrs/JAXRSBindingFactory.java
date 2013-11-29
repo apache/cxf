@@ -30,7 +30,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSDefaultFaultOutInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor;
@@ -64,8 +63,7 @@ public class JAXRSBindingFactory extends AbstractBindingFactory {
         binding.getOutInterceptors().add(new JAXRSOutInterceptor());
         
         binding.getOutFaultInterceptors().add(new JAXRSDefaultFaultOutInterceptor());
-        binding.getOutFaultInterceptors().add(new StaxOutInterceptor());
-
+        
         return binding;
     }
     

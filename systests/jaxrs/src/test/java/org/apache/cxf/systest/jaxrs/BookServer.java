@@ -37,7 +37,6 @@ import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
-import org.apache.cxf.jaxrs.interceptor.JAXRSOutExceptionMapperInterceptor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -86,7 +85,6 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.setInInterceptors(inInts);
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
-        outInts.add(new JAXRSOutExceptionMapperInterceptor());
         sf.setOutInterceptors(outInts);
         List<Interceptor<? extends Message>> outFaultInts = new ArrayList<Interceptor<? extends Message>>();
         outFaultInts.add(new CustomOutFaultInterceptor());

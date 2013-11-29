@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.interceptor;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -41,7 +40,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
@@ -54,12 +52,9 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.logging.FaultListener;
-import org.apache.cxf.logging.NoOpFaultListener;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -264,59 +259,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     @Override
     public void handleFault(Message message) {
         super.handleFault(message);
-        
-        Object mapProp = message.getContextualProperty("map.cxf.interceptor.fault");
-        if (mapProp == null || MessageUtils.isTrue(mapProp)) {
-            Throwable ex = message.getContent(Exception.class);
-            if (ex instanceof Fault) {
-                ex = ((Fault)ex).getCause();
-            }
-            Response r = JAXRSUtils.convertFaultToResponse(ex, message);
-            if (r != null) {
-                message.removeContent(Exception.class);
-                message.getInterceptorChain().setFaultObserver(null);
-                if (message.getContextualProperty(FaultListener.class.getName()) == null) {
-                    message.put(FaultListener.class.getName(), new NoOpFaultListener());
-                }
-                
-                createOutMessage(message, r);
-                
-                Iterator<Interceptor<? extends Message>> iterator = message.getInterceptorChain().iterator();
-                while (iterator.hasNext()) {
-                    Interceptor<? extends Message> inInterceptor = iterator.next();
-                    if (inInterceptor.getClass() == OutgoingChainInterceptor.class) {
-                        ((OutgoingChainInterceptor)inInterceptor).handleMessage(message);
-                        return;
-                    }
-                }
-            }
-        }
-        
-        
-        LOG.fine("Cleanup thread local variables");
-        
-        Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
-        Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
-        if (rootInstance != null && rootProvider != null) {
-            try {
-                ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
-            } catch (Throwable tex) {
-                LOG.warning("Exception occurred during releasing the service instance, " + tex.getMessage());
-            }
-        }
-        ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
-        ClassResourceInfo cri = (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
-        if (cri != null) {
-            cri.clearThreadLocalProxies();
-        }
     }
     
     private Message createOutMessage(Message inMessage, Response r) {
         Endpoint e = inMessage.getExchange().get(Endpoint.class);
-        Message mout = new MessageImpl();
+        Message mout = e.getBinding().createMessage();
         mout.setContent(List.class, new MessageContentsList(r));
         mout.setExchange(inMessage.getExchange());
-        mout = e.getBinding().createMessage(mout);
         mout.setInterceptorChain(
              OutgoingChainInterceptor.getOutInterceptorChain(inMessage.getExchange()));
         inMessage.getExchange().setOutMessage(mout);

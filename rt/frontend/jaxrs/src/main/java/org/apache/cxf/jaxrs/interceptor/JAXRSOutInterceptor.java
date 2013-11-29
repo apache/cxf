@@ -80,8 +80,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
         try {
             processResponse(providerFactory, message);
-        } catch (Exception ex) {
-            message.put("jaxrs.out.fault", Boolean.TRUE);    
         } finally {
             Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
             Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
@@ -482,6 +480,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     public void handleFault(Message message) {
-        message.put("jaxrs.out.fault", Boolean.TRUE);
+        // complete
     }
 }

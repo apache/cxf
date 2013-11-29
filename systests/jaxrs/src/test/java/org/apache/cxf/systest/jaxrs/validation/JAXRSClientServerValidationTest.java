@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.interceptor.JAXRSOutExceptionMapperInterceptor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor;
@@ -64,7 +63,6 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
                 in));
              
             sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
-                new JAXRSOutExceptionMapperInterceptor(),
                 new JAXRSBeanValidationOutInterceptor()));
 
             sf.create();

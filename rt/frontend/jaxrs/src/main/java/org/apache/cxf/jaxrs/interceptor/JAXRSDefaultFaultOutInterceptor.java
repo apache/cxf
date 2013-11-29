@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.jaxrs.interceptor;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -30,7 +32,10 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxOutInterceptor;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -46,12 +51,21 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
     }
 
     public void handleMessage(Message message) throws Fault {
+        final Fault f = (Fault) message.getContent(Exception.class);
         
-        if (mustPropogateException(message)) {
-            throw (Fault) message.getContent(Exception.class);
+        Response r = JAXRSUtils.convertFaultToResponse(f.getCause(), message);
+        if (r != null) {
+            JAXRSUtils.setMessageContentType(message, r);
+            message.setContent(List.class, new MessageContentsList(r));
+            new JAXRSOutInterceptor().handleMessage(message);
+            return;
         }
         
-        Fault f = (Fault) message.getContent(Exception.class);
+        if (mustPropogateException(message)) {
+            throw f;
+        }
+        
+        new StaxOutInterceptor().handleMessage(message);
         message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
         NSStack nsStack = new NSStack();
         nsStack.push();
@@ -94,4 +108,6 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
     protected boolean mustPropogateException(Message m) {
         return Boolean.TRUE.equals(m.getExchange().get(Message.PROPOGATE_EXCEPTION));
     }
+    
+    
 }

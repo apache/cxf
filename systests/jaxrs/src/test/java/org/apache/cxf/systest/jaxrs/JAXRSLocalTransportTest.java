@@ -124,7 +124,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
     public void testProxyServerOutFault() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         Response r = localProxy.outfault();
-        assertEquals(500, r.getStatus());
+        assertEquals(403, r.getStatus());
     }
     
     @Test
@@ -132,7 +132,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, "true");
         Response r = localProxy.outfault();
-        assertEquals(500, r.getStatus());
+        assertEquals(403, r.getStatus());
     }
     
     @Test
