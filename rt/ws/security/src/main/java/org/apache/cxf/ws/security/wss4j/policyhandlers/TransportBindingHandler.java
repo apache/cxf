@@ -139,19 +139,21 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         if (secToken == null) {
                             policyNotAsserted(transportToken, "No transport token id");
                             return;
-                        } else {
-                            policyAsserted(transportToken);
                         }
                         if (includeToken(transportToken.getInclusion())) {
                             Element el = secToken.getToken();
                             addEncryptedKeyElement(cloneElement(el));
                         } 
                     }
+                    policyAsserted(transportToken);
                     
                     handleNonEndorsingSupportingTokens();
                     handleEndorsingSupportingTokens();
                 }
             } else {
+                if (tbinding != null && tbinding.getTransportToken() != null) {
+                    policyAsserted(tbinding.getTransportToken().getToken());
+                }
                 addSignatureConfirmation(null);
             }
         } catch (Exception e) {
