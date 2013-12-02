@@ -16,40 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.sts.common;
+package org.apache.cxf.systest.sts.deployment;
 
-/**
- * This holds some parameters to pass to the tests to avoid duplicating code.
- */
-public final class TestParam {
-    final String port;
-    final boolean streaming;
-    final String stsPort;
-    
-    public TestParam(String p, boolean b) {
-        this(p, b, null);
-    }
-    
-    public TestParam(String p, boolean b, String stsPort) {
-        port = p;
-        streaming = b;
-        this.stsPort = stsPort;
-    }
-    
-    public String toString() {
-        return port + ":" + (streaming ? "streaming" : "dom") + ":" + stsPort;
+import java.net.URL;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
+public class StaxSTSServer extends AbstractBusTestServerBase {
+
+    public StaxSTSServer() {
+
     }
 
-    public String getPort() {
-        return port;
-    }
+    protected void run()  {
+        URL busFile = StaxSTSServer.class.getResource("stax-cxf-servlet.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
 
-    public boolean isStreaming() {
-        return streaming;
+        try {
+            new StaxSTSServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-    public String getStsPort() {
-        return stsPort;
-    }
-    
 }

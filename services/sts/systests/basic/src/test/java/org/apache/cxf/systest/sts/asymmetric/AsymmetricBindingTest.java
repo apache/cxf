@@ -33,6 +33,7 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -53,15 +54,15 @@ import org.junit.runners.Parameterized.Parameters;
 public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
+    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
+    static final String STAX_STSPORT2 = allocatePort(StaxSTSServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
     
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
-    private static boolean standalone;
     
     final TestParam test;
     
@@ -83,25 +84,32 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(StaxServer.class, true)
         );
-        String deployment = System.getProperty("sts.deployment");
-        if ("standalone".equals(deployment) || deployment == null) {
-            standalone = true;
-            assertTrue(
-                    "Server failed to launch",
-                    // run the server in the same process
-                    // set this to false to fork
-                    launchServer(STSServer.class, true)
-            );
-        }
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(STSServer.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxSTSServer.class, true)
+        );
     }
     
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
        
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
+                                                {new TestParam(PORT, true, STSPORT2)},
+                                                {new TestParam(STAX_PORT, false, STSPORT2)},
+                                                {new TestParam(STAX_PORT, true, STSPORT2)},
+                                                
+                                                {new TestParam(PORT, false, STAX_STSPORT2)},
+                                                {new TestParam(PORT, true, STAX_STSPORT2)},
+                                                {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
+                                                {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
         });
     }
     
@@ -127,9 +135,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType asymmetricSaml1Port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml1Port, test.getPort());
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1Port, STSPORT2);
-        }
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1Port, test.getStsPort());
         
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml1Port);
@@ -157,9 +164,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType asymmetricSaml2Port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml2Port, test.getPort());
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, STSPORT2);
-        }
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, test.getStsPort());
         
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml2Port);
@@ -188,9 +194,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         DoubleItPortType asymmetricSaml1EncryptedPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml1EncryptedPort, test.getPort());
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1EncryptedPort, STSPORT2);
-        }
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1EncryptedPort, test.getStsPort());
         
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml1EncryptedPort);
@@ -211,7 +216,6 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         if (!test.isStreaming()) {
             doubleIt(asymmetricSaml1EncryptedPort, 40);
         }
-        
         
         ((java.io.Closeable)asymmetricSaml1EncryptedPort).close();
         bus.shutdown(true);

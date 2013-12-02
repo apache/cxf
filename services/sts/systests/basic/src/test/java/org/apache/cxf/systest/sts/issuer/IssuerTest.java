@@ -42,8 +42,6 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
 
     private static final String PORT = allocatePort(Server.class);
     
-    private static boolean standalone;
-    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -57,16 +55,12 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
             ServerSocket sock = new ServerSocket(30101);
             sock.close();
             
-            String deployment = System.getProperty("sts.deployment");
-            if ("standalone".equals(deployment) || deployment == null) {
-                standalone = true;
-                assertTrue(
-                        "Server failed to launch",
-                        // run the server in the same process
-                        // set this to false to fork
-                        launchServer(STSServer.class, true)
-                );
-            }
+            assertTrue(
+                       "Server failed to launch",
+                       // run the server in the same process
+                       // set this to false to fork
+                       launchServer(STSServer.class, true)
+            );
         } catch (IOException ex) {
             // standalone is set to false + the test won't run
         }
@@ -84,10 +78,6 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML1Issuer() throws Exception {
         
-        if (!standalone) {
-            return;
-        }
-
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
@@ -112,10 +102,6 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML2MEX() throws Exception {
         
-        if (!standalone) {
-            return;
-        }
-
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 

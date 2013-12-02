@@ -54,8 +54,6 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
     
     private static final String PORT = allocatePort(Intermediary.class);
     
-    private static boolean standalone;
-
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -70,16 +68,12 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
             // set this to false to fork
             launchServer(Server.class, true)
         );
-        String deployment = System.getProperty("sts.deployment");
-        if ("standalone".equals(deployment) || deployment == null) {
-            standalone = true;
-            assertTrue(
-                    "Server failed to launch",
-                    // run the server in the same process
-                    // set this to false to fork
-                    launchServer(STSServer.class, true)
-            );
-        }
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(STSServer.class, true)
+        );
     }
     
     @org.junit.AfterClass
@@ -104,9 +98,8 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         DoubleItPortType transportPort = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
-        }
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
 
         doubleIt(transportPort, 25);
         
@@ -130,9 +123,8 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         DoubleItPortType transportPort = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
-        if (standalone) {
-            TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
-        }
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
 
         try {
             doubleIt(transportPort, 30);
