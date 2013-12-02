@@ -20,20 +20,23 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
   xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/jaxws
+http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/jaxrs
 http://cxf.apache.org/schemas/jaxrs.xsd">
 	<import resource="classpath:/META-INF/cxf/cxf.xml"/>
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
-    <jaxrs:server address="/">
+    <jaxrs:server address="/jaxrs">
         <jaxrs:inInterceptors>
-            <ref bean="validationInInterceptor" />
+            <ref bean="jaxrsValidationInInterceptor" />
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
-            <ref bean="validationOutInterceptor" />
+            <ref bean="jaxrsValidationOutInterceptor" />
         </jaxrs:outInterceptors>
         <jaxrs:serviceBeans>
             <ref bean="bookStoreWithValidation"/>
@@ -53,10 +56,36 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <bean id="bookStoreWithValidation" class="org.apache.cxf.systest.jaxrs.validation.spring.BookStoreWithValidation">
        <property name="provider" ref="validationProvider" />
     </bean>       
-    <bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
+    <bean id="jaxrsValidationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
         <property name="provider" ref="validationProvider" />
     </bean>
-    <bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
+    <bean id="jaxrsValidationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
         <property name="provider" ref="validationProvider" />
-    </bean>    
+    </bean>
+    
+    <jaxrs:server address="/bwrest">
+        <jaxrs:serviceBeans>
+            <ref bean="bookWorldValidation"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="exceptionMapper"/>
+        </jaxrs:providers>
+        <jaxrs:features>
+            <ref bean="commonValidationFeature" />
+        </jaxrs:features>
+    </jaxrs:server>
+    
+    <jaxws:endpoint xmlns:s="http://bookworld.com" 
+                    serviceName="s:BookWorld" 
+                    endpointName="s:BookWorldPort" 
+                    implementor="#bookWorldValidation" 
+                    address="/bwsoap">
+        <jaxws:features>
+            <ref bean="commonValidationFeature" />
+        </jaxws:features>
+    </jaxws:endpoint>                
+    
+    <bean id="bookWorldValidation" class="org.apache.cxf.systest.jaxrs.validation.spring.BookWorldImpl"/>
+    <bean id="commonValidationFeature" class="org.apache.cxf.validation.BeanValidationFeature"/>
+    
 </beans>

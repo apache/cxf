@@ -18,13 +18,20 @@
  */
 package org.apache.cxf.systest.jaxrs.validation.spring;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPBinding;
+import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.systest.jaxrs.validation.AbstractJAXRSValidationTest;
+import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -61,14 +68,51 @@ public class JAXRSClientServerValidationSpringTest extends AbstractJAXRSValidati
     
     @Test
     public void testProgrammaticValidationFailsIfNameIsNull()  {
-        final Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1"));
+        final Response r = createWebClient("/jaxrs/bookstore/books").post(new Form().param("id", "1"));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
 
     @Test
     public void testProgrammaticValidationPassesButParameterValidationFailesIfIdIsNull()  {
-        final Response r = createWebClient("/bookstore/books").post(new Form().param("name", "aa"));
+        final Response r = createWebClient("/jaxrs/bookstore/books").post(new Form().param("name", "aa"));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
+    }
+    
+    @Test
+    public void testHelloRestValidationFailsIfNameIsNull() throws Exception {
+        String address = "http://localhost:" + PORT + "/bwrest";
+        
+        BookWorld service = JAXRSClientFactory.create(address, BookWorld.class);
+        
+        BookWithValidation bw = service.echoBook(new BookWithValidation("RS", "123"));
+        assertEquals("123", bw.getId());
+        
+        try {
+            service.echoBook(new BookWithValidation(null, "123"));
+            fail("Validation failure expected");
+        } catch (BadRequestException ex) {
+            // complete
+        }
+        
+    }
+    @Test
+    public void testHelloSoapValidationFailsIfNameIsNull() throws Exception {
+        final QName serviceName = new QName("http://bookworld.com", "BookWorld");
+        final QName portName = new QName("http://bookworld.com", "BookWorldPort");
+        final String address = "http://localhost:" + PORT + "/bwsoap";
+        
+        Service service = Service.create(serviceName);
+        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
+    
+        BookWorld bwService = service.getPort(BookWorld.class); 
+        BookWithValidation bw = bwService.echoBook(new BookWithValidation("WS", "123"));
+        assertEquals("123", bw.getId());
+        try {
+            bwService.echoBook(new BookWithValidation(null, "123"));
+            fail("Validation failure expected");
+        } catch (SOAPFaultException ex) {
+            // complete
+        }
     }
 
     @Override
