@@ -88,7 +88,7 @@ public class SecurityToken implements Serializable {
     /**
      * The secret associated with the Token
      */
-    private byte[] secret;
+    private transient byte[] secret;
     
     /**
      * Created time
