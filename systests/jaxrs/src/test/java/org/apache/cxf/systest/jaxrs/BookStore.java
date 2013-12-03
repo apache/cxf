@@ -841,6 +841,13 @@ public class BookStore {
         return doGetBook(id);
     }
     
+    @GET
+    @Path("/books/query/default")
+    @Produces("application/xml")
+    public Book getBook(@QueryParam("bookId") long id) throws BookNotFoundFault {
+        return books.get(id + 123);
+    }
+    
     
     
     @GET
