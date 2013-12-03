@@ -54,6 +54,7 @@ import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.form.Form;
@@ -176,9 +177,13 @@ public class MultipartProvider extends AbstractConfigurableProvider
         
         if (id != null && !id.required()) {
             /*
-             * If user asked for a null, give them a null. 
+             * Return default value for a missing optional part 
              */
-            return null;
+            Object defaultValue = null;
+            if (c.isPrimitive()) {
+                defaultValue = PrimitiveUtils.read((Class<?>)c == boolean.class ? "false" : "0", c);
+            }
+            return defaultValue;
         }
         
         throw new WebApplicationException(400);

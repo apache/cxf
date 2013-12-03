@@ -440,6 +440,19 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testNullableParamsPrimitive() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/testnullpartprimitive";
+        WebClient client = WebClient.create(address);
+        client.type("multipart/form-data").accept("text/plain");
+        List<Attachment> atts = new LinkedList<Attachment>();
+        atts.add(new Attachment("somepart", "text/plain", "hello there"));
+        Response r = client.postCollection(atts, Attachment.class);
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertEquals((Integer)0, Integer.valueOf(IOUtils.readStringFromStream((InputStream)r.getEntity())));
+    }
+    
+    
+    @Test
     public void testAddBookJaxbJsonImageWebClientMixed() throws Exception {
         Map<String, String> params = 
             doTestAddBookJaxbJsonImageWebClient("multipart/mixed");

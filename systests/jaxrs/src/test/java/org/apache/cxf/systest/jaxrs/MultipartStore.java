@@ -160,6 +160,14 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/testnullpartprimitive")
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    public int testNullPart2(@Multipart(value = "someid", required = false) int value) {
+        return value;
+    }
+    
+    @POST
     @Path("/books/testnullpartFormParam")
     @Consumes("multipart/form-data")
     @Produces("text/plain")
