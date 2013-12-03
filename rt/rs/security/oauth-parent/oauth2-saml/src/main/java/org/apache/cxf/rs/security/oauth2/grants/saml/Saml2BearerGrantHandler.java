@@ -33,7 +33,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
@@ -61,9 +60,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.dom.validate.Validator;
@@ -188,10 +189,13 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
                 
                 Signature sig = assertion.getSignature();
+                WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
                 KeyInfo keyInfo = sig.getKeyInfo();
+                
                 SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
-                        keyInfo.getDOM(), data.getSigVerCrypto()
+                    SAMLUtil.getCredentialFromKeyInfo(
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data, docInfo), 
+                        data.getSigVerCrypto()
                     );
                 assertion.verifySignature(samlKeyInfo);
                 

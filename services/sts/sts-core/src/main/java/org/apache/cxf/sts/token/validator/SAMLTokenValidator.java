@@ -49,8 +49,10 @@ import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.dom.validate.Validator;
@@ -172,20 +174,21 @@ public class SAMLTokenValidator implements TokenValidator {
                     return response;
                 }
                 
-                // Verify the signature
-                Signature sig = assertion.getSignature();
-                KeyInfo keyInfo = sig.getKeyInfo();
-                SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
-                        keyInfo.getDOM(), sigCrypto
-                    );
-                assertion.verifySignature(samlKeyInfo);
-                
                 RequestData requestData = new RequestData();
                 requestData.setSigVerCrypto(sigCrypto);
                 WSSConfig wssConfig = WSSConfig.getNewInstance();
                 requestData.setWssConfig(wssConfig);
                 requestData.setCallbackHandler(callbackHandler);
+                WSDocInfo docInfo = new WSDocInfo(validateTargetElement.getOwnerDocument());
+                
+                // Verify the signature
+                Signature sig = assertion.getSignature();
+                KeyInfo keyInfo = sig.getKeyInfo();
+                SAMLKeyInfo samlKeyInfo = 
+                    SAMLUtil.getCredentialFromKeyInfo(
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
+                    );
+                assertion.verifySignature(samlKeyInfo);
                 
                 // Validate the assertion against schemas/profiles
                 validateAssertion(assertion);

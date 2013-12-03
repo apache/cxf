@@ -350,10 +350,12 @@ public class SAMLProtocolResponseValidator {
             // Verify the signature
             try {
                 Signature sig = assertion.getSignature();
+                WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
                 KeyInfo keyInfo = sig.getKeyInfo();
+                
                 SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
-                        keyInfo.getDOM(), sigCrypto
+                    SAMLUtil.getCredentialFromKeyInfo(
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
                     );
                 assertion.verifySignature(samlKeyInfo);
                 

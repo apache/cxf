@@ -36,7 +36,6 @@ import javax.ws.rs.core.Response;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -52,6 +51,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -133,12 +133,14 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
                 }
                 data.setEnableRevocation(MessageUtils.isTrue(
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
-                
                 Signature sig = assertion.getSignature();
+                WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
                 KeyInfo keyInfo = sig.getKeyInfo();
+                
                 SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
-                        keyInfo.getDOM(), data.getSigVerCrypto()
+                    SAMLUtil.getCredentialFromKeyInfo(
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data, docInfo), 
+                        data.getSigVerCrypto()
                     );
                 
                 assertion.verifySignature(samlKeyInfo);
