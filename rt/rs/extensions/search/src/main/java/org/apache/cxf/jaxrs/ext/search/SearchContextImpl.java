@@ -170,9 +170,12 @@ public class SearchContextImpl implements SearchContext {
     private <T> SearchConditionParser<T> getParser(Class<T> cls, 
                                                    Map<String, String> beanProperties,
                                                    Map<String, String> parserProperties) {
-        // we can use this method as a parser factory, ex
-        // we can get parsers capable of parsing XQuery and other languages
-        // depending on the properties set by a user
+        
+        Object parserProp = message.getContextualProperty(SearchConditionParser.class.getName());
+        if (parserProp != null) {
+            return getCustomParser(parserProp);
+        }
+        
         Map<String, String> props = null;
         if (parserProperties == null) {
             props = new LinkedHashMap<String, String>(4);
@@ -198,5 +201,10 @@ public class SearchContextImpl implements SearchContext {
         }
         
         return new FiqlParser<T>(cls, props, beanProps); 
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> SearchConditionParser<T> getCustomParser(Object parserProp) {
+        return (SearchConditionParser<T>)parserProp;
     }
 }

@@ -19,9 +19,8 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 /**
- * Search Language Parser implementation.
- * FIQL Language parser is the default implementation. 
+ * Search Expression Parser converts an expression into SearchCondition.
  */
 public interface SearchConditionParser<T> {
-    SearchCondition<T> parse(String fiqlExpression) throws SearchParseException;
+    SearchCondition<T> parse(String searchExpression) throws SearchParseException;
 }
