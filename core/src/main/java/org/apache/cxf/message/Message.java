@@ -87,9 +87,11 @@ public interface Message extends StringMap {
     String PROCESS_ONEWAY_RESPONSE = "org.apache.cxf.transport.processOneWayResponse";
     
     /**
-     * @deprecated use PROCESS_ONEWAY_RESPONSE
+     * Boolean property specifying if the thread which runs a request is 
+     * different to the thread which created this Message.
      */
-    String PROCESS_ONEWAY_REPONSE = PROCESS_ONEWAY_RESPONSE;
+    String THREAD_CONTEXT_SWITCHED = "thread.context.switched";
+    
     
     String ROBUST_ONEWAY = "org.apache.cxf.oneway.robust";
     

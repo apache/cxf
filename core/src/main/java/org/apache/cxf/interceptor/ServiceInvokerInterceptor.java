@@ -110,13 +110,18 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                     super.done();
                     if (contextSwitched.get()) {
                         PhaseInterceptorChain.setCurrentMessage(chain, null);
+                        message.remove(Message.THREAD_CONTEXT_SWITCHED);
                     }
                     chain.releaseChain();
                 }
                 
                 @Override
                 public void run() {
-                    contextSwitched.getAndSet(PhaseInterceptorChain.setCurrentMessage(chain, message));
+                    if (PhaseInterceptorChain.setCurrentMessage(chain, message)) {
+                        contextSwitched.set(true);
+                        message.put(Message.THREAD_CONTEXT_SWITCHED, true);
+                    }
+                    
                     synchronized (chain) {
                         super.run();
                     }

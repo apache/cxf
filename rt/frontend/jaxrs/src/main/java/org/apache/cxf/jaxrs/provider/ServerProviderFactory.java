@@ -51,6 +51,7 @@ import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
@@ -58,6 +59,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public final class ServerProviderFactory extends ProviderFactory {
@@ -461,5 +463,38 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         
     }
+    
+    public static void clearThreadLocalProxies(Message message) {
+        clearThreadLocalProxies(ServerProviderFactory.getInstance(message), message);
+    }
+    public static void clearThreadLocalProxies(ServerProviderFactory factory, Message message) {
+        factory.clearThreadLocalProxies();
+        ClassResourceInfo cri =
+            (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+        if (cri != null) {
+            cri.clearThreadLocalProxies();
+        }    
+    }
+    public static void releaseRequestState(Message message) {
+        releaseRequestState(ServerProviderFactory.getInstance(message), message);
+    }
+    public static void releaseRequestState(ServerProviderFactory factory, Message message) {
+        Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
+        if (rootInstance != null) {
+            Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
+            if (rootProvider != null) {
+                try {
+                    ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
+                } catch (Throwable tex) {
+                    // ignore
+                }
+            }
+        }
+        
+        clearThreadLocalProxies(factory, message);
+    }
+    
+    
+    
     
 }

@@ -91,6 +91,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         
         ResourceProvider provider = getResourceProvider(exchange);
         Object rootInstance = null;
+        Message inMessage = exchange.getInMessage();
         try {
             rootInstance = getServiceObject(exchange);
             Object serviceObject = getActualServiceObject(exchange, rootInstance);
@@ -101,16 +102,17 @@ public class JAXRSInvoker extends AbstractInvoker {
             if (responseList != null) {
                 return responseList; 
             }
-            return handleFault(ex, exchange.getInMessage());
+            return handleFault(ex, inMessage);
         } finally {
             boolean suspended = isSuspended(exchange);
-            if (exchange.isOneWay() || suspended) {
-                ServerProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
-            }
-            if (!suspended && !isServiceObjectRequestScope(exchange.getInMessage())) {
-                provider.releaseInstance(exchange.getInMessage(), rootInstance);
-            } else {
+            if (suspended || exchange.isOneWay() || inMessage.get(Message.THREAD_CONTEXT_SWITCHED) != null) {
+                ServerProviderFactory.clearThreadLocalProxies(inMessage);
+            } 
+            if (suspended || isServiceObjectRequestScope(inMessage)) {
                 persistRoots(exchange, rootInstance, provider);
+            } else {
+                provider.releaseInstance(inMessage, rootInstance);
+                exchange.remove(JAXRSUtils.ROOT_INSTANCE);
             }
         }
     }
@@ -333,12 +335,6 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
         if (excResponse == null) {
-            ServerProviderFactory.getInstance(inMessage).clearThreadLocalProxies();
-            ClassResourceInfo criRoot =
-                (ClassResourceInfo)inMessage.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
-            if (criRoot != null) {
-                criRoot.clearThreadLocalProxies();
-            }
             inMessage.getExchange().put(Message.PROPOGATE_EXCEPTION, 
                                         JAXRSUtils.propogateException(inMessage));
             throw ex;

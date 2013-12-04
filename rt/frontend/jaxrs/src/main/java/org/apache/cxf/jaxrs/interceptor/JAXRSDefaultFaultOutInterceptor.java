@@ -33,6 +33,7 @@ import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
@@ -61,6 +62,7 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
             return;
         }
         
+        ServerProviderFactory.releaseRequestState(message);
         if (mustPropogateException(message)) {
             throw f;
         }

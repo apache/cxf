@@ -70,21 +70,22 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) {
+        final Exchange exchange = message.getExchange(); 
         
-        if (message.getExchange().get(OperationResourceInfo.class) != null) {
-            // it's a suspended invocation;
-            return;
-        }
-        message.getExchange().put(Message.REST_MESSAGE, Boolean.TRUE);
+        exchange.put(Message.REST_MESSAGE, Boolean.TRUE);
         
         try {
             processRequest(message);
+            if (exchange.isOneWay()) {
+                ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
+            }
         } catch (Fault ex) {
             convertExceptionToResponseIfPossible(ex.getCause(), message);
         } catch (RuntimeException ex) {
             convertExceptionToResponseIfPossible(ex, message);
         }
-        Response r = message.getExchange().get(Response.class);
+        
+        Response r = exchange.get(Response.class);
         if (r != null) {
             createOutMessage(message, r);
             message.getInterceptorChain().doInterceptStartingAt(message,
