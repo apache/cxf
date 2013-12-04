@@ -50,8 +50,6 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <!-- <bean id="kerberosTicketDecoderImpl" 
-          class="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenDecoderImpl"/>-->
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransport" address="https://localhost:${testutil.ports.StaxServer.2}/DoubleItKerberosTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.is-bsp-compliant" value="false"/>

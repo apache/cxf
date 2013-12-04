@@ -50,12 +50,9 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <!-- <bean id="kerberosTicketDecoderImpl" 
-          class="org.apache.cxf.systest.ws.kerberos.server.KerberosTokenDecoderImpl"/>-->
     <bean id="kerberosValidator" class="org.apache.wss4j.dom.validate.KerberosTokenValidator">
         <property name="contextName" value="bob"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
-        <!--<property name="kerberosTokenDecoder" ref="kerberosTicketDecoderImpl"/>-->
     </bean>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransport" address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
         <jaxws:properties>
