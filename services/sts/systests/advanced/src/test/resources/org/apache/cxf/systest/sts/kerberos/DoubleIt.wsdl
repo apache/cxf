@@ -78,8 +78,7 @@
                                 <sp:RequireInternalReference/>
                             </wsp:Policy>
                             <sp:Issuer>
-                                <wsaw:Address>http://localhost:8080/STS/STSUT
-                                                                </wsaw:Address>
+                                <wsaw:Address>http://localhost:8080/STS/STSUT</wsaw:Address>
                                 <wsaw:Metadata>
                                     <wsx:Metadata>
                                         <wsx:MetadataSection>

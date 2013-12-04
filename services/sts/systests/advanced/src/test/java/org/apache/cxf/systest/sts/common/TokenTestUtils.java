@@ -20,8 +20,9 @@ package org.apache.cxf.systest.sts.common;
 
 import java.util.List;
 
-import org.w3c.dom.Element;
+import javax.xml.ws.BindingProvider;
 
+import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
@@ -72,4 +73,25 @@ public final class TokenTestUtils {
         }
     }
 
+    public static void updateSTSPort(BindingProvider p, String port) {
+        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location != null && location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location != null && location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
+        stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT + ".sct");
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
+    }
+    
 }

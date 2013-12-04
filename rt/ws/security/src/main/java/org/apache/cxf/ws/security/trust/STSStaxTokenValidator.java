@@ -20,42 +20,52 @@ package org.apache.cxf.ws.security.trust;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.commons.codec.binary.Base64;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-
+import org.apache.wss4j.binding.wss10.AttributedString;
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
+import org.apache.wss4j.binding.wss10.EncodedString;
+import org.apache.wss4j.binding.wss10.PasswordString;
+import org.apache.wss4j.binding.wss10.UsernameTokenType;
+import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.PKIPathSecurity;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.X509V3SecurityTokenImpl;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.BinarySecurityTokenValidator;
 import org.apache.wss4j.stax.validate.BinarySecurityTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
-
+import org.apache.wss4j.stax.validate.UsernameTokenValidator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 /**
  * A Streaming SAML Token Validator implementation to validate a received Token to a 
  * SecurityTokenService (STS).
+ * 
+ * TODO Refactor this class a bit better...
  */
 public class STSStaxTokenValidator 
-    extends SamlTokenValidatorImpl implements BinarySecurityTokenValidator {
+    extends SamlTokenValidatorImpl implements BinarySecurityTokenValidator, UsernameTokenValidator {
     
     private boolean alwaysValidateToSts;
     
@@ -140,6 +150,228 @@ public class STSStaxTokenValidator
         throws WSSecurityException {
         STSStaxBSTValidator validator = new STSStaxBSTValidator(alwaysValidateToSts);
         return validator.validate(binarySecurityTokenType, tokenContext);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(UsernameTokenType usernameTokenType,
+                                                                               TokenContext tokenContext)
+        throws WSSecurityException {
+        // If the UsernameToken is to be used for key derivation, the (1.1)
+        // spec says that it cannot contain a password, and it must contain
+        // an Iteration element
+        final byte[] salt = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse11_Salt);
+        PasswordString passwordType = 
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
+        final Long iteration = 
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse11_Iteration);
+        if (salt != null && (passwordType != null || iteration == null)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
+        }
+
+        boolean handleCustomPasswordTypes = 
+            tokenContext.getWssSecurityProperties().getHandleCustomPasswordTypes();
+        boolean allowUsernameTokenNoPassword = 
+            tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword() 
+                || Boolean.parseBoolean((String)tokenContext.getWsSecurityContext().get(
+                    WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD));
+
+        // Check received password type against required type
+        WSSConstants.UsernameTokenPasswordType requiredPasswordType = 
+            tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
+        if (requiredPasswordType != null) {
+            if (passwordType == null || passwordType.getType() == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+            WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType =
+                WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
+            if (requiredPasswordType != usernameTokenPasswordType) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
+        }
+        
+        WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = 
+            WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
+        if (passwordType != null && passwordType.getType() != null) {
+            usernameTokenPasswordType = 
+                WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(
+                    passwordType.getType());
+        }
+
+        final AttributedString username = usernameTokenType.getUsername();
+        if (username == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
+                                          "badTokenType01");
+        }
+
+        final EncodedString encodedNonce =
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), 
+                                              WSSConstants.TAG_wsse_Nonce);
+        byte[] nonceVal = null;
+        if (encodedNonce != null && encodedNonce.getValue() != null) {
+            nonceVal = Base64.decodeBase64(encodedNonce.getValue());
+        }
+
+        final AttributedDateTime attributedDateTimeCreated =
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(),
+                                              WSSConstants.TAG_wsu_Created);
+
+        String created = null;
+        if (attributedDateTimeCreated != null) {
+            created = attributedDateTimeCreated.getValue();
+        }
+        
+        // Validate to STS if required
+        boolean valid = false;
+        final SoapMessage message = 
+            (SoapMessage)tokenContext.getWssSecurityProperties().getMsgContext();
+        if (alwaysValidateToSts) {
+            Element tokenElement = 
+                convertToDOM(username.getValue(), passwordType.getValue(), 
+                             passwordType.getType(), usernameTokenType.getId());
+            validateTokenToSTS(tokenElement, message);
+            valid = true;
+        }
+
+        if (!valid) {
+            try {
+                if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
+                    if (encodedNonce == null || attributedDateTimeCreated == null) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
+                                                      "badTokenType01");
+                    }
+    
+                    if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, 
+                                                      "badTokenType01");
+                    }
+    
+                    verifyDigestPassword(username.getValue(), passwordType, nonceVal, created, tokenContext);
+                } else if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT
+                        || passwordType != null && passwordType.getValue() != null
+                        && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
+                    
+                    verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
+                } else if (passwordType != null && passwordType.getValue() != null) {
+                    if (!handleCustomPasswordTypes) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+                    }
+                    verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
+                } else {
+                    if (!allowUsernameTokenNoPassword) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+                    }
+                }
+            } catch (WSSecurityException ex) {
+                Element tokenElement = 
+                    convertToDOM(username.getValue(), passwordType.getValue(), 
+                                 passwordType.getType(), usernameTokenType.getId());
+                validateTokenToSTS(tokenElement, message);
+            }
+        }
+
+        final String password;
+        if (passwordType != null) {
+            password = passwordType.getValue();
+        } else if (salt != null) {
+            WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
+                   WSPasswordCallback.USERNAME_TOKEN);
+            try {
+                WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
+            } catch (WSSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+            }
+            password = pwCb.getPassword();
+        } else {
+            password = null;
+        }
+
+        UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
+                usernameTokenPasswordType, username.getValue(), password, created,
+                nonceVal, salt, iteration,
+                tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
+                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+        usernameSecurityToken.setElementPath(tokenContext.getElementPath());
+        usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
+
+        return (T)usernameSecurityToken;
+    }
+    
+    /**
+     * Verify a UsernameToken containing a password digest.
+     */
+    private void verifyDigestPassword(
+        String username,
+        PasswordString passwordType,
+        byte[] nonceVal,
+        String created,
+        TokenContext tokenContext
+    ) throws WSSecurityException {
+        WSPasswordCallback pwCb = new WSPasswordCallback(username,
+                null,
+                passwordType.getType(),
+                WSPasswordCallback.USERNAME_TOKEN);
+        try {
+            WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
+        } catch (WSSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+        }
+
+        if (pwCb.getPassword() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+
+        String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
+        if (!passwordType.getValue().equals(passDigest)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+        passwordType.setValue(pwCb.getPassword());
+    }
+    
+    /**
+     * Verify a UsernameToken containing a plaintext password.
+     */
+    private void verifyPlaintextPassword(
+        String username,
+        PasswordString passwordType,
+        TokenContext tokenContext
+    ) throws WSSecurityException {
+        WSPasswordCallback pwCb = new WSPasswordCallback(username,
+                null,
+                passwordType.getType(),
+                WSPasswordCallback.USERNAME_TOKEN);
+        try {
+            WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
+        } catch (WSSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+        }
+
+        if (pwCb.getPassword() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+
+        if (!passwordType.getValue().equals(pwCb.getPassword())) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+        passwordType.setValue(pwCb.getPassword());
+    }
+    
+    // Convert to DOM to send the token to the STS - it does not copy Nonce/Created/Iteration 
+    // values
+    private Element convertToDOM(
+        String username, String password, String passwordType, String id
+    ) {
+        Document doc = DOMUtils.newDocument();
+        
+        UsernameToken usernameToken = new UsernameToken(true, doc, passwordType);
+        usernameToken.setName(username);
+        usernameToken.setPassword(password);
+        usernameToken.setID(id);
+        
+        usernameToken.addWSSENamespace();
+        usernameToken.addWSUNamespace();
+        
+        return usernameToken.getElement();
     }
     
     private static void validateTokenToSTS(Element tokenElement, SoapMessage message) 
@@ -322,4 +554,6 @@ public class STSStaxTokenValidator
             return binarySecurity.getElement();
         }
     }
+
+
 }

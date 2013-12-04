@@ -19,18 +19,25 @@
 package org.apache.cxf.systest.sts.kerberos;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
+import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * In this test, a CXF client requests a SAML2 HOK Assertion from the STS, which has a policy of requiring
@@ -42,14 +49,22 @@ import org.junit.BeforeClass;
  * user principal "alice" (keytab in "/etc/alice.keytab"), and host service "bob@service.ws.apache.org" 
  * (keytab in "/etc/bob.keytab").
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
+    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
+    
+    final TestParam test;
+    
+    public KerberosTokenTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -65,6 +80,22 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(STSServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxSTSServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
+                                                {new TestParam(PORT, true, STSPORT)},
+                                                {new TestParam(PORT, false, STAX_STSPORT)},
+                                                {new TestParam(PORT, true, STAX_STSPORT)},
+        });
     }
     
     @org.junit.AfterClass
@@ -89,7 +120,9 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
         DoubleItPortType transportSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml2Port, PORT);
+        updateAddressPort(transportSaml2Port, test.getPort());
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, test.getStsPort());
 
         doubleIt(transportSaml2Port, 25);
         
