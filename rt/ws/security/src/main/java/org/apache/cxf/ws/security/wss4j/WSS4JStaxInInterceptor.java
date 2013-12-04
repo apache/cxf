@@ -143,6 +143,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             secProps.setCallbackHandler(callbackHandler);
 
             setTokenValidators(secProps, soapMessage);
+            secProps.setMsgContext(soapMessage);
             
             List<SecurityEventListener> securityEventListeners = 
                 configureSecurityEventListeners(soapMessage, secProps);
@@ -436,8 +437,10 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 return (Validator)((Class<?>)o).newInstance();
             } else if (o instanceof String) {
                 return (Validator)ClassLoaderUtils.loadClass(o.toString(),
-                                                             WSS4JInInterceptor.class)
+                                                             WSS4JStaxInInterceptor.class)
                                                              .newInstance();
+            } else if (o != null) {
+                LOG.info("Cannot load Validator: " + o);
             }
         } catch (RuntimeException t) {
             throw t;

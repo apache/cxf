@@ -19,28 +19,40 @@
 package org.apache.cxf.systest.sts.asymmetric_encr;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.secure_conv.SecurityContextTokenUnitTest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 
 /**
  * In this test, a CXF client gets a token from the STS over the Asymmetric Binding. The STS is configured 
  * to encrypt the issued token, using the certificate obtained from the received signature.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
+    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
+    
+    final TestParam test;
+    
+    public AsymmetricEncryptionTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -50,6 +62,20 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(STSServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxSTSServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
+                                                {new TestParam("", false, STAX_STSPORT)},
+        });
     }
     
     @org.junit.AfterClass
@@ -67,15 +93,15 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        SecurityToken token = requestSecurityToken(bus);
+        SecurityToken token = requestSecurityToken(bus, test.getStsPort());
         assertTrue(token != null);
         
         bus.shutdown(true);
     }
 
-    private SecurityToken requestSecurityToken(Bus bus) throws Exception {
+    private SecurityToken requestSecurityToken(Bus bus, String stsPort) throws Exception {
         STSClient stsClient = new STSClient(bus);
-        stsClient.setWsdlLocation("http://localhost:" + STSPORT + "/SecurityTokenService/X509?wsdl");
+        stsClient.setWsdlLocation("http://localhost:" + stsPort + "/SecurityTokenService/X509?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port");
         stsClient.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0");
