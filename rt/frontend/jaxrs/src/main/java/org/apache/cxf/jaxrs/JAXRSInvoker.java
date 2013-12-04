@@ -112,7 +112,6 @@ public class JAXRSInvoker extends AbstractInvoker {
                 persistRoots(exchange, rootInstance, provider);
             } else {
                 provider.releaseInstance(inMessage, rootInstance);
-                exchange.remove(JAXRSUtils.ROOT_INSTANCE);
             }
         }
     }
