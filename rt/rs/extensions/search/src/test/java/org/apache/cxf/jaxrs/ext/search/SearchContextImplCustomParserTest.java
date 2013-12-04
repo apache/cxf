@@ -30,7 +30,7 @@ public class SearchContextImplCustomParserTest extends Assert {
     public void testQuery() {
         Message m = new MessageImpl();
         m.put(SearchContextImpl.CUSTOM_SEARCH_QUERY_PARAM_NAME, "$customfilter");
-        m.put(SearchConditionParser.class.getName(), new CustomParser());
+        m.put(SearchContextImpl.CUSTOM_SEARCH_PARSER_PROPERTY, new CustomParser());
         m.put(Message.QUERY_STRING, "$customfilter=color is red");
         SearchCondition<Color> sc = new SearchContextImpl(m).getCondition(Color.class);
         

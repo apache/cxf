@@ -42,6 +42,7 @@ public class SearchContextImpl implements SearchContext {
 
     public static final String SEARCH_QUERY = "_search";
     public static final String SHORT_SEARCH_QUERY = "_s";
+    public static final String CUSTOM_SEARCH_PARSER_PROPERTY = "search.parser";
     public static final String CUSTOM_SEARCH_QUERY_PARAM_NAME = "search.query.parameter.name";
     private static final String USE_PLAIN_QUERY_PARAMETERS = "search.use.plain.queries";
     private static final String USE_ALL_QUERY_COMPONENT = "search.use.all.query.component";
@@ -171,7 +172,7 @@ public class SearchContextImpl implements SearchContext {
                                                    Map<String, String> beanProperties,
                                                    Map<String, String> parserProperties) {
         
-        Object parserProp = message.getContextualProperty(SearchConditionParser.class.getName());
+        Object parserProp = message.getContextualProperty(CUSTOM_SEARCH_PARSER_PROPERTY);
         if (parserProp != null) {
             return getCustomParser(parserProp);
         }
