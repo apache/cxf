@@ -359,7 +359,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     }
 
     public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
-        if (connectionManager == null) {
+        if (client == null) {
             setupNIOClient(c.getClient());
         }
         return client;
