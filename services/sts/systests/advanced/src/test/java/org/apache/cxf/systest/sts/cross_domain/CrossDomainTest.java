@@ -32,7 +32,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * In this test, a CXF client checks to see that the location defined on it's STSClient is different
+ * In this test, a CXF client checks to see that the location defined on its STSClient is different
  * from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
  * service provider. It obtains a SAML Token from the configured STS first, and then sends it in
  * the security header to the second STS. The returned token is then sent to the service provider.

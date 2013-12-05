@@ -440,7 +440,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                                                              WSS4JStaxInInterceptor.class)
                                                              .newInstance();
             } else if (o != null) {
-                LOG.info("Cannot load Validator: " + o);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                                  "Cannot load Validator: " + o);
             }
         } catch (RuntimeException t) {
             throw t;

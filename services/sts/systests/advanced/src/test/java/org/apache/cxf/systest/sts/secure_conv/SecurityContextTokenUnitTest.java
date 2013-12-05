@@ -19,25 +19,37 @@
 package org.apache.cxf.systest.sts.secure_conv;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * In this test case, a CXF client requests a SecurityContextToken from an STS.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
+    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
+    
+    final TestParam test;
+    
+    public SecurityContextTokenUnitTest(TestParam type) {
+        this.test = type;
+    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -47,6 +59,20 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
                    // set this to false to fork
                    launchServer(STSServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxSTSServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
+                                                {new TestParam("", true, STAX_STSPORT)},
+        });
     }
     
     @org.junit.AfterClass
@@ -65,7 +91,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -83,7 +109,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -101,7 +127,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
@@ -119,7 +145,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);

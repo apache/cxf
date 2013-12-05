@@ -19,34 +19,42 @@
 package org.apache.cxf.systest.sts.soap12;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
+import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is a test for invoking on an STS using SOAP 1.2 via the TransportBinding. The CXF client gets a 
  * token from the STS over TLS, and then sends it to the CXF endpoint over TLS.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class Soap12Test extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
+    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -59,7 +67,14 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
     
     private static final String PORT = allocatePort(Server.class);
+    private static final String STAX_PORT = allocatePort(StaxServer.class);
 
+    final TestParam test;
+    
+    public Soap12Test(TestParam type) {
+        this.test = type;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -69,11 +84,38 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
                 launchServer(Server.class, true)
         );
         assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true)
+        );
+        assertTrue(
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
                 launchServer(STSServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxSTSServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
+                                                {new TestParam(PORT, true, STSPORT)},
+                                                {new TestParam(STAX_PORT, false, STSPORT)},
+                                                {new TestParam(STAX_PORT, true, STSPORT)},
+                                                
+                                                {new TestParam(PORT, false, STAX_STSPORT)},
+                                                {new TestParam(PORT, true, STAX_STSPORT)},
+                                                {new TestParam(STAX_PORT, false, STAX_STSPORT)},
+                                                {new TestParam(STAX_PORT, true, STAX_STSPORT)},
+        });
     }
     
     @org.junit.AfterClass
@@ -97,7 +139,13 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
         DoubleItPortType transportSaml2Port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml2Port, PORT);
+        updateAddressPort(transportSaml2Port, test.getPort());
+        
+        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, test.getStsPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml2Port);
+        }
         
         doubleIt(transportSaml2Port, 30);
         

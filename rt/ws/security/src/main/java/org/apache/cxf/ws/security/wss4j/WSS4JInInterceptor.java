@@ -852,6 +852,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                         return (Validator)ClassLoaderUtils.loadClass(o.toString(),
                                                                      WSS4JInInterceptor.class)
                                                                      .newInstance();
+                    } else if (o != null) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                                      "Cannot load Validator: " + o);
                     }
                 } catch (RuntimeException t) {
                     throw t;

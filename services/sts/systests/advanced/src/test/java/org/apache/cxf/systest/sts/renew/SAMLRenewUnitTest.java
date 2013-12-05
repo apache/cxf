@@ -19,6 +19,8 @@
 package org.apache.cxf.systest.sts.renew;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,20 +28,31 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * In this test case, a CXF client requests a SAML Token from an STS and then tries to renew it.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
     
     static final String STSPORT = allocatePort(STSServer.class);
+    static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     
+    final TestParam test;
+    
+    public SAMLRenewUnitTest(TestParam type) {
+        this.test = type;
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -48,6 +61,20 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(STSServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxSTSServer.class, true)
+        );
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<TestParam[]> data() {
+       
+        return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
+                                                {new TestParam("", false, STAX_STSPORT)},
+        });
     }
     
     @org.junit.AfterClass
@@ -66,7 +93,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
         // Request the token
         SecurityToken token = 
@@ -103,7 +130,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
         // Request the token
         SecurityToken token = 
@@ -140,7 +167,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
         // Request the token
         SecurityToken token = 
@@ -170,7 +197,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
         // Request the token
         SecurityToken token = 
@@ -202,7 +229,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
         // Request the token
         SecurityToken token = 
@@ -233,7 +260,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
         
         String wsdlLocation = 
-            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+            "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         
         // Request the token
         SecurityToken token = 
