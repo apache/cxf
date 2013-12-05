@@ -21,12 +21,10 @@ package org.apache.cxf.jaxrs.impl;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-@Provider
 public class PathSegmentImpl implements PathSegment {
 
     private String path;
