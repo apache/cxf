@@ -472,7 +472,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             // copy saved output stream to new output stream in chunks of 1024
             IOUtils.copyAndCloseInput(bis, os);
             os.flush();
-            os.close();
+            // closing the conduit this way will close the underlining stream that is os.
+            c.close(message);
         } catch (ConnectException ex) {
             //ignore, we'll just resent again later
         } catch (IOException ex) {
