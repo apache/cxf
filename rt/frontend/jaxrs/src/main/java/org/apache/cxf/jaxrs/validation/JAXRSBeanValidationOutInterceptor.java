@@ -24,12 +24,13 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.BeanValidationOutInterceptor;
 
-
+@Provider
 public class JAXRSBeanValidationOutInterceptor extends BeanValidationOutInterceptor
     implements ContainerResponseFilter {
     public JAXRSBeanValidationOutInterceptor() {

@@ -22,12 +22,14 @@ import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.BeanValidationInInterceptor;
 
-
+@Provider
 public class JAXRSBeanValidationInInterceptor extends BeanValidationInInterceptor 
     implements ContainerRequestFilter {
     public JAXRSBeanValidationInInterceptor() {
@@ -43,7 +45,7 @@ public class JAXRSBeanValidationInInterceptor extends BeanValidationInIntercepto
     
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        super.handleMessage(PhaseInterceptorChain.getCurrentMessage());
-        
+        InterceptorChain chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain();
+        chain.add(this);    
     }
 }
