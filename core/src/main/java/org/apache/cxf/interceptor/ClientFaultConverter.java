@@ -47,7 +47,6 @@ import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -58,7 +57,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
 /**
  * Takes a Fault and converts it to a local exception type if possible.
  */
-public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
+public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     public static final String DISABLE_FAULT_MAPPING = "disable-fault-mapping";
     private static final Logger LOG = LogUtils.getLogger(ClientFaultConverter.class);
 
@@ -147,11 +146,11 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
 
         Object e = null;
         if (isDOMSupported(dataBinding)) {
-            DataReader<Node> reader = dataBinding.createReader(Node.class);
+            DataReader<Node> reader = this.getNodeDataReader(msg);
             reader.setProperty(DataReader.FAULT, fault);
             e = reader.read(part, exDetail);
         } else {
-            DataReader<XMLStreamReader> reader = dataBinding.createReader(XMLStreamReader.class);
+            DataReader<XMLStreamReader> reader = this.getDataReader(msg);
             XMLStreamReader xsr = new W3CDOMStreamReader(exDetail);
             try {
                 xsr.nextTag();
