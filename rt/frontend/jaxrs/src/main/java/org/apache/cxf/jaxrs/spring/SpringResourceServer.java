@@ -45,7 +45,7 @@ public class SpringResourceServer {
     private String address = "/";
     
     @Bean
-    public Server create() {
+    public Server jaxrsServer() {
         List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
         List<Object> jaxrsProviders = new LinkedList<Object>();
         
