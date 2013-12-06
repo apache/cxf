@@ -45,7 +45,7 @@ public final class HolderUtils {
 
         try {
             Unmarshaller umr = getContext(c, jaxbContext, jaxbClasses, cl).createUnmarshaller();
-            JAXBElement<?> ele = (JAXBElement<?>) umr.unmarshal(parent);
+            JAXBElement<?> ele = (JAXBElement<?>) umr.unmarshal(parent, c);
 
             return ele.getValue();
         } catch (JAXBException e) {
