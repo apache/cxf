@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.spring;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
@@ -43,6 +44,7 @@ public class SpringResourceServer {
     private ApplicationContext ctx;
 
     private String address = "/";
+    private Set<String> supportedBeanNames;
     
     @Bean
     public Server jaxrsServer() {
@@ -50,12 +52,14 @@ public class SpringResourceServer {
         List<Object> jaxrsProviders = new LinkedList<Object>();
         
         for (String beanName : ctx.getBeanDefinitionNames()) {
-            if (ctx.findAnnotationOnBean(beanName, Path.class) != null) {
-                SpringResourceFactory factory = new SpringResourceFactory(beanName);
-                factory.setApplicationContext(ctx);
-                resourceProviders.add(factory);
-            } else if (checkJaxrsProviders() && ctx.findAnnotationOnBean(beanName, Provider.class) != null) {
-                jaxrsProviders.add(ctx.getBean(beanName));
+            if (isBeanSupported(beanName)) {
+                if (ctx.findAnnotationOnBean(beanName, Path.class) != null) {
+                    SpringResourceFactory factory = new SpringResourceFactory(beanName);
+                    factory.setApplicationContext(ctx);
+                    resourceProviders.add(factory);
+                } else if (checkJaxrsProviders() && ctx.findAnnotationOnBean(beanName, Provider.class) != null) {
+                    jaxrsProviders.add(ctx.getBean(beanName));
+                }
             }
         }
 
@@ -77,5 +81,17 @@ public class SpringResourceServer {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Set<String> getSupportedBeanNames() {
+        return supportedBeanNames;
+    }
+
+    public void setSupportedBeanNames(Set<String> supportedBeanNames) {
+        this.supportedBeanNames = supportedBeanNames;
+    }
+    
+    protected boolean isBeanSupported(String beanName) {
+        return supportedBeanNames == null || supportedBeanNames.contains(beanName);
     }
 }
