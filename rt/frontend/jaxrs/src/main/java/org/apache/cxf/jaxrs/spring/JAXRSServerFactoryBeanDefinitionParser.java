@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
 
@@ -205,6 +206,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             try {
                 if (basePackages != null && !basePackages.isEmpty()) {
                     final List< Object > providers = new ArrayList< Object >();
+                    final List< Object > services = new ArrayList< Object >();
                     
                     // Reusing Spring's approach to classpath scanning. Because Java packages are
                     // open, it's impossible to get all classes belonging to specific package.
@@ -231,14 +233,19 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                             
                             // Create a bean only if it's a provider (annotated)
                             if (metadata.isAnnotated(Provider.class.getName())) {                                
-                                final Class<?> clazz = ClassLoaderUtils.loadClass(metadata.getClassName(), getClass());
-                                providers.add(ctx.getAutowireCapableBeanFactory().createBean(clazz));
+                                providers.add(createBean(ctx, metadata));
+                            } else if (metadata.isAnnotated(Path.class.getName())) { 
+                                services.add(createBean(ctx, metadata));
                             }
                         }                        
                     }
                     
                     if (!providers.isEmpty()) {                        
                         this.setProviders(providers);
+                    }
+                    
+                    if (!services.isEmpty()) {                        
+                        this.setServiceBeans(services);
                     }
                 }
             } catch (IOException ex) {
@@ -250,6 +257,12 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
+        }
+
+        private Object createBean(final ApplicationContext ctx, final AnnotationMetadata metadata) 
+            throws ClassNotFoundException {
+            final Class<?> clazz = ClassLoaderUtils.loadClass(metadata.getClassName(), getClass());
+            return ctx.getAutowireCapableBeanFactory().createBean(clazz);
         }
         
         private boolean shouldSkip(final String classname) {
