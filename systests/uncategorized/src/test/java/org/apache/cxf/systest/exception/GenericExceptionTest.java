@@ -33,13 +33,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class GenericExceptionTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = "9001";
-        //Server.PORT;
+    public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://cxf.apache.org/test/HelloService", "HelloService");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        //assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class));
 
     }
 
