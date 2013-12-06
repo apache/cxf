@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -36,7 +38,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.junit.Test;
 
 
@@ -513,11 +514,10 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         service.getInInterceptors().add(inhandler);
         
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        outProperties.setOutAction(
-            new XMLSecurityConstants.Action[] {
-                WSSConstants.SIGNATURE, WSSConstants.SIGNATURE_CONFIRMATION
-            }
-        );
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
+        outProperties.setActions(actions);
         outProperties.setSignatureUser("myalias");
         
         Properties outCryptoProperties = 

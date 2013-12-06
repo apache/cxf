@@ -159,7 +159,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     }
 
     private void checkAsymmetricBinding(
-        AssertionInfoMap aim, SoapMessage message
+        AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
             getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
@@ -176,12 +176,12 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
-            signCrypto = getSignatureCrypto(s, message);
+            signCrypto = getSignatureCrypto(s, message, securityProperties);
         }
         
         if (signCrypto != null) {
@@ -199,7 +199,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     }
     
     private void checkTransportBinding(
-        AssertionInfoMap aim, SoapMessage message
+        AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws XMLSecurityException {
         boolean transportPolicyInEffect = 
             !getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING).isEmpty();
@@ -235,12 +235,12 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
 
-        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
-            signCrypto = getSignatureCrypto(s, message);
+            signCrypto = getSignatureCrypto(s, message, securityProperties);
         }
 
         if (signCrypto != null) {
@@ -270,7 +270,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     }
     
     private void checkSymmetricBinding(
-        AssertionInfoMap aim, SoapMessage message
+        AssertionInfoMap aim, SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = 
             getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
@@ -287,12 +287,12 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
             signCrypto = encrCrypto;
         } else {
-            signCrypto = getSignatureCrypto(s, message);
+            signCrypto = getSignatureCrypto(s, message, securityProperties);
         }
         
         if (isRequestor(message)) {
@@ -334,7 +334,9 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
     }
     
-    private Crypto getEncryptionCrypto(Object e, SoapMessage message) throws WSSecurityException {
+    private Crypto getEncryptionCrypto(
+        Object e, SoapMessage message, WSSSecurityProperties securityProperties
+    ) throws WSSecurityException {
         Crypto encrCrypto = null;
         if (e instanceof Crypto) {
             encrCrypto = (Crypto)e;
@@ -349,7 +351,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             
             encrCrypto = CryptoFactory.getInstance(props, 
                                                    Loader.getClassLoader(CryptoFactory.class),
-                                                   getPasswordEncryptor(message));
+                                                   getPasswordEncryptor(message, securityProperties));
 
             EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
             synchronized (info) {
@@ -359,7 +361,9 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         return encrCrypto;
     }
     
-    private Crypto getSignatureCrypto(Object s, SoapMessage message) throws WSSecurityException {
+    private Crypto getSignatureCrypto(
+        Object s, SoapMessage message, WSSSecurityProperties securityProperties
+    ) throws WSSecurityException {
         Crypto signCrypto = null;
         if (s instanceof Crypto) {
             signCrypto = (Crypto)s;
@@ -374,7 +378,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             
             signCrypto = CryptoFactory.getInstance(props,
                                                    Loader.getClassLoader(CryptoFactory.class),
-                                                   getPasswordEncryptor(message));
+                                                   getPasswordEncryptor(message, securityProperties));
 
             EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
             synchronized (info) {
@@ -385,11 +389,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     }
     
     @Override
-    protected void configureProperties(SoapMessage msg) throws XMLSecurityException {
+    protected void configureProperties(
+        SoapMessage msg, WSSSecurityProperties securityProperties
+    ) throws XMLSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
-        checkAsymmetricBinding(aim, msg);
-        checkSymmetricBinding(aim, msg);
-        checkTransportBinding(aim, msg);
+        checkAsymmetricBinding(aim, msg, securityProperties);
+        checkSymmetricBinding(aim, msg, securityProperties);
+        checkTransportBinding(aim, msg, securityProperties);
         
         // Allow for setting non-standard asymmetric signature algorithms
         String asymSignatureAlgorithm = 
@@ -405,14 +411,14 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             }
         }
         
-        super.configureProperties(msg);
+        super.configureProperties(msg, securityProperties);
     }
     
     /**
      * Is a Nonce Cache required, i.e. are we expecting a UsernameToken 
      */
     @Override
-    protected boolean isNonceCacheRequired(SoapMessage msg) {
+    protected boolean isNonceCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
@@ -430,7 +436,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
      * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
      */
     @Override
-    protected boolean isTimestampCacheRequired(SoapMessage msg) {
+    protected boolean isTimestampCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 
@@ -448,7 +454,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
      * Is a SAML Cache required, i.e. are we expecting a SAML Token 
      */
     @Override
-    protected boolean isSamlCacheRequired(SoapMessage msg) {
+    protected boolean isSamlCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         if (aim != null) {
             Collection<AssertionInfo> ais = 

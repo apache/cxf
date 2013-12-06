@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
@@ -52,7 +51,9 @@ import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
@@ -69,7 +70,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
     private SoapMessage message;
     
     public StaxAsymmetricBindingHandler(
-        Map<String, Object> properties, 
+        WSSSecurityProperties properties, 
         SoapMessage msg,
         AsymmetricBinding abinding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
@@ -131,13 +132,12 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     }
                     
                     // Set up CallbackHandler which wraps the configured Handler
-                    Map<String, Object> config = getProperties();
+                    WSSSecurityProperties properties = getProperties();
                     TokenStoreCallbackHandler callbackHandler = 
                         new TokenStoreCallbackHandler(
-                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
-                            WSS4JUtils.getTokenStore(message)
+                            properties.getCallbackHandler(), WSS4JUtils.getTokenStore(message)
                         );
-                    config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+                    properties.setCallbackHandler(callbackHandler);
                 } else if (initiatorToken instanceof SamlToken) {
                     addSamlToken((SamlToken)initiatorToken, false, true);
                 }
@@ -174,16 +174,15 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             addSupportingTokens();
             
-            Map<String, Object> config = getProperties();
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                if (action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)
-                    && action.contains(ConfigurationConstants.SIGNATURE)) {
-                    String newAction = action.replaceFirst(ConfigurationConstants.SIGNATURE, "").trim();
-                    config.put(ConfigurationConstants.ACTION, newAction);
+            WSSSecurityProperties properties = getProperties();
+            if (properties.getActions() != null) {
+                List<WSSConstants.Action> actionList = properties.getActions();
+                if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)
+                    && actionList.contains(WSSConstants.SIGNATURE)) {
+                    actionList.remove(WSSConstants.SIGNATURE);
                 }
-            } 
-            
+            }
+
             List<SecurePart> enc = getEncryptedParts();
             
             //Check for signature protection
@@ -263,13 +262,12 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     }
                     
                     // Set up CallbackHandler which wraps the configured Handler
-                    Map<String, Object> config = getProperties();
+                    WSSSecurityProperties properties = getProperties();
                     TokenStoreCallbackHandler callbackHandler = 
                         new TokenStoreCallbackHandler(
-                            (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
-                            WSS4JUtils.getTokenStore(message)
+                            properties.getCallbackHandler(), WSS4JUtils.getTokenStore(message)
                         );
-                    config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+                    properties.setCallbackHandler(callbackHandler);
                 } else if (initiatorToken instanceof SamlToken) {
                     addSamlToken((SamlToken)initiatorToken, false, true);
                 }
@@ -349,74 +347,34 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             
             // Action
-            Map<String, Object> config = getProperties();
-            String actionToPerform = ConfigurationConstants.ENCRYPT;
+            WSSSecurityProperties properties = getProperties();
+            WSSConstants.Action actionToPerform = WSSConstants.ENCRYPT;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                actionToPerform = ConfigurationConstants.ENCRYPT_DERIVED;
+                actionToPerform = WSSConstants.ENCRYPT_WITH_DERIVED_KEY;
+            }
+            properties.addAction(actionToPerform);
+            
+            for (SecurePart encPart : encrParts) {
+                properties.addEncryptionPart(encPart);
             }
             
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-            } else {
-                config.put(ConfigurationConstants.ACTION, actionToPerform);
-            }
-            
-            String parts = "";
-            if (config.containsKey(ConfigurationConstants.ENCRYPTION_PARTS)) {
-                parts = (String)config.get(ConfigurationConstants.ENCRYPTION_PARTS);
-                if (!parts.endsWith(";")) {
-                    parts += ";";
-                }
-            }
-            
-            String optionalParts = "";
-            if (config.containsKey(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS)) {
-                optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
-                if (!optionalParts.endsWith(";")) {
-                    optionalParts += ";";
-                }
-            }
+            properties.setEncryptionKeyIdentifier(
+                ConfigurationConverter.convertKeyIdentifier(getKeyIdentifierType(recToken, encrToken)));
 
-            if (encrParts != null) {
-                for (SecurePart part : encrParts) {
-                    QName name = part.getName();
-                    String modifier = part.getModifier().getModifier();
-                    if (modifier == null || Modifier.Element.getModifier().equals(modifier)) {
-                        modifier = "Element";
-                    } else {
-                        modifier = "Content";
-                    }
-                    
-                    String parsedPart = "";
-                    if (name != null) {
-                        parsedPart = "{" + modifier + "}{" + name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
-                    } else {
-                        parsedPart = "{" + modifier + "}" + part.getExternalReference() + ";";
-                    }
-                    
-                    if (part.isRequired()) {
-                        parts += parsedPart;
-                    } else {
-                        optionalParts += parsedPart;
-                    }
-                }
-            }
-
-            config.put(ConfigurationConstants.ENCRYPTION_PARTS, parts);
-            config.put(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS, optionalParts);
-    
-            config.put(ConfigurationConstants.ENC_KEY_ID, 
-                       getKeyIdentifierType(recToken, encrToken));
-
-            config.put(ConfigurationConstants.ENC_KEY_TRANSPORT, 
+            properties.setEncryptionKeyTransportAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());
-            config.put(ConfigurationConstants.ENC_SYM_ALGO, 
+            properties.setEncryptionSymAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getEncryption());
 
             String encUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-            if (encUser != null) {
-                config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
+            if (encUser == null) {
+                encUser = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+            }
+            if (encUser != null && properties.getEncryptionUser() == null) {
+                properties.setEncryptionUser(encUser);
+            }
+            if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(encUser)) {
+                properties.setUseReqSigCertForEncryption(true);
             }
             
             //
@@ -424,7 +382,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             // we're extracting the cert from a SAML Assertion on the provider side
             //
             if (!isRequestor() && recToken.getToken() instanceof IssuedToken) {
-                config.put(ConfigurationConstants.ENCRYPTION_USER, ConfigurationConstants.USE_REQ_SIG_CERT);
+                properties.setUseReqSigCertForEncryption(true);
             }
         }
     }
@@ -433,56 +391,20 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         throws WSSecurityException, SOAPException {
         
         // Action
-        Map<String, Object> config = getProperties();
-        String actionToPerform = ConfigurationConstants.SIGNATURE;
+        WSSSecurityProperties properties = getProperties();
+        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
         if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
+            actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
         }
-        
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
+        List<WSSConstants.Action> actionList = properties.getActions();
+        if (actionList.contains(WSSConstants.SIGNATURE_CONFIRMATION)) {
+            actionList.add(0, actionToPerform);
         } else {
-            config.put(ConfigurationConstants.ACTION, actionToPerform);
+            actionList.add(actionToPerform);
         }
         
-        String parts = "";
-        if (config.containsKey(ConfigurationConstants.SIGNATURE_PARTS)) {
-            parts = (String)config.get(ConfigurationConstants.SIGNATURE_PARTS);
-            if (!parts.endsWith(";")) {
-                parts += ";";
-            }
-        }
-        
-        String optionalParts = "";
-        if (config.containsKey(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS)) {
-            optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
-            if (!optionalParts.endsWith(";")) {
-                optionalParts += ";";
-            }
-        }
-        
-        for (SecurePart part : sigParts) {
-            QName name = part.getName();
-            String modifier = part.getModifier().getModifier();
-            if (modifier == null || Modifier.Element.getModifier().equals(modifier)) {
-                modifier = "Element";
-            } else {
-                modifier = "Content";
-            }
-            
-            String parsedPart = "";
-            if (name != null) {
-                parsedPart = "{" + modifier + "}{" + name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
-            } else {
-                parsedPart = "{" + modifier + "}" + part.getExternalReference() + ";";
-            }
-            
-            if (part.isRequired()) {
-                parts += parsedPart;
-            } else {
-                optionalParts += parsedPart;
-            }
+        for (SecurePart sigPart : sigParts) {
+            properties.addSignaturePart(sigPart);
         }
         
         AbstractToken sigToken = wrapper.getToken();
@@ -490,18 +412,17 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         
         if (abinding.isProtectTokens() && (sigToken instanceof X509Token)
             && sigToken.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-            parts += "{Element}{" + WSSConstants.NS_WSSE10 + "}BinarySecurityToken;";
+            SecurePart securePart = 
+                new SecurePart(new QName(WSSConstants.NS_WSSE10, "BinarySecurityToken"), Modifier.Element);
+            properties.addSignaturePart(securePart);
         } else if (sigToken instanceof IssuedToken || sigToken instanceof SecurityContextToken
             || sigToken instanceof SecureConversationToken || sigToken instanceof SpnegoContextToken
             || sigToken instanceof SamlToken) {
-            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+            properties.setIncludeSignatureToken(false);
         }
         
-        config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
-        config.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
-        
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            properties.setSignatureAlgorithm(
                    abinding.getAlgorithmSuite().getSymmetricSignature());
         }
     }

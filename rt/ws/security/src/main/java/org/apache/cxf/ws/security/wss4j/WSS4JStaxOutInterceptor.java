@@ -72,12 +72,11 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     private boolean mtomEnabled;
     
     public WSS4JStaxOutInterceptor(WSSSecurityProperties securityProperties) {
-        super();
+        super(securityProperties);
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         
         ending = createEndingInterceptor();
-        setSecurityProperties(securityProperties);
     }
 
     public WSS4JStaxOutInterceptor(Map<String, Object> props) {
@@ -123,21 +122,16 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             final List<SecurityEvent> requestSecurityEvents = 
                 (List<SecurityEvent>) mc.getExchange().get(SecurityEvent.class.getName() + ".in");
             
-            translateProperties(mc);
+            WSSSecurityProperties secProps = createSecurityProperties();
+            translateProperties(mc, secProps);
             Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens = 
                 new HashMap<String, SecurityTokenProvider<OutboundSecurityToken>>();
-            configureCallbackHandler(mc);
-            configureProperties(mc, outboundTokens);
+            configureCallbackHandler(mc, secProps);
+            configureProperties(mc, outboundTokens, secProps);
             
             OutboundWSSec outboundWSSec = null;
-            WSSSecurityProperties secProps = null;
-            if (getSecurityProperties() != null) {
-                secProps = getSecurityProperties();
-            } else {
-                secProps = ConfigurationConverter.convert(getProperties());
-            }
             
-            if ((secProps.getOutAction() == null || secProps.getOutAction().length == 0)
+            if ((secProps.getActions() == null || secProps.getActions().size() == 0)
                 && mc.get(AssertionInfoMap.class) != null) {
                 // If no actions configured (with SecurityPolicy) then return
                 return;
@@ -213,7 +207,8 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     }
     
     protected void configureProperties(
-        SoapMessage msg, Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
+        SoapMessage msg, Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens,
+        WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Map<String, Object> config = getProperties();
         
@@ -221,30 +216,30 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         if (config != null) {
             String user = (String)msg.getContextualProperty(SecurityConstants.USERNAME);
             if (user != null) {
-                config.put(ConfigurationConstants.USER, user);
+                securityProperties.setTokenUser(user);
             }
             String sigUser = (String)msg.getContextualProperty(SecurityConstants.SIGNATURE_USERNAME);
             if (sigUser != null) {
-                config.put(ConfigurationConstants.SIGNATURE_USER, sigUser);
+                securityProperties.setSignatureUser(sigUser);
             }
             String encUser = (String)msg.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
             if (encUser != null) {
-                config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
+                securityProperties.setEncryptionUser(encUser);
             }
             
             Crypto sigCrypto = 
                 loadCrypto(
                     msg,
                     ConfigurationConstants.SIG_PROP_FILE,
-                    ConfigurationConstants.SIG_PROP_REF_ID
+                    ConfigurationConstants.SIG_PROP_REF_ID,
+                    securityProperties
                 );
             if (sigCrypto != null) {
                 config.put(ConfigurationConstants.SIG_PROP_REF_ID, "RefId-" + sigCrypto.hashCode());
                 config.put("RefId-" + sigCrypto.hashCode(), sigCrypto);
                 if (sigUser == null && sigCrypto.getDefaultX509Identifier() != null) {
                     // Fall back to default identifier
-                    config.put(ConfigurationConstants.SIGNATURE_USER, 
-                               sigCrypto.getDefaultX509Identifier());
+                    securityProperties.setSignatureUser(sigCrypto.getDefaultX509Identifier());
                 }
             }
             
@@ -252,16 +247,24 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 loadCrypto(
                     msg,
                     ConfigurationConstants.ENC_PROP_FILE,
-                    ConfigurationConstants.ENC_PROP_REF_ID
+                    ConfigurationConstants.ENC_PROP_REF_ID,
+                    securityProperties
                 );
             if (encCrypto != null) {
                 config.put(ConfigurationConstants.ENC_PROP_REF_ID, "RefId-" + encCrypto.hashCode());
                 config.put("RefId-" + encCrypto.hashCode(), encCrypto);
                 if (encUser == null && encCrypto.getDefaultX509Identifier() != null) {
                     // Fall back to default identifier
-                    config.put(ConfigurationConstants.ENCRYPTION_USER, 
-                               encCrypto.getDefaultX509Identifier());
+                    securityProperties.setEncryptionUser(encCrypto.getDefaultX509Identifier());
                 }
+            }
+            ConfigurationConverter.parseCrypto(config, securityProperties);
+            
+            if (securityProperties.getSignatureUser() == null && user != null) {
+                securityProperties.setSignatureUser(user);
+            }
+            if (securityProperties.getEncryptionUser() == null && user != null) {
+                securityProperties.setEncryptionUser(user);
             }
         }
     }

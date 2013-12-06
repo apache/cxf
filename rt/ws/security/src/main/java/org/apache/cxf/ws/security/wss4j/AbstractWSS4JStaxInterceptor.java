@@ -58,6 +58,7 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 
@@ -75,111 +76,89 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
 
     private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
     private Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
-    private WSSSecurityProperties securityProperties;
+    private WSSSecurityProperties userSecurityProperties;
     private Set<String> before = new HashSet<String>();
     private Set<String> after = new HashSet<String>();
     private String phase;
     private String id;
     
-    public AbstractWSS4JStaxInterceptor() {
+    public AbstractWSS4JStaxInterceptor(WSSSecurityProperties securityProperties) {
         super();
         id = getClass().getName();
+        userSecurityProperties = securityProperties;
     }
     
     public AbstractWSS4JStaxInterceptor(Map<String, Object> properties) {
-        this();
-        this.properties.putAll(properties);
+        super();
+        id = getClass().getName();
+        this.properties = properties;
+    }
+
+    protected WSSSecurityProperties createSecurityProperties() {
+        if (userSecurityProperties != null) {
+            return new WSSSecurityProperties(userSecurityProperties);
+        } else {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            ConfigurationConverter.parseActions(properties, securityProperties);
+            ConfigurationConverter.parseUserProperties(properties, securityProperties);
+            ConfigurationConverter.parseCallback(properties, securityProperties);
+            ConfigurationConverter.parseBooleanProperties(properties, securityProperties);
+            ConfigurationConverter.parseNonBooleanProperties(properties, securityProperties);
+            return securityProperties;
+        }
     }
     
-    protected void translateProperties(SoapMessage msg) {
+    protected void translateProperties(SoapMessage msg, WSSSecurityProperties securityProperties) {
         String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
         if (bspCompliant != null) {
-            if (securityProperties != null) {
-                securityProperties.setDisableBSPEnforcement(Boolean.valueOf(bspCompliant));
-            } else {
-                properties.put(ConfigurationConstants.IS_BSP_COMPLIANT, bspCompliant);
-            }
+            securityProperties.setDisableBSPEnforcement(!Boolean.valueOf(bspCompliant));
         }
+        
         String futureTTL = 
             (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_FUTURE_TTL);
         if (futureTTL != null) {
-            if (securityProperties != null) {
-                securityProperties.setTimeStampFutureTTL(Integer.parseInt(futureTTL));
-            } else {
-                properties.put(ConfigurationConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
-            }
+            securityProperties.setTimeStampFutureTTL(Integer.parseInt(futureTTL));
         }
+        
         String ttl = 
             (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
         if (ttl != null) {
-            if (securityProperties != null) {
-                securityProperties.setTimestampTTL(Integer.parseInt(ttl));
-            } else {
-                properties.put(ConfigurationConstants.TTL_TIMESTAMP, ttl);
-            }
+            securityProperties.setTimestampTTL(Integer.parseInt(ttl));
         }
         
         String utFutureTTL = 
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_FUTURE_TTL);
         if (utFutureTTL != null) {
-            if (securityProperties != null) {
-                securityProperties.setUtFutureTTL(Integer.parseInt(utFutureTTL));
-            } else {
-                properties.put(ConfigurationConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
-            }
+            securityProperties.setUtFutureTTL(Integer.parseInt(utFutureTTL));
         }
+        
         String utTTL = 
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_TTL);
         if (utTTL != null) {
-            if (securityProperties != null) {
-                securityProperties.setUtTTL(Integer.parseInt(utTTL));
-            } else {
-                properties.put(ConfigurationConstants.TTL_USERNAMETOKEN, utTTL);
-            }
+            securityProperties.setUtTTL(Integer.parseInt(utTTL));
         }
         
         String certConstraints = 
             (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
         if (certConstraints != null) {
-            if (securityProperties != null) {
-                securityProperties.setSubjectCertConstraints(convertCertConstraints(certConstraints));
-            } else {
-                properties.put(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
-            }
+            securityProperties.setSubjectCertConstraints(convertCertConstraints(certConstraints));
         }
         
         // Now set SAML SenderVouches + Holder Of Key requirements
         String validateSAMLSubjectConf = 
             (String)msg.getContextualProperty(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION);
         if (validateSAMLSubjectConf != null) {
-            if (securityProperties != null) {
-                securityProperties.setValidateSamlSubjectConfirmation(Boolean.valueOf(validateSAMLSubjectConf));
-            } else {
-                properties.put(ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
-                               validateSAMLSubjectConf);
-            }
+            securityProperties.setValidateSamlSubjectConfirmation(Boolean.valueOf(validateSAMLSubjectConf));
         }
         
         String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
         if (actor != null) {
-            if (securityProperties != null) {
-                securityProperties.setActor(actor);
-            } else {
-                properties.put(ConfigurationConstants.ACTOR, actor);
-            }
+            securityProperties.setActor(actor);
         }
         
         boolean mustUnderstand = 
             MessageUtils.getContextualBoolean(msg, SecurityConstants.MUST_UNDERSTAND, true);
-        if (properties != null) {
-            properties.put(ConfigurationConstants.MUST_UNDERSTAND, Boolean.toString(mustUnderstand));
-        }
-        
-        PasswordEncryptor passwordEncryptor = 
-            (PasswordEncryptor)msg.getContextualProperty(SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE);
-        if (passwordEncryptor != null && securityProperties == null) {
-            properties.put(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
-        }
+        securityProperties.setMustUnderstand(mustUnderstand);
     }
     
     private  Collection<Pattern> convertCertConstraints(String certConstraints) {
@@ -200,7 +179,9 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         return null;
     }
     
-    protected void configureCallbackHandler(SoapMessage soapMessage) throws WSSecurityException {
+    protected void configureCallbackHandler(
+        SoapMessage soapMessage, WSSSecurityProperties securityProperties
+    ) throws WSSecurityException {
         Object o = soapMessage.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
         if (o instanceof String) {
             try {
@@ -228,13 +209,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         }
         
         if (o instanceof CallbackHandler) {
-            Map<String, Object> config = getProperties();
-            
-            if (securityProperties != null) {
-                securityProperties.setCallbackHandler((CallbackHandler)o);
-            } else {
-                config.put(ConfigurationConstants.PW_CALLBACK_REF, (CallbackHandler)o);
-            }
+            securityProperties.setCallbackHandler((CallbackHandler)o);
         }
     }
     
@@ -323,14 +298,6 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         return MessageUtils.isRequestor(message);
     }
 
-    public WSSSecurityProperties getSecurityProperties() {
-        return securityProperties;
-    }
-
-    public void setSecurityProperties(WSSSecurityProperties securityProperties) {
-        this.securityProperties = securityProperties;
-    }  
-    
     /**
      * Load a Crypto instance. Firstly, it tries to use the cryptoPropertyRefId tag to retrieve
      * a Crypto object via a custom reference Id. Failing this, it tries to load the crypto 
@@ -339,7 +306,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     protected Crypto loadCrypto(
         SoapMessage soapMessage,
         String cryptoPropertyFile,
-        String cryptoPropertyRefId
+        String cryptoPropertyRefId,
+        WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         Crypto crypto = null;
         
@@ -354,7 +322,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                 if (obj instanceof Properties) {
                     crypto = CryptoFactory.getInstance((Properties)obj, 
                                                        getClassLoader(),
-                                                       getPasswordEncryptor(soapMessage));
+                                                       getPasswordEncryptor(soapMessage, securityProperties));
                     cryptos.put(refId, crypto);
                 } else if (obj instanceof Crypto) {
                     crypto = (Crypto)obj;
@@ -376,7 +344,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             if (propFile != null) {
                 crypto = cryptos.get(propFile);
                 if (crypto == null) {
-                    crypto = loadCryptoFromPropertiesFile(soapMessage, propFile);
+                    crypto = loadCryptoFromPropertiesFile(soapMessage, propFile, securityProperties);
                     cryptos.put(propFile, crypto);
                 }
                 if (crypto == null) {
@@ -392,7 +360,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     }
     
     protected Crypto loadCryptoFromPropertiesFile(
-        SoapMessage soapMessage, String propFilename
+        SoapMessage soapMessage, String propFilename, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         ClassLoaderHolder orig = null;
         try {
@@ -413,7 +381,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
                     props.load(in);
                     in.close();
                     return CryptoFactory.getInstance(props, getClassLoader(), 
-                                                     getPasswordEncryptor(soapMessage));
+                                                     getPasswordEncryptor(soapMessage, securityProperties));
                 }
             } catch (Exception e) {
                 //ignore
@@ -426,7 +394,9 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         }
     }
     
-    protected PasswordEncryptor getPasswordEncryptor(SoapMessage soapMessage) {
+    protected PasswordEncryptor getPasswordEncryptor(
+        SoapMessage soapMessage, WSSSecurityProperties securityProperties
+    ) {
         PasswordEncryptor passwordEncryptor = 
             (PasswordEncryptor)soapMessage.getContextualProperty(
                 SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
@@ -434,13 +404,12 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         if (passwordEncryptor != null) {
             return passwordEncryptor;
         }
-        
-        CallbackHandler callbackHandler = null;
-        if (securityProperties != null) {
-            callbackHandler = securityProperties.getCallbackHandler();
-        } else {
+
+        CallbackHandler callbackHandler = securityProperties.getCallbackHandler();
+        if (callbackHandler == null) {
             callbackHandler = (CallbackHandler)getProperties().get(ConfigurationConstants.PW_CALLBACK_REF);
         }
+
         if (callbackHandler != null) {
             return new JasyptPasswordEncryptor(callbackHandler);
         }

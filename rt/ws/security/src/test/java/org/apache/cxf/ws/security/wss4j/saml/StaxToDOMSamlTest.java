@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.ws.security.wss4j.saml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -48,7 +50,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.junit.Test;
 
 
@@ -83,7 +84,9 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED});
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+        properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
@@ -155,7 +158,9 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED});
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+        properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
@@ -235,7 +240,9 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED});
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+        properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
@@ -309,7 +316,9 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED});
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+        properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
@@ -391,7 +400,9 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED});
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+        properties.setActions(actions);
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setSignAssertion(true);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
@@ -502,7 +513,9 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED});
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+        properties.setActions(actions);
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setSignAssertion(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);

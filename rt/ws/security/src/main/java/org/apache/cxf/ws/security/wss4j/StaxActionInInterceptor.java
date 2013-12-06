@@ -31,6 +31,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
 
@@ -44,9 +45,9 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
     private static final Logger LOG = 
         LogUtils.getL7dLogger(StaxActionInInterceptor.class);
                                                             
-    private final List<String> inActions;
+    private final List<XMLSecurityConstants.Action> inActions;
     
-    public StaxActionInInterceptor(List<String> inActions) {
+    public StaxActionInInterceptor(List<XMLSecurityConstants.Action> inActions) {
         super(Phase.PRE_PROTOCOL);
         this.inActions = inActions;
         this.getBefore().add(StaxSecurityContextInInterceptor.class.getName());
@@ -55,7 +56,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
         
-        if (inActions == null || inActions.isEmpty()) {
+        if (inActions == null || inActions.size() == 0) {
             return;
         }
         
@@ -70,16 +71,16 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
             throw createSoapFault(soapMessage.getVersion(), ex);
         }
         
-        for (String action : inActions) {
+        for (XMLSecurityConstants.Action action : inActions) {
             Event requiredEvent = null;
-            if (WSSConstants.TIMESTAMP.getName().equals(action)) {
+            if (WSSConstants.TIMESTAMP.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.Timestamp;
-            } else if (WSSConstants.USERNAMETOKEN.getName().equals(action)) {
+            } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.UsernameToken;
-            } else if (WSSConstants.SIGNATURE.getName().equals(action)) {
+            } else if (WSSConstants.SIGNATURE.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.SignatureValue;
-            } else if (WSSConstants.SAML_TOKEN_SIGNED.getName().equals(action)
-                || WSSConstants.SAML_TOKEN_UNSIGNED.getName().equals(action)) {
+            } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)
+                || WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.SamlToken;
             }
             
@@ -91,7 +92,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
                 throw createSoapFault(soapMessage.getVersion(), ex);
             }
             
-            if (WSSConstants.ENCRYPT.getName().equals(action)) {
+            if (WSSConstants.ENCRYPT.equals(action)) {
                 boolean foundEncryptionPart = 
                     isEventInResults(WSSecurityEventConstants.EncryptedPart, incomingSecurityEventList);
                 if (!foundEncryptionPart) {

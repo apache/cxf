@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
@@ -37,7 +36,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
-import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -62,6 +60,9 @@ import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.XPath;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
@@ -74,7 +75,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     private TransportBinding tbinding;
 
     public StaxTransportBindingHandler(
-        Map<String, Object> properties, 
+        WSSSecurityProperties properties, 
         SoapMessage msg,
         TransportBinding tbinding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
@@ -281,57 +282,51 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             SecurityToken securityToken = getSecurityToken();
             addIssuedToken(token, securityToken, false, true);
             
-            Map<String, Object> config = getProperties();
+            WSSSecurityProperties properties = getProperties();
             if (securityToken != null) {
                 storeSecurityToken(securityToken);
                 
                 // Set up CallbackHandler which wraps the configured Handler
                 TokenStoreCallbackHandler callbackHandler = 
                     new TokenStoreCallbackHandler(
-                        (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
-                        WSS4JUtils.getTokenStore(message)
+                        properties.getCallbackHandler(), WSS4JUtils.getTokenStore(message)
                     );
-                config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+                
+                properties.setCallbackHandler(callbackHandler);
             }
             
             doSignature(token, wrapper);
             
-            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
-            config.put(ConfigurationConstants.SIG_ALGO, 
-                       tbinding.getAlgorithmSuite().getSymmetricSignature());
+            properties.setIncludeSignatureToken(true);
+            properties.setSignatureAlgorithm(
+                tbinding.getAlgorithmSuite().getSymmetricSignature());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
-            config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
+            properties.setSignatureDigestAlgorithm(algType.getDigest());
         } else if (token instanceof X509Token || token instanceof KeyValueToken) {
             doSignature(token, wrapper);
         } else if (token instanceof SamlToken) {
             addSamlToken((SamlToken)token, false, true);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
             
-            Map<String, Object> config = getProperties();
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            WSSSecurityProperties properties = getProperties();
+            properties.setSignatureAlgorithm(
                        tbinding.getAlgorithmSuite().getAsymmetricSignature());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
-            config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
+            properties.setSignatureDigestAlgorithm(algType.getDigest());
         } else if (token instanceof UsernameToken) {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
         } else if (token instanceof KerberosToken) {
-            Map<String, Object> config = getProperties();
-            String signatureAction = ConfigurationConstants.SIGNATURE;
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, action + " " + signatureAction);
-            } else {
-                config.put(ConfigurationConstants.ACTION, signatureAction);
-            }
+            WSSSecurityProperties properties = getProperties();
+            properties.addAction(WSSConstants.SIGNATURE);
             configureSignature(wrapper, token, false);
             
             addKerberosToken((KerberosToken)token, false, true, false);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
             
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            properties.setSignatureAlgorithm(
                        tbinding.getAlgorithmSuite().getSymmetricSignature());
             AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
-            config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
+            properties.setSignatureDigestAlgorithm(algType.getDigest());
         }
     }
     
@@ -341,22 +336,16 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
         // Action
-        Map<String, Object> config = getProperties();
-        String actionToPerform = ConfigurationConstants.SIGNATURE;
+        WSSSecurityProperties properties = getProperties();
+        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
+            actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
         }
-        
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-        } else {
-            config.put(ConfigurationConstants.ACTION, actionToPerform);
-        }
+        properties.addAction(actionToPerform);
         
         configureSignature(wrapper, token, false);
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            properties.setSignatureAlgorithm(
                    tbinding.getAlgorithmSuite().getSymmetricSignature());
         }
     }
@@ -368,36 +357,29 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
         SignedParts signedParts,
         SignedElements signedElements
     ) throws SOAPException {
-        Map<String, Object> properties = getProperties();
-        String parts = "";
-        if (properties.containsKey(ConfigurationConstants.SIGNATURE_PARTS)) {
-            parts = (String)properties.get(ConfigurationConstants.SIGNATURE_PARTS);
-            if (!parts.endsWith(";")) {
-                parts += ";";
-            }
-        }
-        
-        String optionalParts = "";
-        if (properties.containsKey(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS)) {
-            optionalParts = (String)properties.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
-            if (!optionalParts.endsWith(";")) {
-                optionalParts += ";";
-            }
-        }
+        WSSSecurityProperties properties = getProperties();
+        List<SecurePart> signatureParts = properties.getSignatureSecureParts();
         
         // Add timestamp
         if (timestampAdded) {
-            parts += "{Element}{" + WSSConstants.NS_WSU10 + "}Timestamp;";
+            SecurePart part = 
+                new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), Modifier.Element);
+            signatureParts.add(part);
         }
 
         // Add SignedParts
         if (signedParts != null) {
             if (signedParts.isBody()) {
-                parts += "{Element}{" + WSSConstants.NS_SOAP11 + "}Body;";
+                SecurePart part = 
+                    new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), Modifier.Element);
+                signatureParts.add(part);
             }
             
             for (Header head : signedParts.getHeaders()) {
-                optionalParts += "{Element}{" +  head.getNamespace() + "}" + head.getName() + ";";
+                SecurePart part = 
+                    new SecurePart(new QName(head.getNamespace(), head.getName()), Modifier.Element);
+                part.setRequired(false);
+                signatureParts.add(part);
             }
         }
         
@@ -406,13 +388,12 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             for (XPath xPath : signedElements.getXPaths()) {
                 List<QName> qnames = PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
-                    parts += "{Element}" + qnames.get(qnames.size() - 1) + ";";
+                    SecurePart part = 
+                        new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
+                    signatureParts.add(part);
                 }
             }
         }
-        
-        properties.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
-        properties.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
     }
 
 

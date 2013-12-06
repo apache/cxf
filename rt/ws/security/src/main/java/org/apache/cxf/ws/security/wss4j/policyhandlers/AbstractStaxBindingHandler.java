@@ -47,7 +47,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.neethi.Assertion;
-import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -87,7 +86,10 @@ import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
 import org.apache.wss4j.policy.model.XPath;
 import org.apache.wss4j.policy.stax.PolicyUtils;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
@@ -117,11 +119,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     protected Map<AbstractToken, SecurePart> sgndEndSuppTokMap;
     protected Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens;
     
-    private final Map<String, Object> properties;
+    private final WSSSecurityProperties properties;
     private AbstractBinding binding;
     
     public AbstractStaxBindingHandler(
-        Map<String, Object> properties, 
+        WSSSecurityProperties properties, 
         SoapMessage msg,
         AbstractBinding binding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
@@ -139,44 +141,36 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             return null;
         }
 
-        Map<String, Object> config = getProperties();
-        
         // Action
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, 
-                       action + " " + ConfigurationConstants.USERNAME_TOKEN);
-        } else {
-            config.put(ConfigurationConstants.ACTION, 
-                       ConfigurationConstants.USERNAME_TOKEN);
-        }
+        WSSConstants.Action actionToPerform = WSSConstants.USERNAMETOKEN;
+        properties.addAction(actionToPerform);
 
         // Password Type
         PasswordType passwordType = usernameToken.getPasswordType();
         if (passwordType == PasswordType.HashPassword) {
-            config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+            properties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_DIGEST);
         } else if (passwordType == PasswordType.NoPassword) {
-            config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
+            properties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_NONE);
         } else {
-            config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+            properties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_TEXT);
         }
 
         // Nonce + Created
         if (usernameToken.isNonce()) {
-            config.put(ConfigurationConstants.ADD_USERNAMETOKEN_NONCE, "true");
+            properties.setAddUsernameTokenNonce(true);
         }
         if (usernameToken.isCreated()) {
-            config.put(ConfigurationConstants.ADD_USERNAMETOKEN_CREATED, "true");
+            properties.setAddUsernameTokenCreated(true);
         }
         
         // Check if a CallbackHandler was specified
-        if (config.get(ConfigurationConstants.PW_CALLBACK_REF) == null) {
+        if (properties.getCallbackHandler() == null) {
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (password != null) {
                 String username = 
                     (String)message.getContextualProperty(SecurityConstants.USERNAME);
                 UTCallbackHandler callbackHandler = new UTCallbackHandler(username, password);
-                config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+                properties.setCallbackHandler(callbackHandler);
             }
         }
         
@@ -260,15 +254,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         
         // Action
-        Map<String, Object> config = getProperties();
-        String actionToPerform = ConfigurationConstants.KERBEROS_TOKEN;
-        
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-        } else {
-            config.put(ConfigurationConstants.ACTION, actionToPerform);
-        }
+        WSSConstants.Action actionToPerform = WSSConstants.KERBEROS_TOKEN;
+        properties.addAction(actionToPerform);
         
         /*
         if (endorsing) {
@@ -296,8 +283,6 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             return null;
         }
         
-        Map<String, Object> config = getProperties();
-        
         //
         // Get the SAML CallbackHandler
         //
@@ -318,20 +303,14 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             policyNotAsserted(token, "No SAML CallbackHandler available");
             return null;
         }
-        config.put(ConfigurationConstants.SAML_CALLBACK_REF, handler);
+        properties.setSamlCallbackHandler(handler);
         
         // Action
-        String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
+        WSSConstants.Action actionToPerform = WSSConstants.SAML_TOKEN_UNSIGNED;
         if (signed || endorsing) {
-            samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
+            actionToPerform = WSSConstants.SAML_TOKEN_SIGNED;
         }
-        
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            config.put(ConfigurationConstants.ACTION, action + " " + samlAction);
-        } else {
-            config.put(ConfigurationConstants.ACTION, samlAction);
-        }
+        properties.addAction(actionToPerform);
         
         QName qname = WSSConstants.TAG_saml2_Assertion;
         SamlTokenType tokenType = token.getSamlTokenType();
@@ -351,17 +330,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             if (el != null && "Assertion".equals(el.getLocalName())
                 && (WSSConstants.NS_SAML.equals(el.getNamespaceURI())
                 || WSSConstants.NS_SAML2.equals(el.getNamespaceURI()))) {
-                String samlAction = ConfigurationConstants.SAML_TOKEN_UNSIGNED;
+                WSSConstants.Action actionToPerform = WSSConstants.SAML_TOKEN_UNSIGNED;
                 if (endorsing) {
-                    samlAction = ConfigurationConstants.SAML_TOKEN_SIGNED;
+                    actionToPerform = WSSConstants.SAML_TOKEN_SIGNED;
                 }
-                Map<String, Object> config = getProperties();
-                if (config.containsKey(ConfigurationConstants.ACTION)) {
-                    String action = (String)config.get(ConfigurationConstants.ACTION);
-                    config.put(ConfigurationConstants.ACTION, action + " " + samlAction);
-                } else {
-                    config.put(ConfigurationConstants.ACTION, samlAction);
-                }
+                properties.addAction(actionToPerform);
                 
                 // Mock up a Subject so that the SAMLTokenOutProcessor can get access to the certificate
                 final SubjectBean subjectBean;
@@ -395,7 +368,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                     }
                     
                 };
-                config.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
+                properties.setSamlCallbackHandler(callbackHandler);
                 
                 QName qname = WSSConstants.TAG_saml2_Assertion;
                 if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
@@ -405,14 +378,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 return new SecurePart(qname, Modifier.Element);
             } else if (isRequestor()) {
                 // An Encrypted Token...just include it as is
-                Map<String, Object> config = getProperties();
-                String actionToPerform = ConfigurationConstants.CUSTOM_TOKEN;
-                if (config.containsKey(ConfigurationConstants.ACTION)) {
-                    String action = (String)config.get(ConfigurationConstants.ACTION);
-                    config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-                } else {
-                    config.put(ConfigurationConstants.ACTION, actionToPerform);
-                }
+                WSSConstants.Action actionToPerform = WSSConstants.CUSTOM_TOKEN;
+                properties.addAction(actionToPerform);
             }
         }
         
@@ -514,71 +481,70 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             return;
         }
         
-        Map<String, Object> config = getProperties();
         boolean timestampLast = 
             layout != null && layout.getLayoutType() == LayoutType.LaxTsLast;
         
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            if (timestampLast) {
-                config.put(ConfigurationConstants.ACTION, 
-                       ConfigurationConstants.TIMESTAMP + " " + action);
-            } else {
-                config.put(ConfigurationConstants.ACTION, 
-                       action + " " + ConfigurationConstants.TIMESTAMP);
-            }
+        WSSConstants.Action actionToPerform = WSSConstants.TIMESTAMP;
+        List<WSSConstants.Action> actionList = properties.getActions();
+        if (timestampLast) {
+            actionList.add(0, actionToPerform);
         } else {
-            config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
+            actionList.add(actionToPerform);
         }
     }
 
-    protected Map<String, Object> getProperties() {
+    protected WSSSecurityProperties getProperties() {
         return properties;
     }
 
     protected void configureSignature(
         AbstractTokenWrapper wrapper, AbstractToken token, boolean attached
     ) throws WSSecurityException {
-        Map<String, Object> config = getProperties();
         
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token) token;
             TokenType tokenType = x509Token.getTokenType();
             if (tokenType == TokenType.WssX509PkiPathV1Token10
                 || tokenType == TokenType.WssX509PkiPathV1Token11) {
-                config.put(ConfigurationConstants.USE_SINGLE_CERTIFICATE, "false");
+                properties.setUseSingleCert(false);
             }
         }
         
-        config.put(ConfigurationConstants.SIG_KEY_ID, getKeyIdentifierType(wrapper, token));
+        properties.setSignatureKeyIdentifier(
+            ConfigurationConverter.convertKeyIdentifier(getKeyIdentifierType(wrapper, token)));
 
         // Find out do we also need to include the token as per the Inclusion requirement
+        WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getSignatureKeyIdentifier();
         if (token instanceof X509Token 
             && isTokenRequired(token.getIncludeTokenType())
-            && ("IssuerSerial".equals(config.get(ConfigurationConstants.SIG_KEY_ID))
-                || "Thumbprint".equals(config.get(ConfigurationConstants.SIG_KEY_ID))
-                || "DirectReference".equals(config.get(ConfigurationConstants.SIG_KEY_ID)))) {
-            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
+            && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
+                || WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)
+                || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(
+                    keyIdentifier))) {
+            properties.setIncludeSignatureToken(true);
         } else {
-            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+            properties.setIncludeSignatureToken(false);
         }
 
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         if (binding instanceof SymmetricBinding) {
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            properties.setSignatureAlgorithm(
                        binding.getAlgorithmSuite().getSymmetricSignature());
         } else {
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            properties.setSignatureAlgorithm(
                        binding.getAlgorithmSuite().getAsymmetricSignature());
         }
         String sigUser = (String)message.getContextualProperty(userNameKey);
-        if (sigUser != null) {
-            config.put(ConfigurationConstants.SIGNATURE_USER, sigUser);
+        if (sigUser == null) {
+            sigUser = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+        }
+        if (sigUser != null && properties.getSignatureUser() == null) {
+            properties.setSignatureUser(sigUser);
         }
 
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
-        config.put(ConfigurationConstants.SIG_DIGEST_ALGO, algType.getDigest());
+        properties.setSignatureDigestAlgorithm(algType.getDigest());
         // sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
     }
@@ -787,25 +753,15 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         for (AbstractToken token : tokenMap.keySet()) {
             SecurePart part = tokenMap.get(token);
 
-            String parts = "";
-            Map<String, Object> config = getProperties();
-            if (config.containsKey(ConfigurationConstants.SIGNATURE_PARTS)) {
-                parts = (String)config.get(ConfigurationConstants.SIGNATURE_PARTS);
-                if (!parts.endsWith(";")) {
-                    parts += ";";
-                }
-            }
-
             QName name = part.getName();
-            String action = (String)config.get(ConfigurationConstants.ACTION);
+            List<WSSConstants.Action> actionList = properties.getActions();
+
             // Don't add a signed SAML Token as a part, as it will be automatically signed by WSS4J
             if (!((WSSConstants.TAG_saml_Assertion.equals(name) 
                 || WSSConstants.TAG_saml2_Assertion.equals(name))
-                && action != null && action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED))) {
-                parts += "{Element}{" +  name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
+                && actionList != null && actionList.contains(WSSConstants.SAML_TOKEN_SIGNED))) {
+                properties.addSignaturePart(part);
             }
-
-            config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
         }
         
     }
@@ -820,8 +776,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         
         // Enable SignatureConfirmation
-        Map<String, Object> config = getProperties();
-        config.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        if (isRequestor()) {
+            properties.setEnableSignatureConfirmationVerification(true);
+        } else {
+            properties.getActions().add(WSSConstants.SIGNATURE_CONFIRMATION);
+        }
         
         if (sigParts != null) {
             SecurePart securePart = 

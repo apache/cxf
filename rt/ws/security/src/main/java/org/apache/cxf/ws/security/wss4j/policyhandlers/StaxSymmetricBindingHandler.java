@@ -27,7 +27,6 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
@@ -58,7 +57,9 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -79,7 +80,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     private SoapMessage message;
     
     public StaxSymmetricBindingHandler(
-        Map<String, Object> properties, 
+        WSSSecurityProperties properties, 
         SoapMessage msg,
         SymmetricBinding sbinding,
         Map<String, SecurityTokenProvider<OutboundSecurityToken>> outboundTokens
@@ -115,13 +116,12 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         // Set up CallbackHandler which wraps the configured Handler
-        Map<String, Object> config = getProperties();
+        WSSSecurityProperties properties = getProperties();
         TokenStoreCallbackHandler callbackHandler = 
             new TokenStoreCallbackHandler(
-                (CallbackHandler)config.get(ConfigurationConstants.PW_CALLBACK_REF), 
-                WSS4JUtils.getTokenStore(message)
+                properties.getCallbackHandler(), WSS4JUtils.getTokenStore(message)
             );
-        config.put(ConfigurationConstants.PW_CALLBACK_REF, callbackHandler);
+        properties.setCallbackHandler(callbackHandler);
         
         if (sbinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
@@ -135,7 +135,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         if (!isRequestor()) {
-            config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
+            properties.setEncryptSymmetricEncrytionKey(false);
         }
         
         configureLayout(aim);
@@ -176,14 +176,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 || encryptionToken instanceof SpnegoContextToken) {
                 tok = getSecurityToken();
                 if (tok != null && isRequestor()) {
-                    Map<String, Object> config = getProperties();
-                    String actionToPerform = ConfigurationConstants.CUSTOM_TOKEN;
-                    if (config.containsKey(ConfigurationConstants.ACTION)) {
-                        String action = (String)config.get(ConfigurationConstants.ACTION);
-                        config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-                    } else {
-                        config.put(ConfigurationConstants.ACTION, actionToPerform);
-                    }
+                    WSSSecurityProperties properties = getProperties();
+                    WSSConstants.Action actionToPerform = WSSConstants.CUSTOM_TOKEN;
+                    properties.addAction(actionToPerform);
                 } else if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
                         findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
@@ -232,8 +227,6 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (encryptionToken != null && encrParts.size() > 0) {
                 if (isRequestor()) {
                     encrParts.addAll(encryptedTokensList);
-                } else {
-                    addSignatureConfirmation(sigParts);
                 }
                 
                 //Check for signature protection
@@ -300,14 +293,9 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     || sigToken instanceof SpnegoContextToken) {
                     sigTok = getSecurityToken();
                     if (sigTok != null && isRequestor()) {
-                        Map<String, Object> config = getProperties();
-                        String actionToPerform = ConfigurationConstants.CUSTOM_TOKEN;
-                        if (config.containsKey(ConfigurationConstants.ACTION)) {
-                            String action = (String)config.get(ConfigurationConstants.ACTION);
-                            config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-                        } else {
-                            config.put(ConfigurationConstants.ACTION, actionToPerform);
-                        }
+                        WSSSecurityProperties properties = getProperties();
+                        WSSConstants.Action actionToPerform = WSSConstants.CUSTOM_TOKEN;
+                        properties.addAction(actionToPerform);
                     } else if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken = 
                             findInboundSecurityToken(WSSecurityEventConstants.SecurityContextToken);
@@ -363,16 +351,13 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             addSupportingTokens();
             
-            if (isRequestor()) {
-                Map<String, Object> config = getProperties();
-                if (config.containsKey(ConfigurationConstants.ACTION)) {
-                    String action = (String)config.get(ConfigurationConstants.ACTION);
-                    if (action.contains(ConfigurationConstants.SAML_TOKEN_SIGNED)
-                        && action.contains(ConfigurationConstants.SIGNATURE)) {
-                        String newAction = action.replaceFirst(ConfigurationConstants.SIGNATURE, "").trim();
-                        config.put(ConfigurationConstants.ACTION, newAction);
-                    }
-                } 
+            WSSSecurityProperties properties = getProperties();
+            if (isRequestor() && properties.getActions() != null) {
+                List<WSSConstants.Action> actionList = properties.getActions();
+                if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)
+                    && actionList.contains(WSSConstants.SIGNATURE)) {
+                    actionList.remove(WSSConstants.SIGNATURE);
+                }
             }
 
             //Encryption
@@ -407,112 +392,84 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             AlgorithmSuite algorithmSuite = sbinding.getAlgorithmSuite();
 
             // Action
-            Map<String, Object> config = getProperties();
-            String actionToPerform = ConfigurationConstants.ENCRYPT;
+            WSSSecurityProperties properties = getProperties();
+            WSSConstants.Action actionToPerform = WSSConstants.ENCRYPT;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                actionToPerform = ConfigurationConstants.ENCRYPT_DERIVED;
+                actionToPerform = WSSConstants.ENCRYPT_WITH_DERIVED_KEY;
                 if (MessageUtils.isRequestor(message) && recToken.getToken() instanceof X509Token) {
-                    config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
+                    properties.setDerivedKeyTokenReference(
+                        ConfigurationConverter.convertDerivedReference("EncryptedKey"));
                 } else {
-                    config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
+                    properties.setDerivedKeyTokenReference(
+                        ConfigurationConverter.convertDerivedReference("DirectReference"));
                 }
                 AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
-                config.put(ConfigurationConstants.DERIVED_ENCRYPTION_KEY_LENGTH,
-                           "" + algSuiteType.getEncryptionDerivedKeyLength() / 8);
+                properties.setDerivedEncryptionKeyLength(
+                           algSuiteType.getEncryptionDerivedKeyLength() / 8);
             }
 
             if (recToken.getVersion() == SPConstants.SPVersion.SP12) {
-                config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
+                properties.setUse200512Namespace(true);
             }
             
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-            } else {
-                config.put(ConfigurationConstants.ACTION, actionToPerform);
-            }
-
-            String parts = "";
-            if (config.containsKey(ConfigurationConstants.ENCRYPTION_PARTS)) {
-                parts = (String)config.get(ConfigurationConstants.ENCRYPTION_PARTS);
-                if (!parts.endsWith(";")) {
-                    parts += ";";
-                }
+            for (SecurePart encPart : encrParts) {
+                properties.addEncryptionPart(encPart);
             }
             
-            String optionalParts = "";
-            if (config.containsKey(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS)) {
-                optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
-                if (!optionalParts.endsWith(";")) {
-                    optionalParts += ";";
-                }
-            }
-
-            if (encrParts != null) {
-                for (SecurePart part : encrParts) {
-                    QName name = part.getName();
-                    String modifier = part.getModifier().getModifier();
-                    if (modifier == null || Modifier.Element.getModifier().equals(modifier)) {
-                        modifier = "Element";
-                    } else {
-                        modifier = "Content";
-                    }
-                    
-                    String parsedPart = "";
-                    if (name != null) {
-                        parsedPart = "{" + modifier + "}{" + name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
-                    } else {
-                        parsedPart = "{" + modifier + "}" + part.getExternalReference() + ";";
-                    }
-                    
-                    if (part.isRequired()) {
-                        parts += parsedPart;
-                    } else {
-                        optionalParts += parsedPart;
-                    }
-                }
-            }
-
-            config.put(ConfigurationConstants.ENCRYPTION_PARTS, parts);
-            config.put(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS, optionalParts);
+            properties.addAction(actionToPerform);
 
             if (isRequestor()) {
-                config.put(ConfigurationConstants.ENC_KEY_ID, 
-                       getKeyIdentifierType(recToken, encrToken));
-                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
+                properties.setEncryptionKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier(
+                        getKeyIdentifierType(recToken, encrToken)));
+                properties.setDerivedKeyKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("DirectReference"));
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
-                config.put(ConfigurationConstants.ENC_KEY_ID, "KerberosSHA1");
-                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
+                properties.setEncryptionKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
+                properties.setDerivedKeyKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
                 if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                    config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
+                    properties.setEncryptionKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
                 }
             } else if ((recToken.getToken() instanceof IssuedToken 
                 || recToken.getToken() instanceof SecureConversationToken
                 || recToken.getToken() instanceof SpnegoContextToken) && !isRequestor()) {
-                config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
+                properties.setEncryptionKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("DirectReference"));
             } else {
-                config.put(ConfigurationConstants.ENC_KEY_ID, "EncryptedKeySHA1");
+                properties.setEncryptionKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
                 if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                    config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "EncryptedKeySHA1");
-                    config.put(ConfigurationConstants.ENC_KEY_ID, "DirectReference");
-                    config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
+                    properties.setDerivedKeyKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
+                    properties.setEncryptionKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                    properties.setEncryptSymmetricEncrytionKey(false);
                 }
             }
 
-            config.put(ConfigurationConstants.ENC_KEY_TRANSPORT, 
+            properties.setEncryptionKeyTransportAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());
-            config.put(ConfigurationConstants.ENC_SYM_ALGO, 
+            properties.setEncryptionSymAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getEncryption());
 
             String encUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-            if (encUser != null) {
-                config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
+            if (encUser == null) {
+                encUser = (String)message.getContextualProperty(SecurityConstants.USERNAME);
+            }
+            if (encUser != null && properties.getEncryptionUser() == null) {
+                properties.setEncryptionUser(encUser);
+            }
+            if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(encUser)) {
+                properties.setUseReqSigCertForEncryption(true);
             }
             
             if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken
                 || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken
                 || encrToken instanceof SecureConversationToken) {
-                config.put(ConfigurationConstants.ENC_SYM_ENC_KEY, "false");
+                properties.setEncryptSymmetricEncrytionKey(false);
             }
         }
     }
@@ -522,118 +479,90 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         throws WSSecurityException, SOAPException {
         
         // Action
-        Map<String, Object> config = getProperties();
-        String actionToPerform = ConfigurationConstants.SIGNATURE;
+        WSSSecurityProperties properties = getProperties();
+        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
         if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            actionToPerform = ConfigurationConstants.SIGNATURE_DERIVED;
+            actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
             if (MessageUtils.isRequestor(message) && policyToken instanceof X509Token) {
-                config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
+                properties.setDerivedKeyTokenReference(
+                    ConfigurationConverter.convertDerivedReference("EncryptedKey"));
             } else {
-                config.put(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
+                properties.setDerivedKeyTokenReference(
+                    ConfigurationConverter.convertDerivedReference("DirectReference"));
             }
             AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
-            config.put(ConfigurationConstants.DERIVED_SIGNATURE_KEY_LENGTH,
-                       "" + algSuiteType.getSignatureDerivedKeyLength() / 8);
+            properties.setDerivedSignatureKeyLength(
+                       algSuiteType.getSignatureDerivedKeyLength() / 8);
         }
         
         if (policyToken.getVersion() == SPConstants.SPVersion.SP12) {
-            config.put(ConfigurationConstants.USE_2005_12_NAMESPACE, "true");
+            properties.setUse200512Namespace(true);
         }
         
-        if (config.containsKey(ConfigurationConstants.ACTION)) {
-            String action = (String)config.get(ConfigurationConstants.ACTION);
-            if (action.contains(ConfigurationConstants.KERBEROS_TOKEN)) {
-                config.put(ConfigurationConstants.ACTION, actionToPerform + " " + action);
-            } else {
-                config.put(ConfigurationConstants.ACTION, action + " " + actionToPerform);
-            }
+        List<WSSConstants.Action> actionList = properties.getActions();
+        if (actionList.contains(WSSConstants.KERBEROS_TOKEN)
+            || actionList.contains(WSSConstants.SIGNATURE_CONFIRMATION)) {
+            actionList.add(0, actionToPerform);
         } else {
-            config.put(ConfigurationConstants.ACTION, actionToPerform);
+            actionList.add(actionToPerform);
         }
-        
-        String parts = "";
-        if (config.containsKey(ConfigurationConstants.SIGNATURE_PARTS)) {
-            parts = (String)config.get(ConfigurationConstants.SIGNATURE_PARTS);
-            if (!parts.endsWith(";")) {
-                parts += ";";
-            }
-        }
-        
-        String optionalParts = "";
-        if (config.containsKey(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS)) {
-            optionalParts = (String)config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
-            if (!optionalParts.endsWith(";")) {
-                optionalParts += ";";
-            }
-        }
-        
-        for (SecurePart part : sigParts) {
-            QName name = part.getName();
-            String modifier = part.getModifier().getModifier();
-            if (modifier == null || Modifier.Element.getModifier().equals(modifier)) {
-                modifier = "Element";
-            } else {
-                modifier = "Content";
-            }
-            
-            String parsedPart = "";
-            if (name != null) {
-                parsedPart = "{" + modifier + "}{" + name.getNamespaceURI() + "}" + name.getLocalPart() + ";";
-            } else {
-                parsedPart = "{" + modifier + "}" + part.getExternalReference() + ";";
-            }
-            
-            if (part.isRequired()) {
-                parts += parsedPart;
-            } else {
-                optionalParts += parsedPart;
-            }
+
+        for (SecurePart sigPart : sigParts) {
+            properties.addSignaturePart(sigPart);
         }
         
         AbstractToken sigToken = wrapper.getToken();
         if (sbinding.isProtectTokens() && sigToken instanceof X509Token && isRequestor()) {
-            parts += "{Element}{" + WSSConstants.NS_XMLENC + "}EncryptedKey;";
+            SecurePart securePart = 
+                new SecurePart(new QName(WSSConstants.NS_XMLENC, "EncryptedKey"), Modifier.Element);
+            properties.addSignaturePart(securePart);
         }
-        
-        config.put(ConfigurationConstants.SIGNATURE_PARTS, parts);
-        config.put(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, optionalParts);
         
         configureSignature(wrapper, sigToken, false);
         
         if (policyToken instanceof X509Token) {
-            config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+            properties.setIncludeSignatureToken(false);
             if (isRequestor()) {
-                config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKey");
+                properties.setSignatureKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("EncryptedKey"));
             } else {
-                config.put(ConfigurationConstants.SIG_KEY_ID, "EncryptedKeySHA1");
+                properties.setSignatureKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
                 if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                    config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "EncryptedKeySHA1");
-                    config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+                    properties.setDerivedKeyKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
+                    properties.setSignatureKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
                 }
             }
         } else if (policyToken instanceof KerberosToken) {
             if (isRequestor()) {
-                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
+                properties.setDerivedKeyKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("DirectReference"));
             } else {
                 if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-                    config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+                    properties.setSignatureKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
                 } else {
-                    config.put(ConfigurationConstants.SIG_KEY_ID, "KerberosSHA1");
+                    properties.setSignatureKeyIdentifier(
+                        ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
                 }
-                config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "KerberosSHA1");
+                properties.setDerivedKeyKeyIdentifier(
+                    ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
             }
         } else if (policyToken instanceof IssuedToken || policyToken instanceof SecurityContextToken
             || policyToken instanceof SecureConversationToken || policyToken instanceof SpnegoContextToken) {
             if (!isRequestor()) {
-                config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "false");
+                properties.setIncludeSignatureToken(false);
             } else {
-                config.put(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, "true");
+                properties.setIncludeSignatureToken(true);
             }
-            config.put(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, "DirectReference");
+            properties.setDerivedKeyKeyIdentifier(
+                ConfigurationConverter.convertKeyIdentifier("DirectReference"));
         }
         
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
-            config.put(ConfigurationConstants.SIG_ALGO, 
+            properties.setSignatureAlgorithm(
                    sbinding.getAlgorithmSuite().getSymmetricSignature());
         }
     }
