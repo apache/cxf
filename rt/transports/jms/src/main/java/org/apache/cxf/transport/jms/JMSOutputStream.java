@@ -76,7 +76,11 @@ class JMSOutputStream extends CachedOutputStream {
             throw new IOException("Error creating request Object from Message content, exception " + ex);
         }
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Payload to be sent out is :[" + request + "]");
+            Object o = request;
+            if (o instanceof byte[]) {
+                o = new String((byte[])o, "utf-8");
+            }
+            LOG.log(Level.FINE, "Payload to be sent out is :[" + o + "]");
         }
         return request;
     }

@@ -75,6 +75,61 @@ import org.apache.cxf.ws.addressing.Names;
  * Holder for utility methods relating to contexts.
  */
 final class InternalContextUtils {
+    private static final class DecoupledDestination implements Destination {
+        private final EndpointInfo ei;
+        private final EndpointReferenceType reference;
+
+        private DecoupledDestination(EndpointInfo ei, EndpointReferenceType reference) {
+            this.ei = ei;
+            this.reference = reference;
+        }
+
+        public EndpointReferenceType getAddress() {
+            return reference;
+        }
+
+        public Conduit getBackChannel(Message inMessage) throws IOException {
+            if (ContextUtils.isNoneAddress(reference)) {
+                return null;
+            }
+            Bus bus = inMessage.getExchange().get(Bus.class);
+            //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
+            //we don't wait for a response.
+            inMessage.getExchange().setOneWay(true);
+            ConduitInitiator conduitInitiator 
+                = bus.getExtension(ConduitInitiatorManager.class)
+                    .getConduitInitiatorForUri(reference.getAddress().getValue());
+            if (conduitInitiator != null) {
+                Conduit c = conduitInitiator.getConduit(ei, reference, bus);
+                // ensure decoupled back channel input stream is closed
+                c.setMessageObserver(new MessageObserver() {
+                    public void onMessage(Message m) {
+                        InputStream is = m.getContent(InputStream.class);
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (Exception e) {
+                                // ignore
+                            }
+                        }
+                    }
+                });
+                return c;
+            }
+            return null;
+        }
+
+        public MessageObserver getMessageObserver() {
+            return null;
+        }
+
+        public void shutdown() {
+        }
+
+        public void setMessageObserver(MessageObserver observer) {
+        }
+    }
+
     private static final Logger LOG = LogUtils.getL7dLogger(InternalContextUtils.class);
 
    /**
@@ -286,47 +341,8 @@ final class InternalContextUtils {
 
     public static Destination createDecoupledDestination(
         Exchange exchange, final EndpointReferenceType reference) {
-
         final EndpointInfo ei = exchange.get(Endpoint.class).getEndpointInfo();
-        return new Destination() {
-            public EndpointReferenceType getAddress() {
-                return reference;
-            }
-            public Conduit getBackChannel(Message inMessage) throws IOException {
-                Bus bus = inMessage.getExchange().get(Bus.class);
-                //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
-                //we don't wait for a response.
-                inMessage.getExchange().setOneWay(true);
-                ConduitInitiator conduitInitiator 
-                    = bus.getExtension(ConduitInitiatorManager.class)
-                        .getConduitInitiatorForUri(reference.getAddress().getValue());
-                if (conduitInitiator != null) {
-                    Conduit c = conduitInitiator.getConduit(ei, reference, bus);
-                    // ensure decoupled back channel input stream is closed
-                    c.setMessageObserver(new MessageObserver() {
-                        public void onMessage(Message m) {
-                            InputStream is = m.getContent(InputStream.class);
-                            if (is != null) {
-                                try {
-                                    is.close();
-                                } catch (Exception e) {
-                                    // ignore
-                                }
-                            }
-                        }
-                    });
-                    return c;
-                }
-                return null;
-            }
-            public MessageObserver getMessageObserver() {
-                return null;
-            }
-            public void shutdown() {
-            }
-            public void setMessageObserver(MessageObserver observer) {
-            }
-        };
+        return new DecoupledDestination(ei, reference);
     }
     
     /**
