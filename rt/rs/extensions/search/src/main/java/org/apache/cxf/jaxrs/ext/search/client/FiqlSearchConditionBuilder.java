@@ -57,7 +57,7 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
  */
 public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
 
-    private Map<String, String> properties;
+    protected Map<String, String> properties;
 
     public FiqlSearchConditionBuilder() {
         this(Collections.<String, String> emptyMap());
@@ -67,37 +67,41 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         this.properties = properties;
     }
 
+    protected Builder newBuilderInstance() {
+        return new Builder(properties);
+    }
+    
     public String query() {
         return "";
     }
 
     public Property is(String property) {
-        return new Builder(properties).is(property);
+        return newBuilderInstance().is(property);
     }
 
     public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, 
                                  CompleteCondition... cn) {
-        return new Builder(properties).and(c1, c2, cn);
+        return newBuilderInstance().and(c1, c2, cn);
     }
     
     public CompleteCondition and(List<CompleteCondition> conditions) {
-        return new Builder(properties).and(conditions);
+        return newBuilderInstance().and(conditions);
     }
     
     public CompleteCondition or(List<CompleteCondition> conditions) {
-        return new Builder(properties).or(conditions);
+        return newBuilderInstance().or(conditions);
     }
 
     public CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
-        return new Builder(properties).or(c1, c2, cn);
+        return newBuilderInstance().or(c1, c2, cn);
     }
 
-    private static class Builder implements Property, CompleteCondition, PartialCondition {
-        private String result = "";
-        private Builder parent;
-        private DateFormat df;
-        private boolean timeZoneSupported;
-        private String currentCompositeOp;
+    protected static class Builder implements Property, CompleteCondition, PartialCondition {
+        protected String result = "";
+        protected Builder parent;
+        protected DateFormat df;
+        protected boolean timeZoneSupported;
+        protected String currentCompositeOp;
 
         public Builder(Map<String, String> properties) {
             parent = null;
@@ -115,16 +119,16 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             return buildPartial(null);
         }
 
-        private DateFormat getDateFormat() {
+        protected DateFormat getDateFormat() {
             return df;
         }
 
-        private boolean isTimeZoneSupported() {
+        protected boolean isTimeZoneSupported() {
             return timeZoneSupported;
         }
 
         // builds from parent but not further then exclude builder
-        private String buildPartial(Builder exclude) {
+        protected String buildPartial(Builder exclude) {
             if (parent != null && !parent.equals(exclude)) {
                 return parent.buildPartial(exclude) + result;
             } else {
@@ -391,7 +395,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             return conditionsList(FiqlParser.OR, conditions);
         }
         
-        private CompleteCondition conditionsList(String op, List<CompleteCondition> conditions) {
+        protected CompleteCondition conditionsList(String op, List<CompleteCondition> conditions) {
             if (conditions.size() == 1) {
                 result += ((Builder)conditions.get(0)).buildPartial(this);
             } else {
@@ -416,7 +420,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             return b;
         }
 
-        private String toString(Object value) {
+        protected String toString(Object value) {
             if (value == null) {
                 return null;
             }
@@ -434,7 +438,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             }
         }
         
-        private String toFiqlPrimitiveCondition(ConditionType type) {
+        protected String toFiqlPrimitiveCondition(ConditionType type) {
             String fiqlType = FiqlParser.CONDITION_MAP.get(type);
             if (fiqlType == null) {
                 throw new IllegalArgumentException("Only primitive condition types are supported");
