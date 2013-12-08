@@ -142,6 +142,14 @@ public final class STSConstants {
     public static final String TOKEN_RENEWING_ALLOW_AFTER_EXPIRY = 
         "org.apache.cxf.sts.token.renewing.allow.after.expiry";
     
+    /**
+     * Constant to specify service endpoint as certificate alias for encryption.
+     * Constant is recognized by STS encryption alias is replaced with AppliesTo() address. 
+     * This address will be used in WSS4J crypto to search service certificate
+     */
+    public static final String USE_ENDPOINT_AS_CERT_ALIAS = 
+        "useEndpointAsCertAlias";
+
     private STSConstants() {
         // complete
     }

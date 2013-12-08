@@ -124,7 +124,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         
         if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)) {
             Crypto crypto = stsProperties.getEncryptionCrypto();
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+
             EncryptionProperties encryptionProperties = providerParameters.getEncryptionProperties();
             String encryptionName = encryptionProperties.getEncryptionName();
             if (encryptionName == null) {
@@ -135,7 +135,18 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 LOG.fine("No encryption Name is configured for Symmetric KeyType");
                 throw new STSException("No Encryption Name is configured", STSException.REQUEST_FAILED);
             }
-            cryptoType.setAlias(encryptionName);
+            
+            CryptoType cryptoType = null;
+
+            // Check using of service endpoint (AppliesTo) as certificate identifier
+            if (encryptionProperties.getKeyIdentifierType() == (WSConstants.ENDPOINT_KEY_IDENTIFIER)) {
+                cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
+                cryptoType.setEndpoint(encryptionProperties.getEncryptionName());
+            } else {
+                cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(encryptionName);
+            }
+
             try {
                 X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
                 if (certs == null || certs.length <= 0) {

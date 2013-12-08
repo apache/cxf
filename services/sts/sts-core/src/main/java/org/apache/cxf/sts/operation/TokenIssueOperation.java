@@ -34,6 +34,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.event.STSIssueFailureEvent;
 import org.apache.cxf.sts.event.STSIssueSuccessEvent;
@@ -65,6 +66,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
@@ -224,6 +226,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             try {
                 KeyRequirements keyRequirements = requestParser.getKeyRequirements();
                 EncryptionProperties encryptionProperties = providerParameters.getEncryptionProperties();
+                mapEncryptionProperties(tokenRequirements, encryptionProperties);
                 RequestSecurityTokenResponseType response = 
                     createResponse(
                             encryptionProperties, tokenResponse, tokenRequirements, keyRequirements, context
@@ -441,4 +444,15 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         return binarySecret;
     }
 
+    private void mapEncryptionProperties(TokenRequirements tokenRequirements,
+                                         EncryptionProperties encryptionProperties) {
+        
+        if (STSConstants.USE_ENDPOINT_AS_CERT_ALIAS
+            .equals(encryptionProperties.getEncryptionName())
+            && (tokenRequirements.getAppliesTo() != null)) {
+            encryptionProperties.setEncryptionName(tokenRequirements.getAppliesTo()
+                .getTextContent());
+            encryptionProperties.setKeyIdentifierType(WSConstants.ENDPOINT_KEY_IDENTIFIER);
+        }
+    }
 }
