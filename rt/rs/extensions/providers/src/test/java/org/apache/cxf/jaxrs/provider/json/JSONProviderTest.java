@@ -699,6 +699,21 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testIgnoreNamespaces() throws Exception {
+        JSONProvider<TestBean> p = new JSONProvider<TestBean>();
+        p.setIgnoreNamespaces(true);
+        TestBean bean = new TestBean();
+        bean.setName("a");
+        bean.setId("b");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        p.writeTo(bean, TestBean.class, TestBean.class, new Annotation[0], 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        String s = os.toString();
+        assertEquals("{\"testBean\":{\"@id\":\"b\",\"name\":\"a\"}}", s);
+        
+    }
+    
+    @Test
     public void testWriteUnqualifiedCollection() throws Exception {
         JSONProvider<List<Book>> p = new JSONProvider<List<Book>>();
         List<Book> books = new ArrayList<Book>();
@@ -1646,4 +1661,26 @@ public class JSONProviderTest extends Assert {
             }
         }
     }
+    
+    @XmlRootElement(namespace = "http://testbean")
+    public static class TestBean {
+        private String name;
+        private String id;
+        public TestBean() {
+            
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public String getId() {
+            return id;
+        }
+        @XmlAttribute(namespace = "http://testbean")
+        public void setId(String id) {
+            this.id = id;
+        }
+    }    
 }
