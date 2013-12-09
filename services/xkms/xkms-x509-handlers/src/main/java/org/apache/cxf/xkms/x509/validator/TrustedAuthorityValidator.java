@@ -97,7 +97,10 @@ public class TrustedAuthorityValidator implements Validator {
             validator.validate(certPath, pkixParams);
             
         } catch (InvalidAlgorithmParameterException e) {
-            LOG.log(Level.SEVERE, "Invalid algorithm by certificate chain validation: " + e.getMessage(), e);
+            LOG.log(Level.SEVERE,
+                    "Invalid algorithm parameter by certificate chain validation. "
+                        + "It is likely that issuer certificates are not found in XKMS trusted storage. "
+                        + e.getMessage(), e);
             throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
             LOG.log(Level.SEVERE, "Unknown algorithm by certificate chain validation: " + e.getMessage(), e);
