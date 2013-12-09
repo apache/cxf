@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.spring;
 
+import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -51,15 +52,16 @@ public class SpringResourceServer {
         List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
         List<Object> jaxrsProviders = new LinkedList<Object>();
         
+        boolean checkJaxrsRoots = checkJaxrsRoots();
+        boolean checkJaxrsProviders = checkJaxrsProviders(); 
+        
         for (String beanName : ctx.getBeanDefinitionNames()) {
-            if (isBeanSupported(beanName)) {
-                if (ctx.findAnnotationOnBean(beanName, Path.class) != null) {
-                    SpringResourceFactory factory = new SpringResourceFactory(beanName);
-                    factory.setApplicationContext(ctx);
-                    resourceProviders.add(factory);
-                } else if (checkJaxrsProviders() && ctx.findAnnotationOnBean(beanName, Provider.class) != null) {
-                    jaxrsProviders.add(ctx.getBean(beanName));
-                }
+            if (checkJaxrsRoots && isAnnotationAvailable(beanName, Path.class)) {
+                SpringResourceFactory factory = new SpringResourceFactory(beanName);
+                factory.setApplicationContext(ctx);
+                resourceProviders.add(factory);
+            } else if (checkJaxrsProviders && isAnnotationAvailable(beanName, Provider.class)) {
+                jaxrsProviders.add(ctx.getBean(beanName));
             }
         }
 
@@ -68,10 +70,24 @@ public class SpringResourceServer {
         factory.setResourceProviders(resourceProviders);
         factory.setProviders(jaxrsProviders);
         factory.setAddress(getAddress());
+        finalizeFactorySetup(factory);
         return factory.create();
     }
     
+    protected <A extends Annotation> boolean isAnnotationAvailable(String beanName, Class<A> annClass) {
+        return isBeanSupported(beanName) 
+            && ctx.findAnnotationOnBean(beanName, annClass) != null;
+    }
+    
+    protected void finalizeFactorySetup(JAXRSServerFactoryBean factory) {
+        // complete
+    }
+    
     protected boolean checkJaxrsProviders() {
+        return true;    
+    }
+    
+    protected boolean checkJaxrsRoots() {
         return true;    
     }
 
