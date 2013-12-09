@@ -397,9 +397,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
         }
         List<WSSConstants.Action> actionList = properties.getActions();
-        if (actionList.contains(WSSConstants.SIGNATURE_CONFIRMATION)) {
-            actionList.add(0, actionToPerform);
-        } else {
+        // Add a Signature directly before a Kerberos or SCT, otherwise just append it
+        boolean actionAdded = false;
+        for (int i = 0; i < actionList.size(); i++) {
+            WSSConstants.Action action = actionList.get(i);
+            if (action.equals(WSSConstants.KERBEROS_TOKEN)
+                || action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
+                actionList.add(i, actionToPerform);
+                actionAdded = true;
+                break;
+            }
+        }
+        if (!actionAdded) {
             actionList.add(actionToPerform);
         }
         

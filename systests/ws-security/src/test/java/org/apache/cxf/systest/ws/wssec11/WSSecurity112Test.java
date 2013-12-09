@@ -123,7 +123,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 {new TestParam("X-AES256", StaxServer12.PORT, false)},
                 {new TestParam("X-TripleDES", StaxServer12.PORT, false)},
                 {new TestParam("XD", StaxServer12.PORT, false)},
-                // TODO Investigate {new TestParam("XD-ES", StaxServer12.PORT, false)},
+                {new TestParam("XD-ES", StaxServer12.PORT, false)},
                 // TODO Endorsing derived streaming not working 
                 // {new TestParam("XD-SEES", StaxServer12.PORT, false)},
             });
@@ -138,7 +138,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 {new TestParam("X", StaxServer12Restricted.PORT, false)},
                 {new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false)},
                 {new TestParam("XD", StaxServer12Restricted.PORT, false)},
-                // TODO Investigate {new TestParam("XD-ES", StaxServer12Restricted.PORT, false)},
+                {new TestParam("XD-ES", StaxServer12Restricted.PORT, false)},
                 // TODO Endorsing derived streaming not working 
                 // {new TestParam("XD-SEES", StaxServer12Restricted.PORT, false)},
             });
