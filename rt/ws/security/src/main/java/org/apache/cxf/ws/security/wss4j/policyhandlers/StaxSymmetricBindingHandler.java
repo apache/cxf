@@ -135,7 +135,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         if (!isRequestor()) {
-            properties.setEncryptSymmetricEncrytionKey(false);
+            properties.setEncryptSymmetricEncryptionKey(false);
         }
         
         configureLayout(aim);
@@ -446,7 +446,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
                     properties.setEncryptionKeyIdentifier(
                         ConfigurationConverter.convertKeyIdentifier("DirectReference"));
-                    properties.setEncryptSymmetricEncrytionKey(false);
+                    properties.setEncryptSymmetricEncryptionKey(false);
                 }
             }
 
@@ -469,7 +469,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (encrToken instanceof KerberosToken || encrToken instanceof IssuedToken
                 || encrToken instanceof SpnegoContextToken || encrToken instanceof SecurityContextToken
                 || encrToken instanceof SecureConversationToken) {
-                properties.setEncryptSymmetricEncrytionKey(false);
+                properties.setEncryptSymmetricEncryptionKey(false);
             }
         }
     }
