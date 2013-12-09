@@ -29,6 +29,15 @@ public class IgnoreNamespacesWriter extends DelegatingXMLStreamWriter {
         super(writer);
     }
 
+    public void writeAttribute(String prefix, String uri, 
+                               String local, String value) throws XMLStreamException {
+        super.writeAttribute(local, value);
+    }
+
+    public void writeAttribute(String uri, String local, String value) throws XMLStreamException {
+        super.writeAttribute(local, value);
+    }
+    
     public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
         super.writeStartElement(local);
     }
