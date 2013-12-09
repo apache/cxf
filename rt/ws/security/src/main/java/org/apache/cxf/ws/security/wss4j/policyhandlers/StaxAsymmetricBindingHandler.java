@@ -51,7 +51,6 @@ import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.X509Token;
-import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -358,8 +357,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 properties.addEncryptionPart(encPart);
             }
             
-            properties.setEncryptionKeyIdentifier(
-                ConfigurationConverter.convertKeyIdentifier(getKeyIdentifierType(recToken, encrToken)));
+            properties.setEncryptionKeyIdentifier(getKeyIdentifierType(recToken, encrToken));
 
             properties.setEncryptionKeyTransportAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());

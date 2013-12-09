@@ -57,10 +57,10 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
-import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -398,10 +398,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 actionToPerform = WSSConstants.ENCRYPT_WITH_DERIVED_KEY;
                 if (MessageUtils.isRequestor(message) && recToken.getToken() instanceof X509Token) {
                     properties.setDerivedKeyTokenReference(
-                        ConfigurationConverter.convertDerivedReference("EncryptedKey"));
+                        WSSConstants.DerivedKeyTokenReference.EncryptedKey);
                 } else {
                     properties.setDerivedKeyTokenReference(
-                        ConfigurationConverter.convertDerivedReference("DirectReference"));
+                        WSSConstants.DerivedKeyTokenReference.DirectReference);
                 }
                 AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
                 properties.setDerivedEncryptionKeyLength(
@@ -419,33 +419,31 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             properties.addAction(actionToPerform);
 
             if (isRequestor()) {
-                properties.setEncryptionKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier(
-                        getKeyIdentifierType(recToken, encrToken)));
+                properties.setEncryptionKeyIdentifier(getKeyIdentifierType(recToken, encrToken));
                 properties.setDerivedKeyKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             } else if (recToken.getToken() instanceof KerberosToken && !isRequestor()) {
                 properties.setEncryptionKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
+                    WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier);
                 properties.setDerivedKeyKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
+                    WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier);
                 if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                     properties.setEncryptionKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
             } else if ((recToken.getToken() instanceof IssuedToken 
                 || recToken.getToken() instanceof SecureConversationToken
                 || recToken.getToken() instanceof SpnegoContextToken) && !isRequestor()) {
                 properties.setEncryptionKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             } else {
                 properties.setEncryptionKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
+                    WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
                 if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                     properties.setDerivedKeyKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
+                        WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
                     properties.setEncryptionKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                     properties.setEncryptSymmetricEncryptionKey(false);
                 }
             }
@@ -485,10 +483,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
             if (MessageUtils.isRequestor(message) && policyToken instanceof X509Token) {
                 properties.setDerivedKeyTokenReference(
-                    ConfigurationConverter.convertDerivedReference("EncryptedKey"));
+                    WSSConstants.DerivedKeyTokenReference.EncryptedKey);
             } else {
                 properties.setDerivedKeyTokenReference(
-                    ConfigurationConverter.convertDerivedReference("DirectReference"));
+                    WSSConstants.DerivedKeyTokenReference.DirectReference);
             }
             AlgorithmSuiteType algSuiteType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
             properties.setDerivedSignatureKeyLength(
@@ -532,31 +530,31 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             properties.setIncludeSignatureToken(false);
             if (isRequestor()) {
                 properties.setSignatureKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("EncryptedKey"));
+                    WSSecurityTokenConstants.KeyIdentifier_EncryptedKey);
             } else {
                 properties.setSignatureKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
+                    WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
                 if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                     properties.setDerivedKeyKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("EncryptedKeySHA1"));
+                        WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
                     properties.setSignatureKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
             }
         } else if (policyToken instanceof KerberosToken) {
             if (isRequestor()) {
                 properties.setDerivedKeyKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             } else {
                 if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                     properties.setSignatureKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 } else {
                     properties.setSignatureKeyIdentifier(
-                        ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
+                        WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier);
                 }
                 properties.setDerivedKeyKeyIdentifier(
-                    ConfigurationConverter.convertKeyIdentifier("KerberosSHA1"));
+                    WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier);
             }
         } else if (policyToken instanceof IssuedToken || policyToken instanceof SecurityContextToken
             || policyToken instanceof SecureConversationToken || policyToken instanceof SpnegoContextToken) {
@@ -566,7 +564,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 properties.setIncludeSignatureToken(true);
             }
             properties.setDerivedKeyKeyIdentifier(
-                ConfigurationConverter.convertKeyIdentifier("DirectReference"));
+                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         }
         
         if (sigToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {

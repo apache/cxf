@@ -86,7 +86,6 @@ import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
 import org.apache.wss4j.policy.model.XPath;
 import org.apache.wss4j.policy.stax.PolicyUtils;
-import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -142,8 +141,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
 
         // Action
-        WSSConstants.Action actionToPerform = WSSConstants.USERNAMETOKEN;
-        properties.addAction(actionToPerform);
+        properties.addAction(WSSConstants.USERNAMETOKEN);
 
         // Password Type
         PasswordType passwordType = usernameToken.getPasswordType();
@@ -254,8 +252,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         
         // Action
-        WSSConstants.Action actionToPerform = WSSConstants.KERBEROS_TOKEN;
-        properties.addAction(actionToPerform);
+        properties.addAction(WSSConstants.KERBEROS_TOKEN);
         
         /*
         if (endorsing) {
@@ -510,8 +507,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }
         }
         
-        properties.setSignatureKeyIdentifier(
-            ConfigurationConverter.convertKeyIdentifier(getKeyIdentifierType(wrapper, token)));
+        properties.setSignatureKeyIdentifier(getKeyIdentifierType(wrapper, token));
 
         // Find out do we also need to include the token as per the Inclusion requirement
         WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getSignatureKeyIdentifier();
@@ -549,20 +545,21 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
 
     }
     
-    protected String getKeyIdentifierType(AbstractTokenWrapper wrapper, AbstractToken token) {
-
-        String identifier = null;
+    protected WSSecurityTokenConstants.KeyIdentifier getKeyIdentifierType(
+        AbstractTokenWrapper wrapper, AbstractToken token
+    ) {
+        WSSecurityTokenConstants.KeyIdentifier identifier = null;
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token)token;
             if (x509Token.isRequireIssuerSerialReference()) {
-                identifier = "IssuerSerial";
+                identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
             } else if (x509Token.isRequireKeyIdentifierReference()) {
-                identifier = "SKIKeyIdentifier";
+                identifier = WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
             } else if (x509Token.isRequireThumbprintReference()) {
-                identifier = "Thumbprint";
+                identifier = WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
             }
         } else if (token instanceof KeyValueToken) {
-            identifier = "KeyValue";
+            identifier = WSSecurityTokenConstants.KeyIdentifier_KeyValue;
         }
         
         if (identifier != null) {
@@ -572,18 +569,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             Wss10 wss = getWss10();
             if (wss == null || wss.isMustSupportRefKeyIdentifier()) {
-                return "SKIKeyIdentifier";
+                return WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
             } else if (wss.isMustSupportRefIssuerSerial()) {
-                return "IssuerSerial";
+                return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
             } else if (wss instanceof Wss11
                 && ((Wss11) wss).isMustSupportRefThumbprint()) {
-                return "Thumbprint";
+                return WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
             }
         } else {
-            return "DirectReference";
+            return WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference;
         }
         
-        return "IssuerSerial";
+        return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
     }
     
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
