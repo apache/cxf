@@ -161,9 +161,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     
     private WebClient createWebClient(String address) {
         List<Object> providers = new ArrayList<Object>();
-        WebClient wc = WebClient.create(address, providers);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
-        return wc;
+        return WebClient.create(address, providers);
     }
     
     private InvocationCallback<Object> createCallback(final Holder<Object> holder) {

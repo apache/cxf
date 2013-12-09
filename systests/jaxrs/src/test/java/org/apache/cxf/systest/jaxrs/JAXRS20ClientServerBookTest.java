@@ -84,7 +84,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     private void doTestGetGenericBook(String address, long bookId, boolean checkAnnotations) 
         throws Exception {
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("application/xml");
         Book book = wc.get(Book.class);
         assertEquals(bookId, book.getId());
@@ -200,7 +199,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     public void testPostMatchContainerFilterThrowsException() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple?throwException";
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response response = wc.get();
         assertEquals(500, response.getStatus());
         assertEquals("Postmatch filter error", response.readEntity(String.class));
@@ -283,7 +281,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2"; 
         WebClient wc = WebClient.create(endpointAddress,
                                         Collections.singletonList(new ReplaceBodyFilter()));
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/mistypedxml").type("text/xml");
         Book book = wc.post(new Book("book", 555L), Book.class);
         assertEquals(561L, book.getId());
@@ -295,7 +292,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2/mistyped"; 
         WebClient wc = WebClient.create(endpointAddress,
                                         Collections.singletonList(new ReplaceBodyFilter()));
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/mistypedxml").type("text/xml").header("THEMETHOD", "PUT");
         Book book = wc.invoke("DELETE", new Book("book", 555L), Book.class);
         assertEquals(561L, book.getId());
@@ -415,9 +411,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         List<Object> providers = new ArrayList<Object>();
         providers.add(new ClientHeaderRequestFilter());
         providers.add(new ClientHeaderResponseFilter());
-        WebClient wc = WebClient.create(address, providers);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
-        return wc;
+        return WebClient.create(address, providers);
     }
     
     private WebClient createWebClientPost(String address) {
@@ -426,9 +420,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         providers.add(new ClientHeaderResponseFilter());
         providers.add(new ClientReaderInterceptor());
         providers.add(new ClientWriterInterceptor());
-        WebClient wc = WebClient.create(address, providers);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
-        return wc;
+        return WebClient.create(address, providers);
     }
     
     private void doTestGetBookAsync(String address, boolean asyncInvoker) 
