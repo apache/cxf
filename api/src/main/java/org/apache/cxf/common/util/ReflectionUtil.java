@@ -108,6 +108,19 @@ public final class ReflectionUtil {
         
     }
     
+    public static <T> Constructor<T>[] getDeclaredConstructors(final Class<T> cls) {
+        return AccessController.doPrivileged(new PrivilegedAction<Constructor<T>[]>() {
+            @SuppressWarnings("unchecked")
+            public Constructor<T>[] run() {
+                try {
+                    return (Constructor<T>[])cls.getDeclaredConstructors();
+                } catch (SecurityException e) {
+                    return null;
+                } 
+            }
+        });      
+    }
+        
     public static Method[] getDeclaredMethods(final Class<?> cls) {
         return AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
             public Method[] run() {

@@ -318,9 +318,12 @@ public class JAXBDataBinding extends AbstractDataBinding
 
 
         contextClasses = new LinkedHashSet<Class<?>>();
+        Map<String, Object> unmarshallerProps = new HashMap<String, Object>();
+        this.setUnmarshallerProperties(unmarshallerProps);
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
+            
             JAXBContextInitializer initializer
-                = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs);
+                = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
             initializer.walk();
             if (serviceInfo.getProperty("extra.class") != null) {
                 Set<Class<?>> exClasses = serviceInfo.getProperty("extra.class", Set.class);
