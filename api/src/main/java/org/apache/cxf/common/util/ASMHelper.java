@@ -168,7 +168,7 @@ public class ASMHelper {
         return buf.toString();
     }
     
-    protected static String periodToSlashes(String s) {
+    public static String periodToSlashes(String s) {
         char ch[] = s.toCharArray();
         for (int x = 0; x < ch.length; x++) {
             if (ch[x] == '.') {

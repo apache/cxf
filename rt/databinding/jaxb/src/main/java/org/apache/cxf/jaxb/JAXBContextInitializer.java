@@ -21,6 +21,7 @@ package org.apache.cxf.jaxb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -31,6 +32,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -45,6 +47,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
 import org.apache.cxf.common.classloader.JAXBClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
+import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelper.ClassWriter;
+import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
+import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
@@ -62,13 +68,16 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private Set<Class<?>> classes;
     private Collection<Object> typeReferences;
     private Set<Class<?>> globalAdapters = new HashSet<Class<?>>();
+    private Map<String, Object> unmarshallerProperties;
 
     public JAXBContextInitializer(ServiceInfo serviceInfo,
                                   Set<Class<?>> classes,
-                                  Collection<Object> typeReferences) {
+                                  Collection<Object> typeReferences, 
+                                  Map<String, Object> unmarshallerProperties) {
         super(serviceInfo);
         this.classes = classes;
         this.typeReferences = typeReferences;
+        this.unmarshallerProperties = unmarshallerProperties;
     }
 
     @Override
@@ -265,19 +274,24 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
     }
 
-
-    private  void addClass(Class<?> cls) {
-        if (Throwable.class.isAssignableFrom(cls)) {
-            if (!Throwable.class.equals(cls)
-                && !Exception.class.equals(cls)) {
-                walkReferences(cls);
+    void addClass(Class<?> claz) {
+        if (Throwable.class.isAssignableFrom(claz)) {
+            if (!Throwable.class.equals(claz)
+                && !Exception.class.equals(claz)) {
+                walkReferences(claz);
             }
             addClass(String.class);
-        } else if (cls.getName().startsWith("java.")
-            || cls.getName().startsWith("javax.")) {
+        } else if (claz.getName().startsWith("java.")
+            || claz.getName().startsWith("javax.")) {
             return;
         } else {
-            cls = JAXBUtils.getValidClass(cls);
+            Class<?> cls = JAXBUtils.getValidClass(claz);
+            if (cls == null && ReflectionUtil.getDeclaredConstructors(claz).length > 0) {
+                //there is no init(), but other constructors
+                Object factory = createFactory(claz, ReflectionUtil.getDeclaredConstructors(claz)[0]);
+                unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
+                cls = claz;
+            }
             if (null != cls) {
                 if (classes.contains(cls)) {
                     return;
@@ -314,10 +328,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 if (!cls.isInterface()) {
                     walkReferences(cls);
                 }
-            }
+            } 
         }
     }
-    
+ 
     private void walkReferences(Class<?> cls) {
         if (cls == null) {
             return;
@@ -467,4 +481,55 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         return false;
     }
+    @SuppressWarnings("unused") 
+    private Object createFactory(Class<?> cls, Constructor<?> contructor) {       
+        String newClassName = cls.getName() + "Factory";
+        ASMHelper helper = new ASMHelper();
+        ClassWriter cw = helper.createClassWriter();
+        MethodVisitor mv;
+
+        cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
+                 ASMHelper.periodToSlashes(newClassName), null, "java/lang/Object", null);
+
+        cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
+
+        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+        mv.visitCode();
+        mv.visitVarInsn(Opcodes.ALOAD, 0);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+        mv.visitInsn(Opcodes.RETURN);
+        mv.visitMaxs(1, 1);
+        mv.visitEnd();
+
+        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
+                            "()L" + ASMHelper.periodToSlashes(cls.getName()) + ";", null, null);
+        mv.visitCode();
+        String name = cls.getName().replace(".", "/");
+        mv.visitTypeInsn(Opcodes.NEW, name);
+        mv.visitInsn(Opcodes.DUP);
+        StringBuilder paraString = new StringBuilder("(");
+       
+        for (Class<?> paraClass : contructor.getParameterTypes()) {
+            mv.visitInsn(Opcodes.ACONST_NULL);
+            paraString.append("Ljava/lang/Object;");      
+        }
+        paraString.append(")V");
+
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, name, "<init>", paraString.toString());
+
+        mv.visitInsn(Opcodes.ARETURN);
+        mv.visitMaxs(1, 1);
+        mv.visitEnd();
+
+        cw.visitEnd();
+        Class<?> factoryClass = helper.loadClass(newClassName, cls, cw.toByteArray());
+        try {
+            return factoryClass.newInstance();
+        } catch (Exception e) {
+           //ignore
+        } 
+        return null;
+    }
+    
+    
 }

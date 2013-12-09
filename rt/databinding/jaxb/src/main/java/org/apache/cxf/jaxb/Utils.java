@@ -205,7 +205,8 @@ final class Utils {
 
     static Class<?> getFieldType(Field f) {
         XmlJavaTypeAdapter adapter = getFieldXJTA(f);
-        if (adapter == null && f.getGenericType() instanceof ParameterizedType) {
+        if (adapter == null && f.getGenericType() instanceof ParameterizedType
+            && ((ParameterizedType)f.getGenericType()).getActualTypeArguments().length == 1) {
             return null;
         }
         Class<?> adapterType = (Class<?>)getTypeFromXmlAdapter(adapter);
@@ -217,7 +218,8 @@ final class Utils {
         // if there is no adapter, yet we have a collection make sure
         // we return the Generic type; if there is an annotation let the
         // adapter handle what gets populated
-        if (adapter == null && m.getGenericReturnType() instanceof ParameterizedType) {
+        if (adapter == null && m.getGenericReturnType() instanceof ParameterizedType 
+            && ((ParameterizedType)m.getGenericReturnType()).getActualTypeArguments().length < 2) {
             return null;
         }
         Class<?> adapterType = (Class<?>)getTypeFromXmlAdapter(adapter);

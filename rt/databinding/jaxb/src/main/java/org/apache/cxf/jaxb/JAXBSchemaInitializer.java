@@ -26,6 +26,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -546,9 +547,13 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             if ((type == null) && (f.getGenericType() instanceof ParameterizedType)) {
                 type = f.getGenericType();
             }
-            JAXBBeanInfo beanInfo = getBeanInfo(type);
-            if (beanInfo != null) {
-                addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
+            if (generateGenericType(type)) {
+                buildGenericElements(schema, seq, f);
+            } else {
+                JAXBBeanInfo beanInfo = getBeanInfo(type);
+                if (beanInfo != null) {
+                    addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
+                }
             }
         }
         for (Method m : Utils.getGetters(cls, accessType)) {
@@ -560,12 +565,17 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             if ((type == null) && (m.getGenericReturnType() instanceof ParameterizedType)) {
                 type = m.getGenericReturnType();
             }
-            JAXBBeanInfo beanInfo = getBeanInfo(type);
-            if (beanInfo != null) {
-                int idx = m.getName().startsWith("get") ? 3 : 2;
-                String name = m.getName().substring(idx);
-                name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type));
+            
+            if (generateGenericType(type)) {
+                buildGenericElements(schema, seq, m, type);
+            } else {
+                JAXBBeanInfo beanInfo = getBeanInfo(type);
+                if (beanInfo != null) {
+                    int idx = m.getName().startsWith("get") ? 3 : 2;
+                    String name = m.getName().substring(idx);
+                    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+                    addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type));
+                }
             }
         }
         // Create element in xsd:sequence for Exception.class
@@ -597,6 +607,106 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         schemas.addCrossImports();
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
+    
+    private boolean generateGenericType(Type type) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType)type;
+            if (paramType.getActualTypeArguments().length > 1) {
+                return true;
+
+            }
+        }
+        return false;
+    }
+    
+    private void buildGenericElements(XmlSchema schema, XmlSchemaSequence seq, Field f) {
+        XmlSchemaComplexType generics = new XmlSchemaComplexType(schema, true);
+        Type type = f.getGenericType();
+        String rawType = ((ParameterizedType)type).getRawType().toString();
+        String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf(".") + 1));
+        generics.setName(typeName);
+
+        Class<?> genericsClass = f.getType();
+        buildGenericSeq(schema, generics, genericsClass);   
+
+        String name = Character.toLowerCase(f.getName().charAt(0)) + f.getName().substring(1);
+        XmlSchemaElement newel = new XmlSchemaElement(schema, false);
+        newel.setName(name);
+        newel.setSchemaTypeName(generics.getQName());
+        newel.setMinOccurs(0);
+        if (!seq.getItems().contains(newel)) {
+            seq.getItems().add(newel);
+        }
+    }
+     
+    private void buildGenericElements(XmlSchema schema, XmlSchemaSequence seq, Method m, Type type) {       
+        String rawType = ((ParameterizedType)type).getRawType().toString();
+        String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf(".") + 1));
+        
+        XmlSchemaComplexType generics = (XmlSchemaComplexType)schema.getTypeByName(typeName);        
+        if (generics == null) {
+            generics =  new XmlSchemaComplexType(schema, true);
+            generics.setName(typeName);
+        }
+        
+        Class<?> genericsClass = m.getReturnType();
+        buildGenericSeq(schema, generics, genericsClass);  
+          
+        int idx = m.getName().startsWith("get") ? 3 : 2;
+        String name = m.getName().substring(idx);
+        name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+        XmlSchemaElement newel = new XmlSchemaElement(schema, false);
+        newel.setName(name);
+        newel.setSchemaTypeName(generics.getQName());
+        newel.setMinOccurs(0);
+        if (!seq.getItems().contains(newel)) {
+            seq.getItems().add(newel);
+        }
+    }
+    
+    private void buildGenericSeq(XmlSchema schema, XmlSchemaComplexType generics, Class<?> genericsClass) {
+        XmlSchemaSequence genericsSeq = new XmlSchemaSequence();
+        generics.setParticle(genericsSeq);
+        XmlAccessType  accessType = Utils.getXmlAccessType(genericsClass);
+        
+        for (Field f : Utils.getFields(genericsClass, accessType)) {
+            if (f.getGenericType() instanceof TypeVariable) {               
+                String genericName = Character.toLowerCase(f.getName().charAt(0)) + f.getName().substring(1);
+                XmlSchemaElement genericEle = new XmlSchemaElement(schema, false);
+                genericEle.setName(genericName);
+                genericEle.setMinOccurs(0);
+                JAXBBeanInfo anyBean = getBeanInfo(context, f.getType()); 
+                Iterator<QName> itr = anyBean.getTypeNames().iterator();
+                if (!itr.hasNext()) {
+                    return;
+                }
+                QName typeName = itr.next();
+                genericEle.setSchemaTypeName(typeName);
+                genericsSeq.getItems().add(genericEle);
+            }
+        }
+               
+        for (Method genericMethod : Utils.getGetters(genericsClass, accessType)) {
+            if (genericMethod.getGenericReturnType() instanceof TypeVariable) {
+                int idx = genericMethod.getName().startsWith("get") ? 3 : 2;
+                String genericName = genericMethod.getName().substring(idx);
+                genericName = Character.toLowerCase(genericName.charAt(0)) + genericName.substring(1);
+                XmlSchemaElement genericEle = new XmlSchemaElement(schema, false);
+                genericEle.setName(genericName);
+                genericEle.setMinOccurs(0);
+                JAXBBeanInfo anyBean = getBeanInfo(context, genericMethod.getReturnType()); 
+                Iterator<QName> itr = anyBean.getTypeNames().iterator();
+                if (!itr.hasNext()) {
+                    return;
+                }
+                QName typeName = itr.next();
+                genericEle.setSchemaTypeName(typeName);
+                genericsSeq.getItems().add(genericEle);
+            }
+            
+        } 
+    }
+    
     
     static boolean isArray(Type cls) {
         if (cls instanceof Class) {
