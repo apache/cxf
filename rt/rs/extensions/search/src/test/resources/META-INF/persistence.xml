@@ -15,6 +15,7 @@
         <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
         <property name="hibernate.connection.username" value="sa"/>
         <property name="hibernate.connection.password" value=""/>
+        <property name="javax.persistence.validation.mode" value="none"/>
      </properties>
    </persistence-unit>
    <persistence-unit name="testUnitOpenJPA" transaction-type="RESOURCE_LOCAL">
