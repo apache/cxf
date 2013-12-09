@@ -60,6 +60,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public class SoapOutInterceptor extends AbstractSoapInterceptor {
@@ -142,6 +143,13 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 List<Header> hdrList = message.getHeaders();
                 for (Header header : hdrList) {
                     XMLStreamWriter writer = xtw;
+                    if (xtw instanceof W3CDOMStreamWriter) {
+                        Element nd = ((W3CDOMStreamWriter)xtw).getCurrentNode();
+                        if (header.getObject() instanceof Element
+                            && nd.isSameNode(((Element)header.getObject()).getParentNode())) {
+                            continue;
+                        }
+                    }
                     if (header instanceof SoapHeader) {
                         SoapHeader soapHeader = (SoapHeader)header;
                         writer = new SOAPHeaderWriter(xtw, soapHeader, soapVersion, soapPrefix);

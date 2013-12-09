@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import org.apache.cxf.common.util.StringUtils;
 
@@ -40,6 +41,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
 
     List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
     boolean isOverlaid = true;
+    boolean textOverlay = false;
     
     public OverlayW3CDOMStreamWriter(Document document) {
         super(document);
@@ -80,6 +82,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         }
         isOverlaid = isOverlaidStack.remove(0);
         super.writeEndElement();
+        textOverlay = false;
     }
     public void writeStartElement(String local) throws XMLStreamException {
         isOverlaidStack.add(0, isOverlaid);
@@ -197,5 +200,22 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             isOverlaid = false;
         }
     }
+    
+    public void writeCharacters(String text) throws XMLStreamException {
+        if (!isOverlaid) {
+            super.writeCharacters(text); 
+        } else if (!textOverlay) {
+            Element nd = getCurrentNode();
+            Node txt = nd.getFirstChild();
+            if (txt instanceof Text
+                && ((Text)txt).getTextContent().startsWith(text)) {
+                textOverlay = true;
+                return;
+            }
+            super.writeCharacters(text);
+        }
+        
+    }
+
     
 }
