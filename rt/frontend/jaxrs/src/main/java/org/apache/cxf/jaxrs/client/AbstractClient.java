@@ -1015,12 +1015,15 @@ public abstract class AbstractClient implements Client, Retryable {
     }
 
     protected Object checkIfBodyEmpty(Object body) {
+        //CHECKSTYLE:OFF
         if (body != null 
             && (body.getClass() == String.class && ((String)body).length() == 0 
             || body.getClass() == Form.class && ((Form)body).getData().isEmpty()
-            || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty())) {
+            || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty() 
+            || body instanceof byte[] && ((byte[])body).length == 0)) {
             body = null;
         }
+        //CHECKSTYLE:ON
         return body;
     }
     
