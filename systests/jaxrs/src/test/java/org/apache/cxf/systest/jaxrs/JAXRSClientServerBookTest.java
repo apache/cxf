@@ -1063,6 +1063,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testEmptyPostBytes() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" 
+                             + PORT + "/bookstore/emptypost");
+        Response response = wc.post(new byte[]{});
+        assertEquals(204, response.getStatus());
+        assertNull(response.getMetadata().getFirst("Content-Type"));
+    }
+    
+    @Test
     public void testEmptyPut() throws Exception {
         WebClient wc = 
             WebClient.create("http://localhost:" 
