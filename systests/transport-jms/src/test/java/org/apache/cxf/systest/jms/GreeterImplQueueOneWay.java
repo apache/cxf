@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jms;
 
 import javax.jws.WebService;
+import javax.xml.ws.soap.Addressing;
 
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 
@@ -29,6 +30,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldOneWayPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
+@Addressing(required = true)
 public class GreeterImplQueueOneWay implements HelloWorldOneWayPort {
 
     public void greetMeOneWay(String stringParam0) {

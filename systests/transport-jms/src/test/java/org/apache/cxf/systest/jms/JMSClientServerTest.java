@@ -40,9 +40,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
 import javax.xml.ws.Response;
+import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
-
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -93,6 +93,7 @@ import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.apache.hello_world_doc_lit.SOAPService7;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -541,7 +542,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         try {
-            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
+            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class,
+                                                           new AddressingFeature(true, true));
             for (int idx = 0; idx < 5; idx++) {
                 greeter.greetMeOneWay("JMS:Queue:Milestone-" + idx);
             }
