@@ -34,41 +34,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Import;
 
-@Configuration
+@Import(JaxRsConfig.class)
 @ComponentScan
-@ImportResource({"classpath:META-INF/cxf/cxf.xml" })
 public class SpringResourceServer {
     @Autowired
-    private ApplicationContext ctx;
+    protected ApplicationContext applicationContext;
 
     private String address = "/";
     private Set<String> supportedBeanNames;
+    private List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
+    private List<Object> jaxrsProviders = new LinkedList<Object>();
     
     @Bean
-    public Server jaxrsServer() {
-        List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
-        List<Object> jaxrsProviders = new LinkedList<Object>();
-        
+    public Server jaxRsServer() {
         boolean checkJaxrsRoots = checkJaxrsRoots();
         boolean checkJaxrsProviders = checkJaxrsProviders(); 
         
-        for (String beanName : ctx.getBeanDefinitionNames()) {
+        for (String beanName : applicationContext.getBeanDefinitionNames()) {
             if (checkJaxrsRoots && isAnnotationAvailable(beanName, Path.class)) {
                 SpringResourceFactory factory = new SpringResourceFactory(beanName);
-                factory.setApplicationContext(ctx);
+                factory.setApplicationContext(applicationContext);
                 resourceProviders.add(factory);
             } else if (checkJaxrsProviders && isAnnotationAvailable(beanName, Provider.class)) {
-                jaxrsProviders.add(ctx.getBean(beanName));
+                jaxrsProviders.add(applicationContext.getBean(beanName));
             }
         }
 
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        factory.setBus(ctx.getBean(SpringBus.class));
-        factory.setResourceProviders(resourceProviders);
-        factory.setProviders(jaxrsProviders);
+        factory.setBus(applicationContext.getBean(SpringBus.class));
+        factory.setResourceProviders(getResourceProviders());
+        factory.setProviders(getJaxrsProviders());
         factory.setAddress(getAddress());
         finalizeFactorySetup(factory);
         return factory.create();
@@ -76,7 +73,7 @@ public class SpringResourceServer {
     
     protected <A extends Annotation> boolean isAnnotationAvailable(String beanName, Class<A> annClass) {
         return isBeanSupported(beanName) 
-            && ctx.findAnnotationOnBean(beanName, annClass) != null;
+            && applicationContext.findAnnotationOnBean(beanName, annClass) != null;
     }
     
     protected void finalizeFactorySetup(JAXRSServerFactoryBean factory) {
@@ -91,6 +88,14 @@ public class SpringResourceServer {
         return true;    
     }
 
+    protected List<ResourceProvider> getResourceProviders() {
+        return resourceProviders;
+    }
+    
+    protected List<Object> getJaxrsProviders() {
+        return jaxrsProviders;
+    }
+    
     public String getAddress() {
         return address;
     }
