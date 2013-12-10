@@ -41,7 +41,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
 
     List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
     boolean isOverlaid = true;
-    boolean textOverlay = false;
+    boolean textOverlay;
     
     public OverlayW3CDOMStreamWriter(Document document) {
         super(document);
