@@ -195,8 +195,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
         
-        // TODO See WSS-481 - "Problem with EncryptSignature + EndorsingSupportingTokens"
-        if (!STAX_PORT.equals(test.getPort())) {
+        // TODO Streaming client is not including a separate main Signature
+        if (!(test.isStreaming() && STAX_PORT.equals(test.getPort()))) {
             doubleIt(symmetricSaml2Port, 30);
         }
         
