@@ -23,6 +23,10 @@ public class ObjectWithGenerics<A, B> {
     private A a;
     private B b;
     
+    public ObjectWithGenerics() {
+        
+    }
+    
     public ObjectWithGenerics(A aa, B bb) {
         this.a = aa;
         this.b = bb;
