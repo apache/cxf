@@ -1536,7 +1536,7 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> T post(Entity<?> entity, GenericType<T> genericType) {
-            return method(HttpMethod.POST, genericType);
+            return method(HttpMethod.POST, entity, genericType);
         }
 
         @Override
