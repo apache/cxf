@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -177,6 +178,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/emptyform";
         WebClient wc = WebClient.create(address);
         Response r = wc.form(new Form());
+        assertEquals("empty form", r.readEntity(String.class));
+    }
+    
+    @Test
+    public void testPostEmptyFormAsInStream() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/emptyform";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.empty.request", true);
+        wc.type(MediaType.APPLICATION_FORM_URLENCODED);
+        Response r = wc.post(new ByteArrayInputStream("".getBytes()));
         assertEquals("empty form", r.readEntity(String.class));
     }
     
