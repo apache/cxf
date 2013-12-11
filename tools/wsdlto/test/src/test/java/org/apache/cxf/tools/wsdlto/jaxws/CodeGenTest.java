@@ -283,7 +283,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method method = clz.getMethod("sendReceiveData", new Class[] {paraClass});
         assertEquals("MyComplexStruct", method.getReturnType().getSimpleName());
 
-        clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_rpclit.GreeterRPCLitImpl");
+        clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_rpclit.SoapPortRPCLitImpl");
         assertNotNull(clz);
         ws = AnnotationUtil.getPrivClassAnnotation(clz, javax.jws.WebService.class);
         assertNotNull(ws);

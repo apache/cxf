@@ -126,7 +126,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         }
         String name = nm.get(service + "/" + port);
         if (name == null) {
-            name = intf.getName() + "Impl";
+            name = port + "Impl";
             name = mapClassName(intf.getPackageName(), name, penv);
             nm.put(service + "/" + port, name);
         }

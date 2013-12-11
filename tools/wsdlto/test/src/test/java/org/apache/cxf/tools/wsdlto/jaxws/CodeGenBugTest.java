@@ -126,7 +126,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug305773/hello_world.wsdl"));
         processor.setContext(env);
         processor.execute();
-        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.GreeterImpl");
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.SoapPortImpl");
 
         WebService webServiceAnn = AnnotationUtil.getPrivClassAnnotation(clz, WebService.class);
         assertTrue("Impl class should note generate name property value in webService annotation",
@@ -1037,7 +1037,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf1048/test.wsdl"));
         processor.setContext(env);
         processor.execute();
-        Class<?> clz = classLoader.loadClass("org.apache.hello_world_soap_http.PingImpl");
+        Class<?> clz = classLoader.loadClass("org.apache.hello_world_soap_http.PingSoapPortImpl");
 
         WebService webServiceAnn = AnnotationUtil.getPrivClassAnnotation(clz, WebService.class);
         assertEquals("org.apache.hello_world_soap_http.Ping", webServiceAnn.endpointInterface());
@@ -1104,8 +1104,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         WSDLToJava.main(args);
 
         assertNotNull(output);
-        assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/GreeterImpl.java").exists());
-        assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/GreeterImpl1.java").exists());
+        assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Soap_PortImpl.java").exists());
+        assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/SoapPortImpl.java").exists());
         assertTrue(new File(output,
                             "org/apache/cxf/w2j/hello_world_soap_http/TestServiceName.java").exists());
         assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/TestServiceName1.java")
