@@ -19,8 +19,10 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
@@ -237,5 +239,77 @@ public class SearchContextImplTest extends Assert {
         assertEquals("CXF", ps.getValue());
         assertEquals(ConditionType.EQUALS, ps.getCondition());
         assertEquals(String.class, ps.getValueType());
+    }
+    
+    @Test
+    public void testIsMetCompositeObject() throws Exception {
+        SearchCondition<TheBook> filter = 
+            new FiqlParser<TheBook>(TheBook.class,
+                null,                          
+                Collections.singletonMap("address", "address.street")).parse("address==Street1");
+        
+        TheBook b = new TheBook();
+        b.setAddress(new TheOwnerAddress("Street1"));
+        assertTrue(filter.isMet(b));
+        
+        b.setAddress(new TheOwnerAddress("Street2"));
+        assertFalse(filter.isMet(b));
+    }
+    @Test
+    public void testIsMetCompositeInterface() throws Exception {
+        SearchCondition<TheBook> filter = 
+            new FiqlParser<TheBook>(TheBook.class,
+                null,                          
+                Collections.singletonMap("address", "addressInterface.street"))
+                    .parse("address==Street1");
+        
+        TheBook b = new TheBook();
+        b.setAddress(new TheOwnerAddress("Street1"));
+        assertTrue(filter.isMet(b));
+        
+        b.setAddress(new TheOwnerAddress("Street2"));
+        assertFalse(filter.isMet(b));
+    }
+        
+    public static class TheBook {
+        private TheOwnerAddressInterface address;
+
+        public TheOwnerAddress getAddress() {
+            return (TheOwnerAddress)address;
+        }
+
+        public void setAddress(TheOwnerAddress a) {
+            this.address = a;
+        }
+        
+        public TheOwnerAddressInterface getAddressInterface() {
+            return address;
+        }
+
+        public void setAddressInterface(TheOwnerAddressInterface a) {
+            this.address = a;
+        }
+    }
+    public interface TheOwnerAddressInterface {
+        String getStreet();
+        void setStreet(String street);
+    }
+    public static class TheOwnerAddress implements TheOwnerAddressInterface {
+        private String street;
+
+        public TheOwnerAddress() {
+            
+        }
+        public TheOwnerAddress(String s) {
+            this.street = s;
+        }
+        
+        public String getStreet() {
+            return street;
+        }
+
+        public void setStreet(String street) {
+            this.street = street;
+        }
     }
 }

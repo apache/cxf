@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.fiql;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.Beanspector;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.InterfaceProxy;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PropertyNotFoundException;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
@@ -381,7 +383,12 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 boolean lastTry = names.length == 2 
                     && (isPrimitive || returnType == Date.class || returnCollection);
                 
-                Object valueObject = lastTry && ownerBean != null ? ownerBean : actualType.newInstance();
+                Object valueObject = lastTry && ownerBean != null ? ownerBean 
+                    : actualType.isInterface() 
+                    ? Proxy.newProxyInstance(this.getClass().getClassLoader(), 
+                                             new Class[]{actualType}, 
+                                             new InterfaceProxy())
+                    : actualType.newInstance();
                 Object nextObject;
                 
                 if (lastTry) {
