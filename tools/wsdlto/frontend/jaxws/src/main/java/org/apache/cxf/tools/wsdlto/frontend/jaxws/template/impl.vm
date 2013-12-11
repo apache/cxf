@@ -60,7 +60,7 @@ public class ${implName} implements $intf.Name {
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    private static final Logger LOG = Logger.getLogger(${intf.Name}Impl.class.getName());
+    private static final Logger LOG = Logger.getLogger(${implName}.class.getName());
 
 #foreach ($method in $intf.Methods)
     /* (non-Javadoc)
