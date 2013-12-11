@@ -337,21 +337,6 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     @Test
-    public void testIsMet() throws Exception {
-        SearchCondition<Book> filter = 
-            new FiqlParser<Book>(Book.class,
-                null,                          
-                Collections.singletonMap("address", "address.street")).parse("address==Street1");
-        
-        Book b = new Book();
-        b.setAddress(new OwnerAddress("Street1"));
-        assertTrue(filter.isMet(b));
-        
-        b.setAddress(new OwnerAddress("Street2"));
-        assertFalse(filter.isMet(b));
-    }
-    
-    @Test
     public void testEqualsAddressQuery2() throws Exception {
         List<Book> books = queryBooks("street==Street1",
             null,                          
