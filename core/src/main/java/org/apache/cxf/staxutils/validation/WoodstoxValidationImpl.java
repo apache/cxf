@@ -52,9 +52,7 @@ public class WoodstoxValidationImpl {
     }
 
 
-    /** {@inheritDoc}
-     * @throws XMLStreamException */
-    public void setupValidation(XMLStreamReader reader, 
+    public void setupValidation(XMLStreamReader reader,
                                 Endpoint endpoint,
                                 ServiceInfo serviceInfo) throws XMLStreamException {
         if (utils != null && reader != null && !utils.setupValidation(reader, endpoint, serviceInfo)) {
