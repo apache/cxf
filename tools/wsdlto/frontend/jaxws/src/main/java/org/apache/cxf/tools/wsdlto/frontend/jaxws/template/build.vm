@@ -165,11 +165,11 @@
         <attribute name="param3" default=""/>
         <attribute name="param4" default=""/>
         <attribute name="param5" default=""/>
-        <attribute name="jvmarg1" default="-D"/>
-        <attribute name="jvmarg2" default="-D"/>
-        <attribute name="jvmarg3" default="-D"/>
-        <attribute name="jvmarg4" default="-D"/>
-        <attribute name="jvmarg5" default="-D"/>
+        <attribute name="jvmarg1" default="-Da=b"/>
+        <attribute name="jvmarg2" default="-Da=b"/>
+        <attribute name="jvmarg3" default="-Da=b"/>
+        <attribute name="jvmarg4" default="-Da=b"/>
+        <attribute name="jvmarg5" default="-Da=b"/>
         <sequential>
             <java classname="@{classname}" fork="yes">
                 <classpath>
