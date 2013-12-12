@@ -19,10 +19,12 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -105,12 +107,30 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         setAttributes("port", port);
         
         setCommonAttributes();
-        
-        String name = intf.getName() + "Impl";
-        name = mapClassName(intf.getPackageName(), name, penv);
+
+        if (StringUtils.isEmpty(port)) {
+            port = intf.getName();
+        }
+        String name = getImplName(port, service == null ? "" : service.getName(), intf, penv);
+
         setAttributes("implName", name);
-        penv.put(ToolConstants.CFG_IMPL_CLASS, name);
+        
         doWrite(IMPL_TEMPLATE, parseOutputName(intf.getPackageName(), name));
+    }
+    
+    private String getImplName(String port, String service, JavaInterface intf, ToolContext penv) {
+        Map<String, String> nm = CastUtils.cast((Map<?, ?>)penv.get(ToolConstants.CFG_IMPL_CLASS));
+        if (nm == null) {
+            nm = new HashMap<String, String>();
+            penv.put(ToolConstants.CFG_IMPL_CLASS, nm);
+        }
+        String name = nm.get(service + "/" + port);
+        if (name == null) {
+            name = intf.getName() + "Impl";
+            name = mapClassName(intf.getPackageName(), name, penv);
+            nm.put(service + "/" + port, name);
+        }
+        return name;
     }
     private String mapClassName(String packageName, String name, ToolContext context) {
         ClassCollector collector = context.get(ClassCollector.class);
