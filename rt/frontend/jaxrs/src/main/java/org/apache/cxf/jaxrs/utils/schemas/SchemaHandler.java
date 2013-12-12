@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -41,6 +42,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.ws.commons.schema.constants.Constants;
@@ -88,15 +90,26 @@ public class SchemaHandler {
         try {
             List<Source> sources = new ArrayList<Source>();
             for (String loc : locations) {
-                URL url = ResourceUtils.getResourceURL(loc, bus);
-                if (url == null) {
-                    return null;
+                List<URL> schemaURLs = new LinkedList<URL>();
+                
+                if (loc.lastIndexOf(".") == -1) {
+                    schemaURLs = ClasspathScanner.findResources(loc, "xsd");
+                } else {
+                    URL url = ResourceUtils.getResourceURL(loc, bus);
+                    if (url != null) {
+                        schemaURLs.add(url);
+                    }
                 }
-                Reader r = new BufferedReader(
-                               new InputStreamReader(url.openStream(), "UTF-8"));
-                StreamSource source = new StreamSource(r);
-                source.setSystemId(url.toString());
-                sources.add(source);
+                for (URL schemaURL : schemaURLs) {
+                    Reader r = new BufferedReader(
+                                   new InputStreamReader(schemaURL.openStream(), "UTF-8"));
+                    StreamSource source = new StreamSource(r);
+                    source.setSystemId(schemaURL.toString());
+                    sources.add(source);
+                }
+            }
+            if (sources.isEmpty()) {
+                return null;
             }
             final OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
             if (catalogResolver != null) {

@@ -31,7 +31,8 @@ public class ClasspathScanner {
     public static final String ALL_FILES = "**/*";
     public static final String ALL_CLASS_FILES = ALL_FILES + ".class";
     public static final String ALL_PACKAGES = "*";
-
+    public static final String CLASSPATH_URL_SCHEME = "classpath:";
+    
     static final ClasspathScanner HELPER;
     static {
         ClasspathScanner theHelper = null;
@@ -50,6 +51,20 @@ public class ClasspathScanner {
     protected ClasspathScanner() {
     }    
 
+    /**
+     * Scans list of base packages for all classes marked with specific annotations. 
+     * @param basePackage base package 
+     * @param annotations annotations to discover
+     * @return all discovered classes grouped by annotations they belong too 
+     * @throws IOException class metadata is not readable 
+     * @throws ClassNotFoundException class not found
+     */
+    public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
+        String basePackage, Class< ? extends Annotation > ... annotations) 
+        throws IOException, ClassNotFoundException {
+        return findClasses(Collections.singletonList(basePackage), Arrays.asList(annotations));
+    }
+    
     /**
      * Scans list of base packages for all classes marked with specific annotations. 
      * @param basePackages list of base packages 
@@ -83,6 +98,18 @@ public class ClasspathScanner {
         Collection< String > basePackages, List<Class< ? extends Annotation > > annotations) 
         throws IOException, ClassNotFoundException {
         return Collections.emptyMap();
+    }
+    
+    /**
+     * Scans list of base packages for all resources with the given extension. 
+     * @param basePackage base package 
+     * @param extension the extension matching resources needs to have
+     * @return list of all discovered resource URLs 
+     * @throws IOException resource is not accessible
+     */
+    public static List<URL> findResources(String basePackage, String extension) 
+        throws IOException {
+        return findResources(Collections.singletonList(basePackage), extension);
     }
     
     /**

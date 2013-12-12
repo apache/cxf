@@ -94,8 +94,13 @@ class SpringClasspathScanner extends ClasspathScanner {
         for (final String basePackage: basePackages) {
             final boolean scanAllPackages = basePackage.equals(ALL_PACKAGES);
             
+            String theBasePackage = basePackage;
+            if (theBasePackage.startsWith(CLASSPATH_URL_SCHEME)) {
+                theBasePackage = theBasePackage.substring(CLASSPATH_URL_SCHEME.length());
+            }
+            
             final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
-                + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(basePackage)) 
+                + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(theBasePackage)) 
                 + ALL_FILES + "." + extension;
             
             final Resource[] resources = resolver.getResources(packageSearchPath);                        
