@@ -294,7 +294,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 marshal(actualObject, actualClass, genericType, encoding, os, m, anns);
             }
         } catch (JAXBException e) {
-            handleJAXBException(e, true);
+            handleJAXBException(e, false);
         }  catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
