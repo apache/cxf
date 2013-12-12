@@ -26,10 +26,12 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -69,6 +71,20 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
             WSSecurityException ex = 
                 new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             throw createSoapFault(soapMessage.getVersion(), ex);
+        }
+        
+        // First check for a SOAP Fault with no security header if we are the client
+        if (MessageUtils.isRequestor(soapMessage)
+            && isEventInResults(WSSecurityEventConstants.NoSecurity, incomingSecurityEventList)) {
+            OperationSecurityEvent securityEvent = 
+                (OperationSecurityEvent)findEvent(
+                    WSSecurityEventConstants.Operation, incomingSecurityEventList
+                );
+            if (securityEvent != null 
+                && soapMessage.getVersion().getFault().equals(securityEvent.getOperation())) {
+                LOG.warning("Request does not contain Security header, but it's a fault.");
+                return;
+            }
         }
         
         for (XMLSecurityConstants.Action action : inActions) {
@@ -116,6 +132,15 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
             }
         }
         return false;
+    }
+    
+    private SecurityEvent findEvent(Event event, List<SecurityEvent> incomingSecurityEventList) {
+        for (SecurityEvent incomingEvent : incomingSecurityEventList) {
+            if (event == incomingEvent.getSecurityEventType()) {
+                return incomingEvent;
+            }
+        }
+        return null;
     }
     
     /**

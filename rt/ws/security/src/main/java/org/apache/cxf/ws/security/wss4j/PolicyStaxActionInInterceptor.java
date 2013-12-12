@@ -20,11 +20,14 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -35,7 +38,10 @@ import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
 
 /**
  * This interceptor marks the CXF AssertionInfos as asserted. WSS4J 2.0 (StAX) takes care of all
@@ -43,6 +49,9 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
  * make sure that policy validation passes.
  */
 public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
+    
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(PolicyStaxActionInInterceptor.class);
     
     public PolicyStaxActionInInterceptor() {
         super(Phase.PRE_PROTOCOL);
@@ -60,9 +69,42 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
             return;
         }
         
+        // First check for a SOAP Fault with no security header if we are the client
+        // In this case don't blanket assert security policies
+        if (MessageUtils.isRequestor(soapMessage)
+            && isEventInResults(WSSecurityEventConstants.NoSecurity, incomingSecurityEventList)) {
+            OperationSecurityEvent securityEvent = 
+                (OperationSecurityEvent)findEvent(
+                    WSSecurityEventConstants.Operation, incomingSecurityEventList
+                );
+            if (securityEvent != null 
+                && soapMessage.getVersion().getFault().equals(securityEvent.getOperation())) {
+                LOG.warning("Request does not contain Security header, but it's a fault.");
+                return;
+            }
+        }
+        
         assertAllSecurityAssertions(aim);
         assertAllAlgorithmSuites(SP11Constants.SP_NS, aim);
         assertAllAlgorithmSuites(SP12Constants.SP_NS, aim);
+    }
+    
+    private boolean isEventInResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
+        for (SecurityEvent incomingEvent : incomingSecurityEventList) {
+            if (event == incomingEvent.getSecurityEventType()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private SecurityEvent findEvent(Event event, List<SecurityEvent> incomingSecurityEventList) {
+        for (SecurityEvent incomingEvent : incomingSecurityEventList) {
+            if (event == incomingEvent.getSecurityEventType()) {
+                return incomingEvent;
+            }
+        }
+        return null;
     }
     
     private void assertAllSecurityAssertions(AssertionInfoMap aim) {
