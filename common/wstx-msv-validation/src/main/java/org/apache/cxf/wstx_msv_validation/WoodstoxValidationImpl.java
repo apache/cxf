@@ -58,9 +58,6 @@ public class WoodstoxValidationImpl implements StaxValidationManager {
         }
     }
 
-
-    /** {@inheritDoc}
-     * @throws XMLStreamException */
     public void setupValidation(XMLStreamReader reader, 
                                 ServiceInfo serviceInfo) throws XMLStreamException {
         if (utils != null && reader != null) {
