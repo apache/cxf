@@ -62,6 +62,9 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
 
             boolean output = false;
             if (!isRequestor(message)) {
+                if (operation.getOutput() == null) {
+                    return;
+                }
                 parts = operation.getOutput().getMessageParts();
                 output = true;
             } else {
