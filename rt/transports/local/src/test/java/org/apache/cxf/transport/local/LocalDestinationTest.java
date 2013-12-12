@@ -50,10 +50,10 @@ public class LocalDestinationTest extends Assert {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress("http://localhost/test");
 
-        LocalDestination d = (LocalDestination) factory.getDestination(ei, bus);
+        LocalDestination d = (LocalDestination) factory.getDestination(ei);
         MessageImpl m = new MessageImpl();
 
-        Conduit conduit = factory.getConduit(ei, bus);
+        Conduit conduit = factory.getConduit(ei);
         m.put(LocalConduit.IN_CONDUIT, conduit);
         Exchange ex = new ExchangeImpl();
         ex.put(Bus.class, bus);
@@ -62,7 +62,7 @@ public class LocalDestinationTest extends Assert {
         Integer code = (Integer)m.get(Message.RESPONSE_CODE);
         assertNull(code);
 
-        Conduit backChannel = d.getBackChannel(m);
+        Conduit backChannel = d.getBackChannel(m, null, null);
 
         backChannel.close(m);
         
