@@ -19,7 +19,9 @@
 package org.apache.cxf.jaxrs.spring;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -48,16 +50,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.util.ClassUtils;
-
-
 
 
 
@@ -89,7 +81,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             final Set<String> basePackages = new HashSet<String>(values.length);
             for (final String value : values) {
                 final String trimmed = value.trim();
-                if (trimmed.equals(SpringJAXRSServerFactoryBean.ALL_PACKAGES)) {
+                if (trimmed.equals(ClasspathScanner.ALL_PACKAGES)) {
                     basePackages.clear();
                     basePackages.add(trimmed);
                     break;
@@ -168,12 +160,9 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
     public static class SpringJAXRSServerFactoryBean extends JAXRSServerFactoryBean implements
         ApplicationContextAware {
         
-        private static final String ALL_CLASS_FILES = "**/*.class";
-        private static final String ALL_PACKAGES = "*";
-        
         private List<SpringResourceFactory> tempFactories;
         private List<String> basePackages;
-
+        private ApplicationContext context;
         public SpringJAXRSServerFactoryBean() {
             super();
         }
@@ -191,6 +180,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         }
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            this.context = ctx;
+            
             if (tempFactories != null) {
                 List<ResourceProvider> factories = new ArrayList<ResourceProvider>(
                     tempFactories.size());
@@ -204,49 +195,13 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             }
             
             try {
-                if (basePackages != null && !basePackages.isEmpty()) {
-                    final List< Object > providers = new ArrayList< Object >();
-                    final List< Object > services = new ArrayList< Object >();
-                    
-                    // Reusing Spring's approach to classpath scanning. Because Java packages are
-                    // open, it's impossible to get all classes belonging to specific package.
-                    // Instead, the classpath is looked for *.class files under package's
-                    // path (f.e., package 'com.example' becomes a classpath 'com/example/**/*.class'). 
-                    final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-                    final MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
-
-                    for (final String basePackage: basePackages) {
-                        final boolean scanAllPackages = basePackage.equals(ALL_PACKAGES);
-                        
-                        final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
-                            + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(basePackage)) 
-                            + ALL_CLASS_FILES;
-                        
-                        final Resource[] resources = resolver.getResources(packageSearchPath);                        
-                        for (final Resource resource: resources) {
-                            final MetadataReader reader = factory.getMetadataReader(resource);
-                            final AnnotationMetadata metadata = reader.getAnnotationMetadata();
-                            
-                            if (scanAllPackages && shouldSkip(metadata.getClassName())) {
-                                continue;
-                            }
-                            
-                            // Create a bean only if it's a provider (annotated)
-                            if (metadata.isAnnotated(Provider.class.getName())) {                                
-                                providers.add(createBean(ctx, metadata));
-                            } else if (metadata.isAnnotated(Path.class.getName())) { 
-                                services.add(createBean(ctx, metadata));
-                            }
-                        }                        
-                    }
-                    
-                    if (!providers.isEmpty()) {                        
-                        this.setProviders(providers);
-                    }
-                    
-                    if (!services.isEmpty()) {                        
-                        this.setServiceBeans(services);
-                    }
+                if (basePackages != null) {
+                    @SuppressWarnings("unchecked")
+                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
+                        ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
+                                              
+                    this.setProviders(createBeans(classes.get(Provider.class)));
+                    this.setServiceBeans(createBeans(classes.get(Path.class)));
                 }
             } catch (IOException ex) {
                 throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
@@ -257,16 +212,13 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
-        }
-
-        private Object createBean(final ApplicationContext ctx, final AnnotationMetadata metadata) 
-            throws ClassNotFoundException {
-            final Class<?> clazz = ClassLoaderUtils.loadClass(metadata.getClassName(), getClass());
-            return ctx.getAutowireCapableBeanFactory().createBean(clazz);
-        }
-        
-        private boolean shouldSkip(final String classname) {
-            return classname.startsWith("org.apache.cxf");
+        }        
+        private List<Object> createBeans(Collection<Class<?>> classes) {
+            final List< Object > providers = new ArrayList< Object >();
+            for (final Class< ? > clazz: classes) {
+                providers.add(context.getAutowireCapableBeanFactory().createBean(clazz));
+            }
+            return providers;
         }
     }
 }
