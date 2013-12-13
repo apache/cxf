@@ -64,12 +64,11 @@ public final class Client {
                 CryptoFactory.getProperties("etc/Client_Sign.properties", Server.class.getClassLoader());
             
             WSSSecurityProperties properties = new WSSSecurityProperties();
-            properties.setOutAction(
-                new XMLSecurityConstants.Action[] {
-                    WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, 
-                    WSSConstants.ENCRYPT
-                }
-            );
+            properties.addAction(WSSConstants.USERNAMETOKEN);
+            properties.addAction(WSSConstants.TIMESTAMP);
+            properties.addAction(WSSConstants.SIGNATURE);
+            properties.addAction(WSSConstants.ENCRYPT);
+
             properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
             properties.setTokenUser("abcd");
             properties.setSignatureUser("clientx509v1");

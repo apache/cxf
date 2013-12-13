@@ -61,12 +61,11 @@ public class Server {
             CryptoFactory.getProperties("etc/Server_SignVerf.properties", Server.class.getClassLoader());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(
-            new XMLSecurityConstants.Action[] {
-                WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, 
-                WSSConstants.ENCRYPT
-            }
-        );
+        properties.addAction(WSSConstants.USERNAMETOKEN);
+        properties.addAction(WSSConstants.TIMESTAMP);
+        properties.addAction(WSSConstants.SIGNATURE);
+        properties.addAction(WSSConstants.ENCRYPT);
+
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         properties.setTokenUser("Alice");
         properties.setSignatureUser("serverx509v1");
