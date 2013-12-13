@@ -119,12 +119,17 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             if (initiatorWrapper == null) {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
+            boolean customTokenAdded = false;
             if (initiatorWrapper != null) {
                 assertTokenWrapper(initiatorWrapper);
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    
+                    if (getProperties().getActions().contains(WSSConstants.CUSTOM_TOKEN)) {
+                        customTokenAdded = true;
+                    }
                     if (sigTok != null) {
                         storeSecurityToken(sigTok);
                         outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
@@ -218,6 +223,11 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             doEncryption(encToken, enc, false);
             
+            // Reshuffle so that a IssuedToken is above a Signature that references it
+            if (customTokenAdded) {
+                properties.getActions().remove(WSSConstants.CUSTOM_TOKEN);
+                properties.getActions().add(WSSConstants.CUSTOM_TOKEN);
+            }
         } catch (Exception e) {
             String reason = e.getMessage();
             LOG.log(Level.WARNING, "Sign before encryption failed due to : " + reason);
@@ -249,12 +259,18 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 initiatorWrapper = abinding.getInitiatorToken();
             }
             
+            boolean customTokenAdded = false;
             if (initiatorWrapper != null) {
                 assertTokenWrapper(initiatorWrapper);
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
                     addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    
+                    if (getProperties().getActions().contains(WSSConstants.CUSTOM_TOKEN)) {
+                        customTokenAdded = true;
+                    }
+                    
                     if (sigTok != null) {
                         storeSecurityToken(sigTok);
                         outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
@@ -329,6 +345,12 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         doSignature(recipientSignatureToken, sigParts);
                     }
                 }
+            }
+            
+            // Reshuffle so that a IssuedToken is above a Signature that references it
+            if (customTokenAdded) {
+                getProperties().getActions().remove(WSSConstants.CUSTOM_TOKEN);
+                getProperties().getActions().add(WSSConstants.CUSTOM_TOKEN);
             }
         } catch (Exception e) {
             String reason = e.getMessage();

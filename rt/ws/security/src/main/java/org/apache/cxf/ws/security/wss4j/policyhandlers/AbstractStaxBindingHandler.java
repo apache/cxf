@@ -375,8 +375,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 return new SecurePart(qname, Modifier.Element);
             } else if (isRequestor()) {
                 // An Encrypted Token...just include it as is
-                WSSConstants.Action actionToPerform = WSSConstants.CUSTOM_TOKEN;
-                properties.addAction(actionToPerform);
+                properties.addAction(WSSConstants.CUSTOM_TOKEN);
             }
         }
         

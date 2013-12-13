@@ -211,11 +211,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         stsClient.setUseKeyCertificate(certs[0]);
         
-        // TODO Streaming - The encrypted issued token is placed under the Signature
-        // and hence an error is thrown on the receiving side
-        if (!test.isStreaming()) {
-            doubleIt(asymmetricSaml1EncryptedPort, 40);
-        }
+        doubleIt(asymmetricSaml1EncryptedPort, 40);
         
         ((java.io.Closeable)asymmetricSaml1EncryptedPort).close();
         bus.shutdown(true);
