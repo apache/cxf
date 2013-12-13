@@ -64,6 +64,7 @@
           <xsd:attribute name="password" type="xsd:string"/>
           <xsd:attribute name="serviceName" type="xsd:QName"/>
           <xsd:attribute name="threadSafe" type="xsd:boolean"/>
+          <xsd:attribute name="base-packages" type="xsd:string"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

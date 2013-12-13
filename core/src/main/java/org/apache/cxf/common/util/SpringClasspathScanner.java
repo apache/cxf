@@ -38,12 +38,18 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.ClassUtils;
 
 class SpringClasspathScanner extends ClasspathScanner {
-    private final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-    private final MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
+    SpringClasspathScanner() throws Exception {
+        Class.forName("org.springframework.core.io.support.PathMatchingResourcePatternResolver");
+        Class.forName("org.springframework.core.type.classreading.CachingMetadataReaderFactory");
+    }
+    
 
     protected Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClassesInternal(
         Collection< String > basePackages, List<Class< ? extends Annotation > > annotations) 
         throws IOException, ClassNotFoundException {
+    
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
         
         final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
             new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
@@ -90,6 +96,9 @@ class SpringClasspathScanner extends ClasspathScanner {
         if (basePackages == null || basePackages.isEmpty()) {
             return resourceURLs;
         }
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        
+        
         
         for (final String basePackage: basePackages) {
             final boolean scanAllPackages = basePackage.equals(ALL_PACKAGES);

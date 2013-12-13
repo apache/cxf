@@ -22,16 +22,19 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.systest.jaxrs.validation.AbstractJAXRSValidationTest;
-
+import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSServerSpringDiscoveryTest extends AbstractJAXRSValidationTest {
-    public static final String PORT = allocatePort(JAXRSServerSpringDiscoveryTest.class);
+    public static final String PORT = TestUtil.getPortNumber("jaxrs-http");
     
     @Ignore
     public static class Server extends AbstractSpringServer {
@@ -69,6 +72,16 @@ public class JAXRSServerSpringDiscoveryTest extends AbstractJAXRSValidationTest 
     public void testParameterValidationFailsIfIdIsNull()  {
         final Response r = createWebClient("/bookstore/books").post(new Form().param("name", "aa"));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
+    }
+    
+    @Test
+    public void testThatClientDiscoversServiceProperly() throws Exception {
+        BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class, 
+            "org/apache/cxf/systest/jaxrs/discovery/jaxrs-http-client.xml");
+        assertEquals("http://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
+        
+        BookWithValidation book = bs.getBook("123");
+        assertEquals(book.getId(), "123");
     }
     
     @Override

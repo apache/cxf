@@ -18,23 +18,33 @@
  */
 package org.apache.cxf.jaxrs.client.spring;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
 
 
 
@@ -66,9 +76,11 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         if ("serviceName".equals(name)) {
             QName q = parseQName(e, val);
             bean.addPropertyValue(name, q);
+        } else if ("base-packages".equals(name)) {
+            bean.addPropertyValue("basePackages", ClasspathScanner.parsePackages(val));
         } else { 
             mapToProperty(bean, name, val);
-        }
+        } 
     }
 
     @Override
@@ -99,11 +111,42 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
     public static class JAXRSSpringClientFactoryBean extends JAXRSClientFactoryBean
         implements ApplicationContextAware {
     
+        private List<String> basePackages;
+        
         public JAXRSSpringClientFactoryBean() {
             super();
         }
+    
+        public void setBasePackages(List<String> basePackages) {
+            this.basePackages = basePackages;
+        }
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+            try {
+                if (basePackages != null) {
+                    @SuppressWarnings("unchecked")
+                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
+                        ClasspathScanner.findClasses(basePackages, Path.class, Provider.class);
+                    
+                    if (classes.get(Path.class).size() > 1) {
+                        throw new NoUniqueBeanDefinitionException(Path.class, classes.get(Path.class).size(), 
+                            "More than one service class (@Path) has been discovered");
+                    } else {                      
+                        for (final Class< ? > providerClass: classes.get(Provider.class)) {
+                            setProvider(ctx.getAutowireCapableBeanFactory().createBean(providerClass));
+                        }
+                        
+                        for (final Class< ? > serviceClass: classes.get(Path.class)) {                        
+                            setServiceClass(serviceClass);
+                        }
+                    }
+                }
+            } catch (IOException ex) {
+                throw new BeanDefinitionStoreException("I/O failure during classpath scanning", ex);
+            } catch (ClassNotFoundException ex) {
+                throw new BeanCreationException("Failed to create bean from classfile", ex);
+            }
+                
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }

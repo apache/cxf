@@ -24,8 +24,10 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ClasspathScanner {
     public static final String ALL_FILES = "**/*";
@@ -122,6 +124,24 @@ public class ClasspathScanner {
     public static List<URL> findResources(Collection<String> basePackages, String extension) 
         throws IOException {
         return HELPER.findResourcesInternal(basePackages, extension);
+    }
+    
+    
+    public static Set<String> parsePackages(final String packagesAsCsv) {        
+        final String[] values = StringUtils.split(packagesAsCsv, ",");
+        final Set<String> basePackages = new HashSet<String>(values.length);
+        for (final String value : values) {
+            final String trimmed = value.trim();
+            if (trimmed.equals(ClasspathScanner.ALL_PACKAGES)) {
+                basePackages.clear();
+                basePackages.add(trimmed);
+                break;
+            } else if (trimmed.length() > 0) {
+                basePackages.add(trimmed);
+            }
+        }
+        
+        return basePackages;
     }
     
     protected List<URL> findResourcesInternal(Collection<String> basePackages, String extension) 

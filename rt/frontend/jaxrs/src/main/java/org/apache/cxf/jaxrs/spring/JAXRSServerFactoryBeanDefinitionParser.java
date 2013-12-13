@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
@@ -76,20 +74,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         } else if ("serviceName".equals(name)) {
             QName q = parseQName(e, val);
             bean.addPropertyValue(name, q);
-        } else if ("base-packages".equals(name)) {
-            final String[] values = StringUtils.split(val, ",");
-            final Set<String> basePackages = new HashSet<String>(values.length);
-            for (final String value : values) {
-                final String trimmed = value.trim();
-                if (trimmed.equals(ClasspathScanner.ALL_PACKAGES)) {
-                    basePackages.clear();
-                    basePackages.add(trimmed);
-                    break;
-                } else if (trimmed.length() > 0) {
-                    basePackages.add(trimmed);
-                }
-            }
-            bean.addPropertyValue("basePackages", basePackages);
+        } else if ("base-packages".equals(name)) {            
+            bean.addPropertyValue("basePackages", ClasspathScanner.parsePackages(val));
         } else {
             mapToProperty(bean, name, val);
         }
