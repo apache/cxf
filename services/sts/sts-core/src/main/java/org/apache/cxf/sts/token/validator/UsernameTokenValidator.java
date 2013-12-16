@@ -121,6 +121,7 @@ public class UsernameTokenValidator implements TokenValidator {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);
+        requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
         
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
