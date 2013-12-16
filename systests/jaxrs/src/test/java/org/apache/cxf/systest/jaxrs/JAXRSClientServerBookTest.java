@@ -643,6 +643,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookWithSpaceProxyWithBufferedStream() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        WebClient.getConfig(store).getResponseContext().put("buffer.proxy.response", "true");
+        Book book = store.getBookWithSpace("123");
+        assertEquals(123L, book.getId());
+        assertTrue(WebClient.client(store).getResponse().readEntity(String.class).contains("<Book"));
+    }
+    
+    @Test
     public void testBookWithMultipleExceptions() throws Exception {
         List<Object> providers = new LinkedList<Object>();
         providers.add(new NotReturnedExceptionMapper());

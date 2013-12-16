@@ -55,6 +55,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -84,6 +85,7 @@ public class ClientProxyImpl extends AbstractClient implements
     private static final Logger LOG = LogUtils.getL7dLogger(ClientProxyImpl.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ClientProxyImpl.class);
     private static final String SLASH = "/";
+    private static final String BUFFER_PROXY_RESPONSE = "buffer.proxy.response";
     
     private ClassResourceInfo cri;
     private ClassLoader proxyLoader;
@@ -679,6 +681,10 @@ public class ClientProxyImpl extends AbstractClient implements
                     && ((InputStream)r.getEntity()).available() == 0)) {
                 return r;
             }
+            if (PropertyUtils.isTrue(super.getConfiguration().getResponseContext().get(BUFFER_PROXY_RESPONSE))) {
+                r.bufferEntity();
+            }
+            
             Class<?> returnType = method.getReturnType();
             Type genericType = 
                 InjectionUtils.processGenericTypeIfNeeded(serviceCls, 
