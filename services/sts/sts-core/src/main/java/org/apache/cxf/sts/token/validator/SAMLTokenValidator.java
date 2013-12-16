@@ -153,6 +153,29 @@ public class SAMLTokenValidator implements TokenValidator {
             SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipalImpl(assertion);
             response.setPrincipal(samlPrincipal);
             
+            if (!assertion.isSigned()) {
+                LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");
+                return response;
+            }
+
+            RequestData requestData = new RequestData();
+            requestData.setSigVerCrypto(sigCrypto);
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            requestData.setWssConfig(wssConfig);
+            requestData.setCallbackHandler(callbackHandler);
+            requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
+
+            WSDocInfo docInfo = new WSDocInfo(validateTargetElement.getOwnerDocument());
+
+            // Verify the signature
+            Signature sig = assertion.getSignature();
+            KeyInfo keyInfo = sig.getKeyInfo();
+            SAMLKeyInfo samlKeyInfo = 
+                SAMLUtil.getCredentialFromKeyInfo(
+                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
+                );
+            assertion.verifySignature(samlKeyInfo);
+                
             SecurityToken secToken = null;
             byte[] signatureValue = assertion.getSignatureValue();
             if (tokenParameters.getTokenStore() != null && signatureValue != null
@@ -169,29 +192,6 @@ public class SAMLTokenValidator implements TokenValidator {
             }
             
             if (secToken == null) {
-                if (!assertion.isSigned()) {
-                    LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");
-                    return response;
-                }
-                
-                RequestData requestData = new RequestData();
-                requestData.setSigVerCrypto(sigCrypto);
-                WSSConfig wssConfig = WSSConfig.getNewInstance();
-                requestData.setWssConfig(wssConfig);
-                requestData.setCallbackHandler(callbackHandler);
-                requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
-
-                WSDocInfo docInfo = new WSDocInfo(validateTargetElement.getOwnerDocument());
-                
-                // Verify the signature
-                Signature sig = assertion.getSignature();
-                KeyInfo keyInfo = sig.getKeyInfo();
-                SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialFromKeyInfo(
-                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
-                    );
-                assertion.verifySignature(samlKeyInfo);
-                
                 // Validate the assertion against schemas/profiles
                 validateAssertion(assertion);
 
@@ -211,7 +211,6 @@ public class SAMLTokenValidator implements TokenValidator {
                 if (!certConstraints.matches(cert)) {
                     return response;
                 }
-                
             }
             
             // Parse roles from the validated token
