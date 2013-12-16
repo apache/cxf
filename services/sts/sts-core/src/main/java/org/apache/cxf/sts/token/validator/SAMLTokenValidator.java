@@ -155,7 +155,6 @@ public class SAMLTokenValidator implements TokenValidator {
             WSSConfig wssConfig = WSSConfig.getNewInstance();
             requestData.setWssConfig(wssConfig);
             requestData.setCallbackHandler(callbackHandler);
-            requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
 
             // Verify the signature
             assertion.verifySignature(
@@ -178,28 +177,6 @@ public class SAMLTokenValidator implements TokenValidator {
             }
             
             if (secToken == null) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-                if (!assertion.isSigned()) {
-                    LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");
-                    return response;
-                }
-                
-                RequestData requestData = new RequestData();
-                requestData.setSigCrypto(sigCrypto);
-                WSSConfig wssConfig = WSSConfig.getNewInstance();
-                requestData.setWssConfig(wssConfig);
-                requestData.setCallbackHandler(callbackHandler);
-                
-                // Verify the signature
-                assertion.verifySignature(
-                    requestData, new WSDocInfo(validateTargetElement.getOwnerDocument())
-                );
-                
-=======
->>>>>>> 4b3dbb3... Validation fix in the STS
-=======
->>>>>>> 8b51624... Fixing build
                 // Validate the assertion against schemas/profiles
                 validateAssertion(assertion);
 
