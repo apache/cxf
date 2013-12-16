@@ -179,6 +179,8 @@ public class SAMLTokenValidator implements TokenValidator {
                 WSSConfig wssConfig = WSSConfig.getNewInstance();
                 requestData.setWssConfig(wssConfig);
                 requestData.setCallbackHandler(callbackHandler);
+                requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
+
                 WSDocInfo docInfo = new WSDocInfo(validateTargetElement.getOwnerDocument());
                 
                 // Verify the signature

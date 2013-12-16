@@ -100,6 +100,7 @@ public class X509TokenValidator implements TokenValidator {
         requestData.setSigVerCrypto(sigCrypto);
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setCallbackHandler(callbackHandler);
+        requestData.setMsgContext(tokenParameters.getWebServiceContext().getMessageContext());
 
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
