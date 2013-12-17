@@ -41,15 +41,7 @@ public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProv
         ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
         ASSERTION_TYPES.add(SP12Constants.ASYMMETRIC_BINDING);
         ASSERTION_TYPES.add(SP12Constants.SYMMETRIC_BINDING);
-<<<<<<< HEAD
-=======
         ASSERTION_TYPES.add(SP12Constants.SIGNED_PARTS);
-        
-        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
-        ASSERTION_TYPES.add(SP11Constants.ASYMMETRIC_BINDING);
-        ASSERTION_TYPES.add(SP11Constants.SYMMETRIC_BINDING);
-        ASSERTION_TYPES.add(SP11Constants.SIGNED_PARTS);
->>>>>>> 5b06160... Also engage the WSS4J policy handlers on a SignedParts policy, in case we have no binding
     }
 
     public WSSecurityInterceptorProvider() {
