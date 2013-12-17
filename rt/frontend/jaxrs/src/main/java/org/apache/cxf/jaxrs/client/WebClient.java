@@ -50,7 +50,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -1042,10 +1045,26 @@ public class WebClient extends AbstractClient {
                                            Exchange exchange,
                                            Map<String, Object> invContext) {
     //CHECKSTYLE:ON    
-        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
-                                    respClass, outType, exchange, invContext);
-        doRunInterceptorChain(m);
-        return doResponse(m, respClass, outType);
+        Bus configuredBus = getConfiguration().getBus();
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(configuredBus);
+        ClassLoaderHolder origLoader = null;
+        try {
+            ClassLoader loader = configuredBus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
+            }
+            Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
+                                        respClass, outType, exchange, invContext);
+            doRunInterceptorChain(m);
+            return doResponse(m, respClass, outType);
+        } finally {
+            if (origLoader != null) {
+                origLoader.reset();
+            }
+            if (origBus != configuredBus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
+        }    
     }
     
     //CHECKSTYLE:OFF
