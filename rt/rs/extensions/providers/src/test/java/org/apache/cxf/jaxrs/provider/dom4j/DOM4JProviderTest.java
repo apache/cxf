@@ -107,7 +107,6 @@ public class DOM4JProviderTest extends Assert {
                    new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(),
                    bos);
         String str = bos.toString();
-        // starts with the xml PI
         assertEquals("{\"a\":\"\"}", str);
     }
     
@@ -122,8 +121,29 @@ public class DOM4JProviderTest extends Assert {
                    new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(),
                    bos);
         String str = bos.toString();
-        // starts with the xml PI
         assertEquals("{\"a\":\"\"}", str);
+    }
+    
+    @Test
+    public void testWriteJSONAsArray() throws Exception {
+        org.dom4j.Document dom = readXML(MediaType.APPLICATION_XML_TYPE, "<root><a>1</a></root>");
+        DOM4JProvider p = new DOM4JProvider();
+        
+        ProviderFactory factory = ServerProviderFactory.getInstance();
+        JSONProvider<Object> provider = new JSONProvider<Object>();
+        provider.setSerializeAsArray(true);
+        provider.setDropRootElement(true);
+        provider.setDropElementsInXmlStream(false);
+        provider.setIgnoreNamespaces(true);
+        factory.registerUserProvider(provider);
+        p.setProviders(new ProvidersImpl(createMessage(factory)));
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        p.writeTo(dom, org.dom4j.Document.class, org.dom4j.Document.class, 
+                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(),
+                   bos);
+        String str = bos.toString();
+        assertEquals("[{\"a\":1}]", str);
     }
     
     private Message createMessage() {
@@ -155,6 +175,9 @@ public class DOM4JProviderTest extends Assert {
         provider.setDropRootElement(true);
         provider.setIgnoreNamespaces(true);
         factory.registerUserProvider(provider);
+        return createMessage(factory);
+    }
+    private Message createMessage(ProviderFactory factory) {
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
