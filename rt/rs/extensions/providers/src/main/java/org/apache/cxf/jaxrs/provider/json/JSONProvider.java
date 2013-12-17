@@ -60,6 +60,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -87,6 +88,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private static final String MAPPED_CONVENTION = "mapped";
     private static final String BADGER_FISH_CONVENTION = "badgerfish";
     private static final String DROP_ROOT_CONTEXT_PROPERTY = "drop.json.root.element";
+    private static final String ARRAY_KEYS_PROPERTY = "json.array.keys";
+    private static final String ROOT_IS_ARRAY_PROPERTY = "json.root.is.array";
+    private static final String DROP_ELEMENT_IN_XML_PROPERTY = "drop.xml.elements";
+    private static final String IGNORE_EMPTY_JSON_ARRAY_VALUES_PROPERTY = "ignore.empty.json.array.values";
     static {
         new SimpleConverter();
     }
@@ -505,11 +510,16 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishWriter(os);
         }
+        boolean dropElementsInXmlStreamProp = getBooleanJsonProperty(DROP_ELEMENT_IN_XML_PROPERTY, 
+                                                                     dropElementsInXmlStream);
         
-        boolean dropRootNeeded = isDropRootNeeded();
+        boolean dropRootNeeded = getBooleanJsonProperty(DROP_ROOT_CONTEXT_PROPERTY, dropRootElement);
+        boolean dropRootInXmlNeeded = dropRootNeeded && dropElementsInXmlStreamProp;
         
-        QName qname = actualClass == Document.class ? null : getQName(actualClass, genericType, actualObject);
-        if (qname != null && ignoreNamespaces && (isCollection || dropRootNeeded)) {        
+        QName qname = actualClass == Document.class 
+            ? org.apache.cxf.helpers.DOMUtils.getElementQName(((Document)actualObject).getDocumentElement()) 
+            : getQName(actualClass, genericType, actualObject);
+        if (qname != null && ignoreNamespaces && (isCollection || dropRootInXmlNeeded)) {        
             qname = new QName(qname.getLocalPart());
         }
         
@@ -518,48 +528,70 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                                           writeXsiType && !ignoreNamespaces,
                                           attributesToElements,
                                           typeConverter);
-        if (!dropElementsInXmlStream && super.outDropElements != null) {
+        if (!dropElementsInXmlStreamProp && super.outDropElements != null) {
             config.setIgnoredElements(outDropElements);
         }
         if (!writeNullAsString) {
             config.setWriteNullAsString(writeNullAsString);
         }
-        if (ignoreEmptyArrayValues) {
-            config.setIgnoreEmptyArrayValues(ignoreEmptyArrayValues);
+        boolean ignoreEmpty = getBooleanJsonProperty(IGNORE_EMPTY_JSON_ARRAY_VALUES_PROPERTY, ignoreEmptyArrayValues);
+        if (ignoreEmpty) {
+            config.setIgnoreEmptyArrayValues(ignoreEmpty);
         }
         
         
-        boolean dropRootInJsonStream = dropRootElement && !dropElementsInXmlStream;
+        boolean dropRootInJsonStream = dropRootNeeded && !dropElementsInXmlStreamProp;
         if (dropRootInJsonStream) {
             config.setDropRootElement(true);
         }
-        if (ignoreNamespaces && serializeAsArray && (arrayKeys == null || dropRootInJsonStream)) {
-            if (arrayKeys == null) {
-                arrayKeys = new LinkedList<String>();
+         
+        List<String> theArrayKeys = getArrayKeys();
+        boolean rootIsArray = isRootArray(theArrayKeys);
+        
+        if (ignoreNamespaces && rootIsArray && (theArrayKeys == null || dropRootInJsonStream)) {
+            if (theArrayKeys == null) {
+                theArrayKeys = new LinkedList<String>();
             } else if (dropRootInJsonStream) {
-                arrayKeys = new LinkedList<String>(arrayKeys);
+                theArrayKeys = new LinkedList<String>(theArrayKeys);
             }
-            arrayKeys.add(qname.getLocalPart());
+            if (qname != null) {
+                theArrayKeys.add(qname.getLocalPart());
+            }
         }
         
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
-             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,
-             isCollection || dropRootNeeded);
+             writeXsiType && !ignoreNamespaces, config, rootIsArray, theArrayKeys,
+             isCollection || dropRootInXmlNeeded);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
-        return createTransformWriterIfNeeded(writer, os, dropElementsInXmlStream);
+        return createTransformWriterIfNeeded(writer, os, dropElementsInXmlStreamProp);
     }
     
-    protected boolean isDropRootNeeded() {
+    protected List<String> getArrayKeys() {
         MessageContext mc = getContext();
         if (mc != null) {
-            Object prop = mc.get(DROP_ROOT_CONTEXT_PROPERTY);
+            Object prop = mc.get(ARRAY_KEYS_PROPERTY);
+            if (prop instanceof List) {
+                return CastUtils.cast((List<?>)prop);
+            }
+        }
+        return arrayKeys;
+    }
+    
+    protected boolean isRootArray(List<String> theArrayKeys) {
+        return theArrayKeys != null ? true : getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
+    }
+    
+    
+    protected boolean getBooleanJsonProperty(String name, boolean defaultValue) {
+        MessageContext mc = getContext();
+        if (mc != null) {
+            Object prop = mc.get(name);
             if (prop != null) {
-                // means the property has been set explicitly
                 return MessageUtils.isTrue(prop);
             }
         }
-        return dropRootElement && dropElementsInXmlStream;
+        return defaultValue;
     }
     
     protected void marshal(Object actualObject, Class<?> actualClass, 
