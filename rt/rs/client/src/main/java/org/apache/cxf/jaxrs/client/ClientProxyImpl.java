@@ -53,6 +53,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -605,46 +609,61 @@ public class ClientProxyImpl extends AbstractClient implements
                                        int bodyIndex,
                                        Exchange exchange,
                                        Map<String, Object> invocationContext) throws Throwable {
-        
-        Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
-                                           exchange, invocationContext, true);
-        if (bodyIndex != -1) {
-            outMessage.put(Type.class, ori.getMethodToInvoke().getGenericParameterTypes()[bodyIndex]);
-        }
-        outMessage.getExchange().setOneWay(ori.isOneway());
-        outMessage.setContent(OperationResourceInfo.class, ori);
-        setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
-        outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
-        
-        outMessage.put(Annotation.class.getName(), 
-                       getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex));
-        
-        if (body != null) {
-            outMessage.put("BODY_INDEX", bodyIndex);
-            outMessage.getInterceptorChain().add(new BodyWriter());
-        }
-
-        Map<String, Object> reqContext = getRequestContext(outMessage);
-        reqContext.put(OperationResourceInfo.class.getName(), ori);
-        reqContext.put("BODY_INDEX", bodyIndex);
-        
-        // execute chain    
-        doRunInterceptorChain(outMessage);
-        
-        Object[] results = preProcessResult(outMessage);
-        if (results != null && results.length == 1) {
-            return results[0];
-        }
-        
-        Object response = null;
+        Bus configuredBus = getConfiguration().getBus();
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(configuredBus);
+        ClassLoaderHolder origLoader = null;
         try {
-            response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
-            return response;
-        } catch (Exception ex) {
-            response = ex;
-            throw ex;
+            ClassLoader loader = configuredBus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
+            }
+            Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
+                                               exchange, invocationContext, true);
+            if (bodyIndex != -1) {
+                outMessage.put(Type.class, ori.getMethodToInvoke().getGenericParameterTypes()[bodyIndex]);
+            }
+            outMessage.getExchange().setOneWay(ori.isOneway());
+            outMessage.setContent(OperationResourceInfo.class, ori);
+            setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
+            outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
+            
+            outMessage.put(Annotation.class.getName(), 
+                           getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex));
+            
+            if (body != null) {
+                outMessage.put("BODY_INDEX", bodyIndex);
+                outMessage.getInterceptorChain().add(new BodyWriter());
+            }
+    
+            Map<String, Object> reqContext = getRequestContext(outMessage);
+            reqContext.put(OperationResourceInfo.class.getName(), ori);
+            reqContext.put("BODY_INDEX", bodyIndex);
+            
+            // execute chain    
+            doRunInterceptorChain(outMessage);
+            
+            Object[] results = preProcessResult(outMessage);
+            if (results != null && results.length == 1) {
+                return results[0];
+            }
+            
+            Object response = null;
+            try {
+                response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
+                return response;
+            } catch (Exception ex) {
+                response = ex;
+                throw ex;
+            } finally {
+                completeExchange(response, outMessage.getExchange(), true);
+            }
         } finally {
-            completeExchange(response, outMessage.getExchange(), true);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
+            if (origBus != configuredBus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
         }
         
     }
