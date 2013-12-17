@@ -1028,6 +1028,32 @@ public class JSONProviderTest extends Assert {
             "{\"ManyTags\":{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}}",
             s);
     }
+    
+    @Test
+    public void testManyTagsEmptyArray() throws Exception {
+        JSONProvider<ManyTags> p = new JSONProvider<ManyTags>() {
+            protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
+                Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
+                return new EmptyListWriter(
+                    super.createWriter(actualObject, actualClass, genericType, enc, os, isCollection));
+            }
+        };
+        p.setSerializeAsArray(true);
+        p.setArrayKeys(Collections.singletonList("list"));
+        p.setIgnoreEmptyArrayValues(true);
+        Tags tags = new Tags();
+        tags.addTag(createTag("a", "b"));
+        ManyTags many = new ManyTags();
+        many.setTags(tags);
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(many, ManyTags.class, ManyTags.class, ManyTags.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"ManyTags\":{\"tags\":{\"list\":[]}}}", s);
+    }
 
     @Test
     public void testInDropElement() throws Exception {
@@ -1645,6 +1671,32 @@ public class JSONProviderTest extends Assert {
                 parameterList = new ArrayList<ParameterDefinition>();
             }
             parameterList.add(parameterDefinition);
+        }
+    }
+    
+    private static class EmptyListWriter extends DelegatingXMLStreamWriter {
+        private int count;
+        public EmptyListWriter(XMLStreamWriter writer) {
+            super(writer);
+        }
+
+        public void writeCharacters(String text) throws XMLStreamException {
+        }
+        
+        public void writeStartElement(String p, String local, String uri) throws XMLStreamException {
+            if ("group".equals(local) || "name".equals(local)) {
+                count++; 
+            } else {
+                super.writeStartElement(p, local, uri);
+            }
+        }
+        
+        public void writeEndElement() throws XMLStreamException {
+            if (count == 0) {
+                super.writeEndElement(); 
+            } else {
+                count--;
+            }
         }
     }
     

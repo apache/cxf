@@ -124,7 +124,7 @@
         <cxf.jaxb.xjc.version>${cxf.jaxb21.xjc.version}</cxf.jaxb.xjc.version>
         <cxf.joda.time.version>2.1</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jettison.version>1.3.4</cxf.jettison.version>
+        <cxf.jettison.version>1.3.5</cxf.jettison.version>
         <cxf.jetty.version>8.1.14.v20131031</cxf.jetty.version>
         <cxf.jetty.osgi.version>[7.6,8.2)</cxf.jetty.osgi.version>
         <cxf.jibx.version>1.2.5</cxf.jibx.version>
