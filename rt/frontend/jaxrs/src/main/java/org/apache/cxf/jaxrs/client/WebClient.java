@@ -42,7 +42,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
@@ -820,53 +823,69 @@ public class WebClient extends AbstractClient {
                                            Exchange exchange,
                                            Map<String, Object> invContext) {
     //CHECKSTYLE:ON    
-        URI uri = getCurrentURI();
-        Message m = createMessage(body, httpMethod, headers, uri, exchange, 
-                invContext, false);
-        
-        Map<String, Object> reqContext = getRequestContext(m);
-        reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
-        reqContext.put(REQUEST_CLASS, requestClass);
-        reqContext.put(REQUEST_TYPE, inGenericType);
-        reqContext.put(RESPONSE_CLASS, responseClass);
-        reqContext.put(RESPONSE_TYPE, outGenericType);
-        
-        if (body != null) {
-            m.getInterceptorChain().add(new BodyWriter());
-        }
-        setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
-        
+        Bus configuredBus = getConfiguration().getBus();
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(configuredBus);
+        ClassLoaderHolder origLoader = null;
         try {
-            m.getInterceptorChain().doIntercept(m);
-        } catch (Exception ex) {
-            m.setContent(Exception.class, ex);
-        }
-        try {
-            Object[] results = preProcessResult(m);
-            if (results != null && results.length == 1) {
-                // this can happen if a connection exception has occurred and
-                // failover feature used this client to invoke on a different address  
-                return (Response)results[0];
+            ClassLoader loader = configuredBus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-        } catch (Exception ex) {
-            throw ex instanceof ServerWebApplicationException 
-                ? (ServerWebApplicationException)ex 
-                : ex instanceof ClientWebApplicationException 
-                ? new ClientWebApplicationException(ex) : new RuntimeException(ex); 
-        }
-        
-        Response response = null;
-        Object entity = null;
-        try {
-            response = handleResponse(m, responseClass, outGenericType);
-            entity = response.getEntity();
-            return response;
-        } catch (RuntimeException ex) {
-            entity = ex;
-            throw ex;
+            URI uri = getCurrentURI();
+            Message m = createMessage(body, httpMethod, headers, uri, exchange, 
+                    invContext, false);
+            
+            Map<String, Object> reqContext = getRequestContext(m);
+            reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+            reqContext.put(REQUEST_CLASS, requestClass);
+            reqContext.put(REQUEST_TYPE, inGenericType);
+            reqContext.put(RESPONSE_CLASS, responseClass);
+            reqContext.put(RESPONSE_TYPE, outGenericType);
+            
+            if (body != null) {
+                m.getInterceptorChain().add(new BodyWriter());
+            }
+            setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
+            
+            try {
+                m.getInterceptorChain().doIntercept(m);
+            } catch (Exception ex) {
+                m.setContent(Exception.class, ex);
+            }
+            try {
+                Object[] results = preProcessResult(m);
+                if (results != null && results.length == 1) {
+                    // this can happen if a connection exception has occurred and
+                    // failover feature used this client to invoke on a different address  
+                    return (Response)results[0];
+                }
+            } catch (Exception ex) {
+                throw ex instanceof ServerWebApplicationException 
+                    ? (ServerWebApplicationException)ex 
+                    : ex instanceof ClientWebApplicationException 
+                    ? new ClientWebApplicationException(ex) : new RuntimeException(ex); 
+            }
+            
+            Response response = null;
+            Object entity = null;
+            try {
+                response = handleResponse(m, responseClass, outGenericType);
+                entity = response.getEntity();
+                return response;
+            } catch (RuntimeException ex) {
+                entity = ex;
+                throw ex;
+            } finally {
+                completeExchange(entity, m.getExchange(), false);
+            }
         } finally {
-            completeExchange(entity, m.getExchange(), false);
-        }
+            if (origLoader != null) {
+                origLoader.reset();
+            }
+            if (origBus != configuredBus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
+        }    
     }
     
     protected Response handleResponse(Message outMessage, Class<?> responseClass, Type genericType) {

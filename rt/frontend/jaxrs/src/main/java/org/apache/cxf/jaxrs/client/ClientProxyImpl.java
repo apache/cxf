@@ -44,6 +44,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -504,49 +508,63 @@ public class ClientProxyImpl extends AbstractClient implements
                                        int bodyIndex,
                                        Exchange exchange,
                                        Map<String, Object> invocationContext) throws Throwable {
-        
-        Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
-                                           exchange, invocationContext, true);
-        
-        outMessage.getExchange().setOneWay(ori.isOneway());
-        outMessage.setContent(OperationResourceInfo.class, ori);
-        setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
-        outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
-        
-        if (body != null) {
-            outMessage.put("BODY_INDEX", bodyIndex);
-            outMessage.getInterceptorChain().add(new BodyWriter());
-        }
-
-        Map<String, Object> reqContext = getRequestContext(outMessage);
-        reqContext.put(OperationResourceInfo.class.getName(), ori);
-        reqContext.put("BODY_INDEX", bodyIndex);
-        
-        // execute chain    
+        Bus configuredBus = getConfiguration().getBus();
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(configuredBus);
+        ClassLoaderHolder origLoader = null;
         try {
-            outMessage.getInterceptorChain().doIntercept(outMessage);
-        } catch (Exception ex) {
-            outMessage.setContent(Exception.class, ex);
-        }
-        
-        Object[] results = preProcessResult(outMessage);
-        if (results != null && results.length == 1) {
-            // this can happen if a connection exception has occurred and
-            // failover feature used this client to invoke on a different address  
-            return results[0];
-        }
-        
-        Object response = null;
-        try {
-            response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
-            return response;
-        } catch (Exception ex) {
-            response = ex;
-            throw ex;
+            ClassLoader loader = configuredBus.getExtension(ClassLoader.class);
+            if (loader != null) {
+                origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
+            }
+            Message outMessage = createMessage(body, ori.getHttpMethod(), headers, uri, 
+                                               exchange, invocationContext, true);
+            
+            outMessage.getExchange().setOneWay(ori.isOneway());
+            outMessage.setContent(OperationResourceInfo.class, ori);
+            setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
+            outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
+            
+            if (body != null) {
+                outMessage.put("BODY_INDEX", bodyIndex);
+                outMessage.getInterceptorChain().add(new BodyWriter());
+            }
+    
+            Map<String, Object> reqContext = getRequestContext(outMessage);
+            reqContext.put(OperationResourceInfo.class.getName(), ori);
+            reqContext.put("BODY_INDEX", bodyIndex);
+            
+            // execute chain    
+            try {
+                outMessage.getInterceptorChain().doIntercept(outMessage);
+            } catch (Exception ex) {
+                outMessage.setContent(Exception.class, ex);
+            }
+            
+            Object[] results = preProcessResult(outMessage);
+            if (results != null && results.length == 1) {
+                // this can happen if a connection exception has occurred and
+                // failover feature used this client to invoke on a different address  
+                return results[0];
+            }
+            
+            Object response = null;
+            try {
+                response = handleResponse(outMessage, ori.getClassResourceInfo().getServiceClass());
+                return response;
+            } catch (Exception ex) {
+                response = ex;
+                throw ex;
+            } finally {
+                completeExchange(response, outMessage.getExchange(), true);
+            }
         } finally {
-            completeExchange(response, outMessage.getExchange(), true);
+            if (origLoader != null) {
+                origLoader.reset();
+            }
+            if (origBus != configuredBus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
         }
-        
     }
     
     @Override
