@@ -102,7 +102,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private boolean dropRootElement;
     private boolean dropElementsInXmlStream = true;
     private boolean dropCollectionWrapperElement;
-    private boolean ignoreMixedContent; 
+    private boolean ignoreMixedContent;
+    private boolean ignoreEmptyArrayValues;
     private boolean writeXsiType = true;
     private boolean readXsiType = true;
     private boolean ignoreNamespaces;
@@ -110,7 +111,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private TypeConverter typeConverter;
     private boolean attributesToElements;
     private boolean writeNullAsString = true;
-    private boolean readNullAsEmptyString = true;
     
     @Override
     public void setAttributesToElements(boolean value) {
@@ -283,7 +283,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                                                   readXsiType, 
                                                   namespaceMap, 
                                                   primitiveArrayKeys,
-                                                  readNullAsEmptyString,
                                                   getDepthProperties());
         }
         reader = createTransformReaderIfNeeded(reader, is);
@@ -525,6 +524,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (!writeNullAsString) {
             config.setWriteNullAsString(writeNullAsString);
         }
+        if (ignoreEmptyArrayValues) {
+            config.setIgnoreEmptyArrayValues(ignoreEmptyArrayValues);
+        }
+        
         
         boolean dropRootInJsonStream = dropRootElement && !dropElementsInXmlStream;
         if (dropRootInJsonStream) {
@@ -609,8 +612,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         this.writeNullAsString = writeNullAsString;
     }
 
-    public void setReadNullAsEmptyString(boolean readNullAsString) {
-        this.readNullAsEmptyString = readNullAsString;
+    public void setIgnoreEmptyArrayValues(boolean ignoreEmptyArrayElements) {
+        this.ignoreEmptyArrayValues = ignoreEmptyArrayElements;
     }
 
 }
