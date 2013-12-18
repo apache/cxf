@@ -46,6 +46,8 @@ public class PolicyBPHandler implements NamespaceHandler {
             location = "schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd";
         } else if ("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd".equals(s)) {
             location = "schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+        } else if ("http://www.w3.org/2000/09/xmldsig#".equals(s)) {
+            location = "schemas/xmldsig-core-schema.xsd";
         } else if ("http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702".equals(s)) {
             location = "schemas/ws-securitypolicy-1.2.xsd";
         }
