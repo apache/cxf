@@ -77,6 +77,14 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         }
         conduits.clear();
     }
+    
+    protected void removeConduit(Conduit conduit) {
+        if (conduit != null) {
+            conduit.close();
+            conduits.remove(conduit);
+        }
+    }
+    
     /**
      * Mechanics to actually get the Conduit from the ConduitInitiator
      * if necessary.
