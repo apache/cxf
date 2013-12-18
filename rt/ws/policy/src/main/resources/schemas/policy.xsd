@@ -18,14 +18,12 @@
   under the License.
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:beans="http://www.springframework.org/schema/beans"
   xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="http://cxf.apache.org/policy" 
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
-  <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
 
   <xsd:annotation>
@@ -102,13 +100,20 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
+      <xsd:attribute name="bus" type="xsd:string">        
+        <xsd:annotation>
+          <xsd:documentation>
+              The name of the bus to apply these settings
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
     </xsd:complexType>
   </xsd:element>
  
   <xsd:element name="externalAttachment">
     <xsd:complexType>
       <xsd:complexContent>
-        <xsd:extension base="beans:identifiedType">
+        <xsd:extension base="cxf-beans:identifiedType">
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>        
           <xsd:attribute name="location" type="xsd:string" default="http://www.w3.org/2006/07/ws-policy">
             <xsd:annotation>
