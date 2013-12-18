@@ -36,14 +36,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
+import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
-import org.ops4j.pax.exam.MavenUtils;
+import org.apache.karaf.features.FeaturesService;
+import org.junit.Assert;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
-import org.ops4j.pax.exam.junit.ProbeBuilder;
+import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -53,8 +58,9 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
-import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
 /**
  * 
@@ -63,24 +69,13 @@ public class CXFOSGiTestSupport {
     static final Long COMMAND_TIMEOUT = 10000L;
     static final Long DEFAULT_TIMEOUT = 20000L;
     static final Long SERVICE_TIMEOUT = 30000L;
-    static final String GROUP_ID = "org.apache.karaf";
-    static final String ARTIFACT_ID = "apache-karaf";
-
-    static final String INSTANCE_STARTED = "Started";
-    static final String INSTANCE_STARTING = "Starting";
-
-    static final String CXF_FEATURE_URL 
-        = "mvn:org.apache.cxf.karaf/apache-cxf/" 
-          //+ org.apache.cxf.version.Version.getCurrentVersion()
-          + "2.6.0-SNAPSHOT"
-          + "/xml/features";
-
-    static final String DEBUG_OPTS = " --java-opts \"-Xdebug -Xnoagent -Djava.compiler=NONE" 
-        + " -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s\"";
 
     @Inject
     protected BundleContext bundleContext;
-
+    
+    @Inject
+    protected FeaturesService featureService;
+    
     ExecutorService executor = Executors.newCachedThreadPool();
 
     /**
@@ -90,22 +85,7 @@ public class CXFOSGiTestSupport {
     @ProbeBuilder
     public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
         probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE, "*,org.apache.felix.service.*;status=provisional");
-
         return probe;
-    }
-
-
-    /**
-     * Installs the CXF feature
-     */
-    protected void installCXF() {
-        System.err.println(executeCommand("features:addurl " + CXF_FEATURE_URL));
-        System.err.println(executeCommand("features:install cxf"));
-    }
-
-    protected void unInstallCXF() {
-        System.err.println(executeCommand("features:uninstall cxf"));
-        System.err.println(executeCommand("list"));
     }
 
     /**
@@ -113,12 +93,26 @@ public class CXFOSGiTestSupport {
      *
      * @return
      */
-    protected Option cxfDistributionConfiguration() {
-        return karafDistributionConfiguration().frameworkUrl(
-                maven().groupId(GROUP_ID).artifactId(ARTIFACT_ID).versionAsInProject().type("tar.gz"))
-                .karafVersion(MavenUtils.getArtifactVersion(GROUP_ID, ARTIFACT_ID))
+    protected Option cxfBaseConfig() {
+        MavenUrlReference karafUrl = maven()
+            .groupId("org.apache.karaf")
+            .artifactId("apache-karaf")
+            .versionAsInProject()
+            .type("tar.gz");
+        MavenUrlReference cxfUrl = maven()
+            .groupId("org.apache.cxf.karaf")
+            .artifactId("apache-cxf")
+            .versionAsInProject()
+            .type("xml")
+            .classifier("features");
+        return CoreOptions.composite(
+             karafDistributionConfiguration()
+                .frameworkUrl(karafUrl)
+                .karafVersion("2.3.3")
                 .name("Apache Karaf")
-                .unpackDirectory(new File("target/paxexam/"));
+                .unpackDirectory(new File("target/paxexam/")),
+             features(cxfUrl, "cxf-core")
+        );
     }
 
     /**
@@ -251,6 +245,9 @@ public class CXFOSGiTestSupport {
         return getOsgiService(type, null, SERVICE_TIMEOUT);
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     protected <T> T getOsgiService(Class<T> type, String filter, long timeout) {
         ServiceTracker tracker = null;
         try {
@@ -271,7 +268,6 @@ public class CXFOSGiTestSupport {
             // This is buggy, as the service reference may change i think
             Object svc = type.cast(tracker.waitForService(timeout));
             if (svc == null) {
-                @SuppressWarnings("unchecked")
                 Dictionary<String, String> dic = bundleContext.getBundle().getHeaders();
                 System.err.println("Test bundle headers: " + explode(dic));
 
@@ -292,7 +288,7 @@ public class CXFOSGiTestSupport {
             throw new RuntimeException(e);
         }
     }
-
+    
     /**
      * Finds a free port starting from the give port numner.
      *
@@ -342,7 +338,38 @@ public class CXFOSGiTestSupport {
     /**
      * Provides an iterable collection of references, even if the original array is null
      */
+    @SuppressWarnings("rawtypes")
     private static Collection<ServiceReference> asCollection(ServiceReference[] references) {
         return references != null ? Arrays.asList(references) : Collections.<ServiceReference>emptyList();
+    }
+    
+    protected void assertBundleInstalled(String name) {
+        Bundle bundle = findBundleByName(name);
+        Assert.assertNotNull("Bundle " + name + " should be installed", bundle);
+        Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
+    }
+    
+    protected Bundle findBundleByName(String symbolicName) {
+        for (Bundle bundle : bundleContext.getBundles()) {
+            if (bundle.getSymbolicName().equals(symbolicName)) {
+                return bundle;
+            }
+        }
+        return null;
+    }
+    
+    public void assertServicePublished(String filter) {
+        try {
+            Filter serviceFilter = bundleContext.createFilter(filter);
+            ServiceTracker<?, ?> tracker = new ServiceTracker<Object, Object>(bundleContext, serviceFilter, null);
+            tracker.waitForService(SERVICE_TIMEOUT);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected exception occured" , e);
+        }
+    }
+    
+    public void assertBlueprintNameSpacePublished(String namespace) {
+        assertServicePublished(String.format("(&(objectClass=%s)(osgi.service.blueprint.namespace='%s'))", 
+                                             NamespaceHandler.class.getName(), namespace));
     }
 }

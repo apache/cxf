@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <groupId>org.apache.cxf.osgi.itests</groupId>
@@ -29,50 +29,99 @@
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
     <properties>
-        <pax.exam.version>2.3.0.M1</pax.exam.version>
-        <pax.exam.karaf.version>0.4.0</pax.exam.karaf.version>
+        <pax.exam.version>3.4.0</pax.exam.version>
         <pax.url.version>1.2.8</pax.url.version>
         <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-mvn</artifactId>
-            <version>${pax.url.version}</version>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.cxf.karaf</groupId>
+            <artifactId>apache-cxf</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        
+        <dependency>
+        	<groupId>org.apache.karaf</groupId>
+        	<artifactId>apache-karaf</artifactId>
+        	<version>${cxf.karaf.version}</version>
+        	<type>tar.gz</type>
         </dependency>
         <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <version>${pax.url.version}</version>
+        	<groupId>org.apache.karaf.features</groupId>
+        	<artifactId>org.apache.karaf.features.core</artifactId>
+        	<version>${cxf.karaf.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.karaf</groupId>
-            <artifactId>apache-karaf</artifactId>
-            <version>${cxf.karaf.version}</version>
-            <type>tar.gz</type>
+        	<groupId>org.apache.karaf.shell</groupId>
+        	<artifactId>org.apache.karaf.shell.console</artifactId>
+        	<version>${cxf.karaf.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.openengsb.labs.paxexam.karaf</groupId>
-            <artifactId>paxexam-karaf-container</artifactId>
-            <version>${pax.exam.karaf.version}</version>
-            <scope>test</scope>
+        	<groupId>org.osgi</groupId>
+        	<artifactId>org.osgi.compendium</artifactId>
         </dependency>
+        
         <dependency>
-            <groupId>org.ops4j.pax.exam</groupId>
-            <artifactId>pax-exam-junit4</artifactId>
-            <version>${pax.exam.version}</version>
-            <scope>test</scope>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-atinject_1.0_spec</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${pax.exam.version}</version>
+            <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam</artifactId>
+            <version>${pax.exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-karaf</artifactId>
+            <version>${pax.exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${pax.exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>1.2.8</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -80,37 +129,12 @@
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
-                <version>1.2</version>
                 <executions>
                     <execution>
                         <id>generate-depends-file</id>
                         <goals>
                             <goal>generate-depends-file</goal>
                         </goals>
-                        <phase>compile</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-unix</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.karaf</groupId>
-                                    <artifactId>apache-karaf</artifactId>
-                                    <type>tar.gz</type>
-                                    <outputDirectory>target/karaf-base</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
