@@ -129,7 +129,7 @@ public class DOM4JProviderTest extends Assert {
         org.dom4j.Document dom = readXML(MediaType.APPLICATION_XML_TYPE, "<root><a>1</a></root>");
         DOM4JProvider p = new DOM4JProvider();
         
-        ProviderFactory factory = ServerProviderFactory.getInstance();
+        ProviderFactory factory = ProviderFactory.getInstance();
         JSONProvider<Object> provider = new JSONProvider<Object>();
         provider.setSerializeAsArray(true);
         provider.setDropRootElement(true);
