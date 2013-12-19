@@ -33,15 +33,18 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class BasicFeatureTest extends CXFOSGiTestSupport {
+public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
     @Test
-    public void testCXFFeaturesModule() throws Exception {
+    public void test() throws Exception {
         assertBundleStarted("org.apache.cxf.cxf-core");
-        assertBlueprintNameSpacePublished("http://cxf.apache.org/blueprint/core", 1000);
-        assertBlueprintNameSpacePublished("http://cxf.apache.org/configuration/beans", 1000);
-        assertBlueprintNameSpacePublished("http://cxf.apache.org/configuration/parameterized-types", 1000);
-        assertBlueprintNameSpacePublished("http://cxf.apache.org/configuration/security", 1000);
-        assertBlueprintNameSpacePublished("http://schemas.xmlsoap.org/wsdl/", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/core", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/beans", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/parameterized-types", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/configuration/security", 1000);
+        assertBlueprintNamespacePublished("http://schemas.xmlsoap.org/wsdl/", 1000);
+        
+        assertBundleStarted("org.apache.cxf.cxf-rt-frontend-jaxws");
+        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/jaxws", 1000);
     }
 
     @Configuration

@@ -32,9 +32,15 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class NoAriesBlueprintTest extends OSGiTestSupport {
+    /**
+     * Make sure cxf bundles start up without aries blueprint
+     * 
+     * @throws Exception
+     */
     @Test
-    public void testCXFCoreBundle() throws Exception {
+    public void testCXFBundles() throws Exception {
         assertBundleStarted("org.apache.cxf.cxf-core");
+        assertBundleStarted("org.apache.cxf.cxf-rt-frontend-jaxws");
     }
 
     @Configuration
@@ -42,6 +48,15 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
         return new Option[]{
                 mavenBundle().groupId("org.apache.ws.xmlschema").artifactId("xmlschema-core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf").artifactId("cxf-core").versionAsInProject(),
+                mavenBundle().groupId("org.apache.servicemix.bundles")
+                    .artifactId("org.apache.servicemix.bundles.wsdl4j").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-wsdl").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-databinding-jaxb").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-bindings-xml").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-bindings-soap").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-frontend-simple").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-transports-http").versionAsInProject(),
+                mavenBundle().groupId("org.apache.cxf").artifactId("cxf-rt-frontend-jaxws").versionAsInProject(),
                 junitBundles()
         };
     }

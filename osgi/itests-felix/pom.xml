@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.apache.cxf.osgi.itests</groupId>
     <artifactId>org.apache.cxf.osgi.itests-felix</artifactId>
-    <name>Apache CXF :: OSGi :: Integration Tests</name>
+    <name>Apache CXF :: OSGi :: Integration Tests pure felix</name>
     <packaging>jar</packaging>
     <properties>
         <pax.exam.version>3.4.0</pax.exam.version>
@@ -41,6 +41,46 @@
     	<dependency>
     		<groupId>org.apache.ws.xmlschema</groupId>
     		<artifactId>xmlschema-core</artifactId>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.apache.servicemix.bundles</groupId>
+    		<artifactId>org.apache.servicemix.bundles.wsdl4j</artifactId>
+    		<version>${cxf.wsdl4j.bundle.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-wsdl</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+     	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-frontend-simple</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-databinding-jaxb</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-bindings-xml</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-bindings-soap</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-transports-http</artifactId>
+    		<version>${project.version}</version>
+    	</dependency>
+     	<dependency>
+    		<groupId>org.apache.cxf</groupId>
+    		<artifactId>cxf-rt-frontend-jaxws</artifactId>
+    		<version>${project.version}</version>
     	</dependency>
     	
     	<dependency>

@@ -110,7 +110,7 @@ public class CXFOSGiTestSupport {
                 .karafVersion("2.3.3")
                 .name("Apache Karaf")
                 .unpackDirectory(new File("target/paxexam/")),
-             features(cxfUrl, "cxf-core")
+             features(cxfUrl, "cxf-core", "cxf-jaxws")
         );
     }
 
@@ -375,7 +375,7 @@ public class CXFOSGiTestSupport {
         }
     }
     
-    public void assertBlueprintNameSpacePublished(String namespace, int timeout) {
+    public void assertBlueprintNamespacePublished(String namespace, int timeout) {
         assertServicePublished(String.format("(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)"
                                              + "(osgi.service.blueprint.namespace=%s))", namespace), timeout);
     }
