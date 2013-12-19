@@ -47,6 +47,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
@@ -61,6 +62,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    @Ignore
     public void testRetrieveBookCustomMethodAsyncSync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
@@ -71,6 +73,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    @Ignore
     public void testDeleteWithBody() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/deletebody";
         WebClient wc = WebClient.create(address);
@@ -81,6 +84,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    @Ignore
     public void testRetrieveBookCustomMethodAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
