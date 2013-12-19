@@ -56,7 +56,7 @@
             com.sun.xml.bind.api.impl;resolution:=optional,
             com.sun.xml.internal.bind.api;resolution:=optional,
             com.sun.xml.internal.bind.api.impl;resolution:=optional,
-            org.apache.aries*;version="${cxf.aries.version.range}"
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*

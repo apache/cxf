@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.features.FeaturesService;
@@ -343,7 +342,7 @@ public class CXFOSGiTestSupport {
         return references != null ? Arrays.asList(references) : Collections.<ServiceReference>emptyList();
     }
     
-    protected void assertBundleInstalled(String name) {
+    protected void assertBundleStarted(String name) {
         Bundle bundle = findBundleByName(name);
         Assert.assertNotNull("Bundle " + name + " should be installed", bundle);
         Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
@@ -358,18 +357,26 @@ public class CXFOSGiTestSupport {
         return null;
     }
     
-    public void assertServicePublished(String filter) {
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    public void assertServicePublished(String filter, int timeout) {
         try {
             Filter serviceFilter = bundleContext.createFilter(filter);
-            ServiceTracker<?, ?> tracker = new ServiceTracker<Object, Object>(bundleContext, serviceFilter, null);
-            tracker.waitForService(SERVICE_TIMEOUT);
+            ServiceTracker tracker = new ServiceTracker(bundleContext, serviceFilter, null);
+            tracker.open();
+            Object service = tracker.waitForService(timeout);
+            tracker.close();
+            if (service == null) {
+                throw new IllegalStateException("Expected service with filter " + filter + " was not found");
+            }
         } catch (Exception e) {
             throw new RuntimeException("Unexpected exception occured" , e);
         }
     }
     
-    public void assertBlueprintNameSpacePublished(String namespace) {
-        assertServicePublished(String.format("(&(objectClass=%s)(osgi.service.blueprint.namespace='%s'))", 
-                                             NamespaceHandler.class.getName(), namespace));
+    public void assertBlueprintNameSpacePublished(String namespace, int timeout) {
+        assertServicePublished(String.format("(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)"
+                                             + "(osgi.service.blueprint.namespace=%s))", namespace), timeout);
     }
 }
