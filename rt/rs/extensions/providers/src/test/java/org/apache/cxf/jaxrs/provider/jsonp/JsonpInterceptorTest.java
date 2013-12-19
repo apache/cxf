@@ -53,7 +53,7 @@ public class JsonpInterceptorTest extends Assert {
         Message message = new MessageImpl();
         message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         message.setExchange(new ExchangeImpl());
-        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_KEY + "=" + "myCallback");
+        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "myCallback");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         message.setContent(OutputStream.class, bos);
         
