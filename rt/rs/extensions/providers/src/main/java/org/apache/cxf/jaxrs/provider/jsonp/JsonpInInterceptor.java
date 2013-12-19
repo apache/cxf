@@ -19,10 +19,9 @@
 
 package org.apache.cxf.jaxrs.provider.jsonp;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -63,8 +62,8 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     protected String getCallbackValue(Message message) {
-        HttpServletRequest request = (HttpServletRequest) message.get("HTTP.REQUEST");
-        String callback = request.getParameter(callbackParam);
+        String theQuery = (String)message.get(Message.QUERY_STRING);
+        String callback = JAXRSUtils.getStructuredParams(theQuery, "&", false, false).getFirst(CALLBACK_KEY);
         if (StringUtils.isEmpty(callback)) {
             String httpAcceptType = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
             if (httpAcceptType != null && mediaType.equals(httpAcceptType)) {
