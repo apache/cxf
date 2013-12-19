@@ -199,6 +199,20 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     @Test
+    public void testQueryCollection2() throws Exception {
+        List<Book> books = 
+            queryBooks("reviews.book.id==10");
+        assertEquals(1, books.size());
+    }
+    
+    @Test
+    public void testQueryCollection3() throws Exception {
+        List<Book> books = 
+            queryBooks("reviews.book.ownerInfo.name==Barry");
+        assertEquals(1, books.size());
+    }
+    
+    @Test
     public void testQueryElementCollection() throws Exception {
         List<Book> books = 
             queryBooks("authors==John");
