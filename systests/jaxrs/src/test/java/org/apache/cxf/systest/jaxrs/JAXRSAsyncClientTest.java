@@ -46,6 +46,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -59,6 +60,14 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerAsyncClient.class, true));
         createStaticBus();
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        String property = System.getProperty("test.delay");
+        if (property != null) {
+            Thread.sleep(Long.valueOf(property));
+        }
     }
     
     @Test

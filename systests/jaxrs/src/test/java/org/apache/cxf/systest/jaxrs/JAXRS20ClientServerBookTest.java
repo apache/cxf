@@ -57,6 +57,7 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -67,6 +68,14 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer20.class, true));
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        String property = System.getProperty("test.delay");
+        if (property != null) {
+            Thread.sleep(Long.valueOf(property));
+        }
     }
     
     @Test
