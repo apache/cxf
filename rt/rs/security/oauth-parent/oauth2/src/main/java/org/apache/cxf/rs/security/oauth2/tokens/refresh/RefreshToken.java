@@ -40,7 +40,7 @@ public class RefreshToken extends ServerAccessToken {
               OAuthConstants.REFRESH_TOKEN_TYPE, 
               OAuthUtils.generateRandomTokenKey(), 
               lifetime, 
-              System.currentTimeMillis() / 1000);
+              OAuthUtils.getIssuedAt());
     }
     
     public RefreshToken(Client client, 

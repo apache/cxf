@@ -26,8 +26,6 @@ public final class OAuthConstants {
     // Common OAuth2 constants
     public static final String CLIENT_ID = "client_id";
     public static final String CLIENT_SECRET = "client_secret";
-    public static final String TEMP_CLIENT_SECRET = "tcs";
-    public static final String TEMP_CLIENT_SECRET_HASH = "tcsh";
     public static final String CLIENT_AUDIENCE = "audience";
     
     public static final String REDIRECT_URI = "redirect_uri";
@@ -53,6 +51,11 @@ public final class OAuthConstants {
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "bearer";
     public static final String MAC_TOKEN_TYPE = "mac";
+    
+    // http://datatracker.ietf.org/doc/draft-sakimura-oauth-tcse
+    public static final String AUTHORIZATION_CODE_VERIFIER = "code_verifier";
+    public static final String AUTHORIZATION_CODE_CHALLENGE = "code_challenge";
+    
     // CXF-specific
     public static final String REFRESH_TOKEN_TYPE = "refresh";
         

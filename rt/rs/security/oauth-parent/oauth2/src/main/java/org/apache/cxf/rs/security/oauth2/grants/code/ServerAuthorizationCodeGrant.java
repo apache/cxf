@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +29,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * The Authorization Code Grant representation visible to the server
  */
-public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant implements Serializable {
+public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private static final long serialVersionUID = -5004608901535459036L;
     
     private long issuedAt;
@@ -39,12 +38,12 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant impleme
     private List<String> approvedScopes = Collections.emptyList();
     private UserSubject subject;
     private String audience;
-    private String tempClientSecretHash;
+    private String clientCodeVerifier;
     
     public ServerAuthorizationCodeGrant(Client client, 
                                         long lifetime) {
         this(client, OAuthUtils.generateRandomTokenKey(), lifetime,
-             System.currentTimeMillis() / 1000);
+             OAuthUtils.getIssuedAt());
     }
     
     public ServerAuthorizationCodeGrant(Client client, 
@@ -125,11 +124,11 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant impleme
         this.audience = audience;
     }
 
-    public String getTempClientSecretHash() {
-        return tempClientSecretHash;
+    public String getClientCodeVerifier() {
+        return clientCodeVerifier;
     }
 
-    public void setTempClientSecretHash(String tempClientSecretHash) {
-        this.tempClientSecretHash = tempClientSecretHash;
+    public void setClientCodeVerifier(String clientCodeVerifier) {
+        this.clientCodeVerifier = clientCodeVerifier;
     }
 }

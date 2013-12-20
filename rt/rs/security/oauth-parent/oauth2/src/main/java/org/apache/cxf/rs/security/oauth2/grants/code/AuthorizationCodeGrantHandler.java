@@ -74,10 +74,10 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         
-        String tempClientSecretHash = grant.getTempClientSecretHash();
-        if (tempClientSecretHash != null) {
-            String tempClientSecret = params.getFirst(OAuthConstants.TEMP_CLIENT_SECRET);
-            if (!compareTcshWithTch(tempClientSecretHash, tempClientSecret)) {
+        String clientCodeVerifier = grant.getClientCodeVerifier();
+        if (clientCodeVerifier != null) {
+            String clientCodeChallenge = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
+            if (!compareCodeVerifierWithChallenge(clientCodeVerifier, clientCodeChallenge)) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
         }
@@ -88,12 +88,12 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                                    grant.getAudience());
     }
     
-    private boolean compareTcshWithTch(String tempClientSecretHash, String tempClientSecret) {
-        if (tempClientSecret == null) {
+    private boolean compareCodeVerifierWithChallenge(String clientCodeVerifier, String clientCodeChallenge) {
+        if (clientCodeChallenge == null) {
             return false;
         }
         MessageDigestGenerator mdg = new MessageDigestGenerator();
-        byte[] digest = mdg.createDigest(tempClientSecret, "SHA-256");
+        byte[] digest = mdg.createDigest(clientCodeVerifier, "SHA-256");
         int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
         
         StringWriter stringWriter = new StringWriter();
@@ -103,7 +103,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException("server_error", e);
         }
         String expectedHash = stringWriter.toString();
-        return tempClientSecretHash.equals(expectedHash);
+        return clientCodeChallenge.equals(expectedHash);
         
     }
 }

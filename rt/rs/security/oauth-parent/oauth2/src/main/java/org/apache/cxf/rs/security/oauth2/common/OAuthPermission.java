@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class OAuthPermission extends Permission {
+    private static final long serialVersionUID = -6486616235830491290L;
     private List<String> httpVerbs = new LinkedList<String>();
     private List<String> uris = new LinkedList<String>();
     

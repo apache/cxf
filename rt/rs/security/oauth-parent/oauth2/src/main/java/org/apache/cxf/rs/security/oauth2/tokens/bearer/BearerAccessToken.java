@@ -35,7 +35,7 @@ public class BearerAccessToken extends ServerAccessToken {
               OAuthConstants.BEARER_TOKEN_TYPE, 
               OAuthUtils.generateRandomTokenKey(), 
               lifetime, 
-              System.currentTimeMillis() / 1000);
+              OAuthUtils.getIssuedAt());
     }
     public BearerAccessToken(Client client, 
                              String tokenKey,

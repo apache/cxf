@@ -23,6 +23,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class ClientCredentialsGrant extends AbstractGrant {
     
+    private static final long serialVersionUID = 5586488165697954347L;
+
     public ClientCredentialsGrant() {
         this(null);
     }

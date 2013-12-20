@@ -72,7 +72,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         codeReg.setApprovedScope(approvedScope);
         codeReg.setSubject(userSubject);
         codeReg.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
-        codeReg.setTempClientSecretHash(params.getFirst(OAuthConstants.TEMP_CLIENT_SECRET_HASH));
+        codeReg.setClientCodeVerifier(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
         
         ServerAuthorizationCodeGrant grant = null;
         try {

@@ -23,6 +23,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 
 public class Saml2BearerGrant extends AbstractSaml2BearerGrant {
+    private static final long serialVersionUID = -7296527609343431294L;
+
     public Saml2BearerGrant(String assertion) {
         this(assertion, false);
     }

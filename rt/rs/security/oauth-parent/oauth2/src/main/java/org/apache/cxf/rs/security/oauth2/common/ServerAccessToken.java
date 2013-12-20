@@ -21,6 +21,8 @@ package org.apache.cxf.rs.security.oauth2.common;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+
 /**
  * Server Access Token representation
  */
@@ -36,8 +38,15 @@ public abstract class ServerAccessToken extends AccessToken {
     protected ServerAccessToken(Client client, 
                                         String tokenType,
                                         String tokenKey,
-                                        long expiresIn, 
-                                        long issuedAt) {
+                                        long expiresIn) {
+        this(client, tokenType, tokenKey, expiresIn, OAuthUtils.getIssuedAt());
+    }
+    
+    protected ServerAccessToken(Client client, 
+                                String tokenType,
+                                String tokenKey,
+                                long expiresIn, 
+                                long issuedAt) {
         super(tokenType, tokenKey, expiresIn, issuedAt);
         this.client = client;
     }

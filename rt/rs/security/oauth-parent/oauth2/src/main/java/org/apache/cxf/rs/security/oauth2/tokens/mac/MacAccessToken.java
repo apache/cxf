@@ -46,7 +46,7 @@ public class MacAccessToken extends ServerAccessToken {
              macAlgo,
              OAuthUtils.generateRandomTokenKey(), 
              lifetime, 
-             System.currentTimeMillis() / 1000);
+             OAuthUtils.getIssuedAt());
     }
     public MacAccessToken(Client client,
                           HmacAlgorithm algo,

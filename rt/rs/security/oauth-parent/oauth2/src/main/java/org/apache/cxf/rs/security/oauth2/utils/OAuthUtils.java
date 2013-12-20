@@ -105,6 +105,10 @@ public final class OAuthUtils {
         return generateRandomTokenKey(null);
     }
     
+    public static long getIssuedAt() {
+        return System.currentTimeMillis() / 1000;
+    }
+    
     public static String generateRandomTokenKey(String digestAlgo) throws OAuthServiceException {
         try {
             byte[] bytes = UUID.randomUUID().toString().getBytes("UTF-8");
