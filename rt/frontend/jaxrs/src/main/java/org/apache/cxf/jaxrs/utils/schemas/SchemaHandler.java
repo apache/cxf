@@ -27,7 +27,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -41,15 +40,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class SchemaHandler {
 
     static final String DEFAULT_CATALOG_LOCATION = "classpath:META-INF/jax-rs-catalog.xml";
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(SchemaHandler.class);
     
     private Schema schema;
     private Bus bus;
@@ -90,7 +86,7 @@ public class SchemaHandler {
             for (String loc : locations) {
                 URL url = ResourceUtils.getResourceURL(loc, bus);
                 if (url == null) {
-                    return null;
+                    throw new IllegalArgumentException("Cannot find XML schema location: " + loc);
                 }
                 Reader r = new BufferedReader(
                                new InputStreamReader(url.openStream(), "UTF-8"));
@@ -134,13 +130,13 @@ public class SchemaHandler {
                             
                         });
                     } catch (IOException ex) {
-                        LOG.warning("Catalog " + catalogLocation + " can not be loaded");
+                        throw new IllegalArgumentException("Catalog " + catalogLocation + " can not be loaded", ex);
                     }
                 }
             }
             s = factory.newSchema(sources.toArray(new Source[sources.size()]));
         } catch (Exception ex) {
-            LOG.warning("Validation will be disabled, failed to create schema : " + ex.getMessage());
+            throw new IllegalArgumentException("Failed to load XML schema : " + ex.getMessage(), ex);
         }
         return s;
         
