@@ -162,6 +162,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             LOG.log(Level.FINE, e.getMessage(), e);
             throw new Fault(e);
         }
+        
+        policyAsserted(SP12Constants.SIGNED_PARTS);
+        policyAsserted(SP12Constants.ENCRYPTED_PARTS);
     }
     
     /**
