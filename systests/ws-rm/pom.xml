@@ -87,6 +87,12 @@
             <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--  rt-ws-security dependency is required prior to 3.0.0 -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
