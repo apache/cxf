@@ -1,71 +1,3 @@
-<<<<<<< HEAD
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<wsp:Policy wsu:Id="AlternativesPolicy" xmlns:wsp="http://www.w3.org/ns/ws-policy"
-	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-	xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-	<wsp:ExactlyOne>
-		<wsp:All>
-			<sp:TransportBinding>
-				<wsp:Policy>
-					<sp:TransportToken>
-						<wsp:Policy>
-							<sp:HttpsToken>
-								<wsp:Policy>
-									<sp:RequireClientCertificate />
-								</wsp:Policy>
-							</sp:HttpsToken>
-						</wsp:Policy>
-					</sp:TransportToken>
-					<sp:AlgorithmSuite>
-						<wsp:Policy>
-							<sp:Basic256 />
-						</wsp:Policy>
-					</sp:AlgorithmSuite>
-				</wsp:Policy>
-			</sp:TransportBinding>
-
-			<sp:SupportingTokens>
-				<wsp:Policy>
-					<sp:UsernameToken>
-						<wsp:Policy>
-							<sp:NoPassword />
-						</wsp:Policy>
-					</sp:UsernameToken>
-				</wsp:Policy>
-			</sp:SupportingTokens>
-		</wsp:All>
-
-		<wsp:All>
-			<sp:TransportBinding>
-				<wsp:Policy>
-					<sp:TransportToken>
-						<wsp:Policy>
-							<sp:HttpsToken>
-								<wsp:Policy />
-							</sp:HttpsToken>
-						</wsp:Policy>
-					</sp:TransportToken>
-					<sp:AlgorithmSuite>
-						<wsp:Policy>
-							<sp:Basic256 />
-						</wsp:Policy>
-					</sp:AlgorithmSuite>
-				</wsp:Policy>
-			</sp:TransportBinding>
-
-			<sp:SupportingTokens>
-				<wsp:Policy>
-					<sp:UsernameToken>
-						<wsp:Policy>
-							<sp:WssUsernameToken11 />
-						</wsp:Policy>
-					</sp:UsernameToken>
-				</wsp:Policy>
-			</sp:SupportingTokens>
-		</wsp:All>
-	</wsp:ExactlyOne>
-=======
 <?xml version="1.0" encoding="UTF-8"?>
 <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" wsu:Id="AlternativesPolicy">
     <wsp:ExactlyOne>
@@ -126,5 +58,4 @@
             </sp:SupportingTokens>
         </wsp:All>
     </wsp:ExactlyOne>
->>>>>>> f90a533... Fixing policies to add a Inclusion Type
 </wsp:Policy>
