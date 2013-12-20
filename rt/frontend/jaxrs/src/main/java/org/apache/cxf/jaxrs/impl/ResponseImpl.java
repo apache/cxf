@@ -371,13 +371,10 @@ public final class ResponseImpl extends Response {
                                                                        entityStream, 
                                                                        mediaType, 
                                                                        responseMessage);
-                if (!entityBufferred && responseStreamCanBeClosed(cls)) {
-                    InputStream.class.cast(entity).close();
-                    entity = null;
-                } 
-                
+                autoClose(cls, false); 
                 return castLastEntity();
             } catch (Exception ex) {
+                autoClose(cls, true);
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, mediaType, ex);
             }
         } else if (entity != null && cls.isAssignableFrom(entity.getClass())) {
@@ -436,10 +433,11 @@ public final class ResponseImpl extends Response {
         throw new ResponseProcessingException(this, errorMessage, cause);
     }
     
-    protected boolean responseStreamCanBeClosed(Class<?> cls) {
-        return cls != InputStream.class
-            && entity instanceof InputStream
-            && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
+    protected void autoClose(Class<?> cls, boolean exception) {
+        if (!entityBufferred && cls != InputStream.class
+            && (exception || MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close")))) {
+            close();
+        }
     }
     
     public boolean bufferEntity() throws ProcessingException {
