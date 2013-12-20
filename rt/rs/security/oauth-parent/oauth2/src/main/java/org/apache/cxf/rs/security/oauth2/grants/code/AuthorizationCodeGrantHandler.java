@@ -19,17 +19,12 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.io.StringWriter;
-
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
-import org.apache.cxf.rs.security.oauth2.utils.MessageDigestGenerator;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -38,6 +33,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * Authorization Code Grant Handler
  */
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
+    
+    private CodeVerifierTransformer codeVerifierTransformer;
     
     public AuthorizationCodeGrantHandler() {
         super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
@@ -92,18 +89,13 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         if (clientCodeChallenge == null) {
             return false;
         }
-        MessageDigestGenerator mdg = new MessageDigestGenerator();
-        byte[] digest = mdg.createDigest(clientCodeVerifier, "SHA-256");
-        int length = digest.length > 128 / 8 ? 128 / 8 : digest.length;
+        String transformedCodeVerifier = codeVerifierTransformer == null 
+            ? clientCodeVerifier : codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier); 
+        return clientCodeChallenge.equals(transformedCodeVerifier);
         
-        StringWriter stringWriter = new StringWriter();
-        try {
-            Base64UrlUtility.encode(digest, 0, length, stringWriter);
-        } catch (Base64Exception e) {
-            throw new OAuthServiceException("server_error", e);
-        }
-        String expectedHash = stringWriter.toString();
-        return clientCodeChallenge.equals(expectedHash);
-        
+    }
+
+    public void setCodeVerifierTransformer(CodeVerifierTransformer codeVerifier) {
+        this.codeVerifierTransformer = codeVerifier;
     }
 }
