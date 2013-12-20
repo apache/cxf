@@ -57,6 +57,11 @@
     </service>
     <service ref="PolicyBPHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
         <service-properties>
+            <entry key="osgi.service.blueprint.namespace" value="http://www.w3.org/2000/09/xmldsig#"/>
+        </service-properties>
+    </service>
+    <service ref="PolicyBPHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+        <service-properties>
             <entry key="osgi.service.blueprint.namespace" value="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"/>
         </service-properties>
     </service>
