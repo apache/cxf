@@ -119,6 +119,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof NotFoundException);
         }
+        wc.close();
     }
     
     @Test
@@ -135,6 +136,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof ProcessingException);
         }
+        wc.close();
     }
     
     @Test
@@ -151,6 +153,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof ResponseProcessingException);
         }
+        wc.close();
     }
     
     @Test
@@ -166,6 +169,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getCause() instanceof NotFoundException);
             assertTrue(ex.getCause() == holder.value);
         }
+        wc.close();
     }
     
     

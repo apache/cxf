@@ -118,6 +118,9 @@ public class LocalClientState implements ClientState {
     
     public void reset() {
         requestHeaders.clear();
+        if (response != null) {
+            response.close();
+        }
         response = null;
         currentBuilder = new UriBuilderImpl().uri(baseURI);
         templates = null;
