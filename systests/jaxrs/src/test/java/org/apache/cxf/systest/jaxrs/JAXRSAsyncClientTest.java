@@ -77,6 +77,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
         Book book = wc.invoke("RETRIEVE", new Book("Retrieve", 123L), Book.class);
         assertEquals("Retrieve", book.getName());
+        wc.close();
     }
     
     @Test
@@ -87,6 +88,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
         Book book = wc.invoke("DELETE", new Book("Delete", 123L), Book.class);
         assertEquals("Delete", book.getName());
+        wc.close();
     }
     
     @Test
@@ -97,6 +99,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         Future<Book> book = wc.async().method("RETRIEVE", Entity.xml(new Book("Retrieve", 123L)), 
                                               Book.class);
         assertEquals("Retrieve", book.get().getName());
+        wc.close();
     }
     
     @Test
