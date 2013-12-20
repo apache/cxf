@@ -35,6 +35,8 @@ public class PolicyBPHandlerTest extends Assert {
         assertNotNull(handler.getSchemaLocation("http://www.w3.org/ns/ws-policy"));
         assertNotNull(handler.getSchemaLocation("http://www.w3.org/2006/07/ws-policy"));
         assertNotNull(handler.getSchemaLocation("http://schemas.xmlsoap.org/ws/2004/09/policy"));
+        
+        assertNotNull(handler.getSchemaLocation("http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"));
     }
 
 }
