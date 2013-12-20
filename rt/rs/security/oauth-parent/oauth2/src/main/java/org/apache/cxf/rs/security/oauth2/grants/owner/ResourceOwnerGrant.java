@@ -24,6 +24,7 @@ import org.apache.cxf.rs.security.oauth2.grants.AbstractGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class ResourceOwnerGrant extends AbstractGrant {
+    private static final long serialVersionUID = -1673025972824906386L;
     private String ownerName;
     private String ownerPassword;
     
