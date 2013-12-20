@@ -238,14 +238,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-<!--
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-hc</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
--->
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
