@@ -59,7 +59,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -159,14 +158,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testGetBookAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBookAsync(address, false);
     }
     
     @Test
-    @Ignore
     public void testGetBookAsyncNoCallback() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         WebClient wc = createWebClient(address);
@@ -177,14 +174,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testGetBookAsyncResponse() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBookAsyncResponse(address, false);
     }
     
     @Test
-    @Ignore
     public void testGetBookAsyncInvoker() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBookAsync(address, true);
@@ -231,14 +226,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         doTestGetBook(address, false);
     }
     @Test
-    @Ignore
     public void testGetBookWrongPathAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/wrongpath";
         doTestGetBookAsync(address, false);
     }
     
     @Test
-    @Ignore
     public void testPostCollectionGenericEntity() throws Exception {
         
         String endpointAddress =
@@ -259,7 +252,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testPostCollectionGenericEntityAsEntity() throws Exception {
         
         String endpointAddress =
@@ -315,7 +307,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testPostGetCollectionGenericEntityAndType() throws Exception {
         
         String endpointAddress =
@@ -345,7 +336,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testPostGetCollectionGenericEntityAndType2() throws Exception {
         
         String endpointAddress =
@@ -573,7 +563,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testPostBookAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple/async";
         WebClient wc = createWebClientPost(address);
@@ -583,7 +572,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
-    @Ignore
     public void testPostBookAsyncHandler() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple/async";
         doTestPostBookAsyncHandler(address);
