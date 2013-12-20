@@ -22,7 +22,7 @@
             </sp:TransportBinding>
             <sp:SupportingTokens>
                 <wsp:Policy>
-                    <sp:UsernameToken>
+                    <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                         <wsp:Policy>
                             <sp:NoPassword/>
                         </wsp:Policy>
@@ -49,7 +49,7 @@
             </sp:TransportBinding>
             <sp:SupportingTokens>
                 <wsp:Policy>
-                    <sp:UsernameToken>
+                    <sp:UsernameToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                         <wsp:Policy>
                             <sp:WssUsernameToken11/>
                         </wsp:Policy>
