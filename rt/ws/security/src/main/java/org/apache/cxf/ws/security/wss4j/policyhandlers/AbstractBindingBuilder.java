@@ -112,7 +112,6 @@ import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
-import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -692,8 +691,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (token.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
-                assertPolicy(
-                     new QName(token.getName().getNamespaceURI(), SPConstants.NO_PASSWORD));
             } else {
                 String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
                 if (StringUtils.isEmpty(password)) {
@@ -704,9 +701,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     // If the password is available then build the token
                     if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
-                        assertPolicy(
-                            new QName(token.getName().getNamespaceURI(), 
-                                      SPConstants.HASH_PASSWORD));
                     } else {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
                     }
@@ -719,17 +713,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             
             if (token.isCreated() && token.getPasswordType() != UsernameToken.PasswordType.HashPassword) {
                 utBuilder.addCreated();
-                assertPolicy(SP13Constants.CREATED);
             }
             if (token.isNonce() && token.getPasswordType() != UsernameToken.PasswordType.HashPassword) {
                 utBuilder.addNonce();
-                assertPolicy(SP13Constants.NONCE);
             }
             
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN10));
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN11));
             return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
@@ -762,10 +750,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 return null;
             }
             
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN10));
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), SPConstants.USERNAME_TOKEN11));
             return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
@@ -819,14 +803,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), "WssSamlV11Token10"));
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), "WssSamlV11Token11"));
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
-            assertPolicy(
-                new QName(token.getName().getNamespaceURI(), "WssSamlV20Token11"));
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);

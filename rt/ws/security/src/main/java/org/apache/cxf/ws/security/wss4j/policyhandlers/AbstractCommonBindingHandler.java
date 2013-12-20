@@ -134,6 +134,10 @@ public abstract class AbstractCommonBindingHandler {
         assertPolicy(token.getName());
         
         String namespace = token.getName().getNamespaceURI();
+        if (token.getDerivedKeys() != null) {
+            assertPolicy(new QName(namespace, token.getDerivedKeys().name()));
+        }
+        
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token)token;
             assertX509Token(x509Token);

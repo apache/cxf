@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -97,6 +99,30 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getInFaultInterceptors().add(PolicyBasedWSS4JStaxInInterceptor.INSTANCE);
     }
     
+    protected static void assertIssuedToken(IssuedToken issuedToken, AssertionInfoMap aim) {
+        if (issuedToken == null) {
+            return;
+        }
+        // Assert some policies
+        if (issuedToken.isRequireExternalReference()) {
+            assertPolicy(new QName(issuedToken.getName().getNamespaceURI(), 
+                                   SPConstants.REQUIRE_EXTERNAL_REFERENCE), aim);
+        }
+        if (issuedToken.isRequireInternalReference()) {
+            assertPolicy(new QName(issuedToken.getName().getNamespaceURI(), 
+                                   SPConstants.REQUIRE_INTERNAL_REFERENCE), aim);
+        }
+    }
+    
+    protected static void assertPolicy(QName n, AssertionInfoMap aim) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
+        }
+    }
+    
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
@@ -124,6 +150,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
                 if (isRequestor(message)) {
                     IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
+                    assertIssuedToken(itok, aim);
                     
                     SecurityToken tok = retrieveCachedToken(message);
                     if (tok == null) {
@@ -155,10 +182,13 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     //server side should be checked on the way in
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
-                    }                    
+                    }
+                    IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
+                    assertIssuedToken(itok, aim);
                 }
             }
         }
+        
         private Trust10 getTrust10(AssertionInfoMap aim) {
             Collection<AssertionInfo> ais = 
                 NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
@@ -502,17 +532,19 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (ais.isEmpty()) {
                     return;
                 }
+                
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
+                }
+                IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
+                assertIssuedToken(itok, aim);
+                
                 if (!isRequestor(message)) {
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && results.size() > 0) {
                         parseHandlerResults(results.get(0), message, aim);
                     }
-                } else {
-                    //client side should be checked on the way out
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }                    
                 }
             }
         }

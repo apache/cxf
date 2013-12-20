@@ -118,9 +118,25 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                 throw new Fault(e);
             }
         } else {
-            if (tbinding != null && tbinding.getTransportToken() != null) {
-                assertTokenWrapper(tbinding.getTransportToken());
-                assertToken(tbinding.getTransportToken().getToken());
+            try {
+                handleNonEndorsingSupportingTokens(aim);
+            } catch (Exception e) {
+                LOG.log(Level.FINE, e.getMessage(), e);
+                throw new Fault(e);
+            }
+            if (tbinding != null) {
+                assertPolicy(tbinding.getName());
+                if (tbinding.getTransportToken() != null) {
+                    assertTokenWrapper(tbinding.getTransportToken());
+                    assertToken(tbinding.getTransportToken().getToken());
+                    
+                    try {
+                        handleEndorsingSupportingTokens(aim);
+                    } catch (Exception e) {
+                        LOG.log(Level.FINE, e.getMessage(), e);
+                        throw new Fault(e);
+                    }
+                }
             }
             addSignatureConfirmation(null);
         }
@@ -192,6 +208,11 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     private void addSignedSupportingTokens(SupportingTokens sgndSuppTokens) 
         throws Exception {
         for (AbstractToken token : sgndSuppTokens.getTokens()) {
+            assertToken(token);
+            if (token != null && !isTokenRequired(token.getIncludeTokenType())) {
+                continue;
+            }
+            
             if (token instanceof UsernameToken) {
                 addUsernameToken((UsernameToken)token);
             } else if (token instanceof IssuedToken) {
@@ -273,6 +294,11 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
     private void handleEndorsingToken(
         AbstractToken token, SupportingTokens wrapper
     ) throws Exception {
+        assertToken(token);
+        if (token != null && !isTokenRequired(token.getIncludeTokenType())) {
+            return;
+        }
+        
         if (token instanceof IssuedToken) {
             SecurityToken securityToken = getSecurityToken();
             addIssuedToken(token, securityToken, false, true);

@@ -97,6 +97,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private void addSignedSupportingTokens(SupportingTokens sgndSuppTokens) 
         throws Exception {
         for (AbstractToken token : sgndSuppTokens.getTokens()) {
+            assertToken(token);
+            if (token != null && !isTokenRequired(token.getIncludeTokenType())) {
+                continue;
+            }
+            
             if (token instanceof UsernameToken) {
                 WSSecUsernameToken utBuilder = addUsernameToken((UsernameToken)token);
                 if (utBuilder != null) {
@@ -159,9 +164,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     handleEndorsingSupportingTokens();
                 }
             } else {
+                handleNonEndorsingSupportingTokens();
                 if (tbinding != null && tbinding.getTransportToken() != null) {
                     assertTokenWrapper(tbinding.getTransportToken());
                     assertToken(tbinding.getTransportToken().getToken());
+                    handleEndorsingSupportingTokens();
                 }
                 addSignatureConfirmation(null);
             }
@@ -301,6 +308,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private void handleEndorsingToken(
         AbstractToken token, SupportingTokens wrapper
     ) throws Exception {
+        assertToken(token);
+        if (token != null && !isTokenRequired(token.getIncludeTokenType())) {
+            return;
+        }
+        
         if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
