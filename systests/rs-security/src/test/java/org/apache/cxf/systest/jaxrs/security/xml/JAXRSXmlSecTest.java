@@ -116,22 +116,31 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookWithEnvelopedSig() throws Exception {
         String address = "https://localhost:" + PORT + "/xmlsig/bookstore/books";
-        doTestSignature(address, false, false);
+        doTestSignature(address, false, false, true);
+    }
+    
+    @Test
+    public void testPostBookWithEnvelopedSigNoKeyInfo() throws Exception {
+        String address = "https://localhost:" + PORT + "/xmlsignokeyinfo/bookstore/books";
+        doTestSignature(address, false, false, false);
     }
     
     @Test
     public void testPostBookWithEnvelopingSig() throws Exception {
         String address = "https://localhost:" + PORT + "/xmlsig/bookstore/books";
-        doTestSignature(address, true, false);
+        doTestSignature(address, true, false, true);
     }
     
     @Test
     public void testPostBookWithEnvelopingSigFromResponse() throws Exception {
         String address = "https://localhost:" + PORT + "/xmlsig/bookstore/books";
-        doTestSignature(address, true, true);
+        doTestSignature(address, true, true, true);
     }
     
-    private void doTestSignature(String address, boolean enveloping, boolean fromResponse) {
+    private void doTestSignature(String address, 
+                                 boolean enveloping, 
+                                 boolean fromResponse,
+                                 boolean useKeyInfo) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -147,14 +156,18 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
-        XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
+        XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
         if (enveloping) {
-            sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+            sigOutInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
         }
-        bean.getOutInterceptors().add(sigInterceptor);
-        bean.getInInterceptors().add(new XmlSigInInterceptor());
+        sigOutInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
+        bean.getOutInterceptors().add(sigOutInterceptor);
+        XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+        sigInInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
+        bean.getInInterceptors().add(sigInInterceptor);
         
         WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
             Book book;
             if (!fromResponse) {

@@ -81,7 +81,7 @@ public class SAMLProtocolResponseValidator {
     
     private Validator assertionValidator = new SamlAssertionValidator();
     private Validator signatureValidator = new SignatureTrustValidator();
-    
+    private boolean keyInfoMustBeAvailable = true;
     /**
      * Validate a SAML 2 Protocol Response
      * @param samlResponse
@@ -256,16 +256,21 @@ public class SAMLProtocolResponseValidator {
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);
         
-        KeyInfo keyInfo = signature.getKeyInfo();
         SAMLKeyInfo samlKeyInfo = null;
-        try {
-            samlKeyInfo = 
-                SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)), sigCrypto
-                );
-        } catch (WSSecurityException ex) {
-            LOG.log(Level.FINE, "Error in getting KeyInfo from SAML Response: " + ex.getMessage(), ex);
-            throw ex;
+        
+        KeyInfo keyInfo = signature.getKeyInfo();
+        if (keyInfo != null) {
+            try {
+                samlKeyInfo = 
+                    SAMLUtil.getCredentialFromKeyInfo(
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)), sigCrypto
+                    );
+            } catch (WSSecurityException ex) {
+                LOG.log(Level.FINE, "Error in getting KeyInfo from SAML Response: " + ex.getMessage(), ex);
+                throw ex;
+            }
+        } else if (!keyInfoMustBeAvailable) {
+            samlKeyInfo = createKeyInfoFromDefaultAlias(sigCrypto);
         }
         if (samlKeyInfo == null) {
             LOG.fine("No KeyInfo supplied in the SAMLResponse signature");
@@ -285,6 +290,19 @@ public class SAMLProtocolResponseValidator {
         } catch (WSSecurityException e) {
             LOG.log(Level.FINE, "Error in validating signature on SAML Response: " + e.getMessage(), e);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+    }
+    
+    protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
+        try {
+            X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
+                                                                    sigCrypto.getDefaultX509Identifier());
+            SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
+            samlKeyInfo.setPublicKey(certs[0].getPublicKey());
+            return samlKeyInfo;
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Error in loading the certificates: " + ex.getMessage(), ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex);
         }
     }
     
@@ -351,12 +369,23 @@ public class SAMLProtocolResponseValidator {
             try {
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
-                KeyInfo keyInfo = sig.getKeyInfo();
                 
-                SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialFromKeyInfo(
+                SAMLKeyInfo samlKeyInfo = null;
+                
+                KeyInfo keyInfo = sig.getKeyInfo();
+                if (keyInfo != null) {
+                    samlKeyInfo = SAMLUtil.getCredentialFromKeyInfo(
                         keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
                     );
+                } else if (!keyInfoMustBeAvailable) {
+                    samlKeyInfo = createKeyInfoFromDefaultAlias(sigCrypto);
+                }
+
+                if (samlKeyInfo == null) {
+                    LOG.fine("No KeyInfo supplied in the SAMLResponse assertion signature");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+                }
+                
                 assertion.verifySignature(samlKeyInfo);
                 
                 assertion.parseHOKSubject(
@@ -517,6 +546,10 @@ public class SAMLProtocolResponseValidator {
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }
+    }
+
+    public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
+        this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
     }
 
 }

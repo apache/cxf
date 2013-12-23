@@ -60,9 +60,15 @@ under the License.
     <bean id="xmlSigInHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSigInHandler">
         <property name="signatureProperties" ref="sigProps"/>
     </bean>
+    <bean id="xmlSigInHandlerNoKeyInfo" class="org.apache.cxf.rs.security.xml.XmlSigInHandler">
+        <property name="keyInfoMustBeAvailable" value="false"/>
+    </bean>
     <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor"/>
     <bean id="xmlSigOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor">
         <property name="signatureProperties" ref="sigProps"/>
+    </bean>
+    <bean id="xmlSigOutHandlerNoKeyInfo" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor">
+        <property name="keyInfoMustBeAvailable" value="false"/>
     </bean>
     <bean id="xmlEncInHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
     <bean id="xmlEncInHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlEncInHandler">
@@ -89,6 +95,23 @@ under the License.
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
+    
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsignokeyinfo">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="xmlSigInHandlerNoKeyInfo"/>
+        </jaxrs:providers>
+        <jaxrs:outInterceptors>
+            <ref bean="xmlSigOutHandlerNoKeyInfo"/>
+        </jaxrs:outInterceptors>
+        <jaxrs:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlenc">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

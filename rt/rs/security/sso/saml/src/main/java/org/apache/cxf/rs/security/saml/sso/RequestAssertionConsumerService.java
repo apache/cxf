@@ -73,6 +73,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     private boolean supportBase64Encoding = true;
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
+    private boolean keyInfoMustBeAvailable = true;
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
@@ -281,6 +282,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     ) {
         try {
             SAMLProtocolResponseValidator protocolValidator = new SAMLProtocolResponseValidator();
+            protocolValidator.setKeyInfoMustBeAvailable(keyInfoMustBeAvailable);
             protocolValidator.validateSamlResponse(samlResponse, getSignatureCrypto(), getCallbackHandler());
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
@@ -338,4 +340,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         LOG.warning(errorMsg.toString());
     }
     
+    public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
+        this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
+    }
 }

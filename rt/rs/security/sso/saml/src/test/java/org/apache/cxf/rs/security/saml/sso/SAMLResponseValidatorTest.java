@@ -235,7 +235,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
         
         response.getAssertions().add(assertion.getSaml2());
-        signResponse(response, "alice", "password", issuerCrypto);
+        signResponse(response, "alice", "password", issuerCrypto, true);
         
         Element policyElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(policyElement);
@@ -245,6 +245,64 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         
         // Validate the Response
         SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
+        try {
+            validator.validateSamlResponse(marshalledResponse, null, new KeystorePasswordCallback());
+            fail("Expected failure on no Signature Crypto");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Validate the Response
+        validator.validateSamlResponse(
+            marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
+        );
+    }
+    
+    @org.junit.Test
+    public void testSignedResponseNoKeyInfo() throws Exception {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        docBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        
+        Status status = 
+            SAML2PResponseComponentBuilder.createStatus(
+                SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
+            );
+        Response response = 
+            SAML2PResponseComponentBuilder.createSAMLResponse(
+                "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
+            );
+        
+        // Create an AuthenticationAssertion
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("http://cxf.apache.org/issuer");
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        
+        Crypto issuerCrypto = new Merlin();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(SAMLResponseValidatorTest.class);
+        InputStream input = Merlin.loadInputStream(loader, "alice.jks");
+        keyStore.load(input, "password".toCharArray());
+        ((Merlin)issuerCrypto).setKeyStore(keyStore);
+        
+        response.getAssertions().add(assertion.getSaml2());
+        signResponse(response, "alice", "password", issuerCrypto, false);
+        
+        Element policyElement = OpenSAMLUtil.toDom(response, doc);
+        doc.appendChild(policyElement);
+        assertNotNull(policyElement);
+        
+        Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(policyElement);
+        
+        // Validate the Response
+        SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
+        validator.setKeyInfoMustBeAvailable(false);
         try {
             validator.validateSamlResponse(marshalledResponse, null, new KeystorePasswordCallback());
             fail("Expected failure on no Signature Crypto");
@@ -267,7 +325,8 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         Response response,
         String issuerKeyName,
         String issuerKeyPassword,
-        Crypto issuerCrypto
+        Crypto issuerCrypto,
+        boolean useKeyInfo
     ) throws Exception {
         //
         // Create the signature
@@ -302,15 +361,17 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
 
         signature.setSigningCredential(signingCredential);
 
-        X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
-        kiFactory.setEmitEntityCertificate(true);
-        
-        try {
-            KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
-            signature.setKeyInfo(keyInfo);
-        } catch (org.opensaml.xml.security.SecurityException ex) {
-            throw new Exception(
-                    "Error generating KeyInfo from signing credential", ex);
+        if (useKeyInfo) {
+            X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
+            kiFactory.setEmitEntityCertificate(true);
+            
+            try {
+                KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
+                signature.setKeyInfo(keyInfo);
+            } catch (org.opensaml.xml.security.SecurityException ex) {
+                throw new Exception(
+                        "Error generating KeyInfo from signing credential", ex);
+            }
         }
 
         // add the signature to the assertion

@@ -65,7 +65,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     private QName envelopeQName = DEFAULT_ENV_QNAME;
     private String sigStyle = ENVELOPED_SIG;
-    
+    private boolean keyInfoMustBeAvailable = true;    
     private SignatureProperties sigProps = new SignatureProperties();
     
     public XmlSigOutInterceptor() {
@@ -80,6 +80,10 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             throw new IllegalArgumentException("Unsupported XML Signature style");
         }
         sigStyle = style;    
+    }
+    
+    public void setKeyInfoMustBeAvailable(boolean use) {
+        this.keyInfoMustBeAvailable = use;
     }
     
     public void setSignatureAlgorithm(String algo) {
@@ -148,9 +152,10 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             sig = prepareEnvelopedSignature(doc, id, referenceId, sigAlgo, digestAlgo);
         }
         
-        
-        sig.addKeyInfo(issuerCerts[0]);
-        sig.addKeyInfo(issuerCerts[0].getPublicKey());
+        if (this.keyInfoMustBeAvailable) {
+            sig.addKeyInfo(issuerCerts[0]);
+            sig.addKeyInfo(issuerCerts[0].getPublicKey());
+        }
         sig.sign(privateKey);
         return sig.getElement().getOwnerDocument();
     }

@@ -34,6 +34,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -51,6 +52,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     
     private boolean removeSignature = true;
     private boolean persistSignature = true;
+    private boolean keyInfoMustBeAvailable = true;
     private SignatureProperties sigProps;
     
     public void setRemoveSignature(boolean remove) {
@@ -114,22 +116,32 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                 signedElement.setIdAttributeNS(null, "ID", true);
             }
             
+            X509Certificate cert = null;
+            PublicKey publicKey = null;
+            
+            
             // See also WSS4J SAMLUtil.getCredentialFromKeyInfo 
             KeyInfo keyInfo = signature.getKeyInfo();
             
-            X509Certificate cert = keyInfo.getX509Certificate();
-            if (cert != null) {
+            if (keyInfo != null) {
+                cert = keyInfo.getX509Certificate();
+                if (cert != null) {
+                    valid = signature.checkSignatureValue(cert);
+                } else {
+                    publicKey = keyInfo.getPublicKey();
+                    if (publicKey != null) {
+                        valid = signature.checkSignatureValue(publicKey);
+                    }
+                } 
+            } else if (!keyInfoMustBeAvailable) {
+                String user = getUserName(crypto, message);
+                cert = SecurityUtils.getCertificates(crypto, user)[0];
+                publicKey = cert.getPublicKey();
                 valid = signature.checkSignatureValue(cert);
-            } else {
-                PublicKey pk = keyInfo.getPublicKey();
-                if (pk != null) {
-                    valid = signature.checkSignatureValue(pk);
-                }
             }
             
             // validate trust 
-            new TrustValidator().validateTrust(crypto, cert, keyInfo.getPublicKey());
-            
+            new TrustValidator().validateTrust(crypto, cert, publicKey);
             if (valid && persistSignature) {
                 message.setContent(XMLSignature.class, signature);
                 message.setContent(Element.class, signedElement);
@@ -155,6 +167,16 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         message.setContent(XMLStreamReader.class, 
                            new W3CDOMStreamReader(root));
         message.setContent(InputStream.class, null);
+        
+    }
+    
+    protected String getUserName(Crypto crypto, Message message) {
+        SecurityContext sc = message.get(SecurityContext.class);
+        if (sc != null && sc.getUserPrincipal() != null) {
+            return sc.getUserPrincipal().getName();
+        } else {
+            return SecurityUtils.getUserName(crypto, null);
+        }
         
     }
     
@@ -340,5 +362,9 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     
     public void setSignatureProperties(SignatureProperties properties) {
         this.sigProps = properties;
+    }
+    
+    public void setKeyInfoMustBeAvailable(boolean use) {
+        this.keyInfoMustBeAvailable = use;
     }
 }

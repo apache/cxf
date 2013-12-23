@@ -26,6 +26,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.NotAuthorizedException;
@@ -47,6 +48,8 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -74,6 +77,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     }
     
     private Validator samlValidator = new SamlAssertionValidator();
+    private boolean keyInfoMustBeAvailable = true;
     private SecurityContextProvider scProvider = new SecurityContextProviderImpl(); 
     
     public void setValidator(Validator validator) {
@@ -135,13 +139,18 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
-                KeyInfo keyInfo = sig.getKeyInfo();
                 
-                SAMLKeyInfo samlKeyInfo = 
-                    SAMLUtil.getCredentialFromKeyInfo(
+                SAMLKeyInfo samlKeyInfo = null;
+                
+                KeyInfo keyInfo = sig.getKeyInfo();
+                if (keyInfo != null) {
+                    samlKeyInfo = SAMLUtil.getCredentialFromKeyInfo(
                         keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data, docInfo), 
                         data.getSigVerCrypto()
                     );
+                } else if (!keyInfoMustBeAvailable) {
+                    samlKeyInfo = createKeyInfoFromDefaultAlias(data.getSigVerCrypto());
+                }
                 
                 assertion.verifySignature(samlKeyInfo);
                 assertion.parseHOKSubject(
@@ -163,6 +172,19 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
             
         } catch (Exception ex) {
             throwFault("Assertion can not be validated", ex);
+        }
+    }
+    
+    protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
+        try {
+            X509Certificate[] certs = SecurityUtils.getCertificates(sigCrypto, 
+                                                                    sigCrypto.getDefaultX509Identifier());
+            SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(new X509Certificate[]{certs[0]});
+            samlKeyInfo.setPublicKey(certs[0].getPublicKey());
+            return samlKeyInfo;
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Error in loading the certificates: " + ex.getMessage(), ex);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex);
         }
     }
     
@@ -330,5 +352,9 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     private boolean isMethodBearer(String confirmMethod) {
         return confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
                 && confirmMethod.endsWith(":cm:bearer");
+    }
+
+    public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
+        this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
     }
 }
