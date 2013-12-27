@@ -154,6 +154,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultMediaType = DEFAULT_MEDIA_TYPE;
     private Bus bus;
+    private DocumentationProvider docProvider;
         
     public WadlGenerator() {
     }
@@ -246,6 +247,8 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
             if (description != null) {
                 handleDocs(new Annotation[] {description}, sbResources, DocTarget.RESOURCE, true, isJson);
+            } else {
+                handleClassJavaDocs(cri, sbResources);
             }
             handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources, isJson);
             sbResources.append("</resource>");
@@ -470,22 +473,24 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
             sb.append("<resource path=\"").append(getPath(path)).append("\">");
             handleDocs(anns, sb, DocTarget.RESOURCE, false, isJson);
-            handlePathAndMatrixClassParams(sb, classParams, isJson);
+            handlePathAndMatrixClassParams(ori, sb, classParams, isJson);
             handlePathAndMatrixParams(sb, ori, isJson);
         } else if (index == 0) {
-            handlePathAndMatrixClassParams(sb, classParams, isJson);
+            handlePathAndMatrixClassParams(ori, sb, classParams, isJson);
             handlePathAndMatrixParams(sb, ori, isJson);
         }
 
         startMethodTag(sb, ori);
-        handleDocs(anns, sb, DocTarget.METHOD, true, isJson);
+        if (!handleDocs(anns, sb, DocTarget.METHOD, true, isJson)) {
+            handleOperJavaDocs(ori, sb);
+        }
         if (getMethod(ori).getParameterTypes().length != 0 || classParams.size() != 0) {
             sb.append("<request>");
             handleDocs(anns, sb, DocTarget.REQUEST, false, isJson);
 
             boolean isForm = isFormRequest(ori);
 
-            doHandleClassParams(sb, classParams, isJson, ParameterType.QUERY, ParameterType.HEADER);
+            doHandleClassParams(ori, sb, classParams, isJson, ParameterType.QUERY, ParameterType.HEADER);
             for (Parameter p : ori.getParameters()) {
                 if (isForm && p.getType() == ParameterType.REQUEST_BODY) {
                     continue;
@@ -574,13 +579,18 @@ public class WadlGenerator implements ContainerRequestFilter {
         sb.append("</resource>");
     }
 
-    protected void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params,
+    protected void handlePathAndMatrixClassParams(OperationResourceInfo ori,
+                                                  StringBuilder sb, 
+                                                  Map<Parameter, Object> params,
                                                   boolean isJson) {
-        doHandleClassParams(sb, params, isJson, ParameterType.PATH);
-        doHandleClassParams(sb, params, isJson, ParameterType.MATRIX);
+        doHandleClassParams(ori, sb, params, isJson, ParameterType.PATH);
+        doHandleClassParams(ori, sb, params, isJson, ParameterType.MATRIX);
     }
 
-    protected void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params, boolean isJson,
+    protected void doHandleClassParams(OperationResourceInfo ori,
+                                       StringBuilder sb, 
+                                       Map<Parameter, Object> params, 
+                                       boolean isJson,
                                        ParameterType... pType) {
         Set<ParameterType> pTypes = new LinkedHashSet<ParameterType>(Arrays.asList(pType));
         for (Map.Entry<Parameter, Object> entry : params.entrySet()) {
@@ -593,7 +603,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                     ? ((Method)obj).getGenericParameterTypes()[0] : ((Field)obj).getGenericType();
                 Annotation[] ann = obj instanceof Method
                     ? ((Method)obj).getParameterAnnotations()[0] : ((Field)obj).getAnnotations();
-                doWriteParam(sb, pm, cls, type, pm.getName(), ann, isJson);
+                doWriteParam(ori, sb, pm, cls, type, pm.getName(), ann, isJson);
             }
         }
     }
@@ -647,17 +657,28 @@ public class WadlGenerator implements ContainerRequestFilter {
         Method method = getMethod(ori);
         Class<?> type = method.getParameterTypes()[pm.getIndex()];
         if (!"".equals(pm.getName())) {
-            doWriteParam(sb, pm, type, method.getGenericParameterTypes()[pm.getIndex()], pm.getName(),
-                         method.getParameterAnnotations()[pm.getIndex()], isJson);
+            doWriteParam(ori,
+                         sb,
+                         pm, 
+                         type, 
+                         method.getGenericParameterTypes()[pm.getIndex()], 
+                         pm.getName(),
+                         method.getParameterAnnotations()[pm.getIndex()], 
+                         isJson);
         } else {
             List<Class<?>> parentBeanClasses = new LinkedList<Class<?>>();
             parentBeanClasses.add(type);
-            doWriteBeanParam(sb, type, pm, null, parentBeanClasses, isJson);
+            doWriteBeanParam(ori, sb, type, pm, null, parentBeanClasses, isJson);
         }
     }
 
-    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName,
-                                  List<Class<?>> parentBeanClasses, boolean isJson) {
+    private void doWriteBeanParam(OperationResourceInfo ori,
+                                  StringBuilder sb, 
+                                  Class<?> type, 
+                                  Parameter pm, 
+                                  String parentName,
+                                  List<Class<?>> parentBeanClasses, 
+                                  boolean isJson) {
         Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType(), true);
         for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
             String name = entry.getKey().getName();
@@ -667,16 +688,23 @@ public class WadlGenerator implements ContainerRequestFilter {
             Class<?> paramCls = entry.getValue();
             boolean isPrimitive = InjectionUtils.isPrimitive(paramCls) || paramCls.isEnum();
             if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
-                doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[] {}, isJson);
+                doWriteParam(ori, sb, entry.getKey(), paramCls, paramCls, name, new Annotation[] {}, isJson);
             } else if (!parentBeanClasses.contains(paramCls)) {
                 parentBeanClasses.add(paramCls);
-                doWriteBeanParam(sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
+                doWriteBeanParam(ori, sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
             }
         }
     }
-
-    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, Type genericType,
-                                String paramName, Annotation[] anns, boolean isJson) {
+    //CHECKSTYLE:OFF
+    protected void doWriteParam(OperationResourceInfo ori,
+                                StringBuilder sb, 
+                                Parameter pm, 
+                                Class<?> type, 
+                                Type genericType,
+                                String paramName, 
+                                Annotation[] anns, 
+                                boolean isJson) {
+      //CHECKSTYLE:ON    
         ParameterType pType = pm.getType();
         boolean isForm = isFormParameter(pm, type, anns);
         if (paramName == null && isForm) {
@@ -718,7 +746,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             setEnumOptions(sb, type);
             sb.append("</param>");
         } else {
-            addDocsAndCloseElement(sb, anns, "param", DocTarget.PARAM, true, isJson);
+            addDocsAndCloseElement(ori, pm.getIndex(), sb, anns, "param", DocTarget.PARAM, true, isJson);
         }
     }
 
@@ -736,12 +764,26 @@ public class WadlGenerator implements ContainerRequestFilter {
             // ignore
         }
     }
-
-    private void addDocsAndCloseElement(StringBuilder sb, Annotation[] anns, String elementName,
-                                        String category, boolean allowDefault, boolean isJson) {
-        if (isDocAvailable(anns)) {
+    //CHECKSTYLE:OFF
+    private void addDocsAndCloseElement(OperationResourceInfo ori,
+                                        int paramIndex,
+                                        StringBuilder sb, 
+                                        Annotation[] anns, 
+                                        String elementName,
+                                        String category, 
+                                        boolean allowDefault, 
+                                        boolean isJson) {
+    //CHECKSTYLE:ON    
+        boolean docAnnAvailable = isDocAvailable(anns);
+        if (docAnnAvailable || (ori != null && docProvider != null)) {
             sb.append(">");
-            handleDocs(anns, sb, category, allowDefault, isJson);
+            if (docAnnAvailable) {
+                handleDocs(anns, sb, category, allowDefault, isJson);
+            } else if (category == DocTarget.RETURN) {
+                handleOperResponseJavaDocs(ori, sb);
+            } else if (category == DocTarget.PARAM) {
+                handleOperParamJavaDocs(ori, paramIndex, sb);
+            }
             sb.append("</" + elementName + ">");
         } else {
             sb.append("/>");
@@ -781,9 +823,10 @@ public class WadlGenerator implements ContainerRequestFilter {
             boolean allowDefault = true;
             String docCategory;
             Annotation[] anns;
+            int inParamIndex = -1;
             if (inbound) {
-                int index = getRequestBodyParam(ori).getIndex();
-                anns = opMethod.getParameterAnnotations()[index];
+                inParamIndex = getRequestBodyParam(ori).getIndex();
+                anns = opMethod.getParameterAnnotations()[inParamIndex];
                 if (!isDocAvailable(anns)) {
                     anns = opMethod.getAnnotations();
                 }
@@ -797,7 +840,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 sb.append(">");
                 Parameter p = inbound ? getRequestBodyParam(ori) : new Parameter(ParameterType.REQUEST_BODY,
                                                                                  0, "result");
-                doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns, isJson);
+                doWriteParam(ori, sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns, isJson);
                 sb.append("</representation>");
             } else {
                 boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
@@ -817,7 +860,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                     generateQName(sb, qnameResolver, clsMap, theActualType, isCollection,
                                   getBodyAnnotations(ori, inbound));
                 }
-                addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault, isJson);
+                addDocsAndCloseElement(ori, inParamIndex, sb, anns, "representation", 
+                                       docCategory, allowDefault, isJson);
             }
         }
 
@@ -1379,13 +1423,49 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
-    protected void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault,
-                            boolean isJson) {
+    protected void handleClassJavaDocs(ClassResourceInfo cri, StringBuilder sb) {
+        if (docProvider != null) {
+            addProvidedDocs(sb, docProvider.getClassDoc(cri));
+        }
+    }
+    
+    protected void handleOperJavaDocs(OperationResourceInfo ori, StringBuilder sb) {
+        if (docProvider != null) {
+            addProvidedDocs(sb, docProvider.getMethodDoc(ori));
+        }
+    }
+    
+    protected void handleOperResponseJavaDocs(OperationResourceInfo ori, StringBuilder sb) {
+        if (docProvider != null) {
+            addProvidedDocs(sb, docProvider.getMethodResponseDoc(ori));
+        }
+    }
+    
+    protected void handleOperParamJavaDocs(OperationResourceInfo ori,
+                                           int paramIndex,
+                                           StringBuilder sb) {
+        if (docProvider != null) {
+            addProvidedDocs(sb, docProvider.getMethodParameterDoc(ori, paramIndex));
+        }
+    }
+    
+    private void addProvidedDocs(StringBuilder sb, String text) {
+        if (!StringUtils.isEmpty(text)) {
+            sb.append("<doc>");
+            sb.append(xmlEncodeIfNeeded(text));
+            sb.append("</doc>");
+        }
+    }
+    
+    protected boolean handleDocs(Annotation[] anns, 
+                              StringBuilder sb, 
+                              String category, 
+                              boolean allowDefault,
+                              boolean isJson) {
         for (Annotation a : anns) {
             if (a.annotationType() == Descriptions.class) {
                 Descriptions ds = (Descriptions)a;
-                handleDocs(ds.value(), sb, category, allowDefault, isJson);
-                return;
+                return handleDocs(ds.value(), sb, category, allowDefault, isJson);
             }
             if (a.annotationType() == Description.class) {
                 Description d = (Description)a;
@@ -1420,8 +1500,10 @@ public class WadlGenerator implements ContainerRequestFilter {
                     }
                 }
                 sb.append("</doc>");
+                return true;
             }
         }
+        return false;
     }
 
     private String getNamespace() {
@@ -1791,6 +1873,14 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     public void setCheckAbsolutePathSlash(boolean checkAbsolutePathSlash) {
         this.checkAbsolutePathSlash = checkAbsolutePathSlash;
+    }
+    
+    public void setJavaDocPath(String path) throws Exception {
+        docProvider = new JavaDocProvider(bus == null ? BusFactory.getDefaultBus() : bus, path);
+    }
+    
+    public void setDocumentationProvider(DocumentationProvider p) {
+        docProvider = p;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
