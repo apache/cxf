@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -282,7 +283,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
      * @param entityProviders the entityProviders
      */
     public void setProviders(List<? extends Object> providers) {
-        this.entityProviders.addAll(providers);
+        List<Object> newBeans = new ArrayList<Object>();
+        addToBeans(newBeans, providers);
+        this.entityProviders.addAll(newBeans);
     }
     
     /**

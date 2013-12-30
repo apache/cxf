@@ -88,12 +88,18 @@
     </jaxrs:server>
     <jaxrs:server id="bookservice5" address="/thebooks5/bookstore">
         <jaxrs:serviceBeans>
-            <ref bean="serviceBean"/>
+            <ref bean="xsltServiceBeans"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref bean="xsltProvider"/>
+            <ref bean="xsltProviders"/>
         </jaxrs:providers>
     </jaxrs:server>
+    <util:list id="xsltServiceBeans">
+        <ref bean="serviceBean"/>
+    </util:list>
+    <util:list id="xsltProviders">
+        <ref bean="xsltProvider"/>
+    </util:list>
     <jaxrs:server id="bookserviceWithStax" address="/thebooksWithStax/bookstore">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

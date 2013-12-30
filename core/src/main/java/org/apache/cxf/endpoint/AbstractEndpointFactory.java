@@ -19,6 +19,7 @@
 package org.apache.cxf.endpoint;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -236,6 +237,16 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
             LOG.fine("Added annotation based interceptors and features");
         }
     }    
+    
+    protected static void addToBeans(Collection<Object> beans, Object o) {
+        if (o instanceof Collection) {
+            for (Object o2: (Collection<?>)o) {
+                addToBeans(beans, o2);
+            }
+        } else {
+            beans.add(o);
+        }
+    }
     
     protected boolean initializeAnnotationInterceptors(AnnotationInterceptors provider, Endpoint ep) {
         boolean hasAnnotation = false;

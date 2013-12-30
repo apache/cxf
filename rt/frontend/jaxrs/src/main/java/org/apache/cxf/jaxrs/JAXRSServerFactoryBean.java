@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -323,8 +324,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param beans the list of resource instances
      */
     public void setServiceBeans(List<Object> beans) {
-        serviceFactory.setResourceClassesFromBeans(beans);
-    }
+        List<Object> newBeans = new ArrayList<Object>();
+        addToBeans(newBeans, beans);
+        serviceFactory.setResourceClassesFromBeans(newBeans);
+    }    
     
     /**
      * Sets the provider managing the life-cycle of the given resource class
