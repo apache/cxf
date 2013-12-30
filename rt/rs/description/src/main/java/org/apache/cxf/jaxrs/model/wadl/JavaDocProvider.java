@@ -20,11 +20,14 @@
 package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.ws.rs.Path;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -122,15 +125,31 @@ public class JavaDocProvider implements DocumentationProvider {
         return null;
     }
     
+    private Class<?> getPathAnnotatedClass(Class<?> cls) {
+        if (cls.getAnnotation(Path.class) != null) { 
+            return cls;
+        }
+        if (cls.getSuperclass().getAnnotation(Path.class) != null) {
+            return cls.getSuperclass();
+        }
+        for (Class<?> i : cls.getInterfaces()) {
+            if (i.getAnnotation(Path.class) != null) {
+                return i;    
+            }
+        }
+        return cls;
+    }
+    
     private ClassDocs getClassDocInternal(ClassResourceInfo cri) throws Exception {
-        String resource = cri.getServiceClass().getName().replace(".", "/") + ".html";
+        Class<?> annotatedClass = getPathAnnotatedClass(cri.getServiceClass());
+        String resource = annotatedClass.getName().replace(".", "/") + ".html";
         ClassDocs classDocs = docs.get(resource);
         if (classDocs == null) {
             InputStream resourceStream = javaDocLoader.getResourceAsStream(resource);
             if (resourceStream != null) {
                 String doc = IOUtils.readStringFromStream(resourceStream);
                 
-                String classMarker = "Class " + cri.getServiceClass().getSimpleName();
+                String classMarker = "Class " + annotatedClass.getSimpleName();
                 int index = doc.indexOf(classMarker);
                 if (index != -1) {
                     String classInfoTag = getClassInfoTag();
@@ -150,7 +169,9 @@ public class JavaDocProvider implements DocumentationProvider {
         if (classDoc == null) {
             return null;
         }
-        String methodName = ori.getMethodToInvoke().getName();
+        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() 
+            : ori.getAnnotatedMethod(); 
+        String methodName = method.getName();
         MethodDocs mDocs = classDoc.getMethodDocs(methodName);
         if (mDocs == null) {
             String operLink = getOperLink();
