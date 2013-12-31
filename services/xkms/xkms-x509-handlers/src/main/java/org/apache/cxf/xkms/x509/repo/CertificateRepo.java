@@ -31,5 +31,6 @@ public interface CertificateRepo {
     void saveCertificate(X509Certificate cert, UseKeyWithType key);
     X509Certificate findBySubjectDn(String dn);
     X509Certificate findByServiceName(String serviceName);
+    X509Certificate findByEndpoint(String endpoint);
     X509Certificate findByIssuerSerial(String issuer, String serial);
 }

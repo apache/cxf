@@ -28,9 +28,13 @@ public enum Applications {
      */
     TLS_HTTPS("urn:ietf:rfc:2818"),
     /**
-     * Service Endpoint Name
+     * Service Name
      */
-    SERVICE_SOAP("urn:apache:cxf:service:soap"),
+    SERVICE_NAME("urn:apache:cxf:service:name"),
+    /**
+     * Service Endpoint
+     */
+    SERVICE_ENDPOINT("urn:apache:cxf:service:endpoint"),
     /**
      * Certificate Issuer
      */

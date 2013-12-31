@@ -78,6 +78,9 @@ public class BasicIntegrationTest {
                                      new File("src/test/resources/data/xkms/certificates/cas/alice.cer")),
             replaceConfigurationFile("data/xkms/certificates/dave.cer",
                                      new File("src/test/resources/data/xkms/certificates/dave.cer")),
+            replaceConfigurationFile("data/xkms/certificates/http___localhost_8080_services_TestService.cer",
+                                     new File("src/test/resources/data/xkms/certificates/" 
+                                     + "http___localhost_8080_services_TestService.cer")),
             replaceConfigurationFile("data/xkms/certificates/crls/wss40CACRL.cer",
                                      new File("src/test/resources/data/xkms/certificates/crls/wss40CACRL.cer")),
             replaceConfigurationFile("etc/org.apache.cxf.xkms.cfg", getConfigFile()),

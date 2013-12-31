@@ -80,8 +80,10 @@ public class X509Locator implements Locator {
             String id = ids.get(0).getIdentifier();
             if (application == Applications.PKIX) {
                 cert = certRepo.findBySubjectDn(id);
-            } else if (application == Applications.SERVICE_SOAP) {
+            } else if (application == Applications.SERVICE_NAME) {
                 cert = certRepo.findByServiceName(id);
+            } else if (application == Applications.SERVICE_ENDPOINT) {
+                cert = certRepo.findByEndpoint(id);
             }
         }
         String issuer = getIdForApplication(Applications.ISSUER, ids);

@@ -23,6 +23,7 @@ public class LdapSchemaConfig {
     private String attrUID = "uid";
     private String attrIssuerID = "manager";
     private String attrSerialNumber = "employeeNumber";
+    private String attrEndpoint = "labeledURI";
     private String attrCrtBinary = "userCertificate;binary";
     private String attrCrlBinary = "certificateRevocationList;binary";
     private String constAttrNamesCSV = "sn";
@@ -135,6 +136,14 @@ public class LdapSchemaConfig {
 
     public void setAttrCrlBinary(String attrCrlBinary) {
         this.attrCrlBinary = attrCrlBinary;
+    }
+
+    public String getAttrEndpoint() {
+        return attrEndpoint;
+    }
+
+    public void setAttrEndpoint(String attrEndpoint) {
+        this.attrEndpoint = attrEndpoint;
     }
 
 }

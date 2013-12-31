@@ -25,7 +25,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -140,13 +142,18 @@ public class LdapCertificateRepo implements CertificateRepo {
         }
     }
 
-    private void saveCertificate(X509Certificate cert, String dn) {
+    private void saveCertificate(X509Certificate cert, String dn, Map<String, String> appAttrs) {
         Attributes attribs = new BasicAttributes();
         attribs.put(new BasicAttribute(ATTR_OBJECT_CLASS, ldapConfig.getCertObjectClass()));
         attribs.put(new BasicAttribute(ldapConfig.getAttrUID(), cert.getSubjectX500Principal().getName()));
         attribs.put(new BasicAttribute(ldapConfig.getAttrIssuerID(), cert.getIssuerX500Principal().getName()));
         attribs.put(new BasicAttribute(ldapConfig.getAttrSerialNumber(), cert.getSerialNumber().toString(16)));
         addConstantAttributes(ldapConfig.getConstAttrNamesCSV(), ldapConfig.getConstAttrValuesCSV(), attribs);
+        if ((appAttrs != null) && (!appAttrs.isEmpty())) {
+            for (String attrName : appAttrs.keySet()) {
+                attribs.put(new BasicAttribute(attrName, appAttrs.get(attrName)));
+            }
+        }
         try {
             attribs.put(new BasicAttribute(ldapConfig.getAttrCrtBinary(), cert.getEncoded()));
             ldapSearch.bind(dn, attribs);
@@ -192,7 +199,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     public X509Certificate findByServiceName(String serviceName) {
         X509Certificate cert = null;
         try {
-            String dn = getDnForServiceName(serviceName);
+            String dn = getDnForIdentifier(serviceName);
             cert = getCertificateForDn(dn);
         } catch (NamingException e) {
             // Not found
@@ -207,8 +214,22 @@ public class LdapCertificateRepo implements CertificateRepo {
         return cert;
     }
 
-    private String getDnForServiceName(String serviceName) {
-        String escapedIdentifier = serviceName.replaceAll("\\/", Matcher.quoteReplacement("\\/"));
+    @Override
+    public X509Certificate findByEndpoint(String endpoint) {
+        X509Certificate cert = null;
+        String filter = String.format("(%s=%s)", ldapConfig.getAttrEndpoint(), endpoint);
+        try {
+            Attribute attr = ldapSearch.findAttribute(rootDN, filter, ldapConfig.getAttrCrtBinary());
+            cert = getCert(attr);
+        } catch (NamingException e) {
+            // Not found
+        }
+        return cert;
+    }
+
+    
+    private String getDnForIdentifier(String id) {
+        String escapedIdentifier = id.replaceAll("\\/", Matcher.quoteReplacement("\\/"));
         return String.format(ldapConfig.getServiceCertRDNTemplate(), escapedIdentifier) + "," + rootDN;
     }
 
@@ -260,15 +281,19 @@ public class LdapCertificateRepo implements CertificateRepo {
     @Override
     public void saveCertificate(X509Certificate cert, UseKeyWithType key) {
         Applications application = Applications.fromUri(key.getApplication());
-        String dn;
+        String dn = null;
+        Map<String, String> attrs = new HashMap<String, String>();
         if (application == Applications.PKIX) {
             dn = key.getIdentifier() + "," + rootDN;
-        } else if (application == Applications.SERVICE_SOAP) {
-            dn = getDnForServiceName(key.getIdentifier());
+        } else if (application == Applications.SERVICE_NAME) {
+            dn = getDnForIdentifier(key.getIdentifier());
+        } else if (application == Applications.SERVICE_ENDPOINT) {
+            attrs.put(ldapConfig.getAttrEndpoint(), key.getIdentifier());
+            dn = getDnForIdentifier(key.getIdentifier());
         } else {
             throw new IllegalArgumentException("Unsupported Application " + application);
         }
-        saveCertificate(cert, dn);
+        saveCertificate(cert, dn, attrs);
     }
 
 }

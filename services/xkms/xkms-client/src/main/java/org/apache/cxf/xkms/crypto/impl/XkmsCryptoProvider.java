@@ -159,7 +159,7 @@ public class XkmsCryptoProvider extends CryptoBase {
     private X509Certificate[] getX509(CryptoType cryptoType) {
         // Try to get X509 certificate from local keystore if it is configured
         if (allowX509FromJKS && (fallbackCrypto != null)) {
-            X509Certificate[] localCerts = getCertificateLocally(cryptoType);
+            X509Certificate[] localCerts = getCertificateLocaly(cryptoType);
             if ((localCerts != null) && localCerts.length > 0) {
                 return localCerts;
             }
@@ -167,14 +167,15 @@ public class XkmsCryptoProvider extends CryptoBase {
         CryptoType.TYPE type = cryptoType.getType();
         if (type == TYPE.SUBJECT_DN) {
             return getX509FromXKMSByID(Applications.PKIX, cryptoType.getSubjectDN());
-            
+        } else if (type == TYPE.ENDPOINT) {
+            return getX509FromXKMSByEndpoint(cryptoType.getEndpoint());
         } else if (type == TYPE.ALIAS) {
             Applications appId = null;
             boolean isServiceName = isServiceName(cryptoType);
             if (!isServiceName) {
                 appId = Applications.PKIX;
             } else {
-                appId = Applications.SERVICE_SOAP;
+                appId = Applications.SERVICE_NAME;
             }
             return getX509FromXKMSByID(appId, cryptoType.getAlias());
             
@@ -220,6 +221,22 @@ public class XkmsCryptoProvider extends CryptoBase {
         return buildX509GetResult(key, cert);
     }
 
+    private X509Certificate[] getX509FromXKMSByEndpoint(String endpoint) {
+        LOG.fine(String.format("Getting public certificate from XKMS for endpoint:%s",
+                               endpoint));
+        
+        // Try local cache first
+        X509Certificate[] certs = checkX509Cache(endpoint);
+        if (certs != null) {
+            return certs;
+        }
+        
+        // Now ask the XKMS Service
+        X509Certificate cert = xkmsInvoker.getCertificateForEndpoint(endpoint);
+        
+        return buildX509GetResult(endpoint, cert);
+    }
+
     private X509Certificate[] checkX509Cache(String key) {
         if (xkmsClientCache == null) {
             return null;
@@ -257,7 +274,7 @@ public class XkmsCryptoProvider extends CryptoBase {
      * @param cryptoType
      * @return if found certificate otherwise null returned
      */
-    private X509Certificate[] getCertificateLocally(CryptoType cryptoType) {
+    private X509Certificate[] getCertificateLocaly(CryptoType cryptoType) {
         // This only applies if we've configured a local Crypto instance...
         if (fallbackCrypto == null) {
             return null;

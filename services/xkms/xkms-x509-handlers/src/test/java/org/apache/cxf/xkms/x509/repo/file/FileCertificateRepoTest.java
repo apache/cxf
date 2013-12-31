@@ -39,8 +39,7 @@ import org.junit.Test;
 
 public class FileCertificateRepoTest {
     private static final String EXAMPLE_SUBJECT_DN = "CN=www.issuer.com, L=CGN, ST=NRW, C=DE, O=Issuer";
-    private static final String EXPECTED_CERT_FILE_NAME = 
-        "CN-www.issuer.com_L-CGN_ST-NRW_C-DE_O-Issuer-11688544847478700689.cer";
+    private static final String EXPECTED_CERT_FILE_NAME = "CN-www.issuer.com_L-CGN_ST-NRW_C-DE_O-Issuer.cer";
 
     @Test
     public void testSaveAndFind() throws CertificateException, IOException {
@@ -113,7 +112,7 @@ public class FileCertificateRepoTest {
     @Test
     public void testConvertDnForFileSystem() throws CertificateException {
         String convertedName = new FileCertificateRepo("src/test/resources/store1")
-            .convertDnForFileSystem(EXAMPLE_SUBJECT_DN);
+            .convertIdForFileSystem(EXAMPLE_SUBJECT_DN);
         Assert.assertEquals("CN-www.issuer.com_L-CGN_ST-NRW_C-DE_O-Issuer", convertedName);
     }
 

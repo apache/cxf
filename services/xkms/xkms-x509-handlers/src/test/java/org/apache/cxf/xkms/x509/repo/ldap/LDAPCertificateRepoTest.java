@@ -130,7 +130,7 @@ public class LDAPCertificateRepoTest {
 
         c.replay();
         UseKeyWithType key = new UseKeyWithType();
-        key.setApplication(Applications.SERVICE_SOAP.getUri());
+        key.setApplication(Applications.SERVICE_NAME.getUri());
         key.setIdentifier(EXPECTED_SERVICE_URI);
         ldapCertRepo.saveCertificate(cert, key);
         c.verify();

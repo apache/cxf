@@ -49,7 +49,7 @@ public class XKMSServiceTest extends BasicIntegrationTest {
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
     
     @Test
-    public void testLocate() throws URISyntaxException, Exception {
+    public void testLocatePKIX() throws URISyntaxException, Exception {
         LocateRequestType request = XKMS_OF.createLocateRequestType();
         setGenericRequestParams(request);
         QueryKeyBindingType queryKeyBindingType = XKMS_OF.createQueryKeyBindingType();
@@ -58,6 +58,25 @@ public class XKMSServiceTest extends BasicIntegrationTest {
         useKeyWithType.setIdentifier("CN=Dave, OU=Apache, O=CXF, L=CGN, ST=NRW, C=DE");
         useKeyWithType.setApplication(Applications.PKIX.getUri());
 
+        locateCertificate(request, queryKeyBindingType, useKeyWithType);
+    }
+
+    @Test
+    public void testLocateByEndpoint() throws URISyntaxException, Exception {
+        LocateRequestType request = XKMS_OF.createLocateRequestType();
+        setGenericRequestParams(request);
+        QueryKeyBindingType queryKeyBindingType = XKMS_OF.createQueryKeyBindingType();
+
+        UseKeyWithType useKeyWithType = XKMS_OF.createUseKeyWithType();
+        useKeyWithType.setIdentifier("http://localhost:8080/services/TestService");
+        useKeyWithType.setApplication(Applications.SERVICE_ENDPOINT.getUri());
+
+        locateCertificate(request, queryKeyBindingType, useKeyWithType);
+    }
+
+    private void locateCertificate(LocateRequestType request,
+                                   QueryKeyBindingType queryKeyBindingType,
+                                   UseKeyWithType useKeyWithType) {
         queryKeyBindingType.getUseKeyWith().add(useKeyWithType);
 
         request.setQueryKeyBinding(queryKeyBindingType);
@@ -101,8 +120,6 @@ public class XKMSServiceTest extends BasicIntegrationTest {
                             result.getResultMajor());
         Assert.assertEquals(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE.value(),
                             result.getResultMinor());
-        ResultDetails message = (ResultDetails)result.getMessageExtension().get(0);
-        Assert.assertEquals("Exactly one useKeyWith element needed", message.getDetails());
     }
     
 }

@@ -73,7 +73,7 @@ class XKMSInvoker {
     }
     
     public X509Certificate getServiceCertificate(QName serviceName) {
-        return getCertificateForId(Applications.SERVICE_SOAP, serviceName.toString());
+        return getCertificateForId(Applications.SERVICE_NAME, serviceName.toString());
     }
     
     public X509Certificate getCertificateForId(Applications application, String id) {
@@ -85,6 +85,12 @@ class XKMSInvoker {
         List<X509AppId> ids = new ArrayList<X509AppId>();
         ids.add(new X509AppId(Applications.ISSUER, issuerDN));
         ids.add(new X509AppId(Applications.SERIAL, serial.toString(16)));
+        return getCertificate(ids);
+    }
+
+    public X509Certificate getCertificateForEndpoint(String endpoint) {
+        List<X509AppId> ids = new ArrayList<X509AppId>();
+        ids.add(new X509AppId(Applications.SERVICE_ENDPOINT, endpoint));
         return getCertificate(ids);
     }
 

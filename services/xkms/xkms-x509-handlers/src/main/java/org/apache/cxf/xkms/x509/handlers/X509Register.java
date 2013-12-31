@@ -81,7 +81,7 @@ public class X509Register implements Register {
             X509Utils.assertElementNotNull(binding, KeyInfoType.class);
             List<UseKeyWithType> useKeyWithList = binding.getUseKeyWith();
             if (useKeyWithList == null || useKeyWithList.size() != 1) {
-                throw new IllegalArgumentException("Exactly one useKeyWith element needed");
+                throw new IllegalArgumentException("Exactly one useKeyWith element is supported");
                 //TODO standard requires support for multiple useKeyWith attributes
             }
             UseKeyWithType useKeyWith = useKeyWithList.get(0);

@@ -37,6 +37,7 @@
         <property name="attrUID" value="uid"/>
         <property name="attrIssuerID" value="manager"/>
         <property name="attrSerialNumber" value="employeeNumber"/>
+        <property name="attrEndpoint" value="labeledURI"/>
         <property name="attrCrtBinary" value="userCertificate;binary"/>
         <property name="constAttrNamesCSV" value="sn"/>
         <property name="constAttrValuesCSV" value="X509 certificate"/>

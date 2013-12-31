@@ -35,6 +35,7 @@
         <property name="attrUID" value="${xkms.ldap.schema.attrUID}"/>
         <property name="attrIssuerID" value="${xkms.ldap.schema.attrIssuerID}"/>
         <property name="attrSerialNumber" value="${xkms.ldap.schema.attrSerialNumber}"/>
+        <property name="attrEndpoint" value="${xkms.ldap.schema.attrEndpoint}"/>
         <property name="attrCrtBinary" value="${xkms.ldap.schema.attrCrtBinary}"/>
         <property name="attrCrlBinary" value="${xkms.ldap.schema.attrCrlBinary}"/>
         <property name="constAttrNamesCSV" value="${xkms.ldap.schema.constAttrNamesCSV}"/>

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.xkms.exception.XKMSConfigurationException;
+import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
 import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
@@ -76,7 +77,7 @@ public class FileCertificateRepo implements CertificateRepo {
     public void saveCRL(X509CRL crl, UseKeyWithType id) {
         String name = crl.getIssuerX500Principal().getName();
         try {
-            String path = convertDnForFileSystem(name) + ".cer";
+            String path = convertIdForFileSystem(name) + ".cer";
             Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
             if (!p.matcher(path).find()) {
                 throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
@@ -96,7 +97,6 @@ public class FileCertificateRepo implements CertificateRepo {
 
     private boolean saveCategorizedCertificate(X509Certificate cert, UseKeyWithType id, boolean isTrustedCA,
                                                boolean isCA) {
-        String name = cert.getSubjectX500Principal().getName();
         String category = "";
         if (isTrustedCA) {
             category = TRUSTED_CAS_PATH;
@@ -106,7 +106,7 @@ public class FileCertificateRepo implements CertificateRepo {
         }
         try {
             File certFile = new File(storageDir + "/" + category,
-                                     getRelativePathForSubjectDn(cert));
+                                     getCertPath(cert, id));
             certFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(certFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -114,12 +114,12 @@ public class FileCertificateRepo implements CertificateRepo {
             bos.close();
             fos.close();
         } catch (Exception e) {
-            throw new RuntimeException("Error saving certificate " + name + ": " + e.getMessage(), e);
+            throw new RuntimeException("Error saving certificate " + cert.getSubjectDN() + ": " + e.getMessage(), e);
         }
         return true;
     }
-    
-    public String convertDnForFileSystem(String dn) {
+
+    public String convertIdForFileSystem(String dn) {
         String result = dn.replace("=", "-");
         result = result.replace(", ", "_");
         result = result.replace(",", "_");
@@ -131,15 +131,26 @@ public class FileCertificateRepo implements CertificateRepo {
         return result;
     }
 
-    public String getRelativePathForSubjectDn(X509Certificate cert)
+    public String getCertPath(X509Certificate cert, UseKeyWithType id)
         throws URISyntaxException {
-        BigInteger serialNumber = cert.getSerialNumber();
-        String issuer = cert.getIssuerX500Principal().getName();
-        String path = convertDnForFileSystem(issuer) + "-" + serialNumber.toString() + ".cer";
-        Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
-        if (p.matcher(path).find()) {
-            return path;
+        Applications application = null;
+        String path = null;
+        if (id != null) {
+            application = Applications.fromUri(id.getApplication());
+        }
+        if (application == Applications.SERVICE_ENDPOINT) {
+            path = id.getIdentifier();
         } else {
+            path = cert.getSubjectDN().getName();
+        }
+        path = convertIdForFileSystem(path) + ".cer";
+        validateCertificatePath(path);
+        return path;
+    }
+
+    private void validateCertificatePath(String path) throws URISyntaxException {
+        Pattern p = Pattern.compile("[a-zA-Z_0-9-_]");
+        if (!p.matcher(path).find()) {
             throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
         }
     }
@@ -246,6 +257,25 @@ public class FileCertificateRepo implements CertificateRepo {
     }
 
     @Override
+    public X509Certificate findByEndpoint(String endpoint) {
+        try {
+            String path = convertIdForFileSystem(endpoint) + ".cer";
+            validateCertificatePath(path);
+            File certFile = new File(storageDir.getAbsolutePath() + "/" + path);
+            if (!certFile.exists()) {
+                LOG.warn(String.format("Certificate not found for endpoint %s, path %s", endpoint,
+                                       certFile.getAbsolutePath()));
+                return null;
+            }
+            return (X509Certificate)certFactory.generateCertificate(new FileInputStream(certFile));
+        } catch (Exception e) {
+            LOG.warn(String.format("Cannot load certificate by endpoint: %s. Error: %s", endpoint,
+                                   e.getMessage()), e);
+            return null;
+        }
+    }
+
+    @Override
     public X509Certificate findBySubjectDn(String subjectDn) {
         List<X509Certificate> result = new ArrayList<X509Certificate>();
         File[] list = getX509Files();
@@ -299,4 +329,5 @@ public class FileCertificateRepo implements CertificateRepo {
         }
         return null;
     }
+
 }
