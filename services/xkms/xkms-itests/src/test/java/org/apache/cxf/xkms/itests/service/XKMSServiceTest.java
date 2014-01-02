@@ -39,6 +39,7 @@ import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -62,6 +63,7 @@ public class XKMSServiceTest extends BasicIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void testLocateByEndpoint() throws URISyntaxException, Exception {
         LocateRequestType request = XKMS_OF.createLocateRequestType();
         setGenericRequestParams(request);
