@@ -43,6 +43,7 @@ public class JavaDocProvider implements DocumentationProvider {
 
     private ClassLoader javaDocLoader;
     private ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<String, ClassDocs>();
+    private double javaDocsBuiltByVersion = JAVA_VERSION;
     
     public JavaDocProvider(URL javaDocUrl) {
         if (javaDocUrl == null) {
@@ -149,7 +150,8 @@ public class JavaDocProvider implements DocumentationProvider {
             if (resourceStream != null) {
                 String doc = IOUtils.readStringFromStream(resourceStream);
                 
-                String classMarker = "Class " + annotatedClass.getSimpleName();
+                String qualifier = annotatedClass.isInterface() ? "Interface" : "Class"; 
+                String classMarker = qualifier + " " + annotatedClass.getSimpleName();
                 int index = doc.indexOf(classMarker);
                 if (index != -1) {
                     String classInfoTag = getClassInfoTag();
@@ -171,15 +173,33 @@ public class JavaDocProvider implements DocumentationProvider {
         }
         Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() 
             : ori.getAnnotatedMethod(); 
-        String methodName = method.getName();
-        MethodDocs mDocs = classDoc.getMethodDocs(methodName);
+        MethodDocs mDocs = classDoc.getMethodDocs(method);
         if (mDocs == null) {
             String operLink = getOperLink();
-            String operMarker = operLink + methodName + "(";
+            String operMarker = operLink + method.getName() + "(";
+            
             int operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker);
+            while (operMarkerIndex != -1) { 
+                int startOfOpSigIndex = operMarkerIndex + operMarker.length();
+                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(")", operMarkerIndex);
+                int paramLen = method.getParameterTypes().length;
+                if (endOfOpSigIndex == startOfOpSigIndex + 1 && paramLen == 0) {
+                    break;
+                } else if (endOfOpSigIndex > startOfOpSigIndex + 1) {
+                    String[] opBits = 
+                        classDoc.getClassDoc().substring(operMarkerIndex, endOfOpSigIndex).split(",");
+                    if (opBits.length == paramLen) {
+                        break;
+                    }
+                }
+                operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker, 
+                                                                 operMarkerIndex + operMarker.length());
+            }
+            
             if (operMarkerIndex == -1) { 
                 return null;
             }
+            
             String operDoc = classDoc.getClassDoc().substring(operMarkerIndex + operMarker.length());
             String operInfoTag = getOperInfoTag();
             String operInfo = getJavaDocText(operDoc, operInfoTag, operLink, 0);
@@ -221,7 +241,7 @@ public class JavaDocProvider implements DocumentationProvider {
                 }
             }
             mDocs = new MethodDocs(operInfo, paramDocs, responseInfo);
-            classDoc.addMethodDocs(methodName, mDocs);
+            classDoc.addMethodDocs(method, mDocs);
         }
         
         return mDocs;
@@ -244,14 +264,14 @@ public class JavaDocProvider implements DocumentationProvider {
     }
     
     protected String getClassInfoTag() {
-        if (JAVA_VERSION == JAVA_VERSION_16) {
+        if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
             return "<P>";
         } else {
             return "<div class=\"block\">";
         }
     }
     protected String getOperInfoTag() {
-        if (JAVA_VERSION == JAVA_VERSION_16) {
+        if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
             return "<DD>";
         } else {
             return "<div class=\"block\">";
@@ -259,22 +279,27 @@ public class JavaDocProvider implements DocumentationProvider {
     }
     protected String getOperLink() {
         String operLink = "<A NAME=\"";
-        return JAVA_VERSION == JAVA_VERSION_16 ? operLink : operLink.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? operLink : operLink.toLowerCase();
     }
     
     protected String getResponseMarker() {
         String tag = "<DD>";
-        return JAVA_VERSION == JAVA_VERSION_16 ? tag : tag.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
     }
     
     protected String getCodeTag() {
         String tag = "</CODE>";
-        return JAVA_VERSION == JAVA_VERSION_16 ? tag : tag.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
     }
+    
+    public void setJavaDocsBuiltByVersion(String version) {
+        javaDocsBuiltByVersion = Double.valueOf(version);
+    }
+    
     private static class ClassDocs {
         private String classDoc;
         private String classInfo;
-        private ConcurrentHashMap<String, MethodDocs> mdocs = new ConcurrentHashMap<String, MethodDocs>(); 
+        private ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<Method, MethodDocs>(); 
         public ClassDocs(String classDoc, String classInfo) {
             this.classDoc = classDoc;
             this.classInfo = classInfo;
@@ -288,12 +313,12 @@ public class JavaDocProvider implements DocumentationProvider {
             return classInfo;
         }
         
-        public MethodDocs getMethodDocs(String name) {
-            return mdocs.get(name);
+        public MethodDocs getMethodDocs(Method method) {
+            return mdocs.get(method);
         }
         
-        public void addMethodDocs(String name, MethodDocs doc) {
-            mdocs.putIfAbsent(name, doc);
+        public void addMethodDocs(Method method, MethodDocs doc) {
+            mdocs.putIfAbsent(method, doc);
         }
     }
     

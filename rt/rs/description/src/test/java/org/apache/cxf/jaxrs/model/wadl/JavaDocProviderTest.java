@@ -39,7 +39,7 @@ public class JavaDocProviderTest extends Assert {
     @Test
     public void testJava7Docs() throws Exception {
         if (JavaDocProvider.JAVA_VERSION != JavaDocProvider.JAVA_VERSION_16) {
-            //doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar");
+            doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar");
         }
     }
     
