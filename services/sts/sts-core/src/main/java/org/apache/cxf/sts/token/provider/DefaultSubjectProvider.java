@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
@@ -138,10 +137,14 @@ public class DefaultSubjectProvider implements SubjectProvider {
             
             CryptoType cryptoType = null;
 
-            // Check using of service endpoint (AppliesTo) as certificate identifier
-            if (encryptionProperties.getKeyIdentifierType() == (WSConstants.ENDPOINT_KEY_IDENTIFIER)) {
+            // Check for using of service endpoint (AppliesTo) as certificate identifier
+            if (STSConstants.USE_ENDPOINT_AS_CERT_ALIAS.equals(encryptionName)) {
+                if (providerParameters.getAppliesToAddress() == null) {
+                    throw new STSException("AppliesTo is not initilaized for encryption name "
+                                           + STSConstants.USE_ENDPOINT_AS_CERT_ALIAS);
+                }
                 cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
-                cryptoType.setEndpoint(encryptionProperties.getEncryptionName());
+                cryptoType.setEndpoint(providerParameters.getAppliesToAddress());
             } else {
                 cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(encryptionName);
@@ -149,9 +152,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
 
             try {
                 X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-                if (certs == null || certs.length <= 0) {
-                    new STSException("Encryption certificate is not found for alias: " + encryptionName,
-                                     STSException.REQUEST_FAILED);
+                if ((certs == null) || (certs.length == 0)) {
+                    throw new STSException("Encryption certificate is not found for alias: " + encryptionName);
                 }
                 KeyInfoBean keyInfo = 
                     createKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
@@ -244,5 +246,4 @@ public class DefaultSubjectProvider implements SubjectProvider {
 
         return keyInfo;
     }
-
 }

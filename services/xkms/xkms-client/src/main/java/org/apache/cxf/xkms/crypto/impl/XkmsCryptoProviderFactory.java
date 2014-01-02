@@ -19,6 +19,8 @@
 
 package org.apache.cxf.xkms.crypto.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.cxf.message.Message;
@@ -74,5 +76,26 @@ public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
     @Override
     public Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto, boolean allowX509FromJKS) {
         return new XkmsCryptoProvider(xkmsClient, fallbackCrypto, allowX509FromJKS);
+    }
+
+    @Override
+    public Crypto create(String keystorePropsPath) {
+        try {
+            Properties keystoreProps = new Properties();
+            InputStream is = this.getClass().getResourceAsStream(keystorePropsPath);
+            if (is == null) {
+                throw new CryptoProviderException("Cannot load security properties: "
+                    + keystorePropsPath);
+            }
+            keystoreProps.load(is);
+            Crypto defaultCrypto = CryptoFactory.getInstance(keystoreProps);
+            return new XkmsCryptoProvider(xkmsConsumer, defaultCrypto);
+        } catch (WSSecurityException e) {
+            throw new CryptoProviderException("Cannot instantiate crypto factory: "
+                + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new CryptoProviderException("Cannot load security properties: "
+                + e.getMessage(), e);
+        }
     }
 }
