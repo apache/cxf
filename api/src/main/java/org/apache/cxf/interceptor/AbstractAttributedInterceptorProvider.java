@@ -19,13 +19,13 @@
 
 package org.apache.cxf.interceptor;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.message.Message;
 
-public abstract class AbstractAttributedInterceptorProvider extends HashMap<String, Object>
+public abstract class AbstractAttributedInterceptorProvider extends ConcurrentHashMap<String, Object>
     implements InterceptorProvider {
 
     private static final long serialVersionUID = -1915876045710441978L;
@@ -38,6 +38,13 @@ public abstract class AbstractAttributedInterceptorProvider extends HashMap<Stri
     private List<Interceptor<? extends Message>> inFault 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
 
+    
+    public Object put(String s, Object o) {
+        if (o == null) {
+            return super.remove(s);
+        }
+        return super.put(s, o);
+    }
     
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
