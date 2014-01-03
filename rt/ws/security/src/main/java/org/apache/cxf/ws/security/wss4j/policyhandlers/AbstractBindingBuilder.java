@@ -1057,7 +1057,7 @@ public abstract class AbstractBindingBuilder {
             id = idAttr.getValue();
         } else {
             //Add an id
-            id = "Id-" + elem.hashCode();
+            id = wssConfig.getIdAllocator().createId("_", elem);
             String pfx = null;
             try {
                 pfx = elem.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
