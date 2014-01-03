@@ -103,11 +103,11 @@
         <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
         <cxf.javax.ws.rs.version>2.0</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
-        <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
-        <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
-        <cxf.jaxb22.version>2.2.6</cxf.jaxb22.version>
-        <cxf.jaxb22.impl.version>2.2.6</cxf.jaxb22.impl.version>
-        <cxf.jaxb22.xjc.version>2.2.6</cxf.jaxb22.xjc.version>
+        <cxf.jaxb21.impl.version>2.1.16</cxf.jaxb21.impl.version>
+        <cxf.jaxb21.xjc.version>2.1.16</cxf.jaxb21.xjc.version>
+        <cxf.jaxb22.version>2.2.7</cxf.jaxb22.version>
+        <cxf.jaxb22.impl.version>2.2.7</cxf.jaxb22.impl.version>
+        <cxf.jaxb22.xjc.version>2.2.7</cxf.jaxb22.xjc.version>
         <!-- by default, we use jaxb 2.1, but java5 profile will override to 2.2 -->
         <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb21.impl.version}</cxf.jaxb.impl.version>
@@ -1625,6 +1625,51 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jdk18</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
+                <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
+                <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                    </plugin>
+                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <configuration>
+                                <additionalJOptions>
+                                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                                </additionalJOptions>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>
