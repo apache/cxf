@@ -33,7 +33,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,7 +53,6 @@ public class CXFActivator implements BundleActivator {
     private ServiceRegistration wqSingleConfigRegistratin;
 
     /** {@inheritDoc}*/
-    @SuppressWarnings("deprecation")
     public void start(BundleContext context) throws Exception {
         cxfBundleListener = new CXFExtensionBundleListener(context.getBundle().getBundleId());
         context.addBundleListener(cxfBundleListener);
@@ -66,12 +64,7 @@ public class CXFActivator implements BundleActivator {
         workQueueServiceRegistration = registerManagedServiceFactory(context, ManagedServiceFactory.class, 
                                                                      workQueues,
                                                                      ManagedWorkQueueList.FACTORY_PID);
-        
-        WorkQueueSingleConfig wqSingleConfig = new WorkQueueSingleConfig(workQueues);
-        wqSingleConfigRegistratin = registerManagedServiceFactory(context, ManagedService.class, 
-                                                                  wqSingleConfig,
-                                                                  WorkQueueSingleConfig.SERVICE_PID);
-        
+                
         extensions = new ArrayList<Extension>();
         extensions.add(createOsgiBusListenerExtension(context));
         extensions.add(createManagedWorkQueueListExtension(workQueues));
