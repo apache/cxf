@@ -38,9 +38,7 @@ import org.apache.cxf.service.factory.SimpleMethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-@SuppressWarnings("deprecation")
-public class JAXWSMethodDispatcher extends SimpleMethodDispatcher
-    implements org.apache.cxf.frontend.MethodDispatcher {
+public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXWSMethodDispatcher.class);
 

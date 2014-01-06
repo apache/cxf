@@ -29,10 +29,8 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-@SuppressWarnings("deprecation")
 public class JAXWSProviderMethodDispatcher 
-    implements org.apache.cxf.service.invoker.MethodDispatcher,
-    org.apache.cxf.frontend.MethodDispatcher {
+    implements org.apache.cxf.service.invoker.MethodDispatcher {
 
     Method invoke;
     
