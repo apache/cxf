@@ -24,11 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.configuration.Configurer;
-import org.apache.cxf.configuration.NullConfigurer;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
-import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -161,28 +158,6 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         constructorArgs.addIndexedArgumentValue(0, valueToInsert);
     }
     
-    
-    /**
-     * This is deprecated and is there to support 2.3.x compatibility.
-     * Code should be updated to call addDefaultBus(ctx) instead to get the bus
-     * associated with the context.
-     * @param bus
-     * @param ctx
-     */
-    @Deprecated
-    public static void updateBusReferencesInContext(Bus bus, ApplicationContext ctx) {
-        Configurer conf = bus.getExtension(Configurer.class);
-        if (conf instanceof NullConfigurer) {
-            bus.setExtension(new ConfigurerImpl(ctx), Configurer.class);
-        } else if (conf instanceof ConfigurerImpl) {
-            ((ConfigurerImpl)conf).addApplicationContext(ctx);
-        }
-        if (ctx instanceof ConfigurableApplicationContext) {
-            ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)ctx;
-            new BusWiringBeanFactoryPostProcessor(bus).postProcessBeanFactory(cctx.getBeanFactory());
-        }
-    }
-
     public static Bus addDefaultBus(ApplicationContext ctx) {
         if (!ctx.containsBean(Bus.DEFAULT_BUS_ID)) {
             Bus b = getBusForName(Bus.DEFAULT_BUS_ID, ctx, true);
