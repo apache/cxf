@@ -41,13 +41,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<SoapMessage> 
     implements SoapInterceptor {
-
-    /**
-     * @deprecated
-     */
-    public AbstractSoapInterceptor() {
-        super(null);
-    }
     
     public AbstractSoapInterceptor(String p) {
         super(p);

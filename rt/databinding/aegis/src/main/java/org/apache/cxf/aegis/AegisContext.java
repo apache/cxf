@@ -354,29 +354,9 @@ public class AegisContext {
      * Return the type mapping configuration associated with this context.
      * 
      * @return Returns the configuration.
-     * @deprecated 2.1
-     */
-    public TypeCreationOptions getConfiguration() {
-        return configuration;
-    }
-
-    /**
-     * Return the type mapping configuration associated with this context.
-     * 
-     * @return Returns the configuration.
      */
     public TypeCreationOptions getTypeCreationOptions() {
         return configuration;
-    }
-
-    /**
-     * Set the configuration object. The configuration specifies default type mapping behaviors.
-     * 
-     * @param configuration The configuration to set.
-     * @deprecated 2.1
-     */
-    public void setConfiguration(TypeCreationOptions newConfiguration) {
-        this.configuration = newConfiguration;
     }
 
     /**

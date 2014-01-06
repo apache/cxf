@@ -43,6 +43,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -73,7 +74,6 @@ import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
-
 import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {
@@ -212,7 +212,6 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         setupAegis(sf, null);
     }
 
-    @SuppressWarnings("deprecation")
     protected void setupAegis(AbstractWSDLBasedEndpointFactory sf, AegisDatabinding binding) {
         if (binding == null) {
             AegisContext context = new AegisContext();
@@ -227,7 +226,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
             }
         }
         sf.getServiceFactory().getServiceConfigurations()
-            .add(0, new org.apache.cxf.aegis.databinding.AegisServiceConfiguration());
+            .add(0, new XFireCompatibilityServiceConfiguration());
         sf.getServiceFactory().setDataBinding(binding);
     }
 

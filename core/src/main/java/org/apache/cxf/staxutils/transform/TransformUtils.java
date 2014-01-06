@@ -105,20 +105,6 @@ public final class TransformUtils {
         }
     }
     
-    /*
-     * @deprecated
-     */
-    protected static void convertToMapOfQNames(Map<String, String> map,
-                                               Map<QName, QName> elementsMap) {
-        if (map != null) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                QName lname = DOMUtils.convertStringToQName(entry.getKey());
-                QName rname = DOMUtils.convertStringToQName(entry.getValue());
-                elementsMap.put(lname, rname);
-            }
-        }
-    }
-    
     static void convertToMapOfElementProperties(Map<String, String> map,
                                                 Map<QName, ElementProperty> elementsMap) {
         if (map != null) {
