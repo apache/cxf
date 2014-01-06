@@ -131,8 +131,6 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         
         try {
-            
-            
             CallbackHandler handler = getCallbackHandler(name, password);  
             LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);  
             

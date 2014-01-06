@@ -25,7 +25,7 @@ import javax.net.ssl.SSLSession;
 /**
  * An immutable struct that contains information about a negotiated
  * TLS Session, including the (potentially negotiated) peer certificates
- * as well as the currently effective TLS ciper suite.
+ * as well as the currently effective TLS cipher suite.
  */
 public class TLSSessionInfo {
 
@@ -54,7 +54,7 @@ public class TLSSessionInfo {
      *              it is unavailable)
      *
      * @param       certs
-     *              the peer X.509 certificate chain (optinally null)
+     *              the peer X.509 certificate chain (optionally null)
      */
     public TLSSessionInfo(
         final String suite,
