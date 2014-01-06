@@ -60,7 +60,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
     public DocLiteralInInterceptor() {
         super(Phase.UNMARSHAL);
-        addAfter(URIMappingInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) {

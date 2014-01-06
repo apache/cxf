@@ -44,7 +44,6 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -79,13 +78,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public final boolean isGET(SoapMessage message) {
         String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);
-        boolean isGet = 
-            "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
-        if (isGet) {
-            //make sure we skip the URIMapping as we cannot apply security requirements to that
-            message.put(URIMappingInterceptor.URIMAPPING_SKIP, Boolean.TRUE);
-        }
-        return isGet;
+        return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
     
     @Override

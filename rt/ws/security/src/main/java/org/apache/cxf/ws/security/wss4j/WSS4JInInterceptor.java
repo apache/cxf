@@ -69,7 +69,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -170,10 +169,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);
         boolean isGet = 
             "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
-        if (isGet) {
-            //make sure we skip the URIMapping as we cannot apply security requirements to that
-            message.put(URIMappingInterceptor.URIMAPPING_SKIP, Boolean.TRUE);
-        }
         return isGet;
     }
     

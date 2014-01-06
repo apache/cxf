@@ -34,7 +34,6 @@ import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.common.gzip.GZIPInInterceptor;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.GreeterImpl;
@@ -47,7 +46,6 @@ public class Server extends AbstractBusTestServerBase {
 
     List<Endpoint> eps = new LinkedList<Endpoint>();
 
-    @SuppressWarnings("deprecation")
     protected void run() {
         URL url = getClass().getResource("fault-stack-trace.xml");
         if (url != null) {
@@ -71,7 +69,6 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new GreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint ep = Endpoint.publish(address, implementor);
-        ((EndpointImpl)ep).getService().getInInterceptors().add(new URIMappingInterceptor());
         eps.add(ep);
         
         implementor = new GreeterImpl();

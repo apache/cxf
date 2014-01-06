@@ -45,7 +45,7 @@
             <bean class="org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean">
                 <property name="serviceConfigurations">
                     <list>
-                        <bean class="org.apache.cxf.aegis.databinding.AegisServiceConfiguration">
+                        <bean class="org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration">
                             <property name="serviceNamespace" value="http://foo.bar.com"/>
                         </bean>
                         <bean class="org.apache.cxf.wsdl.service.factory.DefaultServiceConfiguration"/>

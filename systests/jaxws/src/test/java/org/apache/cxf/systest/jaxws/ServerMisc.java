@@ -37,7 +37,6 @@ import org.apache.cxf.service.invoker.PooledFactory;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.systest.jaxws.cxf5064.SOAPHeaderServiceImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 
 
@@ -74,10 +73,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
         endpoints.clear();
     }
     
-    
-    @SuppressWarnings("deprecation")
     protected void run() {
-        
         Factory factory = new PerRequestFactory(DocLitWrappedCodeFirstServiceImpl.class);
         factory = new PooledFactory(factory, 4);
         
@@ -111,7 +107,6 @@ public class ServerMisc extends AbstractBusTestServerBase {
         Object implementor7 = new DocLitBareCodeFirstServiceImpl();
         EndpointImpl ep = (EndpointImpl)Endpoint.publish(DOCLITBARE_CODEFIRST_URL, implementor7);
         ep.getServer().getEndpoint().getInInterceptors().add(new SAAJInInterceptor());
-        ep.getServer().getEndpoint().getInInterceptors().add(new URIMappingInterceptor());
         endpoints.add(ep);
 
         

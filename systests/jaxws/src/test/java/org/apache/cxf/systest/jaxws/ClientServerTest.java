@@ -26,7 +26,6 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,20 +46,16 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
-import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -760,68 +755,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getCause().getStackTrace().length > 0);            
         }
     }
-    
-    @Test
-    public void testGetSayHi() throws Exception {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/sayHi");
-        httpConnection.connect(); 
-        
-        httpConnection.connect();
-        
-        assertEquals(200, httpConnection.getResponseCode());
-        
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
-        assertEquals("OK", httpConnection.getResponseMessage());
-        
-        InputStream in = httpConnection.getInputStream();
-        assertNotNull(in);        
-       
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-        
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("soap", Soap11.SOAP_NAMESPACE);
-        ns.put("ns2", "http://apache.org/hello_world_soap_http/types");
-        XPathUtils xu = new XPathUtils(ns);
-        Node body = (Node) xu.getValue("/soap:Envelope/soap:Body", doc, XPathConstants.NODE);
-        assertNotNull(body);
-        String response = (String) xu.getValue("//ns2:sayHiResponse/ns2:responseType/text()", 
-                                               body, 
-                                               XPathConstants.STRING);
-        assertEquals("Bonjour", response);
-    }
 
-    @Test
-    public void testGetGreetMe() throws Exception {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT 
-                              + "/SoapContext/SoapPort/greetMe/requestType/cxf");    
-        httpConnection.connect();        
-        
-        assertEquals(200, httpConnection.getResponseCode());
-    
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
-        assertEquals("OK", httpConnection.getResponseMessage());
-        
-        InputStream in = httpConnection.getInputStream();
-        assertNotNull(in);
-        
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-        
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("soap", Soap11.SOAP_NAMESPACE);
-        ns.put("ns2", "http://apache.org/hello_world_soap_http/types");
-        XPathUtils xu = new XPathUtils(ns);
-        Node body = (Node) xu.getValue("/soap:Envelope/soap:Body", doc, XPathConstants.NODE);
-        assertNotNull(body);
-        String response = (String) xu.getValue("//ns2:greetMeResponse/ns2:responseType/text()", 
-                                               body, 
-                                               XPathConstants.STRING);
-        assertEquals("Hello cxf", response);
-    }
-    
     @Test
     public void testGetWSDL() throws Exception {
         String url = "http://localhost:" + PORT + "/SoapContext/SoapPort?wsdl";
@@ -858,37 +792,6 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         GZIPInputStream inputStream = new GZIPInputStream(in);
         Document doc = StaxUtils.read(inputStream);
         assertNotNull(doc);
-    }
-    
-    @Test
-    public void testGetGreetMeFromQuery() throws Exception {
-        String url = "http://localhost:" + PORT + "/SoapContext/SoapPort/greetMe?requestType=" 
-            + URLEncoder.encode("cxf (was CeltixFire)", "UTF-8"); 
-        
-        HttpURLConnection httpConnection = getHttpConnection(url);    
-        httpConnection.connect();        
-        
-        assertEquals(200, httpConnection.getResponseCode());
-    
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
-        assertEquals("OK", httpConnection.getResponseMessage());
-        
-        InputStream in = httpConnection.getInputStream();
-        assertNotNull(in);
-        
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-        
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("soap", Soap11.SOAP_NAMESPACE);
-        ns.put("ns2", "http://apache.org/hello_world_soap_http/types");
-        XPathUtils xu = new XPathUtils(ns);
-        Node body = (Node) xu.getValue("/soap:Envelope/soap:Body", doc, XPathConstants.NODE);
-        assertNotNull(body);
-        String response = (String) xu.getValue("//ns2:greetMeResponse/ns2:responseType/text()", 
-                                               body, 
-                                               XPathConstants.STRING);
-        assertEquals("Hello cxf (was CeltixFire)", response);
     }
     
     @Test

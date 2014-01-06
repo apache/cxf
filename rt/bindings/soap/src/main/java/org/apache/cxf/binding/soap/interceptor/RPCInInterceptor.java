@@ -50,7 +50,6 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     private static final QName SOAP12_RESULT = new QName("http://www.w3.org/2003/05/soap-rpc",
@@ -59,7 +58,6 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     
     public RPCInInterceptor() {
         super(Phase.UNMARSHAL);
-        addAfter(URIMappingInterceptor.class.getName());
     }
 
     private BindingOperationInfo getOperation(Message message, QName opName) {

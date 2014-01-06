@@ -24,9 +24,7 @@ import java.util.List;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 import org.apache.headers.HeaderTesterImpl;
 import org.apache.hello_world_xml_http.bare.GreeterImpl;
 import org.apache.hello_world_xml_http.wrapped.GreeterFaultImpl;
@@ -39,14 +37,11 @@ public class ServerXMLBinding extends AbstractBusTestServerBase {
 
     List<Endpoint> eps = new LinkedList<Endpoint>();
     
-    @SuppressWarnings("deprecation")
     protected void run() {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + REG_PORT + "/XMLService/XMLPort";
         eps.add(Endpoint.publish(address, implementor));
         
-        ((EndpointImpl)eps.get(0)).getService().getInInterceptors().add(new URIMappingInterceptor());
-
         Object implementor1 = new org.apache.hello_world_xml_http.wrapped.GreeterImpl();
         address = "http://localhost:" + WRAP_PORT + "/XMLService/XMLPort";
         eps.add(Endpoint.publish(address, implementor1));

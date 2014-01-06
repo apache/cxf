@@ -36,7 +36,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -83,103 +82,6 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
             assertEquals((short)1, detail.getMinor());
             assertEquals("PingMeFault raised by server", ex.getMessage());            
         }
-    }
-    
-    @Test
-    public void testGetSayHi() throws Exception {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/sayHi");    
-        httpConnection.connect();        
-        
-        InputStream in = httpConnection.getInputStream();        
-        assertNotNull(in);
-        assertEquals("application/soap+xml; charset=utf-8", httpConnection.getContentType().toLowerCase());
-       
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("soap12", Soap12.SOAP_NAMESPACE);
-        ns.put("ns2", "http://apache.org/hello_world_soap12_http/types");
-        XPathUtils xu = new XPathUtils(ns);
-        Node body = (Node) xu.getValue("/soap12:Envelope/soap12:Body", doc, XPathConstants.NODE);
-        assertNotNull(body);
-        String response = (String) xu.getValue("//ns2:sayHiResponse/ns2:responseType/text()", 
-                                               body, 
-                                               XPathConstants.STRING);
-        assertEquals("Bonjour", response);
-    }
-
-    @Test
-    public void testGetPingMe() throws Exception  {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/pingMe");    
-        httpConnection.connect();
-        
-        assertEquals(500, httpConnection.getResponseCode());
-        
-        assertEquals("Server Error", httpConnection.getResponseMessage());
-
-        InputStream in = httpConnection.getErrorStream();
-        assertNotNull(in);     
-        assertEquals("application/soap+xml; charset=utf-8", httpConnection.getContentType().toLowerCase());
-        
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);        
-
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("s", Soap12.SOAP_NAMESPACE);
-        ns.put("ns2", "http://apache.org/hello_world_soap12_http/types");
-        XPathUtils xu = new XPathUtils(ns);
-        String codeValue  = (String) xu.getValue("/s:Envelope/s:Body/s:Fault/s:Code/s:Value/text()", 
-                                                 doc, 
-                                                 XPathConstants.STRING);
-       
-        assertEquals("soap:Receiver", codeValue);
-        String reason = (String) xu.getValue("//s:Reason//text()", 
-                                             doc, 
-                                             XPathConstants.STRING);
-        assertEquals("PingMeFault raised by server", reason);
-        
-        String minor = (String) xu.getValue("//s:Detail//ns2:faultDetail/ns2:minor/text()", 
-                                               doc, 
-                                               XPathConstants.STRING);
-        assertEquals("1", minor);
-        String major = (String) xu.getValue("//s:Detail//ns2:faultDetail/ns2:major/text()", 
-                                            doc, 
-                                            XPathConstants.STRING);
-        assertEquals("2", major);
-    }
-    
-    @Test
-    public void testGetMethodNotExist() throws Exception  {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/greetMe");
-        httpConnection.connect();
-        
-        assertEquals(500, httpConnection.getResponseCode());
-
-        assertEquals("application/soap+xml; charset=utf-8", httpConnection.getContentType().toLowerCase());
-        
-        assertEquals("Server Error", httpConnection.getResponseMessage());
-
-        InputStream in = httpConnection.getErrorStream();                  
-        assertNotNull(in);        
-            
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("s", Soap12.SOAP_NAMESPACE);
-        ns.put("ns2", "http://apache.org/hello_world_soap12_http/types");
-        XPathUtils xu = new XPathUtils(ns);
-        String codeValue  = (String) xu.getValue("/s:Envelope/s:Body/s:Fault/s:Code/s:Value/text()", 
-                                                 doc, 
-                                                 XPathConstants.STRING);
-       
-        assertEquals("soap:Receiver", codeValue);
-        String reason = (String) xu.getValue("//s:Reason//text()", 
-                                             doc, 
-                                             XPathConstants.STRING);
-        assertTrue(reason.contains("No such operation: greetMe"));        
     }
     
     @Test

@@ -59,7 +59,6 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
     public BareInInterceptor() {
         super(Phase.UNMARSHAL);
-        addAfter(URIMappingInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) {

@@ -19,11 +19,8 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import java.io.InputStream;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -31,13 +28,8 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 import javax.xml.ws.http.HTTPException;
-import javax.xml.xpath.XPathConstants;
 
-import org.w3c.dom.Document;
-
-import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.headers.HeaderTester;
 import org.apache.headers.XMLHeaderService;
@@ -124,31 +116,6 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception) ex.getCause();
         }
-    }
-
-    @Test
-    public void testBareGetGreetMe() throws Exception {
-        HttpURLConnection httpConnection =
-            getHttpConnection("http://localhost:" + REG_PORT 
-                              + "/XMLService/XMLPort/greetMe/requestType/cxf");
-        httpConnection.connect();
-
-        assertEquals(200, httpConnection.getResponseCode());
-
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
-        assertEquals("OK", httpConnection.getResponseMessage());
-
-        InputStream in = httpConnection.getInputStream();
-        assertNotNull(in);
-
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("ns2", "http://apache.org/hello_world_xml_http/bare/types");
-        XPathUtils xu = new XPathUtils(ns);
-        String response = (String) xu.getValue("//ns2:responseType/text()", doc, XPathConstants.STRING);
-        assertEquals("Hello cxf", response);
     }
 
     @Test

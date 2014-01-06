@@ -23,9 +23,9 @@
     <bean id="aegisBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding">
         <property name="aegisContext">
             <bean class="org.apache.cxf.aegis.AegisContext">
-                <!--  the test that uses this uses JDOM -->
+                <!-- the test that uses this uses JDOM -->
                 <property name="enableJDOMMappings" value="true"/>
-                <property name="configuration">
+                <property name="typeCreationOptions">
                     <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
                         <property name="defaultMinOccurs" value="3"/>
                         <property name="defaultNillable" value="false"/>

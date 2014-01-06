@@ -26,14 +26,11 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.frontend.WSDLGetUtils;
 import org.apache.cxf.greeter_control.GreeterImplNoWsdl;
-import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.wsdl.interceptors.URIMappingInterceptor;
 
 public class ServerGreeterNoWsdl extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(ServerGreeterNoWsdl.class);
 
-    @SuppressWarnings("deprecation")
     protected void run() {
         Object implementor = new GreeterImplNoWsdl();
         String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
@@ -42,7 +39,6 @@ public class ServerGreeterNoWsdl extends AbstractBusTestServerBase {
         props.put(WSDLGetUtils.WSDL_CREATE_IMPORTS, Boolean.TRUE);
         ep.setProperties(props);
         ep.publish(address);
-        ((EndpointImpl)ep).getService().getInInterceptors().add(new URIMappingInterceptor());
     }
 
     public static void main(String[] args) {

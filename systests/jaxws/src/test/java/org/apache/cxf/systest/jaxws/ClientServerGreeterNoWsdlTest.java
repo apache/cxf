@@ -19,20 +19,14 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import java.io.InputStream;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.xpath.XPathConstants;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-
-import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.helpers.XPathUtils;
@@ -78,37 +72,4 @@ public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBa
             throw (Exception)ex.getCause();
         }
     }
-    
-    // test the http get invocation 
-    
-    @Test
-    public void testGetGreetMe() throws Exception {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:"
-                              + PORT + "/SoapContext/GreeterPort/greetMe/requestType/cxf");    
-        httpConnection.connect();        
-        
-        assertEquals(200, httpConnection.getResponseCode());
-    
-        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
-        assertEquals("OK", httpConnection.getResponseMessage());
-        
-        InputStream in = httpConnection.getInputStream();
-        assertNotNull(in);
-        
-        Document doc = StaxUtils.read(in);
-        assertNotNull(doc);
-        
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("soap", Soap11.SOAP_NAMESPACE);
-        ns.put("ns2", "http://cxf.apache.org/greeter_control/types");
-        XPathUtils xu = new XPathUtils(ns);
-        Node body = (Node) xu.getValue("/soap:Envelope/soap:Body", doc, XPathConstants.NODE);
-        assertNotNull(body);
-        String response = (String) xu.getValue("//ns2:greetMeResponse/ns2:responseType/text()", 
-                                               body, 
-                                               XPathConstants.STRING);
-        assertEquals("Hello cxf", response);
-    }
-
 }

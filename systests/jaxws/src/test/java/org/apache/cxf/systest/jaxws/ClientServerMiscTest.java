@@ -94,14 +94,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(ServerMisc.class, true));
     }
-    @Test
-    public void testCXF3170() throws Exception {
-        URL url = new URL(ServerMisc.DOCLITBARE_CODEFIRST_URL + "/foo");
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-        con.getResponseCode();
-        String  str = IOUtils.readStringFromStream(con.getErrorStream());
-        assertTrue(str.contains("/foo"));  //No such operation
-    }
+
     @Test
     public void testWSDLDocs() throws Exception {
         Map<String, String> ns = new HashMap<String, String>();
