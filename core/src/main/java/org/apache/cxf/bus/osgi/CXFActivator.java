@@ -50,7 +50,6 @@ public class CXFActivator implements BundleActivator {
     private ServiceTracker configAdminTracker;
     private CXFExtensionBundleListener cxfBundleListener;
     private ServiceRegistration workQueueServiceRegistration;
-    private ServiceRegistration wqSingleConfigRegistratin;
 
     /** {@inheritDoc}*/
     public void start(BundleContext context) throws Exception {
@@ -119,7 +118,6 @@ public class CXFActivator implements BundleActivator {
         cxfBundleListener.shutdown();
         workQueues.shutDown();
         workQueueServiceRegistration.unregister();
-        wqSingleConfigRegistratin.unregister();
         configAdminTracker.close();
         ExtensionRegistry.removeExtensions(extensions);
     }
