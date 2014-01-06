@@ -66,7 +66,6 @@ import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -383,27 +382,8 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         if (properties != null) {
             getService().putAll(properties);
         }
-        setOldMethodDispatcherProperty();
     }
     
-    @Deprecated
-    protected void setOldMethodDispatcherProperty() {
-        //Try adding the MethodDispatcher using the old interface
-        MethodDispatcher md = getMethodDispatcher();
-        if (getService().get("org.apache.cxf.frontend.MethodDispatcher") == null) {
-            try {
-                Class<?> cls = ClassLoaderUtils.loadClass("org.apache.cxf.frontend.MethodDispatcher",
-                                                          getClass());
-                Object o = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
-                                                  new Class[] {cls},
-                                                  new ReflectionInvokationHandler(md));
-                getService().put("org.apache.cxf.frontend.MethodDispatcher", o);
-            } catch (Exception ex) {
-                //ignore
-            }
-        }
-    }
-
     protected void buildServiceFromWSDL(String url) {
         sendEvent(Event.CREATE_FROM_WSDL, url);
 
