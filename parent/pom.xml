@@ -60,7 +60,7 @@
         <cxf.osgi.import />
         <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
         <cxf.osgi.dynamic.import />
-        <cxf.osgi.spring.version>[3.1,4)</cxf.osgi.spring.version>
+        <cxf.osgi.spring.version>[3.1,5)</cxf.osgi.spring.version>
         <cxf.osgi.commons.lang.version>[2.4,3)</cxf.osgi.commons.lang.version>
         <cxf.osgi.slf4j.version>[1.5,2)</cxf.osgi.slf4j.version>
         <cxf.osgi.javax.annotation.version>[0.0,2)</cxf.osgi.javax.annotation.version>
@@ -138,7 +138,7 @@
         <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
         <cxf.slf4j.version>1.7.5</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.1</cxf.specs.jaxws.api.version>
-        <cxf.spring.version>3.2.5.RELEASE</cxf.spring.version>
+        <cxf.spring.version>3.2.6.RELEASE</cxf.spring.version>
         <cxf.spring.security.version>3.1.4.RELEASE</cxf.spring.security.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>1.3.1.RELEASE</cxf.spring.ldap.version>
@@ -642,7 +642,7 @@
             <dependency>
                 <groupId>httpunit</groupId>
                 <artifactId>httpunit</artifactId>
-                <version>1.6.2</version>
+                <version>1.7</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>

@@ -101,10 +101,7 @@ public final class JMSFactory {
         if (jmsConfig.getJmsTemplate() != null) {
             return jmsConfig.getJmsTemplate();
         }
-        @SuppressWarnings("deprecation")
-        JmsTemplate jmsTemplate = jmsConfig.isUseJms11() 
-            ? new JmsTemplate() 
-            : new org.springframework.jms.core.JmsTemplate102();
+        JmsTemplate jmsTemplate = new JmsTemplate();
         jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
         if (jmsConfig.getReceiveTimeout() != null) {
@@ -136,7 +133,6 @@ public final class JMSFactory {
      * @param destinationName null for temp dest or a destination name
      * @return
      */
-    @SuppressWarnings("deprecation")
     public static AbstractMessageListenerContainer createJmsListener(EndpointInfo ei,
                                                                     JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
@@ -157,19 +153,15 @@ public final class JMSFactory {
         }
         DefaultMessageListenerContainer jmsListener = null;
         
-        if (jmsConfig.isUseJms11()) {
-            //Check to see if transport is being used in JCA RA with XA
-            Method method = ei.getProperty(JCATransactionalMessageListenerContainer.MDB_TRANSACTED_METHOD,
-                                           java.lang.reflect.Method.class);
-            if (method != null 
-                && 
-                jmsConfig.getConnectionFactory() instanceof XAConnectionFactory) {
-                jmsListener = new JCATransactionalMessageListenerContainer(ei); 
-            } else {
-                jmsListener = new DefaultMessageListenerContainer();
-            }
+        //Check to see if transport is being used in JCA RA with XA
+        Method method = ei.getProperty(JCATransactionalMessageListenerContainer.MDB_TRANSACTED_METHOD,
+                                       java.lang.reflect.Method.class);
+        if (method != null 
+            && 
+            jmsConfig.getConnectionFactory() instanceof XAConnectionFactory) {
+            jmsListener = new JCATransactionalMessageListenerContainer(ei); 
         } else {
-            jmsListener = new org.springframework.jms.listener.DefaultMessageListenerContainer102();
+            jmsListener = new DefaultMessageListenerContainer();
         }
         
         return createJmsListener(jmsListener,
@@ -193,10 +185,7 @@ public final class JMSFactory {
                                                                     Destination destination, 
                                                                     String messageSelectorPrefix,
                                                                     boolean userCID) {
-        @SuppressWarnings("deprecation")
-        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
-            ? new DefaultMessageListenerContainer() 
-            : new org.springframework.jms.listener.DefaultMessageListenerContainer102();
+        DefaultMessageListenerContainer jmsListener = new DefaultMessageListenerContainer(); 
         
         return createJmsListener(jmsListener,
                                  jmsConfig,
@@ -211,10 +200,7 @@ public final class JMSFactory {
                                                                     String destination, 
                                                                     String messageSelectorPrefix,
                                                                     boolean userCID) {
-        @SuppressWarnings("deprecation")
-        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
-            ? new DefaultMessageListenerContainer() 
-            : new org.springframework.jms.listener.DefaultMessageListenerContainer102();
+        DefaultMessageListenerContainer jmsListener = new DefaultMessageListenerContainer(); 
         
         return createJmsListener(jmsListener,
                                  jmsConfig,

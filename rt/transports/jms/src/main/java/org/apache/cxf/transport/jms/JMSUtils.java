@@ -120,7 +120,6 @@ public final class JMSUtils {
      * @return the message payload as byte[]
      * @throws UnsupportedEncodingException
      */
-    @SuppressWarnings("deprecation")
     public static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage,
                                              Message message, String encoding)
         throws UnsupportedEncodingException {
@@ -128,7 +127,7 @@ public final class JMSUtils {
         Object converted;
         byte[] result;
         try {
-            converted = new org.springframework.jms.support.converter.SimpleMessageConverter102()
+            converted = new org.springframework.jms.support.converter.SimpleMessageConverter()
                 .fromMessage(message);
         } catch (MessageConversionException e) {
             throw new RuntimeException("Conversion failed", e);

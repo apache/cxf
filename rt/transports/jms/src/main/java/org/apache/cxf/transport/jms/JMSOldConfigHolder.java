@@ -268,7 +268,7 @@ public class JMSOldConfigHolder {
                 jmsConfig.setTimeToLive(timeToLive);
             }
             if (endpoint.isSetUseJMS11()) {
-                jmsConfig.setUseJms11(endpoint.isUseJMS11());
+                LOG.log(Level.WARNING, "Use of jms:endpoint[@useJms11] is no longer supported");
             }
             if (serverBehavior.isSetTransactional()) {
                 jmsConfig.setSessionTransacted(serverBehavior.isTransactional());
@@ -332,7 +332,7 @@ public class JMSOldConfigHolder {
             endpoint.setReconnectOnException(address.isReconnectOnException());
         }
         if (address.isSetUseJms11()) {
-            endpoint.setUseJMS11(address.isUseJms11());
+            LOG.log(Level.WARNING, "Use of address[@useJms11] is no longer supported");
         }
         boolean useJndi = address.isSetJndiDestinationName();
         if (useJndi) {

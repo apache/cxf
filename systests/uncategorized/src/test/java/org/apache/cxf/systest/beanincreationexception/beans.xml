@@ -29,7 +29,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref local="testBeanABOImpl"/>
+            <ref bean="testBeanABOImpl"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -51,7 +51,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref local="testBeanBBOImpl"/>
+            <ref bean="testBeanBBOImpl"/>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -72,7 +72,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref local="testBeanCBOImpl"/>
+            <ref bean="testBeanCBOImpl"/>
         </property>
         <property name="transactionAttributes">
             <props>

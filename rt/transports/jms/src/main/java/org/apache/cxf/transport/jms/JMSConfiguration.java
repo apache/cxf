@@ -42,8 +42,6 @@ public class JMSConfiguration implements InitializingBean {
      */
     public static final int DEFAULT_VALUE = -1;
 
-    static final boolean DEFAULT_USEJMS11 = true;
-
     private boolean usingEndpointInfo = true;
 
     private JmsTemplate jmsTemplate;
@@ -55,7 +53,6 @@ public class JMSConfiguration implements InitializingBean {
     private PlatformTransactionManager transactionManager;
     private boolean wrapInSingleConnectionFactory = true;
     private TaskExecutor taskExecutor;
-    private boolean useJms11 = DEFAULT_USEJMS11;
     private boolean reconnectOnException = true;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
@@ -324,14 +321,6 @@ public class JMSConfiguration implements InitializingBean {
         this.replyPubSubDomain = replyPubSubDomain;
     }
 
-    public boolean isUseJms11() {
-        return useJms11;
-    }
-
-    public void setUseJms11(boolean useJms11) {
-        this.useJms11 = useJms11;
-    }
-
     public DestinationResolver getDestinationResolver() {
         return destinationResolver;
     }
@@ -458,20 +447,12 @@ public class JMSConfiguration implements InitializingBean {
             }
             if (wrapInSingleConnectionFactory && !(connectionFactory instanceof SingleConnectionFactory)) {
                 SingleConnectionFactory scf;
-                if (useJms11) {
-                    if (connectionFactory instanceof XAConnectionFactory) {
-                        scf = new XASingleConnectionFactory(connectionFactory);
-                    } else {
-                        scf = new SingleConnectionFactory(connectionFactory);
-                    }
-                    autoWrappedConnectionFactory = true;
+                if (connectionFactory instanceof XAConnectionFactory) {
+                    scf = new XASingleConnectionFactory(connectionFactory);
                 } else {
-                    @SuppressWarnings("deprecation")
-                    SingleConnectionFactory scf2
-                        = new org.springframework.jms.connection.SingleConnectionFactory102(connectionFactory,
-                                                                                            pubSubDomain);
-                    scf = scf2;
+                    scf = new SingleConnectionFactory(connectionFactory);
                 }
+                autoWrappedConnectionFactory = true;
                 if (getDurableSubscriptionClientId() != null) {
                     scf.setClientId(getDurableSubscriptionClientId());
                 }
