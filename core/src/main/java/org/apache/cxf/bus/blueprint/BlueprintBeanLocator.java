@@ -68,7 +68,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             if (bm instanceof ExtendedBeanMetadata) {
                 cls = ((ExtendedBeanMetadata)bm).getRuntimeClass();
             } 
-            if (cls == null && container instanceof ExtendedBlueprintContainer) {
+            if (cls == null && container instanceof ExtendedBlueprintContainer && bm.getClassName() != null) {
                 try {
                     cls = ((ExtendedBlueprintContainer)container).loadClass(bm.getClassName());
                 } catch (ClassNotFoundException cnfe) {
