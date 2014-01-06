@@ -58,6 +58,9 @@
         <argument ref="certificateRepo"/>
         <property name="enableRevocation" value="${xkms.enableRevocation}"/>
     </bean>
+    <bean id="directTrustValidator" class="org.apache.cxf.xkms.x509.validator.DirectTrustValidator">
+        <argument ref="certificateRepo"/>
+    </bean>
     <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">
         <argument ref="certificateRepo"/>
     </bean>
@@ -71,6 +74,7 @@
             <list>
                 <ref component-id="dateValidator"/>
                 <ref component-id="trustedAuthorityValidator"/>
+                <ref component-id="directTrustValidator"/>
             </list>
         </property>
         <property name="locators">

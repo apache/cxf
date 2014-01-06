@@ -14,6 +14,9 @@
     <bean id="trustedAuthorityValidator" class="org.apache.cxf.xkms.x509.validator.TrustedAuthorityValidator">
         <constructor-arg ref="certificateRepo"/>
     </bean>
+    <bean id="directTrustValidator" class="org.apache.cxf.xkms.x509.validator.DirectTrustValidator">
+        <constructor-arg ref="certificateRepo"/>
+    </bean>
     <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">
         <constructor-arg ref="certificateRepo"/>
     </bean>

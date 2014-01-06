@@ -20,6 +20,7 @@ package org.apache.cxf.xkms.handlers;
 
 public final class XKMSConstants {
     public static final String XKMS_ENDPOINT_NAME = "http://cxf.apache.org/services/XKMS/";
+    public static final String DIRECT_TRUST_VALIDATION = "http://cxf.apache.org/xkms#DirectTrust";
 
     private XKMSConstants() {
     }

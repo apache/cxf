@@ -31,6 +31,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.itests.BasicIntegrationTest;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
+import org.apache.cxf.xkms.model.xkms.KeyUsageEnum;
 import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
 import org.apache.cxf.xkms.model.xkms.QueryKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.ReasonEnum;
@@ -120,6 +121,36 @@ public class ValidatorTest extends BasicIntegrationTest {
         Assert.assertFalse(result.getInvalidReason().isEmpty());
         Assert.assertEquals(ReasonEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALIDITY_INTERVAL.value(), result
             .getInvalidReason().get(0));
+    }
+
+    @Test
+    public void testDaveDirectTrust() throws JAXBException, CertificateException {
+        X509Certificate daveCertificate = readCertificate("dave.cer");
+        ValidateRequestType request = prepareValidateXKMSRequest(daveCertificate);
+        request.getQueryKeyBinding().getKeyUsage().add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SIGNATURE);
+        StatusType result = doValidate(request);
+
+        Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALID, result.getStatusValue());
+        Assert.assertFalse(result.getValidReason().isEmpty());
+        Assert.assertEquals(ReasonEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_VALIDITY_INTERVAL.value(), result
+            .getValidReason().get(0));
+        Assert.assertEquals(ReasonEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_ISSUER_TRUST.value(), result
+            .getValidReason().get(1));
+        Assert.assertEquals(XKMSConstants.DIRECT_TRUST_VALIDATION, result
+                            .getValidReason().get(2));
+    }
+
+    @Test
+    public void testWss40DirectTrustNegative() throws JAXBException, CertificateException {
+        X509Certificate wss40Certificate = readCertificate("wss40.cer");
+        ValidateRequestType request = prepareValidateXKMSRequest(wss40Certificate);
+        request.getQueryKeyBinding().getKeyUsage().add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SIGNATURE);
+        StatusType result = doValidate(request);
+
+        Assert.assertEquals(KeyBindingEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_INVALID, result.getStatusValue());
+        Assert.assertFalse(result.getInvalidReason().isEmpty());
+        Assert.assertEquals(XKMSConstants.DIRECT_TRUST_VALIDATION, result
+                            .getInvalidReason().get(0));
     }
 
     /*

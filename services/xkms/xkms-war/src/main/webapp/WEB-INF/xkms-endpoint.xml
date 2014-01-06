@@ -28,6 +28,7 @@
             <list>
                 <ref bean="dateValidator"/>
                 <ref bean="trustedAuthorityValidator"/>
+                <ref bean="directTrustValidator"/>
             </list>
         </property>
         <property name="locators">

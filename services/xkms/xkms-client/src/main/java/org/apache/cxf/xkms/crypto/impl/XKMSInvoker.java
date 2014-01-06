@@ -40,6 +40,7 @@ import org.apache.cxf.xkms.exception.XKMSValidateException;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.model.xkms.KeyBindingEnum;
+import org.apache.cxf.xkms.model.xkms.KeyUsageEnum;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
 import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
@@ -110,8 +111,20 @@ class XKMSInvoker {
     }
 
     public boolean validateCertificate(X509Certificate cert) {
+        return checkCertificateValidity(cert, false);
+    }
+
+    public boolean validateDirectTrustCertificate(X509Certificate cert) {
+        return checkCertificateValidity(cert, true);
+    }
+
+    protected boolean checkCertificateValidity(X509Certificate cert, boolean directTrust) {
         try {
             ValidateRequestType validateRequestType = prepareValidateXKMSRequest(cert);
+            if (directTrust) {
+                validateRequestType.getQueryKeyBinding().getKeyUsage()
+                    .add(KeyUsageEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SIGNATURE);
+            }
             ValidateResultType validateResultType = xkmsConsumer.validate(validateRequestType);
             String id = cert.getSubjectDN().getName();
             CertificateValidationResult result = parseValidateXKMSResponse(validateResultType, id);
