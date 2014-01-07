@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -234,7 +233,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
                 if (suppTokens != null && suppTokens.getTokens() != null 
                     && suppTokens.getTokens().size() > 0) {
-                    handleSupportingTokens(suppTokens, false, new HashMap<AbstractToken, Object>());
+                    handleSupportingTokens(suppTokens, false, new ArrayList<SupportingToken>());
                 }
                 ai.setAsserted(true);
             }

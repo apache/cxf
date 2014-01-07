@@ -189,20 +189,6 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         el.getParentNode().removeChild(el);
                     }
                 }
-                
-                ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
-                if (!ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }                    
-                }
-                ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
-                if (!ais.isEmpty()) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }                    
-                }
-
             }
             
         }
