@@ -39,7 +39,7 @@
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
-        <cxf.bundle.activator>org.apache.cxf.jaxws.osgi.Activator</cxf.bundle.activator>
+        <cxf.bundle.activator>org.apache.cxf.jaxws.blueprint.Activator</cxf.bundle.activator>
     </properties>
     <dependencies>
         <dependency>

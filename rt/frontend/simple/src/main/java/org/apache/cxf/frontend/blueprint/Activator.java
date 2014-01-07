@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxws.osgi;
+package org.apache.cxf.frontend.blueprint;
 
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
-import org.apache.cxf.jaxws.blueprint.JAXWSBPNamespaceHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -32,10 +31,11 @@ public class Activator implements BundleActivator {
             
             @Override
             public Object createNamespaceHandler() {
-                return new JAXWSBPNamespaceHandler();
+                return new SimpleBPNamespaceHandler();
             }
         };
-        NamespaceHandlerRegisterer.register(context, factory , "http://cxf.apache.org/blueprint/jaxws");
+        NamespaceHandlerRegisterer.register(context, factory , "http://cxf.apache.org/blueprint/simple");
+        
     }
 
     @Override
