@@ -58,7 +58,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                                org.apache.cxf.xkms.crypto.impl,
+                                org.apache.cxf.xkms.crypto.provider,
                                 org.apache.cxf.xkms.cache,
                                 org.apache.cxf.xkms.client
                                 <!-- To avoid problems with existing users.

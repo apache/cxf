@@ -32,7 +32,7 @@
         </jaxws:properties>
     </jaxws:client>
     <service ref="xkmsClient" interface="org.w3._2002._03.xkms_wsdl.XKMSPortType"/>
-    <bean id="xkmsCryptoProviderFactory" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProviderFactory">
+    <bean id="xkmsCryptoProviderFactory" class="org.apache.cxf.xkms.crypto.provider.XkmsCryptoProviderFactory">
         <argument ref="xkmsClient"/>
     </bean>
     <service ref="xkmsCryptoProviderFactory" interface="org.apache.cxf.xkms.crypto.CryptoProviderFactory"/>

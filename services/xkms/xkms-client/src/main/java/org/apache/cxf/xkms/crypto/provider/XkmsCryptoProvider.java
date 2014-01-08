@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.xkms.crypto.impl;
+package org.apache.cxf.xkms.crypto.provider;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
@@ -32,6 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.cache.EHCacheXKMSClientCache;
 import org.apache.cxf.xkms.cache.XKMSCacheToken;
 import org.apache.cxf.xkms.cache.XKMSClientCache;
+import org.apache.cxf.xkms.client.XKMSInvoker;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.wss4j.common.crypto.Crypto;

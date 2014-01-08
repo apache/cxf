@@ -47,7 +47,7 @@
         </constructor-arg>
         <constructor-arg ref="cxf"/>
     </bean>
-    <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
+    <bean id="xkmsCrypto" class="org.apache.cxf.xkms.crypto.provider.XkmsCryptoProvider">
         <constructor-arg>
             <ref bean="xkmsClient"/>
         </constructor-arg>
@@ -65,7 +65,7 @@
             <util:properties id="cryptoProperties" location="classpath:alice.properties"/>
         </constructor-arg>
     </bean>
-    <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.impl.XkmsCryptoProvider">
+    <bean id="xkmsAsymmetricCrypto" class="org.apache.cxf.xkms.crypto.provider.XkmsCryptoProvider">
         <constructor-arg>
             <ref bean="xkmsClient"/>
         </constructor-arg>

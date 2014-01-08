@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.xkms.crypto.impl;
+package org.apache.cxf.xkms.client;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
@@ -32,7 +32,6 @@ import java.util.UUID;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.xkms.client.X509AppId;
 import org.apache.cxf.xkms.exception.ExceptionMapper;
 import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.exception.XKMSLocateException;
@@ -55,7 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
-class XKMSInvoker {
+public class XKMSInvoker {
     private static final Logger LOG = LoggerFactory.getLogger(XKMSInvoker.class);
 
     private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF =

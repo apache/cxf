@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.xkms.crypto.impl;
+package org.apache.cxf.xkms.crypto.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
