@@ -78,6 +78,15 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
     public void setLoginConfig(Configuration config) {
         interceptor.setLoginConfig(config);
     }
+
+    public void setRoleClassifier(String rc) {
+        interceptor.setRoleClassifier(rc);
+    }
+
+    public void setRoleClassifierType(String rct) {
+        interceptor.setRoleClassifierType(rct);
+    }
+
     
     public void setRedirectURI(String uri) {
         this.redirectURI = URI.create(uri);
