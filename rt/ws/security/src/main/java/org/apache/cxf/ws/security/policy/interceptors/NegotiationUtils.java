@@ -329,5 +329,19 @@ final class NegotiationUtils {
             
         return Collections.emptySet();
     }
+    
+    static boolean isThereAnAssertionByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            return true;
+        }
+
+        return false;
+    }
 
 }

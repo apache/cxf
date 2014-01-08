@@ -58,13 +58,6 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
-    /**
-     * Property name for a map of action IDs ({@link Integer}) to action
-     * class names. Values can be either {@link Class}) or Objects
--    * implementing {@link Action}.
-     */
-    public static final String WSS4J_ACTION_MAP = "wss4j.action.map";
-    
     public static final String OUTPUT_STREAM_HOLDER = 
         WSS4JStaxOutInterceptor.class.getName() + ".outputstream";
     private WSS4JStaxOutInterceptorInternal ending;
@@ -81,6 +74,14 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public WSS4JStaxOutInterceptor(Map<String, Object> props) {
         super(props);
+        setPhase(Phase.PRE_STREAM);
+        getBefore().add(StaxOutInterceptor.class.getName());
+        
+        ending = createEndingInterceptor();
+    }
+    
+    public WSS4JStaxOutInterceptor() {
+        super();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -32,7 +31,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -73,7 +71,6 @@ import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    static final Logger LOG = LogUtils.getL7dLogger(SecureConversationInInterceptor.class);
     
     public SecureConversationInInterceptor() {
         super(Phase.PRE_STREAM);

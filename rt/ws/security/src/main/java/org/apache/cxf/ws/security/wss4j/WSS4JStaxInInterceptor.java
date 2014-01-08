@@ -75,6 +75,12 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
+    
+    public WSS4JStaxInInterceptor() {
+        super();
+        setPhase(Phase.POST_STREAM);
+        getAfter().add(StaxInInterceptor.class.getName());
+    }
 
     public final boolean isGET(SoapMessage message) {
         String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);

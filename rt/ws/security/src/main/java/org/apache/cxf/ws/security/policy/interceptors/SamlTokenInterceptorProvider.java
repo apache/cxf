@@ -19,10 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.xml.namespace.QName;
+import java.util.Arrays;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JStaxInInterceptor;
@@ -36,16 +33,10 @@ import org.apache.wss4j.policy.SP12Constants;
  */
 public class SamlTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     private static final long serialVersionUID = -2270910622513357794L;
-    private static final Collection<QName> ASSERTION_TYPES;
-    static {
-        ASSERTION_TYPES = new ArrayList<QName>();
-        
-        ASSERTION_TYPES.add(SP12Constants.SAML_TOKEN);
-        ASSERTION_TYPES.add(SP11Constants.SAML_TOKEN);
-    }
 
     public SamlTokenInterceptorProvider() {
-        super(ASSERTION_TYPES);
+        super(Arrays.asList(SP12Constants.SAML_TOKEN, SP11Constants.SAML_TOKEN));
+        
         this.getOutInterceptors().add(new SamlTokenInterceptor());
         this.getInInterceptors().add(new SamlTokenInterceptor());
         

@@ -21,11 +21,9 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -43,7 +41,6 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  * 
  */
 public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    static final Logger LOG = LogUtils.getL7dLogger(SpnegoTokenInterceptorProvider.class);
 
     private static final long serialVersionUID = -3412111025613191505L;
 

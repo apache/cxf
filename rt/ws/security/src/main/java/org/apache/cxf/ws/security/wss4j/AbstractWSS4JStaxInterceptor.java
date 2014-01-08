@@ -93,6 +93,11 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         id = getClass().getName();
         this.properties = properties;
     }
+    
+    public AbstractWSS4JStaxInterceptor() {
+        super();
+        id = getClass().getName();
+    }
 
     protected WSSSecurityProperties createSecurityProperties() {
         if (userSecurityProperties != null) {

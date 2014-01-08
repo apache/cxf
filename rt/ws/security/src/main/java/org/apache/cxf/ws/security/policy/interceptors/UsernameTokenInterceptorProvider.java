@@ -19,10 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.xml.namespace.QName;
+import java.util.Arrays;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
@@ -37,13 +34,6 @@ import org.apache.wss4j.policy.SP12Constants;
  */
 public class UsernameTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     private static final long serialVersionUID = -1507727324874727254L;
-    private static final Collection<QName> ASSERTION_TYPES;
-    static {
-        ASSERTION_TYPES = new ArrayList<QName>();
-        
-        ASSERTION_TYPES.add(SP12Constants.USERNAME_TOKEN);
-        ASSERTION_TYPES.add(SP11Constants.USERNAME_TOKEN);
-    }
 
     public UsernameTokenInterceptorProvider() {
         this(new UsernameTokenInterceptor());
@@ -55,7 +45,8 @@ public class UsernameTokenInterceptorProvider extends AbstractPolicyInterceptorP
     }
     
     public UsernameTokenInterceptorProvider(UsernameTokenInterceptor inInterceptor) {
-        super(ASSERTION_TYPES);
+        super(Arrays.asList(SP12Constants.USERNAME_TOKEN, SP11Constants.USERNAME_TOKEN));
+
         this.getOutInterceptors().add(new UsernameTokenInterceptor());
         this.getInInterceptors().add(inInterceptor == null ? new UsernameTokenInterceptor() : inInterceptor);
         //not needed on fault chains

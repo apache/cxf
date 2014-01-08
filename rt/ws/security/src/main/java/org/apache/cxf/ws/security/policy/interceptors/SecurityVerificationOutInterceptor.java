@@ -57,50 +57,63 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
     public void handleMessage(SoapMessage message) throws Fault {
         if (MessageUtils.isRequestor(message)) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-            if (aim != null) {
-                Collection<AssertionInfo> aisTransport = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-                Collection<AssertionInfo> aisAssymetric = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-                Collection<AssertionInfo> aisSymetric = 
-                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-                
-                if (aisTransport.isEmpty() && aisAssymetric.isEmpty() && aisSymetric.isEmpty()) {
-                    
-                    Collection<AssertionInfo> aisSignedParts = 
-                        NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
-                    checkAssertion(aisSignedParts, SPConstants.SIGNED_PARTS);
-                    
-                    Collection<AssertionInfo> aisSignedElements = aim.get(SP12Constants.SIGNED_ELEMENTS);
-                    checkAssertion(aisSignedElements, SPConstants.SIGNED_ELEMENTS);
-                    
-                    Collection<AssertionInfo> aisEncryptedParts = aim.get(SP12Constants.ENCRYPTED_PARTS);
-                    checkAssertion(aisEncryptedParts, SPConstants.ENCRYPTED_PARTS);
-                    
-                    Collection<AssertionInfo> aisEncryptedElements = 
-                        aim.get(SP12Constants.ENCRYPTED_ELEMENTS);
-                    checkAssertion(aisEncryptedElements, SPConstants.ENCRYPTED_ELEMENTS);
-                    
-                    Collection<AssertionInfo> aisContentEncryptedElements = 
-                        aim.get(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
-                    checkAssertion(aisContentEncryptedElements, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+            if (aim != null && !isThereASecurityBinding(aim)) {
+                AssertionInfo assertion = getSecuredPart(aim);
+                if (assertion != null) {
+                    String error = String
+                        .format("%s assertion cannot be fulfilled without binding. "
+                            + "At least one binding assertion (%s, %s, %s) must be specified in policy.",
+                            assertion.getAssertion().getName(),
+                            SP12Constants.TRANSPORT_BINDING.getLocalPart(),
+                            SP12Constants.ASYMMETRIC_BINDING.getLocalPart(),
+                            SP12Constants.SYMMETRIC_BINDING.getLocalPart());
+                    assertion.setNotAsserted(error);
+                    LOG.severe(error);
+                    throw new PolicyException(assertion);
                 }
             }
         }
     }
-
-    private void checkAssertion(Collection<AssertionInfo> ais, String assertionName) {
-        if ((ais != null) && (!ais.isEmpty())) {
-            String error = String
-                .format("%s assertion cannot be fulfilled without binding. "
-                        + "At least one binding assertion (%s, %s, %s) must be specified in policy.",
-                        assertionName, SP12Constants.TRANSPORT_BINDING.getLocalPart(),
-                        SP12Constants.ASYMMETRIC_BINDING.getLocalPart(),
-                        SP12Constants.SYMMETRIC_BINDING.getLocalPart());
-            AssertionInfo info = ais.iterator().next();
-            info.setNotAsserted(error);
-            LOG.severe(error);
-            throw new PolicyException(info);
-        }
+    
+    private boolean isThereASecurityBinding(AssertionInfoMap aim) {
+        return 
+            NegotiationUtils.isThereAnAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING)
+            || NegotiationUtils.isThereAnAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING)
+            || NegotiationUtils.isThereAnAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
     }
+    
+    private AssertionInfo getSecuredPart(AssertionInfoMap aim) {
+        Collection<AssertionInfo> assertions = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+        if (!assertions.isEmpty()) {
+            return assertions.iterator().next();
+        }
+        
+        assertions = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        if (!assertions.isEmpty()) {
+            return assertions.iterator().next();
+        }
+        
+        assertions = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+        if (!assertions.isEmpty()) {
+            return assertions.iterator().next();
+        }
+        
+        assertions = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        if (!assertions.isEmpty()) {
+            return assertions.iterator().next();
+        }
+        
+        assertions = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (!assertions.isEmpty()) {
+            return assertions.iterator().next();
+        }
+        
+        return null;
+    }
+
 }

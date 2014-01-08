@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -70,10 +69,6 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         = new PolicyBasedWSS4JStaxOutInterceptor();
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JStaxOutInterceptor.class);
 
-    public PolicyBasedWSS4JStaxOutInterceptor() {
-        super(new HashMap<String, Object>());
-    }
-    
     public void handleMessage(SoapMessage msg) throws Fault {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         boolean enableStax = 

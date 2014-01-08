@@ -21,15 +21,14 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -61,7 +60,6 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    static final Logger LOG = LogUtils.getL7dLogger(SpnegoContextTokenInInterceptor.class);
     
     public SpnegoContextTokenInInterceptor() {
         super(Phase.PRE_STREAM);

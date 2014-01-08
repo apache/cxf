@@ -61,17 +61,10 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     private static final Logger LOG = LogUtils
             .getL7dLogger(WSS4JOutInterceptor.class);
 
-    private static final Logger TIME_LOG = LogUtils
-            .getL7dLogger(WSS4JOutInterceptor.class,
-                          null,
-                          WSS4JOutInterceptor.class.getName() + "-Time");
-        
     private WSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
     private boolean mtomEnabled;
     
-    
-
     public WSS4JOutInterceptor() {
         super();
         setPhase(Phase.PRE_PROTOCOL);
@@ -147,15 +140,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         public void handleMessage(SoapMessage mc) throws Fault {
             
             boolean doDebug = LOG.isLoggable(Level.FINE);
-            boolean doTimeDebug = TIME_LOG.isLoggable(Level.FINE);
-    
-            long t0 = 0;
-            long t1 = 0;
-            long t2 = 0;
-    
-            if (doTimeDebug) {
-                t0 = System.currentTimeMillis();
-            }
     
             if (doDebug) {
                 LOG.fine("WSS4JOutInterceptor: enter handleMessage()");
@@ -271,20 +255,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     
                 Document doc = saaj.getSOAPPart();
 
-                if (doTimeDebug) {
-                    t1 = System.currentTimeMillis();
-                }
-    
                 doSenderAction(doc, reqData, actions, Boolean.TRUE
                         .equals(getProperty(mc, org.apache.cxf.message.Message.REQUESTOR_ROLE)));
-    
-                if (doTimeDebug) {
-                    t2 = System.currentTimeMillis();
-                    TIME_LOG.fine("Send request: total= " + (t2 - t0)
-                            + " request preparation= " + (t1 - t0)
-                            + " request processing= " + (t2 - t1)
-                            + "\n");
-                }
     
                 if (doDebug) {
                     LOG.fine("WSS4JOutInterceptor: exit handleMessage()");
