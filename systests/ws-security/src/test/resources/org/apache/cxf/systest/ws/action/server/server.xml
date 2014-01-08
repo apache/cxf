@@ -156,4 +156,24 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="SamlToken"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSamlToken" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSamlTokenPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+       <jaxws:inInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="SAMLTokenUnsigned"/> 
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:inInterceptors>
+     
+    </jaxws:endpoint> 
+    
 </beans>

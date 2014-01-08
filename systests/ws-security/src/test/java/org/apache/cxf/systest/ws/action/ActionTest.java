@@ -191,5 +191,29 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testSAMLToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSamlTokenPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // Successful call
+        port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 
 }

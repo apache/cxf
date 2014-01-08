@@ -20,12 +20,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xmlns:cxf="http://cxf.apache.org/core"
        xmlns:p="http://cxf.apache.org/policy"
        xmlns:sec="http://cxf.apache.org/configuration/security"
        xsi:schemaLocation="
           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd
           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd
           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd
@@ -137,6 +139,28 @@
                </constructor-arg>
            </bean>
        </jaxws:inInterceptors>
+    </jaxws:client>
+    
+    <bean id="samlCallbackHandler" class="org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler">
+        <property name="confirmationMethod" value="urn:oasis:names:tc:SAML:2.0:cm:bearer" />
+    </bean>
+    
+    <util:properties id="samlProperties" location="classpath:saml_sv.properties"/>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSamlTokenPort" 
+                  createdFromAPI="true">
+       <jaxws:outInterceptors>
+           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+               <constructor-arg>
+                   <map>
+                        <entry key="action" value="SAMLTokenUnsigned"/> 
+                        <entry key="samlCallbackRef" value-ref="samlCallbackHandler"/>
+                        <entry key="samlPropRefId" value="samlPropertiesId" />
+                        <entry key="samlPropertiesId" value-ref="samlProperties" />
+                   </map>
+               </constructor-arg>
+           </bean>
+       </jaxws:outInterceptors>
     </jaxws:client>
     
 </beans>
