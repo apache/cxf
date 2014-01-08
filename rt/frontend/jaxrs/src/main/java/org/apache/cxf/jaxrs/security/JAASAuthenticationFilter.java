@@ -68,6 +68,15 @@ public class JAASAuthenticationFilter implements RequestHandler {
     public void setLoginConfig(Configuration config) {
         interceptor.setLoginConfig(config);
     }
+
+    public void setRoleClassifier(String rc) {
+        interceptor.setRoleClassifier(rc);
+    }
+
+    public void setRoleClassifierType(String rct) {
+        interceptor.setRoleClassifierType(rct);
+    }
+
     
     @Deprecated
     public void setRolePrefix(String name) {
