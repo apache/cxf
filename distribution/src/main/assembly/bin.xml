@@ -58,6 +58,7 @@
             <directory>src/main/release/bin</directory>
             <outputDirectory>apache-cxf-${cxf.version}/bin</outputDirectory>
             <fileMode>755</fileMode>
+            <directoryMode>755</directoryMode>
         </fileSet>
         <fileSet>
             <directory>src/main/release/etc</directory>
