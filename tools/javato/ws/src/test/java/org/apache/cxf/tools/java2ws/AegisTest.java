@@ -105,7 +105,7 @@ public class AegisTest extends ToolTestBase {
         File wsdlFile = null;
         wsdlFile = outputFile("aegis.wsdl");
         JavaToWS.main(args);
-        assertTrue("wsdl is not generated", wsdlFile.exists());
+        assertTrue("wsdl is not generated " + getStdErr(), wsdlFile.exists());
     
         WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
