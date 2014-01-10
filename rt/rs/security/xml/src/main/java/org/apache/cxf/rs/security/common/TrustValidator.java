@@ -36,7 +36,9 @@ public class TrustValidator {
         
         Credential trustCredential = new Credential();
         trustCredential.setPublicKey(publicKey);
-        trustCredential.setCertificates(new X509Certificate[]{cert});
+        if (cert != null) {
+            trustCredential.setCertificates(new X509Certificate[]{cert});
+        }
         validator.validate(trustCredential, data);
     }
 }
