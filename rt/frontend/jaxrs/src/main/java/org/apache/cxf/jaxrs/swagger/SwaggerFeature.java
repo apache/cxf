@@ -75,8 +75,10 @@ public class SwaggerFeature extends AbstractFeature {
     }
     
     private void calulateDefaultBasePath(Server server) {
-        String address = server.getEndpoint().getEndpointInfo().getAddress();
-        setBasePath(address + "/api-docs");
+        if (getBasePath() == null || getBasePath().length() == 0) {
+            String address = server.getEndpoint().getEndpointInfo().getAddress();
+            setBasePath(address + "/api-docs");
+        }
     }
     public String getResourcePackage() {
         return resourcePackage;
