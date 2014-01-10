@@ -32,9 +32,14 @@
     </parent>
     <properties>
         <cxf.osgi.import>
-            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/jaxrs-client"
+        </cxf.export.service>
+        <cxf.bundle.activator>org.apache.cxf.jaxrs.client.blueprint.Activator</cxf.bundle.activator>
     </properties>
     <dependencies>
         <dependency>

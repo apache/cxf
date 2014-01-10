@@ -29,6 +29,8 @@ import java.util.StringTokenizer;
 
 import javax.management.MBeanServer;
 
+import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
+import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.apache.cxf.configuration.jsse.TLSParameterJaxBUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertStoreType;
@@ -44,16 +46,14 @@ import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
+import org.apache.cxf.transport.http_jetty.blueprint.HTTPJettyTransportNamespaceHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
-
 
 public class HTTPJettyTransportActivator 
     implements BundleActivator, ManagedServiceFactory {
@@ -61,12 +61,12 @@ public class HTTPJettyTransportActivator
     
     BundleContext context; 
     MBeanServer mbeans;
-    ServiceTracker configAdminTracker;
+    ServiceTracker mbeanServerTracker;
     ServiceRegistration reg;
     
     JettyHTTPServerEngineFactory factory = new JettyHTTPServerEngineFactory() {
         public MBeanServer getMBeanServer() {
-            return mbeans;
+            return (MBeanServer)mbeanServerTracker.getService();
         }
     };
     
@@ -77,19 +77,21 @@ public class HTTPJettyTransportActivator
         reg = context.registerService(ManagedServiceFactory.class.getName(),
                                        this, servProps);
         
-        
-        configAdminTracker = new ServiceTracker(context, ConfigurationAdmin.class.getName(), null);
-        configAdminTracker.open();
-        
-        ServiceReference ref = context.getServiceReference(MBeanServer.class.getName());
-        if (ref != null) {
-            mbeans = (MBeanServer)context.getService(ref);
-        }
+        mbeanServerTracker = new ServiceTracker(ctx, MBeanServer.class.getName(), null);
+        BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
+            
+            @Override
+            public Object createNamespaceHandler() {
+                return new HTTPJettyTransportNamespaceHandler();
+            }
+        };
+        NamespaceHandlerRegisterer.register(context, nsHandlerFactory,
+                                            "http://cxf.apache.org/transports/http-jetty/configuration");  
     }
 
     public void stop(BundleContext ctx) throws Exception {
+        mbeanServerTracker.close();
         reg.unregister();
-        configAdminTracker.close();
     }
 
     public String getName() {

@@ -497,6 +497,9 @@
                         <DynamicImport-Package>
                             ${cxf.osgi.dynamic.import}
                         </DynamicImport-Package>
+                        <Export-Service>
+                           	${cxf.export.service}
+                        </Export-Service>
                         <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
                     </instructions>
                 </configuration>

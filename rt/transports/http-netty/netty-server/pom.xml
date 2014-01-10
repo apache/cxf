@@ -31,15 +31,20 @@
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+	    <cxf.bundle.activator>org.apache.cxf.transport.http.netty.server.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             io.netty.*;version="${cxf.netty.version.range}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}",
-        org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
+        	org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
         <cxf.osgi.export>
             org.apache.cxf.*,
         </cxf.osgi.export>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http-netty-server/configuration"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>

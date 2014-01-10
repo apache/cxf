@@ -45,6 +45,7 @@ public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
         
         assertBundleStarted("org.apache.cxf.cxf-rt-frontend-jaxws");
         assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/jaxws", 1000);
+        assertBlueprintNamespacePublished("http://cxf.apache.org/blueprint/simple", 1000);
     }
 
     @Configuration

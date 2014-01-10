@@ -34,9 +34,13 @@
         <cxf.bundle.activator>org.apache.cxf.transport.http.osgi.HTTPTransportActivator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http/configuration"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>

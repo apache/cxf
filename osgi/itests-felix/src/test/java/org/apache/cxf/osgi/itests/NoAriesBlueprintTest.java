@@ -40,6 +40,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
     @Test
     public void testCXFBundles() throws Exception {
         assertBundleStarted("org.apache.cxf.cxf-core");
+        assertBundleStarted("org.apache.cxf.cxf-rt-frontend-simple");
         assertBundleStarted("org.apache.cxf.cxf-rt-frontend-jaxws");
     }
 

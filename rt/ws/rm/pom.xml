@@ -31,10 +31,16 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+    	<cxf.bundle.activator>org.apache.cxf.ws.rm.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
-            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/ws/rm/manager",
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>

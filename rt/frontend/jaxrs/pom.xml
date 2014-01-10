@@ -33,7 +33,7 @@
     <properties>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
             javax.validation*;resolution:=optional;version="${cxf.validation.api.version}",
             javax.ws.rs.client;version="[2.0,3)",
@@ -42,6 +42,11 @@
         <cxf.osgi.export>
             org.apache.cxf.jaxrs*
         </cxf.osgi.export>
+        <cxf.bundle.activator>org.apache.cxf.jaxrs.blueprint.Activator</cxf.bundle.activator>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/jaxrs"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>

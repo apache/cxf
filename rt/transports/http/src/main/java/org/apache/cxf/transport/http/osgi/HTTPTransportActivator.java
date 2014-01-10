@@ -21,7 +21,10 @@ package org.apache.cxf.transport.http.osgi;
 
 import java.util.Properties;
 
+import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
+import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
+import org.apache.cxf.transport.http.blueprint.HttpBPHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -46,6 +49,15 @@ public class HTTPTransportActivator
         servProps.put(Constants.SERVICE_PID,  "org.apache.cxf.http.conduit-configurer");  
         reg = context.registerService(HTTPConduitConfigurer.class.getName(),
                                 conduitConfigurer, servProps);
+        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+            
+            @Override
+            public Object createNamespaceHandler() {
+                return new HttpBPHandler();
+            }
+        };
+        NamespaceHandlerRegisterer.register(context, factory,
+                                            "http://cxf.apache.org/transports/http/configuration");  
     }
 
     public void stop(BundleContext context) throws Exception {

@@ -32,9 +32,14 @@
     </parent>
     <properties>
         <cxf.osgi.import>
-            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
+        <cxf.bundle.activator>org.apache.cxf.binding.soap.blueprint.Activator</cxf.bundle.activator>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/bindings/soap"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>

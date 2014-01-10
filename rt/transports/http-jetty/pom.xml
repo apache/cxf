@@ -35,12 +35,16 @@
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.eclipse.jetty.jmx
         </cxf.osgi.dynamic.import>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http-jetty/configuration"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>

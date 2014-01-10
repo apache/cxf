@@ -34,8 +34,13 @@
     <properties>
         <cxf.osgi.import>
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}"
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
         </cxf.osgi.import>
+        <cxf.bundle.activator>org.apache.cxf.binding.coloc.blueprint.Activator</cxf.bundle.activator>
+        <!-- keep in sync with services exported in activator -->
+        <cxf.export.service>
+            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/binding/coloc"
+        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>
