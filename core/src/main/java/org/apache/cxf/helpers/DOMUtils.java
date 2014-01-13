@@ -80,8 +80,7 @@ public final class DOMUtils {
     }
     
     /**
-     * Creates a new Docuement object
-     * @return
+     * Creates a new Document object
      * @throws ParserConfigurationException
      */
     public static Document newDocument() {
@@ -313,7 +312,6 @@ public final class DOMUtils {
      * for the prefix
      * @param qualifiedName
      * @param node
-     * @return
      */
     public static QName createQName(String qualifiedName, Node node) {
         if (qualifiedName == null) {

@@ -153,9 +153,9 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
     
     /**
      * Walk the list of registered EndpointResolvers, so as to mint a new 
-     * abstract EPR for a gievn physical EPR.
+     * abstract EPR for a given physical EPR.
      * 
-     * @param serviceName
+     * @param physical
      * @return the newly minted EPR if appropriate, null otherwise
      */
     public EndpointReferenceType mint(EndpointReferenceType physical) {

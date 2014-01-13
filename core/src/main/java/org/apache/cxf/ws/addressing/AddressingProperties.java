@@ -73,14 +73,14 @@ public class AddressingProperties  {
     
     /**
      * Mutator for the <b>To</b> property.
-     * @param iri new value for To property
+     * @param t new value for To property
      */
     public void setTo(AttributedURIType t) {
         toURIType = t;
     }
     /**
      * Mutator for the <b>To</b> property.
-     * @param iri new value for To property
+     * @param epr new value for To property
      */
     public void setTo(EndpointReferenceType epr) {
         to = epr;
@@ -194,8 +194,6 @@ public class AddressingProperties  {
      * Used to specify a different WS-Addressing namespace URI, 
      * so as to cause MAPs to be exposed (i.e. encoded in externalized
      * message with a different WS-Addressing version).
-     * 
-     * @return WS-Addressing namespace URI
      */
     public void exposeAs(String uri) {
         namespaceURI = uri;

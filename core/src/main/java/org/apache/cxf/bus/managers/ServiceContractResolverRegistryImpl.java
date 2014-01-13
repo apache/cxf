@@ -52,7 +52,7 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
     /**
      * Sets the bus with which the registry is associated.
      *
-     * @param bus
+     * @param b
      */
     public final void setBus(Bus b) {
         this.bus = b;
