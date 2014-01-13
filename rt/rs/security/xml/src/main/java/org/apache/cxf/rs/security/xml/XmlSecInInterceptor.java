@@ -235,7 +235,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
             && !encryptionProperties.getEncryptionKeyTransportAlgo().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The key transport algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
-        } else if (XMLSecurityConstants.Dig.equals(event.getAlgorithmUsage())
+        } else if (XMLSecurityConstants.EncDig.equals(event.getAlgorithmUsage())
             && encryptionProperties.getEncryptionDigestAlgo() != null
             && !encryptionProperties.getEncryptionDigestAlgo().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The encryption digest algorithm "
@@ -251,18 +251,22 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
             && !sigProps.getSignatureAlgo().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature algorithm "
                                            + event.getAlgorithmURI() + " is not allowed");
-        } else if (XMLSecurityConstants.Dig.equals(event.getAlgorithmUsage())
+        } else if (XMLSecurityConstants.SigDig.equals(event.getAlgorithmUsage())
             && sigProps.getSignatureDigestAlgo() != null
             && !sigProps.getSignatureDigestAlgo().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature digest algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
-        } /*else if (XMLSecurityConstants.C14n.equals(event.getAlgorithmUsage())
+        } else if (XMLSecurityConstants.SigC14n.equals(event.getAlgorithmUsage())
             && sigProps.getSignatureC14Method() != null
             && !sigProps.getSignatureC14Method().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature c14n algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
-        }*/
-        // TODO Signature Digest Transform checking
+        } else if (XMLSecurityConstants.SigTransform.equals(event.getAlgorithmUsage())
+            && sigProps.getSignatureC14Transform() != null
+            && !sigProps.getSignatureC14Transform().equals(event.getAlgorithmURI())) {
+            throw new XMLSecurityException("empty", "The signature transformation algorithm "
+                + event.getAlgorithmURI() + " is not allowed");
+        }
     }
     
     private void checkSignatureTrust(
