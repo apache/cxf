@@ -62,6 +62,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
 public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
+    public static final String SECURITY_PROCESSED = WSS4JStaxInInterceptor.class.getName() + ".DONE";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxInInterceptor.class);
     
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) {
@@ -90,7 +92,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
         
-        if (isGET(soapMessage)) {
+        if (soapMessage.containsKey(SECURITY_PROCESSED) || isGET(soapMessage)) {
             return;
         }
 
@@ -143,6 +145,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             // interceptor doesn't handle the ws-security stuff but just setup the relevant stuff
             // for it. Exceptions will be thrown as a wrapped XMLStreamException during further
             // processing in the WS-Stack.
+            soapMessage.put(SECURITY_PROCESSED, Boolean.TRUE);
         } catch (WSSecurityException e) {
             throw createSoapFault(soapMessage.getVersion(), e);
         } catch (XMLSecurityException e) {
