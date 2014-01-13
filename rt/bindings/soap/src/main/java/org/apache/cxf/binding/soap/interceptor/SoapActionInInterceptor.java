@@ -189,15 +189,16 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
     }
 
-    private static boolean isActionMatch(SoapMessage message, BindingOperationInfo boi,
-                                         String action) {
+    private static boolean isActionMatch(SoapMessage message, BindingOperationInfo boi, String action) {
         SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-        boolean allowNoMatchingToDefault = MessageUtils
-            .getContextualBoolean(message,
-                                  ALLOW_NON_MATCHING_TO_DEFAULT,
-                                  false);
-        return ((soi != null) && action.equals(soi.getAction()))
-               || ((soi != null) && allowNoMatchingToDefault && StringUtils
-                   .isEmpty(soi.getAction()));
+        if (soi == null) {
+            return false;
+        }
+        boolean allowNoMatchingToDefault = MessageUtils.getContextualBoolean(message,
+                                                                    ALLOW_NON_MATCHING_TO_DEFAULT,
+                                                                    false);
+        return action.equals(soi.getAction())
+               || (allowNoMatchingToDefault && StringUtils.isEmpty(soi.getAction())
+               || (message.getVersion() instanceof Soap12) && StringUtils.isEmpty(soi.getAction()));
     }
 }
