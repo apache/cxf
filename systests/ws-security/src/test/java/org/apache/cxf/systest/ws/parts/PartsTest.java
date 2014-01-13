@@ -90,7 +90,6 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testSOAPFaultError() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -162,10 +161,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "RequiredParts: No header element";
-                assertTrue(ex.getMessage().contains(error) || ex.getMessage().contains("ToTo"));
-            }
+            String error = "RequiredParts: No header element";
+            assertTrue(ex.getMessage().contains(error) || ex.getMessage().contains("ToTo"));
         }
 
         ((java.io.Closeable)port).close();
@@ -209,11 +206,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "RequiredElements: No header element";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("ToTo must be present"));
-            }
+            String error = "RequiredElements: No header element";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("ToTo must be present"));
         }
         
         ((java.io.Closeable)port).close();
@@ -257,11 +252,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "SignedParts";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("Body must be signed"));
-            }
+            String error = "SignedParts";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("Body must be signed"));
         }
         
         // This should fail, as the service requires that the To header must be signed
@@ -277,11 +270,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "SignedParts";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("To must be signed"));
-            }
+            String error = "SignedParts";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("To must be signed"));
         }
         
         ((java.io.Closeable)port).close();
@@ -325,11 +316,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "SignedElements";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("To must be signed"));
-            }
+            String error = "SignedElements";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("To must be signed"));
         }
         
         ((java.io.Closeable)port).close();
@@ -373,11 +362,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "EncryptedParts";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("Body must be encrypted"));
-            }
+            String error = "EncryptedParts";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("Body must be encrypted"));
         }
         
         // This should fail, as the service requires that the To header must be encrypted
@@ -393,11 +380,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "EncryptedParts";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("To must be encrypted"));
-            }
+            String error = "EncryptedParts";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("To must be encrypted"));
         }
         
         ((java.io.Closeable)port).close();
@@ -441,11 +426,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "EncryptedElements";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("To must be encrypted"));
-            }
+            String error = "EncryptedElements";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("To must be encrypted"));
         }
         
         ((java.io.Closeable)port).close();
@@ -489,11 +472,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "EncryptedElements";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("To must be encrypted"));
-            }
+            String error = "EncryptedElements";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("To must be encrypted"));
         }
         
         ((java.io.Closeable)port).close();
@@ -541,10 +522,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt3(doubleIt, "12345".getBytes());
             fail("Failure expected on an attachment which isn't signed");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "SignedParts";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "SignedParts";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();
@@ -592,10 +571,8 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             port.doubleIt3(doubleIt, "12345".getBytes());
             fail("Failure expected on an attachment which isn't encrypted");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "EncryptedParts";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "EncryptedParts";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();

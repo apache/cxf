@@ -138,10 +138,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML2 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("Wrong SAML Version")
-                           || ex.getMessage().contains("enforces SamlVersion11Profile11 but we got 2.0"));
-            }
+            assertTrue(ex.getMessage().contains("Wrong SAML Version")
+                       || ex.getMessage().contains("enforces SamlVersion11Profile11 but we got 2.0"));
         }
 
         ((BindingProvider)saml1Port).getRequestContext().put(
@@ -163,10 +161,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml1Port.doubleIt(25);
             fail("Failure expected on no token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the token inclusion requirement";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)saml1Port).close();
@@ -290,9 +286,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml1Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
-            }
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml1Port).getRequestContext().put(
@@ -330,9 +324,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
-            }
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -342,10 +334,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("Wrong SAML Version")
-                           || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
-            }
+            assertTrue(ex.getMessage().contains("Wrong SAML Version")
+                       || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -390,10 +380,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("An error was discovered processing")
-                           || ex.getMessage().contains("SamlToken not satisfied"));
-            }
+            assertTrue(ex.getMessage().contains("An error was discovered processing")
+                       || ex.getMessage().contains("SamlToken not satisfied"));
         }
         
         ((java.io.Closeable)saml2Port).close();
@@ -425,9 +413,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with no SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
-            }
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -437,10 +423,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with a SAML1 Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                assertTrue(ex.getMessage().contains("Wrong SAML Version")
-                           || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
-            }
+            assertTrue(ex.getMessage().contains("Wrong SAML Version")
+                       || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
         }
         
         ((BindingProvider)saml2Port).getRequestContext().put(
@@ -462,10 +446,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Failure expected on no token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the token inclusion requirement";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)saml2Port).close();
@@ -855,11 +837,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Failure expected on no SamlToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the token inclusion requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("SamlToken not satisfied"));
-            }
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("SamlToken not satisfied"));
         }
         
         ((java.io.Closeable)saml2Port).close();

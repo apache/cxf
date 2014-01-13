@@ -123,10 +123,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on OnlySignEntireHeadersAndBody property");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "OnlySignEntireHeadersAndBody";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "OnlySignEntireHeadersAndBody";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();
@@ -170,11 +168,9 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the signature property");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The signature is not protected";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("Signature must be encrypted"));
-            }
+            String error = "The signature is not protected";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("Signature must be encrypted"));
         }
         
         ((java.io.Closeable)port).close();
@@ -218,11 +214,9 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Received Timestamp does not match the requirements";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("Timestamp must be present"));
-            }
+            String error = "Received Timestamp does not match the requirements";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("Timestamp must be present"));
         }
         
         ((java.io.Closeable)port).close();
@@ -266,11 +260,9 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting before signing");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Not encrypted before signed";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("EncryptBeforeSigning"));
-            }
+            String error = "Not encrypted before signed";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("EncryptBeforeSigning"));
         }
         
         ((java.io.Closeable)port).close();
@@ -315,11 +307,9 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing before encrypting");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Not signed before encrypted";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("SignBeforeEncrypting"));
-            }
+            String error = "Not signed before encrypted";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("SignBeforeEncrypting"));
         }
         
         ((java.io.Closeable)port).close();
@@ -422,10 +412,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
                 fail("Failure expected on sending the timestamp first");
             }
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Layout does not match the requirements";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "Layout does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();
@@ -475,10 +463,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
                 fail("Failure expected on sending the timestamp last");
             }
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Layout does not match the requirements";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "Layout does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();
@@ -574,10 +560,9 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not enabling SignatureConfirmation");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Check Signature confirmation";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "Check Signature confirmation";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("SignatureConfirmation must be present"));
         }
         
         ((java.io.Closeable)port).close();

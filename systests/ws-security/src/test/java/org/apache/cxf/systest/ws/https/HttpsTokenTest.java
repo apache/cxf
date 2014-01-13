@@ -121,7 +121,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not using a client cert");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
+            if (!STAX_PORT.equals(test.getPort())) {
                 String error = "HttpsToken";
                 assertTrue(ex.getMessage().contains(error));
             }
@@ -167,7 +167,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernamePassword");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
+            if (!STAX_PORT.equals(test.getPort())) {
                 String error = "HttpsToken";
                 assertTrue(ex.getMessage().contains(error));
             }
