@@ -181,9 +181,9 @@ public class JavaDocProvider implements DocumentationProvider {
             int operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker);
             while (operMarkerIndex != -1) { 
                 int startOfOpSigIndex = operMarkerIndex + operMarker.length();
-                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(")", operMarkerIndex);
+                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(")", startOfOpSigIndex);
                 int paramLen = method.getParameterTypes().length;
-                if (endOfOpSigIndex == startOfOpSigIndex + 1 && paramLen == 0) {
+                if (endOfOpSigIndex == startOfOpSigIndex && paramLen == 0) {
                     break;
                 } else if (endOfOpSigIndex > startOfOpSigIndex + 1) {
                     String[] opBits = 
