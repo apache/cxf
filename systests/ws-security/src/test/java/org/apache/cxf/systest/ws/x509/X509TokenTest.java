@@ -182,10 +182,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
         
-        // TODO WSS-468 Streaming
-        if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
-        }
+        x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -212,10 +209,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
         
-        // TODO WSS-468 Streaming
-        if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
-        }
+        x509Port.doubleIt(25);
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);

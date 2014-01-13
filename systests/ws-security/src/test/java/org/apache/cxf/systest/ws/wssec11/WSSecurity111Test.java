@@ -134,9 +134,8 @@ public class WSSecurity111Test extends WSSecurity11Common {
             {new TestParam("A", domPort, true)},
             {new TestParam("A-NoTimestamp", domPort, true)},
             {new TestParam("AD", domPort, true)},
-            // TODO See WSS-468 EncryptBeforeSigning not working 
-            // {new TestParam("A-ES", domPort, true)},
-            // {new TestParam("AD-ES", domPort, true)},
+            {new TestParam("A-ES", domPort, true)},
+            {new TestParam("AD-ES", domPort, true)},
             {new TestParam("UX", domPort, true)},
             {new TestParam("UX-NoTimestamp", domPort, true)},
             {new TestParam("UXD", domPort, true)},
@@ -157,9 +156,8 @@ public class WSSecurity111Test extends WSSecurity11Common {
             {new TestParam("A", staxPort, true)},
             {new TestParam("A-NoTimestamp", staxPort, true)},
             {new TestParam("AD", staxPort, true)},
-            // TODO See WSS-468 EncryptBeforeSigning not working 
-            // {new TestParam("A-ES", staxPort, true)},
-            // {new TestParam("AD-ES", staxPort, true)},
+            {new TestParam("A-ES", staxPort, true)},
+            {new TestParam("AD-ES", staxPort, true)},
             {new TestParam("UX", staxPort, true)},
             {new TestParam("UX-NoTimestamp", staxPort, true)},
             {new TestParam("UXD", staxPort, true)},
