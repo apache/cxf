@@ -110,6 +110,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertPolicy(
                 new QName(abinding.getName().getNamespaceURI(), SPConstants.SIGN_BEFORE_ENCRYPTING));
         }
+        reshuffleTimestamp();
         
         assertAlgorithmSuite(abinding.getAlgorithmSuite());
         assertWSSProperties(abinding.getName().getNamespaceURI());

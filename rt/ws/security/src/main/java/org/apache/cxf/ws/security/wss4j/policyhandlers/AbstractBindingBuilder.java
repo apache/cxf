@@ -50,6 +50,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -362,6 +363,25 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             addTopDownElement(timestampEl.getElement());
         }
         return timestamp;
+    }
+    
+    protected void reshuffleTimestamp() {
+        // Make sure that the Timestamp is in first place, if that is what the policy requires
+        if (binding.getLayout() != null && timestampEl != null) {
+            if (binding.getLayout().getLayoutType() == LayoutType.LaxTsFirst
+                && secHeader.getSecurityHeader().getFirstChild() != timestampEl.getElement()) {
+                Node firstChild = secHeader.getSecurityHeader().getFirstChild();
+                while (firstChild != null && firstChild.getNodeType() != Node.ELEMENT_NODE) {
+                    firstChild = firstChild.getNextSibling();
+                }
+                if (firstChild != null && firstChild != timestampEl.getElement()) {
+                    secHeader.getSecurityHeader().insertBefore(timestampEl.getElement(), firstChild);
+                }
+            } else if (binding.getLayout().getLayoutType() == LayoutType.LaxTsLast
+                && secHeader.getSecurityHeader().getLastChild() != timestampEl.getElement()) {
+                secHeader.getSecurityHeader().appendChild(timestampEl.getElement());
+            } 
+        }
     }
     
     private List<SupportingToken> handleSupportingTokens(

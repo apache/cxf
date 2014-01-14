@@ -338,9 +338,8 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
         
-        // TODO It's not sending the Timestamp "first" correctly - DOM
         // TODO Timestamp First/Last validation not working - see WSS-444
-        if (test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
+        if (!STAX_PORT.equals(test.getPort())) {
             port.doubleIt(25);
         }
         
@@ -354,15 +353,14 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         }
         
         try {
-            // TODO DOM not working as above
             // TODO Timestamp First/Last validation not working - see WSS-444
-            if (test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
+            if (!STAX_PORT.equals(test.getPort())) {
                 port.doubleIt(25);
                 fail("Failure expected on on sending the timestamp last");
             }
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // String error = "Layout does not match the requirements";
-            // assertTrue(ex.getMessage().contains(error));
+            String error = "Layout does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)port).close();

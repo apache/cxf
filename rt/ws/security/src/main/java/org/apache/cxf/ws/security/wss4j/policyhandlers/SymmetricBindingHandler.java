@@ -126,6 +126,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             assertPolicy(
                 new QName(sbinding.getName().getNamespaceURI(), SPConstants.SIGN_BEFORE_ENCRYPTING));
         }
+        reshuffleTimestamp();
         
         assertAlgorithmSuite(sbinding.getAlgorithmSuite());
         assertWSSProperties(sbinding.getName().getNamespaceURI());
