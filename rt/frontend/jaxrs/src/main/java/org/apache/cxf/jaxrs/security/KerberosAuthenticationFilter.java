@@ -115,14 +115,14 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
                                             gssContext));
             
         } catch (LoginException e) {
-            LOG.fine("Unsuccessful JAAS login for the service principal");
-            throw new NotAuthorizedException(getFaultResponse());
+            LOG.fine("Unsuccessful JAAS login for the service principal: " + e.getMessage());
+            throw new NotAuthorizedException(getFaultResponse(), e);
         } catch (GSSException e) {
             LOG.fine("GSS API exception: " + e.getMessage());
-            throw new NotAuthorizedException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse(), e);
         } catch (PrivilegedActionException e) {
             LOG.fine("PrivilegedActionException: " + e.getMessage());
-            throw new NotAuthorizedException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse(), e);
         }
     }
 
