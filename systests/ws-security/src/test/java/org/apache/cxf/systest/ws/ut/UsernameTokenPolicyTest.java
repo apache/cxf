@@ -121,11 +121,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken Supporting Token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "These policy alternatives can not be satisfied";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         ((java.io.Closeable)port).close();
@@ -168,11 +166,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a hashed password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "These policy alternatives can not be satisfied";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("password must not be hashed"));
-            }
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("password must not be hashed"));
         }
         
         // This should fail, as the client is not sending any password
@@ -231,11 +227,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a plaintext password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "These policy alternatives can not be satisfied";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken does not contain a hashed password"));
-            }
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken does not contain a hashed password"));
         }
         
         // This should fail, as the client is not sending any password
@@ -294,11 +288,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Created element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "These policy alternatives can not be satisfied";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken does not contain a created"));
-            }
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken does not contain a created"));
         }
         
         ((java.io.Closeable)port).close();
@@ -341,11 +333,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a Nonce element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "These policy alternatives can not be satisfied";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken does not contain a nonce"));
-            }
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken does not contain a nonce"));
         }
         
         ((java.io.Closeable)port).close();

@@ -123,11 +123,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the signed supporting token requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = "The received token does not match the signed supporting token requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         // This should fail, as the client is (encrypting) but not signing the UsernameToken
@@ -143,11 +141,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the signed supporting token requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = "The received token does not match the signed supporting token requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         ((java.io.Closeable)port).close();
@@ -191,11 +187,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the encrypted supporting token requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = "The received token does not match the encrypted supporting token requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         // This should fail, as the client is (signing) but not encrypting the UsernameToken
@@ -211,11 +205,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the encrypted supporting token requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = "The received token does not match the encrypted supporting token requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         ((java.io.Closeable)port).close();
@@ -259,12 +251,10 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = 
-                    "The received token does not match the signed encrypted supporting token requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = 
+                "The received token does not match the signed encrypted supporting token requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         // This should fail, as the client is (encrypting) but not signing the UsernameToken
@@ -280,12 +270,10 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = 
-                    "The received token does not match the signed encrypted supporting token requirement";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = 
+                "The received token does not match the signed encrypted supporting token requirement";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("UsernameToken not satisfied"));
         }
         
         ((java.io.Closeable)port).close();

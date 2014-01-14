@@ -157,11 +157,9 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
             fail("Expected failure on a bad cert");
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             String message = fault.getMessage();
-            if (!test.isStreaming()) {
-                assertTrue(message.contains("STS Authentication failed")
-                    || message.contains("Validation of security token failed")
-                    || message.contains("PolicyViolationException"));
-            }
+            assertTrue(message.contains("STS Authentication failed")
+                || message.contains("Validation of security token failed")
+                || message.contains("PolicyViolationException"));
         }
         
         ((java.io.Closeable)asymmetricBSTPort).close();

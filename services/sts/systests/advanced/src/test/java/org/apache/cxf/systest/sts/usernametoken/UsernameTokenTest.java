@@ -155,12 +155,10 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
-            if (!test.isStreaming()) {
-                String message = fault.getMessage();
-                assertTrue(message.contains("STS Authentication failed")
-                    || message.contains("Validation of security token failed")
-                    || message.contains("PolicyViolationException"));
-            }
+            String message = fault.getMessage();
+            assertTrue(message.contains("STS Authentication failed")
+                || message.contains("Validation of security token failed")
+                || message.contains("PolicyViolationException"));
         }
         
         ((java.io.Closeable)transportUTPort).close();

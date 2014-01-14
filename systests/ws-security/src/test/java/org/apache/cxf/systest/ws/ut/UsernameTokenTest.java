@@ -330,11 +330,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             utPort.doubleIt(25);
             fail("Failure expected on no UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "The received token does not match the token inclusion requirement";
-                assertTrue(ex.getMessage().contains(error)
-                       || ex.getMessage().contains("UsernameToken not satisfied"));
-            }
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error)
+                   || ex.getMessage().contains("UsernameToken not satisfied"));
         }
 
         ((java.io.Closeable)utPort).close();
@@ -452,10 +450,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             utPort.doubleIt(30);
             fail("Failure expected on a user with the wrong role");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "Unauthorized";
-                assertTrue(ex.getMessage().contains(error));
-            }
+            String error = "Unauthorized";
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)utPort).close();

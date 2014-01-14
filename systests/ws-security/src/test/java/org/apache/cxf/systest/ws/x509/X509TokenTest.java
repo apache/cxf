@@ -1177,11 +1177,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             x509Port.doubleIt(25);
             fail("Failure expected on not endorsing the token");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            if (!test.isStreaming()) {
-                String error = "These policy alternatives can not be satisfied";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains("X509Token not satisfied"));
-            }
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("X509Token not satisfied"));
         }
         
         ((java.io.Closeable)x509Port).close();
