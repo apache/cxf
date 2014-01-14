@@ -241,6 +241,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     SecurePart part = 
                         new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
                     encrParts.add(part);
+                    if (signatureConfirmationAdded) {
+                        part = new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
+                        encrParts.add(part);
+                    }
                     assertPolicy(
                         new QName(sbinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
                 }
@@ -387,6 +391,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 SecurePart part = 
                     new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
                 enc.add(part);
+                if (signatureConfirmationAdded) {
+                    part = new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
+                    enc.add(part);
+                }
                 assertPolicy(
                     new QName(sbinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
             }

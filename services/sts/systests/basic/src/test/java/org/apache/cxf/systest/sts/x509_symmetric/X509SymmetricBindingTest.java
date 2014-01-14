@@ -196,7 +196,7 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         }
         
         // TODO Streaming client is not including a separate main Signature
-        if (!(test.isStreaming() && STAX_PORT.equals(test.getPort()))) {
+        if (!test.isStreaming()) {
             doubleIt(symmetricSaml2Port, 30);
         }
         

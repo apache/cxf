@@ -194,11 +194,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(symmetricSaml1Port);
         }
 
-        // TODO Streaming - The encrypted issued token is placed under the ReferenceList
-        // and hence an error is thrown on the receiving side
-        if (!test.isStreaming()) {
-            doubleIt(symmetricSaml1Port, 25);
-        }
+        doubleIt(symmetricSaml1Port, 25);
         
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);

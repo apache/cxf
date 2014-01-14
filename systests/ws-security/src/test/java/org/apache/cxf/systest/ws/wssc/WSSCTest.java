@@ -122,12 +122,10 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", PORT, true)},
             {new TestParam("AC_IPingService", PORT, true)},
             {new TestParam("ADC_IPingService", PORT, true)},
-            // TODO Error with "EncryptBeforeSigning" ordering.
-            // {new TestParam("ADC-ES_IPingService", PORT, true)},
+            {new TestParam("ADC-ES_IPingService", PORT, true)},
             {new TestParam("_A_IPingService", PORT, true)},
             {new TestParam("_AD_IPingService", PORT, true)},
-            // TODO Error with "EncryptBeforeSigning" ordering.
-            // {new TestParam("_AD-ES_IPingService", PORT, true)},
+            {new TestParam("_AD-ES_IPingService", PORT, true)},
             {new TestParam("UXC_IPingService", PORT, true)},
             {new TestParam("UXDC_IPingService", PORT, true)},
             {new TestParam("UXDC-SEES_IPingService", PORT, true)},
@@ -147,7 +145,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("_XD-SEES_IPingService", PORT, true)},
             // {new TestParam("_XD-ES_IPingService", PORT, true)},
 
-            // TODO Endorsing derived keys not supported.
+            // TODO StAX Policy Validation error caused by incorrect DOM message
             // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", 
             //               STAX_PORT, false)},
             {new TestParam("AC_IPingService", STAX_PORT, false)},
@@ -178,12 +176,10 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             //               STAX_PORT, true)},
             {new TestParam("AC_IPingService", STAX_PORT, true)},
             {new TestParam("ADC_IPingService", STAX_PORT, true)},
-            // TODO Error with "EncryptBeforeSigning" ordering.
-            // {new TestParam("ADC-ES_IPingService", STAX_PORT, true)},
+            {new TestParam("ADC-ES_IPingService", STAX_PORT, true)},
             {new TestParam("_A_IPingService", STAX_PORT, true)},
             {new TestParam("_AD_IPingService", STAX_PORT, true)},
-            // TODO Error with "EncryptBeforeSigning" ordering.
-            // {new TestParam("_AD-ES_IPingService", STAX_PORT, true)},
+            {new TestParam("_AD-ES_IPingService", STAX_PORT, true)},
             {new TestParam("UXC_IPingService", STAX_PORT, true)},
             {new TestParam("UXDC_IPingService", STAX_PORT, true)},
             {new TestParam("UXDC-SEES_IPingService", STAX_PORT, true)},
