@@ -24,7 +24,14 @@
   xsi:schemaLocation="
   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:security="http://www.springframework.org/schema/security" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/security  http://www.springframework.org/schema/security/spring-security-2.0.4.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:security="http://www.springframework.org/schema/security" 
+    xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd 
+                         http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd 
+                         http://www.springframework.org/schema/security  http://www.springframework.org/schema/security/spring-security.xsd 
+                         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     <jaxrs:server id="bookservice" address="/">
@@ -50,13 +57,15 @@
         <security:http-basic/>
     </security:http>
     <bean id="bookstoreGenerics" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreGenerics"/>
-    <security:authentication-provider>
-        <security:user-service>
-            <security:user name="bob" password="bobspassword" authorities="ROLE_USER"/>
-            <security:user name="baddy" password="baddyspassword" authorities="ROLE_USER"/>
-            <security:user name="foo" password="bar" authorities="ROLE_USER, ROLE_ADMIN"/>
-            <security:user name="baz" password="baz" authorities="ROLE_BAZ"/>
-        </security:user-service>
-    </security:authentication-provider>
+    <security:authentication-manager>
+	    <security:authentication-provider>
+	        <security:user-service>
+	            <security:user name="bob" password="bobspassword" authorities="ROLE_USER"/>
+	            <security:user name="baddy" password="baddyspassword" authorities="ROLE_USER"/>
+	            <security:user name="foo" password="bar" authorities="ROLE_USER, ROLE_ADMIN"/>
+	            <security:user name="baz" password="baz" authorities="ROLE_BAZ"/>
+	        </security:user-service>
+	    </security:authentication-provider>
+	</security:authentication-manager>    
 </beans>
 <!-- END SNIPPET: beans -->

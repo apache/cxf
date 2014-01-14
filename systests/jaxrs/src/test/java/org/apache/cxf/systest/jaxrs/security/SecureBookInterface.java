@@ -26,7 +26,7 @@ import javax.ws.rs.Produces;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
-import org.springframework.security.annotation.Secured;
+import org.springframework.security.access.annotation.Secured;
 
 public interface SecureBookInterface {
 

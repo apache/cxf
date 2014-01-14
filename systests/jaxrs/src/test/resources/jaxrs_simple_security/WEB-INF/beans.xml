@@ -17,7 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
+    xmlns:util="http://www.springframework.org/schema/util" 
+    xsi:schemaLocation=" 
+      http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd 
+      http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd 
+      http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     <jaxrs:server id="bookservice" address="/security1">
@@ -76,7 +83,7 @@
         <property name="securedObject" ref="securedObject"/>
     </bean>
     <bean id="annotationsInterceptor2" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
-        <property name="annotationClassName" value="org.springframework.security.annotation.Secured"/>
+        <property name="annotationClassName" value="org.springframework.security.access.annotation.Secured"/>
         <property name="securedObject" ref="securedObjectWithInterface"/>
     </bean>
     <bean id="securedObject" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoInterface"/>
