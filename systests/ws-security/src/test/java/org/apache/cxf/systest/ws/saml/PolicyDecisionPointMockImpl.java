@@ -21,9 +21,17 @@ package org.apache.cxf.systest.ws.saml;
 
 import java.util.List;
 
-import org.apache.cxf.message.Message;
-import org.apache.cxf.rt.security.xacml.AbstractXACMLAuthorizingInterceptor;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.xacml.XACMLConstants;
+import org.apache.cxf.rt.security.xacml.pdp.api.PolicyDecisionPoint;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.opensaml.Configuration;
 import org.opensaml.xacml.XACMLObjectBuilder;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -35,16 +43,24 @@ import org.opensaml.xacml.ctx.StatusCodeType;
 import org.opensaml.xacml.ctx.StatusType;
 import org.opensaml.xacml.ctx.SubjectType;
 import org.opensaml.xml.XMLObjectBuilderFactory;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
- * A test implementation of AbstractXACMLAuthorizingInterceptor. It just mocks up a Response
+ * A test implementation of PolicyDecisionPoint. It just mocks up a Response
  * object based on the role of the Subject. If the role is "manager" then it permits the
  * request, otherwise it denies it.
  */
-public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
+public class PolicyDecisionPointMockImpl implements PolicyDecisionPoint {
     
-    public ResponseType performRequest(RequestType request, Message message) throws Exception {
+    public PolicyDecisionPointMockImpl() {
+        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
+    }
+    
+    @Override
+    public Source evaluate(Source request) {
+        RequestType requestType = requestSourceToRequestType(request);
         
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
         
@@ -75,7 +91,7 @@ public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterce
             
         DecisionType decisionType = decisionTypeBuilder.buildObject();
         
-        String role = getSubjectRole(request);
+        String role = getSubjectRole(requestType);
         if ("manager".equals(role)) {
             decisionType.setDecision(DecisionType.DECISION.Permit); 
         } else {
@@ -94,9 +110,35 @@ public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterce
         ResponseType response = responseTypeBuilder.buildObject();
         response.setResult(result);
         
-        return response;
+        return responseType2Source(response);
     }
-
+    
+    private RequestType requestSourceToRequestType(Source requestSource) {
+        try {
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            DOMResult res = new DOMResult();
+            trans.transform(requestSource, res);
+            Node nd = res.getNode();
+            if (nd instanceof Document) {
+                nd = ((Document)nd).getDocumentElement();
+            }
+            return (RequestType)OpenSAMLUtil.fromDom((Element)nd);
+        } catch (Exception e) {
+            throw new RuntimeException("Error converting pdp response to ResponseType", e);
+        }
+    }
+    
+    private Source responseType2Source(ResponseType response) {
+        Document doc = DOMUtils.createDocument();
+        Element responseElement;
+        try {
+            responseElement = OpenSAMLUtil.toDom(response, doc);
+        } catch (WSSecurityException e) {
+            throw new RuntimeException("Error converting PDP RequestType to Dom", e);
+        }
+        return new DOMSource(responseElement);
+    }
+    
     private String getSubjectRole(RequestType request) {
         List<SubjectType> subjects = request.getSubjects();
         if (subjects != null) {
