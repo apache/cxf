@@ -27,6 +27,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.xacml.XACMLConstants;
 import org.apache.cxf.rt.security.xacml.pdp.api.PolicyDecisionPoint;
@@ -43,9 +47,6 @@ import org.opensaml.xacml.ctx.StatusCodeType;
 import org.opensaml.xacml.ctx.StatusType;
 import org.opensaml.xacml.ctx.SubjectType;
 import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * A test implementation of PolicyDecisionPoint. It just mocks up a Response
