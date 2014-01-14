@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -37,12 +38,36 @@ public class HazelCastTokenStore implements TokenStore {
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
 
     private IMap<Object, Object> cacheMap;
+
     private long ttl = DEFAULT_TTL;
+    private HazelcastInstance hazelcastInstance;
+    private String mapName;
     
     public HazelCastTokenStore(String mapName) {
-        cacheMap = Hazelcast.getDefaultInstance().getMap(mapName);
+        this.mapName = mapName;
     }
     
+    /**
+     * Get the Hazelcast instance
+     * If null, return Default instance
+     * @param hzInstance Hazelcast instance
+     */
+    public HazelcastInstance getHazelcastInstance() {
+        if (hazelcastInstance == null) {
+            hazelcastInstance = Hazelcast.getDefaultInstance();
+        }
+        return hazelcastInstance;
+    }
+
+    /**
+     * Set the Hazelcast instance, otherwise default instance used
+     * If you configure Hazelcast instance in spring, you must inject the instance here.
+     * @param hzInstance Hazelcast instance
+     */
+    public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        this.hazelcastInstance = hazelcastInstance;
+    }
+
     /**
      * Set a new (default) TTL value in seconds
      * @param newTtl a new (default) TTL value in seconds
@@ -63,7 +88,7 @@ public class HazelCastTokenStore implements TokenStore {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             int parsedTTL = getTTL(token);
             if (parsedTTL > 0) {
-                cacheMap.put(token.getId(), token, parsedTTL, TimeUnit.SECONDS);
+                getCacheMap().put(token.getId(), token, parsedTTL, TimeUnit.SECONDS);
             }
         }
     }
@@ -72,19 +97,19 @@ public class HazelCastTokenStore implements TokenStore {
         if (token != null && !StringUtils.isEmpty(identifier)) {
             int parsedTTL = getTTL(token);
             if (parsedTTL > 0) {
-                cacheMap.put(identifier, token, parsedTTL, TimeUnit.SECONDS);
+                getCacheMap().put(identifier, token, parsedTTL, TimeUnit.SECONDS);
             }
         }
     }
     
     public void remove(String identifier) {
-        if (!StringUtils.isEmpty(identifier) && cacheMap.containsKey(identifier)) {
-            cacheMap.remove(identifier);
+        if (!StringUtils.isEmpty(identifier) && getCacheMap().containsKey(identifier)) {
+            getCacheMap().remove(identifier);
         }
     }
     
     public Collection<String> getTokenIdentifiers() {
-        return CastUtils.cast((Collection<?>)cacheMap.keySet());
+        return CastUtils.cast((Collection<?>)getCacheMap().keySet());
     }
 
     public Collection<SecurityToken> getExpiredTokens() {
@@ -93,7 +118,13 @@ public class HazelCastTokenStore implements TokenStore {
     }
 
     public SecurityToken getToken(String identifier) {
-        return (SecurityToken)cacheMap.get(identifier);
+        return (SecurityToken)getCacheMap().get(identifier);
+    }
+    
+    public void destroy() {
+        if (hazelcastInstance != null) {
+            hazelcastInstance.getLifecycleService().shutdown();
+        }
     }
 
     private int getTTL(SecurityToken token) {
@@ -126,4 +157,12 @@ public class HazelCastTokenStore implements TokenStore {
         return parsedTTL;
     }
     
+    private IMap<Object, Object> getCacheMap() {
+        if (this.cacheMap == null) {
+            this.cacheMap = getHazelcastInstance().getMap(mapName);
+        }
+        return this.cacheMap;
+    }
+    
 }
+
