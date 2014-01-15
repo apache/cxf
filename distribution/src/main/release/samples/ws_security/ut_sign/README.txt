@@ -9,7 +9,10 @@ incoming interceptors. Various Actions like, Timestamp, UsernameToken,
 Signature, Encryption, etc., can be applied to the interceptors by passing
 appropriate configuration properties.
 
-This demo also shows how the DefaultCryptoCoverageChecker can be used to
+CXF 3.0.0 supports both a DOM-based (in-memory) and StAX-based (streaming)
+approach to WS-Security. This demo shows how to use both approaches.
+
+This demo also shows how the CryptoCoverageChecker can be used to
 make sure that the correct Elements were signed and/or encrypted.
 
 The logging feature is used to log the inbound and outbound
@@ -48,18 +51,26 @@ Building and running the demo using Maven
 From the base directory of this sample (i.e., where this README file is
 located), the maven pom.xml file can be used to build and run the demo.
 
-
 Using either UNIX or Windows:
 
   mvn install (builds the demo)
+
+To use the DOM-based WS-Security functionality:
+
   mvn -Pserver  (from one command line window)
   mvn -Pclient  (from a second command line window)
+
+To use the StAX-based WS-Security functionality:
+
+  mvn -Pstax-server  (from one command line window)
+  mvn -Pstax-client  (from a second command line window)
+
+You can also run the DOM client against the StAX server, and vice versa.
 
 On startup, the client makes a sequence of 4 two-way invocations.
 
 To remove the code generated from the WSDL file and the .class
 files, run "mvn clean".
-
 
 
 Building the demo using wsdl2java and javac

@@ -35,7 +35,9 @@ import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
-
+/**
+ * A DOM-based client
+ */
 public final class Client {
 
     private static final String WSU_NS
