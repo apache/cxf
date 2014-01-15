@@ -20,7 +20,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-rt-transports-http-hc</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Apache CXF Runtime HTTP Async Transport</name>
     <description>Apache CXF Runtime HTTP Async Transport</description>
     <url>http://cxf.apache.org</url>
@@ -31,14 +31,10 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+    	<cxf.bundle.activator>org.apache.cxf.transport.http.asyncclient.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
-            org.apache.http.nio.conn;version="${cxf.httpcomponents.asyncclient.version.range}",
-            org.apache.http.nio.conn.scheme;version="${cxf.httpcomponents.asyncclient.version.range}",
-            org.apache.http.nio.conn.ssl;version="${cxf.httpcomponents.asyncclient.version.range}",
-            org.apache.http.impl.nio.client;version="${cxf.httpcomponents.asyncclient.version.range}",
-            org.apache.http.impl.nio.conn;version="${cxf.httpcomponents.asyncclient.version.range}",
-            org.apache.http.*;version="${cxf.httpcomponents.core.version.range}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
+            *
         </cxf.osgi.import>
     </properties>
     <dependencies>
@@ -51,6 +47,18 @@
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+            <optional/>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+            <optional/>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

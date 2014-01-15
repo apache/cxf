@@ -19,36 +19,45 @@
 
 package org.apache.cxf.transport.http.osgi;
 
+import java.util.Dictionary;
 import java.util.Properties;
+
+import javax.servlet.Servlet;
 
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
+import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
+import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.blueprint.HttpBPHandler;
+import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 
 public class HTTPTransportActivator 
     implements BundleActivator {
     
-    ServiceRegistration reg;
-    ServiceRegistration reg2;
-    
     public void start(BundleContext context) throws Exception {
         ConfigAdminHttpConduitConfigurer conduitConfigurer = new ConfigAdminHttpConduitConfigurer();
+        DestinationRegistry destinationRegistry = new DestinationRegistryImpl();
+        HTTPTransportFactory transportFactory = new HTTPTransportFactory(destinationRegistry);
+        Servlet servlet = new CXFNonSpringServlet(destinationRegistry , false);
+        ServletConfigurer servletConfig = new ServletConfigurer(context, servlet);
 
-        Properties servProps = new Properties();
-        servProps.put(Constants.SERVICE_PID, ConfigAdminHttpConduitConfigurer.FACTORY_PID);  
-        reg2 = context.registerService(ManagedServiceFactory.class.getName(),
-                                       conduitConfigurer, servProps);
-        
-        servProps = new Properties();
-        servProps.put(Constants.SERVICE_PID,  "org.apache.cxf.http.conduit-configurer");  
-        reg = context.registerService(HTTPConduitConfigurer.class.getName(),
-                                conduitConfigurer, servProps);
+        registerService(context, ManagedServiceFactory.class, conduitConfigurer, 
+                        ConfigAdminHttpConduitConfigurer.FACTORY_PID);
+        registerService(context, HTTPConduitConfigurer.class, conduitConfigurer, 
+                        "org.apache.cxf.http.conduit-configurer");
+        context.registerService(DestinationRegistry.class.getName(), destinationRegistry, null);
+        context.registerService(HTTPTransportFactory.class.getName(), transportFactory, null);
+        registerService(context, ManagedService.class, servletConfig, "org.apache.cxf.osgi");
+
         BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
             
             @Override
@@ -60,9 +69,71 @@ public class HTTPTransportActivator
                                             "http://cxf.apache.org/transports/http/configuration");  
     }
 
-    public void stop(BundleContext context) throws Exception {
-        reg.unregister();
-        reg2.unregister();
+    private void registerService(BundleContext context, Class<?> serviceInterface,
+                                        Object serviceObject, String servicePid) {
+        Properties servProps = new Properties();
+        servProps.put(Constants.SERVICE_PID,  servicePid);  
+        context.registerService(serviceInterface.getName(), serviceObject, servProps);
     }
 
+    public void stop(BundleContext context) throws Exception {
+    }
+
+    
+    class ServletConfigurer implements ManagedService {
+        private ServiceRegistration reg;
+        private BundleContext context;
+        private Servlet servlet;
+        
+        public ServletConfigurer(BundleContext context, Servlet servlet) {
+            this.servlet = servlet;
+            this.context = context;
+        }
+
+        @SuppressWarnings("rawtypes")
+        @Override
+        public void updated(Dictionary properties) throws ConfigurationException {
+            if (reg != null) {
+                reg.unregister();
+            }
+            if (properties == null) {
+                properties = new Properties();
+            }
+            Properties sprops = new Properties();
+            sprops.put("alias",
+                       getProp(properties, "org.apache.cxf.servlet.context", "/cxf"));
+            sprops.put("servlet-name", 
+                       getProp(properties, "org.apache.cxf.servlet.name", "cxf-osgi-transport-servlet"));
+            sprops.put("hide-service-list-page", 
+                       getProp(properties, "org.apache.cxf.servlet.hide-service-list-page", "false"));
+            sprops.put("disable-address-updates", 
+                       getProp(properties, "org.apache.cxf.servlet.disable-address-updates", "false"));
+            sprops.put("base-address", 
+                       getProp(properties, "org.apache.cxf.servlet.base-address", ""));
+            sprops.put("service-list-path", 
+                       getProp(properties, "org.apache.cxf.servlet.service-list-path", ""));
+            sprops.put("static-resources-list", 
+                       getProp(properties, "org.apache.cxf.servlet.static-resources-list", ""));
+            sprops.put("redirects-list", 
+                       getProp(properties, "org.apache.cxf.servlet.redirects-list", ""));
+            sprops.put("redirect-servlet-name", 
+                       getProp(properties, "org.apache.cxf.servlet.redirect-servlet-name", ""));
+            sprops.put("redirect-servlet-path", 
+                       getProp(properties, "org.apache.cxf.servlet.redirect-servlet-path", ""));
+            sprops.put("service-list-all-contexts", 
+                       getProp(properties, "org.apache.cxf.servlet.service-list-all-contexts", ""));
+            sprops.put("service-list-page-authenticate", 
+                       getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate", "false"));
+            sprops.put("service-list-page-authenticate-realm", 
+                       getProp(properties, "org.apache.cxf.servlet.service-list-page-authenticate-realm", "karaf"));
+            context.registerService(Servlet.class.getName(), servlet, sprops);
+        }
+
+        @SuppressWarnings("rawtypes")
+        private Object getProp(Dictionary properties, String key, Object defaultValue) {
+            Object value = properties.get(key);
+            return value == null ? defaultValue : value;
+        }
+        
+    }
 }

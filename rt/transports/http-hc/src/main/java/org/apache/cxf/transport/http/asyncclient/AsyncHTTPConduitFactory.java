@@ -67,7 +67,6 @@ import org.apache.http.protocol.HttpContext;
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPConduitFactory {
-
     
     //TCP related properties
     public static final String TCP_NODELAY = "org.apache.cxf.transport.http.async.TCP_NODELAY";
