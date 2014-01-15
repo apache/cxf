@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
 import org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker;
@@ -55,99 +56,42 @@ public final class StaxClient {
         try {
 
             SpringBusFactory bf = new SpringBusFactory();
-            URL busFile = StaxClient.class.getResource("wssec.xml");
+            URL busFile = StaxClient.class.getResource("/wssec.xml");
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
-            Properties encCryptoProperties = 
-                CryptoFactory.getProperties("etc/Client_Encrypt.properties", StaxClient.class.getClassLoader());
-            Properties sigCryptoProperties = 
-                CryptoFactory.getProperties("etc/Client_Sign.properties", StaxClient.class.getClassLoader());
-            
             WSSSecurityProperties properties = new WSSSecurityProperties();
             properties.addAction(WSSConstants.USERNAMETOKEN);
             properties.addAction(WSSConstants.TIMESTAMP);
-            properties.addAction(WSSConstants.SIGNATURE);
-            properties.addAction(WSSConstants.ENCRYPT);
 
             properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
             properties.setTokenUser("abcd");
-            properties.setSignatureUser("clientx509v1");
-            properties.setEncryptionUser("serverx509v1");
-            
-            properties.setEncryptionCryptoProperties(encCryptoProperties);
-            properties.setEncryptionKeyIdentifier(
-                WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
-            );
-            properties.setEncryptionKeyTransportAlgorithm(
-                "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"
-            );
-            properties.addEncryptionPart(
-                new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
-            );
-            properties.addEncryptionPart(
-                new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Content)
-            );
-            
-            properties.setSignatureCryptoProperties(sigCryptoProperties);
-            properties.setSignatureKeyIdentifier(
-                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
-            );
-            properties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
-            properties.addSignaturePart(
-                new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
-            );
-            properties.addSignaturePart(
-                new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
-            );
-            properties.addSignaturePart(
-                new SecurePart(new QName("http://www.w3.org/2005/08/addressing", "ReplyTo"),
-                    SecurePart.Modifier.Element)
-            );
             properties.setCallbackHandler(new UTPasswordCallback());
-            
-            WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
-            bus.getOutInterceptors().add(ohandler);
             
             WSSSecurityProperties inProperties = new WSSSecurityProperties();
             inProperties.addAction(WSSConstants.USERNAMETOKEN);
             inProperties.addAction(WSSConstants.TIMESTAMP);
-            inProperties.addAction(WSSConstants.SIGNATURE);
-            inProperties.addAction(WSSConstants.ENCRYPT);
 
+            inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
             inProperties.setCallbackHandler(new UTPasswordCallback());
-            inProperties.setDecryptionCryptoProperties(sigCryptoProperties);
-            inProperties.setSignatureVerificationCryptoProperties(encCryptoProperties);
             
-            WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-            bus.getInInterceptors().add(inhandler);
-
-            // Check to make sure that the SOAP Body and Timestamp were signed,
-            // and that the SOAP Body was encrypted
-            StaxCryptoCoverageChecker coverageChecker = new StaxCryptoCoverageChecker();
-            coverageChecker.setSignBody(true);
-            coverageChecker.setSignTimestamp(true);
-            coverageChecker.setEncryptBody(true);
-            bus.getInInterceptors().add(coverageChecker);
-
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
+            org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
+            client.getInInterceptors().add(new WSS4JStaxInInterceptor(inProperties));
+            client.getOutInterceptors().add(new WSS4JStaxOutInterceptor(properties));
 
-            String[] names = new String[] {"Anne", "Bill", "Chris", "Sachin Tendulkar"};
+            String[] names = new String[] {"Anne", "Bill", "Chris", "Scott"};
             // make a sequence of 4 invocations
             for (int i = 0; i < 4; i++) {
                 System.out.println("Invoking greetMe...");
                 String response = port.greetMe(names[i]);
                 System.out.println("response: " + response + "\n");
+
             }
-
-            // allow asynchronous resends to occur
-            Thread.sleep(30 * 1000);
-
             if (port instanceof Closeable) {
                 ((Closeable)port).close();
             }
-
             bus.shutdown(true);
 
         } catch (UndeclaredThrowableException ex) {

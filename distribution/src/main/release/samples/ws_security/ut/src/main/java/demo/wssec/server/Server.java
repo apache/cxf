@@ -32,12 +32,13 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
-
+/**
+ * A DOM-based server
+ */
 public class Server {
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
-
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";

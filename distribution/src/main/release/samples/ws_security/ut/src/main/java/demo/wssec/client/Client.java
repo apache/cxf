@@ -34,9 +34,9 @@ import org.apache.cxf.hello_world_soap_http.GreeterService;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
-
-
-
+/**
+ * A DOM-based client
+ */
 public final class Client {
 
     private Client() {
@@ -57,20 +57,16 @@ public final class Client {
             outProps.put("user", "abcd");
             outProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");
 
-
             Map<String, Object> inProps = new HashMap<String, Object>();
             inProps.put("action", "UsernameToken Timestamp");
             inProps.put("passwordType", "PasswordText");
             inProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");
-
 
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
             org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
             client.getInInterceptors().add(new WSS4JInInterceptor(inProps));
             client.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
-            
-            
 
             String[] names = new String[] {"Anne", "Bill", "Chris", "Scott"};
             // make a sequence of 4 invocations

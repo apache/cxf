@@ -104,6 +104,11 @@ public class StaxServer {
         bus.getOutInterceptors().add(ohandler);
         
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.addAction(WSSConstants.USERNAMETOKEN);
+        inProperties.addAction(WSSConstants.TIMESTAMP);
+        inProperties.addAction(WSSConstants.SIGNATURE);
+        inProperties.addAction(WSSConstants.ENCRYPT);
+
         inProperties.setCallbackHandler(new UTPasswordCallback());
         inProperties.setDecryptionCryptoProperties(decCryptoProperties);
         inProperties.setSignatureVerificationCryptoProperties(sigVerCryptoProperties);
