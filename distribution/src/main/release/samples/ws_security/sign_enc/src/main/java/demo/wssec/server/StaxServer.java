@@ -38,11 +38,13 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
-public class Server {
+/**
+ * A StAX-based server
+ */
+public class StaxServer {
 
-    protected Server() throws Exception {
-        System.out.println("Starting Server");
-
+    protected StaxServer() throws Exception {
+        System.out.println("Starting StaxServer");
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
@@ -56,9 +58,9 @@ public class Server {
         Bus bus = bf.createBus(busFile.toString());
 
         Properties decCryptoProperties = 
-            CryptoFactory.getProperties("etc/Server_Decrypt.properties", Server.class.getClassLoader());
+            CryptoFactory.getProperties("etc/Server_Decrypt.properties", StaxServer.class.getClassLoader());
         Properties sigVerCryptoProperties = 
-            CryptoFactory.getProperties("etc/Server_SignVerf.properties", Server.class.getClassLoader());
+            CryptoFactory.getProperties("etc/Server_SignVerf.properties", StaxServer.class.getClassLoader());
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.addAction(WSSConstants.USERNAMETOKEN);
@@ -119,13 +121,13 @@ public class Server {
 
         BusFactory.setDefaultBus(bus);
 
-        new Server();
-        System.out.println("Server ready...");
+        new StaxServer();
+        System.out.println("StaxServer ready...");
 
         Thread.sleep(5 * 60 * 1000);
 
         bus.shutdown(true);
-        System.out.println("Server exiting");
+        System.out.println("StaxServer exiting");
         System.exit(0);
     }
 }

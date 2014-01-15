@@ -33,6 +33,9 @@ import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
+/**
+ * A DOM-based server
+ */
 public class Server {
     private static final String WSSE_NS 
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
@@ -41,7 +44,6 @@ public class Server {
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
-
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";

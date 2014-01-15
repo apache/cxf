@@ -41,27 +41,28 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
-import demo.wssec.server.Server;
 import demo.wssec.server.UTPasswordCallback;
 
+/**
+ * A StAX-based client
+ */
+public final class StaxClient {
 
-public final class Client {
-
-    private Client() {
+    private StaxClient() {
     }
 
     public static void main(String args[]) throws Exception {
         try {
 
             SpringBusFactory bf = new SpringBusFactory();
-            URL busFile = Client.class.getResource("wssec.xml");
+            URL busFile = StaxClient.class.getResource("wssec.xml");
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
             Properties encCryptoProperties = 
-                CryptoFactory.getProperties("etc/Client_Encrypt.properties", Server.class.getClassLoader());
+                CryptoFactory.getProperties("etc/Client_Encrypt.properties", StaxClient.class.getClassLoader());
             Properties sigCryptoProperties = 
-                CryptoFactory.getProperties("etc/Client_Sign.properties", Server.class.getClassLoader());
+                CryptoFactory.getProperties("etc/Client_Sign.properties", StaxClient.class.getClassLoader());
             
             WSSSecurityProperties properties = new WSSSecurityProperties();
             properties.addAction(WSSConstants.USERNAMETOKEN);

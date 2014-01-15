@@ -100,6 +100,29 @@
             </build>
         </profile>
         <profile>
+            <id>stax-server</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.wssec.server.StaxServer</mainClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>client</id>
             <build>
                 <defaultGoal>test</defaultGoal>
@@ -115,6 +138,29 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>demo.wssec.client.Client</mainClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>stax-client</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.wssec.client.StaxClient</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
