@@ -74,14 +74,40 @@
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>java</executable>
+                                    <mainClass>demo.wssec.server.Server</mainClass>
                                     <arguments>
-                                        <argument>-classpath</argument>
-                                        <classpath/>
-                                        <argument>demo.wssec.server.Server</argument>
+                                        <argument>${basedir}/src/main/resources/ServiceConfig.xml</argument>
+                                        <argument>secure</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>stax-server</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                               <configuration>
+                                    <mainClass>demo.wssec.server.Server</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/src/main/resources/ServiceConfigStax.xml</argument>
+                                        <argument>secure</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -108,6 +134,35 @@
                                     <mainClass>demo.wssec.client.Client</mainClass>
                                     <arguments>
                                         <argument>${basedir}/src/main/config/hello_world.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/ClientConfig.xml</argument>
+                                        <argument>secure</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>stax-client</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.wssec.client.Client</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/src/main/config/hello_world.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/ClientConfigStax.xml</argument>
                                         <argument>secure</argument>
                                     </arguments>
                                 </configuration>
@@ -135,6 +190,7 @@
                                     <mainClass>demo.wssec.client.Client</mainClass>
                                     <arguments>
                                         <argument>${basedir}/src/main/config/hello_world_no_policy.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/ClientConfig.xml</argument>
                                         <argument>secure</argument>
                                     </arguments>
                                 </configuration>
