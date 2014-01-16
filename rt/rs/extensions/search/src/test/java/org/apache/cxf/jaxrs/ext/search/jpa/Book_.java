@@ -28,7 +28,7 @@ public final class Book_ {
         
     }
     public static volatile SingularAttribute<Book, Integer> id;
-    public static volatile SingularAttribute<Book, String> title;
+    public static volatile SingularAttribute<Book, String> bookTitle;
     public static volatile SingularAttribute<Book, Library> library;
     public static volatile SingularAttribute<Book, OwnerInfo> ownerInfo;
     public static volatile SingularAttribute<Book, OwnerAddress> address;

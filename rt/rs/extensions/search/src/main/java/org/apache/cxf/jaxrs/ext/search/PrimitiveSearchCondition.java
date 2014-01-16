@@ -110,7 +110,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         String thePropertyName;
         int index = getter.indexOf(".");
         if (index != -1) {
-            thePropertyName = getter.substring(0, index).toLowerCase();
+            thePropertyName = getter.substring(0, index);
         } else {
             thePropertyName = getter;
         }
@@ -118,7 +118,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         Object value;
         try {
             if (beanspector != null) {
-                value = beanspector.swap(pojo).getValue(thePropertyName);
+                value = beanspector.swap(pojo).getValue(thePropertyName.toLowerCase());
             } else {
                 value = ((SearchBean)pojo).get(getter);
             }
