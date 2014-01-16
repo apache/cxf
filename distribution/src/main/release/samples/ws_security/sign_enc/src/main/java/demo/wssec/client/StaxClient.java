@@ -83,7 +83,7 @@ public final class StaxClient {
                 "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"
             );
             properties.addEncryptionPart(
-                new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
+                new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
             properties.addEncryptionPart(
                 new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Content)
