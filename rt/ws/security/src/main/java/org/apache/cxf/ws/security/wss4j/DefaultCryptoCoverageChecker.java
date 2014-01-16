@@ -27,10 +27,12 @@ import org.apache.wss4j.dom.WSConstants;
 /**
  * This utility extends the CryptoCoverageChecker to provide an easy way to check to see
  * if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, if the Timestamp was signed,
- * and if the WS-Addressing ReplyTo and FaultTo headers were signed.
+ * if the WS-Addressing ReplyTo and FaultTo headers were signed, and if the UsernameToken
+ * was encrypted.
  * 
- * The default configuration is that the SOAP Body, Timestamp must be signed, and WS-Addressing
- * ReplyTo and FaultTo headers must be signed (if they exist in the message payload).
+ * The default configuration is that the SOAP Body, Timestamp must be signed, WS-Addressing
+ * ReplyTo and FaultTo headers must be signed, and a WSS UsernameToken must be encrypted
+ * (if they exist in the message payload).
  */
 public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
     
@@ -44,6 +46,8 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
     private boolean signTimestamp;
     private boolean encryptBody;
     private boolean signAddressingHeaders;
+    private boolean signUsernameToken;
+    private boolean encryptUsernameToken;
     
     /**
      * Creates a new instance. Enforces that the SOAP Body, Timestamp, and WS-Addressing
@@ -66,6 +70,9 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
         
         // Sign Addressing Headers
         setSignAddressingHeaders(true);
+        
+        // Encrypt UsernameToken
+        setEncryptUsernameToken(true);
     }
     
     public boolean isSignBody() {
@@ -216,6 +223,76 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
             }
             if (xPaths.contains(soap12Expression2)) {
                 xPaths.remove(soap12Expression2);
+            }
+        }
+    }
+
+    public boolean isEncryptUsernameToken() {
+        return encryptUsernameToken;
+    }
+
+    public void setEncryptUsernameToken(boolean encryptUsernameToken) {
+        this.encryptUsernameToken = encryptUsernameToken;
+        
+        XPathExpression soap11Expression = 
+            new XPathExpression(
+                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsse:UsernameToken", 
+                CoverageType.ENCRYPTED
+            );
+        XPathExpression soap12Expression = 
+            new XPathExpression(
+                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsse:UsernameToken", 
+                CoverageType.ENCRYPTED
+            );
+
+        if (encryptUsernameToken) {
+            if (!xPaths.contains(soap11Expression)) {
+                xPaths.add(soap11Expression);
+            }
+            if (!xPaths.contains(soap12Expression)) {
+                xPaths.add(soap12Expression);
+            }
+        } else {
+            if (xPaths.contains(soap11Expression)) {
+                xPaths.remove(soap11Expression);
+            }
+            if (xPaths.contains(soap12Expression)) {
+                xPaths.remove(soap12Expression);
+            }
+        }
+    }
+
+    public boolean isSignUsernameToken() {
+        return signUsernameToken;
+    }
+
+    public void setSignUsernameToken(boolean signUsernameToken) {
+        this.signUsernameToken = signUsernameToken;
+        
+        XPathExpression soap11Expression = 
+            new XPathExpression(
+                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsse:UsernameToken", 
+                CoverageType.SIGNED
+            );
+        XPathExpression soap12Expression = 
+            new XPathExpression(
+                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsse:UsernameToken", 
+                CoverageType.SIGNED
+            );
+
+        if (signUsernameToken) {
+            if (!xPaths.contains(soap11Expression)) {
+                xPaths.add(soap11Expression);
+            }
+            if (!xPaths.contains(soap12Expression)) {
+                xPaths.add(soap12Expression);
+            }
+        } else {
+            if (xPaths.contains(soap11Expression)) {
+                xPaths.remove(soap11Expression);
+            }
+            if (xPaths.contains(soap12Expression)) {
+                xPaths.remove(soap12Expression);
             }
         }
     }

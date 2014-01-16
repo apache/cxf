@@ -41,8 +41,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
 /**
  * This interceptor handles parsing the StaX WS-Security results (events) + checks that the
  * specified crypto coverage events actually occurred. The default functionality is to enforce 
- * that the SOAP Body, Timestamp, and WS-Addressing ReplyTo and FaultTo headers must be signed 
- * (if they exist in the message payload).
+ * that the SOAP Body, Timestamp, and WS-Addressing ReplyTo and FaultTo headers must be signed,
+ * and the UsernameToken must be encrypted (if they exist in the message payload).
  * 
  * Note that this interceptor must be explicitly added to the InInterceptor chain.
  */
@@ -71,6 +71,9 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
         
         // Sign Addressing Headers
         setSignAddressingHeaders(true);
+        
+        // Encrypt UsernameToken
+        setEncryptUsernameToken(true);
     }
 
     @Override

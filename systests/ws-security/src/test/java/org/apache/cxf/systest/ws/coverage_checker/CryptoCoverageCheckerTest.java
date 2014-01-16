@@ -35,6 +35,7 @@ import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
+import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -630,4 +631,105 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testEncryptedUsernameToken() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedUsernameTokenPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put("action", "UsernameToken Encrypt");
+        outProps.put("encryptionPropFile", "bob.properties");
+        outProps.put("user", "alice");
+        outProps.put("encryptionUser", "bob");
+        outProps.put("passwordCallbackClass", 
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
+        outProps.put("encryptionParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
+                     + "{Element}{" + WSConstants.WSSE_NS + "}UsernameToken;");
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+        
+        if (test.isStreaming()) {
+            WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
+            bus.getOutInterceptors().add(staxOutInterceptor);
+        } else {
+            WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
+            bus.getOutInterceptors().add(outInterceptor);
+        }
+
+        port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testNotEncryptedUsernameToken() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CryptoCoverageCheckerTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedUsernameTokenPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put("action", "UsernameToken Encrypt");
+        outProps.put("encryptionPropFile", "bob.properties");
+        outProps.put("user", "alice");
+        outProps.put("encryptionUser", "bob");
+        outProps.put("passwordCallbackClass", 
+                     "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
+        outProps.put("encryptionParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+        
+        if (test.isStreaming()) {
+            WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
+            bus.getOutInterceptors().add(staxOutInterceptor);
+        } else {
+            WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
+            bus.getOutInterceptors().add(outInterceptor);
+        }
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not encrypting the UsernameToken");
+        } catch (Exception ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }

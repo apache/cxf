@@ -76,4 +76,6 @@
             </bean>
         </jaxws:inFaultInterceptors>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptedUsernameTokenPort" createdFromAPI="true">
+    </jaxws:client>
 </beans>

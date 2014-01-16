@@ -92,4 +92,20 @@
             <wsa:addressing xmlns:wsa="http://cxf.apache.org/ws/addressing"/>
         </jaxws:features>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedUsernameToken" address="http://localhost:${testutil.ports.StaxServer}/DoubleItEncryptedUsernameToken" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedUsernameTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Encrypt UsernameToken"/>
+                        <entry key="decryptionPropFile" value="bob.properties"/>
+                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+            <bean class="org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker">
+                <property name="signBody" value="false"/>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
 </beans>

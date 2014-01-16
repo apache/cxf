@@ -58,15 +58,6 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  * coverage based on the results of the WSS4J processors.  This interceptor
  * provides an alternative to using WS-Policy based configuration for crypto
  * coverage enforcement.
- * <p/>
- * Note that the processor must properly address the Security Token
- * Reference Dereference transform in the case of a signed security token
- * such as a SAML assertion.  Consequently, a version of WSS4J that properly
- * addresses this transform must be used with this utility if you wish to 
- * check coverage over a message part referenced through the Security Token
- * Reference Dereference transform.
- * See <a href="https://issues.apache.org/jira/browse/WSS-222">WSS-222</a>
- * for more details.
  */
 public class CryptoCoverageChecker extends AbstractSoapInterceptor {
     

@@ -240,6 +240,8 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         properties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
+        
+        checker.setEncryptUsernameToken(false);
 
         assertEquals("test", echo.echo("test"));
         

@@ -68,5 +68,8 @@
         <wsdl:port name="DoubleItClientCheckerPort2" binding="tns:DoubleItSoapBinding">
             <soap:address location="http://localhost:9001/DoubleItClientChecker2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItEncryptedUsernameTokenPort" binding="tns:DoubleItSoapBinding">
+            <soap:address location="http://localhost:9001/DoubleItEncryptedUsernameToken"/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
