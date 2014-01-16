@@ -596,9 +596,10 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             if (isPrimitive(cond)) {
                 return new SimpleSearchCondition<T>(ct, cond); 
             } else {
-                return new SimpleSearchCondition<T>(Collections.singletonMap(templateName.toLowerCase(), ct),
-                                                    Collections.singletonMap(templateName, name),
-                                                    Collections.singletonMap(templateName, tvalue.getTypeInfo()),
+                String templateNameLCase = templateName.toLowerCase();
+                return new SimpleSearchCondition<T>(Collections.singletonMap(templateNameLCase, ct),
+                                                    Collections.singletonMap(templateNameLCase, name),
+                                                    Collections.singletonMap(templateNameLCase, tvalue.getTypeInfo()),
                                                     cond);
             }
         }

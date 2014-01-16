@@ -31,7 +31,7 @@ import javax.persistence.OneToMany;
 @Entity(name = "Book")
 public class Book {
     private int id;
-    private String title;
+    private String bookTitle;
     private OwnerAddress address;
     private OwnerInfo ownerInfo;
     private Library library;
@@ -47,12 +47,12 @@ public class Book {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getBookTitle() {
+        return bookTitle;
     }
 
-    public void setTitle(String name) {
-        this.title = name;
+    public void setBookTitle(String name) {
+        this.bookTitle = name;
     }
 
     @Embedded
