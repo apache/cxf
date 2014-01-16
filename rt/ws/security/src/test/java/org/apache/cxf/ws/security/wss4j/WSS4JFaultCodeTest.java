@@ -170,8 +170,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an invalid Timestamp");
         } catch (SoapFault fault) {
-            assertTrue(fault.getReason().contains(
-                " The security semantics of the message have expired"));
+            assertTrue(fault.getReason().contains("The message has expired"));
             QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
             assertTrue(fault.getFaultCode().equals(faultCode));
         }

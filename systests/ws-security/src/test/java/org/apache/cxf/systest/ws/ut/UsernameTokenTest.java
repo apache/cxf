@@ -369,10 +369,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
             } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-                String error = "A replay attack has been detected";
-                assertTrue(ex.getMessage().contains(error)
-                           || ex.getMessage().contains(
-                               "The security token could not be authenticated or authorized"));
+                String error = "An error was discovered processing the <wsse:Security> header.";
+                String error2 = "The security token could not be authenticated or authorized";
+                assertTrue(ex.getMessage().contains(error) || ex.getMessage().contains(error2));
             }
         }
         

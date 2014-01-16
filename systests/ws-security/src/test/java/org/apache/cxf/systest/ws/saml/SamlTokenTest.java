@@ -953,8 +953,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Failure expected on a replayed SAML Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
-            assertTrue(ex.getMessage().contains(error));
+            String error = "An error was discovered processing the <wsse:Security> header.";
+            assertTrue(ex.getMessage().contains(error)
+                       || ex.getMessage().contains("A replay attack has been detected"));
         }
         
         ((java.io.Closeable)saml2Port).close();

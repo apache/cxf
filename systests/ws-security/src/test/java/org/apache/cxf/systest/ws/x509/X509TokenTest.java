@@ -925,7 +925,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             x509Port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "A replay attack has been detected";
+            String error = "An error was discovered processing the <wsse:Security> header.";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("The message has expired"));
         }
