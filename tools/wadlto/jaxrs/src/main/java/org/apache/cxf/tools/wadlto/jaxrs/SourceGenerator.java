@@ -676,7 +676,7 @@ public class SourceGenerator {
             if (!jaxpSourceRequired && inXmlRep != null && xmlRequestReps.size() > 1) {
                 String value = inXmlRep.getAttribute("element");
                 int index = value.indexOf(":");
-                suffixName = value.substring(index + 1);
+                suffixName = value.substring(index + 1).replace("-", "");
             }
             if (writeAnnotations(info.isInterfaceGenerated())) {
                 sbCode.append(TAB);
@@ -706,6 +706,9 @@ public class SourceGenerator {
             if (methodNameLowerCase.length() > 0) {
                 responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, suspendedAsync);
                 String genMethodName = id + suffixName;
+                if (genMethodName.contains("-")) {
+                    System.out.println(genMethodName);
+                }
                 if (methodNameLowerCase.equals(genMethodName)) {
                     List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
                     StringBuilder sb = new StringBuilder();
