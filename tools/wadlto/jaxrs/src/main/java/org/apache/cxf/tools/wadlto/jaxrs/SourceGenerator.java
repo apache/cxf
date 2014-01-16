@@ -706,9 +706,6 @@ public class SourceGenerator {
             if (methodNameLowerCase.length() > 0) {
                 responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, suspendedAsync);
                 String genMethodName = id + suffixName;
-                if (genMethodName.contains("-")) {
-                    System.out.println(genMethodName);
-                }
                 if (methodNameLowerCase.equals(genMethodName)) {
                     List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
                     StringBuilder sb = new StringBuilder();
