@@ -133,14 +133,22 @@ public class FiqlParserTest extends Assert {
     
     @Test
     public void testParseTheName() throws SearchParseException {
-        doTestParseName("thename==king");
+        doTestParseName2("thename==king2");
     }
     
     @Test
     public void testParseTheName2() throws SearchParseException {
-        doTestParseName("theName==king");
+        doTestParseName2("theName==king2");
     }
 
+    private void doTestParseName2(String exp) throws SearchParseException {
+        SearchCondition<Condition> filter = parser.parse(exp);
+        assertTrue(filter.isMet(new Condition("king", 10, new Date(), "king2")));
+        assertTrue(filter.isMet(new Condition("king", 0, null, "king2")));
+        assertFalse(filter.isMet(new Condition("diamond", 10, new Date(), "theking2")));
+        assertFalse(filter.isMet(new Condition("diamond", 0, null, "theking2")));
+    }
+    
     private void doTestParseName(String exp) throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse(exp);
         assertTrue(filter.isMet(new Condition("king", 10, new Date())));
@@ -297,6 +305,7 @@ public class FiqlParserTest extends Assert {
     @Ignore
     public static class Condition {
         private String name;
+        private String name2;
         private Integer level;
         private Date time;
 
@@ -307,6 +316,14 @@ public class FiqlParserTest extends Assert {
             this.name = name;
             this.level = level;
             this.time = time;
+        }
+        
+        public Condition(String name, Integer level, Date time, String name2) {
+            this.name = name;
+            this.level = level;
+            this.time = time;
+            this.name2 = name2;
+            
         }
 
         public String getName() {
@@ -334,11 +351,11 @@ public class FiqlParserTest extends Assert {
         }
 
         public void setTheName(String thename) {
-            setName(thename);
+            name2 = thename;
         }
         
         public String getTheName() {
-            return getName();
+            return name2;
         }
 
     }
