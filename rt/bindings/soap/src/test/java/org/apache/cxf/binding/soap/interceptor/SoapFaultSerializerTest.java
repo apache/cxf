@@ -315,4 +315,48 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"), 
              fault2.getSubCode());
     }
+    
+    
+    @Test
+    public void testCXF5493() throws Exception {
+
+        SoapMessage m = new SoapMessage(new MessageImpl());
+        m.setVersion(Soap11.getInstance());        
+
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
+                                                                 .getResourceAsStream("cxf5493.xml"));
+        m.setContent(XMLStreamReader.class, reader);
+        reader.nextTag(); //env
+        reader.nextTag(); //body
+        reader.nextTag(); //fault
+
+        Soap11FaultInInterceptor inInterceptor = new Soap11FaultInInterceptor();
+        inInterceptor.handleMessage(m);
+
+        SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
+        assertNotNull(fault2);
+        assertEquals(Soap11.getInstance().getReceiver(), fault2.getFaultCode());
+        assertEquals("some text containing a xml tag <xml-tag>", fault2.getMessage());
+        
+        
+        
+        m = new SoapMessage(new MessageImpl());
+        m.put(Message.HTTP_REQUEST_METHOD, "POST");
+        m.setVersion(Soap11.getInstance());        
+        reader = StaxUtils.createXMLStreamReader(this.getClass().getResourceAsStream("cxf5493.xml"));
+
+        m.setContent(XMLStreamReader.class, reader);
+
+        new SAAJPreInInterceptor().handleMessage(m);
+        new ReadHeadersInterceptor(null).handleMessage(m);
+        new StartBodyInterceptor().handleMessage(m);
+        new SAAJInInterceptor().handleMessage(m);
+        new Soap11FaultInInterceptor().handleMessage(m);
+
+        fault2 = (SoapFault)m.getContent(Exception.class);
+        assertNotNull(fault2);
+        assertEquals(Soap11.getInstance().getReceiver(), fault2.getFaultCode());
+        assertEquals("some text containing a xml tag <xml-tag>", fault2.getMessage());
+    }
 }
