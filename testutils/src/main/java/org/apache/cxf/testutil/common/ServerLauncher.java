@@ -326,6 +326,9 @@ public class ServerLauncher {
                             ps.flush();
                         }
                     }
+                    if (serverOutputAll.length() > 64000) {
+                        serverOutputAll.delete(0, 10000);
+                    }
                 }
                 ps.close();
             } catch (IOException ex) {
