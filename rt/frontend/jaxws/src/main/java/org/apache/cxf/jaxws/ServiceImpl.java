@@ -255,7 +255,9 @@ public class ServiceImpl extends ServiceDelegate {
         
         //When the dispatch is created from EPR, the EPR's address will be set in portInfo
         PortInfoImpl portInfo = getPortInfo(portName);
-        if (portInfo != null && !portInfo.getAddress().equals(ei.getAddress())) {
+        if (portInfo != null
+            && portInfo.getAddress() != null 
+            && !portInfo.getAddress().equals(ei.getAddress())) {
             ei.setAddress(portInfo.getAddress());
         }
 
