@@ -174,7 +174,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Get the SubjectConfirmation method given a tokenType and keyType
      */
-    private String getSubjectConfirmationMethod(String tokenType, String keyType) {
+    protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
         if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
             || WSConstants.SAML2_NS.equals(tokenType)) {
             if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
@@ -196,7 +196,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Create a KeyInfoBean that contains an X.509 certificate or Public Key
      */
-    private static KeyInfoBean createKeyInfo(X509Certificate certificate, PublicKey publicKey) {
+    protected static KeyInfoBean createKeyInfo(X509Certificate certificate, PublicKey publicKey) {
         KeyInfoBean keyInfo = new KeyInfoBean();
 
         if (certificate != null) {
@@ -213,7 +213,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     /**
      * Create an EncryptedKey KeyInfo.
      */
-    private static KeyInfoBean createKeyInfo(
+    protected static KeyInfoBean createKeyInfo(
         X509Certificate certificate, 
         byte[] secret,
         Document doc,
