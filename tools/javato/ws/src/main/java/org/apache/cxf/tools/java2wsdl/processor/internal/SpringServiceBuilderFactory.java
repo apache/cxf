@@ -132,7 +132,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
                 throw new ToolException("Unable to open bean definition file " + pathname, bdse.getCause());
             }
         }
-
+        appContext.refresh();
         return appContext;
     }
 
