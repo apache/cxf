@@ -84,7 +84,7 @@
         <cxf.ehcache.version>2.7.4</cxf.ehcache.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
-        <cxf.httpcomponents.asyncclient.version>4.0.1-SNAPSHOT</cxf.httpcomponents.asyncclient.version>
+        <cxf.httpcomponents.asyncclient.version>4.0</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.1)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.client.version>4.3.1</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.3</cxf.httpcomponents.core.version>
