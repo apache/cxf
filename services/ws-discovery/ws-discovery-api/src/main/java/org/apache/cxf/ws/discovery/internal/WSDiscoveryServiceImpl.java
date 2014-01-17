@@ -28,6 +28,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -54,6 +56,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
@@ -81,6 +84,8 @@ import org.apache.cxf.ws.discovery.wsdl.ResolveType;
 import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 
 public class WSDiscoveryServiceImpl implements WSDiscoveryService {
+    private static final Logger LOG = LogUtils.getL7dLogger(WSDiscoveryService.class);
+    
     Bus bus;
     Endpoint udpEndpoint;
     WSDiscoveryClient client;
@@ -120,13 +125,13 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     }
     
     public HelloType register(EndpointReference ref) {
-        startup();
+        startup(false);
         HelloType ht = client.register(ref); 
         registered.add(ht);
         return ht;
     }
     public void register(HelloType ht) {
-        startup();
+        startup(false);
         client.register(ht); 
         registered.add(ht);
     }
@@ -144,7 +149,9 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         if (o == Boolean.TRUE || Boolean.valueOf((String)o)) {
             return;
         }
-        startup();
+        if (!startup(true)) {
+            return;
+        }
         HelloType ht = new HelloType();
         ht.setScopes(new ScopesType());
         ht.setMetadataVersion(1);
@@ -225,8 +232,10 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     }
     
     
-    
     public synchronized void startup() {
+        startup(false);
+    }    
+    public synchronized boolean startup(boolean optional) {
         if (!started && client.isAdHoc()) {
             Bus b = BusFactory.getAndSetThreadDefaultBus(bus);
             try {
@@ -236,12 +245,19 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                 udpEndpoint.setProperties(props);
                 udpEndpoint.publish("soap.udp://239.255.255.250:3702");
                 started = true;
+            } catch (RuntimeException ex) {
+                if (!optional) {
+                    throw ex;
+                } else {
+                    LOG.log(Level.WARNING, "Could not start WS-Discovery Service.", ex);
+                }
             } finally {
                 if (b != bus) {
                     BusFactory.setThreadDefaultBus(b);
                 }
             }
         }
+        return true;
     }
     
     
