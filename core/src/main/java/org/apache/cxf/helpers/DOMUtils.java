@@ -150,7 +150,7 @@ public final class DOMUtils {
         String s = null;
         Node n1 = n.getFirstChild();
         while (n1 != null) {
-            if (n1.getNodeType() == Node.TEXT_NODE) {
+            if (n1.getNodeType() == Node.TEXT_NODE || n1.getNodeType() == Node.CDATA_SECTION_NODE) {
                 if (b != null) {
                     b.append(((Text)n1).getNodeValue());
                 } else if (s == null) {
@@ -159,7 +159,7 @@ public final class DOMUtils {
                     b = new StringBuilder(s).append(((Text)n1).getNodeValue());
                     s = null;
                 }
-            }
+            } 
             n1 = n1.getNextSibling();
         }
         if (b != null) {

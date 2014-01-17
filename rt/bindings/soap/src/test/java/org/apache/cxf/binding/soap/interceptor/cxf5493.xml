@@ -1,0 +1,8 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+ <soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <soap:Fault>
+     <faultcode>soap:Server</faultcode>
+     <faultstring><![CDATA[some text containing a xml tag <xml-tag>]]></faultstring>
+   </soap:Fault>
+ </soap:Body>
+</soap:Envelope>
