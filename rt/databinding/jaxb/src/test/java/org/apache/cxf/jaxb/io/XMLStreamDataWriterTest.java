@@ -71,7 +71,7 @@ public class XMLStreamDataWriterTest extends Assert {
     public void testSetProperty() throws Exception {
         JAXBDataBinding db = getTestWriterFactory();
                
-        DataWriterImpl<XMLStreamWriter> dw = (DataWriterImpl)db.createWriter(XMLStreamWriter.class);
+        DataWriterImpl<XMLStreamWriter> dw = (DataWriterImpl<XMLStreamWriter>)db.createWriter(XMLStreamWriter.class);
         assertNotNull(dw);
         
         // Build message to set custom event handler
