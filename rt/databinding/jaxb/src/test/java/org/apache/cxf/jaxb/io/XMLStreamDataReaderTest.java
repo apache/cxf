@@ -63,7 +63,7 @@ public class XMLStreamDataReaderTest extends Assert {
         reader = getTestReader("../resources/SetPropertyValidationFailureReq.xml");
         assertNotNull(reader);
         
-        DataReaderImpl<XMLStreamReader> dr = (DataReaderImpl)db.createReader(XMLStreamReader.class);
+        DataReaderImpl<XMLStreamReader> dr = (DataReaderImpl<XMLStreamReader>)db.createReader(XMLStreamReader.class);
         assertNotNull(dr);
         
         // Build message to set custom event handler
