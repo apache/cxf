@@ -719,7 +719,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             crypto = createCrypto(false);
             cert = getCert(crypto);
             writeElementsForRSTPublicKey(writer, cert);
-        } else if (isSpnego) {
+        } else if (isSpnego || isSecureConv) {
             addKeySize(keySize, writer);
         }
         
@@ -793,7 +793,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             boolean wroteKeySize) throws Exception {
         byte[] requestorEntropy = null;
 
-        if (!wroteKeySize && (!isSecureConv || keySize != 256)) {
+        if (!wroteKeySize) {
             addKeySize(keySize, writer);
         }
 
