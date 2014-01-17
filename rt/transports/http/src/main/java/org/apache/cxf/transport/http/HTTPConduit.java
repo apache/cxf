@@ -1492,12 +1492,13 @@ public class HTTPConduit
                 || ("GET".equals(connection.getRequestMethod()) && getClient().isAutoRedirect())) {
 
                 if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
-                    LOG.fine("Conduit \""
-                             + getConduitName() 
-                             + "\" Transmit cached message to: " 
-                             + connection.getURL()
-                             + ": "
-                             + new String(cachedStream.getBytes()));
+                    StringBuilder b = new StringBuilder(4096);
+                    b.append("Conduit \"").append(getConduitName())
+                        .append("\" Transmit cached message to: ")
+                        .append(connection.getURL())
+                        .append(": ");
+                    cachedStream.writeCacheTo(b, 16 * 1024);
+                    LOG.fine(b.toString());
                 }
 
 
