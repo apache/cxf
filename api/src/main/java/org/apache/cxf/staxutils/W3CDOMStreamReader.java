@@ -85,7 +85,12 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         return document;
     }
     public String getSystemId() {
-        return sysId == null ? document.getDocumentURI() : sysId;
+        try {
+            return sysId == null ? document.getDocumentURI() : sysId;
+        } catch (Throwable ex) {
+            //ignore, probably not DOM level 3
+        }
+        return sysId;
     }
     /**
      * Find name spaces declaration in atrributes and move them to separate
@@ -429,8 +434,6 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
         try {
             return StaxUtils.toString(document);
-        } catch (XMLStreamException e) {
-            return super.toString();
         } catch (Throwable t) {
             t.printStackTrace();
             return super.toString();
