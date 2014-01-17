@@ -801,11 +801,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     private SoapFault 
     createSoapFault(SoapVersion version, WSSecurityException e) {
         SoapFault fault;
-        javax.xml.namespace.QName faultCode = e.getFaultCode();
-        String errorMessage = WSS4JUtils.mapFaultCodeToMessage(faultCode);
+        String errorMessage = WSS4JUtils.getSafeExceptionMessage(e);
         if (errorMessage == null) {
             errorMessage = e.getMessage();
         }
+        javax.xml.namespace.QName faultCode = e.getFaultCode();
         if (version.getVersion() == 1.1 && faultCode != null) {
             fault = new SoapFault(errorMessage, e, faultCode);
         } else {

@@ -150,7 +150,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a replayed UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "An error was discovered processing the <wsse:Security> header.";
+            String error = "A replay attack has been detected";
             assertTrue(ex.getMessage().contains(error));
         }
         
@@ -212,7 +212,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "An error was discovered processing the <wsse:Security> header.";
+            String error = "A replay attack has been detected";
             assertTrue(ex.getMessage().contains(error));
         }
         

@@ -41,6 +41,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -231,10 +232,18 @@ public final class WSS4JUtils {
     }
 
     /**
-     * Map a standard FaultCode QName to a standard error String
+     * Map a WSSecurityException FaultCode to a standard error String, so as not to leak
+     * internal configuration to an attacker.
      */
-    public static String mapFaultCodeToMessage(QName faultCode) {
+    public static String getSafeExceptionMessage(WSSecurityException ex) {
+        // Allow a Replay Attack message to be returned, otherwise it could be confusing
+        // for clients who don't understand the default caching functionality of WSS4J/CXF
+        if (ex.getMessage() != null && ex.getMessage().contains("replay attack")) {
+            return ex.getMessage();
+        }
+        
         String errorMessage = null;
+        QName faultCode = ex.getFaultCode();
         if (WSConstants.UNSUPPORTED_SECURITY_TOKEN.equals(faultCode)) {
             errorMessage = UNSUPPORTED_TOKEN_ERR;
         } else if (WSConstants.UNSUPPORTED_ALGORITHM.equals(faultCode)) {
