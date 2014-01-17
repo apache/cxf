@@ -69,7 +69,13 @@ public class CXFAuthenticator extends Authenticator {
             }
             
             try {
-                ClassLoader loader = new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
+                ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                        public ClassLoader run() {
+                            return new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
+                        }
+                    }, null);
+                
+                
                 Method m = ClassLoader.class.getDeclaredMethod("defineClass", String.class, 
                                                                byte[].class, Integer.TYPE, Integer.TYPE);
                 
@@ -94,9 +100,15 @@ public class CXFAuthenticator extends Authenticator {
                     });
 
                 }
+                try {
+                    //clear the acc field that can hold onto the webapp classloader
+                    Field f = loader.getClass().getDeclaredField("acc");
+                    ReflectionUtil.setAccessible(f).set(loader, null);
+                } catch (Throwable t) {
+                    //ignore
+                }
             } catch (Throwable t) {
                 //ignore
-                t.printStackTrace();
             }
         }
     }
