@@ -327,6 +327,9 @@ public class ServerLauncher {
                             ps.flush();
                         }
                     }
+                    if (serverOutputAll.length() > 64000) {
+                        serverOutputAll.delete(0, 10000);
+                    }
                 }
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
