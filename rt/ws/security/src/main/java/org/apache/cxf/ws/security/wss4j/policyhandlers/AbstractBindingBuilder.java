@@ -572,8 +572,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (tempTok instanceof WSSecSignature) {
                 WSSecSignature tempSig = (WSSecSignature) tempTok;
                 SecurityTokenReference secRef = tempSig.getSecurityTokenReference();
-                // TODO Add support for SAML2 here
-                if ((WSConstants.WSS_SAML_KI_VALUE_TYPE).equals(secRef.getKeyIdentifierValueType())) {
+               
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
+                    || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                     
                     Element secRefElement = cloneElement(secRef.getElement());
                     addSupportingElement(secRefElement);
