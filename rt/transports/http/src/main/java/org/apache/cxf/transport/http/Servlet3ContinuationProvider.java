@@ -123,6 +123,12 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public void reset() {
             context.complete();
             obj = null;
+            if (callback != null) {
+                final Exception ex = inMessage.getExchange().get(Exception.class);
+                if (ex != null && isClientDisconnected(ex)) {
+                    callback.onDisconnect();    
+                }
+            }
         }
 
         public boolean isNew() {
@@ -165,6 +171,10 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             isPending = false;
             //REVISIT: isResumed = true;
             redispatch();
+        }
+        private boolean isClientDisconnected(Exception ex) {
+            String exName = (String)inMessage.getContextualProperty("disconnected.client.exception.class");
+            return ex != null && exName.equals(ex.getClass().getName());
         }
         
     }

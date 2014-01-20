@@ -21,12 +21,22 @@ package org.apache.cxf.continuations;
 
 /**
  * Callback that receives continuation status updates.
- * 
- * Note: this interface is a work in progress
  */
 public interface ContinuationCallback {
     
+    /**
+     * This method is called when the container completes writing the response to the client  
+     */
     void onComplete();
     
+    /**
+     * This method is called when the exception gets propagated to the container  
+     * @param t the propagated exception instance
+     */
     void onError(Throwable error);
+    
+    /**
+     * This method may be called if the container detects that the client has disconnected
+     */
+    void onDisconnect();
 }

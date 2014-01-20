@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -48,6 +47,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
@@ -184,9 +184,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         // Run the filters
         try {
             JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori, invoked);
-        } catch (IOException ex) {
-            handleWriteException(providerFactory, message, ex, firstTry);
-            return;
         } catch (Throwable ex) {
             handleWriteException(providerFactory, message, ex, firstTry);
             return;
@@ -264,9 +261,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 }
             }
             
-        } catch (IOException ex) {
-            logWriteError(firstTry, targetType, responseMediaType);
-            handleWriteException(providerFactory, message, ex, firstTry);
         } catch (Throwable ex) {
             logWriteError(firstTry, targetType, responseMediaType);
             handleWriteException(providerFactory, message, ex, firstTry);
@@ -366,7 +360,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         if (excResponse == null) {
             setResponseStatus(message, 500);
-            throw new InternalServerErrorException(ex);
+            throw new Fault(ex);
         } else {
             serializeMessage(pf, message, excResponse, null, false);
         } 

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -53,7 +55,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private boolean resumedByApplication;
     private TimeoutHandler timeoutHandler;
     
-    private List<CompletionCallback> completionCallbacks;
+    private List<CompletionCallback> completionCallbacks = new LinkedList<CompletionCallback>();
+    private List<ConnectionCallback> connectionCallbacks = new LinkedList<ConnectionCallback>();
     private Throwable unmappedThrowable;
     
     public AsyncResponseImpl(Message inMessage) {
@@ -195,16 +198,16 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
             Class<?> callbackCls = allCallbacks[i].getClass();
             Collection<Class<?>> knownCallbacks = map.get(callbackCls);
             if (knownCallbacks == null) {
-                knownCallbacks = new LinkedList<Class<?>>();
+                knownCallbacks = new HashSet<Class<?>>();
                 map.put(callbackCls, knownCallbacks);
             }
             
             if (allCallbacks[i] instanceof CompletionCallback) {
                 knownCallbacks.add(CompletionCallback.class);
-                if (completionCallbacks == null) {
-                    completionCallbacks = new LinkedList<CompletionCallback>();
-                    completionCallbacks.add((CompletionCallback)allCallbacks[i]);        
-                }
+                completionCallbacks.add((CompletionCallback)allCallbacks[i]);        
+            } else if (allCallbacks[i] instanceof ConnectionCallback) {
+                knownCallbacks.add(ConnectionCallback.class);
+                connectionCallbacks.add((ConnectionCallback)allCallbacks[i]);        
             }
         }
         return map;
@@ -222,11 +225,16 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     private void updateCompletionCallbacks(Throwable error) {
-        if (completionCallbacks != null) {
-            Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
-            for (CompletionCallback completionCallback : completionCallbacks) {
-                completionCallback.onComplete(actualError);
-            }
+        Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
+        for (CompletionCallback completionCallback : completionCallbacks) {
+            completionCallback.onComplete(actualError);
+        }
+    }
+    
+    @Override
+    public void onDisconnect() {
+        for (ConnectionCallback connectionCallback : connectionCallbacks) {
+            connectionCallback.onDisconnect(this);
         }
     }
     
