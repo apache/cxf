@@ -153,7 +153,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
                 }
                 
                 assertion.verifySignature(samlKeyInfo);
-                assertion.parseHOKSubject(
+                assertion.parseSubject(
                     new WSSSAMLKeyInfoProcessor(data, null), data.getSigVerCrypto(), 
                     data.getCallbackHandler()
                 );
