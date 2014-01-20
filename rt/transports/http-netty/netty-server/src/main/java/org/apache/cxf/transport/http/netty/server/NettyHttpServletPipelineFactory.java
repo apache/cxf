@@ -68,6 +68,8 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     private final Map<String, NettyHttpContextHandler> handlerMap;
     
     private final int maxChunkContentSize;
+    
+    private final EventExecutorGroup applicationExecutor;
 
     public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters, 
                                            boolean supportSession, int threadPoolSize, int maxChunkContentSize,
@@ -79,6 +81,8 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         this.handlerMap = handlerMap;
         this.tlsServerParameters = tlsServerParameters;
         this.maxChunkContentSize = maxChunkContentSize;
+        //TODO need to configure the thread size of EventExecutorGroup
+        applicationExecutor = new DefaultEventExecutorGroup(16);
     }
 
 
@@ -110,7 +114,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     public void shutdown() {
         allChannels.close();
         watchdog.stopWatching();
-        
+        applicationExecutor.shutdownGracefully();
     }
 
     protected HttpSessionStore getHttpSessionStore() {
@@ -194,9 +198,8 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ChannelPipeline pipeline = getDefaulHttpChannelPipeline(ch);
-        //TODO need to configure the thread size of EventExecutorGroup
-        EventExecutorGroup e1 = new DefaultEventExecutorGroup(16);
-        pipeline.addLast(e1, "handler", this.getServletHandler());
+        
+        pipeline.addLast(applicationExecutor, "handler", this.getServletHandler());
     }
 
 }
