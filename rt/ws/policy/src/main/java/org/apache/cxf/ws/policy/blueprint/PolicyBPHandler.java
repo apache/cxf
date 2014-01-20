@@ -35,7 +35,7 @@ public class PolicyBPHandler implements NamespaceHandler {
         //Say yes to various schemas.
         String location = null;
         if ("http://cxf.apache.org/policy".equals(s)) {
-            location = "schemas/blueprint/policy.xsd";
+            location = "schemas/policy.xsd";
         } else if ("http://www.w3.org/ns/ws-policy".equals(s)) {
             location = "schemas/ws-policy-200702.xsd";
         } else if ("http://www.w3.org/2006/07/ws-policy".equals(s)) {
