@@ -807,7 +807,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         data.setCallbackHandler(new PasswordCallbackHandler());
         data.setWssConfig(WSSConfig.getNewInstance());
         
-        assertionWrapper.parseHOKSubject(
+        assertionWrapper.parseSubject(
             new WSSSAMLKeyInfoProcessor(data, new WSDocInfo(assertion.getOwnerDocument())), 
                                         data.getSigVerCrypto(), data.getCallbackHandler()
         );

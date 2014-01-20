@@ -119,7 +119,7 @@ public class STSTokenValidator implements Validator {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e);
         }
     }
     
@@ -154,7 +154,7 @@ public class STSTokenValidator implements Validator {
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e);
             }
         }
         return false;

@@ -339,7 +339,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
             // Parse the HOK subject if it exists
             
             WSDocInfo docInfo = new WSDocInfo(((Element)tokenToRenew.getToken()).getOwnerDocument());
-            assertion.parseHOKSubject(
+            assertion.parseSubject(
                 new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto, callbackHandler
             );
             

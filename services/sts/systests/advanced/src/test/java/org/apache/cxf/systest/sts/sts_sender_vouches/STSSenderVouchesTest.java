@@ -50,7 +50,6 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    private static final String STAX_PORT = allocatePort(StaxServer.class);
 
     final TestParam test;
     
@@ -70,12 +69,6 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
                    launchServer(STSServer.class, true)
         );
         assertTrue(
@@ -90,14 +83,7 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
     public static Collection<TestParam[]> data() {
        
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(PORT, true, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STSPORT)},
-                                                
                                                 {new TestParam(PORT, false, STAX_STSPORT)},
-                                                {new TestParam(PORT, true, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT)},
         });
     }
     
@@ -108,7 +94,6 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testSAML2SenderVouches() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

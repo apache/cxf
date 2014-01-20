@@ -46,7 +46,7 @@ public class SCTTokenValidator extends STSTokenValidator {
 
         Document doc = transformedToken.getElement().getOwnerDocument();
         
-        transformedToken.parseHOKSubject(
+        transformedToken.parseSubject(
             new WSSSAMLKeyInfoProcessor(data, new WSDocInfo(doc)), data.getSigVerCrypto(), 
             data.getCallbackHandler()
         );
