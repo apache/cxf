@@ -125,7 +125,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
-                if (ex != null && isClientDisconnected(ex)) {
+                if (ex instanceof IOException && isClientDisconnected(ex)) {
                     callback.onDisconnect();    
                 }
             }
@@ -174,7 +174,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         private boolean isClientDisconnected(Exception ex) {
             String exName = (String)inMessage.getContextualProperty("disconnected.client.exception.class");
-            if (exName != null && ex instanceof IOException) {
+            if (exName != null) {
                 return exName.equals(IOException.class.getName()) || exName.equals(ex.getClass().getName());
             } else {
                 return false;
