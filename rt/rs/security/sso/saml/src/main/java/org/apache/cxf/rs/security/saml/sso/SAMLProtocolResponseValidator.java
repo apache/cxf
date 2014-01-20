@@ -388,7 +388,7 @@ public class SAMLProtocolResponseValidator {
                 
                 assertion.verifySignature(samlKeyInfo);
                 
-                assertion.parseHOKSubject(
+                assertion.parseSubject(
                     new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)),
                     requestData.getSigVerCrypto(), 
                     requestData.getCallbackHandler()
