@@ -1591,6 +1591,9 @@ public abstract class AbstractBindingBuilder {
                                 && ((Wss11) wss).isMustSupportRefThumbprint()) {
                     secBase.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
                 }
+            } else if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
+                && !isRequestor() && token instanceof X509Token) {
+                secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             } else {
                 secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             }
