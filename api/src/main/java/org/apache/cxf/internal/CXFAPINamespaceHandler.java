@@ -36,14 +36,25 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class CXFAPINamespaceHandler implements NamespaceHandler {    
     
     public URL getSchemaLocation(String namespace) {
+        String location = null;
+
         if ("http://cxf.apache.org/configuration/beans".equals(namespace)) {
-            return getClass().getClassLoader().getResource("schemas/configuration/cxf-beans.xsd");           
+            location = "schemas/configuration/cxf-beans.xsd";
         } else if ("http://cxf.apache.org/configuration/parameterized-types".equals(namespace)) {
-            return getClass().getClassLoader().getResource("schemas/configuration/parameterized-types.xsd");
+            location = "schemas/configuration/parameterized-types.xsd";
         } else if ("http://cxf.apache.org/configuration/security".equals(namespace)) {
-            return getClass().getClassLoader().getResource("schemas/configuration/security.xsd");
+            location = "schemas/configuration/security.xsd";
         } else if ("http://schemas.xmlsoap.org/wsdl/".equals(namespace)) {
-            return getClass().getClassLoader().getResource("schemas/wsdl/wsdl.xsd");
+            location = "schemas/wsdl/wsdl.xsd";
+        } else if ("http://www.w3.org/2005/08/addressing".equals(namespace)) {
+            location = "schemas/wsdl/ws-addr.xsd";
+        } else if ("http://schemas.xmlsoap.org/ws/2004/08/addressing".equals(namespace)) {
+            location = "schemas/wsdl/addressing.xsd";
+        } else if ("http://cxf.apache.org/blueprint/core".equals(namespace)) {
+            location = "schemas/blueprint/core.xsd";
+        }
+        if (location != null) {
+            return getClass().getClassLoader().getResource(location);
         }
         return null;
     }
