@@ -45,4 +45,14 @@
       <entry key="osgi.service.blueprint.namespace" value="http://schemas.xmlsoap.org/wsdl/"/>
     </service-properties>
   </service>
+  <service ref="CXFAPINamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace" value="http://www.w3.org/2005/08/addressing"/>
+    </service-properties>
+  </service>
+  <service ref="CXFAPINamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace" value="http://schemas.xmlsoap.org/ws/2004/08/addressing"/>
+    </service-properties>
+  </service>
 </blueprint>
