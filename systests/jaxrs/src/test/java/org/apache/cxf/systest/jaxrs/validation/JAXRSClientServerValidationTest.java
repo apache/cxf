@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -213,6 +214,14 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
 
+    @Test
+    public void testThatResponseValidationIsNotTriggeredForUnacceptableMediaType()  {
+        final Response r = createWebClient("/bookstore/books/direct")
+            .type(MediaType.APPLICATION_JSON)
+            .post(new BookWithValidation("BeanVal", "1"));
+        assertEquals(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(), r.getStatus());
+    }
+    
     @Override
     protected String getPort() {
         return PORT;

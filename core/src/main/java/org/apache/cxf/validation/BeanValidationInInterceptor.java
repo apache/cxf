@@ -21,6 +21,8 @@ package org.apache.cxf.validation;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.validation.ValidationException;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -32,6 +34,23 @@ public class BeanValidationInInterceptor extends AbstractValidationInterceptor {
         super(phase);
     }
 
+    protected Object getServiceObject(Message message) {
+        return checkNotNull(super.getServiceObject(message), "SERVICE_OBJECT_NULL");
+    }
+    
+    protected Method getServiceMethod(Message message) {
+        return (Method)checkNotNull(super.getServiceMethod(message), "SERVICE_METHOD_NULL");
+    }
+    
+    private Object checkNotNull(Object object, String name) {
+        if (object == null) {
+            String message = new org.apache.cxf.common.i18n.Message(name, BUNDLE).toString();
+            LOG.severe(message);
+            throw new ValidationException(message.toString());
+        }
+        return object;
+    }
+    
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {

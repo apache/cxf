@@ -32,6 +32,9 @@ public final class ValidationUtils {
     }
     public static Object getResourceInstance(Message message) {
         final OperationResourceInfo ori = message.getExchange().get(OperationResourceInfo.class);
+        if (ori == null) {
+            return null;
+        }
         final ResourceProvider resourceProvider = ori.getClassResourceInfo().getResourceProvider();
         if (!resourceProvider.isSingleton()) {
             String error = "Service object is not a singleton, use a custom invoker to validate";

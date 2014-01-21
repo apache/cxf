@@ -20,10 +20,10 @@ package org.apache.cxf.validation;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.validation.ValidationException;
-
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
@@ -37,7 +37,8 @@ import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractValidationInterceptor extends AbstractPhaseInterceptor< Message > {
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
+    protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractValidationInterceptor.class);
     
     private Object serviceObject;
     private volatile BeanValidationProvider provider;
@@ -58,16 +59,12 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
     public void handleMessage(Message message) throws Fault {        
         final Object theServiceObject = getServiceObject(message);
         if (theServiceObject == null) {
-            String error = "Service object is not available";
-            LOG.severe(error);
-            throw new ValidationException(error);
+            return;
         }
         
         final Method method = getServiceMethod(message);
         if (method == null) {
-            String error = "Service method is not available";
-            LOG.severe(error);
-            throw new ValidationException(error);
+            return;
         }
         
         
