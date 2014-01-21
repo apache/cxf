@@ -1517,6 +1517,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                                 && ((Wss11) wss).isMustSupportRefThumbprint()) {
                     secBase.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
                 }
+            } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
+                && !isRequestor() && token instanceof X509Token) {
+                secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             } else {
                 secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             }

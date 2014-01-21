@@ -568,18 +568,23 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             Wss10 wss = getWss10();
             if (wss == null || wss.isMustSupportRefKeyIdentifier()) {
-                return WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
+                identifier = WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
             } else if (wss.isMustSupportRefIssuerSerial()) {
-                return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
+                identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
             } else if (wss instanceof Wss11
                 && ((Wss11) wss).isMustSupportRefThumbprint()) {
-                return WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
+                identifier = WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
             }
-        } else {
-            return WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference;
+        } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
+            && !isRequestor() && token instanceof X509Token) {
+            identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
         }
         
-        return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
+        if (identifier != null) {
+            return identifier;
+        }
+        
+        return WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference;
     }
     
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
