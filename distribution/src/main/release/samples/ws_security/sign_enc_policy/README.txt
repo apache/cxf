@@ -43,6 +43,8 @@ To use the StAX-based WS-Security functionality:
   mvn -Pstax-server  (from one command line window)
   mvn -Pstax-client  (from a second command line window)
 
+You can also run the DOM client against the StAX server, and vice versa.
+
 On startup, the client makes one invocation.
 
 To remove the code generated from the WSDL file and the .class

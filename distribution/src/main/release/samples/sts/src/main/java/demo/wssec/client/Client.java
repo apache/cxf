@@ -44,8 +44,8 @@ public final class Client {
 
     public static void main(String args[]) throws Exception {
         
-        if (args.length == 0) {
-            System.out.println("please specify wsdl");
+        if (args.length < 2) {
+            System.out.println("please specify wsdl and configuration file");
             System.exit(1);
         }
         
@@ -58,7 +58,13 @@ public final class Client {
         }
         
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = new ClassPathResource("wssec-client.xml").getURL();
+        URL busURL;
+        File busFile = new File(args[1]);
+        if (busFile.exists()) {
+            busURL = busFile.toURI().toURL();
+        } else {
+            busURL = new URL(args[1]);
+        }
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);

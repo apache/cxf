@@ -115,15 +115,45 @@
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>java</executable>
+                                    <mainClass>demo.wssec.sts.Server</mainClass>
                                     <arguments>
-                                        <argument>-Djava.endorsed.dirs=${basedir}/target/endorsed</argument>
-                                        <argument>-classpath</argument>
-                                        <classpath/>
-                                        <argument>demo.wssec.sts.Server</argument>
+                                        <argument>${basedir}/src/main/resources/wssec-sts.xml</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.cxf.services.sts</groupId>
+                    <artifactId>cxf-services-sts-core</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>stax-sts</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.wssec.sts.Server</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/src/main/resources/wssec-sts-stax.xml</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -151,15 +181,38 @@
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>java</executable>
+                                    <mainClass>demo.wssec.server.Server</mainClass>
                                     <arguments>
-                                        <argument>-Djava.endorsed.dirs=${basedir}/target/endorsed</argument>
-                                        <argument>-classpath</argument>
-                                        <classpath/>
-                                        <argument>demo.wssec.server.Server</argument>
+                                        <argument>${basedir}/src/main/resources/wssec-server.xml</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>stax-server</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.wssec.server.Server</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/src/main/resources/wssec-server-stax.xml</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -186,6 +239,34 @@
                                     <mainClass>demo.wssec.client.Client</mainClass>
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/wssec-client.xml</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>stax-client</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.wssec.client.Client</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/wssec-client-stax.xml</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -224,6 +305,16 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.7.5</version>
         </dependency>
     </dependencies>
 </project>
