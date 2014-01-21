@@ -358,8 +358,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
 
         // Lifetime
         LifetimeType lifetime = 
-            createLifetime(tokenResponse.getCreated(), tokenResponse.getExpires(),
-                           tokenResponse.getLifetime());
+            createLifetime(tokenResponse.getCreated(), tokenResponse.getExpires());
         JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
         response.getAny().add(lifetimeType);
 

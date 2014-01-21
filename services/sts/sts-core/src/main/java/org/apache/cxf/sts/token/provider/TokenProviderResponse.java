@@ -37,7 +37,6 @@ public class TokenProviderResponse {
     private TokenReference unAttachedReference;
     private Date created;
     private Date expires;
-    private long lifetime;
     
     /**
      * Return true if the entropy represents a Computed Key.
@@ -179,22 +178,4 @@ public class TokenProviderResponse {
         this.expires = expires;
     }
 
-    /**
-     * Set the lifetime of the Token to be returned in seconds.
-     * @deprecated use setCreated/setExpires instead
-     * @param lifetime the lifetime of the Token to be returned in seconds
-     */
-    public void setLifetime(long lifetime) {
-        this.lifetime = lifetime;
-    }
-
-    /**
-     * Get the lifetime of the Token to be returned in seconds
-     * @deprecated use getCreated/getExpires instead
-     * @return the lifetime of the Token to be returned in seconds
-     */
-    public long getLifetime() {
-        return lifetime;
-    }
-    
 }

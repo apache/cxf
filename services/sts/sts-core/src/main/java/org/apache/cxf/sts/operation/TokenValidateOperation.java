@@ -234,8 +234,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             
             // Lifetime
             LifetimeType lifetime = 
-                createLifetime(tokenProviderResponse.getCreated(), tokenProviderResponse.getExpires(),
-                               tokenProviderResponse.getLifetime());
+                createLifetime(tokenProviderResponse.getCreated(), tokenProviderResponse.getExpires());
             JAXBElement<LifetimeType> lifetimeType =
                 QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
             response.getAny().add(lifetimeType);

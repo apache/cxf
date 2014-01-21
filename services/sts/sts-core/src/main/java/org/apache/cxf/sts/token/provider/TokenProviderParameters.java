@@ -93,14 +93,6 @@ public class TokenProviderParameters {
         this.keyRequirements = keyRequirements;
     }
 
-    @Deprecated
-    public RequestClaimCollection getRequestedClaims() {
-        if (requestedPrimaryClaims != null) {
-            return requestedPrimaryClaims;
-        }
-        return requestedSecondaryClaims;
-    }
-
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }

@@ -284,9 +284,7 @@ public abstract class AbstractOperation {
      * Create a LifetimeType object given a created + expires Dates
      */
     protected static LifetimeType createLifetime(
-        Date tokenCreated, 
-        Date tokenExpires,
-        long lifetime
+        Date tokenCreated, Date tokenExpires
     ) {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
@@ -298,10 +296,7 @@ public abstract class AbstractOperation {
         Date expirationTime = tokenExpires;
         if (expirationTime == null) {
             expirationTime = new Date();
-            long lifeTimeOfToken = lifetime;
-            if (lifeTimeOfToken <= 0) {
-                lifeTimeOfToken = 300L;
-            }
+            long lifeTimeOfToken = 300L;
             expirationTime.setTime(creationTime.getTime() + (lifeTimeOfToken * 1000L));
         }
 
