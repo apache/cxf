@@ -81,7 +81,9 @@ public class CXFActivator implements BundleActivator {
                                             "http://cxf.apache.org/configuration/beans",
                                             "http://cxf.apache.org/configuration/parameterized-types",
                                             "http://cxf.apache.org/configuration/security",
-                                            "http://schemas.xmlsoap.org/wsdl/");
+                                            "http://schemas.xmlsoap.org/wsdl/",
+                                            "http://www.w3.org/2005/08/addressing",
+                                            "http://schemas.xmlsoap.org/ws/2004/08/addressing");
 
     }
 
