@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
-import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
@@ -126,8 +125,10 @@ public class SpringBus extends ExtensionManagerBus
                 if (getState() != BusState.RUNNING) {
                     initialize();
                 }
-            } else if (event instanceof ContextClosedEvent) {
-                getExtension(BusLifeCycleManager.class).postShutdown();
+            } else if (event instanceof ContextClosedEvent && getState() == BusState.RUNNING) {
+                // The bus could be create by using SpringBusFactory.createBus("/cxf.xml"); 
+                // Just to make sure the shutdown is called rightly 
+                shutdown(); 
             }
         }
     }

@@ -96,6 +96,14 @@ public class SpringBusFactoryTest extends Assert {
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
         checkCustomerConfiguration(bus);
     }
+
+    @Test 
+    public void testCustomerBusShutdown() { 
+        String cfgFile = "org/apache/cxf/bus/spring/customerBus.xml"; 
+        Bus bus = new SpringBusFactory().createBus(cfgFile, true); 
+        // We have three bus here, which should be closed rightly 
+        bus.shutdown(true); 
+    } 
     
     @Test
     public void testCustomFileURLFromSystemProperty() {
