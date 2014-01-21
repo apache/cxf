@@ -61,6 +61,13 @@ public class PolicyFeatureBPDefinitionParser extends AbstractBPBeanDefinitionPar
         return cxfBean;
     }
 
+    @Override
+    protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
+        if ("alternativeSelector".equals(name)) {
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
+    }
+
     public static Metadata createElement(ParserContext context, Element value) {
         MutablePassThroughMetadata anElement = context.createMetadata(MutablePassThroughMetadata.class);
         anElement.setObject(value);
