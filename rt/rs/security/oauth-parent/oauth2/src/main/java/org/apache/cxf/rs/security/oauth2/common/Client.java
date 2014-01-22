@@ -19,8 +19,10 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a registered third-party Client application
@@ -45,7 +47,7 @@ public class Client implements Serializable {
     private List<String> registeredScopes = new LinkedList<String>();
     private List<String> registeredAudiences = new LinkedList<String>();
     
-    private List<Property> properties = new LinkedList<Property>();
+    private Map<String, String> properties = new HashMap<String, String>();
     private UserSubject subject;
         
     public Client(String clientId, String clientSecret, boolean isConfidential) {
@@ -225,7 +227,7 @@ public class Client implements Serializable {
      * Get the list of additional client properties
      * @return the list of properties
      */
-    public List<Property> getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 
@@ -233,7 +235,7 @@ public class Client implements Serializable {
      * Set the list of additional client properties
      * @param properties the properties
      */
-    public void setProperties(List<Property> properties) {
+    public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
 

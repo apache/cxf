@@ -21,6 +21,8 @@ package org.apache.cxf.rs.security.oauth2.common;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
@@ -50,6 +52,20 @@ public abstract class ServerAccessToken extends AccessToken {
         super(tokenType, tokenKey, expiresIn, issuedAt);
         this.client = client;
     }
+    
+    protected ServerAccessToken(ServerAccessToken token, String key) {    
+        super(token.getTokenType(), 
+             key, 
+             token.getExpiresIn(), 
+             token.getIssuedAt(),
+             token.getRefreshToken(),
+             token.getParameters());
+        this.client = token.getClient();
+        this.grantType = token.getGrantType();
+        this.scopes = token.getScopes();
+        this.audience = token.getAudience();
+        this.subject = token.getSubject();
+    }
 
     /**
      * Returns the Client associated with this token
@@ -57,15 +73,6 @@ public abstract class ServerAccessToken extends AccessToken {
      */
     public Client getClient() {
         return client;
-    }
-
-    @Deprecated
-    /**
-     * Returns the number of seconds this token can be valid after it was issued
-     * @return the seconds
-     */
-    public long getLifetime() {
-        return getExpiresIn();
     }
 
     /**
@@ -128,4 +135,10 @@ public abstract class ServerAccessToken extends AccessToken {
         this.audience = audience;
     }
 
+    protected static ServerAccessToken validateTokenType(ServerAccessToken token, String expectedType) {
+        if (!token.getTokenType().equals(expectedType)) {
+            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+        }
+        return token;
+    }
 }

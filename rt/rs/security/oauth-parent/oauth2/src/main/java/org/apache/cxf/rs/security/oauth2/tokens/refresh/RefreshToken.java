@@ -54,6 +54,13 @@ public class RefreshToken extends ServerAccessToken {
               issuedAt);
     }
 
+    public RefreshToken(ServerAccessToken token,
+                        String key,
+                        List<String> accessTokens) {
+        super(validateTokenType(token, OAuthConstants.REFRESH_TOKEN_TYPE), key);
+        this.accessTokens = accessTokens;
+    }
+    
     public List<String> getAccessTokens() {
         return accessTokens;
     }

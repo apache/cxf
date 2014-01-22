@@ -22,6 +22,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
@@ -39,7 +40,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
-import org.apache.cxf.rs.security.oauth2.common.Property;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -194,9 +194,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         secData.setApplicationDescription(client.getApplicationDescription());
         secData.setApplicationLogoUri(client.getApplicationLogoUri());
         secData.setAudience(params.getFirst(OAuthConstants.CLIENT_AUDIENCE));
-        List<Property> extraProperties = client.getProperties();
-        secData.setExtraApplicationProperties(extraProperties == null ? Collections.<Property>emptyList()
-            : Collections.unmodifiableList(extraProperties));
+        Map<String, String> extraProperties = client.getProperties();
+        secData.setExtraApplicationProperties(extraProperties);
         String replyTo = getMessageContext().getUriInfo()
             .getAbsolutePathBuilder().path("decision").build().toString();
         secData.setReplyTo(replyTo);

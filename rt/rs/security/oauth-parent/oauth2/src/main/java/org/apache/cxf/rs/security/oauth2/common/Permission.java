@@ -73,10 +73,12 @@ public class Permission implements Serializable {
 
     /**
      * Indicates if this permission has been allocated by default or not.
-     * Authorization View handlers may use this property in order to restrict
-     * the list of scopes which may be refused to non-default scopes only.
-     * For example, the read-only check-box controls can be used to represent
-     * the default scopes 
+     * Authorization View handlers may use this property to optimize the way the user selects the
+     * scopes.
+     * For example, assume that read', 'add' and 'update' scopes are supported and the 
+     * 'read' scope is always allocated. This can be presented at the UI level as follows:
+     * the read-only check-box control will represent a 'read' scope and a user will be able to
+     * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one. 
      * @param isDefault true if the permission has been allocated by default
      */
     public void setDefault(boolean value) {

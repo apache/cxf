@@ -19,8 +19,10 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -36,7 +38,7 @@ public class UserSubject implements Serializable {
     private String login;
     private String id;
     private List<String> roles = new LinkedList<String>();
-    private List<Property> properties = new LinkedList<Property>();
+    private Map<String, String> properties = new HashMap<String, String>();
     
     public UserSubject() {
         
@@ -100,7 +102,7 @@ public class UserSubject implements Serializable {
      * Get the list of additional user subject properties
      * @return the list of properties
      */
-    public List<Property> getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 
@@ -108,7 +110,7 @@ public class UserSubject implements Serializable {
      * Set the list of additional user subject properties
      * @param properties the properties
      */
-    public void setProperties(List<Property> properties) {
+    public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
     

@@ -45,10 +45,18 @@ public abstract class AccessToken implements Serializable {
     
     protected AccessToken(String tokenType, String tokenKey,
                           long expiresIn, long issuedAt) {
-        this.tokenType = tokenType;
-        this.tokenKey = tokenKey;
+        this(tokenType, tokenKey);
         this.expiresIn = expiresIn;
         this.issuedAt = issuedAt;
+    }
+    
+    protected AccessToken(String tokenType, String tokenKey,
+                          long expiresIn, long issuedAt,
+                          String refreshToken,
+                          Map<String, String> parameters) {
+        this(tokenType, tokenKey, expiresIn, issuedAt);
+        this.refreshToken = refreshToken;
+        this.parameters = parameters;
     }
 
     /**
@@ -59,12 +67,20 @@ public abstract class AccessToken implements Serializable {
         return tokenType;
     }
     
+    public void setTokenType(String type) {
+        this.tokenType = type;
+    }
+    
     /**
      * Returns the token key
      * @return the key
      */
     public String getTokenKey() {
         return tokenKey;
+    }
+    
+    public void setTokenKey(String key) {
+        this.tokenKey = key;
     }
 
     /**
@@ -109,8 +125,6 @@ public abstract class AccessToken implements Serializable {
         return issuedAt;
     }
 
-    // Can be set at the server or at the moment 
-    // the token is deserialized on the client
     public void setIssuedAt(long issuedAt) {
         this.issuedAt = issuedAt;
     }
