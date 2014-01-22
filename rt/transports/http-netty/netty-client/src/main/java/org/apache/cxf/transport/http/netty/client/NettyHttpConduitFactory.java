@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.http.netty.client;
 
 import java.io.IOException;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -29,12 +30,19 @@ import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+
+
 @NoJSR250Annotations
 public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPConduitFactory {
 
     boolean isShutdown;
+    
+    final EventLoopGroup eventLoopGroup; 
 
     public NettyHttpConduitFactory() {
+        eventLoopGroup = new NioEventLoopGroup();
     }
 
     @Override
@@ -66,12 +74,15 @@ public class NettyHttpConduitFactory implements BusLifeCycleListener, HTTPCondui
 
     @Override
     public void postShutdown() {
-        // shutdown the group
-        
+        eventLoopGroup.shutdownGracefully().syncUninterruptibly();
     }
 
     public boolean isShutdown() {
         return isShutdown;
+    }
+    
+    public EventLoopGroup getEventLoopGroup() {
+        return eventLoopGroup;
     }
 
 }

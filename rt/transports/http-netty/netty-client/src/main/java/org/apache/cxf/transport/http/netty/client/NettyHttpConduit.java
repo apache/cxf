@@ -63,8 +63,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
@@ -75,16 +73,14 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
     public static final String USE_ASYNC = "use.async.http.conduit";
     final NettyHttpConduitFactory factory;
     private Bootstrap bootstrap;
-    // TODO do we need to use the EventLoop from NettyHttpConduitFactory
-    private final EventLoopGroup group;
+    
     
     public NettyHttpConduit(Bus b, EndpointInfo ei, EndpointReferenceType t, NettyHttpConduitFactory conduitFactory)
         throws IOException {
         super(b, ei, t);
         factory = conduitFactory;
-        group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
-        bootstrap.group(group);
+        bootstrap.group(factory.getEventLoopGroup());
         bootstrap.channel(NioSocketChannel.class);
     }
     
@@ -92,12 +88,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         return factory;
     }
     
-    public void close() {
-        super.close();
-        // clean up thread of the group
-        group.shutdownGracefully().syncUninterruptibly();
-    }
-
     // Using Netty API directly
     protected void setupConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
         // need to do some clean up work on the URI address
