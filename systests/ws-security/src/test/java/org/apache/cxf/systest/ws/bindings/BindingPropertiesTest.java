@@ -558,9 +558,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not enabling SignatureConfirmation");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = "Check Signature confirmation";
-            assertTrue(ex.getMessage().contains(error)
-                       || ex.getMessage().contains("SignatureConfirmation must be present"));
+            // expected
         }
         
         ((java.io.Closeable)port).close();
