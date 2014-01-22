@@ -184,6 +184,9 @@ public final class WSS4JUtils {
             errorMessage = SECURITY_TOKEN_UNAVAILABLE_ERR;
         } else if (WSConstants.MESSAGE_EXPIRED.equals(faultCode)) {
             errorMessage = MESSAGE_EXPIRED_ERR;
+        } else {
+            // Default
+            errorMessage = INVALID_SECURITY_ERR;
         }
         return errorMessage;
         
