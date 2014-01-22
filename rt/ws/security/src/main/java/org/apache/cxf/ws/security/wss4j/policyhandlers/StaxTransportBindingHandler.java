@@ -310,7 +310,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             
             WSSSecurityProperties properties = getProperties();
             if (securityToken != null) {
-                storeSecurityToken(securityToken);
+                storeSecurityToken(token, securityToken);
                 
                 // Set up CallbackHandler which wraps the configured Handler
                 TokenStoreCallbackHandler callbackHandler = 

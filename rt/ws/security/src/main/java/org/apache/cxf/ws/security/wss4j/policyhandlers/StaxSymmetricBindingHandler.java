@@ -215,7 +215,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             // Store key
             if (!(MessageUtils.isRequestor(message) && encryptionToken instanceof KerberosToken)) {
-                storeSecurityToken(tok);
+                storeSecurityToken(encryptionToken, tok);
             }
             
             List<SecurePart> encrParts = null;
@@ -352,7 +352,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             // Store key
             if (!(MessageUtils.isRequestor(message) && sigToken instanceof KerberosToken)) {
-                storeSecurityToken(sigTok);
+                storeSecurityToken(sigToken, sigTok);
             }
 
             // Add timestamp

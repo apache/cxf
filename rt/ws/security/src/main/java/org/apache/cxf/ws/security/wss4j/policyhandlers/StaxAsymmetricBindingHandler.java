@@ -131,7 +131,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         customTokenAdded = true;
                     }
                     if (sigTok != null) {
-                        storeSecurityToken(sigTok);
+                        storeSecurityToken(initiatorToken, sigTok);
                         outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
                     }
                     
@@ -272,7 +272,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     }
                     
                     if (sigTok != null) {
-                        storeSecurityToken(sigTok);
+                        storeSecurityToken(initiatorToken, sigTok);
                         outboundTokens.remove(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION); 
                     }
                     

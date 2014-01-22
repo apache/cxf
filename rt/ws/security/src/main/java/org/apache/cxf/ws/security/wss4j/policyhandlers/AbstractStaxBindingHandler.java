@@ -382,7 +382,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         return null;
     }
     
-    protected void storeSecurityToken(SecurityToken tok) {
+    protected void storeSecurityToken(AbstractToken policyToken, SecurityToken tok) {
         SecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.EncryptedKeyToken;
         if (tok.getTokenType() != null) {
             if (tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
@@ -425,7 +425,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                     return super.getSecretKey(algorithmURI);
                 }
             };
-        
+            
+        // Store a DOM Element reference if it exists
+        Element ref;
+        if (isTokenRequired(policyToken.getIncludeTokenType())) {
+            ref = tok.getAttachedReference();
+        } else {
+            ref = tok.getUnattachedReference();
+        }
+
+        if (ref != null && policyToken instanceof IssuedToken) {
+            encryptedKeySecurityToken.setCustomTokenReference(ref);
+        }
         final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
             new SecurityTokenProvider<OutboundSecurityToken>() {
 
