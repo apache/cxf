@@ -38,6 +38,10 @@ public abstract class AccessToken implements Serializable {
     
     private Map<String, String> parameters = new LinkedHashMap<String, String>();
     
+    protected AccessToken() {
+        
+    }
+    
     protected AccessToken(String tokenType, String tokenKey) {
         this.tokenType = tokenType;
         this.tokenKey = tokenKey;

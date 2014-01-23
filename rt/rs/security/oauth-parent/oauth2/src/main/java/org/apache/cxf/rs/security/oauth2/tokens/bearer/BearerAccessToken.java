@@ -46,4 +46,7 @@ public class BearerAccessToken extends ServerAccessToken {
     public BearerAccessToken(ServerAccessToken token, String newKey) {
         super(validateTokenType(token, OAuthConstants.BEARER_TOKEN_TYPE), newKey);
     }
+    public BearerAccessToken() {
+        
+    }
 }

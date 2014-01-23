@@ -50,6 +50,10 @@ public class Client implements Serializable {
     private Map<String, String> properties = new HashMap<String, String>();
     private UserSubject subject;
         
+    public Client() {
+        
+    }
+    
     public Client(String clientId, String clientSecret, boolean isConfidential) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -75,6 +79,10 @@ public class Client implements Serializable {
         return clientId;
     }
 
+    public void setClientId(String id) {
+        clientId = id;
+    }
+    
     /**
      * Gets the client secret
      * @return the secret
@@ -83,6 +91,10 @@ public class Client implements Serializable {
         return clientSecret;
     }
 
+    public void setClientSecret(String secret) {
+        this.clientSecret = secret;
+    }
+    
     /**
      * Gets the name of the third-party application
      * this client represents

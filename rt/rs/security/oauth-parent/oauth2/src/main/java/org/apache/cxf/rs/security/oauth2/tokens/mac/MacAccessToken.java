@@ -67,6 +67,10 @@ public class MacAccessToken extends ServerAccessToken {
         this.setExtraParameters(algo, macKey);
     }
     
+    public MacAccessToken(ServerAccessToken token, String newKey) {
+        super(validateTokenType(token, OAuthConstants.MAC_TOKEN_TYPE), newKey);
+    }
+    
     private void setExtraParameters(HmacAlgorithm algo, String macKey) {
         String theKey = macKey == null ? HmacUtils.generateSecret(algo) : macKey; 
         super.getParameters().put(OAuthConstants.MAC_TOKEN_KEY,

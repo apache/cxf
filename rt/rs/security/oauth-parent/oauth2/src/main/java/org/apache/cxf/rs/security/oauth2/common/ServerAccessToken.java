@@ -37,6 +37,10 @@ public abstract class ServerAccessToken extends AccessToken {
     private UserSubject subject;
     private String audience;
     
+    protected ServerAccessToken() {
+        
+    }
+    
     protected ServerAccessToken(Client client, 
                                         String tokenType,
                                         String tokenKey,
@@ -75,6 +79,10 @@ public abstract class ServerAccessToken extends AccessToken {
         return client;
     }
 
+    public void setClient(Client c) {
+        this.client = c;
+    }
+    
     /**
      * Returns a list of opaque permissions/scopes
      * @return the scopes

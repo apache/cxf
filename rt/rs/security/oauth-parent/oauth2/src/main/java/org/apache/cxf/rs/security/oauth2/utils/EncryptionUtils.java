@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.security.Key;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
@@ -87,27 +88,27 @@ public final class EncryptionUtils {
     }
     
     public static String encryptTokenWithSecretKey(ServerAccessToken token, 
-                                                      SecretKey symmetricKey) {
-        return encryptTokenWithSecretKey(token, symmetricKey, null);
+                                                  Key secretKey) {
+        return encryptTokenWithSecretKey(token, secretKey, null);
     }
     
     public static String encryptTokenWithSecretKey(ServerAccessToken token, 
-                                                   SecretKey symmetricKey,
+                                                   Key secretKey,
                                                    SecretKeyProperties props) {
         String tokenSequence = tokenizeServerToken(token);
-        return encryptSequence(tokenSequence, symmetricKey, props);
+        return encryptSequence(tokenSequence, secretKey, props);
     }
     
-    public static String encryptRefreshTokenWithSecretKey(RefreshToken token, SecretKey symmetricKey) {
-        return encryptRefreshTokenWithSecretKey(token, symmetricKey, null);
+    public static String encryptRefreshTokenWithSecretKey(RefreshToken token, Key secretKey) {
+        return encryptRefreshTokenWithSecretKey(token, secretKey, null);
     }
     
     public static String encryptRefreshTokenWithSecretKey(RefreshToken token, 
-                                                             SecretKey symmetricKey,
-                                                             SecretKeyProperties props) {
+                                                          Key secretKey,
+                                                          SecretKeyProperties props) {
         String tokenSequence = tokenizeRefreshToken(token);
         
-        return encryptSequence(tokenSequence, symmetricKey, props);
+        return encryptSequence(tokenSequence, secretKey, props);
     }
     
     public static String decryptTokenSequence(String encodedToken, 
@@ -115,39 +116,38 @@ public final class EncryptionUtils {
         return decryptTokenSequence(encodedToken, encodedSecretKey, "AES");
     }
     
-    public static String decryptTokenSequence(String encodedToken, 
+    public static String decryptTokenSequence(String encodedData, 
                                               String encodedSecretKey, 
                                               String algo) {
         try {
             SecretKey key = decodeSecretKey(encodedSecretKey, algo);
-            return decryptTokenSequence(encodedToken, key);
+            return decryptSequence(encodedData, key);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
     
-    public static String decryptTokenSequence(String encodedToken, 
+    public static String decryptTokenSequence(String encodedData, 
                                               String encodedSecretKey, 
                                               SecretKeyProperties props) {
         try {
             SecretKey key = decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-            return decryptTokenSequence(encodedToken, key, props);
+            return decryptSequence(encodedData, key, props);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
     
-    public static String decryptTokenSequence(String encodedToken, 
-                                              SecretKey key) {
-        return decryptTokenSequence(encodedToken, key, null);
+    public static String decryptSequence(String encodedData, Key secretKey) {
+        return decryptSequence(encodedData, secretKey, null);
     }
     
-    public static String decryptTokenSequence(String encodedToken, 
-                                              SecretKey key,
+    public static String decryptSequence(String encodedData, 
+                                              Key secretKey,
                                               SecretKeyProperties props) {
         try {
-            byte[] encryptedBytes = decodeSequence(encodedToken);
-            byte[] bytes = processBytes(encryptedBytes, key, props, Cipher.DECRYPT_MODE);
+            byte[] encryptedBytes = decodeSequence(encodedData);
+            byte[] bytes = processBytes(encryptedBytes, secretKey, props, Cipher.DECRYPT_MODE);
             return new String(bytes, "UTF-8");
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -178,17 +178,17 @@ public final class EncryptionUtils {
     
     public static ServerAccessToken decryptToken(OAuthDataProvider provider,
                                                  String encodedToken, 
-                                                 SecretKey key) {
-        return decryptToken(provider, encodedToken, key, null);
+                                                 Key secretKey) {
+        return decryptToken(provider, encodedToken, secretKey, null);
     }
     
     public static ServerAccessToken decryptToken(OAuthDataProvider provider,
-                                                 String encodedToken, 
-                                                 SecretKey key, 
+                                                 String encodedData, 
+                                                 Key secretKey, 
                                                  SecretKeyProperties props) {
         try {
-            String decryptedSequence = decryptTokenSequence(encodedToken, key, props);
-            return recreateToken(provider, encodedToken, decryptedSequence);
+            String decryptedSequence = decryptSequence(encodedData, secretKey, props);
+            return recreateToken(provider, encodedData, decryptedSequence);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -196,27 +196,31 @@ public final class EncryptionUtils {
     
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
                                                    String encodedToken, 
-                                                   SecretKey key) {
+                                                   Key key) {
         return decryptRefreshToken(provider, encodedToken, key, null);
     }
     
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
-                                                   String encodedToken, 
-                                                   SecretKey key, 
+                                                   String encodedData, 
+                                                   Key key, 
                                                    SecretKeyProperties props) {
         try {
-            String decryptedSequence = decryptTokenSequence(encodedToken, key, props);
-            return recreateRefreshToken(provider, encodedToken, decryptedSequence);
+            String decryptedSequence = decryptSequence(encodedData, key, props);
+            return recreateRefreshToken(provider, encodedData, decryptedSequence);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
     
-    private static String encryptSequence(String sequence, SecretKey symmetricKey,
-                                          SecretKeyProperties keyProps) {
+    public static String encryptSequence(String sequence, Key secretKey) {
+        return encryptSequence(sequence, secretKey, null);
+    }
+    
+    public static String encryptSequence(String sequence, Key secretKey,
+                                         SecretKeyProperties keyProps) {
         try {
             byte[] bytes = processBytes(sequence.getBytes("UTF-8"), 
-                                        symmetricKey,
+                                        secretKey,
                                         keyProps,
                                         Cipher.ENCRYPT_MODE);
             return Base64UrlUtility.encode(bytes);
@@ -225,21 +229,21 @@ public final class EncryptionUtils {
         }
     }
     
-    private static byte[] processBytes(byte[] bytes, SecretKey symmetricKey, 
+    private static byte[] processBytes(byte[] bytes, Key secretKey, 
                                        SecretKeyProperties keyProps, int mode) {
         try {
-            Cipher c = Cipher.getInstance(symmetricKey.getAlgorithm());
+            Cipher c = Cipher.getInstance(secretKey.getAlgorithm());
             if (keyProps == null || keyProps.getAlgoSpec() == null && keyProps.getSecureRandom() == null) {
-                c.init(mode, symmetricKey);
+                c.init(mode, secretKey);
             } else {
                 AlgorithmParameterSpec algoSpec = keyProps.getAlgoSpec();
                 SecureRandom random = keyProps.getSecureRandom();
                 if (algoSpec == null) {
-                    c.init(mode, symmetricKey, random);
+                    c.init(mode, secretKey, random);
                 } else if (random == null) {
-                    c.init(mode, symmetricKey, algoSpec);
+                    c.init(mode, secretKey, algoSpec);
                 } else {
-                    c.init(mode, symmetricKey, algoSpec, random);
+                    c.init(mode, secretKey, algoSpec, random);
                 }
             }
             return c.doFinal(bytes);

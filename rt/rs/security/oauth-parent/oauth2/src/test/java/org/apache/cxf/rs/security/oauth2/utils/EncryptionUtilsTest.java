@@ -18,22 +18,21 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import javax.crypto.SecretKey;
+import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
@@ -44,11 +43,11 @@ import org.junit.Test;
 
 public class EncryptionUtilsTest extends Assert {
     
-    private CustomProvider p;
+    private EncryptingDataProvider p;
     
     @Before
     public void setUp() throws Exception {
-        p = new CustomProvider();
+        p = new EncryptingDataProvider();
     }
     
     @After
@@ -64,6 +63,29 @@ public class EncryptionUtilsTest extends Assert {
         ServerAccessToken token = p.createAccessToken(atr);
         // decrypt
         ServerAccessToken token2 = p.getAccessToken(token.getTokenKey());
+        
+        // compare tokens
+        compareAccessTokens(token, token2);
+    }
+    
+    @Test
+    public void testBearerTokenJSON() throws Exception {
+        AccessTokenRegistration atr = prepareTokenRegistration();
+        
+        BearerAccessToken token = p.createAccessTokenInternal(atr);
+        JSONProvider<BearerAccessToken> jsonp = new JSONProvider<BearerAccessToken>();
+        jsonp.setMarshallAsJaxbElement(true);
+        jsonp.setUnmarshallAsJaxbElement(true);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        jsonp.writeTo(token, BearerAccessToken.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
+                      new MetadataMap<String, Object>(), bos);
+        
+        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.tokenKey);
+        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.tokenKey);
+        ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
+                                                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                                                  new MetadataMap<String, String>(), 
+                                                  new ByteArrayInputStream(decrypted.getBytes()));
         
         // compare tokens
         compareAccessTokens(token, token2);
@@ -115,93 +137,5 @@ public class EncryptionUtilsTest extends Assert {
         return atr;
     }
     
-    private class CustomProvider implements OAuthDataProvider {
-
-        private Map<String, Client> clients;
-        private SecretKey tokenKey;
-        
-        private Set<String> tokens = new HashSet<String>();
-        private Map<String, String> refreshTokens = new HashMap<String, String>();
-        
-        public CustomProvider() throws Exception {
-            tokenKey = EncryptionUtils.getSecretKey();
-            clients = Collections.singletonMap("1", new Client("1", "2", true));
-        }
-        
-        @Override
-        public Client getClient(String clientId) throws OAuthServiceException {
-            return clients.get(clientId);
-        }
-
-        @Override
-        public ServerAccessToken createAccessToken(AccessTokenRegistration accessTokenReg)
-            throws OAuthServiceException {
-            
-            ServerAccessToken token = createNewToken(accessTokenReg);
-            
-            String encryptedToken = 
-                EncryptionUtils.encryptTokenWithSecretKey(token, tokenKey);
-            
-            tokens.add(encryptedToken);
-            refreshTokens.put(token.getRefreshToken(), encryptedToken);
-            token.setTokenKey(encryptedToken);
-            return token;
-        }
-        
-        @Override
-        public ServerAccessToken getAccessToken(String accessTokenKey) throws OAuthServiceException {
-            return EncryptionUtils.decryptToken(this, accessTokenKey, tokenKey);
-        }
-
-        @Override
-        public ServerAccessToken refreshAccessToken(Client client, String refreshToken,
-                                                    List<String> requestedScopes)
-            throws OAuthServiceException {
-            return null;
-        }
-
-        @Override
-        public void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException {
-            tokens.remove(accessToken.getTokenKey());
-        }
-
-        @Override
-        public void revokeToken(Client client, String token, String tokenTypeHint)
-            throws OAuthServiceException {
-            // complete
-        }
-
-        @Override
-        public ServerAccessToken getPreauthorizedToken(Client client, List<String> requestedScopes,
-                                                       UserSubject subject, String grantType)
-            throws OAuthServiceException {
-            return null;
-        }
-        
-        @Override
-        public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
-            return null;
-        }
-        
-        private ServerAccessToken createNewToken(AccessTokenRegistration accessTokenReg) {
-            ServerAccessToken token = new BearerAccessToken(accessTokenReg.getClient(), 3600L);
-            token.setSubject(accessTokenReg.getSubject());
-            
-            RefreshToken refreshToken = new RefreshToken(accessTokenReg.getClient(),
-                                                         "refresh",
-                                                         1200L,
-                                                         OAuthUtils.getIssuedAt());
-            
-            String encryptedRefreshToken = EncryptionUtils.encryptTokenWithSecretKey(refreshToken, tokenKey);
-            token.setRefreshToken(encryptedRefreshToken);
-            
-            token.setGrantType(accessTokenReg.getGrantType());
-            token.setAudience(accessTokenReg.getAudience());
-            token.setParameters(Collections.singletonMap("param", "value"));
-            token.setScopes(Collections.singletonList(
-                new OAuthPermission("read", "read permission")));
-            return token;
-        }
-        
-    }
+    
 }
