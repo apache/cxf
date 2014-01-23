@@ -604,7 +604,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             List<BinarySecurity> results = new ArrayList<BinarySecurity>();
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.BST) {
+                if (actInt.intValue() == WSConstants.BST 
+                    && Boolean.TRUE.equals(wser.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN))) {
                     results.add((BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN));
                 }
             }
