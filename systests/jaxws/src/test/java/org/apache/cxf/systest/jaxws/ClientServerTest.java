@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -41,8 +42,10 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
@@ -63,6 +66,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
@@ -76,7 +80,6 @@ import org.apache.hello_world_soap_http.SOAPServiceMultiPortTypeTest;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -1057,4 +1060,19 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello World", resp);
     }
 
+    @Test
+    public void testEchoProviderAsync() throws Exception {
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+
+        StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+        StreamSource response = dispatcher.invoke(request);
+
+        assertEquals(requestString, StaxUtils.toString(response));
+    }
 }

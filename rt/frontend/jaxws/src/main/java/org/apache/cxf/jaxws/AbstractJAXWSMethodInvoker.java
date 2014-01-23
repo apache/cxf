@@ -20,6 +20,8 @@
 package org.apache.cxf.jaxws;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.activation.DataHandler;
 import javax.xml.ws.AsyncHandler;
+import javax.xml.ws.Provider;
 import javax.xml.ws.Response;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
@@ -52,6 +55,7 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
@@ -77,18 +81,24 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         }
         return null;
     }
-    protected Method adjustMethodAndParams(Method m, Exchange ex, List<Object> params) {
+
+    @Override
+    protected Method adjustMethodAndParams(Method mOriginal, Exchange ex, List<Object> params,
+                                           Class<?> serviceObjectClass) {
+        // If class implements Provider<T> interface, use overriden method from service object class
+        // to check UseAsyncMethod annotation
+        Method mso = getProviderServiceObjectMethod(mOriginal, serviceObjectClass);
         
-        UseAsyncMethod uam = m.getAnnotation(UseAsyncMethod.class);
+        UseAsyncMethod uam = mso.getAnnotation(UseAsyncMethod.class);
         if (uam != null) {
             BindingOperationInfo bop = ex.getBindingOperationInfo();
             Method ret = bop.getProperty(ASYNC_METHOD, Method.class);
             if (ret == null) {
-                Class<?> ptypes[] = new Class<?>[m.getParameterTypes().length + 1];
-                System.arraycopy(m.getParameterTypes(), 0, ptypes, 0, m.getParameterTypes().length);
-                ptypes[m.getParameterTypes().length] = AsyncHandler.class;
+                Class<?> ptypes[] = new Class<?>[mso.getParameterTypes().length + 1];
+                System.arraycopy(mso.getParameterTypes(), 0, ptypes, 0, mso.getParameterTypes().length);
+                ptypes[mso.getParameterTypes().length] = AsyncHandler.class;
                 try {
-                    ret = m.getDeclaringClass().getMethod(m.getName() + "Async", ptypes);
+                    ret = mso.getDeclaringClass().getMethod(mso.getName() + "Async", ptypes);
                     bop.setProperty(ASYNC_METHOD, ret);
                 } catch (Throwable t) {
                     //ignore
@@ -115,9 +125,52 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
                 }
             }
         }
-        return m;
+        return mOriginal;
     }
     
+    private Method getProviderServiceObjectMethod(Method m, Class<?> serviceObjectClass) {
+        if (!Provider.class.isAssignableFrom(serviceObjectClass)) {
+            return m;
+        }
+        Class<?> currentSvcClass = serviceObjectClass;
+        Class<?> genericType = null;
+
+        while (currentSvcClass != null) {
+            genericType = getProviderGenericType(currentSvcClass);
+            if (genericType != null) {
+                break;
+            }
+            // Check superclass until top
+            currentSvcClass = currentSvcClass.getSuperclass();
+        }
+        // Should never happens
+        if (genericType == null) {
+            return m;
+        }
+        try {
+            return serviceObjectClass.getMethod("invoke", genericType);
+        } catch (Exception e) {
+            throw new ServiceConstructionException(e);
+        }
+    }
+
+    private Class<?> getProviderGenericType(Class<?> svcClass) {
+        Type[] interfaces = svcClass.getGenericInterfaces();
+        for (Type interfaceType : interfaces) {
+            if (interfaceType instanceof ParameterizedType) {
+                ParameterizedType paramInterface = (ParameterizedType)interfaceType;
+                if (!paramInterface.getRawType().equals(Provider.class)) {
+                    continue;
+                }
+                Type[] typeArgs = paramInterface.getActualTypeArguments();
+                if (typeArgs.length > 0) {
+                    return (Class<?>)typeArgs[0];
+                }
+            }
+        }
+        return null;
+    }
+
     class JaxwsServerHandler implements AsyncHandler<Object> {
         Response<Object> r;
         Continuation continuation;
