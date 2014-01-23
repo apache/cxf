@@ -37,6 +37,10 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     private String code;
     private String redirectUri;
     
+    public AuthorizationCodeGrant() {
+        
+    }
+    
     public AuthorizationCodeGrant(String code) {
         this.code = code;
     }
@@ -69,6 +73,10 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
      */
     public String getCode() {
         return code;
+    }
+    
+    public void setCode(String c) {
+        this.code = c;
     }
 
     /**

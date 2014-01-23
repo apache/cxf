@@ -33,12 +33,16 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private static final long serialVersionUID = -5004608901535459036L;
     
     private long issuedAt;
-    private long lifetime;
+    private long expiresIn;
     private Client client;
     private List<String> approvedScopes = Collections.emptyList();
     private UserSubject subject;
     private String audience;
     private String clientCodeVerifier;
+    
+    public ServerAuthorizationCodeGrant() {
+        
+    }
     
     public ServerAuthorizationCodeGrant(Client client, 
                                         long lifetime) {
@@ -48,11 +52,11 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     
     public ServerAuthorizationCodeGrant(Client client, 
                                   String code,
-                                  long lifetime, 
+                                  long expiresIn, 
                                   long issuedAt) {
         super(code);
         this.client = client;
-        this.lifetime = lifetime;
+        this.expiresIn = expiresIn;
         this.issuedAt = issuedAt;
     }
 
@@ -63,13 +67,30 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     public long getIssuedAt() {
         return issuedAt;
     }
+    
+    public void setIssuedAt(long issuedAt) {
+        this.issuedAt = issuedAt;
+    }
 
     /**
      * Returns the number of seconds this grant can be valid after it was issued
      * @return the seconds this grant will be valid for
      */
+    @Deprecated
     public long getLifetime() {
-        return lifetime;
+        return expiresIn;
+    }
+    
+    /**
+     * Returns the number of seconds this grant can be valid after it was issued
+     * @return the seconds this grant will be valid for
+     */
+    public long getExpiresIn() {
+        return expiresIn;
+    }
+    
+    public void setExpiresIn(long expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
     /**
@@ -80,6 +101,10 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
         return client;
     }
 
+    public void setClient(Client c) {
+        this.client = c;
+    }
+    
     /**
      * Sets the scopes explicitly approved by the end user.
      * If this list is empty then the end user had no way to down-scope. 

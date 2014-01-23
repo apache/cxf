@@ -121,7 +121,7 @@ public class EncryptionUtilsTest extends Assert {
         assertEquals(perm1.getDescription(), perm2.getDescription());
         
         RefreshToken refreshToken = 
-            EncryptionUtils.decryptRefreshToken(p, token2.getRefreshToken(), p.tokenKey);
+            ModelEncryptionSupport.decryptRefreshToken(p, token2.getRefreshToken(), p.tokenKey);
         assertEquals(1200L, refreshToken.getExpiresIn());
     }
     

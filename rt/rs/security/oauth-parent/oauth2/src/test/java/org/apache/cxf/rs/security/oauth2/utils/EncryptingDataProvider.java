@@ -62,7 +62,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         ServerAccessToken token = createAccessTokenInternal(accessTokenReg);
         
         String encryptedToken = 
-            EncryptionUtils.encryptTokenWithSecretKey(token, tokenKey);
+            ModelEncryptionSupport.encryptAccessToken(token, tokenKey);
         
         tokens.add(encryptedToken);
         refreshTokens.put(token.getRefreshToken(), encryptedToken);
@@ -72,7 +72,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     
     @Override
     public ServerAccessToken getAccessToken(String accessTokenKey) throws OAuthServiceException {
-        return EncryptionUtils.decryptToken(this, accessTokenKey, tokenKey);
+        return ModelEncryptionSupport.decryptAccessToken(this, accessTokenKey, tokenKey);
     }
 
     @Override
@@ -114,7 +114,8 @@ public class EncryptingDataProvider implements OAuthDataProvider {
                                                      1200L,
                                                      OAuthUtils.getIssuedAt());
         
-        String encryptedRefreshToken = EncryptionUtils.encryptTokenWithSecretKey(refreshToken, tokenKey);
+        String encryptedRefreshToken = 
+            ModelEncryptionSupport.encryptRefreshToken(refreshToken, tokenKey);
         token.setRefreshToken(encryptedRefreshToken);
         
         token.setGrantType(accessTokenReg.getGrantType());
