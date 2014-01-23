@@ -25,8 +25,14 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import javax.jws.WebService;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.Provider;
+import javax.xml.ws.Service;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceProvider;
 
 import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -58,6 +64,10 @@ public class Server extends AbstractBusTestServerBase {
         address = "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort";
         eps.add(Endpoint.publish(address, implementor));
         
+        implementor = new AsyncEchoProvider();
+        address = "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider";
+        eps.add(Endpoint.publish(address, implementor));
+
         implementor = new GreeterImplMultiPort();
         address = "http://localhost:" + PORT + "/MultiPort/GreeterPort";
         eps.add(Endpoint.publish(address, implementor));
@@ -137,6 +147,33 @@ public class Server extends AbstractBusTestServerBase {
                     resp.setResponseType("Hello " + requestType);
                     r.set(resp);
                     asyncHandler.handleResponse(r);                    
+                }
+            } .start();
+            return r;
+        }
+    }
+
+    @WebServiceProvider
+    @ServiceMode(value = Service.Mode.PAYLOAD)
+    public class AsyncEchoProvider implements Provider<StreamSource> {
+
+        @Override
+        @UseAsyncMethod
+        public StreamSource invoke(StreamSource request) {
+            throw new RuntimeException("Should be async");
+        }
+
+        public Future<?> invokeAsync(final StreamSource s, final AsyncHandler<Source> asyncHandler) {
+            final ServerAsyncResponse<Source> r = new ServerAsyncResponse<Source>();
+            new Thread() {
+                public void run() {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        // ignore
+                    }
+                    r.set(s);
+                    asyncHandler.handleResponse(r);
                 }
             } .start();
             return r;
