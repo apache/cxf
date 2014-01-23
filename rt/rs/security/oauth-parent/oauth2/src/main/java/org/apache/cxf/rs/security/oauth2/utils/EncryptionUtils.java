@@ -229,8 +229,8 @@ public final class EncryptionUtils {
         }
     }
     
-    private static byte[] processBytes(byte[] bytes, Key secretKey, 
-                                       SecretKeyProperties keyProps, int mode) {
+    public static byte[] processBytes(byte[] bytes, Key secretKey, 
+                                      SecretKeyProperties keyProps, int mode) {
         try {
             Cipher c = Cipher.getInstance(secretKey.getAlgorithm());
             if (keyProps == null || keyProps.getAlgoSpec() == null && keyProps.getSecureRandom() == null) {
@@ -252,7 +252,7 @@ public final class EncryptionUtils {
         }
     }
     
-    private static SecretKey decodeSecretKey(String encodedSecretKey, String algo) {
+    public static SecretKey decodeSecretKey(String encodedSecretKey, String algo) {
         try {
             byte[] secretKeyBytes = decodeSequence(encodedSecretKey);
             return new SecretKeySpec(secretKeyBytes, algo);
@@ -261,9 +261,9 @@ public final class EncryptionUtils {
         }
     }
     
-    private static byte[] decodeSequence(String encodedSecretKey) {
+    public static byte[] decodeSequence(String encodedSequence) {
         try {
-            return Base64UrlUtility.decode(encodedSecretKey);
+            return Base64UrlUtility.decode(encodedSequence);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -285,7 +285,7 @@ public final class EncryptionUtils {
                                 parseSimpleList(parts[parts.length - 1]));
     }
     
-    public static ServerAccessToken recreateToken(OAuthDataProvider provider,
+    private static ServerAccessToken recreateToken(OAuthDataProvider provider,
                                                   String newTokenKey,
                                                   String[] parts) {
         
@@ -329,36 +329,6 @@ public final class EncryptionUtils {
         return newToken;
     }
     
-    private static String getStringPart(String str) {
-        return "null".equals(str) ? null : str;
-    }
-    
-    private static String prepareSimpleString(String str) {
-        return str.trim().isEmpty() ? "" : str.substring(1, str.length() - 1);
-    }
-    
-    private static List<String> parseSimpleList(String listStr) {
-        String pureStringList = prepareSimpleString(listStr);
-        if (pureStringList.isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(pureStringList.split(","));
-        }
-    }
-    
-    private static Map<String, String> parseSimpleMap(String mapStr) {
-        Map<String, String> props = new HashMap<String, String>();
-        List<String> entries = parseSimpleList(mapStr);
-        for (String entry : entries) {
-            String[] pair = entry.split("=");
-            props.put(pair[0], pair[1]);
-        }
-        return props;
-    }
-    private static String tokenizeRefreshToken(RefreshToken token) {
-        String seq = tokenizeServerToken(token);
-        return seq + SEP + token.getAccessTokens().toString();
-    }
     private static String tokenizeServerToken(ServerAccessToken token) {
         StringBuilder state = new StringBuilder();
         // 0: key
@@ -431,5 +401,34 @@ public final class EncryptionUtils {
         return state.toString();
     }
     
-
+    private static String getStringPart(String str) {
+        return "null".equals(str) ? null : str;
+    }
+    
+    private static String prepareSimpleString(String str) {
+        return str.trim().isEmpty() ? "" : str.substring(1, str.length() - 1);
+    }
+    
+    private static List<String> parseSimpleList(String listStr) {
+        String pureStringList = prepareSimpleString(listStr);
+        if (pureStringList.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(pureStringList.split(","));
+        }
+    }
+    
+    private static Map<String, String> parseSimpleMap(String mapStr) {
+        Map<String, String> props = new HashMap<String, String>();
+        List<String> entries = parseSimpleList(mapStr);
+        for (String entry : entries) {
+            String[] pair = entry.split("=");
+            props.put(pair[0], pair[1]);
+        }
+        return props;
+    }
+    private static String tokenizeRefreshToken(RefreshToken token) {
+        String seq = tokenizeServerToken(token);
+        return seq + SEP + token.getAccessTokens().toString();
+    }
 }
