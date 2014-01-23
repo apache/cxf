@@ -24,16 +24,16 @@ import java.util.List;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.message.Message;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Import;
 
 @Import(JaxRsConfig.class)
-public abstract class AbstractSpringConfigurationFactory implements ApplicationContextAware {
+public abstract class AbstractSpringConfigurationFactory 
+    extends AbstractBasicInterceptorProvider implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
     
@@ -65,19 +65,7 @@ public abstract class AbstractSpringConfigurationFactory implements ApplicationC
         return Collections.emptyList();
     }
     
-    protected List<Interceptor<? extends Message>> getInInterceptors() {
-        return Collections.emptyList();
-    }
-    
-    protected List<Interceptor<? extends Message>> getOutInterceptors() {
-        return Collections.emptyList();
-    }
-    
     protected List<Feature> getFeatures() {
-        return Collections.emptyList();
-    }
-    
-    protected List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return Collections.emptyList();
     }
     
