@@ -322,11 +322,17 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             try {
                 Map<String, Key> secretKeys = kerberosToken.getSecretKey();
                 if (secretKeys != null) {
+                    SecretKey foundKey = null;
                     for (String key : kerberosToken.getSecretKey().keySet()) {
                         if (secretKeys.get(key) instanceof SecretKey) {
-                            return (SecretKey)secretKeys.get(key);
+                            SecretKey secretKey = (SecretKey)secretKeys.get(key);
+                            if (foundKey == null
+                                || secretKey.getEncoded().length > foundKey.getEncoded().length) {
+                                foundKey = secretKey;
+                            }
                         }
                     }
+                    return foundKey;
                 }
             } catch (XMLSecurityException e) {
                 LOG.fine(e.getMessage());
