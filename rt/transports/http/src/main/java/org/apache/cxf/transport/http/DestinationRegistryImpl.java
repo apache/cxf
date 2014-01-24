@@ -141,7 +141,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
      * @param path 
      * @return trimmed path
      */
-    public static String getTrimmedPath(String path) {
+    public String getTrimmedPath(String path) {
         if (path == null) {
             return "/";
         }
