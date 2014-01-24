@@ -158,7 +158,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             String message = fault.getMessage();
             assertTrue(message.contains("STS Authentication failed")
                 || message.contains("Validation of security token failed")
-                || message.contains("PolicyViolationException"));
+                || message.contains("The security token could not be authenticated or authorized"));
         }
         
         ((java.io.Closeable)transportUTPort).close();

@@ -24,7 +24,6 @@ import java.security.Key;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -41,8 +40,6 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -53,21 +50,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
  */
 public final class WSS4JUtils {
     
-    // FAULT error messages
-    public static final String UNSUPPORTED_TOKEN_ERR = "An unsupported token was provided";
-    public static final String UNSUPPORTED_ALGORITHM_ERR = 
-        "An unsupported signature or encryption algorithm was used";
-    public static final String INVALID_SECURITY_ERR = 
-        "An error was discovered processing the <wsse:Security> header.";
-    public static final String INVALID_SECURITY_TOKEN_ERR = 
-        "An invalid security token was provided";
-    public static final String FAILED_AUTHENTICATION_ERR = 
-        "The security token could not be authenticated or authorized";
-    public static final String FAILED_CHECK_ERR = "The signature or decryption was invalid";
-    public static final String SECURITY_TOKEN_UNAVAILABLE_ERR = 
-        "Referenced security token could not be retrieved";
-    public static final String MESSAGE_EXPIRED_ERR = "The message has expired";
-
     private WSS4JUtils() {
         // complete
     }
@@ -231,40 +213,4 @@ public final class WSS4JUtils {
 
     }
 
-    /**
-     * Map a WSSecurityException FaultCode to a standard error String, so as not to leak
-     * internal configuration to an attacker.
-     */
-    public static String getSafeExceptionMessage(WSSecurityException ex) {
-        // Allow a Replay Attack message to be returned, otherwise it could be confusing
-        // for clients who don't understand the default caching functionality of WSS4J/CXF
-        if (ex.getMessage() != null && ex.getMessage().contains("replay attack")) {
-            return ex.getMessage();
-        }
-        
-        String errorMessage = null;
-        QName faultCode = ex.getFaultCode();
-        if (WSConstants.UNSUPPORTED_SECURITY_TOKEN.equals(faultCode)) {
-            errorMessage = UNSUPPORTED_TOKEN_ERR;
-        } else if (WSConstants.UNSUPPORTED_ALGORITHM.equals(faultCode)) {
-            errorMessage = UNSUPPORTED_ALGORITHM_ERR;
-        } else if (WSConstants.INVALID_SECURITY.equals(faultCode)) {
-            errorMessage = INVALID_SECURITY_ERR;
-        } else if (WSConstants.INVALID_SECURITY_TOKEN.equals(faultCode)) {
-            errorMessage = INVALID_SECURITY_TOKEN_ERR;
-        } else if (WSConstants.FAILED_AUTHENTICATION.equals(faultCode)) {
-            errorMessage = FAILED_AUTHENTICATION_ERR;
-        } else if (WSConstants.FAILED_CHECK.equals(faultCode)) {
-            errorMessage = FAILED_CHECK_ERR;
-        } else if (WSConstants.SECURITY_TOKEN_UNAVAILABLE.equals(faultCode)) {
-            errorMessage = SECURITY_TOKEN_UNAVAILABLE_ERR;
-        } else if (WSConstants.MESSAGE_EXPIRED.equals(faultCode)) {
-            errorMessage = MESSAGE_EXPIRED_ERR;
-        } else {
-            // Default
-            errorMessage = INVALID_SECURITY_ERR;
-        }
-        return errorMessage;
-        
-    }
 }
