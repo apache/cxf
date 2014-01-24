@@ -141,7 +141,7 @@ public final class ModelEncryptionSupport {
             String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, secretKey, props);
             return recreateAccessToken(provider, encodedData, decryptedSequence);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -173,7 +173,7 @@ public final class ModelEncryptionSupport {
             String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, key, props);
             return recreateRefreshToken(provider, encodedData, decryptedSequence);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -205,7 +205,7 @@ public final class ModelEncryptionSupport {
             String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, key, props);
             return recreateCodeGrant(provider, decryptedSequence);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
