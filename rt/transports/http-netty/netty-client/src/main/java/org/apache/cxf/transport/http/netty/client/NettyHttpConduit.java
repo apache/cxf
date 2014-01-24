@@ -63,6 +63,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
@@ -80,7 +81,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         super(b, ei, t);
         factory = conduitFactory;
         bootstrap = new Bootstrap();
-        bootstrap.group(factory.getEventLoopGroup());
+        EventLoopGroup eventLoopGroup = bus.getExtension(EventLoopGroup.class);
+        bootstrap.group(eventLoopGroup);
         bootstrap.channel(NioSocketChannel.class);
     }
     

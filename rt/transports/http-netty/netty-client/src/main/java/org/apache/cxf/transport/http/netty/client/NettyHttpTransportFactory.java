@@ -36,6 +36,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
+
 public class NettyHttpTransportFactory extends AbstractTransportFactory implements ConduitInitiator {
 
     public static final List<String> DEFAULT_NAMESPACES = Arrays
@@ -45,6 +46,8 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
      * This constant holds the prefixes served by this factory.
      */
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    
+   
     
     static {
         URI_PREFIXES.add("netty://");
@@ -90,6 +93,8 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
         return address;
     }
     
+    
+    
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, Bus bus) throws IOException {
         return getConduit(endpointInfo, endpointInfo.getTarget(), bus);
@@ -118,5 +123,6 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
         conduit.finalizeConfig();
         return conduit;
     }
-
+    
+    
 }
