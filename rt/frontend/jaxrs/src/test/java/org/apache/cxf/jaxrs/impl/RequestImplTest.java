@@ -212,6 +212,16 @@ public class RequestImplTest extends Assert {
     }
     
     @Test
+    public void testIfNotMatchAndLastModified() {
+        metadata.putSingle(HttpHeaders.IF_NONE_MATCH, "1");
+        
+        ResponseBuilder rb = 
+            new RequestImpl(m).evaluatePreconditions(new Date(), new EntityTag("1"));
+        assertEquals("Precondition must not be met", 
+                     304, rb.build().getStatus());
+    }
+    
+    @Test
     public void testEtagsIfNotMatch() {
         metadata.putSingle(HttpHeaders.IF_NONE_MATCH, "\"123\"");
         

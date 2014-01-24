@@ -287,7 +287,7 @@ public class RequestImpl implements Request {
             // the ETag conditions do not match, so last modified should be ignored
             // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html (section 14.26 for
             // "If-None-Match", behaviour not specified for "If-Match", section 14.24)
-            return null;
+            return rb;
         }
     }
     
