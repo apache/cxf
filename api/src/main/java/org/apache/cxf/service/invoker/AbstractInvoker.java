@@ -78,6 +78,13 @@ public abstract class AbstractInvoker implements Invoker {
         }
     }
 
+    // Kept for compatibility reasons
+    protected Method adjustMethodAndParams(Method m,
+                                           Exchange ex,
+                                           List<Object> params) {
+        return adjustMethodAndParams(m, ex, params, null);
+    }
+
     protected Method adjustMethodAndParams(Method m,
                                            Exchange ex,
                                            List<Object> params,

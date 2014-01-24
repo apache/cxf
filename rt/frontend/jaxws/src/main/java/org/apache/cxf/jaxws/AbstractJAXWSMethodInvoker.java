@@ -129,7 +129,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
     }
     
     private Method getProviderServiceObjectMethod(Method m, Class<?> serviceObjectClass) {
-        if (!Provider.class.isAssignableFrom(serviceObjectClass)) {
+        if ((serviceObjectClass == null) || (!Provider.class.isAssignableFrom(serviceObjectClass))) {
             return m;
         }
         Class<?> currentSvcClass = serviceObjectClass;
