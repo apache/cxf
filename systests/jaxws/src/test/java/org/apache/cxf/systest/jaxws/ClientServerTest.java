@@ -54,7 +54,6 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.bus.CXFBusFactory;
@@ -65,10 +64,12 @@ import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.DocLitBare;
 import org.apache.hello_world_soap_http.Greeter;
@@ -90,6 +91,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
     static final String BOGUS_PORT = allocatePort(Server.class, 3);
     static final String PUB_PORT = allocatePort(Server.class, 4);
+    static final String CLIENT_PORT = allocatePort(Server.class, 5);
     
     
 
@@ -1069,6 +1071,29 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,
                                                                    Service.Mode.PAYLOAD);
+
+        StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+        StreamSource response = dispatcher.invoke(request);
+
+        assertEquals(requestString, StaxUtils.toString(response));
+    }
+
+    @Test
+    public void testEchoProviderAsyncDecoupledEndpoints() throws Exception {
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+
+        Client client = ((DispatchImpl<StreamSource>)dispatcher).getClient();
+        WSAddressingFeature wsAddressingFeature = new WSAddressingFeature();
+        wsAddressingFeature.initialize(client, client.getBus());
+        dispatcher.getRequestContext().put("org.apache.cxf.ws.addressing.replyto",
+                                           "http://localhost:" + CLIENT_PORT
+                                               + "/SoapContext/AsyncEchoClient");
 
         StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
         StreamSource response = dispatcher.invoke(request);
