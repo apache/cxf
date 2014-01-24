@@ -55,6 +55,7 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.FactoryInvoker;
@@ -63,6 +64,8 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
     private static final String ASYNC_METHOD = "org.apache.cxf.jaxws.async.method";
+    private static final String PARTIAL_RESPONSE_SENT_PROPERTY =
+        "org.apache.cxf.ws.addressing.partial.response.sent";
 
     public AbstractJAXWSMethodInvoker(final Object bean) {
         super(new SingletonFactory(bean));
@@ -110,7 +113,10 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
                     return ret; 
                 }
                 ContinuationProvider cp = ex.getInMessage().get(ContinuationProvider.class);
-                if (cp == null && uam.always()) {
+                // Check for decoupled endpoints: if partial response already was sent, ignore continuation
+                boolean decoupledEndpoints = MessageUtils
+                    .getContextualBoolean(ex.getInMessage(), PARTIAL_RESPONSE_SENT_PROPERTY, false);
+                if ((cp == null) && uam.always() || decoupledEndpoints) {
                     JaxwsServerHandler handler = new JaxwsServerHandler(null);
                     ex.put(JaxwsServerHandler.class, handler);
                     params.add(handler);
