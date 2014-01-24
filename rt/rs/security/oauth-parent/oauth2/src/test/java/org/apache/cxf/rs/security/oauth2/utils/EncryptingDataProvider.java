@@ -39,20 +39,20 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
 public class EncryptingDataProvider implements OAuthDataProvider {
 
-    SecretKey tokenKey;
-    private Map<String, Client> clients;
-    
+    SecretKey key;
+    private Map<String, String> clients;
     private Set<String> tokens = new HashSet<String>();
     private Map<String, String> refreshTokens = new HashMap<String, String>();
     
     public EncryptingDataProvider() throws Exception {
-        tokenKey = EncryptionUtils.getSecretKey();
-        clients = Collections.singletonMap("1", new Client("1", "2", true));
+        key = EncryptionUtils.getSecretKey();
+        String encryptedClient = ModelEncryptionSupport.encryptClient(new Client("1", "2", true), key);
+        clients = Collections.singletonMap("1", encryptedClient);
     }
     
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
-        return clients.get(clientId);
+        return ModelEncryptionSupport.decryptClient(clients.get(clientId), key);
     }
 
     @Override
@@ -60,26 +60,29 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         throws OAuthServiceException {
         
         ServerAccessToken token = createAccessTokenInternal(accessTokenReg);
-        
-        String encryptedToken = 
-            ModelEncryptionSupport.encryptAccessToken(token, tokenKey);
-        
-        tokens.add(encryptedToken);
-        refreshTokens.put(token.getRefreshToken(), encryptedToken);
-        token.setTokenKey(encryptedToken);
+        encryptAccessToken(token);
         return token;
     }
     
     @Override
     public ServerAccessToken getAccessToken(String accessTokenKey) throws OAuthServiceException {
-        return ModelEncryptionSupport.decryptAccessToken(this, accessTokenKey, tokenKey);
+        return ModelEncryptionSupport.decryptAccessToken(this, accessTokenKey, key);
     }
 
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshToken,
                                                 List<String> requestedScopes)
         throws OAuthServiceException {
-        return null;
+        String encrypted = refreshTokens.remove(refreshToken);
+        ServerAccessToken token = ModelEncryptionSupport.decryptAccessToken(this, encrypted, key);
+        tokens.remove(token.getTokenKey());
+        
+        // create a new refresh token
+        createRefreshToken(token);
+        // possibly update other token properties 
+        encryptAccessToken(token);
+        
+        return token;
     }
 
     @Override
@@ -90,7 +93,10 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     @Override
     public void revokeToken(Client client, String token, String tokenTypeHint)
         throws OAuthServiceException {
-        // complete
+        // the fast way: if it is the refresh token then there will be a matching value for it
+        String accessToken = refreshTokens.remove(token);
+        // if no matching value then the token parameter is access token key
+        tokens.remove(accessToken == null ? token : accessToken);
     }
 
     @Override
@@ -109,14 +115,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         BearerAccessToken token = new BearerAccessToken(accessTokenReg.getClient(), 3600L);
         token.setSubject(accessTokenReg.getSubject());
         
-        RefreshToken refreshToken = new RefreshToken(accessTokenReg.getClient(),
-                                                     "refresh",
-                                                     1200L,
-                                                     OAuthUtils.getIssuedAt());
-        
-        String encryptedRefreshToken = 
-            ModelEncryptionSupport.encryptRefreshToken(refreshToken, tokenKey);
-        token.setRefreshToken(encryptedRefreshToken);
+        createRefreshToken(token);
         
         token.setGrantType(accessTokenReg.getGrantType());
         token.setAudience(accessTokenReg.getAudience());
@@ -126,4 +125,20 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         return token;
     }
     
+    private void encryptAccessToken(ServerAccessToken token) {
+        String encryptedToken = ModelEncryptionSupport.encryptAccessToken(token, key);
+        tokens.add(encryptedToken);
+        refreshTokens.put(token.getRefreshToken(), encryptedToken);
+        token.setTokenKey(encryptedToken);
+    }
+    
+    private void createRefreshToken(ServerAccessToken token) {
+        RefreshToken refreshToken = new RefreshToken(token.getClient(),
+                                                     "refresh",
+                                                     1200L,
+                                                     OAuthUtils.getIssuedAt());
+        
+        String encryptedRefreshToken = ModelEncryptionSupport.encryptRefreshToken(refreshToken, key);
+        token.setRefreshToken(encryptedRefreshToken);
+    }
 }

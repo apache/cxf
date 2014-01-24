@@ -23,7 +23,7 @@ public class OOBAuthorizationResponse {
     private String authorizationCode;
     private String clientId;
     private String userId;
-    private long lifetime;
+    private long expiresIn;
     
     public String getAuthorizationCode() {
         return authorizationCode;
@@ -49,12 +49,21 @@ public class OOBAuthorizationResponse {
         this.userId = userId;
     }
 
+    @Deprecated
     public long getLifetime() {
-        return lifetime;
+        return expiresIn;
+    }
+    @Deprecated
+    public void setLifetime(long lifetime) {
+        this.expiresIn = lifetime;
+    }
+    
+    public long getExpiresIn() {
+        return expiresIn;
     }
 
-    public void setLifetime(long lifetime) {
-        this.lifetime = lifetime;
+    public void setExpiresIn(long lifetime) {
+        this.expiresIn = lifetime;
     }
     
 }

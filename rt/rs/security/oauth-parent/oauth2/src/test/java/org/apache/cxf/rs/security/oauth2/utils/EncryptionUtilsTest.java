@@ -33,6 +33,8 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
+import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
@@ -43,11 +45,11 @@ import org.junit.Test;
 
 public class EncryptionUtilsTest extends Assert {
     
-    private EncryptingDataProvider p;
+    private CodeGrantEncryptingDataProvider p;
     
     @Before
     public void setUp() throws Exception {
-        p = new EncryptingDataProvider();
+        p = new CodeGrantEncryptingDataProvider();
     }
     
     @After
@@ -69,6 +71,17 @@ public class EncryptionUtilsTest extends Assert {
     }
     
     @Test
+    public void testEncryptDecryptCodeGrant() throws Exception {
+        AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration(); 
+        codeReg.setAudience("http://bar");
+        codeReg.setClient(p.getClient("1"));
+        ServerAuthorizationCodeGrant grant = p.createCodeGrant(codeReg);
+        ServerAuthorizationCodeGrant grant2 = p.removeCodeGrant(grant.getCode());
+        assertEquals("http://bar", grant2.getAudience());
+        assertEquals("1", grant2.getClient().getClientId());
+    }
+    
+    @Test
     public void testBearerTokenJSON() throws Exception {
         AccessTokenRegistration atr = prepareTokenRegistration();
         
@@ -80,8 +93,8 @@ public class EncryptionUtilsTest extends Assert {
         jsonp.writeTo(token, BearerAccessToken.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                       new MetadataMap<String, Object>(), bos);
         
-        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.tokenKey);
-        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.tokenKey);
+        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
+        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
         ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                                                   new MetadataMap<String, String>(), 
@@ -89,6 +102,55 @@ public class EncryptionUtilsTest extends Assert {
         
         // compare tokens
         compareAccessTokens(token, token2);
+    }
+    
+    @Test
+    public void testClientJSON() throws Exception {
+        Client c = new Client("client", "secret", true);
+        c.setSubject(new UserSubject("subject", "id"));
+        JSONProvider<Client> jsonp = new JSONProvider<Client>();
+        jsonp.setMarshallAsJaxbElement(true);
+        jsonp.setUnmarshallAsJaxbElement(true);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        jsonp.writeTo(c, Client.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
+                      new MetadataMap<String, Object>(), bos);
+        
+        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
+        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
+        Client c2 = jsonp.readFrom(Client.class, Client.class, 
+                                                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                                                  new MetadataMap<String, String>(), 
+                                                  new ByteArrayInputStream(decrypted.getBytes()));
+        
+        assertEquals(c.getClientId(), c2.getClientId());
+        assertEquals(c.getClientSecret(), c2.getClientSecret());
+        assertTrue(c2.isConfidential());
+        assertEquals("subject", c2.getSubject().getLogin());
+        assertEquals("id", c2.getSubject().getId());
+    }
+    
+    @Test
+    public void testCodeGrantJSON() throws Exception {
+        Client c = new Client("client", "secret", true);
+        ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(c, "code", 1, 2); 
+        JSONProvider<ServerAuthorizationCodeGrant> jsonp = new JSONProvider<ServerAuthorizationCodeGrant>();
+        jsonp.setMarshallAsJaxbElement(true);
+        jsonp.setUnmarshallAsJaxbElement(true);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        jsonp.writeTo(grant, ServerAuthorizationCodeGrant.class, new Annotation[]{}, 
+                      MediaType.APPLICATION_JSON_TYPE,
+                      new MetadataMap<String, Object>(), bos);
+        
+        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
+        String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
+        ServerAuthorizationCodeGrant grant2 = jsonp.readFrom(ServerAuthorizationCodeGrant.class,
+                                                             Client.class, 
+                                                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                                                  new MetadataMap<String, String>(), 
+                                                  new ByteArrayInputStream(decrypted.getBytes()));
+        assertEquals("code", grant2.getCode());
+        assertEquals(1, grant2.getExpiresIn());
+        assertEquals(2, grant2.getIssuedAt());
     }
     
     private void compareAccessTokens(ServerAccessToken token, ServerAccessToken token2) {
@@ -99,7 +161,7 @@ public class EncryptionUtilsTest extends Assert {
         Client regClient1 = token.getClient();
         Client regClient2 = token2.getClient();
         assertEquals(regClient1.getClientId(), regClient2.getClientId());
-        
+        assertNull(regClient2.getApplicationDescription());
         UserSubject endUser1 = token.getSubject();
         UserSubject endUser2 = token2.getSubject();
         assertEquals(endUser1.getLogin(), endUser2.getLogin());
@@ -121,7 +183,7 @@ public class EncryptionUtilsTest extends Assert {
         assertEquals(perm1.getDescription(), perm2.getDescription());
         
         RefreshToken refreshToken = 
-            ModelEncryptionSupport.decryptRefreshToken(p, token2.getRefreshToken(), p.tokenKey);
+            ModelEncryptionSupport.decryptRefreshToken(p, token2.getRefreshToken(), p.key);
         assertEquals(1200L, refreshToken.getExpiresIn());
     }
     

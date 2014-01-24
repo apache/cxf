@@ -86,7 +86,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             oobResponse.setClientId(client.getClientId());
             oobResponse.setAuthorizationCode(grant.getCode());
             oobResponse.setUserId(userSubject.getLogin());
-            oobResponse.setLifetime(grant.getLifetime());
+            oobResponse.setExpiresIn(grant.getExpiresIn());
             return deliverOOBResponse(oobResponse);
         } else {
             // return the code by appending it as a query parameter to the redirect URI

@@ -28,6 +28,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+
 
 /**
  * Encryption helpers
@@ -40,7 +42,7 @@ public final class EncryptionUtils {
         try {
             return Base64UrlUtility.encode(key.getEncoded());
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -86,7 +88,7 @@ public final class EncryptionUtils {
             SecretKey key = decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
             return decryptSequence(encodedData, key, props);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -102,7 +104,7 @@ public final class EncryptionUtils {
             byte[] bytes = processBytes(encryptedBytes, secretKey, props, Cipher.DECRYPT_MODE);
             return new String(bytes, "UTF-8");
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -119,7 +121,7 @@ public final class EncryptionUtils {
                                         Cipher.ENCRYPT_MODE);
             return Base64UrlUtility.encode(bytes);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -142,7 +144,7 @@ public final class EncryptionUtils {
             }
             return c.doFinal(bytes);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -151,7 +153,7 @@ public final class EncryptionUtils {
             byte[] secretKeyBytes = decodeSequence(encodedSecretKey);
             return new SecretKeySpec(secretKeyBytes, algo);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -159,7 +161,7 @@ public final class EncryptionUtils {
         try {
             return Base64UrlUtility.decode(encodedSequence);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     

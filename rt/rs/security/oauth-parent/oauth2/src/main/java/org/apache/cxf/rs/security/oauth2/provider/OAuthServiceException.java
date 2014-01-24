@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 /**
@@ -36,6 +37,10 @@ public class OAuthServiceException extends RuntimeException {
     
     public OAuthServiceException(String message, Throwable cause) {
         super(message, cause);
+    }
+    
+    public OAuthServiceException(Throwable cause) {
+        super(OAuthConstants.SERVER_ERROR, cause);
     }
     
     public OAuthServiceException(OAuthError error) {

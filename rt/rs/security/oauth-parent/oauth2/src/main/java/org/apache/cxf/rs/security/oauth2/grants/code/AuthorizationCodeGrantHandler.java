@@ -51,7 +51,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             return null;
         }
         // check it has not expired, the client ids are the same
-        if (OAuthUtils.isExpired(grant.getIssuedAt(), grant.getLifetime())) {
+        if (OAuthUtils.isExpired(grant.getIssuedAt(), grant.getExpiresIn())) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         if (!grant.getClient().getClientId().equals(client.getClientId())) {

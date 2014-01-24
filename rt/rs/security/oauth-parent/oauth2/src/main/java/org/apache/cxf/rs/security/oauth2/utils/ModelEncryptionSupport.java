@@ -35,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
 
@@ -108,7 +109,7 @@ public final class ModelEncryptionSupport {
             String decryptedSequence = EncryptionUtils.decryptSequence(encodedData, secretKey, props);
             return recreateClient(decryptedSequence);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
     
@@ -336,9 +337,10 @@ public final class ModelEncryptionSupport {
 
     private static Client recreateClientInternal(String sequence) {
         String[] parts = getParts(sequence);
-        Client c = new Client(parts[0], parts[1], Boolean.valueOf(parts[2]), parts[3], parts[4]);
-        c.setApplicationDescription(parts[5]);
-        c.setApplicationLogoUri(parts[6]);
+        Client c = new Client(parts[0], parts[1], Boolean.valueOf(parts[2]), 
+                              getStringPart(parts[3]), getStringPart(parts[4]));
+        c.setApplicationDescription(getStringPart(parts[5]));
+        c.setApplicationLogoUri(getStringPart(parts[6]));
         c.setAllowedGrantTypes(parseSimpleList(parts[7]));
         c.setRegisteredScopes(parseSimpleList(parts[8]));
         c.setRedirectUris(parseSimpleList(parts[9]));
@@ -397,9 +399,9 @@ public final class ModelEncryptionSupport {
                                                                               parts[1],
                                                                               Long.valueOf(parts[2]),
                                                                               Long.valueOf(parts[3]));
-        grant.setRedirectUri(parts[4]);
-        grant.setAudience(parts[5]);
-        grant.setClientCodeVerifier(parts[6]);
+        grant.setRedirectUri(getStringPart(parts[4]));
+        grant.setAudience(getStringPart(parts[5]));
+        grant.setClientCodeVerifier(getStringPart(parts[6]));
         grant.setApprovedScopes(parseSimpleList(parts[7]));
         grant.setSubject(recreateUserSubject(parts[8]));
         return grant; 
