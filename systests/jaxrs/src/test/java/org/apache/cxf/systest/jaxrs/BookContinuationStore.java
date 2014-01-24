@@ -35,6 +35,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 
@@ -136,6 +137,27 @@ public class BookContinuationStore {
         throw new BookNotFoundFault("");
     }
     
+    @GET
+    @Path("/disconnect")
+    public void handleClientDisconnects(@Suspended AsyncResponse response) {
+        response.setTimeout(0, TimeUnit.SECONDS);
+
+        response.register(new ConnectionCallback() {            
+            @Override
+            public void onDisconnect(AsyncResponse disconnected) {
+                System.out.println("ConnectionCallback: onDisconnect, client disconnects");
+            }
+        });
+        
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            // ignore 
+        }       
+        
+        response.resume(books.values().toString());
+    }
+
     
     private void resumeSuspended(final String id, final AsyncResponse response) {
         

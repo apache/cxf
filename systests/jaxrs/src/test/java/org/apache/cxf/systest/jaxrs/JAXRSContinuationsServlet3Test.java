@@ -20,13 +20,15 @@
 package org.apache.cxf.systest.jaxrs;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-
+import org.apache.cxf.testutil.common.ServerLauncher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTest {
     public static final String PORT = BookContinuationServlet3Server.PORT;
+   
+    
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -41,6 +43,14 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
     public void testTimeoutAndCancelAsyncExecutor() throws Exception {
         doTestTimeoutAndCancel("/asyncexecutor/bookstore");
     }
+    
+    @Test
+    public void testClientDisconnect() throws Exception {
+        ServerLauncher launcher = new ServerLauncher(BookContinuationClient.class.getName());
+        assertTrue("server did not launch correctly", launcher.launchServer());
+        Thread.sleep(4000);
+    }
+
     
     protected String getBaseAddress() {
         return "/async/bookstore";

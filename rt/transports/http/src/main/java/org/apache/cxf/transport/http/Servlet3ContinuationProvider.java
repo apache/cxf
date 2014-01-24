@@ -125,7 +125,9 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
-                if (ex instanceof IOException && isClientDisconnected(ex)) {
+                Throwable cause = isCausedByIO( ex );
+                
+                if (cause != null && isClientDisconnected(cause)) {
                     callback.onDisconnect();    
                 }
             }
@@ -172,7 +174,18 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             //REVISIT: isResumed = true;
             redispatch();
         }
-        private boolean isClientDisconnected(Exception ex) {
+        
+        private Throwable isCausedByIO(final Exception ex) {
+            Throwable cause = ex;
+            
+            while(cause != null && !(cause instanceof IOException)) {
+                cause = cause.getCause();
+            }
+            
+            return cause;
+        }
+        
+        private boolean isClientDisconnected(Throwable ex) {
             String exName = (String)inMessage.getContextualProperty("disconnected.client.exception.class");
             if (exName != null) {
                 return exName.equals(IOException.class.getName()) || exName.equals(ex.getClass().getName());

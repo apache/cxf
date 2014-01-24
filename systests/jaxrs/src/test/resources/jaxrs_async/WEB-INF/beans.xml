@@ -34,7 +34,10 @@
     <jaxrs:server id="bookservice" address="/async">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
-        </jaxrs:serviceBeans>
+        </jaxrs:serviceBeans>        
+        <jaxrs:properties>
+            <entry key="disconnected.client.exception.class" value="org.eclipse.jetty.io.EofException"/>
+        </jaxrs:properties>
     </jaxrs:server>
     
     <jaxrs:server id="bookservice2" address="/asyncexecutor">
