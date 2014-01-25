@@ -125,7 +125,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
-                Throwable cause = isCausedByIO( ex );
+                Throwable cause = isCausedByIO(ex);
                 
                 if (cause != null && isClientDisconnected(cause)) {
                     callback.onDisconnect();    
@@ -178,7 +178,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         private Throwable isCausedByIO(final Exception ex) {
             Throwable cause = ex;
             
-            while(cause != null && !(cause instanceof IOException)) {
+            while (cause != null && !(cause instanceof IOException)) {
                 cause = cause.getCause();
             }
             
