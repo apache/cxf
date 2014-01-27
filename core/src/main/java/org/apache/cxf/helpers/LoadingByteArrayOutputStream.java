@@ -21,6 +21,13 @@ package org.apache.cxf.helpers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+
+import org.apache.cxf.io.Transferable;
 
 /**
  * Subclass of ByteArrayOutputStream that allows creation of a
@@ -43,12 +50,30 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
         super(i);
     }
     
-    public ByteArrayInputStream createInputStream() {
-        return new ByteArrayInputStream(buf, 0, count) {
-            public String toString() {
-                return IOUtils.newStringFromBytes(buf, 0, count);
+    private static class LoadedByteArrayInputStream extends ByteArrayInputStream implements Transferable {
+        public LoadedByteArrayInputStream(byte[] buf, int length) {
+            super(buf, 0, length);
+        }
+        public String toString() {
+            return IOUtils.newStringFromBytes(buf, 0, count);
+        }
+
+        @Override
+        public void transferTo(File file) throws IOException {
+            FileOutputStream fout = new FileOutputStream(file);
+            FileChannel channel = fout.getChannel();
+            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count); 
+            while (bb.hasRemaining()) {
+                channel.write(bb);
             }
-        };
+            channel.close();
+            fout.close();
+        }
+        
+    }
+    
+    public ByteArrayInputStream createInputStream() {
+        return new LoadedByteArrayInputStream(buf, count);
     }
     
     public void setSize(int i) {

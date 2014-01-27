@@ -527,16 +527,7 @@ public class CachedOutputStream extends OutputStream {
             }
         } else {
             try {
-                InputStream fileInputStream = new FileInputStream(tempFile) {
-                    boolean closed;
-                    public void close() throws IOException {
-                        if (!closed) {
-                            super.close();
-                            maybeDeleteTempFile(this);
-                        }
-                        closed = true;
-                    }
-                };
+                InputStream fileInputStream = new TransferableFileInputStream(tempFile);
                 streamList.add(fileInputStream);
                 if (cipherTransformation != null) {
                     fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
@@ -662,4 +653,35 @@ public class CachedOutputStream extends OutputStream {
         return in;
     }
 
+    private class TransferableFileInputStream extends FileInputStream implements Transferable {
+        private boolean closed;
+        private File sourceFile;
+        
+        TransferableFileInputStream(File sourceFile) throws FileNotFoundException {
+            super(sourceFile);
+            this.sourceFile = sourceFile;
+        }
+        
+        public void close() throws IOException {
+            if (!closed) {
+                super.close();
+                maybeDeleteTempFile(this);
+            }
+            closed = true;
+        }
+
+        @Override
+        public void transferTo(File destinationFile) throws IOException {
+            if (closed) {
+                throw new IOException("Stream closed");
+            }
+            //We've cached the file so try renaming.
+            boolean transfered = sourceFile.renameTo(destinationFile);
+            if (!transfered) {
+                // Data is in memory, or we failed to rename the file, try copying
+                // the stream instead.
+                IOUtils.transferTo(getInputStream(), destinationFile);
+            }
+        }
+    }
 }

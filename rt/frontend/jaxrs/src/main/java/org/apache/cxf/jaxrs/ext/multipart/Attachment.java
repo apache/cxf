@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.multipart;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
@@ -31,6 +33,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.Transferable;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
@@ -42,7 +46,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
  * See the {@link AttachmentBuilder} for a convenient 
  * way to create attachments for use with {@link org.apache.cxf.jaxrs.client.WebClient}.
  */
-public class Attachment {
+public class Attachment implements Transferable {
 
     private DataHandler handler;
     private MultivaluedMap<String, String> headers = 
@@ -163,6 +167,10 @@ public class Attachment {
         return new MetadataMap<String, String>(headers, false, true);
     }
     
+    public void transferTo(File destinationFile) throws IOException {
+        IOUtils.transferTo(handler.getInputStream(), destinationFile);
+    }
+
     @Override
     public int hashCode() {
         return headers.hashCode(); 

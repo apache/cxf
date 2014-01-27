@@ -21,6 +21,8 @@ package org.apache.cxf.helpers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +33,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 
 import org.apache.cxf.io.CopyingOutputStream;
+import org.apache.cxf.io.Transferable;
 
 public final class IOUtils {
     public static final Charset UTF8_CHARSET = Charset.forName("utf-8");
@@ -174,6 +177,24 @@ public final class IOUtils {
             n = input.read(buffer);
         }
     }
+    
+    public static void transferTo(InputStream inputStream, File destinationFile) throws IOException {
+        if (Transferable.class.isAssignableFrom(inputStream.getClass())) {
+            ((Transferable)inputStream).transferTo(destinationFile);
+        } else {
+            FileOutputStream fout = new FileOutputStream(destinationFile);
+            try {
+                copyAndCloseInput(inputStream, fout);
+            } finally {
+                try {
+                    fout.close();
+                } catch (IOException ex) {
+                    //ignore
+                }
+            }
+        }
+    }
+
 
     public static String toString(final InputStream input) throws IOException {
         return toString(input, DEFAULT_BUFFER_SIZE);

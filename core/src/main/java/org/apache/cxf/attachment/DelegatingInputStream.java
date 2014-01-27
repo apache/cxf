@@ -20,12 +20,14 @@
 package org.apache.cxf.attachment;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.Transferable;
 
-public class DelegatingInputStream extends InputStream {
+public class DelegatingInputStream extends InputStream implements Transferable {
     private InputStream is;
     private AttachmentDeserializer deserializer;
     private boolean isClosed;
@@ -50,6 +52,13 @@ public class DelegatingInputStream extends InputStream {
             deserializer.markClosed(this);
         }
         isClosed = true;
+    }
+
+    public void transferTo(File destinationFile) throws IOException {
+        if (isClosed) {
+            throw new IOException("Stream is closed");
+        }
+        IOUtils.transferTo(is, destinationFile);
     }
 
     public boolean isClosed() {
