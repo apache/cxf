@@ -88,7 +88,7 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     @BeforeClass
     public static void startServers() throws Exception {
         //must be out of process so the system properties aren't in effect
-        assertTrue("server did not launch correctly", launchServer(Server.class, false));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     
     @org.junit.Before

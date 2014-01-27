@@ -34,8 +34,8 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
-import org.apache.cxf.helpers.XMLUtils;
 
 public class W3CDOMStreamWriter implements XMLStreamWriter {
     static final String XML_NS = "http://www.w3.org/2000/xmlns/";
@@ -47,7 +47,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     private Map<String, Object> properties = Collections.emptyMap();
 
     public W3CDOMStreamWriter() throws ParserConfigurationException {
-        document = XMLUtils.newDocument();
+        document = DOMUtils.newDocument();
     }
 
     public W3CDOMStreamWriter(DocumentBuilder builder) {
@@ -144,15 +144,23 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
             }
         }
     }
+    
+    protected Element createElementNS(String ns, String pfx, String local) {
+        if (pfx != null) {
+            local = pfx + ":" + local;
+        }
+        return document.createElementNS(ns, local);
+    }
+    
     protected void createAndAddElement(String prefix, String local, String namespace) {
         if (prefix == null) {
             if (namespace == null) {
-                newChild(document.createElementNS(null, local));
+                newChild(createElementNS(null, null, local));
             } else {
-                newChild(document.createElementNS(namespace, local));
+                newChild(createElementNS(namespace, null, local));
             }
         } else {
-            newChild(document.createElementNS(namespace, prefix + ":" + local));
+            newChild(createElementNS(namespace, prefix, local));
         }
     }
 
@@ -335,8 +343,6 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         }
         try {
             return StaxUtils.toString(document);
-        } catch (XMLStreamException e) {
-            return super.toString();
         } catch (Throwable t) {
             t.printStackTrace();
             return super.toString();

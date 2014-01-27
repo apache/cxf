@@ -691,25 +691,54 @@ public final class StaxUtils {
      * @throws XMLStreamException
      */
     public static void copy(XMLStreamReader reader, XMLStreamWriter writer) throws XMLStreamException {
-        copy(reader, writer, false);
+        copy(reader, writer, false, false);
     }
-    public static void copy(XMLStreamReader reader, XMLStreamWriter writer,
-                            boolean fragment) throws XMLStreamException {
+    public static void copy(XMLStreamReader reader, XMLStreamWriter writer, boolean fragment) 
+        throws XMLStreamException {
+        copy(reader, writer, fragment, false);
+    }
+    public static void copy(XMLStreamReader reader,
+                            XMLStreamWriter writer,
+                            boolean fragment,
+                            boolean isThreshold) throws XMLStreamException {
         // number of elements read in
         int read = 0;
+        int elementCount = 0;
+        Stack<Integer> countStack = new Stack<Integer>();
         int event = reader.getEventType();
 
         while (reader.hasNext()) {
             switch (event) {
             case XMLStreamConstants.START_ELEMENT:
                 read++;
+                if (isThreshold) {
+                    elementCount++;
+                    
+                    if (innerElementLevelThreshold != -1 
+                        && read >= innerElementLevelThreshold) {
+                        throw new DepthExceededStaxException("reach the innerElementLevelThreshold:" 
+                                                   + innerElementLevelThreshold);
+                    }
+                    if (innerElementCountThreshold != -1 
+                        && elementCount >= innerElementCountThreshold) {
+                        throw new DepthExceededStaxException("reach the innerElementCountThreshold:" 
+                                                   + innerElementCountThreshold);
+                    }                
+                    countStack.push(elementCount);
+                    elementCount = 0;
+                }
                 writeStartElement(reader, writer);
                 break;
             case XMLStreamConstants.END_ELEMENT:
-                writer.writeEndElement();
+                if (read > 0) {
+                    writer.writeEndElement();
+                }
                 read--;
                 if (read <= 0 && !fragment) {
                     return;
+                }
+                if (isThreshold && !countStack.isEmpty()) {
+                    elementCount = countStack.pop();
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
@@ -751,6 +780,10 @@ public final class StaxUtils {
         if (uri != null) {
             writeElementNS = true;
             Iterator<String> it = CastUtils.cast(writer.getNamespaceContext().getPrefixes(uri));
+            if (!it.hasNext() && StringUtils.isEmpty(prefix) && StringUtils.isEmpty(uri)
+                && StringUtils.isEmpty(writer.getNamespaceContext().getNamespaceURI(""))) {
+                writeElementNS = false;
+            }
             while (it != null && it.hasNext()) {
                 String s = it.next();
                 if (s == null) {
@@ -1739,22 +1772,24 @@ public final class StaxUtils {
         }
     }
 
-    public static String toString(Source src) throws XMLStreamException {
+    public static String toString(Source src) {
         StringWriter sw = new StringWriter(1024);
         XMLStreamWriter writer = null;
         try {
             writer = createXMLStreamWriter(sw);
             copy(src, writer);
             writer.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
         } finally {
             StaxUtils.close(writer);
         }
         return sw.toString();
     }
-    public static String toString(Node src) throws XMLStreamException {
+    public static String toString(Node src) {
         return toString(new DOMSource(src));
     }
-    public static String toString(Document doc) throws XMLStreamException {
+    public static String toString(Document doc) {
         StringWriter sw = new StringWriter(1024);
         XMLStreamWriter writer = null;
         try {
@@ -1768,7 +1803,7 @@ public final class StaxUtils {
         }
         return sw.toString();
     }
-    public static String toString(Element el) throws XMLStreamException {
+    public static String toString(Element el) {
         return toString(el, 0);
     }
     public static String toString(Element el, int indent) {
