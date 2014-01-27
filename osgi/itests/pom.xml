@@ -56,6 +56,16 @@
             <artifactId>apache-karaf</artifactId>
             <version>${cxf.karaf.version}</version>
             <type>tar.gz</type>
+        	<exclusions>
+        	    <exclusion>
+        	      <groupId>org.eclipse</groupId>
+        	      <artifactId>osgi</artifactId>
+        	    </exclusion>
+        	    <exclusion>
+        	      <groupId>org.apache.xerces</groupId>
+        	      <artifactId>xercesImpl</artifactId>
+        	    </exclusion>
+        	</exclusions>
         </dependency>
         <dependency>
             <groupId>org.openengsb.labs.paxexam.karaf</groupId>
