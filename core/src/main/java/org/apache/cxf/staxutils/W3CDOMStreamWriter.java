@@ -144,15 +144,23 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
             }
         }
     }
+    
+    protected Element createElementNS(String ns, String pfx, String local) {
+        if (pfx != null) {
+            local = pfx + ":" + local;
+        }
+        return document.createElementNS(ns, local);
+    }
+    
     protected void createAndAddElement(String prefix, String local, String namespace) {
         if (prefix == null) {
             if (namespace == null) {
-                newChild(document.createElementNS(null, local));
+                newChild(createElementNS(null, null, local));
             } else {
-                newChild(document.createElementNS(namespace, local));
+                newChild(createElementNS(namespace, null, local));
             }
         } else {
-            newChild(document.createElementNS(namespace, prefix + ":" + local));
+            newChild(createElementNS(namespace, prefix, local));
         }
     }
 

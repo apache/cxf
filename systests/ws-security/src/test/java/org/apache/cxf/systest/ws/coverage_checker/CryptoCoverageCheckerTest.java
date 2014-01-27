@@ -581,7 +581,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         
         // This test only applies to the DOM implementation
         if (PORT.equals(test.getPort()) && !test.isStreaming()) {
-            port.doubleIt(25);
+            int result = port.doubleIt(25);
+            assertEquals(50, result);
             
             // Now try with a message that will create a Fault in the SEI
             try {

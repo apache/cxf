@@ -691,25 +691,54 @@ public final class StaxUtils {
      * @throws XMLStreamException
      */
     public static void copy(XMLStreamReader reader, XMLStreamWriter writer) throws XMLStreamException {
-        copy(reader, writer, false);
+        copy(reader, writer, false, false);
     }
-    public static void copy(XMLStreamReader reader, XMLStreamWriter writer,
-                            boolean fragment) throws XMLStreamException {
+    public static void copy(XMLStreamReader reader, XMLStreamWriter writer, boolean fragment) 
+        throws XMLStreamException {
+        copy(reader, writer, fragment, false);
+    }
+    public static void copy(XMLStreamReader reader,
+                            XMLStreamWriter writer,
+                            boolean fragment,
+                            boolean isThreshold) throws XMLStreamException {
         // number of elements read in
         int read = 0;
+        int elementCount = 0;
+        Stack<Integer> countStack = new Stack<Integer>();
         int event = reader.getEventType();
 
         while (reader.hasNext()) {
             switch (event) {
             case XMLStreamConstants.START_ELEMENT:
                 read++;
+                if (isThreshold) {
+                    elementCount++;
+                    
+                    if (innerElementLevelThreshold != -1 
+                        && read >= innerElementLevelThreshold) {
+                        throw new DepthExceededStaxException("reach the innerElementLevelThreshold:" 
+                                                   + innerElementLevelThreshold);
+                    }
+                    if (innerElementCountThreshold != -1 
+                        && elementCount >= innerElementCountThreshold) {
+                        throw new DepthExceededStaxException("reach the innerElementCountThreshold:" 
+                                                   + innerElementCountThreshold);
+                    }                
+                    countStack.push(elementCount);
+                    elementCount = 0;
+                }
                 writeStartElement(reader, writer);
                 break;
             case XMLStreamConstants.END_ELEMENT:
-                writer.writeEndElement();
+                if (read > 0) {
+                    writer.writeEndElement();
+                }
                 read--;
                 if (read <= 0 && !fragment) {
                     return;
+                }
+                if (isThreshold && !countStack.isEmpty()) {
+                    elementCount = countStack.pop();
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
@@ -751,6 +780,10 @@ public final class StaxUtils {
         if (uri != null) {
             writeElementNS = true;
             Iterator<String> it = CastUtils.cast(writer.getNamespaceContext().getPrefixes(uri));
+            if (!it.hasNext() && StringUtils.isEmpty(prefix) && StringUtils.isEmpty(uri)
+                && StringUtils.isEmpty(writer.getNamespaceContext().getNamespaceURI(""))) {
+                writeElementNS = false;
+            }
             while (it != null && it.hasNext()) {
                 String s = it.next();
                 if (s == null) {

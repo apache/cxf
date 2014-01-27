@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.binding.soap.saaj;
 
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPPart;
 
 import org.w3c.dom.Element;
@@ -124,4 +127,46 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         super.createAndAddElement(prefix, local, namespace);
     }
+    
+    @Override
+    protected Element createElementNS(String ns, String pfx, String local) {
+        Element cur = getCurrentNode();
+        if (cur instanceof SOAPBody) {
+            try {
+                if (StringUtils.isEmpty(pfx) && StringUtils.isEmpty(ns)) {
+                    Element el = ((SOAPBody)cur).addBodyElement(new QName(local));
+                    cur.removeChild(el);
+                    return el;
+                }
+                Element el = ((SOAPBody)cur).addBodyElement(new QName(ns, local,  pfx == null ? "" : pfx));
+                cur.removeChild(el);
+                return el;
+            } catch (SOAPException e) {
+                //ignore
+            }
+        } else if (cur instanceof SOAPHeader) {
+            try {
+                Element el = ((SOAPHeader)cur).addHeaderElement(new QName(ns, local, pfx == null ? "" : pfx));
+                cur.removeChild(el);
+                return el;
+            } catch (SOAPException e) {
+                //ignore
+            }
+        } else if (cur instanceof SOAPElement) {
+            try {
+                Element el = null;
+                if (StringUtils.isEmpty(pfx) && StringUtils.isEmpty(ns)) {
+                    el = ((SOAPElement)cur).addChildElement(local);
+                } else {
+                    el = ((SOAPElement)cur).addChildElement(local, pfx, ns);
+                }
+                cur.removeChild(el);
+                return el;
+            } catch (SOAPException e) {
+                //ignore
+            }
+        }
+        return super.createElementNS(ns, pfx, local);
+    }
+    
 }
