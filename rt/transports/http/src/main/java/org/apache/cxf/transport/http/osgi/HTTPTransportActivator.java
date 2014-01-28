@@ -107,7 +107,7 @@ public class HTTPTransportActivator
             sprops.put("hide-service-list-page", 
                        getProp(properties, "org.apache.cxf.servlet.hide-service-list-page", "false"));
             sprops.put("disable-address-updates", 
-                       getProp(properties, "org.apache.cxf.servlet.disable-address-updates", "false"));
+                       getProp(properties, "org.apache.cxf.servlet.disable-address-updates", "true"));
             sprops.put("base-address", 
                        getProp(properties, "org.apache.cxf.servlet.base-address", ""));
             sprops.put("service-list-path", 
