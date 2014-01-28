@@ -233,10 +233,13 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 addClass((Class<?>)cls);
             }
         } else if (cls instanceof ParameterizedType) {
-            addType(((ParameterizedType)cls).getRawType());
-            if (!((ParameterizedType)cls).getRawType().equals(Enum.class)) {
-                for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
-                    addType(t2);
+            final ParameterizedType parameterizedType = (ParameterizedType)cls;
+            addType(parameterizedType.getRawType());
+            if (!parameterizedType.getRawType().equals(Enum.class)) {
+                for (Type t2 : parameterizedType.getActualTypeArguments()) {
+                    if (shouldTypeBeAdded(t2, parameterizedType)) {
+                        addType(t2);
+                    }
                 }
             }
         } else if (cls instanceof GenericArrayType) {
@@ -275,7 +278,20 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
     }
 
-
+    private boolean shouldTypeBeAdded(final Type t2, final ParameterizedType parameterizedType) {
+        if (!(t2 instanceof TypeVariable)) {
+            return true;
+        }
+        TypeVariable<?> typeVariable = (TypeVariable<?>) t2;
+        final Type[] bounds = typeVariable.getBounds();
+        for (Type bound : bounds) {
+            if (bound instanceof ParameterizedType && bound.equals(parameterizedType)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     void addClass(Class<?> claz) {
         if (Throwable.class.isAssignableFrom(claz)) {
             if (!Throwable.class.equals(claz)
