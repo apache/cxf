@@ -1,4 +1,4 @@
-Apache CXF 2.6.11 Release Notes
+Apache CXF 2.6.12 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.11 fixes over 34 JIRA issues reported by users and the community.
+2.6.12 fixes over 39 JIRA issues reported by users and the community.
 
 
 
@@ -78,41 +78,53 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
+
 ** Bug
-    * [CXF-5048] - StaticSTSProperties class requires a CXF message context to initialize using configure() method
-    * [CXF-5258] - Return type list of a typed type, e.g. List<Type<Typee>>, leads to ClassCastException
-    * [CXF-5287] - NPE at org.apache.cxf.maven_plugin.ClassLoaderSwitcher.restoreClassLoader
-    * [CXF-5289] - WADLGenerator misses Description annotations if they are bound to interfaces
-    * [CXF-5294] - XMLFaultOutInterceptor only marshals first detail element
-    * [CXF-5296] - OAuth2ClientUtils can not get access token if custom params contain semicolon or no token_type param is available
-    * [CXF-5299] - FiqlParser fails to parse an expression with child properties when SearchBean is used
-    * [CXF-5306] - Soap body in header
-    * [CXF-5307] - Add DecoupledFaultHandler for request-response message when decoupled fault is supported
-    * [CXF-5326] - Hardcoded reference to com.ibm.wsdl.util.xml.DOMUtils
-    * [CXF-5328] - JAX-RS ProviderFactory ignores MBR/MBW typed on Object for primitive arrays 
-    * [CXF-5335] - Incorrect handle of ws-policy 1.1 (Incorrect inclusion value: null)
-    * [CXF-5340] - IDLToWSDL crashes with certain idl constructs
-    * [CXF-5341] - NPE in org.apache.cxf.jaxws.support.JaxWsEndpointImpl.checkRespectBindingFeature
-    * [CXF-5347] - Request routing is broken when the URL contains both jsessionid and an extension
-    * [CXF-5354] - faultTo address is ignored when fault is thrown
-    * [CXF-5357] - CORBA binding corrupts byte arrays
-    * [CXF-5361] - Attachments iterator may incorrectly handle its remove operation
-    * [CXF-5366] - Authorization header is not set correctly in CXF HTTP digest authentication 
-    * [CXF-5372] - ServerEngineFactoryHolder should release JAXB classes when it is destroyed
-    * [CXF-5381] - SAAJStreamWriter transforms DigestValue of custom signature
-    * [CXF-5383] - Trailing semi-colon in Content-Type line of header for MTOM attachments.
-    * [CXF-5386] - Multipart params of type InputStream don't show in generated WADL
-    * [CXF-5390] - AbstractSamlBase64InHandler goes into infinite loop when processing bad header value.
-    * [CXF-5391] - Response code is not logged for SOAP responses
-    * [CXF-5394] - ImplicitGrantService always redirect to broken redirect url
+    * [CXF-4949] - FIQL - searchContext returns null SearchCondition
+    * [CXF-5405] - WS-RM with anonymous endpoint throwing security policy validation exception for SequenceAck
+    * [CXF-5412] - Big CXF Bundles have truncated Export-Package instruction
+    * [CXF-5420] - Issue with EhCacheTokenStore using default LRU.
+    * [CXF-5423] - Callbackhandlers and other resources aren't found if configured in blueprint config due to classloading issues
+    * [CXF-5428] - Sevice list page default stylesheet is not effective
+    * [CXF-5433] - JAX-RS method invocation failes in case @Mutipart(required=false) is used on primitives
+    * [CXF-5434] - IllegalStateException calling Oneway method using JMS and WSA
+    * [CXF-5435] - WS-RM's retransmission should call conduit.close(message) after successful retransmission
+    * [CXF-5437] - JAXBDataBinding can not handle the exception with generic objects like ObjectWithGenerics<Boolean, Integer>
+    * [CXF-5440] - NPE is thrown at http conduit's authorization setting in Blueprint
+    * [CXF-5442] - CXFAuthenticator causes classloader leaks
+    * [CXF-5445] - IgnoreNamespacesWriter does not handle qualified attributes
+    * [CXF-5450] - With SAAJ In/Out forwarding, headers can cause an infinite loop and OOM
+    * [CXF-5454] - Latest Jetty doesn't like the -D jvmargs added to generated build.xml
+    * [CXF-5455] - Generated servers only use first port impl
+    * [CXF-5459] - Some imported xsd schemas are not resolved in spring when referenced from another schema
+    * [CXF-5465] - policy.xsd used in rt-ws-policy's blueprint configuration is inconsistent
+    * [CXF-5476] - NPE while trying to create a dispatch for SOAP service without port address specified in WSDL
+    * [CXF-5480] - Element Id not unique in AbstractBindingBuilder
+    * [CXF-5484] - JAASAuthenticationFilter cannot separate 3rdParty java.security.Principals based on user/role
+    * [CXF-5485] - Apache CXF kit bin directory is not set with access right
+    * [CXF-5493] - SOAPFaultException has empty message in case of response containing CDATA in fault:faultstring (SOAP 1.1)
+    * [CXF-5494] - WADL to Java code generator can get element names with '-' added to Java method names
+    * [CXF-5497] - STSClient is not sending a KeySize for SecureConversation in every circumstance
+    * [CXF-5498] - W3CDOMStreamReader does not check the DOM-Level in all Cases
+    * [CXF-5500] - FINE logging could result in OOM
+    * [CXF-5505] - SpringBus should shutdown the bus when the application context is closed
+    * [CXF-5506] - Make ws-addressing schema available during blueprint schema resolution
+    * [CXF-5507] - Missing alternativeSelector handling in ws-policy feature's blueprint configuration
+    * [CXF-5508] - Request.evaluatePreconditions(Date, EntityTag) loses a non-null ResponseBuilder 
+    * [CXF-5518] - Setting SecurityConstants.STS_TOKEN_ACT_AS as string improper handling
+    * [CXF-5520] - Setting SecurityConstants.STS_TOKEN_ON_BEHALF_OF as string improper handling
 
 ** Improvement
-    * [CXF-4987] - org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor disables mtom silently
-    * [CXF-5301] - JSONProvider should add an array key for root if arrayKeys is not empty but top level array has to be produced  
-    * [CXF-5317] - Policy exception handler throws away useful exception stack trace
-    * [CXF-5319] - WADLGenerator should not need "ignoreMessageWriters" property disabled to produces JSON
-    * [CXF-5322] - misleading warning for @XmlType without 'propOrder' element
-    * [CXF-5323] - [cxf-rt-core] remove geronimo-javamail_1.4_spec dependency
-    * [CXF-5329] - cxf-wsn doesn't register its bus as OSGi-Service
-    * [CXF-5332] - Support spring expression language for jaxws:client address attribute
+    * [CXF-5409] - Make response code be included in logging for LocalTransport
+    * [CXF-5438] - Allow FiqlSearchConditionBuilder extension
+    * [CXF-5461] - Add ws-securitypolicy-1.2.xsd to rt-ws-policy's schema resolution
+    * [CXF-5519] - Setting SecurityConstants.STS_TOKEN_ACT_AS as CallbackHander requires better documentation.
+    * [CXF-5521] - Setting SecurityConstants.STS_TOKEN_ON_BEHALF_OF as CallbackHander requires better documentation.
+
+** Task
+    * [CXF-5463] - Upgrade to Jettison 1.3.5
+
+
+
+
 
