@@ -158,7 +158,7 @@
         <cxf.wss4j.version>1.6.14</cxf.wss4j.version>
         <cxf.xerces.version>2.11.0</cxf.xerces.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.1.0</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
 
 
