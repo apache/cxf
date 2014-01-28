@@ -113,6 +113,9 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             if (signedElement.hasAttributeNS(null, "ID")) {
                 signedElement.setIdAttributeNS(null, "ID", true);
             }
+            if (signedElement.hasAttributeNS(null, "Id")) {
+                signedElement.setIdAttributeNS(null, "Id", true);
+            }
             
             // See also WSS4J SAMLUtil.getCredentialFromKeyInfo 
             KeyInfo keyInfo = signature.getKeyInfo();

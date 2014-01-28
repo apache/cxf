@@ -262,7 +262,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             if (is == null) {
                 Reader reader = getStreamHandlerFromCurrentMessage(Reader.class);
                 if (reader == null) {
-                    LOG.severe("No InputStream, Reader, or XMStreamReader is available");
+                    LOG.severe("No InputStream, Reader, or XMLStreamReader is available");
                     throw new InternalServerErrorException();
                 }
                 xmlReader = StaxUtils.createXMLStreamReader(reader);
@@ -567,7 +567,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         if (os == null) {
             Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
             if (writer == null) {
-                LOG.severe("No OutputStream, Writer, or XMStreamWriter is available");
+                LOG.severe("No OutputStream, Writer, or XMLStreamWriter is available");
                 throw new InternalServerErrorException();
             }
             ms.marshal(obj, writer);
