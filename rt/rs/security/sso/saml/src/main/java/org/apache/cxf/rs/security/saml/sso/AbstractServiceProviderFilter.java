@@ -128,10 +128,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     }
     
     @PreDestroy
-    public void close() throws IOException {
-        if (getStateProvider() != null) {
-            getStateProvider().close();
-        }
+    public void close() {
+        super.close();
     }
     
     private String getIssuerId(Message m) {

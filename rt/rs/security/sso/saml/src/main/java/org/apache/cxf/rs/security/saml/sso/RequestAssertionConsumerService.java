@@ -140,9 +140,13 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     
     @PreDestroy
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (replayCache != null) {
-            replayCache.close();
+            try {
+                replayCache.close();
+            } catch (IOException ex) {
+                LOG.warning("Replay cache can not be closed: " + ex.getMessage());
+            }
         }
         super.close();
     }
