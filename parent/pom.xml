@@ -121,7 +121,7 @@
         <cxf.junit.version>4.11</cxf.junit.version>
         <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
         <cxf.msv.version>2011.1</cxf.msv.version>
-        <cxf.neethi.version>3.0.2</cxf.neethi.version>
+        <cxf.neethi.version>3.0.3</cxf.neethi.version>
         <cxf.netty.version>4.0.7.Final</cxf.netty.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
