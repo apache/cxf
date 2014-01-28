@@ -17,12 +17,19 @@
  * under the License.
  */
 
-/**
- * Support for producing logs in
- * <a href="http://tools.ietf.org/html/rfc4287">ATOM Syndication Format</a>.
- * Allows to configure <tt>java.util.logging</tt> (JUL) loggers to use
- * handlers producing ATOM feeds that are either pushed to or pulled by client.  
- */
-@Hold
 package org.apache.cxf.management.web.logging.atom;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/*
+ * Marker annotation to force the package-info.java to be compiled by javac 
+ * to avoid problems with the maven compiler plugin always compiling everything
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PACKAGE })
+@interface Hold {
+
+}
