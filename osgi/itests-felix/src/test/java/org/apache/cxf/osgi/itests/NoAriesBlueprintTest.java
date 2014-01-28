@@ -20,6 +20,7 @@ package org.apache.cxf.osgi.itests;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -28,6 +29,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -47,6 +49,9 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
     @Configuration
     public Option[] config() {
         return new Option[]{
+                systemProperty("java.awt.headless").value("true"),
+                systemProperty("org.ops4j.pax.url.mvn.localRepository")
+                    .value(System.getProperty("localRepository")),
                 mavenBundle().groupId("org.apache.ws.xmlschema").artifactId("xmlschema-core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.cxf").artifactId("cxf-core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.servicemix.bundles")

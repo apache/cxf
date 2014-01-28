@@ -109,6 +109,7 @@
                         <project.version>${project.version}</project.version>
                         <karaf.version>${karaf.version}</karaf.version>
                         <buildDirectory>${project.build.directory}</buildDirectory>
+                        <org.ops4j.pax.url.mvn.localRepository>${maven.repo.local}</org.ops4j.pax.url.mvn.localRepository>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

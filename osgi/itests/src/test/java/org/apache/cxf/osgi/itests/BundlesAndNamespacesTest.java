@@ -21,6 +21,7 @@ package org.apache.cxf.osgi.itests;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -28,7 +29,8 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
@@ -51,8 +53,12 @@ public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
     @Configuration
     public Option[] config() {
         return new Option[]{
-                cxfBaseConfig(), 
-                keepRuntimeFolder(),
+                cxfBaseConfig(),
+                systemProperty("java.awt.headless").value("true"),
+
+                editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", 
+                                         "org.ops4j.pax.url.mvn.localRepository",
+                                         System.getProperty("localRepository")),
                 logLevel(LogLevel.INFO)};
     }
 }
