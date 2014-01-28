@@ -115,6 +115,9 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             if (signedElement.hasAttributeNS(null, "ID")) {
                 signedElement.setIdAttributeNS(null, "ID", true);
             }
+            if (signedElement.hasAttributeNS(null, "Id")) {
+                signedElement.setIdAttributeNS(null, "Id", true);
+            }
             
             X509Certificate cert = null;
             PublicKey publicKey = null;
