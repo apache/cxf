@@ -56,9 +56,13 @@ public class AbstractSSOSpHandler {
     }
     
     @PreDestroy
-    public void close() throws IOException {
+    public void close() {
         if (stateProvider != null) {
-            stateProvider.close();
+            try {
+                stateProvider.close();
+            } catch (IOException ex) {
+                LOG.warning("State provider can not be closed: " + ex.getMessage());
+            }
             stateProvider = null;
         }
     }
