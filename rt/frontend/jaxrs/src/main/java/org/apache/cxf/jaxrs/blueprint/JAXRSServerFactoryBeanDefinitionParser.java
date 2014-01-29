@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.blueprint;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -31,6 +32,7 @@ import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -97,6 +99,15 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
             bean.addProperty(name, this.parseListData(ctx, bean, el));
         }  else if ("serviceFactories".equals(name)) {
             bean.addProperty("resourceProviders", this.parseListData(ctx, bean, el));
+        } else if ("resourceClasses".equals(name)) {
+            List<String> resources = getResourceClassesFromElement(el);
+            MutableCollectionMetadata list = ctx.createMetadata(MutableCollectionMetadata.class);
+            list.setCollectionClass(List.class);
+            for (String res : resources) {
+                MutableBeanMetadata objectOfClass = createObjectOfClass(ctx, res);
+                list.addValue(objectOfClass);
+            }
+            bean.addProperty("serviceBeans", list);
         } else if ("model".equals(name)) {
             List<UserResource> resources = ResourceUtils.getResourcesFromElement(el);
             MutableCollectionMetadata list = ctx.createMetadata(MutableCollectionMetadata.class);
@@ -146,4 +157,17 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
         }
     }
 
+    private static List<String> getResourceClassesFromElement(Element modelEl) {
+        List<String> resources = new ArrayList<String>();
+        List<Element> resourceEls =
+            DOMUtils.findAllElementsByTagName(modelEl, "class");
+        for (Element e : resourceEls) {
+            resources.add(getResourceClassFromElement(e));
+        }
+        return resources;
+    }
+    
+    private static String getResourceClassFromElement(Element e) {
+        return e.getAttribute("name");
+    }
 }

@@ -48,6 +48,7 @@
             <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="properties" type="beans:Tmap" minOccurs="0"/>
             <xsd:element name="serviceBeans" type="xsd:anyType" minOccurs="0"/>            
+            <xsd:element name="resourceClasses" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="modelBeans" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="model" type="tns:model" minOccurs="0"/>
             <xsd:element name="providers" type="xsd:anyType" minOccurs="0"/>
