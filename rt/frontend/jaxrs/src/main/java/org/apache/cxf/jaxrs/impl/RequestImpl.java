@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -165,18 +166,28 @@ public class RequestImpl implements Request {
         if (eTag == null) {
             throw new IllegalArgumentException("ETag is null");
         }
-        ResponseBuilder rb = evaluateIfMatch(eTag);
+        return evaluateAll(eTag, null);
+    }
+    
+    private ResponseBuilder evaluateAll(EntityTag eTag, Date lastModified) {
+        // http://tools.ietf.org/search/draft-ietf-httpbis-p4-conditional-25#section-5
+        // Check If-Match. If it is not available proceed to checking If-Not-Modified-Since
+        // if it is available and the preconditions are not met - return, otherwise:
+        // Check If-Not-Match. If it is not available proceed to checking If-Modified-Since
+        // otherwise return the evaluation result
+        
+        ResponseBuilder rb = evaluateIfMatch(eTag, lastModified);
         if (rb == null) {
-            rb = evaluateIfNonMatch(eTag);
+            rb = evaluateIfNonMatch(eTag, lastModified);
         }
         return rb;
     }
 
-    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {
+    private ResponseBuilder evaluateIfMatch(EntityTag eTag, Date date) {
         List<String> ifMatch = headers.getRequestHeader(HttpHeaders.IF_MATCH);
         
         if (ifMatch == null || ifMatch.size() == 0) {
-            return null;
+            return date == null ? null : evaluateIfNotModifiedSince(date);
         }
         
         try {
@@ -196,15 +207,15 @@ public class RequestImpl implements Request {
         return Response.status(Response.Status.PRECONDITION_FAILED).tag(eTag);
     }
 
-    private ResponseBuilder evaluateIfNonMatch(EntityTag eTag) {
+    private ResponseBuilder evaluateIfNonMatch(EntityTag eTag, Date lastModified) {
         List<String> ifNonMatch = headers.getRequestHeader(HttpHeaders.IF_NONE_MATCH);
         
         if (ifNonMatch == null || ifNonMatch.size() == 0) {
-            return null;
+            return lastModified == null ? null : evaluateIfModifiedSince(lastModified);
         }
         
         String method = getMethod();
-        boolean getOrHead = "GET".equals(method) || "HEAD".equals(method);
+        boolean getOrHead = HttpMethod.GET.equals(method) || HttpMethod.HEAD.equals(method);
         try {
             for (String value : ifNonMatch) {
                 boolean result = "*".equals(value);
@@ -229,10 +240,18 @@ public class RequestImpl implements Request {
         if (lastModified == null) {
             throw new IllegalArgumentException("Date is null");
         }
+        ResponseBuilder rb = evaluateIfNotModifiedSince(lastModified);
+        if (rb == null) {
+            rb = evaluateIfModifiedSince(lastModified);
+        }
+        return rb;
+    }
+    
+    private ResponseBuilder evaluateIfModifiedSince(Date lastModified) {
         List<String> ifModifiedSince = headers.getRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
         
         if (ifModifiedSince == null || ifModifiedSince.size() == 0) {
-            return evaluateIfNotModifiedSince(lastModified);
+            return null;
         }
         
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
@@ -254,7 +273,7 @@ public class RequestImpl implements Request {
         return Response.status(Response.Status.NOT_MODIFIED);
     }
     
-    public ResponseBuilder evaluateIfNotModifiedSince(Date lastModified) {
+    private ResponseBuilder evaluateIfNotModifiedSince(Date lastModified) {
         List<String> ifNotModifiedSince = headers.getRequestHeader(HttpHeaders.IF_UNMODIFIED_SINCE);
         
         if (ifNotModifiedSince == null || ifNotModifiedSince.size() == 0) {
@@ -282,16 +301,10 @@ public class RequestImpl implements Request {
 
 
     public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
-        final ResponseBuilder rb = evaluatePreconditions(eTag);
-        if (rb == null) {
-            // the ETag conditions match; so now conditions for last modified must match
-            return evaluatePreconditions(lastModified);
-        } else {
-            // the ETag conditions do not match, so last modified should be ignored
-            // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html (section 14.26 for
-            // "If-None-Match", behaviour not specified for "If-Match", section 14.24)
-            return rb;
+        if (eTag == null || lastModified == null) {
+            throw new IllegalArgumentException("ETag or Date is null");
         }
+        return evaluateAll(eTag, lastModified);
     }
     
     public String getMethod() {
