@@ -83,7 +83,7 @@ public class MapEventLogger implements MapEventListener {
         } else if (value instanceof Date) {
             return dateFormat.format(value);
         } else {
-            return value.toString();
+            return (value == null) ? "<null>" : value.toString();
         }
     }
 
