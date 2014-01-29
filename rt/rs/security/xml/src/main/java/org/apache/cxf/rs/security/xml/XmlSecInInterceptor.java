@@ -257,13 +257,13 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
             throw new XMLSecurityException("empty", "The signature digest algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
         } else if (XMLSecurityConstants.SigC14n.equals(event.getAlgorithmUsage())
-            && sigProps.getSignatureC14Method() != null
-            && !sigProps.getSignatureC14Method().equals(event.getAlgorithmURI())) {
+            && sigProps.getSignatureC14nMethod() != null
+            && !sigProps.getSignatureC14nMethod().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature c14n algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
         } else if (XMLSecurityConstants.SigTransform.equals(event.getAlgorithmUsage())
-            && sigProps.getSignatureC14Transform() != null
-            && !sigProps.getSignatureC14Transform().equals(event.getAlgorithmURI())) {
+            && sigProps.getSignatureC14nTransform() != null
+            && !sigProps.getSignatureC14nTransform().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature transformation algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
         }

@@ -49,8 +49,8 @@ under the License.
     <bean id="sigProps" class="org.apache.cxf.rs.security.xml.SignatureProperties">
         <property name="signatureAlgo" value="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
         <property name="signatureDigestAlgo" value="http://www.w3.org/2000/09/xmldsig#sha1"/>
-        <property name="signatureC14Method" value="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-        <property name="signatureC14Transform" value="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <property name="signatureC14nMethod" value="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+        <property name="signatureC14nTransform" value="http://www.w3.org/2001/10/xml-exc-c14n#"/>
     </bean>
     <bean id="encProps" class="org.apache.cxf.rs.security.xml.EncryptionProperties">
         <property name="encryptionKeyTransportAlgo" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>

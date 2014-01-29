@@ -104,8 +104,8 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                     && !sigProps.getSignatureAlgo().equals(sInfo.getSignatureMethodURI())) {
                     throwFault("Signature Algorithm is not supported", null);
                 }
-                if (sigProps.getSignatureC14Method() != null
-                    && !sigProps.getSignatureC14Method().equals(sInfo.getCanonicalizationMethodURI())) {
+                if (sigProps.getSignatureC14nMethod() != null
+                    && !sigProps.getSignatureC14nMethod().equals(sInfo.getCanonicalizationMethodURI())) {
                     throwFault("Signature C14n Algorithm is not supported", null);
                 }
             }
@@ -246,7 +246,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         }
         
         boolean c14TransformConfirmed = false;
-        String c14TransformExpected = sigProps != null ? sigProps.getSignatureC14Transform() : null;
+        String c14TransformExpected = sigProps != null ? sigProps.getSignatureC14nTransform() : null;
         boolean envelopedConfirmed = false;
         for (int i = 0; i < transforms.getLength(); i++) {
             try {

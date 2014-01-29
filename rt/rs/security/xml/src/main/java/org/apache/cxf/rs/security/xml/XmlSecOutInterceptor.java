@@ -291,16 +291,16 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         }
         
         String c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
-        if (sigProps.getSignatureC14Method() != null) {
-            c14nMethod = sigProps.getSignatureC14Method();
+        if (sigProps.getSignatureC14nMethod() != null) {
+            c14nMethod = sigProps.getSignatureC14nMethod();
         }
         properties.setSignatureCanonicalizationAlgorithm(c14nMethod);
         
         properties.addAction(XMLSecurityConstants.SIGNATURE);
         // Only enveloped supported for the moment.
         String transform = "http://www.w3.org/2001/10/xml-exc-c14n#";
-        if (sigProps.getSignatureC14Transform() != null) {
-            transform = sigProps.getSignatureC14Transform();
+        if (sigProps.getSignatureC14nTransform() != null) {
+            transform = sigProps.getSignatureC14nTransform();
         }
         SecurePart securePart = 
             new SecurePart(elementsToSign.get(0), SecurePart.Modifier.Element,

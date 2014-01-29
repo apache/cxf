@@ -21,8 +21,8 @@ package org.apache.cxf.rs.security.xml;
 public class SignatureProperties {
     private String signatureAlgo;
     private String signatureDigestAlgo;
-    private String signatureC14Method;
-    private String signatureC14Transform;
+    private String signatureC14nMethod;
+    private String signatureC14nTransform;
     private String signatureKeyIdType;
     
     public void setSignatureAlgo(String signatureAlgo) {
@@ -37,17 +37,33 @@ public class SignatureProperties {
     public String getSignatureDigestAlgo() {
         return signatureDigestAlgo;
     }
+    @Deprecated
     public void setSignatureC14Method(String signatureC14Method) {
-        this.signatureC14Method = signatureC14Method;
+        setSignatureC14nMethod(signatureC14Method);
     }
+    public void setSignatureC14nMethod(String signatureC14nMethod) {
+        this.signatureC14nMethod = signatureC14nMethod;
+    }
+    @Deprecated
     public String getSignatureC14Method() {
-        return signatureC14Method;
+        return getSignatureC14nMethod();
     }
+    public String getSignatureC14nMethod() {
+        return signatureC14nMethod;
+    }
+    @Deprecated
     public void setSignatureC14Transform(String signatureC14Transform) {
-        this.signatureC14Transform = signatureC14Transform;
+        setSignatureC14nTransform(signatureC14Transform);
     }
+    public void setSignatureC14nTransform(String signatureC14nTransform) {
+        this.signatureC14nTransform = signatureC14nTransform;
+    }
+    @Deprecated
     public String getSignatureC14Transform() {
-        return signatureC14Transform;
+        return getSignatureC14nTransform();
+    }
+    public String getSignatureC14nTransform() {
+        return signatureC14nTransform;
     }
     public String getSignatureKeyIdType() {
         return signatureKeyIdType;
