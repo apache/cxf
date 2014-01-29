@@ -129,7 +129,10 @@ public class AbstractTokenService extends AbstractOAuthService {
         try {
             client = getValidClient(clientId);
         } catch (OAuthServiceException ex) {
-            // log it
+            if (ex.getError() != null) {
+                reportInvalidRequestError(ex.getError());
+                return null;
+            }
         }
         if (client == null) {
             reportInvalidRequestError("Client ID is invalid");
