@@ -106,7 +106,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                 }
                 if (sigProps.getSignatureC14Method() != null
                     && !sigProps.getSignatureC14Method().equals(sInfo.getCanonicalizationMethodURI())) {
-                    throwFault("Signature Algorithm is not supported", null);
+                    throwFault("Signature C14n Algorithm is not supported", null);
                 }
             }
             

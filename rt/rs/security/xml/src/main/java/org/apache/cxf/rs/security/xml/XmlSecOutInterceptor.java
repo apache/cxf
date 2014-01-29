@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.xml;
 
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
@@ -51,6 +54,8 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
@@ -77,8 +82,8 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     private EncryptionProperties encryptionProperties = new EncryptionProperties();
     private SignatureProperties sigProps = new SignatureProperties();
     private String phase;
-    //private boolean encryptSymmetricKey = true;
-    //private SecretKey symmetricKey;
+    private boolean encryptSymmetricKey = true;
+    private SecretKey symmetricKey;
     private boolean signRequest;
     private boolean encryptRequest;
     private List<QName> elementsToSign = new ArrayList<QName>();
@@ -107,39 +112,12 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         try {
             XMLSecurityProperties properties = new XMLSecurityProperties();
             
-            if (encryptRequest) {
-                // Configure algorithms
-                /*
-                if (encryptionProperties != null) {
-                    if (encryptionProperties.getEncryptionKeyTransportAlgo() != null) {
-                        properties.setEncryptionKeyTransportAlgorithm(
-                            encryptionProperties.getEncryptionKeyTransportAlgo());
-                    }
-                    if (encryptionProperties.getEncryptionSymmetricKeyAlgo() != null) {
-                        properties.setEncryptionSymAlgorithm(
-                            encryptionProperties.getEncryptionSymmetricKeyAlgo());
-                    }
-                    if (encryptionProperties.getEncryptionDigestAlgo() != null) {
-                        properties.setEncryptionKeyTransportDigestAlgorithm(
-                            encryptionProperties.getEncryptionDigestAlgo());
-                    }
-                    */
-                    /* TODO
-                    if (encryptionProperties.getEncryptionKeyIdType() != null) {
-                        if (encryptionProperties.getEncryptionKeyIdType().equals(SecurityUtils.X509_CERT)) {
-                        } else if (encryptionProperties.getEncryptionKeyIdType().equals(
-                            SecurityUtils.X509_ISSUER_SERIAL)) {
-                            
-                        } else {
-                            throw new Exception("Unsupported key identifier:" + keyIdType);
-                        }
-                    }
-                }
-                */
-            }
-            
             if (signRequest) {
                 configureSignature(message, properties);
+            }
+            
+            if (encryptRequest) {
+                configureEncryption(message, properties);
             }
             
             OutboundXMLSec outboundXMLSec = XMLSec.getOutboundXMLSec(properties);
@@ -169,40 +147,93 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         message.getInterceptorChain().add(ending);
     }
     
-    /*
-    private void configureKeys(Message message, XMLSecurityProperties properties) 
+    private void configureEncryption(Message message, XMLSecurityProperties properties) 
         throws Exception {
-        if (symmetricKey != null) {
-            properties.setEncryptionKey(symmetricKey);
+        if (elementsToEncrypt == null || elementsToEncrypt.isEmpty()) {
+            throw new Exception("An Element to Encrypt must be specified");
         }
+        
+        properties.setEncryptionSymAlgorithm(
+            encryptionProperties.getEncryptionSymmetricKeyAlgo());
+        properties.setEncryptionKey(
+            getSymmetricKey(encryptionProperties.getEncryptionSymmetricKeyAlgo()));
         if (encryptSymmetricKey) {
+            String userName = 
+                (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+            CryptoLoader loader = new CryptoLoader();
+            Crypto crypto = loader.getCrypto(message, 
+                                      SecurityConstants.ENCRYPT_CRYPTO,
+                                      SecurityConstants.ENCRYPT_PROPERTIES);
             
+            userName = SecurityUtils.getUserName(crypto, userName);
+            if (StringUtils.isEmpty(userName)) {
+                throw new Exception("User name is not available");
+            }
+            X509Certificate sendingCert = getCertificateFromCrypto(crypto, userName);
+            if (sendingCert == null) {
+                throw new Exception("Sending certificate is not available");
+            }
+            
+            properties.setEncryptionUseThisCertificate(sendingCert);
+            
+            // TODO Uncomment
+            //properties.setEncryptionKeyIdentifier(
+            //    convertKeyIdentifier(encryptionProperties.getEncryptionKeyIdType()));
+                                      
+            if (encryptionProperties.getEncryptionKeyTransportAlgo() != null) {
+                properties.setEncryptionKeyTransportAlgorithm(
+                    encryptionProperties.getEncryptionKeyTransportAlgo());
+            }
+            if (encryptionProperties.getEncryptionDigestAlgo() != null) {
+                properties.setEncryptionKeyTransportDigestAlgorithm(
+                    encryptionProperties.getEncryptionDigestAlgo());
+            }
         }
-        String userName = 
-            (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-        CryptoLoader loader = new CryptoLoader();
-        Crypto crypto = loader.getCrypto(message, 
-                                  SecurityConstants.ENCRYPT_CRYPTO,
-                                  SecurityConstants.ENCRYPT_PROPERTIES);
         
-        userName = SecurityUtils.getUserName(crypto, userName);
-        if (StringUtils.isEmpty(userName)) {
-            throw new Exception("User name is not available");
-        }
-        X509Certificate receiverCert = getReceiverCertificateFromCrypto(crypto, userName);
-        if (receiverCert == null) {
-            throw new Exception("Receiver certificate is not available");
-        }
-        
-        properties.setEncryptionKey(receiverCert.getPublicKey());
-        properties.setEncryptionUseThisCertificate(receiverCert);
+        properties.addAction(XMLSecurityConstants.ENCRYPT);
+        SecurePart securePart = 
+            new SecurePart(elementsToEncrypt.get(0), SecurePart.Modifier.Element);
+        properties.addEncryptionPart(securePart);
     }
     
-    private X509Certificate getReceiverCertificateFromCrypto(Crypto crypto, String user) throws Exception {
+    private X509Certificate getCertificateFromCrypto(Crypto crypto, String user) throws Exception {
         X509Certificate[] certs = SecurityUtils.getCertificates(crypto, user);
         return certs[0];
     }
-    */
+    
+    private SecretKey getSymmetricKey(String symEncAlgo) throws Exception {
+        synchronized (this) {
+            if (symmetricKey == null) {
+                KeyGenerator keyGen = getKeyGenerator(symEncAlgo);
+                symmetricKey = keyGen.generateKey();
+            } 
+            return symmetricKey;
+        }
+    }
+    
+    private KeyGenerator getKeyGenerator(String symEncAlgo) throws WSSecurityException {
+        try {
+            //
+            // Assume AES as default, so initialize it
+            //
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
+                keyGen.init(128);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
+                keyGen.init(192);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
+                keyGen.init(256);
+            }
+            return keyGen;
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e);
+        }
+    }
+    
     private void configureSignature(
         Message message, XMLSecurityProperties properties
     ) throws Exception {
@@ -230,12 +261,13 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         
         String sigAlgo = sigProps.getSignatureAlgo() == null 
             ? SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1 : sigProps.getSignatureAlgo();
-        properties.setSignatureAlgorithm(sigAlgo);
         
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
         }
+        
+        properties.setSignatureAlgorithm(sigAlgo);
         PrivateKey privateKey = null;
         try {
             privateKey = crypto.getPrivateKey(user, password);
@@ -253,13 +285,23 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         properties.setSignatureKeyIdentifier(
             convertKeyIdentifier(sigProps.getSignatureKeyIdType()));
         
+        String c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+        if (sigProps.getSignatureC14Method() != null) {
+            c14nMethod = sigProps.getSignatureC14Method();
+        }
+        properties.setSignatureCanonicalizationAlgorithm(c14nMethod);
+        
         properties.addAction(XMLSecurityConstants.SIGNATURE);
         // Only enveloped supported for the moment.
+        String transform = "http://www.w3.org/2001/10/xml-exc-c14n#";
+        if (sigProps.getSignatureC14Transform() != null) {
+            transform = sigProps.getSignatureC14Transform();
+        }
         SecurePart securePart = 
             new SecurePart(elementsToSign.get(0), SecurePart.Modifier.Element,
                            new String[]{
                                "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
-                               "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+                               transform
                            },
                            digestAlgo);
         properties.addSignaturePart(securePart);
@@ -427,5 +469,21 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
             }
         }
 
+    }
+
+    public boolean isEncryptSymmetricKey() {
+        return encryptSymmetricKey;
+    }
+
+    public void setEncryptSymmetricKey(boolean encryptSymmetricKey) {
+        this.encryptSymmetricKey = encryptSymmetricKey;
+    }
+
+    public SecretKey getSymmetricKey() {
+        return symmetricKey;
+    }
+
+    public void setSymmetricKey(SecretKey symmetricKey) {
+        this.symmetricKey = symmetricKey;
     }
 }
