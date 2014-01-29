@@ -411,10 +411,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
         
         // TODO Endorsing SAML not supported Streaming
-        // TODO WSS-490 Problem with policy validation on the StAX Server side
-        // Remove "PORT.equals(test.getPort())" as per below to reproduce
-        // if (!test.isStreaming()) {
-        if (!test.isStreaming() && PORT.equals(test.getPort())) {
+        if (!test.isStreaming()) {
             samlPort.doubleIt(25);
         }
         
