@@ -88,6 +88,7 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     private boolean encryptRequest;
     private List<QName> elementsToSign = new ArrayList<QName>();
     private List<QName> elementsToEncrypt = new ArrayList<QName>();
+    private boolean keyInfoMustBeAvailable = true;
 
     public XmlSecOutInterceptor() {
         setPhase(Phase.PRE_STREAM);
@@ -282,8 +283,12 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
             ? Constants.ALGO_ID_DIGEST_SHA1 : sigProps.getSignatureDigestAlgo();
         properties.setSignatureDigestAlgorithm(digestAlgo);
         
-        properties.setSignatureKeyIdentifier(
-            convertKeyIdentifier(sigProps.getSignatureKeyIdType()));
+        if (this.keyInfoMustBeAvailable) {
+            properties.setSignatureKeyIdentifier(
+                convertKeyIdentifier(sigProps.getSignatureKeyIdType()));
+        } else {
+            properties.setSignatureKeyIdentifier(SecurityTokenConstants.KeyIdentifier_NoKeyInfo);
+        }
         
         String c14nMethod = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
         if (sigProps.getSignatureC14Method() != null) {
@@ -367,6 +372,10 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     
     public void setEncryptionDigestAlgorithm(String algo) {
         encryptionProperties.setEncryptionDigestAlgo(algo);
+    }
+    
+    public void setKeyInfoMustBeAvailable(boolean use) {
+        this.keyInfoMustBeAvailable = use;
     }
     
     public void setSignatureProperties(SignatureProperties props) {
