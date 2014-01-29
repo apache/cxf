@@ -117,6 +117,10 @@ public abstract class AbstractOAuthService {
         reportInvalidRequestError(error, mt);
     }
     
+    protected void reportInvalidRequestError(OAuthError entity) {
+        reportInvalidRequestError(entity, MediaType.APPLICATION_JSON_TYPE);
+    }
+    
     protected void reportInvalidRequestError(OAuthError entity, MediaType mt) {
         ResponseBuilder rb = Response.status(400);
         if (mt != null) {
