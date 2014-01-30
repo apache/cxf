@@ -279,10 +279,10 @@ public final class ModelEncryptionSupport {
     private static String tokenizeServerToken(ServerAccessToken token) {
         StringBuilder state = new StringBuilder();
         // 0: key
-        state.append(token.getTokenKey());
+        state.append(tokenizeString(token.getTokenKey()));
         // 1: type
         state.append(SEP);
-        state.append(token.getTokenType());
+        state.append(tokenizeString(token.getTokenType()));
         // 2: expiresIn 
         state.append(SEP);
         state.append(token.getExpiresIn());
@@ -291,16 +291,16 @@ public final class ModelEncryptionSupport {
         state.append(token.getIssuedAt());
         // 4: client id
         state.append(SEP);
-        state.append(token.getClient().getClientId());
+        state.append(tokenizeString(token.getClient().getClientId()));
         // 5: refresh token
         state.append(SEP);
-        state.append(token.getRefreshToken());
+        state.append(tokenizeString(token.getRefreshToken()));
         // 6: grant type
         state.append(SEP);
-        state.append(token.getGrantType());
+        state.append(tokenizeString(token.getGrantType()));
         // 7: audience
         state.append(SEP);
-        state.append(token.getAudience());
+        state.append(tokenizeString(token.getAudience()));
         // 8: other parameters
         state.append(SEP);
         // {key=value, key=value}
@@ -312,10 +312,10 @@ public final class ModelEncryptionSupport {
         } else {
             for (OAuthPermission p : token.getScopes()) {
                 // 9.1
-                state.append(p.getPermission());
+                state.append(tokenizeString(p.getPermission()));
                 state.append(".");
                 // 9.2
-                state.append(p.getDescription());
+                state.append(tokenizeString(p.getDescription()));
                 state.append(".");
                 // 9.3
                 state.append(p.isDefault());
@@ -352,37 +352,37 @@ public final class ModelEncryptionSupport {
     private static String tokenizeClient(Client client) {
         StringBuilder state = new StringBuilder();
         // 0: id
-        state.append(client.getClientId());
+        state.append(tokenizeString(client.getClientId()));
         state.append(SEP);
         // 1: secret
-        state.append(client.getClientSecret());
+        state.append(tokenizeString(client.getClientSecret()));
         state.append(SEP);
         // 2: confidentiality
         state.append(client.isConfidential());
         state.append(SEP);
         // 3: app name
-        state.append(client.getApplicationName());
+        state.append(tokenizeString(client.getApplicationName()));
         state.append(SEP);
         // 4: app web URI
-        state.append(client.getApplicationWebUri());
+        state.append(tokenizeString(client.getApplicationWebUri()));
         state.append(SEP);
         // 5: app description
-        state.append(client.getApplicationDescription());
+        state.append(tokenizeString(client.getApplicationDescription()));
         state.append(SEP);
         // 6: app logo URI
-        state.append(client.getApplicationLogoUri());
+        state.append(tokenizeString(client.getApplicationLogoUri()));
         state.append(SEP);
         // 7: grants
         state.append(client.getAllowedGrantTypes().toString());
         state.append(SEP);
         // 8: redirect URIs
-        state.append(client.getRedirectUris());
+        state.append(client.getRedirectUris().toString());
         state.append(SEP);
         // 9: registered scopes
-        state.append(client.getRegisteredScopes());
+        state.append(client.getRegisteredScopes().toString());
         state.append(SEP);
         // 10: registered audiences
-        state.append(client.getRegisteredAudiences());
+        state.append(client.getRegisteredAudiences().toString());
         state.append(SEP);
         // 11: properties
         state.append(client.getProperties().toString());
@@ -412,7 +412,7 @@ public final class ModelEncryptionSupport {
         state.append(grant.getClient().getClientId());
         state.append(SEP);
         // 1: code
-        state.append(grant.getCode());
+        state.append(tokenizeString(grant.getCode()));
         state.append(SEP);
         // 2: expiresIn
         state.append(grant.getExpiresIn());
@@ -421,13 +421,13 @@ public final class ModelEncryptionSupport {
         state.append(grant.getIssuedAt());
         state.append(SEP);
         // 4: redirect URI
-        state.append(grant.getRedirectUri());
+        state.append(tokenizeString(grant.getRedirectUri()));
         state.append(SEP);
         // 5: audience
-        state.append(grant.getAudience());
+        state.append(tokenizeString(grant.getAudience()));
         state.append(SEP);
         // 6: code verifier
-        state.append(grant.getClientCodeVerifier());
+        state.append(tokenizeString(grant.getClientCodeVerifier()));
         state.append(SEP);
         // 7: approved scopes
         state.append(grant.getApprovedScopes().toString());
@@ -439,7 +439,7 @@ public final class ModelEncryptionSupport {
     }
     
     private static String getStringPart(String str) {
-        return "null".equals(str) ? null : str;
+        return " ".equals(str) ? null : str;
     }
     
     private static String prepareSimpleString(String str) {
@@ -473,7 +473,7 @@ public final class ModelEncryptionSupport {
         UserSubject subject = null;
         if (!sequence.trim().isEmpty()) {
             String[] subjectParts = sequence.split("\\.");
-            subject = new UserSubject(subjectParts[0], getStringPart(subjectParts[1]));
+            subject = new UserSubject(getStringPart(subjectParts[0]), getStringPart(subjectParts[1]));
             subject.setRoles(parseSimpleList(subjectParts[2]));
             subject.setProperties(parseSimpleMap(subjectParts[3]));
         }
@@ -485,10 +485,10 @@ public final class ModelEncryptionSupport {
     private static void tokenizeUserSubject(StringBuilder state, UserSubject subject) {
         if (subject != null) {
             // 1
-            state.append(subject.getLogin());
+            state.append(tokenizeString(subject.getLogin()));
             state.append(".");
             // 2
-            state.append(subject.getId());
+            state.append(tokenizeString(subject.getId()));
             state.append(".");
             // 3
             state.append(subject.getRoles().toString());
@@ -498,5 +498,9 @@ public final class ModelEncryptionSupport {
         } else {
             state.append(" ");
         }
+    }
+    
+    private static String tokenizeString(String str) {
+        return str != null ? str : " ";
     }
 }
