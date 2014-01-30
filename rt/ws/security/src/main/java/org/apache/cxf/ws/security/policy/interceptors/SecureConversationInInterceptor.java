@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -53,6 +53,7 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
@@ -352,6 +353,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 token.setSecurityContext(sc);
             }
             
+            // Get Bootstrap Token
+            SecurityToken bootstrapToken = getBootstrapToken(exchange.getInMessage());
+            if (bootstrapToken != null) {
+                Properties properties = new Properties();
+                properties.put(SecurityToken.BOOTSTRAP_TOKEN_ID, bootstrapToken.getId());
+                token.setProperties(properties);
+            }
+            
             ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
             
@@ -362,6 +371,16 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
 
+        private SecurityToken getBootstrapToken(Message message) {
+            SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+            if (st == null) {
+                String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                if (id != null) {
+                    st = WSS4JUtils.getTokenStore(message).getToken(id);
+                }
+            }
+            return st;
+        }
     }
     
     

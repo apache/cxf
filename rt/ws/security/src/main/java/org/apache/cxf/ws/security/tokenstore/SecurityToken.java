@@ -45,6 +45,11 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
  */
 public class SecurityToken implements Serializable {
     
+    /**
+     * This tag holds an ID of a Bootstrap SecurityToken stored in the TokenStore 
+     */
+    public static final String BOOTSTRAP_TOKEN_ID = "bootstrap_security_token_id";
+    
     private static final long serialVersionUID = 3820740387121650613L;
 
     /**
