@@ -191,11 +191,11 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                     conditions.setNotBefore(creationDateTime);
                 } catch (ParseException e) {
                     LOG.warning("Failed to parse life time element: " + e.getMessage());
-                    conditions.setTokenPeriodMinutes((int)(lifetime / 60L));
+                    conditions.setTokenPeriodSeconds(lifetime);
                 }
                 
             } else {
-                conditions.setTokenPeriodMinutes((int)(lifetime / 60L));
+                conditions.setTokenPeriodSeconds(lifetime);
             }
         } else {
             conditions.setTokenPeriodMinutes(5);
