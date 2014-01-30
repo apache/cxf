@@ -21,10 +21,10 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -291,6 +291,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 token.setSecurityContext(sc);
             }
             
+            // Get Bootstrap Token
+            SecurityToken bootstrapToken = getBootstrapToken(exchange.getInMessage());
+            if (bootstrapToken != null) {
+                Properties properties = new Properties();
+                properties.put(SecurityToken.BOOTSTRAP_TOKEN_ID, bootstrapToken.getId());
+                token.setProperties(properties);
+            }
+            
             ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
             
@@ -301,6 +309,16 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
 
+        private SecurityToken getBootstrapToken(Message message) {
+            SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+            if (st == null) {
+                String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                if (id != null) {
+                    st = NegotiationUtils.getTokenStore(message).getToken(id);
+                }
+            }
+            return st;
+        }
     }
     
     
