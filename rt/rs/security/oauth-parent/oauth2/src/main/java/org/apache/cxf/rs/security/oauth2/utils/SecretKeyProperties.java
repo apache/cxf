@@ -24,8 +24,10 @@ import java.security.spec.AlgorithmParameterSpec;
 public class SecretKeyProperties {
     private String keyAlgo;
     private int keySize;
+    private int blockSize = -1;
     private SecureRandom secureRandom;
     private AlgorithmParameterSpec algoSpec;
+    private boolean compressionSupported = true;
     public SecretKeyProperties() {
         this("AES", 128);
     }
@@ -60,6 +62,19 @@ public class SecretKeyProperties {
     public void setAlgoSpec(AlgorithmParameterSpec algoSpec) {
         this.algoSpec = algoSpec;
     }
+    public int getBlockSize() {
+        return blockSize;
+    }
+    public void setBlockSize(int blockSize) {
+        this.blockSize = blockSize;
+    }
+    public boolean isCompressionSupported() {
+        return compressionSupported;
+    }
+    public void setCompressionSupported(boolean compressionSupported) {
+        this.compressionSupported = compressionSupported;
+    }
+    
     
     
 }

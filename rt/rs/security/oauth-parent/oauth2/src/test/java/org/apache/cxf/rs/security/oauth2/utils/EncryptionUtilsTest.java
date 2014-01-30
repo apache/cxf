@@ -21,6 +21,10 @@ package org.apache.cxf.rs.security.oauth2.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Collections;
 import java.util.List;
 
@@ -63,7 +67,6 @@ public class EncryptionUtilsTest extends Assert {
         
         // encrypt
         ServerAccessToken token = p.createAccessToken(atr);
-        // decrypt
         ServerAccessToken token2 = p.getAccessToken(token.getTokenKey());
         
         // compare tokens
@@ -95,6 +98,37 @@ public class EncryptionUtilsTest extends Assert {
         
         String encrypted = EncryptionUtils.encryptSequence(bos.toString(), p.key);
         String decrypted = EncryptionUtils.decryptSequence(encrypted, p.key);
+        ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
+                                                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                                                  new MetadataMap<String, String>(), 
+                                                  new ByteArrayInputStream(decrypted.getBytes()));
+        
+        // compare tokens
+        compareAccessTokens(token, token2);
+    }
+    
+    @Test
+    public void testBearerTokenJSONCertificate() throws Exception {
+        
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        KeyPair keyPair = kpg.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+        
+        AccessTokenRegistration atr = prepareTokenRegistration();
+        
+        BearerAccessToken token = p.createAccessTokenInternal(atr);
+        JSONProvider<BearerAccessToken> jsonp = new JSONProvider<BearerAccessToken>();
+        jsonp.setMarshallAsJaxbElement(true);
+        jsonp.setUnmarshallAsJaxbElement(true);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        jsonp.writeTo(token, BearerAccessToken.class, new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
+                      new MetadataMap<String, Object>(), bos);
+        
+        SecretKeyProperties props1 = new SecretKeyProperties(publicKey.getAlgorithm());
+        String encrypted = EncryptionUtils.encryptSequence(bos.toString(), publicKey, props1);
+        SecretKeyProperties props2 = new SecretKeyProperties(privateKey.getAlgorithm());
+        String decrypted = EncryptionUtils.decryptSequence(encrypted, privateKey, props2);
         ServerAccessToken token2 = jsonp.readFrom(BearerAccessToken.class, BearerAccessToken.class, 
                                                   new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
                                                   new MetadataMap<String, String>(), 
@@ -199,5 +233,20 @@ public class EncryptionUtilsTest extends Assert {
         return atr;
     }
     
+// TODO: remove once the wiki documentation is updated
+//  KeyStore keyStore = loadKeyStore(); 
+//  Certificate cert = keyStore.getCertificate("alice");
+//  PublicKey publicKey = cert.getPublicKey();
+//  KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
+//      keyStore.getEntry("alice", new KeyStore.PasswordProtection(
+//           new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}));
+//  PrivateKey privateKey = pkEntry.getPrivateKey();
     
+    
+//    private KeyStore loadKeyStore() throws Exception {
+//        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+//        InputStream is = this.getClass().getResourceAsStream("alice.jks");
+//        ks.load(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'});
+//        return ks;
+//    }
 }

@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.security.Key;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -28,6 +29,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.cxf.common.util.CompressionUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 
@@ -125,8 +128,14 @@ public final class EncryptionUtils {
         }
     }
     
-    public static byte[] processBytes(byte[] bytes, Key secretKey, 
-                                      SecretKeyProperties keyProps, int mode) {
+    public static byte[] processBytes(byte[] bytes, 
+                                      Key secretKey, 
+                                      SecretKeyProperties keyProps, 
+                                      int mode) {
+        boolean compressionSupported = keyProps != null && keyProps.isCompressionSupported();
+        if (compressionSupported && mode == Cipher.ENCRYPT_MODE) {
+            bytes = CompressionUtils.compress(bytes, false);
+        }
         try {
             Cipher c = Cipher.getInstance(secretKey.getAlgorithm());
             if (keyProps == null || keyProps.getAlgoSpec() == null && keyProps.getSecureRandom() == null) {
@@ -142,10 +151,36 @@ public final class EncryptionUtils {
                     c.init(mode, secretKey, algoSpec, random);
                 }
             }
-            return c.doFinal(bytes);
+            byte[] result = new byte[0];
+            int blockSize = keyProps != null ? keyProps.getBlockSize() : -1;
+            if (secretKey instanceof SecretKey && blockSize == -1) {
+                result = c.doFinal(bytes);
+            } else {
+                if (blockSize == -1) {
+                    blockSize = secretKey instanceof PublicKey ? 117 : 128;
+                }
+                int offset = 0;
+                for (; offset + blockSize < bytes.length; offset += blockSize) {
+                    result = addToResult(result, c.doFinal(bytes, offset, blockSize));
+                }
+                if (offset < bytes.length) {
+                    result = addToResult(result, c.doFinal(bytes, offset, bytes.length - offset));
+                }
+            }
+            if (compressionSupported && mode == Cipher.DECRYPT_MODE) {
+                result = IOUtils.readBytesFromStream(CompressionUtils.decompress(result, false));
+            }
+            return result;
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
         }
+    }
+    
+    private static byte[] addToResult(byte[] prefix, byte[] suffix) {
+        byte[] result = new byte[prefix.length + suffix.length];
+        System.arraycopy(prefix, 0, result, 0, prefix.length);
+        System.arraycopy(suffix, 0, result, prefix.length, suffix.length);
+        return result;
     }
     
     public static SecretKey decodeSecretKey(String encodedSecretKey, String algo) {

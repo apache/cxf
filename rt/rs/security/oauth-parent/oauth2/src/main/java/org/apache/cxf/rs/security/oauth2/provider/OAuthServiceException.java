@@ -31,6 +31,10 @@ public class OAuthServiceException extends RuntimeException {
     private static final long serialVersionUID = 343738539234766320L;
     private OAuthError error;
     
+    public OAuthServiceException() {
+        super(OAuthConstants.SERVER_ERROR);
+    }
+    
     public OAuthServiceException(String message) {
         super(message);
     }

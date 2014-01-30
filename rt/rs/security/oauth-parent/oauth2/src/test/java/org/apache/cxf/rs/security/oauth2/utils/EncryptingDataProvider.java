@@ -100,14 +100,18 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     }
 
     @Override
-    public ServerAccessToken getPreauthorizedToken(Client client, List<String> requestedScopes,
-                                                   UserSubject subject, String grantType)
-        throws OAuthServiceException {
-        return null;
+    public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
+        // assuming that no specific scopes is documented/supported
+        return Collections.emptyList();
     }
     
     @Override
-    public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
+    public ServerAccessToken getPreauthorizedToken(Client client, List<String> requestedScopes,
+                                                   UserSubject subject, String grantType)
+        throws OAuthServiceException {
+        // This is an optimization useful in cases where a client requests an authorization code: 
+        // if a user has already provided a given client with a pre-authorized token then challenging 
+        // a user with yet another form asking for the authorization is redundant  
         return null;
     }
     
