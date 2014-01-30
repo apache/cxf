@@ -22,8 +22,10 @@ package org.apache.cxf.rs.security.oauth2.services;
 import java.security.Principal;
 
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -78,7 +80,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         }
         
         if (client == null) {
-            throw new NotAuthorizedException(Response.status(401).build());
+            reportInvalidClient();
         }
         return client;
     }
@@ -125,20 +127,32 @@ public class AbstractTokenService extends AbstractOAuthService {
      * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found
      */
     protected Client getClient(String clientId) {
+        if (clientId == null) {
+            reportInvalidRequestError("Client ID is null");
+            return null;
+        }
         Client client = null;
         try {
             client = getValidClient(clientId);
         } catch (OAuthServiceException ex) {
             if (ex.getError() != null) {
-                reportInvalidRequestError(ex.getError());
+                reportInvalidClient(ex.getError());
                 return null;
             }
         }
         if (client == null) {
-            reportInvalidRequestError("Client ID is invalid");
+            reportInvalidClient();
         }
         return client;
-        
+    }
+    
+    protected void reportInvalidClient() {
+        reportInvalidClient(new OAuthError(OAuthConstants.INVALID_CLIENT));
+    }
+    
+    protected void reportInvalidClient(OAuthError error) {
+        ResponseBuilder rb = Response.status(401);
+        throw new NotAuthorizedException(rb.type(MediaType.APPLICATION_JSON_TYPE).entity(error).build());
     }
     
     public void setCanSupportPublicClients(boolean support) {
