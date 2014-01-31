@@ -589,6 +589,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
             && !isRequestor() && token instanceof X509Token) {
             identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
+        } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
+            && isRequestor() && token instanceof X509Token) {
+            identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
         }
         
         if (identifier != null) {
