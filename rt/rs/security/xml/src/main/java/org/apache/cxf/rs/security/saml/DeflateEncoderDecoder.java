@@ -26,10 +26,10 @@ import org.apache.cxf.common.util.CompressionUtils;
 public class DeflateEncoderDecoder {
     public InputStream inflateToken(byte[] deflatedToken) 
         throws DataFormatException {
-        return CompressionUtils.decompress(deflatedToken);
+        return CompressionUtils.inflate(deflatedToken);
     }
     
     public byte[] deflateToken(byte[] tokenBytes) {
-        return CompressionUtils.compress(tokenBytes);
+        return CompressionUtils.deflate(tokenBytes);
     }
 }

@@ -165,7 +165,7 @@ public final class EncryptionUtils {
                                       int mode)  throws EncryptionException {
         boolean compressionSupported = keyProps != null && keyProps.isCompressionSupported();
         if (compressionSupported && mode == Cipher.ENCRYPT_MODE) {
-            bytes = CompressionUtils.compress(bytes, false);
+            bytes = CompressionUtils.deflate(bytes, false);
         }
         try {
             Cipher c = Cipher.getInstance(secretKey.getAlgorithm());
@@ -199,7 +199,7 @@ public final class EncryptionUtils {
                 }
             }
             if (compressionSupported && mode == Cipher.DECRYPT_MODE) {
-                result = IOUtils.readBytesFromStream(CompressionUtils.decompress(result, false));
+                result = IOUtils.readBytesFromStream(CompressionUtils.inflate(result, false));
             }
             return result;
         } catch (Exception ex) {

@@ -29,11 +29,11 @@ public final class CompressionUtils {
     private CompressionUtils() {
         
     }
-    public static InputStream decompress(byte[] deflatedToken) 
+    public static InputStream inflate(byte[] deflatedToken) 
         throws DataFormatException {
-        return decompress(deflatedToken, true);
+        return inflate(deflatedToken, true);
     }
-    public static InputStream decompress(byte[] deflatedToken, boolean nowrap) 
+    public static InputStream inflate(byte[] deflatedToken, boolean nowrap) 
         throws DataFormatException {
         Inflater inflater = new Inflater(nowrap);
         inflater.setInput(deflatedToken);
@@ -67,11 +67,11 @@ public final class CompressionUtils {
         return is;
     }
     
-    public static byte[] compress(byte[] tokenBytes) {
-        return compress(tokenBytes, true);
+    public static byte[] deflate(byte[] tokenBytes) {
+        return deflate(tokenBytes, true);
     }
     
-    public static byte[] compress(byte[] tokenBytes, boolean nowrap) {
+    public static byte[] deflate(byte[] tokenBytes, boolean nowrap) {
         Deflater compresser = new Deflater(Deflater.DEFLATED, nowrap);
         
         compresser.setInput(tokenBytes);
