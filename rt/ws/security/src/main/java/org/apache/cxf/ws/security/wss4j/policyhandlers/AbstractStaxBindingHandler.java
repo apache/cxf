@@ -1004,4 +1004,27 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         return null;
     }
+    
+    // Signature + Signed SAML Token actions are not allowed together
+    protected void removeSignatureIfSignedSAML() {
+        if (properties.getActions() != null) {
+            List<WSSConstants.Action> actionList = properties.getActions();
+            if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)
+                && actionList.contains(WSSConstants.SIGNATURE)) {
+                actionList.remove(WSSConstants.SIGNATURE);
+            }
+        }
+    }
+    
+    // If we have EncryptBeforeSigning, then we want to have the Signature component after
+    // the Encrypt action, which is not the case if we have a Signed SAML Supporting Token
+    protected void enforceEncryptBeforeSigningWithSignedSAML() {
+        if (properties.getActions() != null) {
+            List<WSSConstants.Action> actionList = properties.getActions();
+            if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)) {
+                actionList.remove(WSSConstants.SAML_TOKEN_SIGNED);
+                actionList.add(WSSConstants.SAML_TOKEN_SIGNED);
+            }
+        }
+    }
 }

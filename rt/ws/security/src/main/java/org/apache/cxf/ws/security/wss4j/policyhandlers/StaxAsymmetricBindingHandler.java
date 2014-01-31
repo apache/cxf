@@ -177,15 +177,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             addSupportingTokens();
-            
-            WSSSecurityProperties properties = getProperties();
-            if (properties.getActions() != null) {
-                List<WSSConstants.Action> actionList = properties.getActions();
-                if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)
-                    && actionList.contains(WSSConstants.SIGNATURE)) {
-                    actionList.remove(WSSConstants.SIGNATURE);
-                }
-            }
+            removeSignatureIfSignedSAML();
 
             List<SecurePart> enc = getEncryptedParts();
             
@@ -225,6 +217,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             // Reshuffle so that a IssuedToken is above a Signature that references it
             if (customTokenAdded) {
+                WSSSecurityProperties properties = getProperties();
                 properties.getActions().remove(WSSConstants.CUSTOM_TOKEN);
                 properties.getActions().add(WSSConstants.CUSTOM_TOKEN);
             }
@@ -346,6 +339,9 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     }
                 }
             }
+            
+            removeSignatureIfSignedSAML();
+            enforceEncryptBeforeSigningWithSignedSAML();
             
             // Reshuffle so that a IssuedToken is above a Signature that references it
             if (customTokenAdded) {

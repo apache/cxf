@@ -738,6 +738,41 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml2OverAsymmetricSignedEncryptedEncryptBeforeSigning() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = 
+            new QName(NAMESPACE, "DoubleItSaml2AsymmetricSignedEncryptedEncryptBeforeSigningPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(saml2Port);
+        }
+        
+        // TODO Only working for DOM client + server atm
+        if (!test.isStreaming() && PORT.equals(test.getPort())) {
+            ((BindingProvider)saml2Port).getRequestContext().put(
+                "ws-security.saml-callback-handler", new SamlCallbackHandler()
+            );
+            int result = saml2Port.doubleIt(25);
+            assertTrue(result == 50);
+        }
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml2OverAsymmetricEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -960,4 +995,5 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
+    
 }
