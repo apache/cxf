@@ -38,6 +38,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -358,6 +359,17 @@ public class ProviderFactoryTest extends Assert {
                        "application/json");
     }
     
+    @Test
+    public void testComplexExceptionMapper() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        pf.registerUserProvider(new SecurityExceptionMapper());
+        ExceptionMapper<SecurityException> mapper = 
+            pf.createExceptionMapper(SecurityException.class, new MessageImpl());
+        assertTrue(mapper instanceof SecurityExceptionMapper);
+        ExceptionMapper<Throwable> mapper2 = 
+            pf.createExceptionMapper(Throwable.class, new MessageImpl());
+        assertNull(mapper2);
+    }
     
     @Test
     public void testRegisterCustomResolver() throws Exception {
@@ -758,4 +770,14 @@ public class ProviderFactoryTest extends Assert {
     public static class AClass {
     }
     
+    private static class SecurityExceptionMapper 
+        extends AbstractBadRequestExceptionMapper<SecurityException> {
+    }
+    private abstract static class AbstractBadRequestExceptionMapper<T extends Throwable> 
+        implements ExceptionMapper<T> {
+        @Override
+        public Response toResponse(T exception) {
+            return Response.status(Status.BAD_REQUEST).entity(exception.getMessage()).build();
+        }
+    }
 }
