@@ -1304,9 +1304,13 @@ public final class ProviderFactory {
         }
         if (expectedClass != null) {
             Type genericSuperType = cls.getGenericSuperclass();
-            if (genericSuperType instanceof ParameterizedType       
-                && expectedClass == InjectionUtils.getActualType(genericSuperType)) {
-                return new Type[]{genericSuperType};
+            if (genericSuperType instanceof ParameterizedType) {       
+                Class<?> actualType = InjectionUtils.getActualType(genericSuperType);
+                if (expectedClass == actualType) {
+                    return new Type[]{genericSuperType};
+                } else if (actualType != null && expectedClass.isAssignableFrom(actualType)) {
+                    return new Type[]{};    
+                }
             }
         }
         Type[] types = cls.getGenericInterfaces();
