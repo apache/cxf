@@ -594,7 +594,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             // Add the BST to the security header if required
             if (!attached && isTokenRequired(sigToken.getIncludeTokenType())) {
                 WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
-                sig.prependBSTElementToHeader(secHeader);
+                sig.appendBSTElementToHeader(secHeader);
             } 
             return;
         }
@@ -671,10 +671,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     bstPart.setElement(bstElement);
                     sigParts.add(bstPart);
                 }
+                sig.prependBSTElementToHeader(secHeader);
             }
 
-            sig.prependBSTElementToHeader(secHeader);
-            
             List<Reference> referenceList = sig.addReferencesToSign(sigParts, secHeader);
             //Do signature
             if (bottomUpElement == null) {
@@ -683,6 +682,13 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 sig.computeSignature(referenceList, true, bottomUpElement);
             }
             bottomUpElement = sig.getSignatureElement();
+            
+            if (!abinding.isProtectTokens()) {
+                Element bstElement = sig.getBinarySecurityTokenElement();
+                if (bstElement != null) {
+                    secHeader.getSecurityHeader().insertBefore(bstElement, bottomUpElement);
+                }
+            }
             
             signatures.add(sig.getSignatureValue());
                         
