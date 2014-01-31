@@ -28,6 +28,7 @@ import java.security.PublicKey;
 import java.util.Collections;
 import java.util.List;
 
+import javax.crypto.SecretKey;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -82,6 +83,27 @@ public class EncryptionUtilsTest extends Assert {
         ServerAuthorizationCodeGrant grant2 = p.removeCodeGrant(grant.getCode());
         assertEquals("http://bar", grant2.getAudience());
         assertEquals("1", grant2.getClient().getClientId());
+    }
+    
+    @Test
+    public void testBearerTokenCertAndSecretKey() throws Exception {
+        AccessTokenRegistration atr = prepareTokenRegistration();
+        BearerAccessToken token = p.createAccessTokenInternal(atr);
+        
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        KeyPair keyPair = kpg.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+        
+        SecretKey secretKey = EncryptionUtils.getSecretKey();
+        String encryptedSecretKey = EncryptionUtils.encryptSecretKey(secretKey, publicKey);
+        
+        String encryptedToken = ModelEncryptionSupport.encryptAccessToken(token, secretKey);
+        token.setTokenKey(encryptedToken);
+        SecretKey decryptedSecretKey = EncryptionUtils.decryptSecretKey(encryptedSecretKey, privateKey);
+        ServerAccessToken token2 = ModelEncryptionSupport.decryptAccessToken(p, encryptedToken, decryptedSecretKey);
+        // compare tokens
+        compareAccessTokens(token, token2);
     }
     
     @Test

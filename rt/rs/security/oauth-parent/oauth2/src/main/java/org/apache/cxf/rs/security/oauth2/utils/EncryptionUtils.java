@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.security.Key;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
@@ -41,9 +42,28 @@ public final class EncryptionUtils {
     private EncryptionUtils() {
     }
     
-    public static String getEncodedSecretKey(SecretKey key) throws Exception {
+    public static String encodeSecretKey(SecretKey key) throws Exception {
         try {
-            return Base64UrlUtility.encode(key.getEncoded());
+            return encodeBytes(key.getEncoded());
+        } catch (Exception ex) {
+            throw new OAuthServiceException(ex);
+        }
+    }
+    
+    public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey) throws Exception {
+        SecretKeyProperties props = new SecretKeyProperties();
+        props.setCompressionSupported(false);
+        return encryptSecretKey(secretKey, publicKey, props);
+    }
+    
+    public static String encryptSecretKey(SecretKey secretKey, 
+                                          PublicKey publicKey,
+                                          SecretKeyProperties props) throws Exception {
+        try {
+            byte[] encryptedBytes = encryptBytes(secretKey.getEncoded(), 
+                                                 publicKey,
+                                                 props);
+            return encodeBytes(encryptedBytes);
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
         }
@@ -104,7 +124,7 @@ public final class EncryptionUtils {
                                               SecretKeyProperties props) {
         try {
             byte[] encryptedBytes = decodeSequence(encodedData);
-            byte[] bytes = processBytes(encryptedBytes, secretKey, props, Cipher.DECRYPT_MODE);
+            byte[] bytes = decryptBytes(encryptedBytes, secretKey, props);
             return new String(bytes, "UTF-8");
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
@@ -118,17 +138,38 @@ public final class EncryptionUtils {
     public static String encryptSequence(String sequence, Key secretKey,
                                          SecretKeyProperties keyProps) {
         try {
-            byte[] bytes = processBytes(sequence.getBytes("UTF-8"), 
-                                        secretKey,
-                                        keyProps,
-                                        Cipher.ENCRYPT_MODE);
+            byte[] bytes = encryptBytes(sequence.getBytes("UTF-8"), secretKey, keyProps);
+            return encodeBytes(bytes);
+        } catch (Exception ex) {
+            throw new OAuthServiceException(ex);
+        }
+    }
+    
+    public static String encodeBytes(byte[] bytes) throws Exception {
+        try {
             return Base64UrlUtility.encode(bytes);
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
         }
     }
     
-    public static byte[] processBytes(byte[] bytes, 
+    public static byte[] encryptBytes(byte[] bytes, Key secretKey) {
+        return encryptBytes(bytes, secretKey, null);
+    }
+    
+    public static byte[] encryptBytes(byte[] bytes, Key secretKey, SecretKeyProperties keyProps) {
+        return processBytes(bytes, secretKey, keyProps, Cipher.ENCRYPT_MODE);
+    }
+    
+    public static byte[] decryptBytes(byte[] bytes, Key secretKey) {
+        return decryptBytes(bytes, secretKey, null);
+    }
+    
+    public static byte[] decryptBytes(byte[] bytes, Key secretKey, SecretKeyProperties keyProps) {
+        return processBytes(bytes, secretKey, keyProps, Cipher.DECRYPT_MODE);
+    }
+    
+    private static byte[] processBytes(byte[] bytes, 
                                       Key secretKey, 
                                       SecretKeyProperties keyProps, 
                                       int mode) {
@@ -183,10 +224,32 @@ public final class EncryptionUtils {
         return result;
     }
     
+    public static SecretKey decodeSecretKey(String encodedSecretKey) {
+        return decodeSecretKey(encodedSecretKey, "AES");
+    }
+    
     public static SecretKey decodeSecretKey(String encodedSecretKey, String algo) {
         try {
             byte[] secretKeyBytes = decodeSequence(encodedSecretKey);
             return new SecretKeySpec(secretKeyBytes, algo);
+        } catch (Exception ex) {
+            throw new OAuthServiceException(ex);
+        }
+    }
+    
+    public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey, PrivateKey privateKey) {
+        SecretKeyProperties props = new SecretKeyProperties();
+        props.setCompressionSupported(false);
+        return decryptSecretKey(encodedEncryptedSecretKey, props, privateKey);
+    }
+    
+    public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey, 
+                                             SecretKeyProperties props,
+                                             PrivateKey privateKey) {
+        try {
+            byte[] encryptedBytes = decodeSequence(encodedEncryptedSecretKey);
+            byte[] descryptedBytes = decryptBytes(encryptedBytes, privateKey, props);
+            return new SecretKeySpec(descryptedBytes, props.getKeyAlgo());
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
         }
