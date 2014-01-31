@@ -1003,7 +1003,7 @@ public abstract class ProviderFactory {
                 Class<?> actualType = InjectionUtils.getActualType(genericSuperType);
                 if (expectedClass == actualType) {
                     return new Type[]{genericSuperType};
-                } else if (expectedClass.isAssignableFrom(actualType)) {
+                } else if (actualType != null && expectedClass.isAssignableFrom(actualType)) {
                     return new Type[]{};    
                 }
             }
