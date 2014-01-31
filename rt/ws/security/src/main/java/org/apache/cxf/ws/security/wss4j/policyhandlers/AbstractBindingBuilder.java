@@ -1594,6 +1594,9 @@ public abstract class AbstractBindingBuilder {
             } else if (token.getInclusion() == SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
                 && !isRequestor() && token instanceof X509Token) {
                 secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+            } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR
+                && isRequestor() && token instanceof X509Token) {
+                secBase.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             } else {
                 secBase.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
             }
