@@ -356,7 +356,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 accepts = InjectionUtils.isPrimitive(responseClass)
                     ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
                     : Collections.singletonList(MediaType.APPLICATION_XML_TYPE);        
-            } else if (responseClass == Void.class) {
+            } else if (responseClass == Void.class || responseClass == Void.TYPE) {
                 accepts = Collections.singletonList(MediaType.WILDCARD_TYPE);
             } else {
                 accepts = ori.getProduceTypes();
@@ -689,7 +689,7 @@ public class ClientProxyImpl extends AbstractClient implements
             
             Method method = outMessage.getExchange().get(Method.class);
             checkResponse(method, r, outMessage);
-            if (method.getReturnType() == Void.class) { 
+            if (method.getReturnType() == Void.class || method.getReturnType() == Void.TYPE) {
                 return null;
             }
             if (method.getReturnType() == Response.class
