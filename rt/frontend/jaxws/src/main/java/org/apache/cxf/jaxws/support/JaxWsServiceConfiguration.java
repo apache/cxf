@@ -296,7 +296,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             }
         }
         if (!isIn && isOutParam(method, paraNumber)) {
-            if (!method.getReturnType().equals(Void.class) && !method.getReturnType().equals(Void.TYPE)) {
+            if (method.getReturnType() != Void.class && method.getReturnType() != Void.TYPE) {
                 ret++;
             }
             for (int i = 0; i < paraNumber; i++) {
