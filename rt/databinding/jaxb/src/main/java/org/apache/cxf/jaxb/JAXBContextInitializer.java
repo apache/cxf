@@ -426,7 +426,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
 
         // must not have parameters and return type must not be void
-        if (method.getReturnType() == Void.class 
+        if (method.getReturnType() == Void.class || method.getReturnType() == Void.TYPE
             || method.getParameterTypes().length != 0
             || (method.getDeclaringClass().equals(Throwable.class)
             && !("getMessage".equals(method.getName())))
