@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ws.policy.AssertionBuilderLoader;
@@ -58,6 +57,7 @@ import org.apache.wss4j.policy.builders.BootstrapPolicyBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedPartsBuilder;
+import org.apache.wss4j.policy.builders.EncryptionTokenBuilder;
 import org.apache.wss4j.policy.builders.HttpsTokenBuilder;
 import org.apache.wss4j.policy.builders.InitiatorEncryptionTokenBuilder;
 import org.apache.wss4j.policy.builders.InitiatorSignatureTokenBuilder;
@@ -75,6 +75,7 @@ import org.apache.wss4j.policy.builders.RequiredPartsBuilder;
 import org.apache.wss4j.policy.builders.SamlTokenBuilder;
 import org.apache.wss4j.policy.builders.SecureConversationTokenBuilder;
 import org.apache.wss4j.policy.builders.SecurityContextTokenBuilder;
+import org.apache.wss4j.policy.builders.SignatureTokenBuilder;
 import org.apache.wss4j.policy.builders.SignedElementsBuilder;
 import org.apache.wss4j.policy.builders.SignedPartsBuilder;
 import org.apache.wss4j.policy.builders.SpnegoContextTokenBuilder;
@@ -116,6 +117,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new AsymmetricBindingBuilder());
         reg.registerBuilder(new ContentEncryptedElementsBuilder());
         reg.registerBuilder(new EncryptedElementsBuilder());
+        reg.registerBuilder(new EncryptionTokenBuilder());
         reg.registerBuilder(new EncryptedPartsBuilder());
         reg.registerBuilder(new HttpsTokenBuilder());
         reg.registerBuilder(new InitiatorTokenBuilder());
@@ -136,6 +138,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new SecurityContextTokenBuilder());
         reg.registerBuilder(new SignedElementsBuilder());
         reg.registerBuilder(new SignedPartsBuilder());
+        reg.registerBuilder(new SignatureTokenBuilder());
         reg.registerBuilder(new SpnegoContextTokenBuilder());
         reg.registerBuilder(new SupportingTokensBuilder());
         reg.registerBuilder(new SymmetricBindingBuilder());
