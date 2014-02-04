@@ -108,6 +108,42 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testSymmetricErrorMessage() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricErrorMessagePort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(x509Port);
+        }
+        
+        // TODO Wait until we pick up WSS4J 2.0.0-SNAPSHOT again
+        if (PORT.equals(test.getPort())) {
+            try {
+                x509Port.doubleIt(25);
+                fail("Failure expected on an incorrect key");
+            } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+                String error = "No certificates were found for decryption";
+                assertTrue(ex.getMessage().contains(error));
+            }
+        }
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testKeyIdentifier() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

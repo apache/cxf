@@ -310,7 +310,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             msg.put(SECURITY_PROCESSED, Boolean.TRUE);
 
         } catch (WSSecurityException e) {
-            throw createSoapFault(version, e);
+            throw createSoapFault(msg, version, e);
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
         } catch (SOAPException e) {
@@ -799,9 +799,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * as the fault code from the WSSecurityException.
      */
     private SoapFault 
-    createSoapFault(SoapVersion version, WSSecurityException e) {
+    createSoapFault(SoapMessage message, SoapVersion version, WSSecurityException e) {
         SoapFault fault;
-        String errorMessage = e.getSafeExceptionMessage();
+        
+        String errorMessage = null;
+        boolean returnSecurityError = 
+            MessageUtils.getContextualBoolean(message, SecurityConstants.RETURN_SECURITY_ERROR, false);
+        if (returnSecurityError) {
+            errorMessage = e.getMessage();
+        } else {
+            errorMessage = e.getSafeExceptionMessage();
+        }
+        
         javax.xml.namespace.QName faultCode = e.getFaultCode();
         if (version.getVersion() == 1.1 && faultCode != null) {
             fault = new SoapFault(errorMessage, e, faultCode);

@@ -202,6 +202,12 @@ public final class SecurityConstants {
     public static final String ENABLE_STREAMING_SECURITY = 
         "ws-security.enable.streaming";
     
+    /**
+     * Whether to return the security error message to the client, and not one of the default error
+     * QNames. The default is false.
+     */
+    public static final String RETURN_SECURITY_ERROR = "ws-security.return.security.error";
+    
     //
     // Non-boolean WS-Security Configuration parameters
     //
@@ -542,7 +548,7 @@ public final class SecurityConstants {
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
             ASYMMETRIC_SIGNATURE_ALGORITHM, PASSWORD_ENCRYPTOR_INSTANCE, ENABLE_SAML_ONE_TIME_USE_CACHE,
-            SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY
+            SAML_ONE_TIME_USE_CACHE_INSTANCE, ENABLE_STREAMING_SECURITY, RETURN_SECURITY_ERROR
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
