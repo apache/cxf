@@ -106,7 +106,6 @@ import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -485,16 +484,25 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
 
             } else if (token instanceof X509Token) {
-                //We have to use a cert
-                //Prepare X509 signature
+                //We have to use a cert. Prepare X509 signature
                 WSSecSignature sig = getSignatureBuilder(suppTokens, token, endorse);
                 Element bstElem = sig.getBinarySecurityTokenElement();
                 if (bstElem != null) {
-                    sig.prependBSTElementToHeader(secHeader);
-                }
-                if (suppTokens.isEncryptedToken()) {
-                    WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
-                    encryptedTokensList.add(part);
+                    if (lastEncryptedKeyElement != null) {
+                        if (lastEncryptedKeyElement.getNextSibling() != null) {
+                            secHeader.getSecurityHeader().insertBefore(bstElem, 
+                                lastEncryptedKeyElement.getNextSibling());
+                        } else {
+                            secHeader.getSecurityHeader().appendChild(bstElem);
+                        }
+                    } else {
+                        sig.prependBSTElementToHeader(secHeader);
+                    }
+                    if (suppTokens.isEncryptedToken()) {
+                        WSEncryptionPart part = new WSEncryptionPart(sig.getBSTTokenId(), "Element");
+                        part.setElement(bstElem);
+                        encryptedTokensList.add(part);
+                    }
                 }
                 ret.add(new SupportingToken(token, sig));
             } else if (token instanceof KeyValueToken) {
@@ -1641,7 +1649,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         WSSecSignature sig = new WSSecSignature(wssConfig);
         sig.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
         checkForX509PkiPath(sig, token);
-        boolean alsoIncludeToken = false;
         if (token instanceof IssuedToken || token instanceof SamlToken) {
             assertPolicy(token);
             assertPolicy(wrapper);
@@ -1698,7 +1705,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 && token.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER
                 && (sig.getKeyIdentifierType() != WSConstants.BST_DIRECT_REFERENCE
                     && sig.getKeyIdentifierType() != WSConstants.KEY_VALUE)) {
-                alsoIncludeToken = true;
+                sig.setIncludeSignatureToken(true);
             }
         }
         
@@ -1758,32 +1765,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             policyNotAsserted(token, e);
         }
         
-        if (alsoIncludeToken) {
-            includeToken(user, crypto, sig);
-        }
-        
         return sig;
     }
 
-    private void includeToken(String user, Crypto crypto, WSSecSignature sig) throws WSSecurityException {
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias(user);
-        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        BinarySecurity bstToken = null;
-        if (!sig.isUseSingleCertificate()) {
-            bstToken = new PKIPathSecurity(saaj.getSOAPPart());
-            ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
-        } else {
-            bstToken = new X509Security(saaj.getSOAPPart());
-            ((X509Security) bstToken).setX509Certificate(certs[0]);
-        }
-        bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", certs[0]));
-        WSSecurityUtil.prependChildElement(
-            secHeader.getSecurityHeader(), bstToken.getElement()
-        );
-        bstElement = bstToken.getElement();
-    }
-    
     protected void doEndorsedSignatures(List<SupportingToken> tokenList,
                                         boolean isTokenProtection,
                                         boolean isSigProtect) {

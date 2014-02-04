@@ -665,11 +665,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         new WSEncryptionPart(sig.getBSTTokenId());
                     bstPart.setElement(sig.getBinarySecurityTokenElement());
                     sigParts.add(bstPart);
-                } else if (bstElement != null) {
-                    WSEncryptionPart bstPart = 
-                        new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
-                    bstPart.setElement(bstElement);
-                    sigParts.add(bstPart);
                 }
                 sig.prependBSTElementToHeader(secHeader);
             }

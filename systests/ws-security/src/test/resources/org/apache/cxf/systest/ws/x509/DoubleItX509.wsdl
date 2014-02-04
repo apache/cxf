@@ -145,6 +145,24 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSymmetricEndorsingEncryptedBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricEndorsingEncryptedPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItContentEncryptedElementsBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItThumbprintPolicy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -539,7 +557,10 @@
                    binding="tns:DoubleItSymmetricThumbprintEndorsingBinding">
             <soap:address location="http://localhost:9001/DoubleItX509SymmetricThumbprintEndorsing"/>
         </wsdl:port>
-        DoubleItSymmetricThumbprintEndorsingBinding
+        <wsdl:port name="DoubleItSymmetricEndorsingEncryptedPort" 
+                   binding="tns:DoubleItSymmetricEndorsingEncryptedBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509SymmetricEndorsingEncrypted"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItContentEncryptedElementsPort" binding="tns:DoubleItContentEncryptedElementsBinding">
             <soap:address location="http://localhost:9001/DoubleItX509ContentEncryptedElements"/>
         </wsdl:port>
@@ -857,6 +878,50 @@
                         </sp:X509Token>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItSymmetricEndorsingEncryptedPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                        <sp:RequireDerivedKeys/>
+                                        <sp:RequireThumbprintReference/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Strict/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:EncryptSignature/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:EndorsingEncryptedSupportingTokens>
+                    <wsp:Policy>
+                        <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:RequireThumbprintReference/>
+                                <sp:WssX509V3Token10/>
+                            </wsp:Policy>
+                        </sp:X509Token>
+                    </wsp:Policy>
+                </sp:EndorsingEncryptedSupportingTokens>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
