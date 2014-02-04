@@ -1,4 +1,4 @@
-Apache CXF 2.7.9 Release Notes
+Apache CXF 2.7.10 Release Notes
 
 1. Overview
 
@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.9 fixes over 64 JIRA issues reported by users and the community.
+2.7.10 fixes over 65 JIRA issues reported by users and the community.
 
 
 
@@ -129,6 +129,7 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-5526] - Unresolvable transitive dependencies from Karaf
     * [CXF-5527] - SAAJ API's can corrupt messages
     * [CXF-5529] - Deploy error when publishing CXF WebService to Glassfish4
+    * [CXF-5532] - jax-ws-catalog.xml / @SchemaValidation / xsd-includes
 
 ** Improvement
     * [CXF-5409] - Make response code be included in logging for LocalTransport
