@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.EntityTag;
@@ -53,6 +54,8 @@ public class EvaluatePreconditionsTest {
     public void setUp() {
         service = new SimpleService();
         service.setEntityTag(ETAG_OLD);
+        DATE_FMT_822.setTimeZone(TimeZone.getTimeZone("GMT"));
+        
         service.setLastModified(DATE_OLD);
     }
 
