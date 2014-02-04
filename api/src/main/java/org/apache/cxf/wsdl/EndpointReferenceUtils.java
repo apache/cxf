@@ -143,25 +143,19 @@ public final class EndpointReferenceUtils {
                     //ignore - baseURI or systemId not a URL either
                 }
             }
+            LSInputImpl impl = null;
             if (done.contains(newId + ":" + namespaceURI)) {
                 return null;
             }
-            LSInputImpl impl = null;
             
             if (schemas.containsKey(newId + ":" + namespaceURI)) {
                 byte[] ds = schemas.remove(newId + ":" + namespaceURI);
-                impl = new LSInputImpl();
-                impl.setSystemId(newId);
-                impl.setBaseURI(newId);
-                impl.setByteStream(new ByteArrayInputStream(ds));
+                impl = createInput(newId, ds);               
                 done.add(newId + ":" + namespaceURI);
             }
             if (impl == null && schemas.containsKey(newId + ":null")) {
                 byte[] ds = schemas.get(newId + ":null");
-                impl = new LSInputImpl();
-                impl.setSystemId(newId);
-                impl.setBaseURI(newId);
-                impl.setByteStream(new ByteArrayInputStream(ds));
+                impl = createInput(newId, ds);               
                 done.add(newId + ":" + namespaceURI);
             }
             if (impl == null && bus != null && systemId != null) {
@@ -174,63 +168,71 @@ public final class EndpointReferenceUtils {
                     }
                     if (schemas.containsKey(newId + ":" + namespaceURI)) {
                         byte[] ds = schemas.remove(newId + ":" + namespaceURI);
-                        impl = new LSInputImpl();
-                        impl.setSystemId(newId);
-                        impl.setBaseURI(newId);
-                        impl.setByteStream(new ByteArrayInputStream(ds));
+                        impl = createInput(newId, ds);
                         done.add(newId + ":" + namespaceURI);
                     }
                 }
             }
-            if (impl != null) {
-                return impl;
-            }
-            for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
-                if (ent.getKey().endsWith(systemId + ":" + namespaceURI)) {
-                    schemas.remove(ent.getKey());
-                    impl = new LSInputImpl();
-                    impl.setSystemId(newId);
-                    impl.setBaseURI(newId);
-                    impl.setCharacterStream(
-                        new InputStreamReader(
-                            new ByteArrayInputStream(ent.getValue())));
-                    done.add(newId + ":" + namespaceURI);
-                    return impl;
-                }
-            }
-            // handle case where given systemId is null (so that
-            // direct key lookup fails) by scanning through map
-            // searching for a namespace match
-            if (namespaceURI != null) {
+            if (impl == null) {
                 for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
-                    if (ent.getKey().endsWith(":" + namespaceURI)) {
+                    if (ent.getKey().endsWith(systemId + ":" + namespaceURI)) {
                         schemas.remove(ent.getKey());
-                        impl = new LSInputImpl();
-                        impl.setSystemId(newId);
-                        impl.setBaseURI(newId);
-                        impl.setCharacterStream(
-                            new InputStreamReader(
-                                new ByteArrayInputStream(ent.getValue())));
+                        impl = createInput(newId, ent.getValue());
                         done.add(newId + ":" + namespaceURI);
                         return impl;
                     }
                 }
-            }
-                
-            //REVIST - we need to get catalogs in here somehow  :-(
-            if (systemId == null) {
-                systemId = publicId;
-            }
-            if (systemId != null) {
-                InputSource source = resolver.resolve(systemId, baseURI);
-                if (source != null) {
-                    impl = new LSInputImpl();
-                    impl.setByteStream(source.getByteStream());
-                    impl.setSystemId(source.getSystemId());
-                    impl.setPublicId(source.getPublicId());
+                // there can be multiple includes on the same namespace. This scenario is not envisioned yet.
+                // hence the filename part is included as well. 
+                if (systemId != null) {
+                    String systemIdFileName = systemId.substring(systemId.lastIndexOf('/') + 1);
+                    for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
+                        if (ent.getKey().endsWith(systemIdFileName + ":" + namespaceURI)) {
+                            schemas.remove(ent.getKey());
+                            impl = createInput(newId, ent.getValue());
+                            done.add(newId + ":" + namespaceURI);
+                            return impl;
+                        }
+                    }
                 }
+                // handle case where given systemId is null (so that
+                // direct key lookup fails) by scanning through map
+                // searching for a namespace match
+                if (namespaceURI != null) {
+                    for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
+                        if (ent.getKey().endsWith(":" + namespaceURI)) {
+                            schemas.remove(ent.getKey());
+                            impl = createInput(newId, ent.getValue());
+                            done.add(newId + ":" + namespaceURI);
+                            return impl;
+                        }
+                    }
+                }
+                    
+                //REVIST - we need to get catalogs in here somehow  :-(
+                if (systemId == null) {
+                    systemId = publicId;
+                }
+                if (systemId != null) {
+                    InputSource source = resolver.resolve(systemId, baseURI);
+                    if (source != null) {
+                        impl = new LSInputImpl();
+                        impl.setByteStream(source.getByteStream());
+                        impl.setSystemId(source.getSystemId());
+                        impl.setPublicId(source.getPublicId());
+                    }
+                }
+                LOG.warning("Could not resolve Schema for " + systemId);
             }
-            LOG.warning("Could not resolve Schema for " + systemId);
+            return impl;
+        }
+        private LSInputImpl createInput(String newId, byte[] value) {
+            LSInputImpl impl = new LSInputImpl();
+            impl.setSystemId(newId);
+            impl.setBaseURI(newId);
+            impl.setCharacterStream(
+                new InputStreamReader(
+                    new ByteArrayInputStream(value)));
             return impl;
         }
     }
