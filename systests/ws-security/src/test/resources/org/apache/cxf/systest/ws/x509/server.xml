@@ -161,6 +161,14 @@
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricPKIPath" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricPKIPath" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPKIPathPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricEncryptBeforeSigning" address="http://localhost:${testutil.ports.Server}/DoubleItX509AsymmetricEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
