@@ -143,11 +143,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             List<WSEncryptionPart> encrParts = getEncryptedParts();
             List<WSEncryptionPart> sigParts = getSignedParts();
             
-            //if (encryptionToken == null && encrParts.size() > 0) {
-                //REVISIT - nothing to encrypt?
-            //}
-            
-            if (encryptionToken != null && encrParts.size() > 0) {
+            if (encryptionToken != null) {
                 //The encryption token can be an IssuedToken or a 
                 //SecureConversationToken
                 String tokenId = null;

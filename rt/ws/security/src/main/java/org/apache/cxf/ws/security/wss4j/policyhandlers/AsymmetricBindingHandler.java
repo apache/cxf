@@ -253,8 +253,11 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     
     private void doEncryptBeforeSign() {
         AbstractTokenWrapper wrapper = getEncryptBeforeSignWrapper();
-        AbstractToken encryptionToken = wrapper.getToken();
-        assertToken(encryptionToken);
+        AbstractToken encryptionToken = null;
+        if (wrapper != null) {
+            encryptionToken = wrapper.getToken();
+            assertToken(encryptionToken);
+        }
         
         AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
         if (initiatorWrapper == null) {

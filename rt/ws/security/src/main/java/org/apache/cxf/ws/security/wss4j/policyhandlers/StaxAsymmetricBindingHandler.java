@@ -244,8 +244,10 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
             }
             assertTokenWrapper(wrapper);
-            encryptionToken = wrapper.getToken();
-            assertToken(encryptionToken);
+            if (wrapper != null) {
+                encryptionToken = wrapper.getToken();
+                assertToken(encryptionToken);
+            }
             
             AbstractTokenWrapper initiatorWrapper = abinding.getInitiatorSignatureToken();
             if (initiatorWrapper == null) {
