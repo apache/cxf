@@ -20,21 +20,45 @@
 -->
 <!-- START SNIPPET: webxml -->
 <web-app>
+  <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>WEB-INF/beans.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <display-name>CXF Servlet</display-name>
         <servlet-class>
-                        org.apache.cxf.transport.servlet.CXFServlet
-                </servlet-class>
+            org.apache.cxf.transport.servlet.CXFServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>CXFServletBus</servlet-name>
+        <display-name>CXF Servlet Bus</display-name>
+        <servlet-class>
+            org.apache.cxf.transport.servlet.CXFServlet
+        </servlet-class>
         <init-param>
-            <param-name>config-location</param-name>
-            <param-value>/WEB-INF/beans.xml</param-value>
+            <param-name>bus</param-name>
+            <param-value>
+                  cxf1
+            </param-value>
         </init-param>
+        
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CXFServletBus</servlet-name>
+        <url-pattern>/custombus/*</url-pattern>
     </servlet-mapping>
 </web-app>
 <!-- END SNIPPET: webxml -->

@@ -20,13 +20,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xmlns:core="http://cxf.apache.org/core"
   xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/core
+http://cxf.apache.org/schemas/core.xsd
 http://cxf.apache.org/jaxrs
 http://cxf.apache.org/schemas/jaxrs.xsd">
 	<import resource="classpath:/META-INF/cxf/cxf.xml"/>
-
+    
     <jaxrs:server id="bookservice"
                   address="/store1">
         <jaxrs:serviceBeans>
@@ -47,7 +50,10 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         </jaxrs:providers>
     </jaxrs:server>
     
+    <core:bus name="cxf1" id="cxf1"/>
+    
     <jaxrs:server id="genericBookStore"
+                  bus="cxf1"
                   address="/genericstore">
         <jaxrs:serviceBeans>
             <ref bean="gBookStore"/>
