@@ -41,6 +41,8 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 public class CXFServlet extends CXFNonSpringServlet
     implements ApplicationListener<ContextRefreshedEvent> {
     private static final long serialVersionUID = -5922443981969455305L;
+    private static final String BUS_PARAMETER = "bus";
+    
     private boolean busCreated;
     private XmlWebApplicationContext createdContext; 
     
@@ -72,7 +74,10 @@ public class CXFServlet extends CXFNonSpringServlet
             wac = createSpringContext(wac, servletConfig, configLocation);
         }
         if (wac != null) {
-            setBus((Bus)wac.getBean("cxf", Bus.class));
+            String busParam = servletConfig.getInitParameter(BUS_PARAMETER);
+            String busName = busParam == null ? "cxf" : busParam.trim();
+            
+            setBus((Bus)wac.getBean(busName, Bus.class));
         } else {
             busCreated = true;
             setBus(BusFactory.newInstance().createBus());

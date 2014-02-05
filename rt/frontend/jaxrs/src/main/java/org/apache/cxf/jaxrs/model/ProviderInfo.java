@@ -26,7 +26,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     private T provider;
     
     public ProviderInfo(T provider, Bus bus) {
-        super(provider.getClass(), provider.getClass(), true, bus);
+        super(provider.getClass(), provider.getClass(), true, true, bus, provider);
         this.provider = provider;
     }
     

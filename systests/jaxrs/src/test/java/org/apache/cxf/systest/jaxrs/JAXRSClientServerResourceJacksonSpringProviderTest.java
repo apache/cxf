@@ -96,6 +96,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
             "http://localhost:" + PORT + "/webapp/store2";
         BookStoreSpring proxy = JAXRSClientFactory.create(endpointAddress, BookStoreSpring.class, 
             Collections.singletonList(new JacksonJsonProvider()));
+        WebClient.getConfig(proxy).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         List<SuperBook> books = 
             proxy.echoSuperBookCollectionJson(Collections.singletonList(new SuperBook("Super", 124L, true)));
         assertEquals(124L, books.get(0).getId());
@@ -118,7 +119,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testEchoGenericSuperBookCollectionProxy() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/genericstore";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore";
         GenericBookStoreSpring proxy = JAXRSClientFactory.create(endpointAddress, 
             GenericBookStoreSpring.class, Collections.singletonList(new JacksonJsonProvider()));
         List<SuperBook> books = 
@@ -131,7 +132,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testEchoGenericSuperBookProxy() throws Exception {
         
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/genericstore";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore";
         GenericBookStoreSpring proxy = JAXRSClientFactory.create(endpointAddress, 
             GenericBookStoreSpring.class, Collections.singletonList(new JacksonJsonProvider()));
         WebClient.getConfig(proxy).getHttpConduit().getClient().setReceiveTimeout(1000000000L);
@@ -170,7 +171,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testEchoGenericSuperBookWebClient() throws Exception {
         
         String endpointAddress = 
-            "http://localhost:" + PORT + "/webapp/genericstore/books/superbook";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore/books/superbook";
         WebClient wc = WebClient.create(endpointAddress, 
                                         Collections.singletonList(new JacksonJsonProvider()));
         wc.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON);
@@ -183,7 +184,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testEchoGenericSuperBookWebClientXml() throws Exception {
         
         String endpointAddress = 
-            "http://localhost:" + PORT + "/webapp/genericstore/books/superbook";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore/books/superbook";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept(MediaType.APPLICATION_XML).type(MediaType.APPLICATION_XML);
         SuperBook book = wc.post(new SuperBook("Super", 124L, true), SuperBook.class);
@@ -195,7 +196,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testEchoGenericSuperBookCollectionWebClient() throws Exception {
         
         String endpointAddress = 
-            "http://localhost:" + PORT + "/webapp/genericstore/books/superbooks";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore/books/superbooks";
         WebClient wc = WebClient.create(endpointAddress, 
                                         Collections.singletonList(new JacksonJsonProvider()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
@@ -213,7 +214,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testGetGenericSuperBookCollectionWebClient() throws Exception {
         
         String endpointAddress = 
-            "http://localhost:" + PORT + "/webapp/genericstore/books/superbooks2";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore/books/superbooks2";
         WebClient wc = WebClient.create(endpointAddress, 
                                         Collections.singletonList(new JacksonJsonProvider()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
@@ -230,7 +231,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testEchoGenericSuperBookCollectionWebClientXml() throws Exception {
         
         String endpointAddress = 
-            "http://localhost:" + PORT + "/webapp/genericstore/books/superbooks";
+            "http://localhost:" + PORT + "/webapp/custombus/genericstore/books/superbooks";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept(MediaType.APPLICATION_XML).type(MediaType.APPLICATION_XML);
         Collection<? extends SuperBook> books = 

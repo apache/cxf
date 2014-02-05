@@ -28,7 +28,7 @@ import org.apache.cxf.phase.Phase;
 public class CustomInFaultyInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public CustomInFaultyInterceptor() {
-        super(Phase.PRE_INVOKE);
+        super(Phase.PRE_LOGICAL);
     }
 
     public void handleMessage(Message message) throws Fault {
