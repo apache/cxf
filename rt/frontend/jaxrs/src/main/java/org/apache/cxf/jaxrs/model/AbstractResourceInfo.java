@@ -80,7 +80,7 @@ public abstract class AbstractResourceInfo {
     private void findContexts(Class<?> cls, Object provider, 
                               Map<Class<?>, ThreadLocalProxy<?>> constructorProxies) {
         findContextFields(cls, provider);
-        findContextSetterMethods(cls);
+        findContextSetterMethods(cls, provider);
         if (constructorProxies != null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxies = getConstructorProxyMap(true);
             proxies.put(serviceClass, constructorProxies);
@@ -130,19 +130,46 @@ public abstract class AbstractResourceInfo {
     }
     
     private static ThreadLocalProxy<?> getFieldThreadLocalProxy(Field f, Object provider) {
+        ThreadLocalProxy<?> defaultValue = InjectionUtils.createThreadLocalProxy(f.getType()); 
         if (provider != null) {
+            Object proxy = null;
             synchronized (provider) {
                 try {
-                    Object proxy = InjectionUtils.extractFieldValue(f, provider);
-                    if (proxy instanceof ThreadLocalProxy) {
-                        return (ThreadLocalProxy<?>)proxy;
-                    }
+                    proxy = InjectionUtils.extractFieldValue(f, provider);
                 } catch (Throwable t) {
                     // continue
                 }
+                if (!(proxy instanceof ThreadLocalProxy)) {
+                    proxy = defaultValue;
+                    InjectionUtils.injectFieldValue(f, provider, proxy);
+                }
             }
+            return (ThreadLocalProxy<?>)proxy;
+        } else {
+            return defaultValue;
         }
-        return InjectionUtils.createThreadLocalProxy(f.getType());
+    }
+    
+    private static ThreadLocalProxy<?> getMethodThreadLocalProxy(Method m, Object provider) {
+        ThreadLocalProxy<?> defaultValue = InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]); 
+        if (provider != null) {
+            Object proxy = null;
+            synchronized (provider) {
+                try {
+                    Method getter = m.getClass().getMethod("get" + m.getName().substring(3), new Class[]{});
+                    proxy = InjectionUtils.extractFromMethod(provider, getter);
+                } catch (Throwable t) {
+                    // continue
+                }
+                if (!(proxy instanceof ThreadLocalProxy)) {
+                    proxy = defaultValue;
+                    InjectionUtils.injectThroughMethod(provider, m, proxy);
+                }
+            }
+            return (ThreadLocalProxy<?>)proxy;
+        } else {
+            return defaultValue;
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -185,7 +212,7 @@ public abstract class AbstractResourceInfo {
         return getProxyMap(Method.class, SETTER_PROXY_MAP, create);
     }
     
-    private void findContextSetterMethods(Class<?> cls) {
+    private void findContextSetterMethods(Class<?> cls, Object provider) {
         
         for (Method m : cls.getMethods()) {
         
@@ -194,25 +221,25 @@ public abstract class AbstractResourceInfo {
             }
             for (Annotation a : m.getAnnotations()) {
                 if (a.annotationType() == Context.class) {
-                    checkContextMethod(m);
+                    checkContextMethod(m, provider);
                     break;
                 }
             }
         }
         Class<?>[] interfaces = cls.getInterfaces();
         for (Class<?> i : interfaces) {
-            findContextSetterMethods(i);
+            findContextSetterMethods(i, provider);
         }
         Class<?> superCls = cls.getSuperclass();
         if (superCls != null && superCls != Object.class) {
-            findContextSetterMethods(superCls);
+            findContextSetterMethods(superCls, provider);
         }
     }
     
-    private void checkContextMethod(Method m) {
+    private void checkContextMethod(Method m, Object provider) {
         Class<?> type = m.getParameterTypes()[0];
         if (m.getName().equals("set" + type.getSimpleName())) {        
-            addContextMethod(type, m);
+            addContextMethod(type, m, provider);
         }
     }
     
@@ -223,14 +250,13 @@ public abstract class AbstractResourceInfo {
                                       : Collections.unmodifiableMap(methods);
     }
     
-    private void addContextMethod(Class<?> contextClass, Method m) {
+    private void addContextMethod(Class<?> contextClass, Method m, Object provider) {
         if (contextMethods == null) {
             contextMethods = new HashMap<Class<?>, Map<Class<?>, Method>>();
         }
         addToMap(contextMethods, contextClass, m);
         if (m.getParameterTypes()[0] != Application.class) {
-            addToMap(getSetterProxyMap(true), m, 
-                     InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]));
+            addToMap(getSetterProxyMap(true), m, getMethodThreadLocalProxy(m, provider));
         }
     }
     

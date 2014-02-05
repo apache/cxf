@@ -982,6 +982,15 @@ public final class InjectionUtils {
             Method method = entry.getValue();
             Object value = method.getParameterTypes()[0] == Application.class 
                 ? app : cri.getContextSetterProxy(method);
+            try {
+                synchronized (instance) {
+                    if (value == InjectionUtils.extractFromMethod(instance, method)) {
+                        continue;
+                    }
+                }
+            } catch (Throwable t) {
+                // continue
+            }
             InjectionUtils.injectThroughMethod(instance, method, value);
         }
         
