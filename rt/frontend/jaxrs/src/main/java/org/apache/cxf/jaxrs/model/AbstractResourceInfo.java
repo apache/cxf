@@ -58,7 +58,7 @@ public abstract class AbstractResourceInfo {
 
     protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, 
                                    boolean isRoot, boolean checkContexts, Bus bus) {
-        this(resourceClass, serviceClass, isRoot, checkContexts, null, bus);
+        this(resourceClass, serviceClass, isRoot, checkContexts, null, bus, null);
     }
     
     protected AbstractResourceInfo(Class<?> resourceClass, 
@@ -66,18 +66,20 @@ public abstract class AbstractResourceInfo {
                                    boolean isRoot, 
                                    boolean checkContexts,
                                    Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
-                                   Bus bus) {
+                                   Bus bus,
+                                   Object provider) {
         this.bus = bus;
         this.serviceClass = serviceClass;
         this.resourceClass = resourceClass;
         root = isRoot;
         if (checkContexts && resourceClass != null) {
-            findContexts(serviceClass, constructorProxies);
+            findContexts(serviceClass, provider, constructorProxies);
         }
     }
     
-    private void findContexts(Class<?> cls, Map<Class<?>, ThreadLocalProxy<?>> constructorProxies) {
-        findContextFields(cls);
+    private void findContexts(Class<?> cls, Object provider, 
+                              Map<Class<?>, ThreadLocalProxy<?>> constructorProxies) {
+        findContextFields(cls, provider);
         findContextSetterMethods(cls);
         if (constructorProxies != null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxies = getConstructorProxyMap(true);
@@ -102,7 +104,7 @@ public abstract class AbstractResourceInfo {
     public void setResourceClass(Class<?> rClass) {
         resourceClass = rClass;
         if (serviceClass.isInterface() && resourceClass != null && !resourceClass.isInterface()) {
-            findContexts(resourceClass, null);
+            findContexts(resourceClass, null, null);
         }
     }
     
@@ -110,7 +112,7 @@ public abstract class AbstractResourceInfo {
         return serviceClass;
     }
     
-    private void findContextFields(Class<?> cls) {
+    private void findContextFields(Class<?> cls, Object provider) {
         if (cls == Object.class || cls == null) {
             return;
         }
@@ -119,12 +121,28 @@ public abstract class AbstractResourceInfo {
                 if (a.annotationType() == Context.class) {
                     contextFields = addContextField(contextFields, f);
                     if (f.getType() != Application.class) {
-                        addToMap(getFieldProxyMap(true), f, InjectionUtils.createThreadLocalProxy(f.getType()));
+                        addToMap(getFieldProxyMap(true), f, getFieldThreadLocalProxy(f, provider));
                     }
                 }
             }
         }
-        findContextFields(cls.getSuperclass());
+        findContextFields(cls.getSuperclass(), provider);
+    }
+    
+    private static ThreadLocalProxy<?> getFieldThreadLocalProxy(Field f, Object provider) {
+        if (provider != null) {
+            synchronized (provider) {
+                try {
+                    Object proxy = InjectionUtils.extractFieldValue(f, provider);
+                    if (proxy instanceof ThreadLocalProxy) {
+                        return (ThreadLocalProxy<?>)proxy;
+                    }
+                } catch (Throwable t) {
+                    // continue
+                }
+            }
+        }
+        return InjectionUtils.createThreadLocalProxy(f.getType());
     }
     
     @SuppressWarnings("unchecked")

@@ -987,6 +987,15 @@ public final class InjectionUtils {
         
         for (Field f : cri.getContextFields()) {
             Object value = f.getType() == Application.class ? app : cri.getContextFieldProxy(f);
+            try {
+                synchronized (instance) {
+                    if (value == InjectionUtils.extractFieldValue(f, instance)) {
+                        continue;
+                    }
+                }
+            } catch (Throwable t) {
+                // continue
+            }
             InjectionUtils.injectFieldValue(f, instance, value);
         }
     }

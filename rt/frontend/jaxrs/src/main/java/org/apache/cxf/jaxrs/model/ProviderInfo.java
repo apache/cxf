@@ -35,7 +35,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     public ProviderInfo(T provider, 
                         Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
                         Bus bus) {
-        super(provider.getClass(), provider.getClass(), true, true, constructorProxies, bus);
+        super(provider.getClass(), provider.getClass(), true, true, constructorProxies, bus, provider);
         this.provider = provider;
     }
     
