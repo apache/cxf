@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,11 +32,11 @@ public class JMSUtilsTest extends Assert {
     
     @Test
     public void testGetEncoding() throws IOException {                
-        assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml; charset=utf-8"), "UTF-8");
-        assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml"), "UTF-8");
-        assertEquals("Get the wrong encoding", JMSUtils.getEncoding("text/xml; charset=GBK"), "GBK");
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=utf-8"), "UTF-8");
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml"), "UTF-8");
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=GBK"), "GBK");
         try {
-            JMSUtils.getEncoding("text/xml; charset=asci");
+            JMSMessageUtils.getEncoding("text/xml; charset=asci");
             fail("Expect the exception here");
         } catch (Exception ex) {
             assertTrue("we should get the UnsupportedEncodingException here",
@@ -49,7 +50,7 @@ public class JMSUtilsTest extends Assert {
         // test min edge case
         AtomicLong messageMinCount = new AtomicLong(0);
         String correlationID = 
-            JMSUtils.createCorrelationId(conduitId, messageMinCount.get());
+            JMSUtil.createCorrelationId(conduitId, messageMinCount.get());
         
         String expected = conduitId + "0000000000000000";
         assertEquals("The correlationID value does not match expected value",
@@ -61,7 +62,7 @@ public class JMSUtilsTest extends Assert {
         AtomicLong messageMaxCount = new AtomicLong(0xFFFFFFFFFFFFFFFFL);
         
         correlationID = 
-            JMSUtils.createCorrelationId(conduitId, messageMaxCount.get());
+            JMSUtil.createCorrelationId(conduitId, messageMaxCount.get());
         
         expected = conduitId + "ffffffffffffffff";
         assertEquals("The correlationID value does not match expected value",
@@ -73,7 +74,7 @@ public class JMSUtilsTest extends Assert {
         AtomicLong overflowCount = new AtomicLong(0xFFFFFFFFFFFFFFFFL);
         
         correlationID = 
-            JMSUtils.createCorrelationId(conduitId, overflowCount.incrementAndGet());
+            JMSUtil.createCorrelationId(conduitId, overflowCount.incrementAndGet());
         
         expected = conduitId + "0000000000000000";
         assertEquals("The correlationID value does not match expected value",
@@ -84,7 +85,7 @@ public class JMSUtilsTest extends Assert {
         // test sequential flow
         AtomicLong messageSequenceCount = new AtomicLong(0);
         correlationID = 
-            JMSUtils.createCorrelationId(conduitId, messageSequenceCount.incrementAndGet());
+            JMSUtil.createCorrelationId(conduitId, messageSequenceCount.incrementAndGet());
         
         expected = conduitId + "0000000000000001";
         assertEquals("The correlationID value does not match expected value",
@@ -93,7 +94,7 @@ public class JMSUtilsTest extends Assert {
                      48, correlationID.length());
 
         correlationID = 
-            JMSUtils.createCorrelationId(conduitId, messageSequenceCount.incrementAndGet());
+            JMSUtil.createCorrelationId(conduitId, messageSequenceCount.incrementAndGet());
 
         expected = conduitId + "0000000000000002";
         assertEquals("The correlationID value does not match expected value",

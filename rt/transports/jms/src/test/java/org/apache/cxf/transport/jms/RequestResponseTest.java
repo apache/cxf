@@ -32,6 +32,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.junit.BeforeClass;
@@ -60,43 +61,6 @@ public class RequestResponseTest extends AbstractJMSTester {
         }
         assertTrue("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds",
                    inMessage != null);
-    }
-
-    private JMSDestination setupJMSDestination(boolean send) throws IOException {
-
-        adjustEndpointInfoURL();
-        JMSConfiguration jmsConfig = new JMSOldConfigHolder()
-            .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, false);
-        
-        JMSDestination jmsDestination = new JMSDestination(bus, endpointInfo, jmsConfig);
-
-        if (send) {
-            // setMessageObserver
-            observer = new MessageObserver() {
-                public void onMessage(Message m) {
-                    Exchange exchange = new ExchangeImpl();
-                    exchange.setInMessage(m);
-                    m.setExchange(exchange);
-                }
-            };
-            jmsDestination.setMessageObserver(observer);
-        }
-        return jmsDestination;
-    }
-    
-    private void setupMessageHeader(Message outMessage, String correlationId, String replyTo) {
-        JMSMessageHeadersType header = new JMSMessageHeadersType();
-        header.setJMSCorrelationID(correlationId);
-        header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
-        header.setJMSPriority(1);
-        header.setTimeToLive(1000);
-        header.setJMSReplyTo(replyTo != null ? replyTo : null);
-        outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
-        outMessage.put(Message.ENCODING, "US-ASCII");
-    }
-
-    private void setupMessageHeader(Message outMessage, String correlationId) {
-        setupMessageHeader(outMessage, correlationId, null);
     }
 
     private void verifyReceivedMessage(Message message) {
@@ -153,78 +117,73 @@ public class RequestResponseTest extends AbstractJMSTester {
 
     
     @Test
-    public void testRequestQueueResponseDynamicQueue() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
+    public void testRequestQueueResponseTempQueue() throws Exception {
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortQueueRequest");
-        sendAndReceiveMessages();
+        sendAndReceiveMessages(ei);
     }
     
     @Test
     public void testRequestQueueResponseStaticQueue() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortQueueRequestQueueResponse");
-        sendAndReceiveMessages();
+        sendAndReceiveMessages(ei);
     }
     
     @Test
-    public void testRequestQueueResponseTopic() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
-                         "JMSSimpleService002X", "SimplePortQueueRequestTopicResponse");
-        sendAndReceiveMessages();
-    }
-    
-    @Test
-    public void testRequestTopicResponseDynamicQueue() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
+    public void testRequestTopicResponseTempQueue() throws Exception {
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequest");
-        sendAndReceiveMessages();
+        sendAndReceiveMessages(ei);
     }
     
     @Test
     public void testRequestTopicResponseStaticQueue() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequestQueueResponse");
-        sendAndReceiveMessages();
+        sendAndReceiveMessages(ei);
     }
     
-    @Test
-    public void testRequestTopicResponseTopic() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
-                         "JMSSimpleService002X", "SimplePortTopicRequestTopicResponse");
-        sendAndReceiveMessages();
+    private Message createMessage() {
+        Message outMessage = new MessageImpl();
+        JMSMessageHeadersType header = new JMSMessageHeadersType();
+        header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
+        header.setJMSPriority(1);
+        header.setTimeToLive(1000);
+        outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
+        outMessage.put(Message.ENCODING, "US-ASCII");
+        return outMessage;
     }
 
-    protected void sendAndReceiveMessages() throws IOException {
+    protected void sendAndReceiveMessages(EndpointInfo ei) throws IOException {
         // set up the conduit send to be true
-        JMSConduit conduit = setupJMSConduit(true, false);
-        final Message outMessage = new MessageImpl();
-        setupMessageHeader(outMessage, null);
-        final JMSDestination destination = setupJMSDestination(false);
+        JMSConduit conduit = setupJMSConduit(ei, true);
+        final Message outMessage = createMessage();
+        final JMSDestination destination = setupJMSDestination(ei);
+
+        MessageObserver observer = new MessageObserver() {
+            public void onMessage(Message m) {
+                Exchange exchange = new ExchangeImpl();
+                exchange.setInMessage(m);
+                m.setExchange(exchange);
+                verifyReceivedMessage(m);
+                verifyHeaders(m, outMessage);
+                // setup the message for
+                Conduit backConduit;
+                try {
+                    backConduit = destination.getBackChannel(m);
+                    // wait for the message to be got from the conduit
+                    Message replyMessage = new MessageImpl();
+                    sendoutMessage(backConduit, replyMessage, true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        destination.setMessageObserver(observer);
         
         try {
-            // set up MessageObserver for handling the conduit message
-            MessageObserver observer = new MessageObserver() {
-                public void onMessage(Message m) {
-                    Exchange exchange = new ExchangeImpl();
-                    exchange.setInMessage(m);
-                    m.setExchange(exchange);
-                    verifyReceivedMessage(m);
-                    verifyHeaders(m, outMessage);
-                    // setup the message for
-                    Conduit backConduit;
-                    try {
-                        backConduit = destination.getBackChannel(m);
-                        // wait for the message to be got from the conduit
-                        Message replyMessage = new MessageImpl();
-                        sendoutMessage(backConduit, replyMessage, true);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
-            destination.setMessageObserver(observer);
-            // set is oneway false for get response from destination
-            sendoutMessage(conduit, outMessage, false);
+            sendoutMessage(conduit, outMessage, false, true);
             // wait for the message to be got from the destination,
             // create the thread to handler the Destination incoming message
     

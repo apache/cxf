@@ -21,14 +21,13 @@ package org.apache.cxf.transport.jms;
 import org.apache.cxf.message.Exchange;
 
 /**
- * Callback interface for JMSOutputStream
+ * Callback interface for SendingOutputStream and SendingWriter
  */
 interface JMSExchangeSender {
     
     /**
-     * Is called from JMSOutputStream.doClose() when the stream is fully
-     * written. Sends the outMessage of the given exchange with the given payload
-     * from the JMSOutputStream. If the exchange is not oneway a reply should be recieved
+     * Sends the outMessage of the given exchange with the given payload.
+     * If the exchange is not oneway a reply should be recieved
      * and set as inMessage
      * 
      * @param exchange

@@ -102,11 +102,4 @@ public class JMSBrokerSetup {
         
        
     }
-    
-    /*class ContainerWapper extends  BrokerContainerImpl {
-        
-        public void shutdown() {
-            super.containerShutdown();
-        }
-    }*/
 }

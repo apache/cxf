@@ -37,13 +37,18 @@ import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jms.connection.JmsTransactionManager;
 
-
+/**
+ * Test transactions based on spring transactions.
+ * These will not be supported anymore in cxf >= 3
+ */
 public class JMSTransactionClientServerTest extends AbstractBusClientServerTestBase {
-    static EmbeddedJMSBrokerLauncher broker;
+    private static final String BROKER_URI = "vm://JMSTransactionClientServerTest?broker.persistent=false";
+    private static EmbeddedJMSBrokerLauncher broker;
 
     public static class Server extends AbstractBusTestServerBase {
         ClassPathXmlApplicationContext context;
@@ -80,7 +85,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
 
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://JMSTransactionClientServerTest");
+        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
         launchServer(new Server());
@@ -100,6 +105,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         return q;
     }
     
+    @Ignore
     @Test
     public void testDocBasicConnection() throws Exception {
         QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
@@ -115,6 +121,8 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         Greeter greeter = service.getPort(portName, Greeter.class);
         doService(greeter, true);
     }
+    
+    @Ignore
     @Test
     public void testNonAopTransaction() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();

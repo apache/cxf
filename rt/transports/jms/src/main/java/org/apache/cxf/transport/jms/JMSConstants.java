@@ -54,6 +54,7 @@ public final class JMSConstants {
     public static final String JMS_CLIENT_CONFIG_ID = "jms-client";
     public static final String JMS_SERVER_CONFIG_ID = "jms-server";
     
+    // Is used by WS-Addressing
     public static final String JMS_REBASED_REPLY_TO = "org.apache.cxf.jms.server.replyto";
     public static final String JMS_SET_REPLY_TO = "org.apache.cxf.jms.client.set.replyto";
     

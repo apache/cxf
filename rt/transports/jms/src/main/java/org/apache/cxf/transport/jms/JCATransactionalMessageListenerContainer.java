@@ -31,21 +31,17 @@ import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
-import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.JmsUtils;
 
 public class JCATransactionalMessageListenerContainer extends DefaultMessageListenerContainer {
     static final ThreadLocal<Map<Class<?>, ?>> ENDPOINT_LOCAL = new ThreadLocal<Map<Class<?>, ?>>();
-    static final String MESSAGE_ENDPOINT_FACTORY = "MessageEndpointFactory";
-    static final String MDB_TRANSACTED_METHOD = "MDBTransactedMethod";
     private MessageEndpointFactory factory;
     private Method method;
     
-    public JCATransactionalMessageListenerContainer(EndpointInfo ei) {
-        factory = ei.getProperty(MESSAGE_ENDPOINT_FACTORY, 
-                                 MessageEndpointFactory.class);
-        method = ei.getProperty(MDB_TRANSACTED_METHOD, Method.class);
+    public JCATransactionalMessageListenerContainer(MessageEndpointFactory factory, Method transactedMethod) {
+        this.factory = factory;
+        this.method = transactedMethod;
         this.setCacheLevel(CACHE_CONNECTION);
     }
     
@@ -68,7 +64,7 @@ public class JCATransactionalMessageListenerContainer extends DefaultMessageList
             mp.put(MessageEndpoint.class, ep);
             
             ENDPOINT_LOCAL.set(mp);
-            ep.beforeDelivery(method);                
+            ep.beforeDelivery(this.method);                
             messageReceived = doReceiveAndExecute(invoker, s, mc, null);
             ep.afterDelivery();
         } catch (Exception ex) {

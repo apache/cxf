@@ -31,17 +31,18 @@ import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.SessionCallback;
 
 public class JMSConduitTest extends AbstractJMSTester {
 
@@ -59,9 +60,9 @@ public class JMSConduitTest extends AbstractJMSTester {
         BusFactory.setDefaultBus(null);
         bus = bf.createBus("/jms_test_config.xml");
         BusFactory.setDefaultBus(bus);
-        setupServiceInfo("http://cxf.apache.org/jms_conf_test", "/wsdl/others/jms_test_no_addr.wsdl",
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_conf_test", "/wsdl/others/jms_test_no_addr.wsdl",
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
-        JMSConduit conduit = setupJMSConduit(false, false);
+        JMSConduit conduit = setupJMSConduit(ei, false);
         assertEquals("Can't get the right ClientReceiveTimeout", 500L, conduit.getJmsConfig()
             .getReceiveTimeout().longValue());
         bus.shutdown(false);
@@ -71,34 +72,16 @@ public class JMSConduitTest extends AbstractJMSTester {
 
     @Test
     public void testPrepareSend() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HelloWorldService", "HelloWorldPort");
 
-        JMSConduit conduit = setupJMSConduit(false, false);
+        JMSConduit conduit = setupJMSConduit(ei, false);
         Message message = new MessageImpl();
-        try {
-            conduit.prepare(message);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        verifySentMessage(false, message);
-    }
-
-    private void verifySentMessage(boolean send, Message message) {
+        conduit.prepare(message);
         OutputStream os = message.getContent(OutputStream.class);
         Writer writer = message.getContent(Writer.class);
         assertTrue("The OutputStream and Writer should not both be null ", os != null || writer != null);
     }
-
-    /*
-     * @Test public void testSendOut() throws Exception {
-     * setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
-     * "HelloWorldServiceLoop", "HelloWorldPortLoop"); JMSConduit conduit = setupJMSConduit(true, false);
-     * conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(10000)); try { for (int c = 0; c < 10; c++) {
-     * LOG.info("Sending message " + c); inMessage = null; Message message = new MessageImpl();
-     * sendoutMessage(conduit, message, false); verifyReceivedMessage(message); } } finally { conduit.close();
-     * } }
-     */
 
     /**
      * Sends several messages and verifies the results. The service sends the message to itself. So it should
@@ -108,17 +91,17 @@ public class JMSConduitTest extends AbstractJMSTester {
      */
     @Test
     public void testTimeoutOnReceive() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HelloWorldServiceLoop", "HelloWorldPortLoop");
 
-        JMSConduit conduit = setupJMSConduit(true, false);
+        JMSConduit conduit = setupJMSConduit(ei, true);
         // TODO IF the system is extremely fast. The message could still get through
         conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(1));
         Message message = new MessageImpl();
         try {
             sendoutMessage(conduit, message, false);
             verifyReceivedMessage(message);
-            throw new RuntimeException("Expected a timeout here");
+            fail("Expected a timeout here");
         } catch (RuntimeException e) {
             LOG.info("Received exception. This is expected");
         } finally {
@@ -153,30 +136,22 @@ public class JMSConduitTest extends AbstractJMSTester {
     }
 
     @Test
-    public void testJMSMessageMarshal() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
-                         "HelloWorldServiceLoop", "HelloWorldPortLoop");
+    public void testJMSMessageMarshal() throws IOException, JMSException {
         String testMsg = "Test Message";
-        JMSConduit conduit = setupJMSConduit(true, false);
-        Message msg = new MessageImpl();
-        conduit.prepare(msg);
         final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset().name()); // TODO encoding
-        JMSConfiguration jmsConfig = conduit.getJmsConfig();
-        JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
-        SessionCallback<javax.jms.Message> sc = new SessionCallback<javax.jms.Message>() {
-            public javax.jms.Message doInJms(Session session) throws JMSException {
-                return JMSUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
-            }
-        };
-        javax.jms.Message message = jmsTemplate.execute(sc);
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+        jmsConfig.setConnectionFactory(new ActiveMQConnectionFactory("vm://tesstMarshal?broker.persistent=false"));
         
-        // The ibm jdk finalizes conduit (during most runs of this test) and
-        // causes it to fail unless we reference the conduit here after the
-        // jmsTemplate.execute() call.
-        assertNotNull("Conduit is null", conduit);
-
-        assertTrue("Message should have been of type BytesMessage ", message instanceof BytesMessage);
+        ResourceCloser closer = new ResourceCloser();
+        try {
+            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+            javax.jms.Message jmsMessage = 
+                JMSMessageUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
+            assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
+        } finally {
+            closer.close();
+        }
+        
     }
 
 }

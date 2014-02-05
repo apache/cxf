@@ -18,19 +18,22 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.util.concurrent.Executor;
+
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.XAConnectionFactory;
+import javax.jms.Session;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.ConfigurationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -44,20 +47,18 @@ public class JMSConfiguration implements InitializingBean {
 
     private boolean usingEndpointInfo = true;
 
-    private JmsTemplate jmsTemplate;
     private AbstractMessageListenerContainer messageListenerContainer;
 
     private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
-    private DestinationResolver destinationResolver;
+    private DestinationResolver destinationResolver = new DynamicDestinationResolver();
     private PlatformTransactionManager transactionManager;
-    private boolean wrapInSingleConnectionFactory = true;
     private TaskExecutor taskExecutor;
     private boolean reconnectOnException = true;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
-    private Long clientReceiveTimeout;
+    private Long clientReceiveTimeout = 0L;
     private Long serverReceiveTimeout;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
@@ -81,6 +82,7 @@ public class JMSConfiguration implements InitializingBean {
      * Destination name to listen on for reply messages
      */
     private String replyDestination;
+    private Destination replyDestinationDest;
     
     /**
      * Destination name to send out as replyTo address in the message 
@@ -91,7 +93,6 @@ public class JMSConfiguration implements InitializingBean {
     private boolean replyPubSubDomain;
     private Boolean useConduitIdSelector;
     private String conduitSelectorPrefix;
-    private boolean autoResolveDestination;
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
@@ -103,13 +104,19 @@ public class JMSConfiguration implements InitializingBean {
     private String targetService;
     private String requestURI;
 
-    private ConnectionFactory wrappedConnectionFactory;
-    private boolean autoWrappedConnectionFactory;
     private JNDIConfiguration jndiConfig;
 
-    public void ensureProperlyConfigured(org.apache.cxf.common.i18n.Message msg) {
-        if (targetDestination == null || getOrCreateWrappedConnectionFactory() == null) {
-            throw new ConfigurationException(msg);
+    private SingleConnectionFactory singleConnectionFactory;
+
+    public void ensureProperlyConfigured() {
+        if (connectionFactory == null) {
+            connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
+        }
+        if (connectionFactory == null) {
+            throw new IllegalArgumentException("JMSConfiguration.connectionFactory may not be null");
+        }
+        if (targetDestination == null) {
+            throw new IllegalArgumentException("JMSConfigruation.targetDestination may not be null");
         }
     }
 
@@ -135,14 +142,6 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setRecoveryInterval(long recoveryInterval) {
         this.recoveryInterval = recoveryInterval;
-    }
-
-    public boolean isAutoResolveDestination() {
-        return autoResolveDestination;
-    }
-
-    public void setAutoResolveDestination(boolean autoResolveDestination) {
-        this.autoResolveDestination = autoResolveDestination;
     }
 
     public boolean isUsingEndpointInfo() {
@@ -290,7 +289,7 @@ public class JMSConfiguration implements InitializingBean {
     }
 
     public String getReplyToDestination() {
-        return replyToDestination;
+        return replyToDestination != null ? replyToDestination : replyDestination;
     }
 
     public void setReplyToDestination(String replyToDestination) {
@@ -377,7 +376,7 @@ public class JMSConfiguration implements InitializingBean {
         this.reconnectPercentOfMax = reconnectPercentOfMax;
     }
 
-    public TaskExecutor getTaskExecutor() {
+    public Executor getTaskExecutor() {
         return taskExecutor;
     }
 
@@ -432,70 +431,21 @@ public class JMSConfiguration implements InitializingBean {
         this.acceptMessagesWhileStopping = acceptMessagesWhileStopping;
     }
 
-    /**
-     * Tries to creates a ConnectionFactory from jndi if none was set as a property
-     * by using the jndConfig. Then it determines if the connectionFactory should be wrapped
-     * into a SingleConnectionFactory and wraps it if necessary. After the first call the
-     * same connectionFactory will be returned for all subsequent calls
-     *
-     * @return usable connectionFactory
-     */
-    public synchronized ConnectionFactory getOrCreateWrappedConnectionFactory() {
-        if (wrappedConnectionFactory == null) {
-            if (connectionFactory == null) {
-                connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
-            }
-            if (wrapInSingleConnectionFactory && !(connectionFactory instanceof SingleConnectionFactory)) {
-                SingleConnectionFactory scf;
-                if (connectionFactory instanceof XAConnectionFactory) {
-                    scf = new XASingleConnectionFactory(connectionFactory);
-                } else {
-                    scf = new SingleConnectionFactory(connectionFactory);
-                }
-                autoWrappedConnectionFactory = true;
-                if (getDurableSubscriptionClientId() != null) {
-                    scf.setClientId(getDurableSubscriptionClientId());
-                }
-                scf.setReconnectOnException(isReconnectOnException());
-                wrappedConnectionFactory = scf;
-            } else {
-                wrappedConnectionFactory = connectionFactory;
-            }
+    public ConnectionFactory getPlainConnectionFactory() {
+        if (connectionFactory == null) {
+            connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
         }
-        return wrappedConnectionFactory;
-    }
-
-    public ConnectionFactory getWrappedConnectionFactory() {
-        return wrappedConnectionFactory;
-    }
-
-    public synchronized void destroyWrappedConnectionFactory() {
-        if (autoWrappedConnectionFactory
-            &&
-            wrappedConnectionFactory instanceof SingleConnectionFactory) {
-            ((SingleConnectionFactory) wrappedConnectionFactory).destroy();
-            if (connectionFactory == wrappedConnectionFactory) {
-                connectionFactory = null;
-            }
-            wrappedConnectionFactory = null;
-            autoWrappedConnectionFactory = false;
-        }
-    }
-
-    /**
-     * Only for tests
-     * @return
-     */
-    protected ConnectionFactory getConnectionFactory() {
         return connectionFactory;
     }
-
-    public boolean isWrapInSingleConnectionFactory() {
-        return wrapInSingleConnectionFactory;
-    }
-
-    public void setWrapInSingleConnectionFactory(boolean wrapInSingleConnectionFactory) {
-        this.wrapInSingleConnectionFactory = wrapInSingleConnectionFactory;
+    
+    public ConnectionFactory getConnectionFactory() {
+        if (singleConnectionFactory == null) {
+            ConnectionFactory cf = getPlainConnectionFactory();
+            singleConnectionFactory = cf instanceof SingleConnectionFactory
+                ? (SingleConnectionFactory)cf : new SingleConnectionFactory(cf);
+            singleConnectionFactory.setClientId(durableSubscriptionClientId);
+        }
+        return singleConnectionFactory;
     }
 
     public String getDurableSubscriptionClientId() {
@@ -537,14 +487,6 @@ public class JMSConfiguration implements InitializingBean {
         return this.enforceSpec != null;
     }
 
-    public void setJmsTemplate(JmsTemplate jmsTemplate) {
-        this.jmsTemplate = jmsTemplate;
-    }
-
-    public JmsTemplate getJmsTemplate() {
-        return jmsTemplate;
-    }
-
     public AbstractMessageListenerContainer getMessageListenerContainer() {
         return messageListenerContainer;
     }
@@ -564,5 +506,36 @@ public class JMSConfiguration implements InitializingBean {
      */
     public void setJmsProviderTibcoEms(boolean jmsProviderTibcoEms) {
         this.jmsProviderTibcoEms = jmsProviderTibcoEms;
+    }
+
+    public static Destination resolveOrCreateDestination(final Session session,
+                                                         final DestinationResolver resolver,
+                                                         final String replyToDestinationName,
+                                                         final boolean pubSubDomain) throws JMSException {
+        if (replyToDestinationName == null) {
+            return session.createTemporaryQueue();
+        }
+        return resolver.resolveDestinationName(session, replyToDestinationName, pubSubDomain);
+    }
+    
+    public Destination getReplyToDestination(Session session, String userDestination) throws JMSException {
+        String replyTo = userDestination;
+        if (replyTo == null) {
+            return getReplyDestination(session);
+        }
+        return getDestinationResolver().resolveDestinationName(session, replyTo, replyPubSubDomain);
+    }
+    
+    public Destination getReplyDestination(Session session) throws JMSException {
+        if (replyDestinationDest == null) {
+            replyDestinationDest = replyDestination == null 
+                ? session.createTemporaryQueue()
+                : getDestinationResolver().resolveDestinationName(session, replyDestination, replyPubSubDomain);
+        }
+        return replyDestinationDest;
+    }
+
+    public Destination getTargetDestination(Session session) throws JMSException {
+        return destinationResolver.resolveDestinationName(session, targetDestination, pubSubDomain);
     }
 }

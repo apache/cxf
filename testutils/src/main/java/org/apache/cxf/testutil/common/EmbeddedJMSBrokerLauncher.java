@@ -20,6 +20,7 @@ package org.apache.cxf.testutil.common;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +70,11 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
         }
         return b.toString();
     }
+    
+    public void updateWsdl(Bus b, URL wsdlLocation) { 
+        updateWsdl(b, wsdlLocation.toString());
+    }
+    
     public void updateWsdl(Bus b, String wsdlLocation) { 
         updateWsdlExtensors(b, wsdlLocation, brokerUrl1, getEncodedBrokerURL());
     }

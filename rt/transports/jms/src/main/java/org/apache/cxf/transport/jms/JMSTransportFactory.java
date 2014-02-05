@@ -70,7 +70,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
                                                                               endpointInfo,
                                                                               target,
                                                                               true);
-        return new JMSConduit(endpointInfo, target, jmsConf, bus);
+        return new JMSConduit(target, jmsConf, bus);
     }
 
     /**

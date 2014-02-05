@@ -19,12 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -35,12 +30,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -54,31 +47,23 @@ import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.continuations.JMSContinuation;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
+import org.apache.cxf.transport.jms.util.JMSSender;
+import org.apache.cxf.transport.jms.util.JMSUtil;
+import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
-import org.springframework.jms.connection.JmsResourceHolder;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-import org.springframework.jms.core.SessionCallback;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
-import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.destination.DestinationResolver;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 public class JMSDestination extends AbstractMultiplexDestination 
-    implements SessionAwareMessageListener<javax.jms.Message>,
-        MessageListener, JMSExchangeSender {
+    implements MessageListener, JMSExchangeSender {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
 
@@ -113,26 +98,33 @@ public class JMSDestination extends AbstractMultiplexDestination
      */
     public void activate() {
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
-        String name = endpointInfo.getName().toString() + ".jms-destination";
-        org.apache.cxf.common.i18n.Message msg = 
-            new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
-        jmsConfig.ensureProperlyConfigured(msg);
+        jmsConfig.ensureProperlyConfigured();
         Object o = ei.getProperty(AbstractMessageListenerContainer.class.getName());
         if (o instanceof AbstractMessageListenerContainer
             && jmsConfig.getMessageListenerContainer() == null) {
             jmsConfig.setMessageListenerContainer((AbstractMessageListenerContainer)o);
         }
+
+        Destination targetDestination = resolveTargetDestination();
         jmsListener = JMSFactory.createJmsListener(ei, jmsConfig, this, 
-                                                   jmsConfig.getTargetDestination());
+                                                   targetDestination);
+    }
+
+    private Destination resolveTargetDestination() {
+        ResourceCloser closer = new ResourceCloser();
+        try {
+            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+            return jmsConfig.getTargetDestination(session);
+        } catch (JMSException e) {
+            throw JMSUtil.convertJmsException(e);
+        } finally {
+            closer.close();
+        }
     }
 
     public void deactivate() {
         if (jmsListener != null) {
             jmsListener.shutdown();
-            // CXF-2788: SingleConnectionFactory ignores the call to
-            // javax.jms.Connection#close(),
-            // use this to really close the target connection.
-            jmsConfig.destroyWrappedConnectionFactory();
         }
     }
 
@@ -141,45 +133,32 @@ public class JMSDestination extends AbstractMultiplexDestination
         this.deactivate();
     }
 
-    private Destination resolveDestinationName(final JmsTemplate jmsTemplate, final String name) {
-        SessionCallback<Destination> sc = new SessionCallback<Destination>() {
-            public Destination doInJms(Session session) throws JMSException {
-                DestinationResolver resolv = jmsTemplate.getDestinationResolver();
-                return resolv.resolveDestinationName(session, name, jmsConfig.isPubSubDomain());
-            }
-        };
-        return jmsTemplate.execute(sc);
-    }
-
-    public Destination getReplyToDestination(JmsTemplate jmsTemplate, Message inMessage) throws JMSException {
+    public Destination getReplyToDestination(Session session, 
+                                             Message inMessage) throws JMSException {
         javax.jms.Message message = (javax.jms.Message)inMessage.get(JMSConstants.JMS_REQUEST_MESSAGE);
         // If WS-Addressing had set the replyTo header.
         final String replyToName = (String)inMessage.get(JMSConstants.JMS_REBASED_REPLY_TO);
         if (replyToName != null) {
-            return resolveDestinationName(jmsTemplate, replyToName);
+            DestinationResolver resolver = jmsConfig.getDestinationResolver();
+            return resolver.resolveDestinationName(session, replyToName, jmsConfig.isReplyPubSubDomain());
         } else if (message.getJMSReplyTo() != null) {
             return message.getJMSReplyTo();
-        } else if (!StringUtils.isEmpty(jmsConfig.getReplyDestination())) {
-            return resolveDestinationName(jmsTemplate, jmsConfig.getReplyDestination());
         } else {
-            throw new RuntimeException("No replyTo destination set on request message or cxf message");
+            return jmsConfig.getReplyDestination(session);
         }
     }
 
     /**
-     * Decides what correlationId to use for the reply by looking at the request headers. If the request has a
-     * correlationId set this is taken. Else the messageId from the request message is used as correlation Id
+     * Decides what correlationId to use for the reply by looking at the request headers
      * 
-     * @param request
-     * @return
+     * @param request jms request message
+     * @return correlation id of request if set else message id from request
      * @throws JMSException
      */
     public String determineCorrelationID(javax.jms.Message request) throws JMSException {
-        String correlationID = request.getJMSCorrelationID();
-        if (correlationID == null || "".equals(correlationID)) {
-            correlationID = request.getJMSMessageID();
-        }
-        return correlationID;
+        return StringUtils.isEmpty(request.getJMSCorrelationID())
+            ? request.getJMSMessageID() 
+            : request.getJMSCorrelationID();
     }
 
     /**
@@ -191,22 +170,17 @@ public class JMSDestination extends AbstractMultiplexDestination
      * @throws IOException
      */
     public void onMessage(javax.jms.Message message) {
-        onMessage(message, null);
-    }
-    public void onMessage(javax.jms.Message message, Session session) {
         ClassLoaderHolder origLoader = null;
         Bus origBus = null;
         try {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            getLogger().log(Level.FINE, "server received request: ", message);
-             // Build CXF message from JMS message
-            Message inMessage = new MessageImpl();            
-            JMSUtils.populateIncomingContext(message, inMessage, 
-                                             JMSConstants.JMS_SERVER_REQUEST_HEADERS, jmsConfig);
-            
-            JMSUtils.retrieveAndSetPayload(inMessage, message, (String)inMessage.get(Message.ENCODING));
+            getLogger().log(Level.INFO, "JMS destination received message " + message + " on " 
+                + jmsConfig.getTargetDestination());
+            Message inMessage = JMSMessageUtils.asCXFMessage(message, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+            SecurityContext securityContext = JMSMessageUtils.buildSecurityContext(message, jmsConfig);
+            inMessage.put(SecurityContext.class, securityContext);
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             ((MessageImpl)inMessage).setDestination(this);
@@ -238,25 +212,14 @@ public class JMSDestination extends AbstractMultiplexDestination
                 && inMessage.getExchange().getInMessage() != null) {
                 inMessage = inMessage.getExchange().getInMessage();
             }
-            //need to propagate any exceptions back to Spring container 
-            //so transactions can occur
-            if (inMessage.getContent(Exception.class) != null && session != null) {
-                PlatformTransactionManager m = jmsConfig.getTransactionManager();
-                if (m != null) {
-                    TransactionStatus status = m.getTransaction(null);
-                    JmsResourceHolder resourceHolder =
-                        (JmsResourceHolder) TransactionSynchronizationManager
-                            .getResource(jmsConfig.getConnectionFactory());
-                    boolean trans = resourceHolder == null 
-                        || !resourceHolder.containsSession(session);
-                    if (status != null && !status.isCompleted() && trans) {
-                        Exception ex = inMessage.getContent(Exception.class);
-                        if (ex.getCause() instanceof RuntimeException) {
-                            throw (RuntimeException)ex.getCause();
-                        } else {
-                            throw new RuntimeException(ex);
-                        }
-                    }
+
+            // need to propagate any exceptions back so transactions can occur
+            if (inMessage.getContent(Exception.class) != null) {
+                Exception ex = inMessage.getContent(Exception.class);
+                if (ex.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException)ex.getCause();
+                } else {
+                    throw new RuntimeException(ex);
                 }
             }
             
@@ -264,6 +227,8 @@ public class JMSDestination extends AbstractMultiplexDestination
             getLogger().log(Level.FINE, "Request message has been suspended");
         } catch (UnsupportedEncodingException ex) {
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
+        } catch (JMSException e) {
+            JMSUtil.convertJmsException(e);
         } finally {
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);
@@ -279,62 +244,77 @@ public class JMSDestination extends AbstractMultiplexDestination
             //Don't need to send anything
             return;
         }
-        Message inMessage = exchange.getInMessage();
+        final Message inMessage = exchange.getInMessage();
         final Message outMessage = exchange.getOutMessage();
 
+        ResourceCloser closer = new ResourceCloser();
         try {
+            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+
             final JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)outMessage
                 .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
             JMSMessageHeadersType inMessageProperties = (JMSMessageHeadersType)inMessage
                 .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-            JMSUtils.initResponseMessageProperties(messageProperties, inMessageProperties);
-            JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, messageProperties);
+            initResponseMessageProperties(messageProperties, inMessageProperties);
 
             // setup the reply message
             final javax.jms.Message request = (javax.jms.Message)inMessage
                 .get(JMSConstants.JMS_REQUEST_MESSAGE);
-            final String msgType;
-            if (isMtomEnabled(outMessage)) {
-                msgType = JMSConstants.BINARY_MESSAGE_TYPE;
-            } else if (request instanceof TextMessage) {
-                msgType = JMSConstants.TEXT_MESSAGE_TYPE;
-            } else if (request instanceof BytesMessage) {
-                msgType = JMSConstants.BYTE_MESSAGE_TYPE;
-            } else {
-                msgType = JMSConstants.BINARY_MESSAGE_TYPE;
+            final String msgType = JMSMessageUtils.isMtomEnabled(outMessage)
+                ? JMSConstants.BINARY_MESSAGE_TYPE : JMSMessageUtils.getMessageType(request);
+            if (isTimedOut(request)) {
+                return;
             }
 
-            Destination replyTo = getReplyToDestination(jmsTemplate, inMessage);
-
-            if (request.getJMSExpiration() > 0) {
-                TimeZone tz = new SimpleTimeZone(0, "GMT");
-                Calendar cal = new GregorianCalendar(tz);
-                long timeToLive = request.getJMSExpiration() - cal.getTimeInMillis();
-                if (timeToLive < 0) {
-                    getLogger()
-                        .log(Level.INFO, "Message time to live is already expired skipping response.");
-                    return;
-                }
+            Destination replyTo = getReplyToDestination(session, inMessage);
+            if (replyTo == null) {
+                throw new RuntimeException("No replyTo destination set");
             }
 
             getLogger().log(Level.FINE, "send out the message!");
-            jmsTemplate.send(replyTo, new MessageCreator() {
-                public javax.jms.Message createMessage(Session session) throws JMSException {
-                    javax.jms.Message reply = JMSUtils.createAndSetPayload(replyObj, session, msgType);
 
-                    reply.setJMSCorrelationID(determineCorrelationID(request));
-
-                    JMSUtils.prepareJMSProperties(messageProperties, outMessage, jmsConfig);
-                    JMSUtils.setJMSProperties(reply, messageProperties);
-
-                    LOG.log(Level.FINE, "server sending reply: ", reply);
-                    return reply;
-                }
-            });
-
+            String correlationId = determineCorrelationID(request);
+            javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig, 
+                                      outMessage, 
+                                      replyObj, 
+                                      msgType,
+                                      session,
+                                      correlationId, JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
+            JMSSender sender = JMSFactory.createJmsSender(jmsConfig, messageProperties);
+            LOG.log(Level.FINE, "server sending reply: ", reply);
+            sender.sendMessage(closer, session, replyTo, reply);
         } catch (JMSException ex) {
             throw JmsUtils.convertJmsAccessException(ex);
+        } finally {
+            closer.close();
         }
+    }
+    
+    /**
+     * @param messageProperties
+     * @param inMessageProperties
+     */
+    public static void initResponseMessageProperties(JMSMessageHeadersType messageProperties,
+                                                     JMSMessageHeadersType inMessageProperties) {
+        messageProperties.setJMSDeliveryMode(inMessageProperties.getJMSDeliveryMode());
+        messageProperties.setJMSPriority(inMessageProperties.getJMSPriority());
+        messageProperties.setSOAPJMSRequestURI(inMessageProperties.getSOAPJMSRequestURI());
+        messageProperties.setSOAPJMSBindingVersion("1.0");
+    }
+
+
+    private boolean isTimedOut(final javax.jms.Message request) throws JMSException {
+        if (request.getJMSExpiration() > 0) {
+            TimeZone tz = new SimpleTimeZone(0, "GMT");
+            Calendar cal = new GregorianCalendar(tz);
+            long timeToLive = request.getJMSExpiration() - cal.getTimeInMillis();
+            if (timeToLive < 0) {
+                getLogger()
+                    .log(Level.INFO, "Message time to live is already expired skipping response.");
+                return true;
+            }
+        }
+        return false;
     }
 
     protected Logger getLogger() {
@@ -347,85 +327,6 @@ public class JMSDestination extends AbstractMultiplexDestination
 
     public void setJmsConfig(JMSConfiguration jmsConfig) {
         this.jmsConfig = jmsConfig;
-    }
-
-    /**
-     * Conduit for sending the reply back to the client
-     */
-    protected class BackChannelConduit extends AbstractConduit {
-
-        protected Message inMessage;
-        private JMSExchangeSender sender;
-
-        BackChannelConduit(JMSExchangeSender sender, EndpointReferenceType ref, Message message) {
-            super(ref);
-            inMessage = message;
-            this.sender = sender;
-        }
-        @Override
-        public void close(Message msg) throws IOException {
-            Writer writer = msg.getContent(Writer.class);
-            if (writer != null) {
-                writer.close();
-            }
-            Reader reader = msg.getContent(Reader.class);
-            if (reader != null) {
-                reader.close();
-            }
-            super.close(msg);
-        }
-        /**
-         * Register a message observer for incoming messages.
-         * 
-         * @param observer the observer to notify on receipt of incoming
-         */
-        public void setMessageObserver(MessageObserver observer) {
-            // shouldn't be called for a back channel conduit
-        }
-
-        /**
-         * Send an outbound message, assumed to contain all the name-value mappings of the corresponding input
-         * message (if any).
-         * 
-         * @param message the message to be sent.
-         */
-        public void prepare(final Message message) throws IOException {
-            // setup the message to be send back
-            javax.jms.Message jmsMessage = (javax.jms.Message)inMessage
-                .get(JMSConstants.JMS_REQUEST_MESSAGE);
-            message.put(JMSConstants.JMS_REQUEST_MESSAGE, jmsMessage);
-
-            if (!message.containsKey(JMSConstants.JMS_SERVER_RESPONSE_HEADERS)
-                && inMessage.containsKey(JMSConstants.JMS_SERVER_RESPONSE_HEADERS)) {
-                message.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, inMessage
-                    .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS));
-            }
-
-            Exchange exchange = inMessage.getExchange();
-            exchange.setOutMessage(message);
-            
-            if ((jmsMessage instanceof TextMessage) && !isMtomEnabled(message)) {
-                message.setContent(Writer.class, new StringWriter() {
-                    @Override
-                    public void close() throws IOException {
-                        super.close();
-                        sender.sendExchange(message.getExchange(), toString());
-                    }
-                });
-
-            } else {
-                message.setContent(OutputStream.class, new JMSOutputStream(sender, exchange, false));
-            }
-        }
-        
-        protected Logger getLogger() {
-            return LOG;
-        }
-    }
-
-    private boolean isMtomEnabled(final Message message) {
-        return MessageUtils.isTrue(message.getContextualProperty(
-                                                       org.apache.cxf.message.Message.MTOM_ENABLED));
     }
 
 }

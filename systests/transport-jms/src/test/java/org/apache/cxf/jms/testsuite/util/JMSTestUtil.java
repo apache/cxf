@@ -38,14 +38,12 @@ import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testsuite.testcase.TestCasesType;
 import org.apache.cxf.transport.jms.JMSConfiguration;
-import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.JNDIConfiguration;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
@@ -104,15 +102,6 @@ public final class JMSTestUtil {
                 }
             }
         }
-    }
-
-    public static JmsTemplate getJmsTemplate(String address) throws Exception {
-        return JMSFactory.createJmsTemplate(getInitJMSConfiguration(address), null);
-    }
-
-    public static Destination getJmsDestination(JmsTemplate jmsTemplate, String destinationName,
-                                                boolean pubSubDomain) {
-        return JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName, pubSubDomain);
     }
 
     public static JMSConfiguration getInitJMSConfiguration(String address) throws Exception {

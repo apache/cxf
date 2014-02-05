@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jms;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 
-
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
@@ -39,15 +38,12 @@ import org.apache.cxf.transport.jms.JMSNamingPropertyType;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
-    static final String PORT = Soap12Server.PORT;
-    
-    static EmbeddedJMSBrokerLauncher broker;
-
+    private static final String BROKER_URI = "vm://JMSClientServerSoap12Test?broker.persistent=false";
+    private static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
     public static class Soap12Server extends AbstractBusTestServerBase {
@@ -68,7 +64,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://JMSClientServerSoap12Test");
+        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
         assertTrue("server did not launch correctly", 
                    launchServer(Soap12Server.class, true));
     }

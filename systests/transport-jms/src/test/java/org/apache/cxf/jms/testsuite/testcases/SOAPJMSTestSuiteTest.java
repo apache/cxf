@@ -65,14 +65,12 @@ import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
-
+import org.apache.cxf.transport.jms.util.JMSSender;
+import org.apache.cxf.transport.jms.util.JMSUtil;
+import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-
 
 /**
  * 
@@ -84,7 +82,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://SOAPJMSTestSuiteTest");
+        broker = new EmbeddedJMSBrokerLauncher("vm://SOAPJMSTestSuiteTest?broker.persistent=false");
         launchServer(broker);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
@@ -256,7 +254,9 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         requestHeader.setJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
         requestHeader.setTimeToLive(10800000);
         requestHeader.setJMSPriority(3);
-        requestHeader.setJMSReplyTo("dynamicQueues/replyqueue00093");
+        
+        // FIXME had to change this
+        requestHeader.setJMSReplyTo("dynamicQueues/replyqueue00091");
 
         twoWayTestWithRequestHeader(testcase, simplePort, requestHeader);
     }
@@ -639,38 +639,27 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     public void twoWayTestWithCreateMessage(final TestCaseType testcase) throws Exception {
         String address = testcase.getAddress();
         JMSConfiguration jmsConfig = JMSTestUtil.getInitJMSConfiguration(address);
-        final JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, null);
         
-        final Destination replyToDestination = JMSFactory.resolveOrCreateDestination(jmsTemplate,
-                                                                                     null, false);
-        class JMSConduitMessageCreator implements MessageCreator {
-            private javax.jms.Message jmsMessage;
-
-            public javax.jms.Message createMessage(Session session) throws JMSException {
-                jmsMessage = JMSTestUtil.buildJMSMessageFromTestCase(testcase, session, replyToDestination);
-                return jmsMessage;
-            }
-
-            public String getMessageID() {
-                if (jmsMessage != null) {
-                    try {
-                        return jmsMessage.getJMSMessageID();
-                    } catch (JMSException e) {
-                        return null;
-                    }
-                }
-                return null;
-            }
+        ResourceCloser closer = new ResourceCloser();
+        try {
+            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+            
+            final Destination replyToDestination = jmsConfig.getReplyToDestination(session, null);
+            Message jmsMessage = JMSTestUtil.buildJMSMessageFromTestCase(testcase, session, replyToDestination);
+            JMSSender sender = JMSFactory.createJmsSender(jmsConfig, null);
+            Destination targetDest = 
+                jmsConfig.getDestinationResolver().resolveDestinationName(session, 
+                                                                          jmsConfig.getTargetDestination(),
+                                                                          jmsConfig.isReplyPubSubDomain());
+            sender.sendMessage(closer, session, targetDest, jmsMessage);
+            Message replyMessage = JMSUtil.receive(session, replyToDestination, 
+                                                   jmsMessage.getJMSMessageID(), 10000, true);
+            checkReplyMessage(replyMessage, testcase);
+        } catch (JMSException e) {
+            throw JMSUtil.convertJmsException(e);
+        } finally {
+            closer.close();
         }
-        JMSConduitMessageCreator messageCreator = new JMSConduitMessageCreator();    
-
-        jmsTemplate.send(jmsConfig.getTargetDestination(), messageCreator);
-        String messageId = messageCreator.getMessageID();
-
-        String messageSelector = "JMSCorrelationID = '" + messageId + "'";
-        javax.jms.Message replyMessage = jmsTemplate.receiveSelected(replyToDestination,
-                                                                     messageSelector);
-        checkReplyMessage(replyMessage, testcase);
     }
 
     private void checkReplyMessage(Message replyMessage, TestCaseType testcase) throws JMSException {

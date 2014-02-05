@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jms;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 
-
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
@@ -39,14 +38,13 @@ import org.apache.cxf.transport.jms.JMSNamingPropertyType;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(GzipServer.class);
-    
-    static EmbeddedJMSBrokerLauncher broker;
+    private static final String BROKER_URI = "vm://" + JMSClientServerGzipTest.class.getSimpleName() 
+        + "?broker.persistent=false";
+    private static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
     
@@ -67,7 +65,7 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
     }
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://" + JMSClientServerGzipTest.class.getSimpleName());
+        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
         launchServer(broker);
         assertTrue("server did not launch correctly", 
                    launchServer(GzipServer.class, true));

@@ -51,11 +51,9 @@ public abstract class AbstractJMSTester extends Assert {
     private static JMSBrokerSetup broker;
 
     protected Bus bus;
-    protected EndpointInfo endpointInfo;
     protected EndpointReferenceType target;
     protected MessageObserver observer;
     protected Message inMessage;
-    protected String wsdlURL;
 
     public static void startBroker(JMSBrokerSetup b) throws Exception {
         assertNotNull(b);
@@ -82,26 +80,32 @@ public abstract class AbstractJMSTester extends Assert {
         if (System.getProperty("cxf.config.file") != null) {
             System.clearProperty("cxf.config.file");
         }
-        wsdlURL = null;
     }
 
-    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
+    protected EndpointInfo setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
-        wsdlURL = wsdlUrl.toString();
+        String wsdlURL = wsdlUrl.toString();
         assertNotNull(wsdlUrl);
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlURL);
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlURL, new QName(ns, serviceName));
 
         Service service = factory.create();
-        endpointInfo = service.getEndpointInfo(new QName(ns, portName));
+        return service.getEndpointInfo(new QName(ns, portName));
 
     }
-
-    protected void sendoutMessage(Conduit conduit, Message message, Boolean isOneWay) throws IOException {
+    
+    protected void sendoutMessage(Conduit conduit, Message message, boolean isOneWay) throws IOException {
+        sendoutMessage(conduit, message, isOneWay, true);
+    }
+    
+    protected void sendoutMessage(Conduit conduit, 
+                                  Message message, 
+                                  boolean isOneWay, 
+                                  boolean synchronous) throws IOException {
 
         Exchange exchange = new ExchangeImpl();
         exchange.setOneWay(isOneWay);
-        exchange.setSynchronous(true);
+        exchange.setSynchronous(synchronous);
         message.setExchange(exchange);
         exchange.setOutMessage(message);
         try {
@@ -122,7 +126,7 @@ public abstract class AbstractJMSTester extends Assert {
         }
     }
 
-    protected void adjustEndpointInfoURL() {
+    protected void adjustEndpointInfoURL(EndpointInfo endpointInfo) {
         if (endpointInfo != null) {
             AddressType at = endpointInfo.getExtensor(AddressType.class);
             if (at != null) {
@@ -138,21 +142,16 @@ public abstract class AbstractJMSTester extends Assert {
         }
     }
     
-    protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) throws IOException {
-        if (decoupled) {
-            // setup the reference type
-        } else {
-            target = EasyMock.createMock(EndpointReferenceType.class);
-        }
-        
-        adjustEndpointInfoURL();
+    protected JMSConduit setupJMSConduit(EndpointInfo ei, boolean send) throws IOException {
+        target = EasyMock.createMock(EndpointReferenceType.class);
+        adjustEndpointInfoURL(ei);
 
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
-            .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, true);
+            .createJMSConfigurationFromEndpointInfo(bus, ei, null, true);
         if (jmsConfig != null && jmsConfig.getReceiveTimeout() == null) {
             jmsConfig.setReceiveTimeout(5000L);
         }
-        JMSConduit jmsConduit = new JMSConduit(endpointInfo, target, jmsConfig, bus);
+        JMSConduit jmsConduit = new JMSConduit(target, jmsConfig, bus);
         if (send) {
             // setMessageObserver
             observer = new MessageObserver() {
@@ -164,6 +163,13 @@ public abstract class AbstractJMSTester extends Assert {
         }
 
         return jmsConduit;
+    }
+    
+    protected JMSDestination setupJMSDestination(EndpointInfo ei) throws IOException {
+        adjustEndpointInfoURL(ei);
+        JMSConfiguration jmsConfig = new JMSOldConfigHolder()
+            .createJMSConfigurationFromEndpointInfo(bus, ei, null, false);
+        return new JMSDestination(bus, ei, jmsConfig);
     }
 
 }

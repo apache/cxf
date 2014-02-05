@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -34,10 +35,10 @@ public class OldConfigTest extends AbstractJMSTester {
 
     @Test
     public void testUsernameAndPassword() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                 "HelloWorldService", "HelloWorldPort");
         JMSOldConfigHolder holder = new JMSOldConfigHolder();
-        JMSEndpoint endpoint = holder.getExtensorsAndConfig(bus, endpointInfo, target, false);
+        JMSEndpoint endpoint = holder.getExtensorsAndConfig(bus, ei, target, false);
         holder.configureEndpoint(false, endpoint);
         Assert.assertEquals("User name does not match." , "testUser", endpoint.getUsername());
         Assert.assertEquals("Password does not match." , "testPassword", endpoint.getPassword());
