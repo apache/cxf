@@ -252,7 +252,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         this.addDerivedKeyElement(secondRefList);
                     } else if (!secondEncrParts.isEmpty()) {
                         //Encrypt, get hold of the ref list and add it
-                        secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, encrParts);
+                        secondRefList = ((WSSecEncrypt)encr).encryptForRef(null, secondEncrParts);
                         this.addDerivedKeyElement(secondRefList);
                     }
                 }

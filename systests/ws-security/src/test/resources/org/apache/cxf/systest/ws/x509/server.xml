@@ -238,6 +238,12 @@
             <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricUsernameToken" address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricUsernameToken" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricUsernameTokenPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        <jaxws:properties>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="bob.properties"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricProtectTokens" address="http://localhost:${testutil.ports.Server}/DoubleItX509SymmetricProtect" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricProtectTokensPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
