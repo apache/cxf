@@ -626,6 +626,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/oneway");
         Response r = client.header("OnewayRequest", "true").post(null);
         assertEquals(202, r.getStatus());
+        assertFalse(r.getHeaders().isEmpty());
     }
     
     @Test
