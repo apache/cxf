@@ -316,15 +316,20 @@ public final class InjectionUtils {
         }
     }
 
+    public static Object extractFromMethod(Object requestObject, Method method) {
+        return extractFromMethod(requestObject, method, true);
+    }
+    
     public static Object extractFromMethod(Object requestObject,
-                                           Method method) {
+                                           Method method,
+                                           boolean logError) {
         try {
             Method methodToInvoke = checkProxy(method, requestObject);
             return methodToInvoke.invoke(requestObject);
         } catch (IllegalAccessException ex) {
-            reportServerError("METHOD_ACCESS_FAILURE", method.getName());
+            reportServerError("METHOD_ACCESS_FAILURE", method.getName(), logError);
         } catch (Exception ex) {
-            reportServerError("METHOD_INJECTION_FAILURE", method.getName());
+            reportServerError("METHOD_INJECTION_FAILURE", method.getName(), logError);
         }
         return null;
     }
@@ -446,11 +451,17 @@ public final class InjectionUtils {
     }
     
     public static void reportServerError(String messageName, String parameter) {
+        reportServerError(messageName, parameter, true);
+    }
+    
+    public static void reportServerError(String messageName, String parameter, boolean logError) {
         org.apache.cxf.common.i18n.Message errorMessage = 
             new org.apache.cxf.common.i18n.Message(messageName, 
                                                    BUNDLE, 
                                                    parameter);
-        LOG.severe(errorMessage.toString());
+        if (logError) {
+            LOG.severe(errorMessage.toString());
+        }
         Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                          .type(MediaType.TEXT_PLAIN_TYPE)
                          .entity(errorMessage.toString()).build();
@@ -971,6 +982,10 @@ public final class InjectionUtils {
         }
     }
     
+    public static Method getGetterFromSetter(Method setter) throws Exception {
+        return setter.getClass().getMethod("get" + setter.getName().substring(3), new Class[]{});
+    }
+    
     public static void injectContextProxiesAndApplication(AbstractResourceInfo cri, 
                                                           Object instance,
                                                           Application app) {
@@ -984,7 +999,9 @@ public final class InjectionUtils {
                 ? app : cri.getContextSetterProxy(method);
             try {
                 synchronized (instance) {
-                    if (value == InjectionUtils.extractFromMethod(instance, method)) {
+                    if (value == InjectionUtils.extractFromMethod(instance, 
+                                                                  getGetterFromSetter(method), 
+                                                                  false)) {
                         continue;
                     }
                 }
