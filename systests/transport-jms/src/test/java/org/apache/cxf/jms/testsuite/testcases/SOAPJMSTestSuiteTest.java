@@ -643,14 +643,10 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         ResourceCloser closer = new ResourceCloser();
         try {
             Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
-            
-            final Destination replyToDestination = jmsConfig.getReplyToDestination(session, null);
-            Message jmsMessage = JMSTestUtil.buildJMSMessageFromTestCase(testcase, session, replyToDestination);
+            Destination targetDest = jmsConfig.getTargetDestination(session);
+            Destination replyToDestination = jmsConfig.getReplyToDestination(session, null);
             JMSSender sender = JMSFactory.createJmsSender(jmsConfig, null);
-            Destination targetDest = 
-                jmsConfig.getDestinationResolver().resolveDestinationName(session, 
-                                                                          jmsConfig.getTargetDestination(),
-                                                                          jmsConfig.isReplyPubSubDomain());
+            Message jmsMessage = JMSTestUtil.buildJMSMessageFromTestCase(testcase, session, replyToDestination);
             sender.sendMessage(closer, session, targetDest, jmsMessage);
             Message replyMessage = JMSUtil.receive(session, replyToDestination, 
                                                    jmsMessage.getJMSMessageID(), 10000, true);

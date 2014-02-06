@@ -40,7 +40,7 @@ import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 /**
- * Factory to create JmsTemplates and JmsListeners from configuration and context information
+ * Factory to create jms helper objects from configuration and context information
  */
 public final class JMSFactory {
     static final String MESSAGE_ENDPOINT_FACTORY = "MessageEndpointFactory";

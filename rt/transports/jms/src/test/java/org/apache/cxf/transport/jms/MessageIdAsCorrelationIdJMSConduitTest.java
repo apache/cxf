@@ -40,7 +40,6 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
     private static final String SERVICE_QUEUE = "test";
     private static final String BROKER_URI = "vm://localhost?broker.persistent=false";
     private ConnectionFactory connectionFactory;
-    //private String requestMessageId;
 
     @Test
     public void testSendReceiveWithTempReplyQueue() throws Exception {

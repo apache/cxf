@@ -55,7 +55,10 @@ import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.util.JMSMessageConverter;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 
-public final class JMSMessageUtils {
+/**
+ * Static util methods for converting cxf to jms messages and vice a versa 
+ */
+final class JMSMessageUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSMessageUtils.class);
 
     private JMSMessageUtils() {

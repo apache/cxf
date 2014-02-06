@@ -28,7 +28,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
-public final class MessageStreamUtil {
+final class MessageStreamUtil {
     
     private MessageStreamUtil() {
     }

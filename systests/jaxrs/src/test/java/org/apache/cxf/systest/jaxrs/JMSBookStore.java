@@ -25,11 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.naming.Context;
@@ -50,7 +50,6 @@ import javax.xml.bind.Marshaller;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.util.JMSUtil;
 
 @Path("/bookstore")
 public class JMSBookStore {
@@ -161,9 +160,8 @@ public class JMSBookStore {
     private void postOneWayBook(Session session, Destination destination, Book book) 
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
-        
-        Message message = JMSUtil.createAndSetPayload(writeBook(book), session, "byte");
-                    
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes(writeBook(book));
         producer.send(message);
         producer.close();
     }

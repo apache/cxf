@@ -65,6 +65,7 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         BusFactory.setDefaultBus(staticBus);
         return staticBus;
     }
+
     public static Bus createStaticBus() throws Exception {
         return createStaticBus(null);
     }

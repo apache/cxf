@@ -350,8 +350,7 @@
             <targetService/>
             <contentType>text/xml; charset=UTF-8</contentType>
             <soapAction/>
-            <requestURI>jms:jndi:dynamicQueues/testqueue1002
-                        </requestURI>
+            <requestURI>jms:jndi:dynamicQueues/testqueue1002</requestURI>
             <messageBody/>
         </requestMessage>
         <responseMessage>

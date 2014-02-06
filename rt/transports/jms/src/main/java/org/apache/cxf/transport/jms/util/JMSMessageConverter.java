@@ -25,6 +25,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
+import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
 /**
@@ -67,6 +68,9 @@ public class JMSMessageConverter {
             return bytes;
         } else if (message instanceof ObjectMessage) {
             return ((ObjectMessage)message).getObject();
+        } else if (message instanceof StreamMessage) {
+            StreamMessage streamMessage = (StreamMessage)message;
+            return streamMessage.readObject();
         } else {
             throw new IllegalArgumentException("Unsupported message type " + nullSafeClassName(message));
         }

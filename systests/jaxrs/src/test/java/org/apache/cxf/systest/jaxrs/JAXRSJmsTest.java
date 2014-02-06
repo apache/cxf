@@ -19,12 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -44,8 +46,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.JMSMessageUtils;
-import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -241,10 +241,11 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     private void checkBookInResponse(Session session, Destination replyToDestination,
                                      long bookId, String bookName) throws Exception {
         MessageConsumer consumer = session.createConsumer(replyToDestination);
-        Message jmsMessage = consumer.receive(300000);
-        org.apache.cxf.message.Message cxfMessage = new org.apache.cxf.message.MessageImpl();
-        JMSMessageUtils.retrieveAndSetPayload(cxfMessage, jmsMessage);
-        Book b = readBook(cxfMessage.getContent(InputStream.class));
+        BytesMessage jmsMessage = (BytesMessage)consumer.receive(300000);
+        byte[] bytes = new byte[(int)jmsMessage.getBodyLength()];
+        jmsMessage.readBytes(bytes);
+        InputStream is = new ByteArrayInputStream(bytes);
+        Book b = readBook(is);
         assertEquals(bookId, b.getId());
         assertEquals(bookName, b.getName());
     }
@@ -274,8 +275,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
         
-        Message message = JMSUtil.createAndSetPayload(
-            writeBook(new Book("JMS OneWay", 125L)), session, "byte");
+        byte[] payload = writeBook(new Book("JMS OneWay", 125L));
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes(payload);
         message.setStringProperty("Content-Type", "application/xml");
         message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
         message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
@@ -287,8 +289,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     private void postBook(Session session, Destination destination, Destination replyTo) 
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
-        
-        Message message = JMSUtil.createAndSetPayload(writeBook(new Book("JMS", 3L)), session, "byte");
+        byte[] payload = writeBook(new Book("JMS", 3L));
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes(payload);
         message.setJMSReplyTo(replyTo);
         // or, if oneway,
         // message.setStringProperty("OnewayRequest", "true");
@@ -327,6 +330,5 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         m.marshal(b, bos);
         return bos.toByteArray();
     }
-    
     
 }

@@ -43,7 +43,7 @@ public final class JMSUtil {
                                   boolean pubSubNoLocal) {
         ResourceCloser closer = new ResourceCloser();
         try {
-            final String messageSelector = "JMSCorrelationID = '" + correlationId + "'";
+            String messageSelector = correlationId == null ? null : "JMSCorrelationID = '" + correlationId + "'";
             MessageConsumer consumer = closer.register(session.createConsumer(replyToDestination, messageSelector,
                                                  pubSubNoLocal));
             javax.jms.Message replyMessage = consumer.receive(receiveTimeout);
@@ -63,8 +63,8 @@ public final class JMSUtil {
         return new RuntimeException(e.getMessage(), e);
     }
 
-    public static String createCorrelationId(final String prefix, long i) {
-        String index = Long.toHexString(i);
+    public static String createCorrelationId(final String prefix, long sequenceNUm) {
+        String index = Long.toHexString(sequenceNUm);
         StringBuilder id = new StringBuilder(prefix);
         id.append(CORRELATTION_ID_PADDING, 0, 16 - index.length());
         id.append(index);
