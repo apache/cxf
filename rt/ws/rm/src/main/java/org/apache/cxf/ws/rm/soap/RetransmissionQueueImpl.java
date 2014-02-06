@@ -19,13 +19,11 @@
 
 package org.apache.cxf.ws.rm.soap;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -390,7 +388,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
         
         final String address = to.getValue();
-        LOG.fine("Resending to address: " + address);
+        LOG.log(Level.FINE, "Resending to address: {0}", address);
         final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
         final Endpoint reliableEndpoint = manager.getReliableEndpoint(message).getEndpoint(protocol);
 
@@ -455,15 +453,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             CachedOutputStream content = (CachedOutputStream)message
                 .get(RMMessageConstants.SAVED_CONTENT);
-            InputStream bis = null;
             if (null == content) {
-                byte[] savedbytes = message.getContent(byte[].class);
-                bis = new ByteArrayInputStream(savedbytes); 
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Using saved byte array: " + Arrays.toString(savedbytes));
-                }
+                LOG.log(Level.WARNING, "Assuming the message has been acknowledged and released, skipping resend.");
             } else {
-                bis = content.getInputStream();
+                InputStream bis = content.getInputStream();
                 if (LOG.isLoggable(Level.FINE)) {
                     if (content.size() < 65536) {
                         LOG.fine("Using saved output stream: " 
@@ -472,17 +465,17 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                         LOG.fine("Using saved output stream: ...");                        
                     }
                 }
-            }
 
-            // copy saved output stream to new output stream in chunks of 1024
-            IOUtils.copyAndCloseInput(bis, os);
-            os.flush();
-            // closing the conduit this way will close the underlining stream that is os.
-            c.close(message);
+                // copy saved output stream to new output stream in chunks of 1024
+                IOUtils.copyAndCloseInput(bis, os);
+                os.flush();
+                // closing the conduit this way will close the underlining stream that is os.
+                c.close(message);
+            }
         } catch (ConnectException ex) {
             //ignore, we'll just resent again later
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "RESEND_FAILED_MSG", ex);
+            LOG.log(Level.WARNING, "RESEND_FAILED_MSG", ex);
         }
     }
 
