@@ -130,6 +130,9 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-5527] - SAAJ API's can corrupt messages
     * [CXF-5529] - Deploy error when publishing CXF WebService to Glassfish4
     * [CXF-5532] - jax-ws-catalog.xml / @SchemaValidation / xsd-includes
+    * [CXF-5348] - Exception mappers implementing ExceptionMapper through an abstract class are not mapped to the declared exception 
+    * [CXF-5517] - Incorrect check for VOID type
+
 
 ** Improvement
     * [CXF-5409] - Make response code be included in logging for LocalTransport
@@ -139,6 +142,7 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-5488] - make basePath in SwaggerFeature configurable
     * [CXF-5489] - Add 'transferTo' functionality to Attachments
     * [CXF-5519] - Setting SecurityConstants.STS_TOKEN_ACT_AS as CallbackHander requires better documentation.
+    * [CXF-5533] - Store a reference to a Bootstrap SecurityToken in SecureConversation
     * [CXF-5521] - Setting SecurityConstants.STS_TOKEN_ON_BEHALF_OF as CallbackHander requires better documentation.
 
 ** Task
