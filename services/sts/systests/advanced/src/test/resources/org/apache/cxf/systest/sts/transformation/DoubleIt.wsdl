@@ -38,6 +38,9 @@
         <wsdl:port name="DoubleItTransportUTPort" binding="tns:DoubleItTransportUTBinding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleittransportut"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItTransportUTClaimsPort" binding="tns:DoubleItTransportUTBinding">
+            <soap:address location="https://localhost:8081/doubleit/services/doubleittransportutclaims"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItBindingTransportUTPolicy">
         <wsp:ExactlyOne>

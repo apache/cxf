@@ -37,6 +37,9 @@ import org.junit.BeforeClass;
  * The provider dispatches the Username Token to an STS for validation (via TLS), and also
  * send a TokenType corresponding to a SAML2 Assertion. The STS will create the requested
  * SAML Assertion after validation and return it to the provider.
+ * 
+ * In the second test, the service will also send some claims to the STS for inclusion in the
+ * SAML Token, and validate the result.
  */
 public class TransformationTest extends AbstractBusClientServerTestBase {
     
@@ -82,6 +85,29 @@ public class TransformationTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransformationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
+        DoubleItPortType transportUTPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportUTPort, PORT);
+        
+        doubleIt(transportUTPort, 25);
+        
+        ((java.io.Closeable)transportUTPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testTokenTransformationClaims() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransformationTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransformationTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportUTClaimsPort");
         DoubleItPortType transportUTPort = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, PORT);

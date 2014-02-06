@@ -1056,6 +1056,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         writer.writeStartElement("wst", "TokenType", namespace);
         writer.writeCharacters(tokentype);
         writer.writeEndElement();
+        
+        addClaims(writer);
 
         writer.writeStartElement("wst", "ValidateTarget", namespace);
 

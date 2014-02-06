@@ -45,7 +45,6 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -75,6 +74,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
@@ -539,16 +539,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 if (!utWithCallbacks) {
                     WSS4JTokenConverter.convertToken(msg, p);
                 }
-                Object receivedAssertion = null;
+                Object receivedAssertion = o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                if (receivedAssertion == null) {
+                    receivedAssertion  = o.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
+                }
                 
                 List<String> roles = null;
-                if (o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
+                if (receivedAssertion instanceof SamlAssertionWrapper) {
                     String roleAttributeName = (String)msg.getContextualProperty(
                             SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
                     if (roleAttributeName == null || roleAttributeName.length() == 0) {
                         roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                     }
-                    receivedAssertion = o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
                     SAMLSecurityContext context = createSecurityContext(p, roles);
                     context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));

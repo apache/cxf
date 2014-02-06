@@ -41,6 +41,7 @@
         <property name="tokenProviders" ref="transportTokenProviders"/>
         <property name="tokenValidators" ref="transportTokenValidators"/>
         <property name="stsProperties" ref="transportSTSProperties"/>
+        <property name="claimsManager" ref="claimsManager"/>
         <property name="tokenStore" ref="defaultTokenStore"/>
     </bean>
     <bean id="defaultTokenStore" class="org.apache.cxf.sts.cache.DefaultInMemoryTokenStore">
