@@ -50,7 +50,7 @@ import javax.xml.bind.Marshaller;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.JMSUtils;
+import org.apache.cxf.transport.jms.util.JMSUtil;
 
 @Path("/bookstore")
 public class JMSBookStore {
@@ -162,8 +162,7 @@ public class JMSBookStore {
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
         
-        Message message = JMSUtils.createAndSetPayload(
-            writeBook(book), session, "byte");
+        Message message = JMSUtil.createAndSetPayload(writeBook(book), session, "byte");
                     
         producer.send(message);
         producer.close();

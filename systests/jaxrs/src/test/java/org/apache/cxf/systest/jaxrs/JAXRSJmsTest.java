@@ -44,8 +44,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.JMSUtils;
-
+import org.apache.cxf.transport.jms.JMSMessageUtils;
+import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -243,7 +243,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         MessageConsumer consumer = session.createConsumer(replyToDestination);
         Message jmsMessage = consumer.receive(300000);
         org.apache.cxf.message.Message cxfMessage = new org.apache.cxf.message.MessageImpl();
-        JMSUtils.retrieveAndSetPayload(cxfMessage, jmsMessage, null);
+        JMSMessageUtils.retrieveAndSetPayload(cxfMessage, jmsMessage);
         Book b = readBook(cxfMessage.getContent(InputStream.class));
         assertEquals(bookId, b.getId());
         assertEquals(bookName, b.getName());
@@ -274,7 +274,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
         
-        Message message = JMSUtils.createAndSetPayload(
+        Message message = JMSUtil.createAndSetPayload(
             writeBook(new Book("JMS OneWay", 125L)), session, "byte");
         message.setStringProperty("Content-Type", "application/xml");
         message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
@@ -288,7 +288,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
         
-        Message message = JMSUtils.createAndSetPayload(writeBook(new Book("JMS", 3L)), session, "byte");
+        Message message = JMSUtil.createAndSetPayload(writeBook(new Book("JMS", 3L)), session, "byte");
         message.setJMSReplyTo(replyTo);
         // or, if oneway,
         // message.setStringProperty("OnewayRequest", "true");

@@ -39,6 +39,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -146,7 +147,7 @@ public class JMSConduitTest extends AbstractJMSTester {
         try {
             Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
             javax.jms.Message jmsMessage = 
-                JMSMessageUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
+                JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
         } finally {
             closer.close();

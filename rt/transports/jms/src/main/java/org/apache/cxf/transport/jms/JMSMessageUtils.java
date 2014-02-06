@@ -37,7 +37,6 @@ import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -54,36 +53,13 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.util.JMSMessageConverter;
+import org.apache.cxf.transport.jms.util.JMSUtil;
 
 public final class JMSMessageUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSMessageUtils.class);
 
     private JMSMessageUtils() {
 
-    }
-
-    /**
-     * Create a JMS of the appropriate type populated with the given payload.
-     * 
-     * @param payload the message payload, expected to be either of type String or byte[] depending on payload
-     *            type
-     * @param session the JMS session
-     * @param replyTo the ReplyTo destination if any
-     * @return a JMS of the appropriate type populated with the given payload
-     */
-    static Message createAndSetPayload(Object payload, Session session, String messageType)
-        throws JMSException {
-        Message message = null;
-        if (JMSConstants.TEXT_MESSAGE_TYPE.equals(messageType)) {
-            message = session.createTextMessage((String)payload);
-        } else if (JMSConstants.BYTE_MESSAGE_TYPE.equals(messageType)) {
-            message = session.createBytesMessage();
-            ((BytesMessage)message).writeBytes((byte[])payload);
-        } else {
-            message = session.createObjectMessage();
-            ((ObjectMessage)message).setObject((byte[])payload);
-        }
-        return message;
     }
 
     public static org.apache.cxf.message.Message asCXFMessage(Message message, String headerType) 
@@ -103,7 +79,7 @@ public final class JMSMessageUtils {
      * @throws UnsupportedEncodingException
      * @throws JMSException 
      */
-    private static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
+    public static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
         throws UnsupportedEncodingException, JMSException {
         String messageType = null;
         Object converted = new JMSMessageConverter().fromMessage(message);
@@ -360,7 +336,7 @@ public final class JMSMessageUtils {
                                        String headerType)
         throws JMSException {
 
-        Message jmsMessage = JMSMessageUtils.createAndSetPayload(payload, session, messageType);
+        Message jmsMessage = JMSUtil.createAndSetPayload(payload, session, messageType);
         JMSMessageHeadersType messageProperties = getOrCreateHeader(outMessage, headerType);
         JMSMessageUtils.prepareJMSMessageHeaderProperties(messageProperties, outMessage, jmsConfig);
         JMSMessageUtils.prepareJMSMessageProperties(messageProperties, outMessage, 
