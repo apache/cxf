@@ -70,7 +70,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
         assertTrue("server did not launch correctly",
-                   launchServer(JMSServer.class));
+                   launchServer(JMSServer.class, true));
         serversStarted = true;
     }
     
@@ -241,7 +241,10 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     private void checkBookInResponse(Session session, Destination replyToDestination,
                                      long bookId, String bookName) throws Exception {
         MessageConsumer consumer = session.createConsumer(replyToDestination);
-        BytesMessage jmsMessage = (BytesMessage)consumer.receive(300000);
+        BytesMessage jmsMessage = (BytesMessage)consumer.receive(5000);
+        if (jmsMessage == null) {
+            throw new RuntimeException("No response recieved on " + replyToDestination);
+        }
         byte[] bytes = new byte[(int)jmsMessage.getBodyLength()];
         jmsMessage.readBytes(bytes);
         InputStream is = new ByteArrayInputStream(bytes);
@@ -262,7 +265,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     private void postGetMessage(Session session, Destination destination, Destination replyTo) 
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
-        Message message = session.createMessage();
+        Message message = session.createBytesMessage();
         message.setJMSReplyTo(replyTo);
         message.setStringProperty("Accept", "application/xml");
         message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");

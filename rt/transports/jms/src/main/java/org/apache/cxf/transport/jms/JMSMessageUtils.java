@@ -64,11 +64,9 @@ final class JMSMessageUtils {
     private JMSMessageUtils() {
 
     }
-
     public static org.apache.cxf.message.Message asCXFMessage(Message message, String headerType) 
         throws UnsupportedEncodingException, JMSException {
-
-        org.apache.cxf.message.Message inMessage = new MessageImpl();            
+        org.apache.cxf.message.Message inMessage = new MessageImpl();
         populateIncomingContext(message, inMessage, headerType);
         retrieveAndSetPayload(inMessage, message);
         return inMessage;
@@ -150,8 +148,7 @@ final class JMSMessageUtils {
                 inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(val));
             }
             if (name.equals(org.apache.cxf.message.Message.RESPONSE_CODE)) {
-                inMessage.getExchange().put(org.apache.cxf.message.Message.RESPONSE_CODE,
-                                            Integer.valueOf(val));
+                inMessage.put(org.apache.cxf.message.Message.RESPONSE_CODE, Integer.valueOf(val));
             }
         }
         inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);

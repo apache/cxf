@@ -72,7 +72,7 @@ public class JMSMessageConverter {
             StreamMessage streamMessage = (StreamMessage)message;
             return streamMessage.readObject();
         } else {
-            throw new IllegalArgumentException("Unsupported message type " + nullSafeClassName(message));
+            return new byte[]{};
         }
     }
 

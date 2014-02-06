@@ -333,10 +333,13 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         
         LOG.log(Level.FINE, "client received reply: ", jmsMessage);
         try {
-            Message inMessage = JMSMessageUtils.asCXFMessage(jmsMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+            Message inMessage = JMSMessageUtils.asCXFMessage(jmsMessage, 
+                                                             JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
             SecurityContext securityContext = JMSMessageUtils.buildSecurityContext(jmsMessage, jmsConfig);
             inMessage.put(SecurityContext.class, securityContext);
             exchange.setInMessage(inMessage);
+            Object responseCode = inMessage.get(org.apache.cxf.message.Message.RESPONSE_CODE);
+            exchange.put(org.apache.cxf.message.Message.RESPONSE_CODE, responseCode);
 
             if (exchange.isSynchronous()) {
                 synchronized (exchange) {

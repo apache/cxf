@@ -20,11 +20,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:p="http://www.springframework.org/schema/p" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation=" http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" 
+    	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
     <bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
         <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
     </bean>
-    <bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="singleConnectionFactory" p:timeToLive="500000" p:concurrentConsumers="1" p:maxSuspendedContinuations="0" p:maxConcurrentConsumers="1"/>
+    <bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration" 
+    	p:connectionFactory-ref="singleConnectionFactory" 
+    	p:timeToLive="500000" 
+    	p:concurrentConsumers="1" 
+    	p:maxSuspendedContinuations="0" 
+    	p:maxConcurrentConsumers="1"/>
     <jms:destination name="{http://books.com}BookService.jms-destination">
         <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text">
             <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
