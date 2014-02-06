@@ -148,8 +148,9 @@ public abstract class AbstractResourceInfo {
             Object proxy = null;
             synchronized (provider) {
                 try {
-                    Method getter = m.getClass().getMethod("get" + m.getName().substring(3), new Class[]{});
-                    proxy = InjectionUtils.extractFromMethod(provider, getter);
+                    proxy = InjectionUtils.extractFromMethod(provider, 
+                                                             InjectionUtils.getGetterFromSetter(m), 
+                                                             false);
                 } catch (Throwable t) {
                     // continue
                 }
