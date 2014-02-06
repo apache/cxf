@@ -1,4 +1,4 @@
-Apache CXF 2.6.12 Release Notes
+Apache CXF 2.6.13 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.12 fixes over 39 JIRA issues reported by users and the community.
+2.6.13 fixes over 39 JIRA issues reported by users and the community.
 
 
 
@@ -78,7 +78,6 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Bug
     * [CXF-4949] - FIQL - searchContext returns null SearchCondition
     * [CXF-5405] - WS-RM with anonymous endpoint throwing security policy validation exception for SequenceAck
@@ -113,6 +112,7 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
     * [CXF-5508] - Request.evaluatePreconditions(Date, EntityTag) loses a non-null ResponseBuilder 
     * [CXF-5518] - Setting SecurityConstants.STS_TOKEN_ACT_AS as string improper handling
     * [CXF-5520] - Setting SecurityConstants.STS_TOKEN_ON_BEHALF_OF as string improper handling
+    * [CXF-5517] - Incorrect check for VOID type
 
 ** Improvement
     * [CXF-5409] - Make response code be included in logging for LocalTransport
