@@ -1579,6 +1579,7 @@ public abstract class HTTPConduit
                     if (in != null) {
                         in.close();
                     }
+                    exchange.setInMessage(inMessage);
                     return;
                 }
             } else {
