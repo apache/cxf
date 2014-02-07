@@ -992,37 +992,35 @@ public final class InjectionUtils {
         if (!cri.contextsAvailable() || !cri.isSingleton()) {
             return;
         }
-        
-        for (Map.Entry<Class<?>, Method> entry : cri.getContextMethods().entrySet()) {
-            Method method = entry.getValue();
-            Object value = method.getParameterTypes()[0] == Application.class 
-                ? app : cri.getContextSetterProxy(method);
-            try {
-                synchronized (instance) {
+        synchronized (instance) {        
+            for (Map.Entry<Class<?>, Method> entry : cri.getContextMethods().entrySet()) {
+                Method method = entry.getValue();
+                Object value = method.getParameterTypes()[0] == Application.class 
+                    ? app : cri.getContextSetterProxy(method);
+                try {
                     if (value == InjectionUtils.extractFromMethod(instance, 
                                                                   getGetterFromSetter(method), 
                                                                   false)) {
                         continue;
                     }
+                    
+                } catch (Throwable t) {
+                    // continue
                 }
-            } catch (Throwable t) {
-                // continue
+                InjectionUtils.injectThroughMethod(instance, method, value);
             }
-            InjectionUtils.injectThroughMethod(instance, method, value);
-        }
-        
-        for (Field f : cri.getContextFields()) {
-            Object value = f.getType() == Application.class ? app : cri.getContextFieldProxy(f);
-            try {
-                synchronized (instance) {
+            
+            for (Field f : cri.getContextFields()) {
+                Object value = f.getType() == Application.class ? app : cri.getContextFieldProxy(f);
+                try {
                     if (value == InjectionUtils.extractFieldValue(f, instance)) {
                         continue;
                     }
+                } catch (Throwable t) {
+                    // continue
                 }
-            } catch (Throwable t) {
-                // continue
+                InjectionUtils.injectFieldValue(f, instance, value);
             }
-            InjectionUtils.injectFieldValue(f, instance, value);
         }
     }
     

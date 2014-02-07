@@ -130,7 +130,6 @@ public abstract class AbstractResourceInfo {
     }
     
     private static ThreadLocalProxy<?> getFieldThreadLocalProxy(Field f, Object provider) {
-        ThreadLocalProxy<?> defaultValue = InjectionUtils.createThreadLocalProxy(f.getType()); 
         if (provider != null) {
             Object proxy = null;
             synchronized (provider) {
@@ -140,18 +139,17 @@ public abstract class AbstractResourceInfo {
                     // continue
                 }
                 if (!(proxy instanceof ThreadLocalProxy)) {
-                    proxy = defaultValue;
+                    proxy = InjectionUtils.createThreadLocalProxy(f.getType());
                     InjectionUtils.injectFieldValue(f, provider, proxy);
                 }
             }
             return (ThreadLocalProxy<?>)proxy;
         } else {
-            return defaultValue;
+            return InjectionUtils.createThreadLocalProxy(f.getType());
         }
     }
     
     private static ThreadLocalProxy<?> getMethodThreadLocalProxy(Method m, Object provider) {
-        ThreadLocalProxy<?> defaultValue = InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]); 
         if (provider != null) {
             Object proxy = null;
             synchronized (provider) {
@@ -163,24 +161,27 @@ public abstract class AbstractResourceInfo {
                     // continue
                 }
                 if (!(proxy instanceof ThreadLocalProxy)) {
-                    proxy = defaultValue;
+                    proxy = InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
                     InjectionUtils.injectThroughMethod(provider, m, proxy);
                 }
             }
             return (ThreadLocalProxy<?>)proxy;
         } else {
-            return defaultValue;
+            return InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
         }
     }
     
     @SuppressWarnings("unchecked")
     private <T> Map<Class<?>, Map<T, ThreadLocalProxy<?>>> getProxyMap(Class<T> keyCls, String prop, boolean create) {
-        Object property = bus.getProperty(prop);
-        if (property == null && create) {
-            Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
-                = new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2);
-            bus.setProperty(prop, map);
-            property = map;
+        Object property = null;
+        synchronized (bus) {
+            property = bus.getProperty(prop);
+            if (property == null && create) {
+                Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
+                    = new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2);
+                bus.setProperty(prop, map);
+                property = map;
+            }
         }
         return (Map<Class<?>, Map<T, ThreadLocalProxy<?>>>)property;
     }
@@ -321,8 +322,9 @@ public abstract class AbstractResourceInfo {
     }
     
     private Map<Class<?>, List<Field>> addContextField(Map<Class<?>, List<Field>> theFields, Field f) {
-        
-        theFields = theFields == null ? new HashMap<Class<?>, List<Field>>() : theFields;
+        if (theFields == null) {
+            theFields = new HashMap<Class<?>, List<Field>>();
+        }
         
         List<Field> fields = theFields.get(serviceClass);
         if (fields == null) {
@@ -335,12 +337,13 @@ public abstract class AbstractResourceInfo {
         return theFields;
     }
     
-    private <T, V> void addToMap(Map<Class<?>, Map<T, V>> theFields, 
-                               T f, V proxy) {
-        Map<T, V> proxies = theFields.get(serviceClass);
+    private <T, V> void addToMap(Map<Class<?>, Map<T, V>> proxyMap,
+                                 T f, 
+                                 V proxy) {
+        Map<T, V> proxies = proxyMap.get(serviceClass);
         if (proxies == null) {
             proxies = new HashMap<T, V>();
-            theFields.put(serviceClass, proxies);
+            proxyMap.put(serviceClass, proxies);
         }
         if (!proxies.containsKey(f)) {
             proxies.put(f, proxy);

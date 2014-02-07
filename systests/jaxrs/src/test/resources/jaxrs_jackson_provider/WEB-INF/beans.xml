@@ -79,12 +79,13 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
             <ref bean="gBookStore2"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref bean="jackson"/>
+            <ref bean="jackson2"/>
             <ref bean="jaxb"/>
         </jaxrs:providers>
     </jaxrs:server>
     
     <bean id="jackson" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+    <bean id="jackson2" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
     <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
         <property name="unmarshallAsJaxbElement" value="true"/>
         <property name="marshallAsJaxbElement" value="true"/>
