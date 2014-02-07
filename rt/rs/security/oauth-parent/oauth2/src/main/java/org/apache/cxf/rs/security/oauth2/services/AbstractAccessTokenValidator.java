@@ -28,6 +28,8 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
@@ -73,7 +75,7 @@ public abstract class AbstractAccessTokenValidator {
     }
     
     public MessageContext getMessageContext() {
-        return mc;
+        return mc != null ? mc : new MessageContextImpl(PhaseInterceptorChain.getCurrentMessage());
     }
 
     protected AccessTokenValidator findTokenValidator(String authScheme) {
@@ -99,7 +101,7 @@ public abstract class AbstractAccessTokenValidator {
         // Get the scheme and its data, Bearer only is supported by default
         // WWW-Authenticate with the list of supported schemes will be sent back 
         // if the scheme is not accepted
-        String[] authParts = AuthorizationUtils.getAuthorizationParts(mc, supportedSchemes);
+        String[] authParts = getAuthorizationParts();
         String authScheme = authParts[0];
         String authSchemeData = authParts[1];
         
@@ -108,7 +110,7 @@ public abstract class AbstractAccessTokenValidator {
         if (handler != null) {
             try {
                 // Convert the HTTP Authorization scheme data into a token
-                accessTokenV = handler.validateAccessToken(mc, authScheme, authSchemeData);
+                accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData);
             } catch (OAuthServiceException ex) {
                 AuthorizationUtils.throwAuthorizationFailure(
                     Collections.singleton(authScheme), realm);
@@ -163,5 +165,8 @@ public abstract class AbstractAccessTokenValidator {
         this.audiences = audiences;
     }
     
+    protected String[] getAuthorizationParts() {
+        return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
+    }
     
 }

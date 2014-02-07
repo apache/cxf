@@ -57,7 +57,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private boolean audienceIsEndpointAddress;
     
     public void filter(ContainerRequestContext context) {
-        Message m = JAXRSUtils.getCurrentMessage();
+        validateRequest(JAXRSUtils.getCurrentMessage());
+    }    
+    
+    protected void validateRequest(Message m) {
         if (isCorsRequest(m)) {
             return;
         }
