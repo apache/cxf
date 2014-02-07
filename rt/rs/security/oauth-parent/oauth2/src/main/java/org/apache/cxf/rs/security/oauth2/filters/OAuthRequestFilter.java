@@ -54,9 +54,13 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
     private boolean audienceIsEndpointAddress;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
-        
+        validateRequest(m);
+        return null;
+    }    
+    
+    protected void validateRequest(Message m) {
         if (isCorsRequest(m)) {
-            return null;
+            return;
         }
         
         // Get the access token
@@ -97,8 +101,6 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         oauthContext.setTokenAudience(accessTokenV.getAudience());
         
         m.setContent(OAuthContext.class, oauthContext);
-        
-        return null;
     }
 
     protected boolean checkHttpVerb(HttpServletRequest req, List<String> verbs) {
