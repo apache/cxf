@@ -1,3 +1,2 @@
 org.apache.cxf.wsdl11.WSDLManagerImpl:org.apache.cxf.wsdl.WSDLManager:true
-org.apache.cxf.wsdl11.WSDLServiceFactoryImpl:org.apache.cxf.wsdl.WSDLServiceFactory:true
 

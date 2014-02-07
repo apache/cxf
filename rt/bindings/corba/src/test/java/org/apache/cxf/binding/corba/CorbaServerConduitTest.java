@@ -320,7 +320,7 @@ public class CorbaServerConduitTest extends Assert {
     protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {        
         URL wsdlUrl = getClass().getResource(wsdl);
         assertNotNull(wsdlUrl);
-        WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl, new QName(ns, serviceName));
+        WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl.toString(), new QName(ns, serviceName));
 
         Service service = f.create();        
         endpointInfo = service.getEndpointInfo(new QName(ns, portName));

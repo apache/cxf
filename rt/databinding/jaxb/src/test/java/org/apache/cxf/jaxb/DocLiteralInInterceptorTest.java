@@ -173,7 +173,7 @@ public class DocLiteralInInterceptorTest extends Assert {
     private void setUpUsingHelloWorld() throws Exception {
         String ns = "http://apache.org/hello_world_soap_http";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
-            .getResource("/wsdl/jaxb/hello_world.wsdl"), new QName(ns, "SOAPService"));
+            .getResource("/wsdl/jaxb/hello_world.wsdl").toString(), new QName(ns, "SOAPService"));
 
         service = factory.create();
         endpointInfo = service.getEndpointInfo(new QName(ns, "SoapPort"));
@@ -198,7 +198,7 @@ public class DocLiteralInInterceptorTest extends Assert {
     private void setUpUsingDocLit() throws Exception {
         String ns = "http://apache.org/hello_world_doc_lit_bare";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
-            .getResource("/wsdl/jaxb/doc_lit_bare.wsdl"), new QName(ns, "SOAPService"));
+            .getResource("/wsdl/jaxb/doc_lit_bare.wsdl").toString(), new QName(ns, "SOAPService"));
 
         service = factory.create();
         endpointInfo = service.getEndpointInfo(new QName(ns, "SoapPort"));

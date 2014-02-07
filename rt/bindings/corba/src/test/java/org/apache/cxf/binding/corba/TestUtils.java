@@ -50,7 +50,7 @@ public class TestUtils {
     public EndpointInfo setupServiceInfo(String ns, String wsdl,
                                          String serviceName, String portName) throws Exception {      
         URL wsdlUrl = getClass().getResource(wsdl);
-        WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl,
+        WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl.toString(),
                                                       new QName(ns, serviceName));
 
         Service service = f.create();

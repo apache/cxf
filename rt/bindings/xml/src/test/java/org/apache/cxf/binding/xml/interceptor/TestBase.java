@@ -132,7 +132,7 @@ public class TestBase extends Assert {
         assertNotNull(bus.getExtension(WSDLManager.class));
         
         WSDLServiceFactory factory = 
-            new WSDLServiceFactory(bus, getClass().getResource(wsdl),
+            new WSDLServiceFactory(bus, getClass().getResource(wsdl).toString(),
                                    new QName(portName.getNamespaceURI(), "XMLService"));
 
         org.apache.cxf.service.Service service = factory.create();

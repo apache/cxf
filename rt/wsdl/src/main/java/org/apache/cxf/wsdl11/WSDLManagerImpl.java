@@ -19,7 +19,6 @@
 
 package org.apache.cxf.wsdl11;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -141,37 +140,6 @@ public class WSDLManagerImpl implements WSDLManager {
      */
     public ExtensionRegistry getExtensionRegistry() {
         return registry;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.cxf.wsdl.WSDLManager#getDefinition(java.net.URL)
-     */
-    public Definition getDefinition(URL url) throws WSDLException { 
-        String urlString = url.toString();
-        synchronized (definitionsMap) {
-            //This needs to use the exact URL object for the cache
-            //as the urlString object is not held onto strongly
-            //and thus, could cause the definition to be garbage
-            //collected.
-            if (definitionsMap.containsKey(url)) {
-                return definitionsMap.get(url);
-            }
-            if (definitionsMap.containsKey(urlString)) {
-                return definitionsMap.get(urlString);
-            }
-        }
-        Definition def = loadDefinition(urlString);
-        synchronized (definitionsMap) {
-            //see note about about the url
-            //The loadDefinition call will add it with the
-            //string form, we just need to add it with the 
-            //url form (which Sonar will complain about,
-            //but we need to do it)
-            definitionsMap.put(url, def);
-        }
-        return def;
     }
 
     /*

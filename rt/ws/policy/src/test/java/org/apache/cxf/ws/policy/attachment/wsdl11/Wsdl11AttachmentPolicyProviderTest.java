@@ -95,7 +95,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
             String resourceName = "/attachment/wsdl11/test" + i + ".wsdl";
             URL url = Wsdl11AttachmentPolicyProviderTest.class.getResource(resourceName);       
             try {
-                services[i] = builder.buildServices(manager.getDefinition(url)).get(0);
+                services[i] = builder.buildServices(manager.getDefinition(url.toString())).get(0);
             } catch (WSDLException ex) {
                 ex.printStackTrace();
                 fail("Failed to build service from resource " + resourceName);

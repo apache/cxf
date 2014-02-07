@@ -91,7 +91,7 @@ public class TestBase extends Assert {
 
         String ns = "http://apache.org/hello_world_soap_http";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
-            .getResource("/org/apache/cxf/jaxb/resources/wsdl/hello_world.wsdl"),
+            .getResource("/org/apache/cxf/jaxb/resources/wsdl/hello_world.wsdl").toString(),
                                                             new QName(ns, "SOAPService"));
 
         service = factory.create();

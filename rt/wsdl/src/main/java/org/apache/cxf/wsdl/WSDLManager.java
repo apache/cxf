@@ -19,7 +19,6 @@
 
 package org.apache.cxf.wsdl;
 
-import java.net.URL;
 import java.util.Map;
 
 import javax.wsdl.Definition;
@@ -49,16 +48,6 @@ public interface WSDLManager {
      * @return the WSDLFactory
      */
     WSDLFactory getWSDLFactory();
-    
-
-    /**
-     * Get the WSDL definition for the given URL.  Implementations
-     * may return a copy from a local cache or load a new copy 
-     * from the URL.
-     * @param url - the location of the WSDL to load 
-     * @return the wsdl definition
-     */
-    Definition getDefinition(URL url) throws WSDLException; 
 
     /**
      * Get the WSDL definition for the given URL.  Implementations

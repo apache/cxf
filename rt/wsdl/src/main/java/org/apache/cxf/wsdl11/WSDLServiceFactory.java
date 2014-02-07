@@ -19,7 +19,6 @@
 
 package org.apache.cxf.wsdl11;
 
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,8 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceFactory.class);
 
-    private URL wsdlUrl;
+    protected final String wsdlUrl;
+    
     private QName serviceName;
     private QName endpointName;
     private Definition definition;
@@ -58,6 +58,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     public WSDLServiceFactory(Bus b, Definition d) {
         setBus(b);
         definition = d;
+        wsdlUrl = d.getDocumentBaseURI();
     }
 
     public WSDLServiceFactory(Bus b, Definition d, QName sn) {
@@ -65,20 +66,9 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         serviceName = sn;
     }
 
-    public WSDLServiceFactory(Bus b, URL url) {
-        setBus(b);
-        wsdlUrl = url;
-
-        try {
-            // use wsdl manager to parse wsdl or get cached definition
-            definition = getBus().getExtension(WSDLManager.class).getDefinition(wsdlUrl);
-        } catch (WSDLException ex) {
-            throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
-        }
-
-    }
     public WSDLServiceFactory(Bus b, String url) {
         setBus(b);
+        wsdlUrl = url;
         try {
             // use wsdl manager to parse wsdl or get cached definition
             definition = getBus().getExtension(WSDLManager.class).getDefinition(url);
@@ -87,12 +77,9 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         }
     }
 
-    public WSDLServiceFactory(Bus b, URL url, QName sn) {
-        this(b, url);
-        serviceName = sn;
-    }
     public WSDLServiceFactory(Bus b, String url, QName sn) {
         setBus(b);
+        wsdlUrl = url;
         try {
             // use wsdl manager to parse wsdl or get cached definition
             definition = getBus().getExtension(WSDLManager.class).getDefinition(url);
