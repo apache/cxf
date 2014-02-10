@@ -41,7 +41,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 
 /**
- * Creates an XMLStreamReader from the InputStream on the Message.
+ * Creates an XMLStreamWriter from the OutputStream on the Message.
  */
 public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String OUTPUT_STREAM_HOLDER = StaxOutInterceptor.class.getName() + ".outputstream";
