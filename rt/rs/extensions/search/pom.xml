@@ -67,6 +67,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+		    <groupId>org.apache.olingo</groupId>
+		    <artifactId>olingo-odata2-core-incubating</artifactId>
+		    <optional>true</optional>
+		</dependency>
+        <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${cxf.lucene.version}</version>

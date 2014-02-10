@@ -178,6 +178,7 @@
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
+        <cxf.olingo.version>1.0.0</cxf.olingo.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
@@ -1084,6 +1085,11 @@
                 <artifactId>spring-security-config</artifactId>
                 <version>${cxf.spring.security.version}</version>
             </dependency>
+            <dependency>
+			    <groupId>org.apache.olingo</groupId>
+			    <artifactId>olingo-odata2-core-incubating</artifactId>
+			    <version>${cxf.olingo.version}</version>
+			</dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
