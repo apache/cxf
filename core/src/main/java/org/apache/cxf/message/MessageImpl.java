@@ -175,6 +175,9 @@ public class MessageImpl extends StringMapImpl implements Message {
         }
         return contextCache.get(key);
     }
+    public Set<String> getContextualPropertyKeys() {
+        return contextCache.keySet();
+    }
     
     private void calcContextCache() {
         Map<String, Object> o = new HashMap<String, Object>() {

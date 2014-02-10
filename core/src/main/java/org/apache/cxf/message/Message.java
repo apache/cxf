@@ -241,4 +241,9 @@ public interface Message extends StringMap {
     
     void resetContextCache();
     void setContextualProperty(String key, Object v);
+    
+    /**
+     * @return set of defined contextual property keys
+     */
+    Set<String> getContextualPropertyKeys();
 }
