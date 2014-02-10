@@ -19,32 +19,24 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.jms.JmsException;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
-
-
 
 public class JMSContinuationTest extends Assert {
 
     private Message m;
-    private List<JMSContinuation> continuations;
     private Bus b;
     private MessageObserver observer;
     
@@ -55,15 +47,15 @@ public class JMSContinuationTest extends Assert {
         m.setExchange(exchange);
         m.setInterceptorChain(EasyMock.createMock(InterceptorChain.class));
         exchange.setInMessage(m);
-        continuations = new LinkedList<JMSContinuation>();
+        
         b = BusFactory.getDefaultBus();
         observer = EasyMock.createMock(MessageObserver.class);
     }
     
     @Test
     public void testInitialStatus() {
-        JMSContinuation cw = 
-            new JMSContinuation(b, m, observer, continuations, null, null);
+        Counter continuations = EasyMock.createMock(Counter.class);
+        JMSContinuation cw = new JMSContinuation(b, m, observer, continuations);
         assertTrue(cw.isNew());
         assertFalse(cw.isPending());
         assertFalse(cw.isResumed());
@@ -71,67 +63,39 @@ public class JMSContinuationTest extends Assert {
     
     @Test
     public void testSuspendResume() {
-        TestJMSContinuationWrapper cw = 
-            new TestJMSContinuationWrapper(b, m, observer, continuations, null, new JMSConfiguration());
-        
+        DummyCounter continuations = new DummyCounter();
+        JMSContinuation cw = new JMSContinuation(b, m, observer, continuations);
+
         cw.suspend(5000);
+        Assert.assertEquals(1, continuations.counter.get());
           
         assertFalse(cw.isNew());
         assertTrue(cw.isPending());
         assertFalse(cw.isResumed());
         
-        assertTrue(cw.isTaskCreated());
-        assertFalse(cw.isTaskCancelled());
-        assertEquals(continuations.size(), 1);
-        assertSame(continuations.get(0), cw);
         
         assertFalse(cw.suspend(1000));
+        Assert.assertEquals(1, continuations.counter.get());
         
         observer.onMessage(m);
         EasyMock.expectLastCall();
         EasyMock.replay(observer);
         
         cw.resume();
-        
+        Assert.assertEquals(0, continuations.counter.get());        
         assertFalse(cw.isNew());
         assertFalse(cw.isPending());
         assertTrue(cw.isResumed());
         
-        assertFalse(cw.isTaskCreated());
-        assertTrue(cw.isTaskCancelled());
-        assertEquals(continuations.size(), 0);
         EasyMock.verify(observer);
     }
     
     @Test
-    public void testThrottleWithJmsStartAndStop() {
+    public void testSendMessageOnResume() {
+        Counter continuations = new DummyCounter();
+        JMSContinuation cw = new JMSContinuation(b, m, observer, continuations);
         
-        DefaultMessageListenerContainerStub springContainer = new DefaultMessageListenerContainerStub();
-        springContainer.setCacheLevel(2);
-        JMSConfiguration config = new JMSConfiguration();
-        config.setMaxSuspendedContinuations(1);
-        
-        TestJMSContinuationWrapper cw = 
-            new TestJMSContinuationWrapper(b, m, observer, continuations,
-                                           springContainer, config);
-        
-        assertFalse(springContainer.isStart());
-        assertFalse(springContainer.isStop());
-        
-        suspendResumeCheckStartAndStop(cw, config, springContainer);
-        EasyMock.reset(observer);
-        suspendResumeCheckStartAndStop(cw, config, springContainer);
-        
-    }
-    
-    private void suspendResumeCheckStartAndStop(JMSContinuation cw, JMSConfiguration config,
-                                            DefaultMessageListenerContainerStub springContainer) {
         cw.suspend(5000);
-            
-        assertEquals(continuations.size(), 1);
-        assertSame(continuations.get(0), cw);
-        assertTrue(springContainer.isStop());
-        
         assertFalse(cw.suspend(1000));
         
         observer.onMessage(m);
@@ -140,75 +104,32 @@ public class JMSContinuationTest extends Assert {
         
         cw.resume();
         
-        assertEquals(continuations.size(), 0);
-        assertTrue(springContainer.isStart());
         EasyMock.verify(observer);
     }
     
     @Test
     public void testUserObject() {
-        JMSContinuation cw = new JMSContinuation(b, m, observer, continuations, null, null);
+        Counter continuations = new DummyCounter();
+        JMSContinuation cw = new JMSContinuation(b, m, observer, continuations);
         assertNull(cw.getObject());
         Object userObject = new Object();
         cw.setObject(userObject);
         assertSame(userObject, cw.getObject());
     }
     
-    private static class TestJMSContinuationWrapper extends JMSContinuation {
-        
-        private boolean taskCreated;
-        private boolean taskCancelled;
-        
-        public TestJMSContinuationWrapper(Bus b,
-                                          Message m, 
-                                          MessageObserver observer,
-                                          List<JMSContinuation> cList,
-                                          DefaultMessageListenerContainer jmsListener,
-                                          JMSConfiguration jmsConfig) {
-            super(b, m, observer, cList, jmsListener, jmsConfig);
+    public class DummyCounter implements Counter {
+        AtomicInteger counter = new AtomicInteger();
+
+        @Override
+        public int incrementAndGet() {
+            return counter.incrementAndGet();
+        }
+
+        @Override
+        public int decrementAndGet() {
+            return counter.decrementAndGet();
         }
         
-        public void createTimerTask(long timeout) {
-            taskCreated = true;
-        }
-        
-        public void cancelTimerTask() {
-            taskCancelled = true;
-        }
-        
-        public boolean isTaskCreated() {
-            boolean result = taskCreated;
-            taskCreated = false;
-            return result;
-        }
-        
-        public boolean isTaskCancelled() {
-            boolean result = taskCancelled;
-            taskCancelled = false;
-            return result;
-        }
     }
-    
-    private class DefaultMessageListenerContainerStub extends DefaultMessageListenerContainer {
-        private boolean start;
-        private boolean stop;
 
-        public void start() throws JmsException {
-            this.start = true;
-            this.stop = false;
-        }
-
-        public void stop() throws JmsException {
-            this.stop = true;
-            this.start = false;
-        }
-
-        public boolean isStart() {
-            return this.start;
-        }
-
-        public boolean isStop() {
-            return this.stop;
-        }
-    }
 }

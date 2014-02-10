@@ -19,38 +19,29 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
-import java.util.Collection;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.jms.JMSConfiguration;
-import org.springframework.jms.listener.AbstractMessageListenerContainer;
 
 public class JMSContinuationProvider implements ContinuationProvider {
 
     private Bus bus;
     private Message inMessage;
     private MessageObserver incomingObserver;
-    private Collection<JMSContinuation> continuations;
-    private AbstractMessageListenerContainer jmsListener;
-    private JMSConfiguration jmsConfig;
+    private Counter suspendendContinuations;
     
     public JMSContinuationProvider(Bus b,
                                    Message m, 
                                    MessageObserver observer,
-                                   Collection<JMSContinuation> cList,
-                                   AbstractMessageListenerContainer jmsListener,
-                                   JMSConfiguration jmsConfig) {
+                                   Counter suspendendContinuations) {
         bus = b;
         inMessage = m;    
         incomingObserver = observer;
-        continuations = cList;
-        this.jmsListener = jmsListener;
-        this.jmsConfig = jmsConfig;
+        this.suspendendContinuations = suspendendContinuations;
     }
+
     public void complete() {
         JMSContinuation cw = inMessage.get(JMSContinuation.class);
         if (cw != null) {
@@ -69,8 +60,7 @@ public class JMSContinuationProvider implements ContinuationProvider {
         }
         JMSContinuation cw = m.get(JMSContinuation.class);
         if (cw == null) {
-            cw = new JMSContinuation(bus, m,  incomingObserver, continuations, 
-                                     jmsListener, jmsConfig);
+            cw = new JMSContinuation(bus, m,  incomingObserver, suspendendContinuations);
             m.put(JMSContinuation.class, cw);
         }
         return cw;

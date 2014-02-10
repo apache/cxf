@@ -26,7 +26,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-
+import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,8 +46,9 @@ public class JMSContinuationProviderTest extends Assert {
         exchange.setOneWay(true);
         Message m = new MessageImpl();
         m.setExchange(exchange);
+        Counter counter = EasyMock.createMock(Counter.class);
         JMSContinuationProvider provider = 
-            new JMSContinuationProvider(null, m, null, null, null, null);
+            new JMSContinuationProvider(null, m, null, counter);
         assertNull(provider.getContinuation());
     }
     
@@ -55,8 +56,9 @@ public class JMSContinuationProviderTest extends Assert {
     public void testGetNewContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
+        Counter counter = EasyMock.createMock(Counter.class);
         JMSContinuationProvider provider = 
-            new JMSContinuationProvider(bus, m, null, null, null, null);
+            new JMSContinuationProvider(bus, m, null, counter);
         Continuation cw = provider.getContinuation(); 
         assertTrue(cw.isNew());
         assertSame(cw, m.get(JMSContinuation.class));
@@ -66,9 +68,10 @@ public class JMSContinuationProviderTest extends Assert {
     public void testGetExistingContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        JMSContinuation cw = new JMSContinuation(bus, m, null, null, null, null);
+        Counter counter = EasyMock.createMock(Counter.class);
+        JMSContinuation cw = new JMSContinuation(bus, m, null, counter);
         m.put(JMSContinuation.class, cw);
-        JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, null, null, null);
+        JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, counter);
         assertSame(cw, provider.getContinuation());
         assertSame(cw, m.get(JMSContinuation.class));
     }

@@ -21,12 +21,10 @@ package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,11 +49,11 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.jms.continuations.JMSContinuation;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
+import org.apache.cxf.transport.jms.util.SpringJMSListenerAdapter;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
@@ -71,8 +69,7 @@ public class JMSDestination extends AbstractMultiplexDestination
     private Bus bus;
     private EndpointInfo ei;
     private AbstractMessageListenerContainer jmsListener;
-    private Collection<JMSContinuation> continuations = 
-        new ConcurrentLinkedQueue<JMSContinuation>();
+    private ThrottlingCounter suspendedContinuations;
     private ClassLoader loader;
 
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
@@ -108,6 +105,10 @@ public class JMSDestination extends AbstractMultiplexDestination
         Destination targetDestination = resolveTargetDestination();
         jmsListener = JMSFactory.createJmsListener(ei, jmsConfig, this, 
                                                    targetDestination);
+        int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
+        this.suspendedContinuations = new ThrottlingCounter(new SpringJMSListenerAdapter(this.jmsListener), 
+                                                            restartLimit,
+                                                            jmsConfig.getMaxSuspendedContinuations());
     }
 
     private Destination resolveTargetDestination() {
@@ -185,13 +186,11 @@ public class JMSDestination extends AbstractMultiplexDestination
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             ((MessageImpl)inMessage).setDestination(this);
             if (jmsConfig.getMaxSuspendedContinuations() != 0) {
-                inMessage.put(ContinuationProvider.class.getName(), 
-                              new JMSContinuationProvider(bus,
-                                                          inMessage,
-                                                          incomingObserver,
-                                                          continuations,
-                                                          jmsListener,
-                                                          jmsConfig));
+                JMSContinuationProvider cp = new JMSContinuationProvider(bus, 
+                                                                         inMessage, 
+                                                                         incomingObserver, 
+                                                                         suspendedContinuations);
+                inMessage.put(ContinuationProvider.class.getName(), cp);
             }
             
             origBus = BusFactory.getAndSetThreadDefaultBus(bus);

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.jms.continuations;
 
-import java.util.Collection;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -30,43 +29,33 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.workqueue.WorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
-import org.springframework.jms.listener.AbstractMessageListenerContainer;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class JMSContinuation implements Continuation {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSContinuation.class);
     private Bus bus;
     private Message inMessage;
     private MessageObserver incomingObserver;
-    private Collection<JMSContinuation> continuations;
-    private AbstractMessageListenerContainer jmsListener;
-    private JMSConfiguration jmsConfig;
-    
+    private Counter suspendendContinuations;
+
     private volatile Object userObject;
-    
+
     private volatile boolean isNew = true;
     private volatile boolean isPending;
     private volatile boolean isResumed;
     private volatile boolean isCanceled;
     private WorkQueue workQueue;
     private ClassLoader loader;
-    
-    public JMSContinuation(Bus b, Message m, MessageObserver observer,
-                           Collection<JMSContinuation> cList, 
-                           AbstractMessageListenerContainer jmsListener,
-                           JMSConfiguration jmsConfig) {
+
+    public JMSContinuation(Bus b, Message m, MessageObserver observer, Counter suspendendContinuations) {
         bus = b;
-        inMessage = m;    
+        inMessage = m;
         incomingObserver = observer;
-        continuations = cList;
-        this.jmsListener = jmsListener;
-        this.jmsConfig = jmsConfig;
+        this.suspendendContinuations = suspendendContinuations;
         WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
         if (manager != null) {
-            workQueue =  manager.getNamedWorkQueue("jms-continuation");
+            workQueue = manager.getNamedWorkQueue("jms-continuation");
             if (workQueue == null) {
                 workQueue = manager.getAutomaticWorkQueue();
             }
@@ -110,7 +99,7 @@ public class JMSContinuation implements Continuation {
     }
     
     protected void doResume() {
-        updateContinuations(true);
+        suspendendContinuations.decrementAndGet();
         ClassLoaderHolder origLoader = null;
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         try {
@@ -139,9 +128,9 @@ public class JMSContinuation implements Continuation {
             return false;
         }
         inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
-        
-        updateContinuations(false);
-                
+
+        suspendendContinuations.incrementAndGet();
+
         isNew = false;
         isResumed = false;
         isPending = true;
@@ -167,45 +156,6 @@ public class JMSContinuation implements Continuation {
     protected synchronized void cancelTimerTask() {
         isCanceled = true;
     }
-    
-    protected void updateContinuations(boolean remove) {
 
-        if (jmsConfig.getMaxSuspendedContinuations() < 0
-            || (jmsListener instanceof DefaultMessageListenerContainer
-                && ((DefaultMessageListenerContainer)jmsListener).getCacheLevel() 
-                    >= DefaultMessageListenerContainer.CACHE_CONSUMER)) {
-            modifyList(remove);
-            return;
-        }
-        
-        // throttle the flow if there're too many continuation instances in memory
-        synchronized (continuations) {
-            modifyList(remove);
-            if (continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
-                jmsListener.stop();
-            } else if (!jmsListener.isRunning()) {
-                int limit = jmsConfig.getReconnectPercentOfMax();
-                if (limit < 0 || limit > 100) {
-                    limit = 70;
-                }
-                limit = (limit * jmsConfig.getMaxSuspendedContinuations()) / 100; 
-            
-                if (continuations.size() <= limit) {
-                    jmsListener.start();
-                }
-            }
-        }
 
-    }
-    
-    protected void modifyList(boolean remove) {
-        if (remove) {
-            continuations.remove(this);
-        } else {
-            continuations.add(this);
-        }
-    }
-    
-    
-    
 }
