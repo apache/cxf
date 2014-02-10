@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.Produces;
@@ -43,6 +42,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
@@ -123,7 +123,7 @@ public class FormEncodingProvider<T> implements
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new BadRequestException(e);
+            throw ExceptionUtils.toBadRequestException(e, null);
         }
     }
 

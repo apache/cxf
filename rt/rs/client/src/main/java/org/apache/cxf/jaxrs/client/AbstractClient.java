@@ -73,6 +73,7 @@ import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -463,9 +464,9 @@ public abstract class AbstractClient implements Client {
     }
     
     protected WebApplicationException convertToWebApplicationException(Response r) {
-        Class<?> exceptionClass = JAXRSUtils.getWebApplicationExceptionClass(r, 
-                                       WebApplicationException.class);
         try {
+            Class<?> exceptionClass = ExceptionUtils.getWebApplicationExceptionClass(r, 
+                                       WebApplicationException.class);
             Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
             return (WebApplicationException)ctr.newInstance(r);
         } catch (Throwable ex2) {

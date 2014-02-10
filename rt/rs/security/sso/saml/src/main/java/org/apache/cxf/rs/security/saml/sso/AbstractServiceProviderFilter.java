@@ -30,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PreDestroy;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Cookie;
@@ -46,6 +45,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
@@ -283,7 +283,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             //TODO: Review the possibility of using this filter
             //for validating SAMLResponse too
             reportError("MISSING_ASSERTION_SERVICE_URL");
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         if (!assertionConsumerServiceAddress.startsWith("http")) {
             String httpBasePath = (String)m.get("http.base.path");

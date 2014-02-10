@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -117,7 +115,7 @@ public final class FormUtils {
             IOUtils.copy(is, bos, 1024);
             return new String(bos.toByteArray(), encoding);
         } catch (Exception ex) {
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
     
@@ -214,7 +212,7 @@ public final class FormUtils {
             String contentId = a.getContentId();
             String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
             if (StringUtils.isEmpty(name)) { 
-                throw new BadRequestException();
+                throw ExceptionUtils.toBadRequestException(null, null);
             }
             if (CONTENT_DISPOSITION_FILES_PARAM.equals(name)) {
                 // this is a reserved name in Content-Disposition for parts containing files
@@ -227,9 +225,9 @@ public final class FormUtils {
             } catch (IllegalArgumentException ex) {
                 LOG.warning("Illegal URL-encoded characters, make sure that no "
                     + "@FormParam and @Multipart annotations are mixed up");
-                throw new InternalServerErrorException();
+                throw ExceptionUtils.toInternalServerErrorException(ex, null);
             } catch (IOException ex) {
-                throw new BadRequestException();
+                throw ExceptionUtils.toBadRequestException(null, null);
             }
         }
     }
@@ -249,7 +247,7 @@ public final class FormUtils {
                 throw new WebApplicationException(413);
             }
         } catch (NumberFormatException ex) {
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 }

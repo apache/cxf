@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -42,6 +41,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -315,7 +315,7 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = Response.status(400).entity(error).build();
-        throw ex != null ? new BadRequestException(response, ex) : new BadRequestException(response);
+        throw ExceptionUtils.toBadRequestException(null, response);
     }
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {

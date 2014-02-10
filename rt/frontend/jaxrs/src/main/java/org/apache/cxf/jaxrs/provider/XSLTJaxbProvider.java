@@ -32,9 +32,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -65,6 +63,7 @@ import org.xml.sax.XMLFilter;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.staxutils.StaxSource;
@@ -186,7 +185,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             return unmarshaller.unmarshal(source);
         } catch (TransformerConfigurationException ex) {
             LOG.warning("Transformation exception : " + ex.getMessage());
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null); 
         }
     }
     
@@ -220,7 +219,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             writer.close();
             return unmarshalFromInputStream(unmarshaller, out.getInputStream(), mt);
         } catch (Exception ex) {
-            throw new BadRequestException(ex);
+            throw ExceptionUtils.toBadRequestException(ex, null);
         }
     }
     
@@ -343,7 +342,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 return null;
             } else {
                 LOG.severe("No template is available");
-                throw new InternalServerErrorException();
+                throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
         }
         

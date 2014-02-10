@@ -34,7 +34,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -47,6 +46,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -194,7 +194,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         } catch (Throwable ex) {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
             ex.printStackTrace();
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null); 
         }
     }
 
@@ -270,7 +270,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                     new org.apache.cxf.common.i18n.Message("RESOURCE_DISPATCH_NOT_FOUND", 
                                                            BUNDLE, servletContextPath).toString();
                 LOG.severe(message);
-                throw new InternalServerErrorException();
+                throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
         }
         return sc; 
@@ -285,7 +285,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 new org.apache.cxf.common.i18n.Message("RESOURCE_PATH_NOT_FOUND", 
                                                        BUNDLE, path).toString();
             LOG.severe(message);
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         return rd;
     }

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -49,21 +48,9 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotAcceptableException;
-import javax.ws.rs.NotAllowedException;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.RedirectionException;
-import javax.ws.rs.ServerErrorException;
-import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -79,7 +66,6 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -87,7 +73,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
@@ -174,22 +159,8 @@ public final class JAXRSUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PATH_SEGMENT_SEP = "/";
-    private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
-    private static final String  SUPPORT_WAE_SPEC_OPTIMIZATION = "support.wae.spec.optimization";
-    private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
-    static {
-        EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
-        EXCEPTIONS_MAP.put(400, BadRequestException.class);
-        EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
-        EXCEPTIONS_MAP.put(403, ForbiddenException.class);
-        EXCEPTIONS_MAP.put(404, NotFoundException.class);
-        EXCEPTIONS_MAP.put(405, NotAllowedException.class);
-        EXCEPTIONS_MAP.put(406, NotAcceptableException.class);
-        EXCEPTIONS_MAP.put(415, NotSupportedException.class);
-        EXCEPTIONS_MAP.put(500, InternalServerErrorException.class);
-        EXCEPTIONS_MAP.put(503, ServiceUnavailableException.class);
-    }
+    private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
     
     private JAXRSUtils() {        
     }
@@ -407,7 +378,7 @@ public final class JAXRSUtils {
         try {
             requestType = toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
-            throw new NotSupportedException(ex);
+            throw ExceptionUtils.toNotSupportedException(ex, null);
         }
         
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
@@ -538,7 +509,7 @@ public final class JAXRSUtils {
         }
         Response response = 
             createResponse(getRootResources(message), message, errorMsg.toString(), status, methodMatched == 0);
-        throw new ClientErrorException(response);
+        throw ExceptionUtils.toHttpException(null, response);
         
     }    
 
@@ -966,7 +937,7 @@ public final class JAXRSUtils {
                                                                BUNDLE, 
                                                                mt.toString());
                     LOG.warning(errorMsg.toString());
-                    throw new NotSupportedException();
+                    throw ExceptionUtils.toNotSupportedException(null, null);
                 }
             }
         }
@@ -1053,13 +1024,13 @@ public final class JAXRSUtils {
             // is available indicates that the one created at start up has been 
             // lost and hence it is 500
             LOG.warning("Bean parameter info is not available");
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         Object instance;
         try {
             instance = ClassLoaderUtils.loadClass(clazz.getName(), JAXRSUtils.class).newInstance();
         } catch (Throwable t) {
-            throw new InternalServerErrorException(t);
+            throw ExceptionUtils.toInternalServerErrorException(t, null); 
         }
         JAXRSUtils.injectParameters(ori, bmi, instance, m);
         
@@ -1295,10 +1266,12 @@ public final class JAXRSUtils {
                                                      is, 
                                                      type,
                                                      m);    
-                } catch (NoContentException e) {
-                    throw new BadRequestException(e);
                 } catch (IOException e) {
-                    throw e;
+                    if (e.getClass().getName().equals(NO_CONTENT_EXCEPTION)) {
+                        throw ExceptionUtils.toBadRequestException(e, null);    
+                    } else {
+                        throw e;
+                    }
                 } catch (WebApplicationException ex) {
                     throw ex;
                 } catch (Exception ex) {
@@ -1593,55 +1566,9 @@ public final class JAXRSUtils {
         return types;
     }
     
-    public static Class<?> getWebApplicationExceptionClass(Response exResponse,
-                                                           Class<?> defaultExceptionType) {
-        int status = exResponse.getStatus();
-        Class<?> cls = EXCEPTIONS_MAP.get(status);
-        if (cls == null) {
-            int family = status / 100;
-            if (family == 3) {
-                cls = RedirectionException.class;
-            } else if (family == 4) {
-                cls = ClientErrorException.class;
-            } else if (family == 5) {
-                cls = ServerErrorException.class;
-            }
-        }
-        return cls == null ? defaultExceptionType : cls;
-    }
-    
+
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message currentMessage) {
-        if (ex == null || currentMessage == null) {
-            return null;
-        }
-        Message inMessage = currentMessage.getExchange().getInMessage();
-        Response response = null;
-        if (ex.getClass() == WebApplicationException.class) {
-            WebApplicationException webEx = (WebApplicationException)ex;
-            if (webEx.getResponse().hasEntity() 
-                && webEx.getCause() == null) {
-                Object prop = inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION);
-                if (prop == null || MessageUtils.isTrue(prop)) {
-                    response = webEx.getResponse();
-                }
-            }
-        }
-        
-        if (response == null) {
-            ExceptionMapper<T>  mapper =
-                ServerProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
-            if (mapper != null) {
-                try {
-                    response = mapper.toResponse(ex);
-                } catch (Exception mapperEx) {
-                    inMessage.getExchange().put(JAXRSUtils.EXCEPTION_FROM_MAPPER, "true");
-                    mapperEx.printStackTrace();
-                    return Response.serverError().build();
-                }
-            }
-        }
-        setMessageContentType(currentMessage, response);
-        return response;
+        return ExceptionUtils.convertFaultToResponse(ex, currentMessage);
     }
     
     public static void setMessageContentType(Message message, Response response) {
@@ -1657,21 +1584,6 @@ public final class JAXRSUtils {
             }
         }
         
-    }
-    
-    public static boolean propogateException(Message m) {
-        
-        Object value = m.getContextualProperty(PROPAGATE_EXCEPTION);
-        
-        if (value == null) {
-            return true;
-        }
-
-        if (Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString())) {
-            return true;
-        }
-        
-        return false;
     }
     
     public static QName getClassQName(Class<?> type) {
@@ -1700,7 +1612,7 @@ public final class JAXRSUtils {
                     InjectionUtils.injectContexts(filter.getProvider(), filter, m);
                     filter.getProvider().filter(context);
                 } catch (IOException ex) {
-                    throw new InternalServerErrorException(ex);
+                    throw ExceptionUtils.toInternalServerErrorException(ex, null); 
                 }
                 Response response = m.getExchange().get(Response.class);
                 if (response != null) {

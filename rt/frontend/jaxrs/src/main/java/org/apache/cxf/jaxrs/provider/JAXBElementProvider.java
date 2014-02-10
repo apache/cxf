@@ -34,9 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -65,6 +63,7 @@ import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
@@ -203,7 +202,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             throw e;
         } catch (Exception e) {
             LOG.warning(getStackTrace(e));
-            throw new BadRequestException(e);        
+            throw ExceptionUtils.toBadRequestException(e, null);        
         } finally {
             try {
                 StaxUtils.close(reader);
@@ -243,8 +242,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 try {
                     reader = factory.createXMLStreamReader(is);
                 } catch (XMLStreamException e) {
-                    throw new InternalServerErrorException(
-                        new RuntimeException("Can not create XMLStreamReader", e));
+                    throw ExceptionUtils.toInternalServerErrorException(
+                        new RuntimeException("Can not create XMLStreamReader", e), null);
                 }
             }
         }
@@ -272,7 +271,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 Reader reader = getStreamHandlerFromCurrentMessage(Reader.class);
                 if (reader == null) {
                     LOG.severe("No InputStream, Reader, or XMLStreamReader is available");
-                    throw new InternalServerErrorException();
+                    throw ExceptionUtils.toInternalServerErrorException(null, null);
                 }
                 xmlReader = StaxUtils.createXMLStreamReader(reader);
             } else {
@@ -312,7 +311,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new InternalServerErrorException(e);        
+            throw ExceptionUtils.toInternalServerErrorException(e, null);        
         }
     }
 
@@ -559,8 +558,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                     try {
                         writer = factory.createXMLStreamWriter(os);
                     } catch (XMLStreamException e) {
-                        throw new InternalServerErrorException(
-                            new RuntimeException("Cant' create XMLStreamWriter", e));
+                        throw ExceptionUtils.toInternalServerErrorException(
+                            new RuntimeException("Cant' create XMLStreamWriter", e), null);
                     }
                 }
             }
@@ -581,7 +580,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
             if (writer == null) {
                 LOG.severe("No OutputStream, Writer, or XMLStreamWriter is available");
-                throw new InternalServerErrorException();
+                throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
             ms.marshal(obj, writer);
             writer.flush();

@@ -26,8 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.NotAcceptableException;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -38,6 +36,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Produces({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
@@ -67,7 +66,7 @@ public class DOM4JProvider extends AbstractConfigurableProvider
         MessageBodyReader<org.w3c.dom.Document> reader =
             providers.getMessageBodyReader(DOM_DOC_CLS, DOM_DOC_CLS, anns, mt);
         if (reader == null) {
-            throw new NotSupportedException();
+            throw ExceptionUtils.toNotSupportedException(null, null);
         }
         org.w3c.dom.Document domDoc =
             reader.readFrom(DOM_DOC_CLS, DOM_DOC_CLS, anns, mt, headers, is);
@@ -98,7 +97,7 @@ public class DOM4JProvider extends AbstractConfigurableProvider
             MessageBodyWriter<org.w3c.dom.Document> writer =
                 providers.getMessageBodyWriter(DOM_DOC_CLS, DOM_DOC_CLS, anns, mt);
             if (writer == null) {
-                throw new NotAcceptableException();
+                throw ExceptionUtils.toNotAcceptableException(null, null);
             }
             writer.writeTo(domDoc, DOM_DOC_CLS, DOM_DOC_CLS, anns, mt, headers, os);
         }
@@ -109,7 +108,7 @@ public class DOM4JProvider extends AbstractConfigurableProvider
         try {
             return StaxUtils.read(new StringReader(xml));
         } catch (Exception ex) {
-            throw new javax.ws.rs.InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 }

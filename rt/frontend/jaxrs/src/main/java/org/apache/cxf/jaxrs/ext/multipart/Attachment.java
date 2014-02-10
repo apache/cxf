@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -36,6 +35,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.Transferable;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 /**
@@ -137,7 +137,7 @@ public class Attachment implements Transferable {
                     return mbr.readFrom(cls, cls, new Annotation[]{}, getContentType(), 
                                         headers, getDataHandler().getInputStream());
                 } catch (Exception ex) {
-                    throw new InternalServerErrorException(ex);
+                    ExceptionUtils.toInternalServerErrorException(ex, null);
                 }
             }
         }

@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -41,6 +40,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -294,7 +294,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = Response.status(400).entity(error).build();
-        throw ex != null ? new BadRequestException(response, ex) : new BadRequestException(response);
+        throw ExceptionUtils.toBadRequestException(null, response);
     }
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {

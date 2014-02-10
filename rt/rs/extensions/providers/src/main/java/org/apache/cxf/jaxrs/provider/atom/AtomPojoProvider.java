@@ -35,11 +35,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -63,6 +60,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 @Produces({"application/atom+xml", "application/atom+xml;type=feed", "application/atom+xml;type=entry" })
@@ -174,7 +172,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
                 atomElement = createEntryFromObject(factory, o, cls);
             }
         } catch (Exception ex) {
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
         
         try {
@@ -551,11 +549,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     private void reportError(String message, Exception ex, int status) {
         LOG.warning(message);
         Response response = Response.status(status).type("text/plain").entity(message).build();
-        if (ex == null) {
-            throw status < 500 ? new ClientErrorException(response) : new ServerErrorException(response);
-        } else {
-            throw status < 500 ? new ClientErrorException(response, ex) : new ServerErrorException(response, ex);
-        }
+        throw ExceptionUtils.toHttpException(ex, response);
     }
     private void reportError(String message, Exception ex) {
         reportError(message, ex, 500);

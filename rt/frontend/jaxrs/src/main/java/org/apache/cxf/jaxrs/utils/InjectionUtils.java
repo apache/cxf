@@ -49,10 +49,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.GenericEntity;
@@ -308,7 +304,7 @@ public final class InjectionUtils {
             Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
             if (r != null) {
                 inMessage.getExchange().put(Response.class, r);
-                throw new InternalServerErrorException();
+                throw new WebApplicationException();
             }
             reportServerError("METHOD_ACCESS_FAILURE", method.getName());
         } catch (Exception ex) {
@@ -374,9 +370,9 @@ public final class InjectionUtils {
                 //
                 if (pType == ParameterType.PATH || pType == ParameterType.QUERY
                     || pType == ParameterType.MATRIX) {
-                    throw new NotFoundException(nfe);
+                    throw ExceptionUtils.toNotFoundException(nfe, null);
                 }
-                throw new BadRequestException(nfe);
+                throw ExceptionUtils.toBadRequestException(nfe, null);
             }
         }
         
@@ -403,7 +399,8 @@ public final class InjectionUtils {
             LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                BUNDLE, 
                                                                pClass.getName()).toString());
-            throw new ClientErrorException(HttpUtils.getParameterFailureStatus(pType), t);
+            Response r = JAXRSUtils.toResponse(HttpUtils.getParameterFailureStatus(pType));
+            throw ExceptionUtils.toHttpException(t, r);
         }
         if (result == null) {
             // check for valueOf(String) static methods
@@ -465,7 +462,7 @@ public final class InjectionUtils {
         Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                          .type(MediaType.TEXT_PLAIN_TYPE)
                          .entity(errorMessage.toString()).build();
-        throw new InternalServerErrorException(r);
+        throw ExceptionUtils.toInternalServerErrorException(null, r);
     }
     
     private static <T> T evaluateFactoryMethod(String value,
@@ -1248,7 +1245,8 @@ public final class InjectionUtils {
             } catch (IllegalAccessException ex) {
                 String msg = "Method " + method.getName() + " can not be invoked"
                     + " due to IllegalAccessException";
-                throw new InternalServerErrorException(Response.serverError().entity(msg).build());
+                throw ExceptionUtils.toInternalServerErrorException(ex, 
+                                                                    Response.serverError().entity(msg).build());
             } 
         }
     }

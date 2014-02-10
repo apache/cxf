@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Application;
@@ -52,6 +51,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -253,7 +253,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                                BUNDLE,
                                                                subResourcePath);
                     LOG.severe(errorM.toString());
-                    throw new NotFoundException();
+                    throw ExceptionUtils.toNotFoundException(null, null);
                 }
 
                 OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(
@@ -335,7 +335,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
         if (excResponse == null) {
             inMessage.getExchange().put(Message.PROPOGATE_EXCEPTION, 
-                                        JAXRSUtils.propogateException(inMessage));
+                                        ExceptionUtils.propogateException(inMessage));
             throw ex;
         }
         return new MessageContentsList(excResponse);
@@ -413,7 +413,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                        BUNDLE,
                                                        subResourcePath);
             LOG.info(errorM.toString());
-            throw new NotFoundException();
+            throw ExceptionUtils.toNotFoundException(null, null);
         }
 
         return result;

@@ -26,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -48,6 +47,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.StaxSource;
@@ -166,7 +166,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         try {
             StaxUtils.copy(reader, writer);
         } catch (XMLStreamException e) {
-            throw new InternalServerErrorException(e);
+            throw ExceptionUtils.toInternalServerErrorException(e, null); 
         } finally {
             try {
                 reader.close();

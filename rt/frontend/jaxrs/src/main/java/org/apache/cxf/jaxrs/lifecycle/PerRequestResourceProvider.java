@@ -25,12 +25,13 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -81,25 +82,29 @@ public class PerRequestResourceProvider implements ResourceProvider {
             return instance;
         } catch (InstantiationException ex) {
             String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated";
-            throw new InternalServerErrorException(Response.serverError().entity(msg).build());
+            throw ExceptionUtils.toInternalServerErrorException(null, serverError(msg));
         } catch (IllegalAccessException ex) {
             String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated"
                 + " due to IllegalAccessException";
-            throw new InternalServerErrorException(Response.serverError().entity(msg).build());
+            throw ExceptionUtils.toInternalServerErrorException(null, serverError(msg));
         } catch (InvocationTargetException ex) {
             Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), m);
             if (r != null) {
                 m.getExchange().put(Response.class, r);
-                throw new InternalServerErrorException();
+                throw new WebApplicationException();
             }
             String msg = "Resource class "
                 + c.getDeclaringClass().getName() + " can not be instantiated"
                 + " due to InvocationTargetException";
-            throw new InternalServerErrorException(Response.serverError().entity(msg).build());
+            throw ExceptionUtils.toInternalServerErrorException(null, serverError(msg));
         }
         
     }
 
+    private Response serverError(String msg) {
+        return Response.serverError().entity(msg).build();
+    }
+    
     /**
      * {@inheritDoc}
      */

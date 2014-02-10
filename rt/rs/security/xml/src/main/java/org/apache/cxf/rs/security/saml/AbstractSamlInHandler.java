@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
@@ -37,7 +36,9 @@ import javax.ws.rs.core.Response;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -218,7 +219,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
         // to rt/rs/security
         LOG.warning(error);
         Response response = Response.status(401).entity(error).build();
-        throw ex != null ? new NotAuthorizedException(response, ex) : new NotAuthorizedException(response);
+        throw ExceptionUtils.toNotAuthorizedException(null, response);
     }
     
     /**

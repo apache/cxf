@@ -28,7 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -43,6 +42,7 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -75,12 +75,12 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             .getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (authHeaders.size() != 1) {
             LOG.fine("No Authorization header is available");
-            throw new NotAuthorizedException(getFaultResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
         String[] authPair = StringUtils.split(authHeaders.get(0), " ");
         if (authPair.length != 2 || !NEGOTIATE_SCHEME.equalsIgnoreCase(authPair[0])) {
             LOG.fine("Negotiate Authorization scheme is expected");
-            throw new NotAuthorizedException(getFaultResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
                 
         byte[] serviceTicket = getServiceTicket(authPair[1]);
@@ -94,7 +94,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             
             GSSName srcName = gssContext.getSrcName();
             if (srcName == null) {
-                throw new NotAuthorizedException(getFaultResponse());
+                throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
             }
             
             String complexUserName = srcName.toString();
@@ -116,13 +116,13 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             
         } catch (LoginException e) {
             LOG.fine("Unsuccessful JAAS login for the service principal: " + e.getMessage());
-            throw new NotAuthorizedException(getFaultResponse(), e);
+            throw ExceptionUtils.toNotAuthorizedException(e, getFaultResponse());
         } catch (GSSException e) {
             LOG.fine("GSS API exception: " + e.getMessage());
-            throw new NotAuthorizedException(getFaultResponse(), e);
+            throw ExceptionUtils.toNotAuthorizedException(e, getFaultResponse());
         } catch (PrivilegedActionException e) {
             LOG.fine("PrivilegedActionException: " + e.getMessage());
-            throw new NotAuthorizedException(getFaultResponse(), e);
+            throw ExceptionUtils.toNotAuthorizedException(e, getFaultResponse());
         }
     }
 
@@ -163,7 +163,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         try {
             return Base64Utility.decode(encodedServiceTicket);
         } catch (Base64Exception ex) {
-            throw new NotAuthorizedException(getFaultResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
     }
     

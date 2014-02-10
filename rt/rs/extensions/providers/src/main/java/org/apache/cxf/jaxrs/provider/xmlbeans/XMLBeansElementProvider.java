@@ -29,7 +29,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -39,6 +38,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.xmlbeans.XmlObject;
 
 /**
@@ -113,11 +113,11 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
             }
 
         } catch (NoSuchMethodException nsme) {
-            throw new InternalServerErrorException(nsme);
+            throw ExceptionUtils.toInternalServerErrorException(nsme, null);
         } catch (InvocationTargetException ite) {
-            throw new InternalServerErrorException(ite);
+            throw ExceptionUtils.toInternalServerErrorException(ite, null);
         } catch (IllegalAccessException iae) {
-            throw new InternalServerErrorException(iae);
+            throw ExceptionUtils.toInternalServerErrorException(iae, null);
         }
 
         return result;

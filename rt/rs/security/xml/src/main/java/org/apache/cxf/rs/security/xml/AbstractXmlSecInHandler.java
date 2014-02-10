@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamReader;
 
@@ -32,6 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
@@ -81,7 +81,7 @@ public abstract class AbstractXmlSecInHandler {
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = Response.status(400).entity(error).build();
-        throw ex != null ? new BadRequestException(response, ex) : new BadRequestException(response);
+        throw ExceptionUtils.toBadRequestException(null, response);
     }
 
     protected Element getNode(Element parent, String ns, String name, int index) {

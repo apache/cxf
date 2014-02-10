@@ -28,9 +28,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
@@ -72,7 +71,7 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             xsr.close();
 
         } catch (XMLStreamException e) {
-            throw new BadRequestException(e);
+            throw ExceptionUtils.toBadRequestException(e, null);
         }
 
         return result;
@@ -101,9 +100,9 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             xsw.close();
 
         } catch (XMLStreamException e) {
-            throw new InternalServerErrorException(e);
+            throw ExceptionUtils.toInternalServerErrorException(e, null);
         } catch (IOException ioe) {
-            throw new InternalServerErrorException(ioe);
+            throw ExceptionUtils.toInternalServerErrorException(ioe, null);
         }
     }
 }

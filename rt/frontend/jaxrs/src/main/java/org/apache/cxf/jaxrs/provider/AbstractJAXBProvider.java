@@ -38,8 +38,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -75,6 +73,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -694,7 +693,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR; 
         Response r = Response.status(status)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
-        throw read ? new BadRequestException(r, t) : new InternalServerErrorException(r, t);
+        WebApplicationException ex = read ? ExceptionUtils.toBadRequestException(t, r) 
+            : ExceptionUtils.toInternalServerErrorException(t, r);
+        throw ex;
     }
     
     protected void handleJAXBException(JAXBException e, boolean read) {
@@ -798,7 +799,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                         ? Integer.valueOf(innerElementCountStr) : -1;
                     return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
                 } catch (Exception ex) {
-                    throw new InternalServerErrorException(ex);
+                    throw ExceptionUtils.toInternalServerErrorException(ex, null);
                 }
             }
         }
