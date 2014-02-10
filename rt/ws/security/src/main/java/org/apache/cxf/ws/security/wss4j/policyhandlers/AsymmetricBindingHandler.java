@@ -41,7 +41,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.wss4j.AttachmentOutCallbackHandler;
+import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -473,7 +473,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
-                    encr.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
+                    encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     
                     encr.setDocument(saaj.getSOAPPart());
                     Crypto crypto = getEncryptionCrypto(recToken);

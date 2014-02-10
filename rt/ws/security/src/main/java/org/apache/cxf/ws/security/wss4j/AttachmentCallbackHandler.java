@@ -37,13 +37,13 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 
 /**
- * A outbound CallbackHandler to be used to sign/encrypt SOAP Attachments.
+ * A CallbackHandler to be used to sign/encrypt SOAP Attachments.
  */
-public class AttachmentOutCallbackHandler implements CallbackHandler {
+public class AttachmentCallbackHandler implements CallbackHandler {
     
     private final SoapMessage soapMessage;
     
-    public AttachmentOutCallbackHandler(SoapMessage soapMessage) {
+    public AttachmentCallbackHandler(SoapMessage soapMessage) {
         this.soapMessage = soapMessage;
     }
 
@@ -57,37 +57,17 @@ public class AttachmentOutCallbackHandler implements CallbackHandler {
                 List<org.apache.wss4j.common.ext.Attachment> attachmentList =
                     new ArrayList<org.apache.wss4j.common.ext.Attachment>();
                 attachmentRequestCallback.setAttachments(attachmentList);
-
-                final Collection<org.apache.cxf.message.Attachment> attachments = 
-                    soapMessage.getAttachments();
-                if (attachments == null) {
-                    return;
+                
+                String attachmentId = attachmentRequestCallback.getAttachmentId();
+                if ("Attachments".equals(attachmentId)) {
+                    // Load all attachments
+                    attachmentId = null;
                 }
-                for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
-                    iterator.hasNext();) {
-                    org.apache.cxf.message.Attachment attachment = iterator.next();
-
-                    org.apache.wss4j.common.ext.Attachment att =
-                        new org.apache.wss4j.common.ext.Attachment();
-                    att.setMimeType(attachment.getDataHandler().getContentType());
-                    att.setId(attachment.getId());
-                    att.setSourceStream(attachment.getDataHandler().getInputStream());
-
-                    Iterator<String> headerIterator = attachment.getHeaderNames();
-                    while (headerIterator.hasNext()) {
-                        String next = headerIterator.next();
-                        att.addHeader(next, attachment.getHeader(next));
-                    }
-                    attachmentList.add(att);
-
-                    iterator.remove();
-                }
-
+                loadAttachments(attachmentList, attachmentId);
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
 
-                final Collection<org.apache.cxf.message.Attachment> attachments = 
-                    soapMessage.getAttachments();
+                final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
 
                 org.apache.cxf.attachment.AttachmentImpl securedAttachment =
                     new org.apache.cxf.attachment.AttachmentImpl(
@@ -112,5 +92,36 @@ public class AttachmentOutCallbackHandler implements CallbackHandler {
         }
     }
 
+    private void loadAttachments(
+        List<org.apache.wss4j.common.ext.Attachment> attachmentList,
+        String attachmentId
+    ) throws IOException {
+        final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
+        // Calling LazyAttachmentCollection.size() here to force it to load the attachments
+        if (attachments != null && attachments.size() > 0) {
+            for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
+                iterator.hasNext();) {
+                org.apache.cxf.message.Attachment attachment = iterator.next();
+
+                if (attachmentId != null && !attachmentId.equals(attachment.getId())) {
+                    continue;
+                }
+
+                org.apache.wss4j.common.ext.Attachment att =
+                    new org.apache.wss4j.common.ext.Attachment();
+                att.setMimeType(attachment.getDataHandler().getContentType());
+                att.setId(attachment.getId());
+                att.setSourceStream(attachment.getDataHandler().getInputStream());
+                Iterator<String> headerIterator = attachment.getHeaderNames();
+                while (headerIterator.hasNext()) {
+                    String next = headerIterator.next();
+                    att.addHeader(next, attachment.getHeader(next));
+                }
+                attachmentList.add(att);
+
+                iterator.remove();
+            }
+        }
+    }
 
 }

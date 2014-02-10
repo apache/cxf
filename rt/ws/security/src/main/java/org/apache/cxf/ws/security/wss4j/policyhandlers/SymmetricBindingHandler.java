@@ -40,7 +40,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.wss4j.AttachmentOutCallbackHandler;
+import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -511,7 +511,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt(wssConfig);
-                    encr.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
+                    encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
@@ -752,7 +752,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             return doSignatureDK(sigs, policyAbstractTokenWrapper, policyToken, tok, included);
         } else {
             WSSecSignature sig = new WSSecSignature(wssConfig);
-            sig.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
+            sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 

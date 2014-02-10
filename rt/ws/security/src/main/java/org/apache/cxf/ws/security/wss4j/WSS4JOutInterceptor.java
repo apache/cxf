@@ -156,7 +156,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             translateProperties(mc);
     
             reqData.setMsgContext(mc);
-            reqData.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(mc));
+            reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
             
             /*
              * The overall try, just to have a finally at the end to perform some

@@ -139,7 +139,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             }
             
             if (secProps.getAttachmentCallbackHandler() == null) {
-                secProps.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(mc));
+                secProps.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
             }
             
             SecurityEventListener securityEventListener = 

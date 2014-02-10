@@ -72,7 +72,7 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.wss4j.AttachmentOutCallbackHandler;
+import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
@@ -1647,7 +1647,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         AbstractTokenWrapper wrapper, AbstractToken token, boolean attached, boolean endorse
     ) throws WSSecurityException {
         WSSecSignature sig = new WSSecSignature(wssConfig);
-        sig.setAttachmentCallbackHandler(new AttachmentOutCallbackHandler(message));
+        sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
         checkForX509PkiPath(sig, token);
         if (token instanceof IssuedToken || token instanceof SamlToken) {
             assertPolicy(token);
