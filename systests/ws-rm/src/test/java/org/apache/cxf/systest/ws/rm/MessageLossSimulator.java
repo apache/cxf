@@ -38,6 +38,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.RMContextUtils;
+import org.apache.cxf.ws.rm.RMMessageConstants;
 
 /**
  * 
@@ -81,6 +82,13 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (MessageUtils.isPartialResponse(message)) {
             return;
         }
+        if (Boolean.TRUE.equals(message.get(RMMessageConstants.MESSAGE_CAPTURE_CHAIN))) {
+            return;
+        }
+        if (Boolean.TRUE.equals(message.get(RMMessageConstants.RM_RETRANSMISSION))) {
+            return;
+        }
+        
         if (mode == 1) {
             // never lose
             return;
@@ -109,22 +117,34 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         
         message.setContent(OutputStream.class, new WrappedOutputStream(message));     
         
-        message.getInterceptorChain().add(new AbstractPhaseInterceptor<Message>(Phase.PREPARE_SEND_ENDING) {
-
-            public void handleMessage(Message message) throws Fault {
-                try {
-                    message.getContent(OutputStream.class).close();
-                    if (throwsException) {
-                        throw new IOException("simulated transmission exception");
-                    }
-                } catch (IOException e) {
-                    throw new Fault(e);
-                }
-            }
-            
-        });
+        message.getInterceptorChain().add(new MessageLossEndingInterceptor(throwsException));
     }
     
+    /**
+     * Ending interceptor to discard message output. Note that the name is used as a String by RMCaptureOutInterceptor,
+     * so if ever changed here also needs to be changed there.
+     */
+    public static final class MessageLossEndingInterceptor extends AbstractPhaseInterceptor<Message> {
+        
+        private final boolean throwsException;
+        
+        public MessageLossEndingInterceptor(boolean except) {
+            super(Phase.PREPARE_SEND_ENDING);
+            throwsException = except;
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            try {
+                message.getContent(OutputStream.class).close();
+                if (throwsException) {
+                    throw new IOException("simulated transmission exception");
+                }
+            } catch (IOException e) {
+                throw new Fault(e);
+            }
+        }
+    }
+
     private class WrappedOutputStream extends AbstractWrappedOutputStream {
 
         private Message outMessage;

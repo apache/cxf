@@ -453,7 +453,7 @@ public class RetransmissionQueueImplTest extends Assert {
         Message message;
         boolean includeAckRequested;
         
-        public void resend(SoapMessage ctx, boolean requestAcknowledge) {
+        public void resend(Message ctx, boolean requestAcknowledge) {
             message = ctx;
             includeAckRequested = requestAcknowledge;
         }

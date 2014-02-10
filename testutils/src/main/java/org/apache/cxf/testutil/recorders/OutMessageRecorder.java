@@ -47,7 +47,6 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
         super(Phase.PREPARE_SEND);
         outbound = new CopyOnWriteArrayList<byte[]>();
         addAfter(MessageSenderInterceptor.class.getName());
-        addAfter("org.apache.cxf.ws.rm.RetransmissionInterceptor");
     }
     
     public void handleMessage(Message message) throws Fault {

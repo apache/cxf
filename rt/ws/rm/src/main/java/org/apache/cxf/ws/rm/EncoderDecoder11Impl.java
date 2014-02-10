@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -127,13 +126,6 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
                 marshaller.marshal(RMUtils.getWSRMFactory().createAckRequested(req), header);
             }
         }
-    }
-
-    protected void addNamespaceDecl(Element element) {
-        Attr attr = element.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/", 
-            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-        attr.setValue(RM10Constants.NAMESPACE_URI);
-        element.setAttributeNodeNS(attr);
     }
 
     public void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller) throws JAXBException {

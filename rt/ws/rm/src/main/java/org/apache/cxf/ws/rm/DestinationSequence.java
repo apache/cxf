@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -167,7 +166,9 @@ public class DestinationSequence extends AbstractSequence {
             RMMessage msg = null;
             if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
                 msg = new RMMessage();
-                msg.setContent((InputStream)message.get(RMMessageConstants.SAVED_CONTENT));
+                RewindableInputStream in = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+                in.rewind();
+                msg.setContent(in);
                 msg.setMessageNumber(st.getMessageNumber());
             }
             store.persistIncoming(this, msg);
@@ -180,7 +181,6 @@ public class DestinationSequence extends AbstractSequence {
        
         long inactivityTimeout = cfg.getInactivityTimeoutTime();
         scheduleSequenceTermination(inactivityTimeout);
-        
     }
     
     void mergeRanges() {

@@ -27,27 +27,29 @@ public final class RMMessageConstants {
     /**
      * Used to cache outbound RM properties in message.
      */
-    public static final String RM_PROPERTIES_OUTBOUND = 
-        "org.apache.cxf.ws.rm.outbound";
+    public static final String RM_PROPERTIES_OUTBOUND = "org.apache.cxf.ws.rm.outbound";
     
     /**
      * Used to cache inbound RM properties in message.
      */
-    public static final String RM_PROPERTIES_INBOUND = 
-        "org.apache.cxf.ws.rm.inbound";
+    public static final String RM_PROPERTIES_INBOUND = "org.apache.cxf.ws.rm.inbound";
     
-    public static final String ORIGINAL_REQUESTOR_ROLE =
-        "org.apache.cxf.client.original";
+    public static final String ORIGINAL_REQUESTOR_ROLE = "org.apache.cxf.client.original";
     
-    public static final String SAVED_CONTENT =
-        "org.apache.cxf.ws.rm.content";
+    /** Message content (must be an instance of {@link RewindableInputStream}. */
+    public static final String SAVED_CONTENT = "org.apache.cxf.ws.rm.content";
     
-    static final String RM_PROTOCOL_VARIATION = 
-        "org.apache.cxf.ws.rm.protocol";
+    /** Retransmission in progress flag (Boolean.TRUE if in progress). */
+    public static final String RM_RETRANSMISSION = "org.apache.cxf.ws.rm.retransmitting";
+    
+    /** Boolean property TRUE for a chain used only to capture (not send) a message. */
+    public static final String MESSAGE_CAPTURE_CHAIN = "org.apache.cxf.rm.captureOnly";
+    
+    static final String RM_PROTOCOL_VARIATION = "org.apache.cxf.ws.rm.protocol";
 
     // keep this constant in the ws-rm package until it finds a general use outside of ws-rm
-    static final String DELIVERING_ROBUST_ONEWAY = 
-        "org.apache.cxf.oneway.robust.delivering";
+    static final String DELIVERING_ROBUST_ONEWAY = "org.apache.cxf.oneway.robust.delivering";
+    
     
     /**
      * Prevents instantiation. 

@@ -23,14 +23,13 @@ import java.io.OutputStream;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
-import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 
 /**
- * 
+ * Just absorbs faults which will be handled by retransmission.
  */
 public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message> {
 
@@ -73,9 +72,6 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
             // error does not reach the client when retransmission is scheduled 
             message.setContent(Exception.class, null);
             message.getExchange().put(Exception.class, null); 
-        } else { 
-            WriteOnCloseOutputStream stream = RMUtils.createCachedStream(message, os);
-            stream.registerCallback(new RetransmissionCallback(message, getManager()));
         }
     }
 }

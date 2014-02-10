@@ -22,18 +22,19 @@ package org.apache.cxf.ws.rm.soap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -256,16 +257,17 @@ public class RMSoapOutInterceptorTest extends Assert {
     }
 
     private void verifyHeaders(SoapMessage message, String... names) {
-        SOAPMessage content = message.getContent(SOAPMessage.class);
+        List<Header> header = message.getHeaders();
 
         // check all expected headers are present
 
         for (String name : names) {
             boolean found = false;
-            try {
-                Iterator<?> elems = content.getSOAPHeader().getChildElements();
-                while (elems.hasNext()) {
-                    Element elem = (Element)elems.next();
+            Iterator<Header> iter = header.iterator();
+            while (iter.hasNext()) {
+                Object obj = iter.next().getObject();
+                if (obj instanceof Element) {
+                    Element elem = (Element) obj;
                     String namespace = elem.getNamespaceURI();
                     String localName = elem.getLocalName();
                     if (RM10Constants.NAMESPACE_URI.equals(namespace)
@@ -278,15 +280,17 @@ public class RMSoapOutInterceptorTest extends Assert {
                         break;
                     }
                 }
-            } catch (SOAPException e) { /* failure will result in not found */ }
+            }
             assertTrue("Could not find header element " + name, found);
         }
 
         // no other headers should be present
-        try {
-            Iterator<?> elems = content.getSOAPHeader().getChildElements();
-            while (elems.hasNext()) {
-                Element elem = (Element)elems.next();
+
+        Iterator<Header> iter1 = header.iterator();
+        while (iter1.hasNext()) {
+            Object obj = iter1.next().getObject();
+            if (obj instanceof Element) {
+                Element elem = (Element) obj;
                 String namespace = elem.getNamespaceURI();
                 String localName = elem.getLocalName();
                 assertTrue(RM10Constants.NAMESPACE_URI.equals(namespace) 
@@ -300,6 +304,6 @@ public class RMSoapOutInterceptorTest extends Assert {
                 }
                 assertTrue("Unexpected header element " + localName, found);
             }
-        } catch (SOAPException e) { /* failure would have been caught before */ }
+        }
     }
 }

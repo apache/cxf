@@ -21,6 +21,7 @@ package org.apache.cxf.ws.rm.soap;
 
 import java.net.HttpURLConnection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,23 +29,28 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
-import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.SequenceFault;
 
@@ -70,9 +76,9 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
      * Constructor.
      */
     public RMSoapOutInterceptor() {
-        super(Phase.POST_PROTOCOL);
+        super(Phase.PRE_PROTOCOL);
         
-        addAfter(RMOutInterceptor.class.getName());
+        addAfter(MAPCodec.class.getName());
     } 
     
     // AbstractSoapInterceptor interface 
@@ -125,27 +131,30 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
         try {
             
             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
-                maps.getNamespaceURI());
-            SOAPMessage content = message.getContent(SOAPMessage.class);
-            boolean added = protocol.getCodec().insertHeaders(rmps, content.getSOAPPart());
-            if (added && MessageUtils.isPartialResponse(message)) {
-                // make sure the response is returned as HTTP 200 and not 202
-                message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
-            }
-            if (added) {
-                try {
-                    content.saveChanges();
-                } catch (SOAPException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(), maps.getNamespaceURI());
+            Element header = protocol.getCodec().buildHeaders(rmps, message.getVersion().getHeader());
+            if (header != null) {
+                Node node = header.getFirstChild();
+                if (node != null && MessageUtils.isPartialResponse(message)) {
+                    // make sure the response is returned as HTTP 200 and not 202
+                    message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
                 }
-                
+                while (node != null) {
+                    Header holder = null;
+                    if (node.getLocalName().equals("Sequence")) {
+                        holder = new SoapHeader(new QName(node.getNamespaceURI(), node.getLocalName()), node);
+                        ((SoapHeader)holder).setMustUnderstand(true);
+                    } else {
+                        holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
+                    }
+                    message.getHeaders().add(holder);
+                    node = node.getNextSibling();
+                }
             }
 
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
-        }        
+        }
     }
     
     /**
@@ -162,8 +171,16 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
             AddressingProperties maps = RMContextUtils.retrieveMAPs(inmsg, false, false);
             ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
                 maps.getNamespaceURI());
-            SOAPMessage content = message.getContent(SOAPMessage.class);
-            protocol.getCodec().insertHeaderFault(sf, content.getSOAPPart());
+            Element header = protocol.getCodec().buildHeaderFault(sf, message.getVersion().getHeader());
+            Node node = header.getFirstChild();
+            if (node instanceof Element) {
+                Attr attr = header.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/",
+                    "xmlns:" + RMConstants.NAMESPACE_PREFIX);
+                attr.setValue(rmps.getNamespaceURI());
+                ((Element)node).setAttributeNodeNS(attr);
+            }
+            List<Header> headers = message.getHeaders();
+            headers.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
         }        

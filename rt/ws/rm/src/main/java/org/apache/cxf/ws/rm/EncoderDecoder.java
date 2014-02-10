@@ -24,12 +24,13 @@ import java.util.Collection;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
@@ -52,13 +53,6 @@ public abstract class EncoderDecoder {
      * @throws JAXBException
      */
     protected abstract JAXBContext getContext() throws JAXBException;
-    
-    /**
-     * Add WS-RM namespace declaration to element.
-     * 
-     * @param element
-     */
-    protected abstract void addNamespaceDecl(Element element);
     
     /**
      * Get the WS-ReliableMessaging namespace used by this encoder/decoder.
@@ -110,71 +104,67 @@ public abstract class EncoderDecoder {
     public abstract Class<?> getTerminateSequenceResponseType();
     
     /**
-     * Insert WS-RM headers into a SOAP message. This adds the appropriate WS-RM namespace declaration to the
-     * SOAP:Header element (which must be present), and then adds any WS-RM headers set in the supplied properties as
-     * child elements.
+     * Builds an element containing WS-RM headers. This adds the appropriate WS-RM namespace declaration to the element,
+     * and then adds any WS-RM headers set in the supplied properties as child elements.
      * 
      * @param rmps
-     * @param doc
-     * @return <code>true</code> if headers added, <code>false</code> if not
+     * @param qname constructed element name
+     * @return element (<code>null</code> if none)
      */
-    public boolean insertHeaders(RMProperties rmps, Document doc) throws JAXBException {
+    public Element buildHeaders(RMProperties rmps, QName qname) throws JAXBException {
         
         // check if there's anything to insert
         SequenceType seq = rmps.getSequence();
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();
         Collection<AckRequestedType> reqs = rmps.getAcksRequested();
         if (seq == null && acks == null && reqs == null) {
-            return false;
+            return null;
         }
         
-        // add WSRM namespace declaration to header, instead of repeating in each individual child node
-        Element header = getSoapHeader(doc);
+        // create element with namespace declaration included
+        Document doc = DOMUtils.createDocument();
+        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
         addNamespaceDecl(header);
         
         // build individual headers
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         buildHeaders(seq, acks, reqs, rmps.isLastMessage(), header, marshaller);
-        return true;
-    }
-
-    /**
-     * Get the SOAP Header element from a message document.
-     * 
-     * @param doc
-     * @return header
-     * @throws JAXBException if not found
-     */
-    protected Element getSoapHeader(Document doc) throws JAXBException {
-        NodeList nodes = doc.getDocumentElement().getChildNodes();
-        Element header = null;
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE && "Header".equals(node.getLocalName())) {
-                header = (Element)node;
-                break;
-            }
-        }
-        if (header == null) {
-            throw new JAXBException("No SOAP:Header element in message");
-        }
         return header;
     }
     
     /**
-     * Inserts a Header element containing a WS-RM Fault into a SOAP message.
+     * Add WS-RM namespace declaration to element.
+     * 
+     * @param element
+     */
+    protected void addNamespaceDecl(Element element) {
+        Attr attr = element.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/", 
+            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
+        attr.setValue(getWSRMNamespace());
+        element.setAttributeNodeNS(attr);
+    }
+    
+    /**
+     * Builds an element containing a WS-RM Fault. This adds the appropriate WS-RM namespace declaration to
+     * the element, and then adds the Fault as a child element.
      * 
      * @param sf
      * @param qname constructed element name
-     * @param doc
+     * @return element
      */
-    public void insertHeaderFault(SequenceFault sf, Document doc) throws JAXBException {
-        Element header = getSoapHeader(doc);
+    public Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException {
+        
+        // create element with namespace declaration included
+        Document doc = DOMUtils.createDocument();
+        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
         addNamespaceDecl(header);
+        
+        // insert the actual fault
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         buildHeaderFault(sf, header, marshaller);
+        return header;
     }
 
     /**

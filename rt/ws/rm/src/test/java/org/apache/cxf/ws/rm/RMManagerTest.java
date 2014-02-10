@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -615,6 +617,7 @@ public class RMManagerTest extends Assert {
         Identifier id = new Identifier();
         id.setValue("S1");
         EasyMock.expect(ss.getIdentifier()).andReturn(id).times(null == m ? 1 : 2);
+        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         EasyMock.expect(store.getMessages(id, true)).andReturn(ms);
         
         
@@ -643,6 +646,8 @@ public class RMManagerTest extends Assert {
         if (null == conduit) {
             EasyMock.expect(m.getTo()).andReturn("toAddress");
         }
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        EasyMock.expect(m.getContent()).andReturn(is).anyTimes();
 
         if (mc != null) {
             queue.addUnacknowledged(EasyMock.capture(mc));

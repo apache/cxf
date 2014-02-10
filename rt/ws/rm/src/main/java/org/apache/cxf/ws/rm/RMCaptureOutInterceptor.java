@@ -21,39 +21,51 @@ package org.apache.cxf.ws.rm;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.interceptor.MessageSenderInterceptor.MessageSenderEndingInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.policy.PolicyVerificationOutInterceptor;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
+import org.apache.cxf.ws.security.SecurityConstants;
 
 /**
  * 
@@ -63,8 +75,9 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     private static final Logger LOG = LogUtils.getL7dLogger(RMCaptureOutInterceptor.class);
  
     public RMCaptureOutInterceptor() {
-        super(Phase.POST_PROTOCOL);
-        addBefore(RMOutInterceptor.class.getName());
+        super(Phase.PRE_STREAM);
+        addBefore(AttachmentOutInterceptor.class.getName());
+        addBefore(LoggingOutInterceptor.class.getName());
     }
     
     protected void handle(Message msg) throws SequenceFault, RMException {  
@@ -73,7 +86,9 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
         }
-        
+        if (Boolean.TRUE.equals(msg.get(RMMessageConstants.RM_RETRANSMISSION))) {
+            return;
+        }
         if (isRuntimeFault(msg)) {
             LogUtils.log(LOG, Level.WARNING, "RUNTIME_FAULT_MSG");
             // in case of a SequenceFault or other WS-RM related fault, set action appropriately.
@@ -140,7 +155,6 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             }
             
             // get the current sequence, requesting the creation of a new one if necessary
-            
             synchronized (source) {
                 SourceSequence seq = null;
                 if (isLastMessage) {
@@ -188,55 +202,132 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         
         // capture message if retranmission possible
         if (isApplicationMessage && !isPartialResponse) {
-            captureMessage(msg);
             getManager().initializeInterceptorChain(msg);
+            captureMessage(msg);
         }
     }
 
     private void captureMessage(Message message) {
-        SOAPMessage content = message.getContent(SOAPMessage.class);
-        try {
-            LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream();
-            content.writeTo(bos);
-            bos.close();
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Captured message: " + bos.toString("UTF-8"));
+        Message capture = new MessageImpl();
+        capture.setId(message.getId());
+        capture.put(RMMessageConstants.MESSAGE_CAPTURE_CHAIN, Boolean.TRUE);
+        Iterator<Class<?>> citer = message.getContentFormats().iterator();
+        while (citer.hasNext()) {
+            Class<?> clas = citer.next();
+            if (OutputStream.class != clas) {
+                
+                // clone contents list so changes won't effect original message
+                Object content = message.getContent(clas);
+                if (content instanceof MessageContentsList) {
+                    content = new MessageContentsList((MessageContentsList)content);
+                }
+                capture.setContent(clas, content);
             }
+        }
+        Iterator<String> kiter = message.keySet().iterator();
+        while (kiter.hasNext()) {
+            String key = kiter.next();
+            capture.put(key, message.get(key));
+        }
+        kiter = message.getContextualPropertyKeys().iterator();
+        while (kiter.hasNext()) {
+            String key = kiter.next();
+            capture.setContextualProperty(key, message.getContextualProperty(key));
+        }
+        if (message instanceof SoapMessage) {
+            capture = new SoapMessage(capture);
+            ((SoapMessage)capture).setVersion(((SoapMessage)message).getVersion());
+        }
+        
+        // eliminate all other RM interceptors, along with attachment and security and message loss interceptors, from
+        //  capture chain
+        PhaseInterceptorChain chain = (PhaseInterceptorChain)message.getInterceptorChain();
+        PhaseInterceptorChain cchain = chain.cloneChain();
+        ListIterator<Interceptor<? extends Message>> iterator = cchain.getIterator();
+        boolean past = false;
+        boolean ending = false;
+        while (iterator.hasNext()) {
+            PhaseInterceptor<? extends Message> intercept = (PhaseInterceptor<? extends Message>)iterator.next();
+            String id = intercept.getId();
+            if (RMCaptureOutInterceptor.class.getName().equals(id)) {
+                past = true;
+            } else if (past && id != null) {
+                if ((id.startsWith(RMCaptureOutInterceptor.class.getPackage().getName())
+                    && !(id.equals(RetransmissionInterceptor.class.getName())))
+                    || id.startsWith(SecurityConstants.class.getPackage().getName())
+                    || PolicyVerificationOutInterceptor.class.getName().equals(id)
+                    || AttachmentOutInterceptor.class.getName().equals(id)
+                    || LoggingOutInterceptor.class.getName().equals(id)
+                    || "org.apache.cxf.systest.ws.rm.MessageLossSimulator$MessageLossEndingInterceptor".equals(id)) {
+                    cchain.remove(intercept);
+                } else if (MessageSenderEndingInterceptor.class.getName().equals(id)) {
+                    ending = true;
+                }
+            }
+        }
+        if (!ending) {
+            
+            // add normal ending interceptor back in, in case removed by MessageLossSimulator
+            cchain.add(new MessageSenderEndingInterceptor());
+        }
+        capture.setInterceptorChain(cchain);
+        LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream();
+        capture.setContent(OutputStream.class, bos);
+        ExchangeImpl captureExchange = new ExchangeImpl((ExchangeImpl)message.getExchange());
+        capture.setExchange(captureExchange);
+        captureExchange.setOutMessage(capture);
+        captureExchange.setConduit(new AbstractConduit(captureExchange.getConduit(capture).getTarget()) {
+            
+            @Override
+            public void prepare(Message message) throws IOException {
+            }
+            
+            @Override
+            protected Logger getLogger() {
+                return null;
+            }
+            
+        });
+        cchain.doInterceptStartingAfter(capture, RMCaptureOutInterceptor.class.getName());
+        try {
+            
+            RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
+            SequenceType sequence = rmps.getSequence();
+            Long number = sequence.getMessageNumber();
+            Identifier sid = sequence.getIdentifier();
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.log(Level.INFO, "Captured message " + number + " in sequence " + sid.getValue());
+            }
+            
+            // save message for potential retransmission
             ByteArrayInputStream bis = bos.createInputStream();
-            message.put(RMMessageConstants.SAVED_CONTENT, bis);
+            message.put(RMMessageConstants.SAVED_CONTENT, RewindableInputStream.makeRewindable(bis));
             RMManager manager = getManager();
             manager.getRetransmissionQueue().start();
             manager.getRetransmissionQueue().addUnacknowledged(message);
-            
             RMStore store = manager.getStore();
             if (null != store) {
-                try {
-                    Source s = manager.getSource(message);
-                    RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
-                    Identifier sid = rmps.getSequence().getIdentifier();
-                    SourceSequence ss = s.getSequence(sid);
-                    RMMessage msg = new RMMessage();
-                    msg.setMessageNumber(rmps.getSequence().getMessageNumber());
-                    if (!MessageUtils.isRequestor(message)) {
-                        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-                        if (null != maps && null != maps.getTo()) {
-                            msg.setTo(maps.getTo().getValue());
-                        }
+                
+                // persist message to store
+                Source s = manager.getSource(message);
+                SourceSequence ss = s.getSequence(sid);
+                RMMessage msg = new RMMessage();
+                msg.setMessageNumber(number);
+                if (!MessageUtils.isRequestor(message)) {
+                    AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
+                    if (null != maps && null != maps.getTo()) {
+                        msg.setTo(maps.getTo().getValue());
                     }
-                    msg.setContent(bis);
-                    store.persistOutgoing(ss, msg);
-                } catch (RMException e) {
-                    // ignore
-                } 
+                }
+                msg.setContent(bis);
+                store.persistOutgoing(ss, msg);
             }
-            
+                
+        } catch (RMException e) {
+            // ignore
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SOAPException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            LOG.log(Level.SEVERE, "Error persisting message", e);
+        } 
     }
 
     private String getAddressingNamespace(AddressingProperties maps) {

@@ -33,7 +33,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 
 /**
  * 
@@ -43,14 +42,17 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
     private static final Logger LOG = LogUtils.getL7dLogger(RMOutInterceptor.class);
  
     public RMOutInterceptor() {
-        super(Phase.POST_PROTOCOL);
-        addBefore(PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal.class.getName());
+        super(Phase.PRE_STREAM);
+        addAfter(RMCaptureOutInterceptor.class.getName());
     }
     
     protected void handle(Message msg) throws SequenceFault, RMException {  
         AddressingProperties maps = ContextUtils.retrieveMAPs(msg, false, true,  false);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
+            return;
+        }
+        if (Boolean.TRUE.equals(msg.get(RMMessageConstants.RM_RETRANSMISSION))) {
             return;
         }
         
@@ -78,6 +80,10 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
         RMConstants constants = protocol.getConstants();
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
+        
+        if (isApplicationMessage && !isPartialResponse) {
+            addRetransmissionInterceptor(msg);
+        }
         
         Identifier inSeqId = null;
 
@@ -107,10 +113,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         assertReliability(msg);
     }
     
-    void addAcknowledgements(Destination destination, 
-                             RMProperties rmpsOut, 
-                             Identifier inSeqId, 
-                             AttributedURIType to) {
+    void addAcknowledgements(Destination destination, RMProperties rmpsOut, Identifier inSeqId,  AttributedURIType to) {
         for (DestinationSequence seq : destination.getAllSequences()) {
             if (!seq.sendAcknowledgement()) {
                 if (LOG.isLoggable(Level.FINE)) {
@@ -145,6 +148,23 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             } else {
                 LOG.fine("Added " + acks.size() + " acknowledgements.");
             }
+        }
+    }
+
+    private void addRetransmissionInterceptor(Message msg) {
+        RetransmissionInterceptor ri = new RetransmissionInterceptor();
+        ri.setManager(getManager());
+        // TODO:
+        // On the server side: If a fault occurs after this interceptor we will switch 
+        // interceptor chains (if this is not already a fault message) and therefore need to 
+        // make sure the retransmission interceptor is added to the fault chain
+        // 
+        msg.getInterceptorChain().add(ri);
+        LOG.fine("Added RetransmissionInterceptor to chain.");
+        
+        RetransmissionQueue queue = getManager().getRetransmissionQueue();
+        if (queue != null) {
+            queue.start();
         }
     }
     

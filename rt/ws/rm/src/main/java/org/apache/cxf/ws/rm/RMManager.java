@@ -19,9 +19,9 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -595,6 +595,7 @@ public class RMManager {
             st.setMessageNumber(m.getMessageNumber());
             RMProperties rmps = new RMProperties();
             rmps.setSequence(st);
+            rmps.exposeAs(ss.getProtocol().getWSRMNamespace());
             if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
                 CloseSequenceType close = new CloseSequenceType();
                 close.setIdentifier(ss.getIdentifier());
@@ -608,10 +609,13 @@ public class RMManager {
                 RMContextUtils.storeMAPs(maps, message, true, false);
             }
                                     
-//            message.put(RMMessageConstants.SAVED_CONTENT, m.getCachedOutputStream());
-            RMContextUtils.setProtocolVariation(message, ss.getProtocol());
-            
-            retransmissionQueue.addUnacknowledged(message);
+            try {
+                message.put(RMMessageConstants.SAVED_CONTENT, RewindableInputStream.makeRewindable(m.getContent()));
+                RMContextUtils.setProtocolVariation(message, ss.getProtocol());
+                retransmissionQueue.addUnacknowledged(message);
+            } catch (IOException e) {
+                LOG.log(Level.SEVERE, "Error reading persisted message data", e);
+            }
         }            
     }
 
@@ -723,14 +727,6 @@ public class RMManager {
     public void initializeInterceptorChain(Message msg) {
         if (retransmitChain == null) {
             LOG.info("Setting retransmit chain from message");
-            Set<Class<?>> formats = msg.getContentFormats();
-            int i = 0;
-            for (Class<?> clas: formats) {
-                Object content = msg.getContent(clas);
-                LOG.info("Found content " + content + " of type " + clas.getName());
-                i++;
-            }
-            LOG.info("Total " + i);
             PhaseInterceptorChain chain = (PhaseInterceptorChain)msg.getInterceptorChain();
             retransmitChain = chain.cloneChain();
         }
@@ -739,9 +735,12 @@ public class RMManager {
     /**
      * Get interceptor chain for retransmitting a message.
      * 
-     * @return chain
+     * @return chain (<code>null</code> if none set)
      */
     public PhaseInterceptorChain getRetransmitChain() {
+        if (retransmitChain == null) {
+            return null;
+        }
         return retransmitChain.cloneChain();
     }
 }

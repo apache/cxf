@@ -26,7 +26,11 @@
     <bean id="rmLogicalIn" class="org.apache.cxf.ws.rm.RMInInterceptor">
         <property name="bus" ref="cxf"/>
     </bean>
-    <bean id="rmCodec" class="org.apache.cxf.ws.rm.soap.RMSoapInterceptor"/>
+    <bean id="rmCaptureOut" class="org.apache.cxf.ws.rm.RMCaptureOutInterceptor">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    <bean id="rmSoapIn" class="org.apache.cxf.ws.rm.soap.RMSoapInInterceptor"/>
+    <bean id="rmSoapOut" class="org.apache.cxf.ws.rm.soap.RMSoapOutInterceptor"/>
     <bean id="rmDelivery" class="org.apache.cxf.ws.rm.RMDeliveryInterceptor">
         <property name="bus" ref="cxf"/>
     </bean>
@@ -36,7 +40,7 @@
             <ref bean="mapAggregator"/>
             <ref bean="mapCodec"/>
             <ref bean="rmLogicalIn"/>
-            <ref bean="rmCodec"/>
+            <ref bean="rmSoapIn"/>
             <ref bean="rmDelivery"/>
             <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
         </cxf:inInterceptors>
@@ -44,7 +48,7 @@
             <ref bean="mapAggregator"/>
             <ref bean="mapCodec"/>
             <ref bean="rmLogicalIn"/>
-            <ref bean="rmCodec"/>
+            <ref bean="rmSoapIn"/>
             <ref bean="rmDelivery"/>
             <!-- bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
         </cxf:inFaultInterceptors>
@@ -52,14 +56,16 @@
             <ref bean="mapAggregator"/>
             <ref bean="mapCodec"/>
             <ref bean="rmLogicalOut"/>
-            <ref bean="rmCodec"/>
+            <ref bean="rmSoapOut"/>
+            <ref bean="rmCaptureOut"/>
             <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
         <cxf:outFaultInterceptors>
             <ref bean="mapAggregator"/>
             <ref bean="mapCodec"/>
             <ref bean="rmLogicalOut"/>
-            <ref bean="rmCodec"/>
+            <ref bean="rmSoapOut"/>
+            <ref bean="rmCaptureOut"/>
             <!-- bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" /-->
         </cxf:outFaultInterceptors>
     </cxf:bus>
