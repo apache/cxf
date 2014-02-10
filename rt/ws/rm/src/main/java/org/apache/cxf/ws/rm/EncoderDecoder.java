@@ -19,10 +19,17 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.util.Collection;
+
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
@@ -34,70 +41,131 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
- * Interface for converting WS-ReliableMessaging structures to and from XML. Implementations of this interface
- * provide version-specific encoding and decoding.
+ * Base class for converting WS-ReliableMessaging structures to and from XML. Subclasses provide version-specific
+ * encoding and decoding.
  */
-public interface EncoderDecoder {
+public abstract class EncoderDecoder {
+
+    /**
+     * Get context for JAXB marshalling/unmarshalling.
+     * 
+     * @return context
+     * @throws JAXBException
+     */
+    protected abstract JAXBContext getContext() throws JAXBException;
+    
+    /**
+     * Add WS-RM namespace declaration to element.
+     * 
+     * @param element
+     */
+    protected abstract void addNamespaceDecl(Element element);
     
     /**
      * Get the WS-ReliableMessaging namespace used by this encoder/decoder.
      * 
      * @return URI
      */
-    String getWSRMNamespace();
+    public abstract String getWSRMNamespace();
     
     /**
      * Get the WS-Addressing namespace used by this encoder/decoder.
      * 
      * @return URI
      */
-    String getWSANamespace();
+    public abstract String getWSANamespace();
     
     /**
      * Get the WS-ReliableMessaging constants used by this encoder/decoder.
      * 
      * @return
      */
-    RMConstants getConstants();
+    public abstract RMConstants getConstants();
     
     /**
      * Get the class used for the CreateSequenceType.
      * 
      * @return class
      */
-    Class<?> getCreateSequenceType();
+    public abstract Class<?> getCreateSequenceType();
     
     /**
      * Get the class used for the CreateSequenceResponseType.
      * 
      * @return class
      */
-    Class<?> getCreateSequenceResponseType();
+    public abstract Class<?> getCreateSequenceResponseType();
     
     /**
      * Get the class used for the TerminateSequenceType.
      * 
      * @return class
      */
-    Class<?> getTerminateSequenceType();
+    public abstract Class<?> getTerminateSequenceType();
     
     /**
      * Get the class used for the TerminateSequenceResponseType.
      * 
      * @return class
      */
-    Class<?> getTerminateSequenceResponseType();
+    public abstract Class<?> getTerminateSequenceResponseType();
     
     /**
-     * Builds an element containing WS-RM headers. This adds the appropriate WS-RM and WS-A namespace
-     * declarations to the element, and then adds any WS-RM headers set in the supplied properties as child
-     * elements.
+     * Insert WS-RM headers into a SOAP message. This adds the appropriate WS-RM namespace declaration to the
+     * SOAP:Header element (which must be present), and then adds any WS-RM headers set in the supplied properties as
+     * child elements.
      * 
      * @param rmps
-     * @param qname constructed element name
-     * @return element
+     * @param doc
+     * @return <code>true</code> if headers added, <code>false</code> if not
      */
-    Element buildHeaders(RMProperties rmps, QName qname) throws JAXBException;
+    public boolean insertHeaders(RMProperties rmps, Document doc) throws JAXBException {
+        
+        // check if there's anything to insert
+        SequenceType seq = rmps.getSequence();
+        Collection<SequenceAcknowledgement> acks = rmps.getAcks();
+        Collection<AckRequestedType> reqs = rmps.getAcksRequested();
+        if (seq == null && acks == null && reqs == null) {
+            return false;
+        }
+        
+        // get the SOAP:Header element
+        NodeList nodes = doc.getDocumentElement().getChildNodes();
+        Element header = null;
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE && "Header".equals(node.getLocalName())) {
+                header = (Element)node;
+                break;
+            }
+        }
+        if (header == null) {
+            throw new JAXBException("No SOAP:Header element in message");
+        }
+        
+        // add WSRM namespace declaration to header, instead of repeating in each individual child node
+        addNamespaceDecl(header);
+        
+        // build individual headers
+        Marshaller marshaller = getContext().createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+        buildHeaders(seq, acks, reqs, rmps.isLastMessage(), header, marshaller);
+        return true;
+    }
+
+    /**
+     * Build all required headers, using the correct protocol variation.
+     * 
+     * @param seq
+     * @param acks
+     * @param reqs
+     * @param last
+     * @param header
+     * @param marshaller
+     * @throws JAXBException
+     */
+    protected abstract void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
+        Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException;
     
     /**
      * Builds an element containing a WS-RM Fault. This adds the appropriate WS-RM namespace declaration to
@@ -107,7 +175,7 @@ public interface EncoderDecoder {
      * @param qname constructed element name
      * @return element
      */
-    Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException;
+    public abstract Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException;
     
     /**
      * Marshals a SequenceAcknowledgement to the appropriate external form.
@@ -116,7 +184,7 @@ public interface EncoderDecoder {
      * @return element
      * @throws JAXBException
      */
-    Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException;
+    public abstract Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException;
     
     /**
      * Marshals an Identifier to the appropriate external form.
@@ -125,7 +193,7 @@ public interface EncoderDecoder {
      * @return element
      * @throws JAXBException
      */
-    Element encodeIdentifier(Identifier id) throws JAXBException;
+    public abstract Element encodeIdentifier(Identifier id) throws JAXBException;
     
     /**
      * Unmarshals a SequenceType, converting it if necessary to the internal form.
@@ -134,7 +202,7 @@ public interface EncoderDecoder {
      * @return
      * @throws JAXBException
      */
-    SequenceType decodeSequenceType(Element elem) throws JAXBException;
+    public abstract SequenceType decodeSequenceType(Element elem) throws JAXBException;
     
     /**
      * Generates a CloseSequenceType if a SequenceType represents a last message state.
@@ -143,7 +211,7 @@ public interface EncoderDecoder {
      * @return CloseSequenceType if last message state, else <code>null</code>
      * @throws JAXBException
      */
-    CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException;
+    public abstract CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException;
     
     /**
      * Unmarshals a SequenceAcknowledgement, converting it if necessary to the internal form.
@@ -152,7 +220,7 @@ public interface EncoderDecoder {
      * @return
      * @throws JAXBException
      */
-    SequenceAcknowledgement decodeSequenceAcknowledgement(Element elem) throws JAXBException;
+    public abstract SequenceAcknowledgement decodeSequenceAcknowledgement(Element elem) throws JAXBException;
     
     /**
      * Unmarshals a AckRequestedType, converting it if necessary to the internal form.
@@ -161,7 +229,7 @@ public interface EncoderDecoder {
      * @return
      * @throws JAXBException
      */
-    AckRequestedType decodeAckRequestedType(Element elem) throws JAXBException;
+    public abstract AckRequestedType decodeAckRequestedType(Element elem) throws JAXBException;
     
     /**
      * Convert a CreateSequence message to the correct format for transmission.
@@ -169,7 +237,7 @@ public interface EncoderDecoder {
      * @param create
      * @return converted
      */
-    Object convertToSend(CreateSequenceType create);
+    public abstract Object convertToSend(CreateSequenceType create);
     
     /**
      * Convert a CreateSequenceResponse message to the correct format for transmission.
@@ -177,7 +245,7 @@ public interface EncoderDecoder {
      * @param create
      * @return converted
      */
-    Object convertToSend(CreateSequenceResponseType create);
+    public abstract Object convertToSend(CreateSequenceResponseType create);
     
     /**
      * Convert a TerminateSequence message to the correct format for transmission.
@@ -185,7 +253,7 @@ public interface EncoderDecoder {
      * @param term
      * @return converted
      */
-    Object convertToSend(TerminateSequenceType term);
+    public abstract Object convertToSend(TerminateSequenceType term);
     
     /**
      * Convert a received TerminateSequence message to internal form.
@@ -193,7 +261,7 @@ public interface EncoderDecoder {
      * @param term
      * @return converted
      */
-    TerminateSequenceType convertReceivedTerminateSequence(Object term);
+    public abstract TerminateSequenceType convertReceivedTerminateSequence(Object term);
     
     /**
      * Convert a received CreateSequence message to internal form.
@@ -201,7 +269,7 @@ public interface EncoderDecoder {
      * @param create
      * @return converted
      */
-    CreateSequenceType convertReceivedCreateSequence(Object create);
+    public abstract CreateSequenceType convertReceivedCreateSequence(Object create);
     
     /**
      * Convert a received CreateSequenceResponse message to internal form.
@@ -209,5 +277,5 @@ public interface EncoderDecoder {
      * @param create
      * @return converted
      */
-    CreateSequenceResponseType convertReceivedCreateSequenceResponse(Object create);
+    public abstract CreateSequenceResponseType convertReceivedCreateSequenceResponse(Object create);
 }

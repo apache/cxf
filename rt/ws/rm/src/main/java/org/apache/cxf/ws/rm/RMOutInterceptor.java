@@ -20,32 +20,20 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.service.Service;
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
-import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 
 /**
  * 
@@ -55,7 +43,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
     private static final Logger LOG = LogUtils.getL7dLogger(RMOutInterceptor.class);
  
     public RMOutInterceptor() {
-        addAfter(MAPAggregator.class.getName());
+        super(Phase.POST_PROTOCOL);
+        addBefore(PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal.class.getName());
     }
     
     protected void handle(Message msg) throws SequenceFault, RMException {  
@@ -66,24 +55,14 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         if (isRuntimeFault(msg)) {
-            LogUtils.log(LOG, Level.WARNING, "RUNTIME_FAULT_MSG");
-            // in case of a SequenceFault or other WS-RM related fault, set action appropriately.
-            // the received inbound maps is available to extract some values in case if needed.
-            Throwable cause = msg.getContent(Exception.class).getCause();
-            if (cause instanceof SequenceFault || cause instanceof RMException) {
-                maps.getAction().setValue(getAddressingNamespace(maps) + "/fault");
-            }
             return;
         }
-
-        Source source = getManager().getSource(msg);
         
         RMConfiguration config = getManager().getEffectiveConfiguration(msg);
         String wsaNamespace = config.getAddressingNamespace();
         String rmNamespace = config.getRMNamespace();
         ProtocolVariation protocol = ProtocolVariation.findVariant(rmNamespace, wsaNamespace);
         RMContextUtils.setProtocolVariation(msg, protocol);
-        maps.exposeAs(wsaNamespace);
         Destination destination = getManager().getDestination(msg);
 
         String action = null;
@@ -98,87 +77,14 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
         RMConstants constants = protocol.getConstants();
-        boolean isLastMessage = constants.getCloseSequenceAction().equals(action);
-        
-        if (isApplicationMessage && !isPartialResponse) {
-            addRetransmissionInterceptor(msg);
-        }
-        
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
-        if (null == rmpsOut) {
-            rmpsOut = new RMProperties();
-            rmpsOut.exposeAs(protocol.getWSRMNamespace());
-            RMContextUtils.storeRMProperties(msg, rmpsOut, true);
-        }
         
-        // Activate process response for oneWay
-        if (msg.getExchange().isOneWay()) {
-            msg.getExchange().put(Message.PROCESS_ONEWAY_RESPONSE, true);
-        }
-        
-        RMProperties rmpsIn = null;
         Identifier inSeqId = null;
-        long inMessageNumber = 0;
-        
+
         if (isApplicationMessage) {
-            rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
+            RMProperties rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
             if (null != rmpsIn && null != rmpsIn.getSequence()) {
                 inSeqId = rmpsIn.getSequence().getIdentifier();
-                inMessageNumber = rmpsIn.getSequence().getMessageNumber();
-            }
-            ContextUtils.storeDeferUncorrelatedMessageAbort(msg);
-        }
-        
-        Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
-        if ((isApplicationMessage || (isLastMessage && invocationContext != null)) && !isPartialResponse) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("inbound sequence: " + (null == inSeqId ? "null" : inSeqId.getValue()));
-            }
-            
-            // get the current sequence, requesting the creation of a new one if necessary
-            
-            synchronized (source) {
-                SourceSequence seq = null;
-                if (isLastMessage) {
-                    seq = (SourceSequence)invocationContext.get(SourceSequence.class.getName());
-                } else {
-                    seq = getManager().getSequence(inSeqId, msg, maps);
-                }
-                assert null != seq;
-
-                // increase message number and store a sequence type object in
-                // context
-                seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
-                
-                if (Boolean.TRUE.equals(msg.getContextualProperty(RMManager.WSRM_LAST_MESSAGE_PROPERTY))) {
-                    // mark the message as the last one
-                    seq.setLastMessage(true);
-                }
-                
-                rmpsOut.setSequence(seq);
-
-                // if this was the last message in the sequence, reset the
-                // current sequence so that a new one will be created next
-                // time the handler is invoked
-
-                if (seq.isLastMessage()) {
-                    source.setCurrent(null);
-                }
-            }
-        } else if (!MessageUtils.isRequestor(msg) && constants.getCreateSequenceAction().equals(action)) {
-            maps.getAction().setValue(constants.getCreateSequenceResponseAction());
-        } else if (isPartialResponse && action == null
-            && isResponseToAction(msg, constants.getSequenceAckAction())) {
-            Collection<SequenceAcknowledgement> acks = rmpsIn.getAcks();
-            if (acks.size() == 1) {
-                SourceSequence ss = source.getSequence(acks.iterator().next().getIdentifier());
-                if (ss != null && ss.allAcknowledged()) {
-                    setAction(maps, constants.getTerminateSequenceAction());
-                    setTerminateSequence(msg, ss.getIdentifier(), protocol);
-                    msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
-                    // removing this sequence now. See the comment in SourceSequence.setAcknowledged()
-                    source.removeSequence(ss);
-                }
             }
         }
         
@@ -199,28 +105,6 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         assertReliability(msg);
-    }
-
-    private void addRetransmissionInterceptor(Message msg) {
-        RetransmissionInterceptor ri = new RetransmissionInterceptor();
-        ri.setManager(getManager());
-        // TODO:
-        // On the server side: If a fault occurs after this interceptor we will switch 
-        // interceptor chains (if this is not already a fault message) and therefore need to 
-        // make sure the retransmission interceptor is added to the fault chain
-        // 
-        msg.getInterceptorChain().add(ri);
-        LOG.fine("Added RetransmissionInterceptor to chain.");
-        
-        getManager().getRetransmissionQueue().start();
-    }
-
-    private String getAddressingNamespace(AddressingProperties maps) {
-        String wsaNamespace = maps.getNamespaceURI();
-        if (wsaNamespace == null) {
-            getManager().getConfiguration().getAddressingNamespace();
-        }
-        return wsaNamespace;
     }
     
     void addAcknowledgements(Destination destination, 
@@ -270,49 +154,6 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return false;
         }
         return FaultMode.CHECKED_APPLICATION_FAULT != mode;
-    }
-
-    private boolean isResponseToAction(Message msg, String action) {
-        AddressingProperties inMaps = RMContextUtils.retrieveMAPs(msg, false, false);
-        String inAction = null;
-        if (null != inMaps.getAction()) {
-            inAction = inMaps.getAction().getValue();
-        }
-        return action.equals(inAction);
-    }
-    
-    private void setTerminateSequence(Message msg, Identifier identifier, ProtocolVariation protocol) 
-        throws RMException {
-        TerminateSequenceType ts = new TerminateSequenceType();
-        ts.setIdentifier(identifier);
-        MessageContentsList contents = 
-            new MessageContentsList(new Object[]{protocol.getCodec().convertToSend(ts)});
-        msg.setContent(List.class, contents);
-
-        // create a new exchange for this output-only exchange
-        Exchange newex = new ExchangeImpl();
-        Exchange oldex = msg.getExchange();
-        
-        newex.put(Bus.class, oldex.getBus());
-        newex.put(Endpoint.class, oldex.getEndpoint());
-        newex.put(Service.class, oldex.getEndpoint().getService());
-        newex.put(Binding.class, oldex.getEndpoint().getBinding());
-        newex.setConduit(oldex.getConduit(msg));
-        newex.setDestination(oldex.getDestination());
-        
-        //Setup the BindingOperationInfo
-        RMEndpoint rmep = getManager().getReliableEndpoint(msg);
-        OperationInfo oi = rmep.getEndpoint(protocol).getEndpointInfo().getService().getInterface()
-            .getOperation(protocol.getConstants().getTerminateSequenceAnonymousOperationName());
-        BindingInfo bi = rmep.getBindingInfo(protocol);
-        BindingOperationInfo boi = bi.getOperation(oi);
-        
-        newex.put(BindingInfo.class, bi);
-        newex.put(BindingOperationInfo.class, boi);
-        newex.put(OperationInfo.class, boi.getOperationInfo());
-        
-        msg.setExchange(newex);
-        newex.setOutMessage(msg);
     }
 
     private static void setAction(AddressingProperties maps, String action) {

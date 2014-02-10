@@ -52,7 +52,7 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
         message.getInterceptorChain().add(ending);
     }
     
-    public class MessageSenderEndingInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static class MessageSenderEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         public MessageSenderEndingInterceptor() {
             super(Phase.PREPARE_SEND_ENDING);
         }
@@ -66,7 +66,7 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
         }
     }
     
-    private Conduit getConduit(Message message) {
+    public static Conduit getConduit(Message message) {
         Exchange exchange = message.getExchange();
         Conduit conduit = exchange.getConduit(message);
         if (conduit == null

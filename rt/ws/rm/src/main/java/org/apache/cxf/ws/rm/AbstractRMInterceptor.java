@@ -107,7 +107,7 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
     
     /**
      * Asserts all RMAssertion assertions for the current message, regardless their attributes
-     * (if there is more thsn one we have ensured that they are all supported by considering
+     * (if there is more than one we have ensured that they are all supported by considering
      * e.g. the minimum acknowledgment interval).
      * @param message the current message
      */

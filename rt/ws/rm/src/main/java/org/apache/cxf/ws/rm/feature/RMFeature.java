@@ -24,6 +24,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.ws.rm.RMCaptureInInterceptor;
+import org.apache.cxf.ws.rm.RMCaptureOutInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
 import org.apache.cxf.ws.rm.RMManager;
@@ -33,7 +34,8 @@ import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
-import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
+import org.apache.cxf.ws.rm.soap.RMSoapInInterceptor;
+import org.apache.cxf.ws.rm.soap.RMSoapOutInterceptor;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
 /**
@@ -53,8 +55,10 @@ public class RMFeature extends AbstractFeature {
     private RMInInterceptor rmLogicalIn = new RMInInterceptor();
     private RMOutInterceptor rmLogicalOut = new RMOutInterceptor();
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
-    private RMSoapInterceptor rmCodec = new RMSoapInterceptor();
+    private RMSoapOutInterceptor rmOutCodec = new RMSoapOutInterceptor();
+    private RMSoapInInterceptor rmInCodec = new RMSoapInInterceptor();
     private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor();
+    private RMCaptureOutInterceptor rmCaptureOut = new RMCaptureOutInterceptor();
 
     public void setDeliveryAssurance(DeliveryAssuranceType da) {
         deliveryAssurance = da;
@@ -114,23 +118,26 @@ public class RMFeature extends AbstractFeature {
         rmLogicalOut.setBus(bus);
         rmDelivery.setBus(bus);
         rmCaptureIn.setBus(bus);
+        rmCaptureOut.setBus(bus);
 
         provider.getInInterceptors().add(rmLogicalIn);
-        provider.getInInterceptors().add(rmCodec);
+        provider.getInInterceptors().add(rmInCodec);
         provider.getInInterceptors().add(rmDelivery);
         if (null != store) {
             provider.getInInterceptors().add(rmCaptureIn);
         }
 
         provider.getOutInterceptors().add(rmLogicalOut);
-        provider.getOutInterceptors().add(rmCodec);
+        provider.getOutInterceptors().add(rmOutCodec);
+        provider.getOutInterceptors().add(rmCaptureOut);
 
         provider.getInFaultInterceptors().add(rmLogicalIn);
-        provider.getInFaultInterceptors().add(rmCodec);
+        provider.getInFaultInterceptors().add(rmInCodec);
         provider.getInFaultInterceptors().add(rmDelivery);
 
         provider.getOutFaultInterceptors().add(rmLogicalOut);
-        provider.getOutFaultInterceptors().add(rmCodec);
+        provider.getOutFaultInterceptors().add(rmOutCodec);
+        provider.getOutFaultInterceptors().add(rmCaptureOut);
 
     }
 }

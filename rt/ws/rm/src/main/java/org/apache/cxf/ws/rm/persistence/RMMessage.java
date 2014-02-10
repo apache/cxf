@@ -18,15 +18,14 @@
  */
 package org.apache.cxf.ws.rm.persistence;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
+import java.util.Collections;
+import java.util.List;
 
 public class RMMessage {
     
-    private CachedOutputStream content;
+    private InputStream content;
+    private List<InputStream> attachments = Collections.emptyList();
     private long messageNumber;
     private String to;
     
@@ -46,55 +45,12 @@ public class RMMessage {
         messageNumber = mn;
     }
     
-
-    /**
-     * Returns the content of the message as an input stream.
-     * @return the content
-     * @deprecated
-     */
-    public byte[] getContent() {
-        byte[] bytes = null;
-        try {
-            bytes = content != null ? content.getBytes() : null;
-        } catch (IOException e) {
-            // ignore and treat it as null
-        }
-        return bytes;
-    }
-
-
-    /**
-     * Sets the message content as an input stream.
-     * @param content the message content
-     * @deprecated
-     */
-    public void setContent(byte[] c) {
-        content = new CachedOutputStream();
-        content.holdTempFile();
-        try {
-            content.write(c);
-        } catch (IOException e) {
-            // ignore
-        }
-    }
-    
     /**
      * Sets the message content using the input stream.
      * @param in
-     * @throws IOException
      */
-    public void setContent(InputStream in) throws IOException {
-        content = new CachedOutputStream();
-        content.holdTempFile();
-        IOUtils.copy(in, content);
-    }
-
-    /**
-     * Sets the message content using the cached output stream.
-     * @param c
-     */
-    public void setContent(CachedOutputStream c) {
-        content = c;
+    public void setContent(InputStream in) {
+        content = in;
     }
     
     /**
@@ -119,24 +75,24 @@ public class RMMessage {
      * @return
      * @throws IOException
      */
-    public InputStream getInputStream() throws IOException {
-        return content != null ? content.getInputStream() : null;
-    }
-    
-    /**
-     * Returns the associated cached output stream.
-     * @return
-     */
-    public CachedOutputStream getCachedOutputStream() {
+    public InputStream getContent() {
         return content;
     }
-    
+
     /**
-     * Returns the length of the message content in bytes.
-     * 
-     * @return
+     * Returns the list of attachments.
+     * @return list (non-null)
      */
-    public long getSize() {
-        return content != null ? content.size() : -1L;
+    public List<InputStream> getAttachments() {
+        return attachments;
+    }
+
+    /**
+     * Set the list of attachments.
+     * @param attaches (non-null)
+     */
+    public void setAttachments(List<InputStream> attaches) {
+        assert attaches != null;
+        attachments = attaches;
     }
 }

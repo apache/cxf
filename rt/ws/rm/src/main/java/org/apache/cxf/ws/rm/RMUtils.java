@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,9 +27,7 @@ import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.management.ManagementConstants;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingConstants;
 
 public final class RMUtils {
@@ -134,17 +131,6 @@ public final class RMUtils {
         }
         return endpoint.getEndpointInfo().getService().getName() + "."
             + endpoint.getEndpointInfo().getName() + "@" + busId;
-    }
-    
-    public static WriteOnCloseOutputStream createCachedStream(Message message, OutputStream os) {
-        // We need to ensure that we have an output stream which won't start writing the 
-        // message until we have a chance to send a createsequence
-        if (!(os instanceof WriteOnCloseOutputStream)) {
-            WriteOnCloseOutputStream cached = new WriteOnCloseOutputStream(os);
-            message.setContent(OutputStream.class, cached);
-            os = cached;
-        }
-        return (WriteOnCloseOutputStream) os;
     }
     
     public static ObjectName getManagedObjectName(RMManager manager) throws JMException {

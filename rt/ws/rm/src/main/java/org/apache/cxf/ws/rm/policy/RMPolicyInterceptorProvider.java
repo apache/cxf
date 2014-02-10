@@ -25,10 +25,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
+import org.apache.cxf.ws.rm.RMCaptureOutInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
-import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
+import org.apache.cxf.ws.rm.soap.RMSoapInInterceptor;
+import org.apache.cxf.ws.rm.soap.RMSoapOutInterceptor;
 
 public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
@@ -36,7 +38,9 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
     private static final Collection<QName> ASSERTION_TYPES;
     private RMInInterceptor rmIn = new RMInInterceptor();
     private RMOutInterceptor rmOut = new RMOutInterceptor();
-    private RMSoapInterceptor rmSoap = new RMSoapInterceptor();
+    private RMCaptureOutInterceptor rmCaptureOut = new RMCaptureOutInterceptor();
+    private RMSoapOutInterceptor rmOutSoap = new RMSoapOutInterceptor();
+    private RMSoapInInterceptor rmInSoap = new RMSoapInInterceptor();
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
 
     static {
@@ -51,20 +55,23 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         super(ASSERTION_TYPES);
         rmIn.setBus(bus);
         rmOut.setBus(bus);
+        rmCaptureOut.setBus(bus);
         rmDelivery.setBus(bus);
         
         getInInterceptors().add(rmIn);
-        getInInterceptors().add(rmSoap);
+        getInInterceptors().add(rmInSoap);
         getInInterceptors().add(rmDelivery);
 
         getOutInterceptors().add(rmOut);
-        getOutInterceptors().add(rmSoap);
+        getOutInterceptors().add(rmCaptureOut);
+        getOutInterceptors().add(rmOutSoap);
 
         getInFaultInterceptors().add(rmIn);
-        getInFaultInterceptors().add(rmSoap);
+        getInFaultInterceptors().add(rmInSoap);
         getInFaultInterceptors().add(rmDelivery);
 
         getOutFaultInterceptors().add(rmOut);
-        getOutFaultInterceptors().add(rmSoap);
+        getOutFaultInterceptors().add(rmCaptureOut);
+        getOutFaultInterceptors().add(rmOutSoap);
     }
 }

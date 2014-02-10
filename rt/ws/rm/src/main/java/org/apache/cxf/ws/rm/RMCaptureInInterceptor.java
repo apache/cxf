@@ -58,7 +58,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
 
                     message.setContent(InputStream.class, saved.getInputStream());
                     LOG.fine("Capturing the original RM message");
-                    message.put(RMMessageConstants.SAVED_CONTENT, saved);
+                    message.put(RMMessageConstants.SAVED_CONTENT, saved.getInputStream());
                 } catch (Exception e) {
                     throw new Fault(e);
                 }

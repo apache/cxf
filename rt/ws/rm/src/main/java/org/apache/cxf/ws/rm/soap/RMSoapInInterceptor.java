@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm.soap;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,14 +33,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.Binding;
-import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
-import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
@@ -52,7 +48,6 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.Service;
@@ -76,7 +71,6 @@ import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
-import org.apache.cxf.ws.rm.SequenceFault;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
@@ -85,7 +79,7 @@ import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
  * Protocol Handler responsible for {en|de}coding the RM 
  * Properties for {outgo|incom}ing messages.
  */
-public class RMSoapInterceptor extends AbstractSoapInterceptor {
+public class RMSoapInInterceptor extends AbstractSoapInterceptor {
 
     protected static JAXBContext jaxbContext;
     
@@ -97,12 +91,12 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         HEADERS = set;
     }
 
-    private static final Logger LOG = LogUtils.getL7dLogger(RMSoapInterceptor.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(RMSoapInInterceptor.class);
     
     /**
      * Constructor.
      */
-    public RMSoapInterceptor() {
+    public RMSoapInInterceptor() {
         super(Phase.PRE_PROTOCOL);
         
         addAfter(MAPCodec.class.getName());
@@ -123,113 +117,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      * @see org.apache.cxf.interceptor.Interceptor#handleMessage(org.apache.cxf.message.Message)
      */
     public void handleMessage(SoapMessage message) throws Fault {
-        mediate(message);
-    }
-
-    /**
-     * Mediate message flow, peforming RMProperties {en|de}coding.
-     * 
-     * @param message the messsage
-     */ 
-    void mediate(SoapMessage message) {
-        if (MessageUtils.isOutbound(message)) {
-            encode(message);
-        } else {
-            decode(message);
-            updateServiceModelInfo(message);
-        }
-    }
-    
-    /**
-     * Encode the current RM properties in protocol-specific headers.
-     *
-     * @param message the SOAP message
-     */
-    void encode(SoapMessage message) {
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
-        if (null != rmps) {
-            encode(message, rmps);
-        } else if (MessageUtils.isFault(message)) {
-            Exception ex = message.getContent(Exception.class);
-            if (ex instanceof SoapFault && ex.getCause() instanceof SequenceFault) {
-                encodeFault(message, (SequenceFault)ex.getCause());
-            }
-        }
-        
-    }
-
-    /**
-     * Encode the current RM properties in protocol-specific headers.
-     *
-     * @param message the SOAP message.
-     * @param rmps the current RM properties.
-     */
-    public static void encode(SoapMessage message, RMProperties rmps) {
-        if (null == rmps) {
-            return;
-        }
-        LOG.log(Level.FINE, "encoding RMPs in SOAP headers");
-        
-        try {
-            
-            List<Header> headers = message.getHeaders();
-            discardRMHeaders(headers);
-            
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
-            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
-                maps.getNamespaceURI());
-            Element header = protocol.getCodec().buildHeaders(rmps, Soap11.getInstance().getHeader());
-            Node node = header.getFirstChild();
-            if (node != null && MessageUtils.isPartialResponse(message)) {
-                // make sure the response is returned as HTTP 200 and not 202
-                message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
-            }
-            while (node != null) {
-                Header holder = null;
-                if (node.getLocalName().equals("Sequence")) {
-                    holder = new SoapHeader(new QName(node.getNamespaceURI(), node.getLocalName()), node);
-                    ((SoapHeader)holder).setMustUnderstand(true);
-                } else {
-                    holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
-                }
-                headers.add(holder);
-                node = node.getNextSibling();
-            }
-
-        } catch (JAXBException je) {
-            LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
-        }        
-    }
-    
-    /**
-     * Encode the SequenceFault in protocol-specific header.
-     *
-     * @param message the SOAP message.
-     * @param sf the SequenceFault.
-     */
-    public static void encodeFault(SoapMessage message, SequenceFault sf) {
-        LOG.log(Level.FINE, "Encoding SequenceFault in SOAP header");
-        try {
-            List<Header> headers = message.getHeaders();
-            discardRMHeaders(headers);
-            Message inmsg = message.getExchange().getInMessage();
-            RMProperties rmps = RMContextUtils.retrieveRMProperties(inmsg, false);
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(inmsg, false, false);
-            ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
-                maps.getNamespaceURI());
-            Element header = protocol.getCodec().buildHeaderFault(sf, Soap11.getInstance().getHeader());
-            Node node = header.getFirstChild();
-            if (node instanceof Element) {
-                Attr attr = header.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/",
-                    "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-                attr.setValue(rmps.getNamespaceURI());
-                ((Element)node).setAttributeNodeNS(attr);
-            }
-            
-            headers.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
-        } catch (JAXBException je) {
-            LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
-        }        
+        decode(message);
+        updateServiceModelInfo(message);
     }
     
     /**
@@ -319,24 +208,6 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             }
         } catch (JAXBException ex) {
             LOG.log(Level.WARNING, "SOAP_HEADER_DECODE_FAILURE_MSG", ex); 
-        }
-    }
-
-    /**
-     * Discard any pre-existing RM headers - this may occur if the runtime
-     * re-uses a SOAP message.
-     *
-     * @param header the SOAP header element
-     */
-    private static void discardRMHeaders(List<Header> header) {
-        Iterator<Header> iter = header.iterator();
-        while (iter.hasNext()) {
-            Header hdr = iter.next();
-            String uri = hdr.getName().getNamespaceURI();
-            if (RM10Constants.NAMESPACE_URI.equals(uri)
-                || RM11Constants.NAMESPACE_URI.equals(uri)) {
-                iter.remove();
-            }
         }
     }
     
@@ -434,7 +305,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         // In the logical RM interceptor set it back to what it was so that the logical
         // addressing interceptor does not try to send a partial response to 
         // server originated oneway RM protocol messages.        
-        // The actions that can appear in the response to the requestor should be excluded.
+        // 
         
         if (!consts.getCreateSequenceResponseAction().equals(action)
             && !consts.getSequenceAckAction().equals(action)

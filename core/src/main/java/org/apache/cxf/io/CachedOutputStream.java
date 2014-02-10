@@ -575,6 +575,10 @@ public class CachedOutputStream extends OutputStream {
     public void setOutputDir(File outputDir) throws IOException {
         this.outputDir = outputDir;
     }
+    
+    public long getThreshold() {
+        return threshold;
+    }
     public void setThreshold(long threshold) {
         this.threshold = threshold;
     }

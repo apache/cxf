@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,14 +50,14 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
- * WS-ReliableMessaging 1.1 encoding and decoding. This just works with the standard internal form of the
+ * WS-ReliableMessaging 1.1/1.2 encoding and decoding. This just works with the standard internal form of the
  * WS-RM data structures.
  */
-public final class EncoderDecoder11Impl implements EncoderDecoder {
+public final class EncoderDecoder11Impl extends EncoderDecoder {
     
     public static final EncoderDecoder11Impl INSTANCE = new EncoderDecoder11Impl();
 
-    private static JAXBContext jaxbContext;
+    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder11Impl.class);
     
@@ -91,65 +92,58 @@ public final class EncoderDecoder11Impl implements EncoderDecoder {
         return org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType.class;
     }
 
-    private static JAXBContext getContext() throws JAXBException {
-        synchronized (EncoderDecoder11Impl.class) {
-            if (jaxbContext == null) {
-                Class<?> clas = RMUtils.getWSRMFactory().getClass();
-                jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(clas),
-                    clas.getClassLoader());
+    protected JAXBContext getContext() throws JAXBException {
+        JAXBContext jaxbContext = jaxbContextReference.get();
+        if (jaxbContext == null) {
+            synchronized (EncoderDecoder11Impl.class) {
+                jaxbContext = jaxbContextReference.get();
+                if (jaxbContext == null) {
+                    Class<?> clas = RMUtils.getWSRMFactory().getClass();
+                    jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(clas),
+                                                          clas.getClassLoader());
+                    jaxbContextReference.set(jaxbContext);
+                }
             }
         }
         return jaxbContext;
     }
-    
-    public Element buildHeaders(RMProperties rmps, QName qname) throws JAXBException {
-        
-        Document doc = DOMUtils.createDocument();
-        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        // add WSRM namespace declaration to header, instead of
-        // repeating in each individual child node
-        Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
-            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-        attr.setValue(RM10Constants.NAMESPACE_URI);
-        header.setAttributeNodeNS(attr);
 
-        Marshaller marshaller = getContext().createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+    protected void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
+        Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException {
        
-        SequenceType seq = rmps.getSequence();
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
             JAXBElement<SequenceType> element = RMUtils.getWSRMFactory().createSequence(seq);
             marshaller.marshal(element, header);
         } 
-        Collection<SequenceAcknowledgement> acks = rmps.getAcks();
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
                 marshaller.marshal(ack, header);
             }
         }
-        Collection<AckRequestedType> reqs = rmps.getAcksRequested();
         if (null != reqs) {
             LOG.log(Level.FINE, "encoding acknowledgement request(s) into RM header");
             for (AckRequestedType req : reqs) {
                 marshaller.marshal(RMUtils.getWSRMFactory().createAckRequested(req), header);
             }
         }
-        return header;
+    }
+
+    protected void addNamespaceDecl(Element element) {
+        Attr attr = element.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/", 
+            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
+        attr.setValue(RM10Constants.NAMESPACE_URI);
+        element.setAttributeNodeNS(attr);
     }
 
     public Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException {
         
         Document doc = DOMUtils.createDocument();
         Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        // add WSRM namespace declaration to header, instead of
-        // repeating in each individual child node
         
-        Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
-            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-        attr.setValue(RM11Constants.NAMESPACE_URI);
-        header.setAttributeNodeNS(attr);
+        // add WSRM namespace declaration to header, instead of repeating in each individual child node
+        addNamespaceDecl(header);
 
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);

@@ -21,6 +21,7 @@ package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -48,6 +49,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
@@ -116,6 +118,7 @@ public class RMManager {
     private DestinationPolicyType destinationPolicy;
     private InstrumentationManager instrumentationManager;
     private ManagedRMManager managedManager;
+    private PhaseInterceptorChain retransmitChain;
     
     // ServerLifeCycleListener
     
@@ -605,7 +608,7 @@ public class RMManager {
                 RMContextUtils.storeMAPs(maps, message, true, false);
             }
                                     
-            message.put(RMMessageConstants.SAVED_CONTENT, m.getCachedOutputStream());
+//            message.put(RMMessageConstants.SAVED_CONTENT, m.getCachedOutputStream());
             RMContextUtils.setProtocolVariation(message, ss.getProtocol());
             
             retransmissionQueue.addUnacknowledged(message);
@@ -709,5 +712,36 @@ public class RMManager {
             sid.setValue(sequenceID);
             return sid;
         }
+    }
+
+    /**
+     * Clones and saves the interceptor chain the first time this is called, so that it can be used for retransmission.
+     * Calls after the first are ignored.
+     * 
+     * @param msg
+     */
+    public void initializeInterceptorChain(Message msg) {
+        if (retransmitChain == null) {
+            LOG.info("Setting retransmit chain from message");
+            Set<Class<?>> formats = msg.getContentFormats();
+            int i = 0;
+            for (Class<?> clas: formats) {
+                Object content = msg.getContent(clas);
+                LOG.info("Found content " + content + " of type " + clas.getName());
+                i++;
+            }
+            LOG.info("Total " + i);
+            PhaseInterceptorChain chain = (PhaseInterceptorChain)msg.getInterceptorChain();
+            retransmitChain = chain.cloneChain();
+        }
+    }
+    
+    /**
+     * Get interceptor chain for retransmitting a message.
+     * 
+     * @return chain
+     */
+    public PhaseInterceptorChain getRetransmitChain() {
+        return retransmitChain.cloneChain();
     }
 }

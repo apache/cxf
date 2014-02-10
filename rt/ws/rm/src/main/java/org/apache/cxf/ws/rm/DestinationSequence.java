@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,7 +34,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -167,7 +167,7 @@ public class DestinationSequence extends AbstractSequence {
             RMMessage msg = null;
             if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
                 msg = new RMMessage();
-                msg.setContent((CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT));
+                msg.setContent((InputStream)message.get(RMMessageConstants.SAVED_CONTENT));
                 msg.setMessageNumber(st.getMessageNumber());
             }
             store.persistIncoming(this, msg);

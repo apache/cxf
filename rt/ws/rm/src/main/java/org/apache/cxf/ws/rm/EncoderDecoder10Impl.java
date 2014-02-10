@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,11 +52,11 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * WS-ReliableMessaging 1.0 encoding and decoding. This converts between the standard WS-RM objects and the
  * 1.0 representation using the WS-Addressing 200408 namespace specified in the WS-RM 1.0 recommendation.
  */
-public final class EncoderDecoder10Impl implements EncoderDecoder {
+public final class EncoderDecoder10Impl extends EncoderDecoder {
     
     public static final EncoderDecoder10Impl INSTANCE = new EncoderDecoder10Impl();
 
-    private static JAXBContext jaxbContext;
+    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder10Impl.class);
     
@@ -90,50 +91,46 @@ public final class EncoderDecoder10Impl implements EncoderDecoder {
         return null;
     }
 
-    private static JAXBContext getContext() throws JAXBException {
-        synchronized (EncoderDecoder10Impl.class) {
-            if (jaxbContext == null) {
-                Class<?> clas = RMUtils.getWSRM200502Factory().getClass();
-                jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(clas),
-                    clas.getClassLoader());
+    protected JAXBContext getContext() throws JAXBException {
+        JAXBContext jaxbContext = jaxbContextReference.get();
+        if (jaxbContext == null) {
+            synchronized (EncoderDecoder10Impl.class) {
+                jaxbContext = jaxbContextReference.get();
+                if (jaxbContext == null) {
+                    Class<?> clas = RMUtils.getWSRM200502Factory().getClass();
+                    jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(clas),
+                                                          clas.getClassLoader());
+                    jaxbContextReference.set(jaxbContext);
+                }
             }
         }
         return jaxbContext;
     }
     
-    public Element buildHeaders(RMProperties rmps, QName qname) throws JAXBException {
-        
-        Document doc = DOMUtils.createDocument();
-        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        // add WSRM namespace declaration to header, instead of
-        // repeating in each individual child node
-        Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
+    protected void addNamespaceDecl(Element element) {
+        Attr attr = element.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/", 
             "xmlns:" + RMConstants.NAMESPACE_PREFIX);
         attr.setValue(RM10Constants.NAMESPACE_URI);
-        header.setAttributeNodeNS(attr);
+        element.setAttributeNodeNS(attr);
+    }
 
-        Marshaller marshaller = getContext().createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-       
-        SequenceType seq = rmps.getSequence();
+    protected void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
+        Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException {
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
             org.apache.cxf.ws.rm.v200502.SequenceType toseq = VersionTransformer.convert200502(seq);
-            if (rmps.isLastMessage()) {
+            if (last) {
                 toseq.setLastMessage(new org.apache.cxf.ws.rm.v200502.SequenceType.LastMessage());
             }
-            JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceType> element 
-                = RMUtils.getWSRM200502Factory().createSequence(toseq);
+            JAXBElement<?> element = RMUtils.getWSRM200502Factory().createSequence(toseq);
             marshaller.marshal(element, header);
         } 
-        Collection<SequenceAcknowledgement> acks = rmps.getAcks();
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
                 marshaller.marshal(VersionTransformer.convert200502(ack), header);
             }
         }
-        Collection<AckRequestedType> reqs = rmps.getAcksRequested();
         if (null != reqs) {
             LOG.log(Level.FINE, "encoding acknowledgement request(s) into RM header");
             for (AckRequestedType req : reqs) {
@@ -141,7 +138,6 @@ public final class EncoderDecoder10Impl implements EncoderDecoder {
                     .createAckRequested(VersionTransformer.convert200502(req)), header);
             }
         }
-        return header;
     }
 
     public Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException {
