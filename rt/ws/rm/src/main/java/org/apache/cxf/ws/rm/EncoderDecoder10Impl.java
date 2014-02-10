@@ -29,7 +29,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -140,25 +139,11 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
         }
     }
 
-    public Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException {
-        
-        Document doc = DOMUtils.createDocument();
-        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        // add WSRM namespace declaration to header, instead of
-        // repeating in each individual child node
-        
-        Attr attr = doc.createAttributeNS("http://www.w3.org/2000/xmlns/", 
-            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-        attr.setValue(RM10Constants.NAMESPACE_URI);
-        header.setAttributeNodeNS(attr);
-
-        Marshaller marshaller = getContext().createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-        QName fqname = RM10Constants.SEQUENCE_FAULT_QNAME;
-        org.apache.cxf.ws.rm.v200502.SequenceFaultType flt =
-            new org.apache.cxf.ws.rm.v200502.SequenceFaultType();
+    public void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller) throws JAXBException {
+        org.apache.cxf.ws.rm.v200502.SequenceFaultType flt = new org.apache.cxf.ws.rm.v200502.SequenceFaultType();
         flt.setFaultCode(sf.getFaultCode());
         Object detail = sf.getDetail();
+        Document doc = DOMUtils.createDocument();
         if (detail instanceof Element) {
             flt.getAny().add(detail);
         } else if (detail instanceof Identifier) {
@@ -170,9 +155,13 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
         if (data != null) {
             flt.getAny().add(data);
         }
-        marshaller.marshal(new JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceFaultType>(fqname,
+        data = sf.getExtraDetail();
+        if (data != null) {
+            flt.getAny().add(data);
+        }
+        marshaller.marshal(new JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceFaultType>(
+            RM10Constants.SEQUENCE_FAULT_QNAME,
             org.apache.cxf.ws.rm.v200502.SequenceFaultType.class, flt), header);
-        return header;
     }
 
     public Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException {

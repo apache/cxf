@@ -20,22 +20,15 @@
 package org.apache.cxf.ws.rm;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
@@ -53,22 +46,6 @@ public class RMOutInterceptorTest extends Assert {
     public void setUp() {
         control = EasyMock.createNiceControl();
     }
-    
-    @Test
-    public void testOrdering() {
-        Phase p = new Phase(Phase.PRE_LOGICAL, 1);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
-        phases.add(p);
-        PhaseInterceptorChain chain = 
-            new PhaseInterceptorChain(phases);
-        MAPAggregator map = new MAPAggregator();
-        RMOutInterceptor rmi = new RMOutInterceptor();        
-        chain.add(rmi);
-        chain.add(map);
-        Iterator<Interceptor<? extends Message>> it = chain.iterator();
-        assertSame("Unexpected order.", map, it.next());
-        assertSame("Unexpected order.", rmi, it.next());                      
-    } 
     
     @Test 
     public void testHandleRuntimeFault() throws NoSuchMethodException, SequenceFault, RMException {
@@ -134,11 +111,6 @@ public class RMOutInterceptorTest extends Assert {
             andReturn(rmpsOut).anyTimes();
         InterceptorChain chain = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(chain).anyTimes();
-        chain.add(EasyMock.isA(RetransmissionInterceptor.class));
-        EasyMock.expectLastCall();
-        RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
-        EasyMock.expect(manager.getRetransmissionQueue()).andReturn(queue).anyTimes();
-        queue.start();
         EasyMock.expectLastCall();
                 
         RMEndpoint rme = control.createMock(RMEndpoint.class);
@@ -169,8 +141,6 @@ public class RMOutInterceptorTest extends Assert {
         
         control.replay();
         interceptor.handle(message);
-        assertSame(sid, rmpsOut.getSequence().getIdentifier());        
-        assertEquals(new Long(10), rmpsOut.getSequence().getMessageNumber());
         control.verify();
     }
     

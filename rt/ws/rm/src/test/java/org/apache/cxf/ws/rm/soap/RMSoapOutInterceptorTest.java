@@ -19,27 +19,21 @@
 
 package org.apache.cxf.ws.rm.soap;
 
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
-import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
-import org.apache.cxf.headers.Header;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -56,24 +50,15 @@ import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
-import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class RMSoapOutInterceptorTest extends Assert {
 
-    private static final String SEQ_IDENTIFIER = "http://Business456.com/RM/ABC";
     private static final Long ONE = new Long(1);
     private static final Long TEN = new Long(10);
-    private static final Long MSG1_MESSAGE_NUMBER = ONE;
-    private static final Long MSG2_MESSAGE_NUMBER = new Long(2);
-
-    private IMocksControl control;
     
     private SequenceType s1;
     private SequenceType s2;
@@ -81,11 +66,6 @@ public class RMSoapOutInterceptorTest extends Assert {
     private SequenceAcknowledgement ack2;
     private AckRequestedType ar1;
     private AckRequestedType ar2;
-    
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl(); 
-    }
 
     @Test
     public void testGetUnderstoodHeaders() throws Exception {
@@ -96,54 +76,6 @@ public class RMSoapOutInterceptorTest extends Assert {
                    headers.contains(RM10Constants.SEQUENCE_ACK_QNAME));
         assertTrue("expected AckRequested header", 
                    headers.contains(RM10Constants.ACK_REQUESTED_QNAME));
-    }
-    
-    @Test
-    public void testHandleMessage() throws NoSuchMethodException {
-        Method m = RMSoapOutInterceptor.class.getDeclaredMethod("mediate", 
-            new Class[] {SoapMessage.class});
-        RMSoapOutInterceptor codec = 
-            EasyMock.createMockBuilder(RMSoapOutInterceptor.class)
-                .addMockedMethod(m).createMock(control);
-        SoapMessage msg = control.createMock(SoapMessage.class);
-        codec.mediate(msg);
-        EasyMock.expectLastCall();
-        
-        control.replay();
-        codec.handleMessage(msg);
-        control.verify();
-    }
-    
-    @Test
-    public void testMediate() throws NoSuchMethodException, XMLStreamException {
-        Method m1 = RMSoapOutInterceptor.class.getDeclaredMethod("encode", 
-                                                             new Class[] {SoapMessage.class});
-        Method m2 = RMSoapOutInterceptor.class.getDeclaredMethod("decode", 
-                                                              new Class[] {SoapMessage.class});
-        RMSoapOutInterceptor codec =
-            EasyMock.createMockBuilder(RMSoapOutInterceptor.class)
-                .addMockedMethods(m1, m2).createMock(control);
-        
-        SoapMessage msg = control.createMock(SoapMessage.class);
-        Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(msg.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.getOutMessage()).andReturn(msg);
-        codec.encode(msg);
-        EasyMock.expectLastCall();
-        
-        control.replay();
-        codec.mediate(msg);
-        control.verify();
-                
-        control.reset();
-        EasyMock.expect(msg.getExchange()).andReturn(null);
-        codec.decode(msg);
-        EasyMock.expectLastCall();
-        
-        control.replay();
-        codec.mediate(msg);
-        control.verify();
-        
     }
 
     @Test
@@ -249,94 +181,6 @@ public class RMSoapOutInterceptorTest extends Assert {
 
     }
 
-    @Test
-    public void testDecodeSequence() throws XMLStreamException {
-        SoapMessage message = setUpInboundMessage("resources/Message1.xml");
-        RMSoapOutInterceptor codec = new RMSoapOutInterceptor();
-        codec.handleMessage(message);
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        SequenceType st = rmps.getSequence();
-        assertNotNull(st);
-        assertEquals(st.getIdentifier().getValue(), SEQ_IDENTIFIER);
-        assertEquals(st.getMessageNumber(), MSG1_MESSAGE_NUMBER);
-        
-        assertNull(rmps.getAcks());
-        assertNull(rmps.getAcksRequested());
-
-    }
-
-    @Test
-    public void testDecodeAcknowledgements() throws XMLStreamException {
-        SoapMessage message = setUpInboundMessage("resources/Acknowledgment.xml");
-        RMSoapOutInterceptor codec = new RMSoapOutInterceptor();
-        codec.handleMessage(message);
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        Collection<SequenceAcknowledgement> acks = rmps.getAcks();
-        assertNotNull(acks);
-        assertEquals(1, acks.size());
-        SequenceAcknowledgement ack = acks.iterator().next();
-        assertNotNull(ack);
-        assertEquals(ack.getIdentifier().getValue(), SEQ_IDENTIFIER);
-        assertEquals(2, ack.getAcknowledgementRange().size());
-        AcknowledgementRange r1 = ack.getAcknowledgementRange().get(0);
-        AcknowledgementRange r2 = ack.getAcknowledgementRange().get(1);
-        verifyRange(r1, 1, 1);
-        verifyRange(r2, 3, 3);
-        assertNull(rmps.getSequence());
-        assertNull(rmps.getAcksRequested());
-    }
-
-    @Test
-    public void testDecodeAcknowledgements2() throws XMLStreamException {
-        SoapMessage message = setUpInboundMessage("resources/Acknowledgment2.xml");
-        RMSoapOutInterceptor codec = new RMSoapOutInterceptor();
-        codec.handleMessage(message);
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        Collection<SequenceAcknowledgement> acks = rmps.getAcks();
-        assertNotNull(acks);
-        assertEquals(1, acks.size());
-        SequenceAcknowledgement ack = acks.iterator().next();
-        assertNotNull(ack);
-        assertEquals(1, ack.getAcknowledgementRange().size());
-        AcknowledgementRange r1 = ack.getAcknowledgementRange().get(0);
-        verifyRange(r1, 1, 3);
-        assertNull(rmps.getSequence());
-        assertNull(rmps.getAcksRequested());
-    }
-
-    private void verifyRange(AcknowledgementRange r, int i, int j) {
-        assertNotNull(r);
-        if (i > 0) {
-            assertNotNull(r.getLower());
-            assertEquals(i, r.getLower().longValue());
-        }
-        if (j > 0) {
-            assertNotNull(r.getUpper());
-            assertEquals(j, r.getUpper().longValue());
-        }
-    }
-
-    @Test
-    public void testDecodeAcksRequested() throws XMLStreamException {
-        SoapMessage message = setUpInboundMessage("resources/Retransmission.xml");
-        RMSoapOutInterceptor codec = new RMSoapOutInterceptor();
-        codec.handleMessage(message);
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
-        Collection<AckRequestedType> requested = rmps.getAcksRequested();
-        assertNotNull(requested);
-        assertEquals(1, requested.size());
-        AckRequestedType ar = requested.iterator().next();
-        assertNotNull(ar);
-        assertEquals(ar.getIdentifier().getValue(), SEQ_IDENTIFIER);
-
-        SequenceType s = rmps.getSequence();
-        assertNotNull(s);
-        assertEquals(s.getIdentifier().getValue(), SEQ_IDENTIFIER);
-        assertEquals(s.getMessageNumber(), MSG2_MESSAGE_NUMBER);
-
-        assertNull(rmps.getAcks());
-    }
-
     private void setUpOutbound() {
         ObjectFactory factory = new ObjectFactory();
         s1 = factory.createSequenceType();
@@ -373,9 +217,9 @@ public class RMSoapOutInterceptorTest extends Assert {
     }
 
     private SoapMessage setupOutboundMessage() throws Exception {
-        Exchange ex = new ExchangeImpl();        
+        Exchange ex = new ExchangeImpl();
         Message message = new MessageImpl();
-        SoapMessage soapMessage = new SoapMessage(message);         
+        SoapMessage soapMessage = new SoapMessage(message);
         RMProperties rmps = new RMProperties();
         rmps.exposeAs(RM10Constants.NAMESPACE_URI);
         RMContextUtils.storeRMProperties(soapMessage, rmps, true);
@@ -383,6 +227,11 @@ public class RMSoapOutInterceptorTest extends Assert {
         RMContextUtils.storeMAPs(maps, soapMessage, true, false);
         ex.setOutMessage(soapMessage);
         soapMessage.setExchange(ex);        
+        MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+        SOAPMessage soap = factory.createMessage();
+        QName bodyName = new QName("http://cxf.apache.org", "dummy", "d");
+        soap.getSOAPBody().addBodyElement(bodyName);
+        soapMessage.setContent(SOAPMessage.class, soap);
         return soapMessage;
     }
     
@@ -399,21 +248,24 @@ public class RMSoapOutInterceptorTest extends Assert {
         SoapMessage soapMessage = new SoapMessage(message);         
         ex.setOutFaultMessage(soapMessage);
         soapMessage.setExchange(ex);        
+        MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+        SOAPMessage soap = factory.createMessage();
+        soap.getSOAPBody().addFault();
+        soapMessage.setContent(SOAPMessage.class, soap);
         return soapMessage;
     }
 
     private void verifyHeaders(SoapMessage message, String... names) {
-        List<Header> header = message.getHeaders();
+        SOAPMessage content = message.getContent(SOAPMessage.class);
 
         // check all expected headers are present
 
         for (String name : names) {
             boolean found = false;
-            Iterator<Header> iter = header.iterator();
-            while (iter.hasNext()) {
-                Object obj = iter.next().getObject();
-                if (obj instanceof Element) {
-                    Element elem = (Element) obj;
+            try {
+                Iterator<?> elems = content.getSOAPHeader().getChildElements();
+                while (elems.hasNext()) {
+                    Element elem = (Element)elems.next();
                     String namespace = elem.getNamespaceURI();
                     String localName = elem.getLocalName();
                     if (RM10Constants.NAMESPACE_URI.equals(namespace)
@@ -426,17 +278,15 @@ public class RMSoapOutInterceptorTest extends Assert {
                         break;
                     }
                 }
-            }
+            } catch (SOAPException e) { /* failure will result in not found */ }
             assertTrue("Could not find header element " + name, found);
         }
 
         // no other headers should be present
-
-        Iterator<Header> iter1 = header.iterator();
-        while (iter1.hasNext()) {
-            Object obj = iter1.next().getObject();
-            if (obj instanceof Element) {
-                Element elem = (Element) obj;
+        try {
+            Iterator<?> elems = content.getSOAPHeader().getChildElements();
+            while (elems.hasNext()) {
+                Element elem = (Element)elems.next();
                 String namespace = elem.getNamespaceURI();
                 String localName = elem.getLocalName();
                 assertTrue(RM10Constants.NAMESPACE_URI.equals(namespace) 
@@ -450,26 +300,6 @@ public class RMSoapOutInterceptorTest extends Assert {
                 }
                 assertTrue("Unexpected header element " + localName, found);
             }
-        }
-    }
-    
-    private SoapMessage setUpInboundMessage(String resource) throws XMLStreamException {
-        Message message = new MessageImpl();
-        SoapMessage soapMessage = new SoapMessage(message);
-        RMProperties rmps = new RMProperties();
-        rmps.exposeAs(RM10Constants.NAMESPACE_URI);
-        RMContextUtils.storeRMProperties(soapMessage, rmps, false);
-        AddressingProperties maps = new AddressingProperties();
-        RMContextUtils.storeMAPs(maps, soapMessage, false, false);
-        message.put(MessaRMSoapOutInterceptorTestENABLED, false);
-        InputStream is = RMSoapInterceptorTest.class.getResourceAsStream(resource);
-        assertNotNull(is);
-        XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(is);
-        soapMessage.setContent(XMLStreamReader.class, reader);
-        ReadHeadersInterceptor rji = new ReadHeadersInterceptor(BusFactory.getDefaultBus());
-        rji.handleMessage(soapMessage); 
-        StartBodyInterceptor sbi = new StartBodyInterceptor();
-        sbi.handleMessage(soapMessage);
-        return soapMessage;
+        } catch (SOAPException e) { /* failure would have been caught before */ }
     }
 }

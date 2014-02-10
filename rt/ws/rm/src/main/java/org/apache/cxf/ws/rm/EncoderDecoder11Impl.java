@@ -29,7 +29,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -137,20 +136,11 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
         element.setAttributeNodeNS(attr);
     }
 
-    public Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException {
-        
-        Document doc = DOMUtils.createDocument();
-        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        
-        // add WSRM namespace declaration to header, instead of repeating in each individual child node
-        addNamespaceDecl(header);
-
-        Marshaller marshaller = getContext().createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-        QName fqname = RM11Constants.SEQUENCE_FAULT_QNAME;
+    public void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller) throws JAXBException {
         SequenceFaultType flt = new SequenceFaultType();
         flt.setFaultCode(sf.getFaultCode());
         Object detail = sf.getDetail();
+        Document doc = DOMUtils.createDocument();
         if (detail instanceof Element) {
             flt.getAny().add(detail);
         } else if (detail instanceof Identifier) {
@@ -166,8 +156,8 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
         if (data != null) {
             flt.getDetail().getAny().add(data);
         }
-        marshaller.marshal(new JAXBElement<SequenceFaultType>(fqname, SequenceFaultType.class, flt), header);
-        return header;
+        marshaller.marshal(new JAXBElement<SequenceFaultType>(RM11Constants.SEQUENCE_FAULT_QNAME,
+            SequenceFaultType.class, flt), header);
     }
 
     public Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException {

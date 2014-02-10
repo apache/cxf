@@ -21,7 +21,6 @@ package org.apache.cxf.ws.rm.soap;
 
 import java.net.HttpURLConnection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,16 +31,10 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -50,7 +43,6 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RM11Constants;
-import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -144,16 +136,9 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
             if (added) {
                 try {
                     content.saveChanges();
-//                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                    content.writeTo(bos);
-//                    bos.close();
-//                    LOG.info("Message after headers added: " + bos.toString("UTF-8"));
                 } catch (SOAPException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-//                } catch (IOException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
                 }
                 
             }
@@ -172,22 +157,13 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
     public static void encodeFault(SoapMessage message, SequenceFault sf) {
         LOG.log(Level.FINE, "Encoding SequenceFault in SOAP header");
         try {
-            List<Header> headers = message.getHeaders();
             Message inmsg = message.getExchange().getInMessage();
             RMProperties rmps = RMContextUtils.retrieveRMProperties(inmsg, false);
             AddressingProperties maps = RMContextUtils.retrieveMAPs(inmsg, false, false);
             ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(),
                 maps.getNamespaceURI());
-            Element header = protocol.getCodec().buildHeaderFault(sf, Soap11.getInstance().getHeader());
-            Node node = header.getFirstChild();
-            if (node instanceof Element) {
-                Attr attr = header.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/",
-                    "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-                attr.setValue(rmps.getNamespaceURI());
-                ((Element)node).setAttributeNodeNS(attr);
-            }
-            
-            headers.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
+            SOAPMessage content = message.getContent(SOAPMessage.class);
+            protocol.getCodec().insertHeaderFault(sf, content.getSOAPPart());
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
         }        

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMEndpoint;
@@ -101,7 +102,7 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testResendCandidateCtor() {
-        Message message = createMock(Message.class);
+        SoapMessage message = createMock(SoapMessage.class);
         setupMessagePolicies(message);
         control.replay();
         long now = System.currentTimeMillis();
@@ -117,7 +118,7 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testResendCandidateAttempted() {
-        Message message = createMock(Message.class);
+        SoapMessage message = createMock(SoapMessage.class);
         setupMessagePolicies(message);
         ready(true);
         long now = System.currentTimeMillis();
@@ -133,7 +134,7 @@ public class RetransmissionQueueImplTest extends Assert {
 
     @Test
     public void testResendCandidateMaxRetries() {
-        Message message = createMock(Message.class);
+        SoapMessage message = createMock(SoapMessage.class);
         setupMessagePolicies(message);
         setupRetryPolicy(message);
         
@@ -159,9 +160,9 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testCacheUnacknowledged() {
-        Message message1 = setUpMessage("sequence1");
-        Message message2 = setUpMessage("sequence2");
-        Message message3 = setUpMessage("sequence1");
+        SoapMessage message1 = setUpMessage("sequence1");
+        SoapMessage message2 = setUpMessage("sequence2");
+        SoapMessage message3 = setUpMessage("sequence1");
         
         setupMessagePolicies(message1);
         setupMessagePolicies(message2);
@@ -215,11 +216,9 @@ public class RetransmissionQueueImplTest extends Assert {
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
             new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
-        Message message1 =
-            setUpMessage("sequence1", messageNumbers[0]);
+        SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);        
-        Message message2 =
-            setUpMessage("sequence1", messageNumbers[1]);
+        SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);
         ready(false);
         
@@ -244,11 +243,9 @@ public class RetransmissionQueueImplTest extends Assert {
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
             new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
-        Message message1 =
-            setUpMessage("sequence1", messageNumbers[0]);
+        SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);        
-        Message message2 =
-            setUpMessage("sequence1", messageNumbers[1]);
+        SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);        
         ready(false);
         
@@ -273,11 +270,9 @@ public class RetransmissionQueueImplTest extends Assert {
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
             new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
-        Message message1 =
-            setUpMessage("sequence1", messageNumbers[0]);
+        SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
-        Message message2 =
-            setUpMessage("sequence1", messageNumbers[1]);
+        SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);
         ready(false);
 
@@ -308,11 +303,9 @@ public class RetransmissionQueueImplTest extends Assert {
             new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
         
         queue.getUnacknowledged().put("sequence1", sequenceList);
-        Message message1 =
-            setUpMessage("sequence1", messageNumbers[0], false);
+        SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0], false);
         setupMessagePolicies(message1);        
-        Message message2 =
-            setUpMessage("sequence1", messageNumbers[1], false);
+        SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1], false);
         setupMessagePolicies(message2);
         ready(false);
         
@@ -344,19 +337,16 @@ public class RetransmissionQueueImplTest extends Assert {
         queue.start();
     }
     
-    private Message setUpMessage(String sid) {
+    private SoapMessage setUpMessage(String sid) {
         return setUpMessage(sid, null);
     }
 
-    private Message setUpMessage(String sid, Long messageNumber) {
+    private SoapMessage setUpMessage(String sid, Long messageNumber) {
         return setUpMessage(sid, messageNumber, true);
     }
 
-    private Message setUpMessage(String sid,
-                                        Long messageNumber,
-                                        boolean storeSequence) {
-        Message message =
-            createMock(Message.class);
+    private SoapMessage setUpMessage(String sid, Long messageNumber, boolean storeSequence) {
+        SoapMessage message = createMock(SoapMessage.class);
         if (storeSequence) {
             setUpSequenceType(message, sid, messageNumber);
         }
@@ -388,9 +378,7 @@ public class RetransmissionQueueImplTest extends Assert {
         }
     }
     
-    private SequenceType setUpSequenceType(Message message,
-                                           String sid,
-                                           Long messageNumber) {
+    private SequenceType setUpSequenceType(Message message, String sid, Long messageNumber) {
         RMProperties rmps = createMock(RMProperties.class);
         if (message != null) {
             message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND);
@@ -417,9 +405,7 @@ public class RetransmissionQueueImplTest extends Assert {
         return sequence;
     }
     
-    private SourceSequence setUpSequence(String sid, 
-                                   Long[] messageNumbers,
-                                   boolean[] isAcked) {
+    private SourceSequence setUpSequence(String sid,  Long[] messageNumbers, boolean[] isAcked) {
         SourceSequence sequence = createMock(SourceSequence.class);
         Identifier id = createMock(Identifier.class);
         sequence.getIdentifier();
@@ -467,7 +453,7 @@ public class RetransmissionQueueImplTest extends Assert {
         Message message;
         boolean includeAckRequested;
         
-        public void resend(Message ctx, boolean requestAcknowledge) {
+        public void resend(SoapMessage ctx, boolean requestAcknowledge) {
             message = ctx;
             includeAckRequested = requestAcknowledge;
         }

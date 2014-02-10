@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +36,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
@@ -645,14 +643,6 @@ public class RMManagerTest extends Assert {
         if (null == conduit) {
             EasyMock.expect(m.getTo()).andReturn("toAddress");
         }
-        byte[] content = new byte[] {'x', '9'};
-        CachedOutputStream cos = new CachedOutputStream();
-        try {
-            cos.write(content);
-        } catch (IOException e) {
-            // ignore
-        }
-        EasyMock.expect(m.getCachedOutputStream()).andReturn(cos);
 
         if (mc != null) {
             queue.addUnacknowledged(EasyMock.capture(mc));

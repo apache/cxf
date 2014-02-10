@@ -24,7 +24,6 @@ import java.util.Collection;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -129,7 +128,25 @@ public abstract class EncoderDecoder {
             return false;
         }
         
-        // get the SOAP:Header element
+        // add WSRM namespace declaration to header, instead of repeating in each individual child node
+        Element header = getSoapHeader(doc);
+        addNamespaceDecl(header);
+        
+        // build individual headers
+        Marshaller marshaller = getContext().createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+        buildHeaders(seq, acks, reqs, rmps.isLastMessage(), header, marshaller);
+        return true;
+    }
+
+    /**
+     * Get the SOAP Header element from a message document.
+     * 
+     * @param doc
+     * @return header
+     * @throws JAXBException if not found
+     */
+    protected Element getSoapHeader(Document doc) throws JAXBException {
         NodeList nodes = doc.getDocumentElement().getChildNodes();
         Element header = null;
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -142,15 +159,22 @@ public abstract class EncoderDecoder {
         if (header == null) {
             throw new JAXBException("No SOAP:Header element in message");
         }
-        
-        // add WSRM namespace declaration to header, instead of repeating in each individual child node
+        return header;
+    }
+    
+    /**
+     * Inserts a Header element containing a WS-RM Fault into a SOAP message.
+     * 
+     * @param sf
+     * @param qname constructed element name
+     * @param doc
+     */
+    public void insertHeaderFault(SequenceFault sf, Document doc) throws JAXBException {
+        Element header = getSoapHeader(doc);
         addNamespaceDecl(header);
-        
-        // build individual headers
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-        buildHeaders(seq, acks, reqs, rmps.isLastMessage(), header, marshaller);
-        return true;
+        buildHeaderFault(sf, header, marshaller);
     }
 
     /**
@@ -166,16 +190,17 @@ public abstract class EncoderDecoder {
      */
     protected abstract void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
         Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException;
-    
+
     /**
-     * Builds an element containing a WS-RM Fault. This adds the appropriate WS-RM namespace declaration to
-     * the element, and then adds the Fault as a child element.
+     * Build a header fault, using the correct protocol variation.
      * 
      * @param sf
-     * @param qname constructed element name
-     * @return element
+     * @param header
+     * @param marshaller
+     * @throws JAXBException
      */
-    public abstract Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException;
+    protected abstract void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller)
+        throws JAXBException;
     
     /**
      * Marshals a SequenceAcknowledgement to the appropriate external form.

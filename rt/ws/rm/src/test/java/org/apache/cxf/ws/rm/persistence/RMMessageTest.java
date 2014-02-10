@@ -53,8 +53,7 @@ public class RMMessageTest extends Assert {
         RMMessage msg = new RMMessage();
         msg.setContent(new ByteArrayInputStream(DATA));
         
-        assertEquals(DATA.length, msg.getSize());
-        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getInputStream());
+        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getContent());
         
         assertArrayEquals(DATA, msgbytes);
     }
@@ -64,13 +63,10 @@ public class RMMessageTest extends Assert {
         RMMessage msg = new RMMessage();
         CachedOutputStream co = new CachedOutputStream();
         co.write(DATA);
-        msg.setContent(co);
+        msg.setContent(co.getInputStream());
         
-        assertEquals(DATA.length, msg.getSize());
-        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getInputStream());
+        byte[] msgbytes = IOUtils.readBytesFromStream(msg.getContent());
         
         assertArrayEquals(DATA, msgbytes);
-
-        assertEquals(co, msg.getCachedOutputStream());
     }
 }

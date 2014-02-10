@@ -155,7 +155,7 @@ public class RMTxStore implements RMStore {
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
     private static final String SELECT_ATTACHMENTS_STMT_STR =
-        "SELECT ATTACHMENT_NO, DATA FROM {0} WHERE SEQ_ID = ?, MSG_ID = ?";
+        "SELECT ATTACHMENT_NO, DATA FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
     private static final String ALTER_TABLE_STMT_STR =
         "ALTER TABLE {0} ADD {1} {2}";
     private static final String CREATE_INBOUND_MESSAGE_STMT_STR = 
@@ -1104,8 +1104,7 @@ public class RMTxStore implements RMStore {
     }
 
     
-    protected void cacheStatement(Connection con, String sql) 
-        throws SQLException {
+    protected void cacheStatement(Connection con, String sql) throws SQLException {
         PreparedStatement stmt = con.prepareStatement(sql);
         cachedStatements.put(sql, stmt);
         statementLocks.put(stmt, new ReentrantLock());
@@ -1137,6 +1136,12 @@ public class RMTxStore implements RMStore {
         cacheStatement(connection, DELETE_OUTBOUND_MESSAGE_STMT_STR);
         cacheStatement(connection, SELECT_INBOUND_MESSAGES_STMT_STR);
         cacheStatement(connection, SELECT_OUTBOUND_MESSAGES_STMT_STR);
+        cacheStatement(connection, CREATE_INBOUND_ATTACHMENT_STMT_STR);
+        cacheStatement(connection, CREATE_OUTBOUND_ATTACHMENT_STMT_STR);
+        cacheStatement(connection, DELETE_INBOUND_ATTACHMENTS_STMT_STR);
+        cacheStatement(connection, DELETE_OUTBOUND_ATTACHMENTS_STMT_STR);
+        cacheStatement(connection, SELECT_INBOUND_ATTACHMENTS_STMT_STR);
+        cacheStatement(connection, SELECT_OUTBOUND_ATTACHMENTS_STMT_STR);
     }
 
     public synchronized void init() {

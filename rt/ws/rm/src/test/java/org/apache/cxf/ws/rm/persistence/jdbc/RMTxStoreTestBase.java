@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.DestinationSequence;
@@ -220,13 +219,13 @@ public abstract class RMTxStoreTestBase extends Assert {
         Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
         
-        EasyMock.expect(msg1.getMessageNumber()).andReturn(ONE); 
-        EasyMock.expect(msg2.getMessageNumber()).andReturn(ONE); 
+        EasyMock.expect(msg1.getMessageNumber()).andReturn(ONE).anyTimes(); 
+        EasyMock.expect(msg2.getMessageNumber()).andReturn(ONE).anyTimes(); 
         byte[] bytes = new byte[89];
-        EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg1.getSize()).andReturn((long)bytes.length);
-        EasyMock.expect(msg2.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg2.getSize()).andReturn((long)bytes.length);
+        EasyMock.expect(msg1.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes();
+        EasyMock.expect(msg2.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes();
+        EasyMock.expect(msg1.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
+        EasyMock.expect(msg2.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
         
         control.replay();
 
@@ -244,8 +243,7 @@ public abstract class RMTxStoreTestBase extends Assert {
         
         control.reset();
         EasyMock.expect(msg1.getMessageNumber()).andReturn(ONE); 
-        EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes));
-        EasyMock.expect(msg1.getSize()).andReturn((long)bytes.length);
+        EasyMock.expect(msg1.getContent()).andReturn(new ByteArrayInputStream(bytes));
         
         control.replay();
         con = getConnection();
@@ -262,12 +260,12 @@ public abstract class RMTxStoreTestBase extends Assert {
         control.verify();
         
         control.reset();
-        EasyMock.expect(msg1.getMessageNumber()).andReturn(TEN);
-        EasyMock.expect(msg2.getMessageNumber()).andReturn(TEN); 
-        EasyMock.expect(msg1.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
-        EasyMock.expect(msg1.getSize()).andReturn((long)bytes.length);
-        EasyMock.expect(msg2.getInputStream()).andReturn(new ByteArrayInputStream(bytes)); 
-        EasyMock.expect(msg2.getSize()).andReturn((long)bytes.length);
+        EasyMock.expect(msg1.getMessageNumber()).andReturn(TEN).anyTimes();
+        EasyMock.expect(msg2.getMessageNumber()).andReturn(TEN).anyTimes(); 
+        EasyMock.expect(msg1.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes(); 
+        EasyMock.expect(msg2.getContent()).andReturn(new ByteArrayInputStream(bytes)).anyTimes(); 
+        EasyMock.expect(msg1.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
+        EasyMock.expect(msg2.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
         
         control.replay();
         con = getConnection();
@@ -863,12 +861,11 @@ public abstract class RMTxStoreTestBase extends Assert {
     
     private RMMessage createRMMessage(Long mn, String to) throws IOException {
         RMMessage msg = control.createMock(RMMessage.class);
-        EasyMock.expect(msg.getMessageNumber()).andReturn(mn);
-        EasyMock.expect(msg.getTo()).andReturn(to);
+        EasyMock.expect(msg.getMessageNumber()).andReturn(mn).anyTimes();
+        EasyMock.expect(msg.getTo()).andReturn(to).anyTimes();
+        EasyMock.expect(msg.getAttachments()).andReturn(new ArrayList<InputStream>()).anyTimes();
         byte[] value = ("Message " + mn.longValue()).getBytes();
-        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(value));
-        EasyMock.expect(msg.getSize()).andReturn((long)value.length);
-        EasyMock.expect(msg.getCachedOutputStream()).andReturn(new CachedOutputStream()).anyTimes();
+        EasyMock.expect(msg.getContent()).andReturn(new ByteArrayInputStream(value)).anyTimes();
         return msg;
     }
 
@@ -932,7 +929,7 @@ public abstract class RMTxStoreTestBase extends Assert {
                 assertNull(msg.getTo());
             }
             try {
-                InputStream actual = msg.getInputStream();
+                InputStream actual = msg.getContent();
                 assertEquals(new String("Message " + mn), IOUtils.readStringFromStream(actual));
             } catch (IOException e) {
                 fail("failed to get the input stream");
