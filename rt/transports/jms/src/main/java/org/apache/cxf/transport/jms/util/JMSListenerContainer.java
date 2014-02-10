@@ -23,4 +23,5 @@ public interface JMSListenerContainer {
     boolean isRunning();
     void stop();
     void start();
+    void shutdown();
 }

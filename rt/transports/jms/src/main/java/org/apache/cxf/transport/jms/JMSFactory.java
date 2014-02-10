@@ -31,12 +31,13 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.transport.jms.util.SessionFactory;
+import org.apache.cxf.transport.jms.util.SpringJMSListenerAdapter;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
-import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 /**
@@ -121,20 +122,10 @@ public final class JMSFactory {
      * @param destination to listen on
      * @return
      */
-    public static AbstractMessageListenerContainer createJmsListener(EndpointInfo ei,
+    public static JMSListenerContainer createJmsListener(EndpointInfo ei,
                                                                     JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
                                                                     Destination destination) {
-        
-        if (jmsConfig.getMessageListenerContainer() != null) {
-            AbstractMessageListenerContainer  jmsListener =  jmsConfig.getMessageListenerContainer();
-            if (jmsListener.getMessageListener() == null) {
-                jmsListener.setMessageListener(listenerHandler);
-                jmsListener.initialize();
-                jmsListener.start();
-            }
-            return jmsListener;
-        }
         
         DefaultMessageListenerContainer jmsListener = null;
         
@@ -150,11 +141,12 @@ public final class JMSFactory {
             jmsListener = new DefaultMessageListenerContainer();
         }
         
-        return createJmsListener(jmsListener,
+        createJmsListener(jmsListener,
                                  jmsConfig,
                                  listenerHandler,
                                  destination,
-                                 null);            
+                                 null);
+        return new SpringJMSListenerAdapter(jmsListener);
     }
 
     /**
@@ -167,19 +159,20 @@ public final class JMSFactory {
      * @param conduitId id for message selector
      * @return
      */
-    public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
+    public static JMSListenerContainer createJmsListener(JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
                                                                     Destination destination, 
                                                                     String conduitId) {
         DefaultMessageListenerContainer jmsListener = new DefaultMessageListenerContainer(); 
-        return createJmsListener(jmsListener,
+        createJmsListener(jmsListener,
                                  jmsConfig,
                                  listenerHandler,
                                  destination,
-                                 conduitId);    
+                                 conduitId);
+        return new SpringJMSListenerAdapter(jmsListener);
     }
 
-    private static DefaultMessageListenerContainer createJmsListener(
+    private static void createJmsListener(
                           DefaultMessageListenerContainer jmsListener,
                           JMSConfiguration jmsConfig,
                           MessageListener listenerHandler,
@@ -241,7 +234,6 @@ public final class JMSFactory {
         jmsListener.setDestination(destination);
         jmsListener.initialize();
         jmsListener.start();
-        return jmsListener;
     }
     
     public static SessionFactory createJmsSessionFactory(JMSConfiguration jmsConfig, ResourceCloser closer) {

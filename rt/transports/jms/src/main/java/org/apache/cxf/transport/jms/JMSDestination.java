@@ -50,15 +50,12 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
+import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
-import org.apache.cxf.transport.jms.util.SpringJMSListenerAdapter;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
-import org.springframework.jms.listener.AbstractMessageListenerContainer;
-import org.springframework.jms.support.JmsUtils;
-import org.springframework.jms.support.destination.DestinationResolver;
 
 public class JMSDestination extends AbstractMultiplexDestination 
     implements MessageListener, JMSExchangeSender {
@@ -68,7 +65,7 @@ public class JMSDestination extends AbstractMultiplexDestination
     private JMSConfiguration jmsConfig;
     private Bus bus;
     private EndpointInfo ei;
-    private AbstractMessageListenerContainer jmsListener;
+    private JMSListenerContainer jmsListener;
     private ThrottlingCounter suspendedContinuations;
     private ClassLoader loader;
 
@@ -96,17 +93,12 @@ public class JMSDestination extends AbstractMultiplexDestination
     public void activate() {
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
         jmsConfig.ensureProperlyConfigured();
-        Object o = ei.getProperty(AbstractMessageListenerContainer.class.getName());
-        if (o instanceof AbstractMessageListenerContainer
-            && jmsConfig.getMessageListenerContainer() == null) {
-            jmsConfig.setMessageListenerContainer((AbstractMessageListenerContainer)o);
-        }
 
         Destination targetDestination = resolveTargetDestination();
         jmsListener = JMSFactory.createJmsListener(ei, jmsConfig, this, 
                                                    targetDestination);
         int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
-        this.suspendedContinuations = new ThrottlingCounter(new SpringJMSListenerAdapter(this.jmsListener), 
+        this.suspendedContinuations = new ThrottlingCounter(this.jmsListener, 
                                                             restartLimit,
                                                             jmsConfig.getMaxSuspendedContinuations());
     }
@@ -140,8 +132,7 @@ public class JMSDestination extends AbstractMultiplexDestination
         // If WS-Addressing had set the replyTo header.
         final String replyToName = (String)inMessage.get(JMSConstants.JMS_REBASED_REPLY_TO);
         if (replyToName != null) {
-            DestinationResolver resolver = jmsConfig.getDestinationResolver();
-            return resolver.resolveDestinationName(session, replyToName, jmsConfig.isReplyPubSubDomain());
+            return jmsConfig.getReplyDestination(session, replyToName);
         } else if (message.getJMSReplyTo() != null) {
             return message.getJMSReplyTo();
         } else {
@@ -283,7 +274,7 @@ public class JMSDestination extends AbstractMultiplexDestination
             LOG.log(Level.FINE, "server sending reply: ", reply);
             sender.sendMessage(closer, session, replyTo, reply);
         } catch (JMSException ex) {
-            throw JmsUtils.convertJmsAccessException(ex);
+            throw JMSUtil.convertJmsException(ex);
         } finally {
             closer.close();
         }

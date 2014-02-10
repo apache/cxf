@@ -43,4 +43,9 @@ public class SpringJMSListenerAdapter implements JMSListenerContainer {
         container.start();
     }
 
+    @Override
+    public void shutdown() {
+        container.shutdown();
+    }
+
 }

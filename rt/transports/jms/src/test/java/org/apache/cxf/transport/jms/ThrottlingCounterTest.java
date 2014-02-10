@@ -60,6 +60,10 @@ public class ThrottlingCounterTest {
             running = true;
         }
 
+        @Override
+        public void shutdown() {
+        }
+
     }
 
 }

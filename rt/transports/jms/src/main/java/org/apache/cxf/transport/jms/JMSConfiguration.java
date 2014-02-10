@@ -27,13 +27,12 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.support.destination.DestinationResolver;
-import org.springframework.jms.support.destination.DynamicDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -47,11 +46,9 @@ public class JMSConfiguration implements InitializingBean {
 
     private boolean usingEndpointInfo = true;
 
-    private AbstractMessageListenerContainer messageListenerContainer;
-
     private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
-    private DestinationResolver destinationResolver = new DynamicDestinationResolver();
+    private DestinationResolver destinationResolver = new JMSDestinationResolver();
     private PlatformTransactionManager transactionManager;
     private TaskExecutor taskExecutor;
     private boolean reconnectOnException = true;
@@ -487,14 +484,6 @@ public class JMSConfiguration implements InitializingBean {
         return this.enforceSpec != null;
     }
 
-    public AbstractMessageListenerContainer getMessageListenerContainer() {
-        return messageListenerContainer;
-    }
-
-    public void setMessageListenerContainer(AbstractMessageListenerContainer messageListenerContainer) {
-        this.messageListenerContainer = messageListenerContainer;
-    }
-
     /** * @return Returns the jmsProviderTibcoEms.
      */
     public boolean isJmsProviderTibcoEms() {
@@ -523,19 +512,23 @@ public class JMSConfiguration implements InitializingBean {
         if (replyTo == null) {
             return getReplyDestination(session);
         }
-        return getDestinationResolver().resolveDestinationName(session, replyTo, replyPubSubDomain);
+        return destinationResolver.resolveDestinationName(session, replyTo, replyPubSubDomain);
     }
     
     public Destination getReplyDestination(Session session) throws JMSException {
         if (replyDestinationDest == null) {
             replyDestinationDest = replyDestination == null 
                 ? session.createTemporaryQueue()
-                : getDestinationResolver().resolveDestinationName(session, replyDestination, replyPubSubDomain);
+                : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
         }
         return replyDestinationDest;
     }
 
     public Destination getTargetDestination(Session session) throws JMSException {
         return destinationResolver.resolveDestinationName(session, targetDestination, pubSubDomain);
+    }
+
+    public Destination getReplyDestination(Session session, String replyToName) throws JMSException {
+        return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
     }
 }

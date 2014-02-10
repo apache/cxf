@@ -71,7 +71,10 @@ public class TestReceiver {
             Session session = new SessionFactory(connectionFactory, closer).createSession();
             MessageConsumer consumer = closer.register(session.createConsumer(session
                 .createQueue(receiveQueueName)));
-            final javax.jms.Message inMessage = consumer.receive();
+            final javax.jms.Message inMessage = consumer.receive(2000);
+            if (inMessage == null) {
+                throw new RuntimeException("No message received on destination " + receiveQueueName);
+            }
             requestMessageId = inMessage.getJMSMessageID();
             System.out.println("Received message " + requestMessageId);
             final TextMessage replyMessage = session.createTextMessage("Result");

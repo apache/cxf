@@ -44,13 +44,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.AbstractConduit;
+import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.jms.support.destination.DestinationResolver;
 
 /**
  * JMSConduit is instantiated by the JMSTransportFactory which is selected by a client if the transport
@@ -66,7 +65,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     
     private JMSConfiguration jmsConfig;
     private Map<String, Exchange> correlationMap = new ConcurrentHashMap<String, Exchange>();
-    private DefaultMessageListenerContainer jmsListener;
+    private JMSListenerContainer jmsListener;
     private String conduitId;
     private AtomicLong messageCount;
     private JMSBusLifeCycleListener listener;
@@ -134,10 +133,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         ResourceCloser closer = new ResourceCloser();
         try {
             Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
-            DestinationResolver resolver = jmsConfig.getDestinationResolver();
-            Destination targetDest = resolver.resolveDestinationName(session, 
-                                                                     jmsConfig.getTargetDestination(), 
-                                                                     jmsConfig.isPubSubDomain());
+            Destination targetDest = jmsConfig.getTargetDestination(session);
             
             Destination replyToDestination = null;
             if (!exchange.isOneWay()) {

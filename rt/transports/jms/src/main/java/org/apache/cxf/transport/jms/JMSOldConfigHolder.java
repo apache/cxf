@@ -39,6 +39,7 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
+import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.apache.cxf.transport.jms.wsdl.DeliveryModeType;
 import org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType;
 import org.apache.cxf.transport.jms.wsdl.JndiContextParameterType;
@@ -49,7 +50,6 @@ import org.apache.cxf.transport.jms.wsdl.ReplyToNameType;
 import org.apache.cxf.transport.jms.wsdl.TimeToLiveType;
 import org.apache.cxf.transport.jms.wsdl.TopicReplyToNameType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
 public class JMSOldConfigHolder {
@@ -276,7 +276,7 @@ public class JMSOldConfigHolder {
             boolean useJndi = endpoint.getJmsVariant().contains(JMSURIConstants.JNDI);
             if (useJndi) {
                 // Setup Destination jndi destination resolver
-                final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();
+                final JMSDestinationResolver jndiDestinationResolver = new JMSDestinationResolver();
                 jndiDestinationResolver.setJndiTemplate(jt);
                 jmsConfig.setDestinationResolver(jndiDestinationResolver);
                 jmsConfig.setTargetDestination(endpoint.getDestinationName());
