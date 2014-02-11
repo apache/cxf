@@ -70,8 +70,11 @@ public class MessageListenerContainer implements JMSListenerContainer {
 
     @Override
     public void stop() {
+        running = false;
         ResourceCloser.close(consumer);
         ResourceCloser.close(session);
+        consumer = null;
+        session = null;
     }
 
     @Override

@@ -32,9 +32,9 @@ import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 public class ThrottlingCounter implements Counter {
 
     private AtomicInteger counter;
-    private int lowWatermark;
-    private int highWatermark;
-    private JMSListenerContainer listenerContainer;
+    private final int lowWatermark;
+    private final int highWatermark;
+    private final JMSListenerContainer listenerContainer;
     
     public ThrottlingCounter(JMSListenerContainer listenerContainer, int lowWatermark, int highWatermark) {
         this.counter = new AtomicInteger();
@@ -45,7 +45,7 @@ public class ThrottlingCounter implements Counter {
     
     public final int incrementAndGet() {
         int curCounter = counter.incrementAndGet();
-        if (curCounter >= highWatermark && listenerContainer.isRunning()) {
+        if (highWatermark >= 0 && curCounter >= highWatermark && listenerContainer.isRunning()) {
             listenerContainer.stop();
         }
         return curCounter;
