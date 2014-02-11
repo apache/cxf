@@ -31,7 +31,6 @@
         serviceName="s:DoubleItService" endpointName="s:DoubleItSignedMTOMPort" 
         implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">
-        <!--
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
@@ -55,7 +54,6 @@
                 </constructor-arg>
             </bean>
         </jaxws:inInterceptors>
-        -->
         <jaxws:properties>
             <entry key="mtom-enabled" value="true"/>
         </jaxws:properties>
