@@ -132,16 +132,18 @@ public final class OAuthUtils {
         String enc = oAuthMessage.getBodyEncoding();
         enc = enc == null ? "UTF-8" : enc;
         
-        if (params.isEmpty() 
-            && MediaType.APPLICATION_FORM_URLENCODED.equals(oAuthMessage.getBodyType())) {
-            InputStream stream = mc != null 
-                ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
-            String body = FormUtils.readBody(stream, enc);
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-            FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true, 
-                                            request);
-            for (String key : map.keySet()) {
-                oAuthMessage.addParameter(key, map.getFirst(key));
+        if (params.isEmpty())  {
+            MediaType bodyMediaType = MediaType.valueOf(oAuthMessage.getBodyType());
+            if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(bodyMediaType)) {
+                InputStream stream = mc != null 
+                    ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
+                String body = FormUtils.readBody(stream, enc);
+                MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+                FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true, 
+                                                request);
+                for (String key : map.keySet()) {
+                    oAuthMessage.addParameter(key, map.getFirst(key));
+                }
             }
         } else {
             // This path will most likely work only for the AuthorizationRequestService
