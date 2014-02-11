@@ -34,21 +34,52 @@ import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheck;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.message.MessageUtils;
 
 public abstract class AbstractSearchConditionParser<T> implements SearchConditionParser<T> {
     
     
     protected final Map<String, String> contextProperties;
     protected final Class<T> conditionClass;
+    protected Beanspector<T> beanspector;       
+    protected Map<String, String> beanPropertiesMap;
+    
     
     protected AbstractSearchConditionParser(Class<T> tclass) {
-        this(tclass, Collections.<String, String>emptyMap());
+        this(tclass, Collections.<String, String>emptyMap(), null);
     }
     
-    protected AbstractSearchConditionParser(Class<T> tclass, Map<String, String> contextProperties) {
+    protected AbstractSearchConditionParser(Class<T> tclass, 
+                                            Map<String, String> contextProperties,
+                                            Map<String, String> beanProperties) {
         this.conditionClass = tclass;
         this.contextProperties = contextProperties == null 
             ? Collections.<String, String>emptyMap() : contextProperties;
+        beanspector = SearchBean.class.isAssignableFrom(tclass) ? null : new Beanspector<T>(tclass);
+        this.beanPropertiesMap = beanProperties;
+    }
+    
+    protected String getActualSetterName(String setter) {
+        String beanPropertyName = beanPropertiesMap == null ? null : beanPropertiesMap.get(setter);
+        return beanPropertyName != null ? beanPropertyName : setter;
+    }
+    
+    protected TypeInfo getTypeInfo(String setter, String value) 
+        throws SearchParseException, PropertyNotFoundException {
+        
+        String name = getSetter(setter);
+        
+        TypeInfo typeInfo = null;
+        try {
+            typeInfo = beanspector != null ? beanspector.getAccessorTypeInfo(name) 
+                    : new TypeInfo(String.class, String.class);
+        } catch (Exception e) {
+            // continue
+        }
+        if (typeInfo == null && !MessageUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
+            throw new PropertyNotFoundException(name, value);
+        }
+        return typeInfo;
     }
     
     protected String getSetter(String setter) {

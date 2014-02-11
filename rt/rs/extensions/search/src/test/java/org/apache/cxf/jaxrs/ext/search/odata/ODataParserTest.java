@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search.odata;
 
+import java.util.Collections;
+
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 
@@ -73,12 +75,20 @@ public class ODataParserTest extends Assert {
 
     @Before
     public void setUp() {
-        parser = new ODataParser<Person>(Person.class);
+        parser = new ODataParser<Person>(Person.class, Collections.<String, String>emptyMap(), 
+            Collections.singletonMap("thename", "FirstName"));
     }
 
     @Test
     public void testFilterByFirstNameEqualsValue() throws SearchParseException {
         SearchCondition< Person > filter = parser.parse("FirstName eq 'Tom'");
+        assertTrue(filter.isMet(new Person("Tom", "Bombadil")));
+        assertFalse(filter.isMet(new Person("Peter", "Bombadil")));
+    }
+    
+    @Test
+    public void testFilterByFirstNameEqualsValueNonMatchingProperty() throws SearchParseException {
+        SearchCondition< Person > filter = parser.parse("thename eq 'Tom'");
         assertTrue(filter.isMet(new Person("Tom", "Bombadil")));
         assertFalse(filter.isMet(new Person("Peter", "Bombadil")));
     }

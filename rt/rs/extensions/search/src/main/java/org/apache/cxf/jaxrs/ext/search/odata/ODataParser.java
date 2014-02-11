@@ -19,11 +19,12 @@
 package org.apache.cxf.jaxrs.ext.search.odata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
-import org.apache.cxf.jaxrs.ext.search.Beanspector;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
@@ -81,11 +82,9 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
     
     private class FilterExpressionVisitor implements ExpressionVisitor {
         private final T condition;
-        private final Beanspector< T > beanspector;
         
         FilterExpressionVisitor(final T condition) {
             this.condition = condition;
-            this.beanspector = new Beanspector<T>(condition);
         }
 
         @Override
@@ -188,12 +187,9 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
         
         @Override
         public Object visitProperty(PropertyExpression propertyExpression, String uriLiteral, EdmTyped edmProperty) {
-            try {
-                final TypeInfo typeInfo = beanspector.getAccessorTypeInfo(uriLiteral);
-                return new TypedProperty(typeInfo, uriLiteral);
-            } catch (Exception ex) {
-                throw new SearchParseException("Failed to get type information from property path: " + uriLiteral, ex);
-            }
+            String setter = getActualSetterName(uriLiteral);
+            final TypeInfo typeInfo = ODataParser.this.getTypeInfo(setter, null);
+            return new TypedProperty(typeInfo, setter);
         }
 
         @Override
@@ -229,14 +225,41 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
     }
     
     /**
-     * Creates OData 2.0 parser.
+     * Creates OData parser.
      * 
      * @param conditionClass - class of T used to create condition objects. Class T must have
      *            accessible no-arguments constructor and complementary setters to these used in 
-     *            OData 2.0 $filter expressions.
+     *            OData $filter expressions.
      */
     public ODataParser(final Class< T > conditionClass) {    
-        super(conditionClass);
+        this(conditionClass, Collections.<String, String>emptyMap());
+    }
+    
+    /**
+     * Creates OData parser.
+     * 
+     * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
+     *            accessible no-arg constructor and complementary setters to these used in 
+     *            OData $filter expressions.
+     * @param contextProperties            
+     */
+    public ODataParser(Class<T> tclass, Map<String, String> contextProperties) {
+        this(tclass, contextProperties, null);
+    }
+    
+    /**
+     * Creates OData parser.
+     * 
+     * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
+     *            accessible no-arg constructor and complementary setters to these used in
+     *            OData $filter expressions.
+     * @param contextProperties            
+     */
+    public ODataParser(Class<T> tclass, 
+                      Map<String, String> contextProperties,
+                      Map<String, String> beanProperties) {
+        super(tclass, contextProperties, beanProperties);
+        
         this.parser = new FilterParserImpl(null);
     }
     

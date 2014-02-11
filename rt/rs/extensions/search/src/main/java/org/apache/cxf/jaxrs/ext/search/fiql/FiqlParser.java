@@ -27,15 +27,12 @@ import java.util.regex.Pattern;
 
 import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
-import org.apache.cxf.jaxrs.ext.search.Beanspector;
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
-import org.apache.cxf.jaxrs.ext.search.PropertyNotFoundException;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
-import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.SimpleSearchCondition;
 import org.apache.cxf.message.MessageUtils;
 
@@ -99,9 +96,6 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         COMPARATORS_PATTERN_SINGLE_EQUALS = Pattern.compile(s2);
     }
 
-    private Beanspector<T> beanspector;       
-    private Map<String, String> beanPropertiesMap;
-    
     private Map<String, ConditionType> operatorsMap = OPERATORS_MAP;
     private Pattern comparatorsPattern = COMPARATORS_PATTERN;
     /**
@@ -135,12 +129,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     public FiqlParser(Class<T> tclass, 
                       Map<String, String> contextProperties,
                       Map<String, String> beanProperties) {
-        super(tclass, contextProperties);
+        super(tclass, contextProperties, beanProperties);
         
-        beanspector = SearchBean.class.isAssignableFrom(tclass) 
-            ? null : new Beanspector<T>(tclass);
-        
-        this.beanPropertiesMap = beanProperties;
         if (MessageUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
             operatorsMap = new HashMap<String, ConditionType>(operatorsMap);
             operatorsMap.put("=", ConditionType.EQUALS);
@@ -172,7 +162,6 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
      */
     public SearchCondition<T> parse(String fiqlExpression) throws SearchParseException {
         ASTNode<T> ast = parseAndsOrsBrackets(fiqlExpression);
-        // System.out.println(ast);
         return ast.build();
     }
 
@@ -267,18 +256,13 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             }
             
             String name = unwrapSetter(propertyName);
-            String beanPropertyName = beanPropertiesMap == null ? null : beanPropertiesMap.get(name);
-            if (beanPropertyName != null) {
-                name = beanPropertyName;
-            }
-            
+        
+            name = getActualSetterName(name);
             TypeInfoObject castedValue = parseType(propertyName, name, value);
             if (castedValue != null) {
                 return new Comparison(name, operator, castedValue);
-            } else if (MessageUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
-                return null;
             } else {
-                throw new PropertyNotFoundException(name, value);
+                return null;
             }
         } else {
             throw new SearchParseException("Not a comparison expression: " + expr);
@@ -287,18 +271,9 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
 
     
     private TypeInfoObject parseType(String originalName, String setter, String value) throws SearchParseException {
-        String name = getSetter(setter);
-        
-        try {
-            TypeInfo typeInfo = 
-                beanspector != null ? beanspector.getAccessorTypeInfo(name) 
-                    : new TypeInfo(String.class, String.class);
-            Object object = parseType(originalName, null, null, setter, typeInfo, value);
-            return new TypeInfoObject(object, typeInfo);
-        } catch (Exception e) {
-            return null;
-        }
-        
+        TypeInfo typeInfo = getTypeInfo(setter, value);
+        Object object = parseType(originalName, null, null, setter, typeInfo, value);
+        return new TypeInfoObject(object, typeInfo);
     }
     
     protected boolean isCount(String propName) {
