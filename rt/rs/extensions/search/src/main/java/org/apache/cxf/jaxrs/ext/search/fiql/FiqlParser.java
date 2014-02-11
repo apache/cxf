@@ -64,6 +64,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         
     
     public static final String SUPPORT_SINGLE_EQUALS = "fiql.support.single.equals.operator";       
+    public static final String EXTENSION_COUNT = "count";
+    protected static final String EXTENSION_COUNT_OPEN = EXTENSION_COUNT + "(";
     
     private static final Map<String, ConditionType> OPERATORS_MAP;
     private static final Pattern COMPARATORS_PATTERN;
@@ -299,7 +301,9 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         
     }
     
-    
+    protected boolean isCount(String propName) {
+        return propName.startsWith(EXTENSION_COUNT_OPEN);
+    }
     
     
     private String unwrapSetter(String setter) {

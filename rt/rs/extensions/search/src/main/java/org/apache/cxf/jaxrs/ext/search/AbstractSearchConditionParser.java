@@ -36,8 +36,7 @@ import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public abstract class AbstractSearchConditionParser<T> implements SearchConditionParser<T> {
-    public static final String EXTENSION_COUNT = "count";
-    protected static final String EXTENSION_COUNT_OPEN = EXTENSION_COUNT + "(";
+    
     
     protected final Map<String, String> contextProperties;
     protected final Class<T> conditionClass;
@@ -185,7 +184,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     private CollectionCheck getCollectionCheck(String propName, boolean isCollection, Class<?> actualCls) {
         if (isCollection) {
             if (InjectionUtils.isPrimitive(actualCls)) {
-                if (propName.startsWith(EXTENSION_COUNT_OPEN)) {
+                if (isCount(propName)) {
                     return CollectionCheck.SIZE;
                 }
             } else {
@@ -193,6 +192,10 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             }
         }
         return null;
+    }
+    
+    protected boolean isCount(String propName) {
+        return false;
     }
     
     private Object getCollectionSingleton(Class<?> collectionCls, Object value) {
