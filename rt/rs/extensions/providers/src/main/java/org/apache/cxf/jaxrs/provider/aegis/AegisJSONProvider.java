@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -45,6 +44,7 @@ import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.jaxrs.provider.json.utils.JSONUtils;
 import org.apache.cxf.jaxrs.provider.json.utils.PrefixCollectingXMLStreamWriter;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
@@ -121,7 +121,7 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
             xmlStreamWriter.flush();
             xmlStreamWriter.close();
         } catch (Exception e) {
-            throw new InternalServerErrorException(e);
+            throw ExceptionUtils.toInternalServerErrorException(e, null);
         }
     }
 

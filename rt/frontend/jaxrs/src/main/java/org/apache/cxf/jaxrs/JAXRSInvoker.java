@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Application;
@@ -59,6 +57,7 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -100,7 +99,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             Object serviceObject = getActualServiceObject(exchange, rootInstance);
             
             return invoke(exchange, request, serviceObject);
-        } catch (InternalServerErrorException ex) {
+        } catch (WebApplicationException ex) {
             responseList = checkExchangeForResponse(exchange);
             if (responseList != null) {
                 return responseList; 
@@ -242,7 +241,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                                BUNDLE,
                                                                subResourcePath);
                     LOG.severe(errorM.toString());
-                    throw new NotFoundException();
+                    throw ExceptionUtils.toNotFoundException(null, null);
                 }
 
                 OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri,
@@ -327,7 +326,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 criRoot.clearThreadLocalProxies();
             }
             inMessage.getExchange().put(Message.PROPOGATE_EXCEPTION, 
-                                        JAXRSUtils.propogateException(inMessage));
+                                        ExceptionUtils.propogateException(inMessage));
             throw ex;
         }
         return new MessageContentsList(excResponse);
@@ -405,7 +404,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                        BUNDLE,
                                                        subResourcePath);
             LOG.info(errorM.toString());
-            throw new NotFoundException();
+            throw ExceptionUtils.toNotFoundException(null, null);
         }
 
         return result;

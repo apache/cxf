@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
 import javax.annotation.PreDestroy;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -53,6 +52,7 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
@@ -198,20 +198,20 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     private RequestState processRelayState(String relayState) {
         if (relayState == null) {
             reportError("MISSING_RELAY_STATE");
-            throw new BadRequestException();
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
         if (relayState.getBytes().length < 0 || relayState.getBytes().length > 80) {
             reportError("INVALID_RELAY_STATE");
-            throw new BadRequestException();
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
         RequestState requestState = getStateProvider().removeRequestState(relayState);
         if (requestState == null) {
             reportError("MISSING_REQUEST_STATE");
-            throw new WebApplicationException(400);
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
         if (isStateExpired(requestState.getCreatedAt(), 0)) {
             reportError("EXPIRED_REQUEST_STATE");
-            throw new BadRequestException();
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
         return requestState;
     }
@@ -222,7 +222,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     ) {
         if (StringUtils.isEmpty(samlResponse)) {
             reportError("MISSING_SAML_RESPONSE");
-            throw new BadRequestException();
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
         
         String samlResponseDecoded = samlResponse;
@@ -232,7 +232,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             try {
                 samlResponseDecoded = URLDecoder.decode(samlResponse, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                throw new BadRequestException();
+                throw ExceptionUtils.toBadRequestException(null, null);
             }
         }
         */
@@ -244,15 +244,15 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
                     ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
                     : new ByteArrayInputStream(deflatedToken); 
             } catch (Base64Exception ex) {
-                throw new BadRequestException(ex);
+                throw ExceptionUtils.toBadRequestException(ex, null);
             } catch (DataFormatException ex) {
-                throw new BadRequestException(ex);
+                throw ExceptionUtils.toBadRequestException(ex, null);
             }
         } else {
             try {
                 tokenStream = new ByteArrayInputStream(samlResponseDecoded.getBytes("UTF-8"));
             } catch (UnsupportedEncodingException ex) {
-                throw new BadRequestException(ex);
+                throw ExceptionUtils.toBadRequestException(ex, null);
             }
         }
         
@@ -269,10 +269,10 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         try {
             responseObject = OpenSAMLUtil.fromDom(responseDoc.getDocumentElement());
         } catch (WSSecurityException ex) {
-            throw new BadRequestException(ex);
+            throw ExceptionUtils.toBadRequestException(ex, null);
         }
         if (!(responseObject instanceof org.opensaml.saml2.core.Response)) {
-            throw new BadRequestException();
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
         return (org.opensaml.saml2.core.Response)responseObject;
     }
@@ -289,7 +289,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         } catch (WSSecurityException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             reportError("INVALID_SAML_RESPONSE");
-            throw new BadRequestException();
+            throw ExceptionUtils.toBadRequestException(null, null);
         }
     }
     
@@ -319,7 +319,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);
         } catch (WSSecurityException ex) {
             reportError("INVALID_SAML_RESPONSE");
-            throw new BadRequestException(ex);
+            throw ExceptionUtils.toBadRequestException(ex, null);
         }
     }
     
@@ -333,7 +333,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         } else {
             reportError("MISSING_TARGET_URI");
         }
-        throw new BadRequestException();
+        throw ExceptionUtils.toBadRequestException(null, null);
     }
     
     private void reportError(String code) {

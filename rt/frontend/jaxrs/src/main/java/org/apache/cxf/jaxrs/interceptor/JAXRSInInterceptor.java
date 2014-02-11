@@ -28,9 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotAcceptableException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -54,6 +51,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -160,7 +158,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         try {
             acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
         } catch (IllegalArgumentException ex) {
-            throw new NotAcceptableException();
+            throw ExceptionUtils.toNotAcceptableException(null, null);
         }
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
@@ -183,7 +181,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             LOG.warning(errorMsg.toString());
             Response resp = JAXRSUtils.createResponse(null, message, errorMsg.toString(), 
                     Response.Status.NOT_FOUND.getStatusCode(), false);
-            throw new NotFoundException(resp);
+            throw ExceptionUtils.toNotFoundException(null, resp);
         }
 
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
@@ -264,8 +262,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (excResponse == null) {
             ProviderFactory.getInstance(message).clearThreadLocalProxies();
             message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
-                                      JAXRSUtils.propogateException(message));
-            throw ex instanceof RuntimeException ? (RuntimeException)ex : new InternalServerErrorException(ex);
+                                      ExceptionUtils.propogateException(message));
+            throw ex instanceof RuntimeException ? (RuntimeException)ex 
+                : ExceptionUtils.toInternalServerErrorException(ex, null);
         }
         message.getExchange().put(Response.class, excResponse);
     }

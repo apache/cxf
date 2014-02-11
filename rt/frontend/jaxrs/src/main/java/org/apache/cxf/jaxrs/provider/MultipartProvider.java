@@ -39,9 +39,7 @@ import java.util.logging.Logger;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.internet.MimeUtility;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -66,6 +64,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
@@ -187,7 +186,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             return defaultValue;
         }
         
-        throw new BadRequestException();
+        throw ExceptionUtils.toBadRequestException(null, null);
         
     }
     
@@ -405,7 +404,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                                    BUNDLE,
                                                    cls);
             LOG.severe(message.toString());
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         
         return new MessageBodyWriterDataHandler<T>(r, obj, cls, genericType, anns, mt);
@@ -470,7 +469,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 writer.writeTo(obj, cls, genericType, anns, contentType, 
                                new MetadataMap<String, Object>(), os);
             } catch (IOException ex) {
-                throw new InternalServerErrorException(ex);
+                throw ExceptionUtils.toInternalServerErrorException(ex, null); 
             }
         }
         

@@ -47,8 +47,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -104,6 +102,7 @@ import org.apache.cxf.jaxrs.model.ResourceTypes;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -287,7 +286,7 @@ public class WadlGenerator implements RequestHandler {
         try {
             return StaxUtils.read(new StringReader(entity));
         } catch (Exception ex) {
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 
@@ -911,7 +910,7 @@ public class WadlGenerator implements RequestHandler {
 
                     }
                 } catch (Exception ex) {
-                    throw new InternalServerErrorException(ex);
+                    throw ExceptionUtils.toInternalServerErrorException(ex, null);
                 }
             }
         }
@@ -955,7 +954,7 @@ public class WadlGenerator implements RequestHandler {
                         .build();
                 }
             } catch (Exception ex) {
-                throw new BadRequestException();
+                throw ExceptionUtils.toBadRequestException(ex, null);
             }
 
         }

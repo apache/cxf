@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -37,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -188,7 +188,7 @@ public class AccessTokenService extends AbstractOAuthService {
         }
         
         if (client == null) {
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
         }
         return client;
     }
@@ -205,7 +205,7 @@ public class AccessTokenService extends AbstractOAuthService {
         if (clientSecret == null || client.getClientSecret() == null 
             || !client.getClientId().equals(clientId) 
             || !client.getClientSecret().equals(clientSecret)) {
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
         }
         return client;
     }
@@ -300,7 +300,8 @@ public class AccessTokenService extends AbstractOAuthService {
     
     protected void reportInvalidClient(OAuthError error) {
         ResponseBuilder rb = Response.status(401);
-        throw new NotAuthorizedException(rb.type(MediaType.APPLICATION_JSON_TYPE).entity(error).build());
+        throw ExceptionUtils.toNotAuthorizedException(null, 
+            rb.type(MediaType.APPLICATION_JSON_TYPE).entity(error).build());
     }
     
     public void setCanSupportPublicClients(boolean support) {

@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -29,6 +28,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
@@ -102,7 +102,7 @@ public abstract class AbstractOAuthService {
         if (!mc.getSecurityContext().isSecure()) {
             LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
             if (blockUnsecureRequests) {
-                throw new BadRequestException();    
+                throw ExceptionUtils.toBadRequestException(null, null);    
             }
         }
     }
@@ -126,7 +126,7 @@ public abstract class AbstractOAuthService {
         if (mt != null) {
             rb.type(mt);
         }
-        throw new BadRequestException(rb.entity(entity).build());
+        throw ExceptionUtils.toBadRequestException(null, rb.entity(entity).build());
     }
 
     /**

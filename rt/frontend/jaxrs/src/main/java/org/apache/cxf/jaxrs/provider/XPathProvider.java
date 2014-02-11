@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -35,6 +34,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 @Provider
 @Consumes({"text/xml", "application/xml", "application/*+xml" })
@@ -89,7 +89,7 @@ public class XPathProvider<T> implements MessageBodyReader<T> {
             : classExpressions.get(cls.getName());
         if (expression == null) {
             // must not happen if isReadable() returned true
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         XMLSource source = new XMLSource(is);
         if (forceDOM) {

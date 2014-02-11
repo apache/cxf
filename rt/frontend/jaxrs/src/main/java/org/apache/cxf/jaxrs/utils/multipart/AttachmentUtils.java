@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -41,6 +39,7 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -141,8 +140,8 @@ public final class AttachmentUtils {
                                                            id.value(),
                                                            mt.toString());
                 LOG.warning(errorMsg.toString());
-                throw new BadRequestException(
-                          new MultipartReadException(id.value(), id.type(), errorMsg.toString()));
+                throw ExceptionUtils.toBadRequestException(
+                          new MultipartReadException(id.value(), id.type(), errorMsg.toString()), null);
             } else {
                 return null;
             }
@@ -230,7 +229,7 @@ public final class AttachmentUtils {
     
     private static void checkMediaTypes(MediaType mt1, String mt2) {
         if (!mt1.isCompatible(JAXRSUtils.toMediaType(mt2))) {                                            
-            throw new NotSupportedException();
+            throw ExceptionUtils.toNotSupportedException(null, null);
         }
     }
 }

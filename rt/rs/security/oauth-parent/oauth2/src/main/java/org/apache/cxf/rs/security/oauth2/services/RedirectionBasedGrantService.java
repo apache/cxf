@@ -25,10 +25,8 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -36,6 +34,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -219,7 +218,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Make sure the session is valid
         if (!compareRequestAndSessionTokens(params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN))) {
-            throw new BadRequestException();     
+            throw ExceptionUtils.toBadRequestException(null, null);     
         }
         //TODO: additionally we can check that the Principal that got authenticated
         // in startAuthorization is the same that got authenticated in completeAuthorization
@@ -304,7 +303,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext securityContext =  
             (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
         if (securityContext == null || securityContext.getUserPrincipal() == null) {
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
         }
         checkTransportSecurity();
         return securityContext;

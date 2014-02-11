@@ -26,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -39,6 +38,7 @@ import org.apache.abdera.parser.Parser;
 import org.apache.abdera.parser.ParserOptions;
 import org.apache.abdera.writer.Writer;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 public abstract class AbstractAtomProvider<T extends Element> 
     implements MessageBodyWriter<T>, MessageBodyReader<T> {
@@ -58,7 +58,7 @@ public abstract class AbstractAtomProvider<T extends Element>
         if (MediaType.APPLICATION_JSON_TYPE.isCompatible(mt)) {
             Writer w = createWriter("json");
             if (w == null) {
-                throw new NotSupportedException();
+                throw ExceptionUtils.toNotSupportedException(null, null);
             }
             element.writeTo(w, os);   
         } else if (formattedOutput) {

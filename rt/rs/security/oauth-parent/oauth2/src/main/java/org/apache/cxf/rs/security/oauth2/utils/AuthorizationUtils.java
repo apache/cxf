@@ -23,13 +23,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 /**
  * Authorization helpers
@@ -43,13 +43,13 @@ public final class AuthorizationUtils {
         try {
             authDecoded = new String(Base64Utility.decode(data));
         } catch (Exception ex) {
-            throw new NotAuthorizedException(ex);
+            throw ExceptionUtils.toNotAuthorizedException(ex, null);
         }
         String authInfo[] = authDecoded.split(":");
         if (authInfo.length == 2) {
             return authInfo;
         }
-        throw new NotAuthorizedException(Response.status(401).build());
+        throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
     }
     
     public static String[] getAuthorizationParts(MessageContext mc) {
@@ -93,7 +93,7 @@ public final class AuthorizationUtils {
             rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
         }
         Response r = rb.build();
-        throw new NotAuthorizedException(r);
+        throw ExceptionUtils.toNotAuthorizedException(null, r);
     }
 
 }

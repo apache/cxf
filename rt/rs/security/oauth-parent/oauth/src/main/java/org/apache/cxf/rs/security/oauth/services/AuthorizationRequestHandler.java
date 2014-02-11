@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -47,6 +46,7 @@ import net.oauth.OAuthProblemException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth.data.AuthorizationInput;
 import org.apache.cxf.rs.security.oauth.data.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
@@ -88,7 +88,7 @@ public class AuthorizationRequestHandler {
                 if (decision != null) {
                     // this is a user decision request, the session has expired or been possibly hijacked
                     LOG.warning("Session authenticity token is missing or invalid");
-                    throw new BadRequestException();
+                    throw ExceptionUtils.toBadRequestException(null, null);
                 }
                 // assume it is an initial authorization request
                 addAuthenticityTokenToSession(secData, request);

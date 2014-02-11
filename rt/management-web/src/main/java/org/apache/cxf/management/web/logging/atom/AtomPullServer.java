@@ -31,7 +31,6 @@ import java.util.WeakHashMap;
 import java.util.logging.Handler;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -48,6 +47,7 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.LogRecord;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
@@ -228,7 +228,7 @@ public class AtomPullServer extends AbstractAtomBean {
             list.add(records.get(index));
         }
         if (list.size() != 1) { 
-            throw new NotFoundException();
+            throw ExceptionUtils.toNotFoundException(null, null);
         }
         return list;
     }

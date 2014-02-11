@@ -24,9 +24,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -39,6 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
@@ -73,7 +72,7 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
             Object o = dataReader.read(null, reader, clazz);
             return o == null ? null : clazz.cast(o);
         } catch (Exception ex) {
-            throw new BadRequestException(ex);
+            throw ExceptionUtils.toBadRequestException(ex, null);
         } finally {
             StaxUtils.close(reader);
         }
@@ -103,7 +102,7 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
             writer = createWriter(clazz, genericType, os);
             writeToWriter(writer, o);
         } catch (Exception ex) {
-            throw new InternalServerErrorException(ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         } finally {
             StaxUtils.close(writer);
         }

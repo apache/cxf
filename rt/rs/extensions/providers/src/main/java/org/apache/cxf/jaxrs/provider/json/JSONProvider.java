@@ -39,9 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -68,6 +66,7 @@ import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.provider.AbstractJAXBProvider;
 import org.apache.cxf.jaxrs.provider.json.utils.JSONUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
@@ -259,7 +258,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new BadRequestException(e);
+            throw ExceptionUtils.toBadRequestException(e, null);
         } finally {
             StaxUtils.close(reader);
         }
@@ -335,7 +334,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         if (name == null) {
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         
         return "{\"" + name + "\":";
@@ -386,7 +385,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (XMLStreamException e) {
             handleXMLStreamException(e, false);
         } catch (Exception e) {
-            throw new InternalServerErrorException(e);
+            throw ExceptionUtils.toInternalServerErrorException(e, null);
         } finally {
             StaxUtils.close(writer);
         }

@@ -24,11 +24,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -95,7 +95,7 @@ public abstract class AbstractAccessTokenValidator {
     protected AccessTokenValidation getAccessTokenValidation() {
         AccessTokenValidation accessTokenV = null;
         if (dataProvider == null && tokenHandlers.isEmpty()) {
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         
         // Get the scheme and its data, Bearer only is supported by default

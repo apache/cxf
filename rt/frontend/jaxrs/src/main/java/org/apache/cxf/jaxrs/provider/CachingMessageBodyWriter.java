@@ -26,12 +26,13 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 @Provider
 public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<T>
@@ -87,7 +88,7 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
             org.apache.cxf.common.i18n.Message message = 
                 new org.apache.cxf.common.i18n.Message("NO_MSG_WRITER", BUNDLE, type);
             LOG.severe(message.toString());
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         return w;
     }

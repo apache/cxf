@@ -25,7 +25,6 @@ import java.security.Signature;
 import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -34,6 +33,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.ws.security.WSPasswordCallback;
@@ -75,7 +75,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                                .build();
             } catch (Exception ex) {
                 ex.printStackTrace();
-                throw new InternalServerErrorException(ex);
+                throw ExceptionUtils.toInternalServerErrorException(ex, null);
             }
         }
     }
@@ -104,17 +104,17 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         Crypto crypto = getSignatureCrypto();
         if (crypto == null) {
             LOG.fine("No crypto instance of properties file configured for signature");
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         String signatureUser = getSignatureUsername();
         if (signatureUser == null) {
             LOG.fine("No user configured for signature");
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         CallbackHandler callbackHandler = getCallbackHandler();
         if (callbackHandler == null) {
             LOG.fine("No CallbackHandler configured to supply a password for signature");
-            throw new InternalServerErrorException();
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
