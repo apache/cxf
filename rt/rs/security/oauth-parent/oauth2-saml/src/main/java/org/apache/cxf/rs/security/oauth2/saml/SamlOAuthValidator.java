@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth2.saml;
 
 import java.util.List;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -72,11 +71,11 @@ public class SamlOAuthValidator {
             String expectedIssuer = OAuthConstants.CLIENT_ID.equals(issuer) 
                 ? wrapper.getSaml2().getSubject().getNameID().getValue() : issuer;
             if (actualIssuer == null || !actualIssuer.equals(expectedIssuer)) {
-                throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+                throw ExceptionUtils.toNotAuthorizedException(null, null);
             }
         }
         if (!validateAuthenticationSubject(message, cs, wrapper.getSaml2().getSubject())) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
     
@@ -97,7 +96,7 @@ public class SamlOAuthValidator {
                 }
             }
         }
-        throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+        throw ExceptionUtils.toNotAuthorizedException(null, null);
     }
     
     private String getAbsoluteTargetAddress(Message m) {
@@ -142,19 +141,19 @@ public class SamlOAuthValidator {
                 && cs.getNotOnOrAfter() != null && !cs.getNotOnOrAfter().isBeforeNow()) {
                 return;
             }
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
           
         // Recipient must match assertion consumer URL
         String recipient = subjectConfData.getRecipient();
         if (recipient == null || !recipient.equals(getAbsoluteTargetAddress(m))) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
           
         // We must have a NotOnOrAfter timestamp
         if (subjectConfData.getNotOnOrAfter() == null
             || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
           
         //TODO: replay cache, same as with SAML SSO case
@@ -162,13 +161,10 @@ public class SamlOAuthValidator {
         // Check address
         if (subjectConfData.getAddress() != null
             && (clientAddress == null || !subjectConfData.getAddress().equals(clientAddress))) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
           
           
     }
     
-    private static Response errorResponse() {
-        return Response.status(401).build();
-    }
 }

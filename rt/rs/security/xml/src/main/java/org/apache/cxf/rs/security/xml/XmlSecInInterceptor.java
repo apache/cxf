@@ -41,6 +41,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -293,7 +294,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
-        Response response = Response.status(400).entity(error).build();
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 

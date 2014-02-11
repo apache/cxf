@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -97,7 +98,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (clientSecret == null || client.getClientSecret() == null 
             || !client.getClientId().equals(clientId) 
             || !client.getClientSecret().equals(clientSecret)) {
-            throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return client;
     }
@@ -117,7 +118,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     protected Response createErrorResponseFromBean(OAuthError errorBean) {
-        return Response.status(400).entity(errorBean).build();
+        return JAXRSUtils.toResponseBuilder(400).entity(errorBean).build();
     }
     
     /**
@@ -151,7 +152,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     protected void reportInvalidClient(OAuthError error) {
-        ResponseBuilder rb = Response.status(401);
+        ResponseBuilder rb = JAXRSUtils.toResponseBuilder(401);
         throw ExceptionUtils.toNotAuthorizedException(null, 
             rb.type(MediaType.APPLICATION_JSON_TYPE).entity(error).build());
     }

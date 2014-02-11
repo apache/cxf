@@ -168,7 +168,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
     }
     
     private static Response getFaultResponse() {
-        return Response.status(401).header(HttpHeaders.WWW_AUTHENTICATE, NEGOTIATE_SCHEME).build();
+        return JAXRSUtils.toResponseBuilder(401).header(HttpHeaders.WWW_AUTHENTICATE, NEGOTIATE_SCHEME).build();
     }
     
     protected String getCompleteServicePrincipalName() {

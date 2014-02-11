@@ -37,7 +37,7 @@ import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-public final class SpecExceptions {
+final class SpecExceptions {
     
     private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
     
@@ -92,6 +92,11 @@ public final class SpecExceptions {
     public static NotAuthorizedException toNotAuthorizedException(Throwable cause, Response response) {
         
         return new NotAuthorizedException(checkResponse(response, 401), cause);
+    }
+    
+    public static ForbiddenException toForbiddenException(Throwable cause, Response response) {
+        
+        return new ForbiddenException(checkResponse(response, 403), cause);
     }
     
     public static NotAcceptableException toNotAcceptableException(Throwable cause, Response response) {

@@ -25,7 +25,6 @@ import java.io.InputStream;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Element;
 
@@ -63,7 +62,7 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         String assertionType = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_TYPE);
         String decodedAssertionType = assertionType != null ? HttpUtils.urlDecode(assertionType) : null;
         if (decodedAssertionType == null || !Constants.CLIENT_AUTH_SAML2_BEARER.equals(decodedAssertionType)) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         String assertion = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_PARAM);
         
@@ -80,7 +79,7 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         try {
             FormUtils.restoreForm(provider, form, message);
         } catch (Exception ex) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
     
@@ -88,20 +87,20 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         try {
             return FormUtils.readForm(provider, message);
         } catch (Exception ex) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());    
+            throw ExceptionUtils.toNotAuthorizedException(null, null);    
         }
     }
     
     protected Element readToken(Message message, String assertion) {
         if (assertion == null) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         try {
             byte[] deflatedToken = Base64UrlUtility.decode(assertion);
             InputStream is = new ByteArrayInputStream(deflatedToken); 
             return readToken(message, is); 
         } catch (Base64Exception ex) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }         
     }
     
@@ -116,18 +115,15 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         // Introduce SAMLOAuth2Validator to be reused between auth and grant handlers
         Subject subject = SAMLUtils.getSubject(message, wrapper);
         if (subject.getName() == null) {
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());  
+            throw ExceptionUtils.toNotAuthorizedException(null, null);  
         }
         
         if (clientId != null && !clientId.equals(subject.getName())) {
             //TODO:  Attempt to map client_id to subject.getName()
-            throw ExceptionUtils.toNotAuthorizedException(null, errorResponse());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         samlOAuthValidator.validate(message, wrapper);
         message.put(OAuthConstants.CLIENT_ID, subject.getName());
     }
     
-    private static Response errorResponse() {
-        return Response.status(401).build();
-    }
 }

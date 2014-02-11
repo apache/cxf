@@ -128,6 +128,14 @@ public final class ExceptionUtils {
         }
     }
     
+    public static WebApplicationException toForbiddenException(Throwable cause, Response response) {
+        try {
+            return SpecExceptions.toForbiddenException(cause, response);
+        } catch (NoClassDefFoundError ex) { 
+            return toWebApplicationException(ex, response);
+        }
+    }
+    
     public static WebApplicationException toNotAcceptableException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toNotAcceptableException(cause, response);

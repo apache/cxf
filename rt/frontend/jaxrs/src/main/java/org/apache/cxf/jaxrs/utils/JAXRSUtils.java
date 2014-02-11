@@ -580,7 +580,7 @@ public final class JAXRSUtils {
 
     public static Response createResponse(List<ClassResourceInfo> cris, Message msg,
                                           String responseMessage, int status, boolean addAllow) {
-        ResponseBuilder rb = Response.status(status);
+        ResponseBuilder rb = toResponseBuilder(status);
         if (addAllow) {
             Set<String> allowedMethods = new HashSet<String>();
             for (ClassResourceInfo cri : cris) {

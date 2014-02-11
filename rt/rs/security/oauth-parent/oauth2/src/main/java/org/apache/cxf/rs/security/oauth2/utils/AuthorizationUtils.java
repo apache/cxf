@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 /**
  * Authorization helpers
@@ -49,7 +50,7 @@ public final class AuthorizationUtils {
         if (authInfo.length == 2) {
             return authInfo;
         }
-        throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
+        throw ExceptionUtils.toNotAuthorizedException(null, null);
     }
     
     public static String[] getAuthorizationParts(MessageContext mc) {
@@ -74,7 +75,7 @@ public final class AuthorizationUtils {
     }
     
     public static void throwAuthorizationFailure(Set<String> challenges, String realm) {
-        ResponseBuilder rb = Response.status(401);
+        ResponseBuilder rb = JAXRSUtils.toResponseBuilder(401);
         
         StringBuilder sb = new StringBuilder();
         for (String challenge : challenges) {

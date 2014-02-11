@@ -42,6 +42,7 @@ import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -314,7 +315,7 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
-        Response response = Response.status(400).entity(error).build();
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 
