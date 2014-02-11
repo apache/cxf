@@ -31,7 +31,7 @@ public interface ContinuationCallback {
     
     /**
      * This method is called when the exception gets propagated to the container  
-     * @param t the propagated exception instance
+     * @param error the propagated exception instance
      */
     void onError(Throwable error);
     
