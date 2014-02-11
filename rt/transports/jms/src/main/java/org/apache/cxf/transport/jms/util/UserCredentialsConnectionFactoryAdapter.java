@@ -18,34 +18,35 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import org.springframework.jms.listener.AbstractJmsListeningContainer;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 
-public class SpringJMSListenerAdapter implements JMSListenerContainer {
-    
-    private AbstractJmsListeningContainer container;
-    
-    public SpringJMSListenerAdapter(AbstractJmsListeningContainer container) {
-        this.container = container;
+public class UserCredentialsConnectionFactoryAdapter implements ConnectionFactory {
+    private String userName;
+    private String password;
+    private ConnectionFactory targetConnectionFactory;
+
+    public void setUsername(String userName2) {
+        this.userName = userName2;
+    }
+
+    public void setPassword(String password2) {
+        this.password = password2;
+    }
+
+    public void setTargetConnectionFactory(ConnectionFactory cf) {
+        this.targetConnectionFactory = cf;
     }
 
     @Override
-    public boolean isRunning() {
-        return container.isRunning();
+    public Connection createConnection() throws JMSException {
+        return createConnection(userName, password);
     }
 
     @Override
-    public void stop() {
-        container.stop();
-    }
-
-    @Override
-    public void start() {
-        container.start();
-    }
-
-    @Override
-    public void shutdown() {
-        container.shutdown();
+    public Connection createConnection(String userName2, String password2) throws JMSException {
+        return targetConnectionFactory.createConnection(userName2, password2);
     }
 
 }

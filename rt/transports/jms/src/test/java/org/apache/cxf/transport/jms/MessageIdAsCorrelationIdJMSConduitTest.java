@@ -43,22 +43,22 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
 
     @Test
     public void testSendReceiveWithTempReplyQueue() throws Exception {
-        sendAndReceive(null);
-    }
-
-    @Test
-    public void testSendReceive() throws Exception {
-        sendAndReceive("testreply");
+        sendAndReceive(true, null);
     }
     
-    public void sendAndReceive(String replyDestination) throws Exception {
+    @Test
+    public void testSendReceive() throws Exception {
+        sendAndReceive(true, "testreply");
+    }
+    
+    public void sendAndReceive(boolean synchronous, String replyDestination) throws Exception {
         BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
         EndpointReferenceType target = new EndpointReferenceType();
 
         connectionFactory = new PooledConnectionFactory(BROKER_URI);
-        TestReceiver receiver = new TestReceiver(connectionFactory, SERVICE_QUEUE);
+        TestReceiver receiver = new TestReceiver(connectionFactory, SERVICE_QUEUE, true);
         receiver.runAsync();
 
         JMSConfiguration jmsConfig = new JMSConfiguration();
@@ -68,9 +68,15 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
 
         JMSConduit conduit = new JMSConduit(target, jmsConfig, bus);
         Exchange exchange = new ExchangeImpl();
+        exchange.setSynchronous(synchronous);
         Message message = new MessageImpl();
         exchange.setOutMessage(message);
         conduit.sendExchange(exchange, "Request");
+        waitForAsyncReply(exchange);
+        receiver.close();
+        if (exchange.getInMessage() == null) {
+            throw new RuntimeException("No reply received within 2 seconds");
+        }
         JMSMessageHeadersType inHeaders = (JMSMessageHeadersType)exchange.getInMessage()
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         Assert.assertEquals(receiver.getRequestMessageId(), inHeaders.getJMSCorrelationID());
@@ -78,7 +84,12 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
         bus.shutdown(true);
     }
 
-
-
+    private void waitForAsyncReply(Exchange exchange) throws InterruptedException {
+        int count = 0;
+        while (exchange.getInMessage() == null && count <= 20) {
+            Thread.sleep(100);
+            count++;
+        }
+    }
 
 }

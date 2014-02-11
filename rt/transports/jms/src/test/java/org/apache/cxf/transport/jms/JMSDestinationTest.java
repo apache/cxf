@@ -85,8 +85,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
             }
             waitTime++;
         }
-        assertTrue("Can't receive the Destination message in " + MAX_RECEIVE_TIME 
-                   + " seconds", destMessage != null);
+        assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME 
+                   + " seconds", destMessage);
     }
 
     protected MessageObserver createMessageObserver() {
@@ -126,8 +126,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
                    jmsConfig.isAcceptMessagesWhileStopping());
         assertNotNull("The connectionFactory should not be null", jmsConfig.getConnectionFactory());
         assertTrue("Should get the instance of ActiveMQConnectionFactory", 
-                   jmsConfig.getPlainConnectionFactory() instanceof ActiveMQConnectionFactory);
-        ActiveMQConnectionFactory cf = (ActiveMQConnectionFactory)jmsConfig.getPlainConnectionFactory();
+                   jmsConfig.getConnectionFactory() instanceof ActiveMQConnectionFactory);
+        ActiveMQConnectionFactory cf = (ActiveMQConnectionFactory)jmsConfig.getConnectionFactory();
         assertEquals("The borker URL is wrong", cf.getBrokerURL(), "tcp://localhost:61500");
         assertEquals("Get a wrong TargetDestination", jmsConfig.getTargetDestination(), "queue:test");
         assertEquals("Get the wrong pubSubDomain value", jmsConfig.isPubSubDomain(), false);
@@ -174,7 +174,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
         // The JMSBroker (ActiveMQ 5.x) need to take some time to setup the DurableSubscriber
         Thread.sleep(2000);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         // wait for the message to be get from the destination
         //long time = System.currentTimeMillis();
         waitForReceiveDestMessage();
@@ -199,7 +199,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
         
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         // wait for the message to be get from the destination
         waitForReceiveDestMessage();
         // just verify the Destination inMessage
@@ -225,7 +225,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         setupMessageHeader(outMessage);
         JMSDestination destination = setupJMSDestination(ei);
         destination.setMessageObserver(createMessageObserver());
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         // just verify the Destination inMessage
         assertTrue("The destination should have got the message ", destMessage != null);
@@ -236,7 +236,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
          * in spec non-compliant mode */
         
         conduit.getJmsConfig().setEnforceSpec(false);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         assertTrue("The destination should have got the message ", destMessage != null);
         String exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
@@ -249,7 +249,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         String contextReplyTo = conduit.getJmsConfig().getReplyDestination() + ".context";
         exName += ".context";
         setupMessageHeader(outMessage, "cidValue", contextReplyTo);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         assertTrue("The destiantion should have got the message ", destMessage != null);
         verifyReplyToSet(destMessage, Queue.class, exName);
@@ -261,7 +261,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         setupMessageHeader(outMessage);
         outMessage.put(JMSConstants.JMS_SET_REPLY_TO, Boolean.FALSE);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         assertTrue("The destiantion should have got the message ", destMessage != null);
         verifyReplyToNotSet(destMessage);
@@ -272,7 +272,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         setupMessageHeader(outMessage);
         outMessage.put(JMSConstants.JMS_SET_REPLY_TO, Boolean.TRUE);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         assertTrue("The destiantion should have got the message ", destMessage != null);
         exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
@@ -430,15 +430,14 @@ public class JMSDestinationTest extends AbstractJMSTester {
                     backConduit = destination.getBackChannel(m);
                     // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
-                    sendoutMessage(backConduit, replyMessage, true);
+                    sendOneWayMessage(backConduit, replyMessage);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         destination.setMessageObserver(observer);
-        // set is oneway false for get response from destination
-        sendoutMessage(conduit, outMessage, false);
+        sendMessageSync(conduit, outMessage);
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
@@ -449,7 +448,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         inMessage = null;
         // Send a second message to check for an issue
         // Where the session was closed the second time
-        sendoutMessage(conduit, outMessage, false);
+        sendMessageSync(conduit, outMessage);
         waitForReceiveInMessage();
         verifyReceivedMessage(inMessage);
 
@@ -496,15 +495,14 @@ public class JMSDestinationTest extends AbstractJMSTester {
                     Message replyMessage = new MessageImpl();
                     // copy the message encoding
                     replyMessage.put(Message.ENCODING, m.get(Message.ENCODING));
-                    sendoutMessage(backConduit, replyMessage, true);
+                    sendOneWayMessage(backConduit, replyMessage);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         destination.setMessageObserver(observer);
-        // set is oneway false for get response from destination
-        sendoutMessage(conduit, outMessage, false);
+        sendMessageSync(conduit, outMessage);
         // wait for the message to be got from the destination,
         // create the thread to handler the Destination incoming message
 
@@ -545,7 +543,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduit(ei, true);
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage, null);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         SecurityContext securityContext = destMessage.get(SecurityContext.class);
         assertNotNull("SecurityContext should be set in message received by JMSDestination", securityContext);
@@ -565,7 +563,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSConduit conduit = setupJMSConduit(ei, true);
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage, null);
-        sendoutMessage(conduit, outMessage, true);
+        sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         conduit.close();
         destination.shutdown();

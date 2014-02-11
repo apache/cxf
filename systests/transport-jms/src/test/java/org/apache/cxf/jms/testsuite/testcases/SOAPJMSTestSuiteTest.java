@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.Map;
 
+import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -642,7 +643,9 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         
         ResourceCloser closer = new ResourceCloser();
         try {
-            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+            Connection connection = closer.register(JMSFactory.createConnection(jmsConfig));
+            connection.start();
+            Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             Destination targetDest = jmsConfig.getTargetDestination(session);
             Destination replyToDestination = jmsConfig.getReplyToDestination(session, null);
             JMSSender sender = JMSFactory.createJmsSender(jmsConfig, null);

@@ -45,6 +45,7 @@ import org.junit.Before;
 
 public abstract class AbstractJMSTester extends Assert {
     public static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    public enum ExchangePattern { oneway, requestReply };
     
     protected static final String MESSAGE_CONTENT = "HelloWorld";
     
@@ -94,11 +95,23 @@ public abstract class AbstractJMSTester extends Assert {
 
     }
     
-    protected void sendoutMessage(Conduit conduit, Message message, boolean isOneWay) throws IOException {
-        sendoutMessage(conduit, message, isOneWay, true);
+    protected void sendMessageAsync(Conduit conduit, Message message) throws IOException {
+        sendoutMessage(conduit, message, false, false);
     }
     
-    protected void sendoutMessage(Conduit conduit, 
+    protected void sendMessageSync(Conduit conduit, Message message) throws IOException {
+        sendoutMessage(conduit, message, false, true);
+    }
+    
+    protected void sendMessage(Conduit conduit, Message message, boolean synchronous) throws IOException {
+        sendoutMessage(conduit, message, false, synchronous);
+    }
+    
+    protected void sendOneWayMessage(Conduit conduit, Message message) throws IOException {
+        sendoutMessage(conduit, message, true, true);
+    }
+    
+    private void sendoutMessage(Conduit conduit, 
                                   Message message, 
                                   boolean isOneWay, 
                                   boolean synchronous) throws IOException {
@@ -111,8 +124,7 @@ public abstract class AbstractJMSTester extends Assert {
         try {
             conduit.prepare(message);
         } catch (IOException ex) {
-            assertFalse("JMSConduit can't prepare to send out message", false);
-            ex.printStackTrace();
+            throw new RuntimeException("JMSConduit can't prepare to send out message");
         }
         OutputStream os = message.getContent(OutputStream.class);
         Writer writer = message.getContent(Writer.class);
@@ -148,7 +160,7 @@ public abstract class AbstractJMSTester extends Assert {
 
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, ei, null, true);
-        if (jmsConfig != null && jmsConfig.getReceiveTimeout() == null) {
+        if (jmsConfig.getReceiveTimeout() == null || jmsConfig.getReceiveTimeout() == 0) {
             jmsConfig.setReceiveTimeout(5000L);
         }
         JMSConduit jmsConduit = new JMSConduit(target, jmsConfig, bus);

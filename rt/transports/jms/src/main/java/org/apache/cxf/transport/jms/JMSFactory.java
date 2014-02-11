@@ -18,27 +18,21 @@
  */
 package org.apache.cxf.transport.jms;
 
-import java.lang.reflect.Method;
-import java.util.logging.Logger;
-
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.jms.XAConnectionFactory;
 import javax.naming.NamingException;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
+import org.apache.cxf.transport.jms.util.JMSUtil;
+import org.apache.cxf.transport.jms.util.MessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
-import org.apache.cxf.transport.jms.util.SessionFactory;
-import org.apache.cxf.transport.jms.util.SpringJMSListenerAdapter;
-import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.apache.cxf.transport.jms.util.UserCredentialsConnectionFactoryAdapter;
 
 /**
  * Factory to create jms helper objects from configuration and context information
@@ -47,7 +41,7 @@ public final class JMSFactory {
     static final String MESSAGE_ENDPOINT_FACTORY = "MessageEndpointFactory";
     static final String MDB_TRANSACTED_METHOD = "MDBTransactedMethod";
 
-    private static final Logger LOG = LogUtils.getL7dLogger(JMSFactory.class);
+    //private static final Logger LOG = LogUtils.getL7dLogger(JMSFactory.class);
     
     private JMSFactory() {
     }
@@ -74,7 +68,7 @@ public final class JMSFactory {
         try {
             ConnectionFactory cf = (ConnectionFactory)jmsConfig.getJndiTemplate().
                 lookup(connectionFactoryName);
-            if (!(cf instanceof SingleConnectionFactory)) {
+            if (userName != null) {
                 UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
                 uccf.setUsername(userName);
                 uccf.setPassword(password);
@@ -122,7 +116,8 @@ public final class JMSFactory {
      * @param destination to listen on
      * @return
      */
-    public static JMSListenerContainer createJmsListener(EndpointInfo ei,
+    /*
+    protected static JMSListenerContainer createJmsListener(EndpointInfo ei,
                                                                     JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
                                                                     Destination destination) {
@@ -140,44 +135,6 @@ public final class JMSFactory {
         } else {
             jmsListener = new DefaultMessageListenerContainer();
         }
-        
-        createJmsListener(jmsListener,
-                                 jmsConfig,
-                                 listenerHandler,
-                                 destination,
-                                 null);
-        return new SpringJMSListenerAdapter(jmsListener);
-    }
-
-    /**
-     * Create and start listener using configuration information from jmsConfig. Uses
-     * resolveOrCreateDestination to determine the destination for the listener.
-     * 
-     * @param jmsConfig configuration information
-     * @param listenerHandler object to be called when a message arrives
-     * @param destinationName null for temp dest or a destination name
-     * @param conduitId id for message selector
-     * @return
-     */
-    public static JMSListenerContainer createJmsListener(JMSConfiguration jmsConfig,
-                                                                    MessageListener listenerHandler,
-                                                                    Destination destination, 
-                                                                    String conduitId) {
-        DefaultMessageListenerContainer jmsListener = new DefaultMessageListenerContainer(); 
-        createJmsListener(jmsListener,
-                                 jmsConfig,
-                                 listenerHandler,
-                                 destination,
-                                 conduitId);
-        return new SpringJMSListenerAdapter(jmsListener);
-    }
-
-    private static void createJmsListener(
-                          DefaultMessageListenerContainer jmsListener,
-                          JMSConfiguration jmsConfig,
-                          MessageListener listenerHandler,
-                          Destination destination,
-                          String conduitId) {
         
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
@@ -220,28 +177,62 @@ public final class JMSFactory {
         if (jmsConfig.isAcceptMessagesWhileStopping()) {
             jmsListener.setAcceptMessagesWhileStopping(jmsConfig.isAcceptMessagesWhileStopping());
         }
-        String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
-        String conduitIdSt = jmsConfig.isUseConduitIdSelector() && conduitId != null ? conduitId : "";
-        String correlationIdPrefix = staticSelectorPrefix + conduitIdSt;
-        
-        if (!correlationIdPrefix.isEmpty()) {
-            String messageSelector = "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
-            jmsListener.setMessageSelector(messageSelector);
-        }
+        String messageSelector = getMessageSelector(jmsConfig, null);
+        jmsListener.setMessageSelector(messageSelector);
         
         jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
-
+        
         jmsListener.setDestination(destination);
         jmsListener.initialize();
         jmsListener.start();
+        return new SpringJMSListenerAdapter(jmsListener);
+    }
+    */
+
+    private static String getMessageSelector(JMSConfiguration jmsConfig, String conduitId) {
+        String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
+        String conduitIdSt = jmsConfig.isUseConduitIdSelector() && conduitId != null ? conduitId : "";
+        String correlationIdPrefix = staticSelectorPrefix + conduitIdSt;
+        return correlationIdPrefix.isEmpty() ? null : "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
     }
     
-    public static SessionFactory createJmsSessionFactory(JMSConfiguration jmsConfig, ResourceCloser closer) {
-        SessionFactory sf = new SessionFactory(jmsConfig.getConnectionFactory(), closer);
-        sf.setAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
-        sf.setSessionTransacted(jmsConfig.isSessionTransacted());
-        sf.setDurableSubscriptionClientId(jmsConfig.getDurableSubscriptionClientId());
-        return sf;
+    public static JMSListenerContainer createTargetDestinationListener(EndpointInfo ei, JMSConfiguration jmsConfig,
+                                                               MessageListener listenerHandler) {
+        Session session = null;
+        try {
+            Connection connection = createConnection(jmsConfig);
+            session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
+            Destination destination = jmsConfig.getTargetDestination(session);
+            MessageListenerContainer container = new MessageListenerContainer(connection, destination, listenerHandler);
+            container.setMessageSelector(jmsConfig.getMessageSelector());
+            container.start();
+            connection.start();
+            return container;
+        } catch (JMSException e) {
+            throw JMSUtil.convertJmsException(e);
+        } finally {
+            ResourceCloser.close(session);
+        }
+    }
+
+    public static JMSListenerContainer createSimpleJmsListener(JMSConfiguration jmsConfig,
+                                                               Connection connection,
+                                                               MessageListener listenerHandler, 
+                                                               Destination destination,
+                                                               String conduitId) {
+        MessageListenerContainer container = new MessageListenerContainer(connection, destination, listenerHandler);
+        String messageSelector = getMessageSelector(jmsConfig, conduitId);
+        container.setMessageSelector(messageSelector);
+        container.start();
+        return container;
+    }
+
+    public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
+        Connection connection = jmsConfig.getConnectionFactory().createConnection();
+        if (jmsConfig.getDurableSubscriptionClientId() != null) {
+            connection.setClientID(jmsConfig.getDurableSubscriptionClientId());
+        }
+        return connection;
     }
     
 }

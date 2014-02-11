@@ -20,6 +20,7 @@ package org.apache.cxf.transport.jms.util;
 
 import java.util.concurrent.Executors;
 
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -33,10 +34,15 @@ public class TestReceiver {
     private String receiveQueueName;
     private String requestMessageId;
     private String staticReplyQueue;
+    private Throwable ex;
+    private boolean forceMessageIdAsCorrelationId;
     
-    public TestReceiver(ConnectionFactory connectionFactory, String receiveQueueName) {
+    public TestReceiver(ConnectionFactory connectionFactory, 
+                        String receiveQueueName, 
+                        boolean forceMessageIdAsCorrelationId) {
         this.connectionFactory = connectionFactory;
         this.receiveQueueName = receiveQueueName;
+        this.forceMessageIdAsCorrelationId = forceMessageIdAsCorrelationId;
         assert this.connectionFactory != null;
         assert this.receiveQueueName != null;
     }
@@ -52,7 +58,8 @@ public class TestReceiver {
     private void drainQueue() {
         ResourceCloser closer = new ResourceCloser();
         try {
-            Session session = new SessionFactory(connectionFactory, closer).createSession();
+            Connection connection = closer.register(connectionFactory.createConnection());
+            Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session.createQueue(receiveQueueName)));
             javax.jms.Message message = null;
             do {
@@ -68,17 +75,20 @@ public class TestReceiver {
     private void receiveAndRespondWithMessageIdAsCorrelationId() {
         ResourceCloser closer = new ResourceCloser();
         try {
-            Session session = new SessionFactory(connectionFactory, closer).createSession();
+            Connection connection = closer.register(connectionFactory.createConnection());
+            Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session
                 .createQueue(receiveQueueName)));
-            final javax.jms.Message inMessage = consumer.receive(2000);
+            final javax.jms.Message inMessage = consumer.receive(1000);
             if (inMessage == null) {
                 throw new RuntimeException("No message received on destination " + receiveQueueName);
             }
             requestMessageId = inMessage.getJMSMessageID();
             System.out.println("Received message " + requestMessageId);
             final TextMessage replyMessage = session.createTextMessage("Result");
-            replyMessage.setJMSCorrelationID(inMessage.getJMSMessageID());
+            String correlationId = (forceMessageIdAsCorrelationId || inMessage.getJMSCorrelationID() == null) 
+                ? inMessage.getJMSMessageID() : inMessage.getJMSCorrelationID();
+            replyMessage.setJMSCorrelationID(correlationId);
             Destination replyDest = staticReplyQueue != null 
                 ? session.createQueue(staticReplyQueue) : inMessage.getJMSReplyTo();
             if (replyDest != null) {
@@ -87,8 +97,8 @@ public class TestReceiver {
                 System.out.println("Sending reply to " + replyDest);
                 producer.send(replyMessage);
             }
-        } catch (JMSException e) {
-            throw JMSUtil.convertJmsException(e);
+        } catch (Throwable e) {
+            ex = e;
         } finally {
             closer.close();
         }
@@ -101,5 +111,11 @@ public class TestReceiver {
                 receiveAndRespondWithMessageIdAsCorrelationId();
             }
         });
+    }
+    
+    public void close() {
+        if (ex != null) {
+            throw new RuntimeException("Error while receiving message or sending reply", ex);
+        }
     }
 }

@@ -40,7 +40,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jms.connection.JmsTransactionManager;
 
 /**
  * Test transactions based on spring transactions.
@@ -69,7 +68,6 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             jmsConfig.setTargetDestination("greeter.queue.noaop");
             jmsConfig.setSessionTransacted(true);
             jmsConfig.setPubSubDomain(false);
-            jmsConfig.setTransactionManager(new JmsTransactionManager(connectionFactory));
             jmsConfig.setCacheLevel(3);
     
             JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();

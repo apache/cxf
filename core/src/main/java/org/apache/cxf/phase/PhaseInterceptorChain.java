@@ -253,7 +253,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
 
-
     public synchronized void pause() {
         state = State.PAUSED;
         pausedMessage = CURRENT_MESSAGE.get();

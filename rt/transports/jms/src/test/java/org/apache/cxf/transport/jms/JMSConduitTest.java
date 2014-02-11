@@ -19,23 +19,20 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -51,24 +48,21 @@ public class JMSConduitTest extends AbstractJMSTester {
 
     @BeforeClass
     public static void createAndStartBroker() throws Exception {
-        startBroker(new JMSBrokerSetup("tcp://localhost:" + JMS_PORT));
+        startBroker(new JMSBrokerSetup("tcp://localhost:" + JMS_PORT + "?persistent=false"));
     }
 
     @Test
     public void testGetConfiguration() throws Exception {
         // setup the new bus to get the configuration file
         SpringBusFactory bf = new SpringBusFactory();
-        BusFactory.setDefaultBus(null);
         bus = bf.createBus("/jms_test_config.xml");
-        BusFactory.setDefaultBus(bus);
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_conf_test", "/wsdl/others/jms_test_no_addr.wsdl",
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         JMSConduit conduit = setupJMSConduit(ei, false);
         assertEquals("Can't get the right ClientReceiveTimeout", 500L, conduit.getJmsConfig()
             .getReceiveTimeout().longValue());
-        bus.shutdown(false);
-        BusFactory.setDefaultBus(null);
         conduit.close();
+        bus.shutdown(false);
     }
 
     @Test
@@ -100,40 +94,14 @@ public class JMSConduitTest extends AbstractJMSTester {
         conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(1));
         Message message = new MessageImpl();
         try {
-            sendoutMessage(conduit, message, false);
-            verifyReceivedMessage(message);
+            sendMessageSync(conduit, message);
             fail("Expected a timeout here");
         } catch (RuntimeException e) {
-            LOG.info("Received exception. This is expected");
+            Assert.assertTrue("Incorrect exception", 
+                              e.getMessage().startsWith("Timeout receiving message with correlationId"));
         } finally {
             conduit.close();
         }
-    }
-
-    private void verifyReceivedMessage(Message message) throws InterruptedException {
-        while (inMessage == null) {
-            //the send has completed, but the response might not be back yet.
-            //wait for it.
-            synchronized (this) {
-                wait(10);
-            }
-        }
-        ByteArrayInputStream bis = (ByteArrayInputStream)inMessage.getContent(InputStream.class);
-        Assert.assertNotNull("The received message input stream should not be null", bis);
-        byte bytes[] = new byte[bis.available()];
-        try {
-            bis.read(bytes);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        String response = IOUtils.newStringFromBytes(bytes);
-        assertEquals("The response data should be equal", "HelloWorld", response);
-
-        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
-            .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-
-        assertTrue("The inMessage JMS Header should not be null", inHeader != null);
-
     }
 
     @Test
@@ -145,7 +113,8 @@ public class JMSConduitTest extends AbstractJMSTester {
         
         ResourceCloser closer = new ResourceCloser();
         try {
-            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+            Connection connection = JMSFactory.createConnection(jmsConfig);
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             javax.jms.Message jmsMessage = 
                 JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);

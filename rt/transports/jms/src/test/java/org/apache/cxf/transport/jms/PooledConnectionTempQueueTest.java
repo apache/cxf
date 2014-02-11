@@ -43,7 +43,6 @@ public class PooledConnectionTempQueueTest {
 
         Connection con1 = cf.createConnection();
         con1.start();
-        //Session session = con1.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
         // This order seems to matter to reproduce the issue
         con1.close();

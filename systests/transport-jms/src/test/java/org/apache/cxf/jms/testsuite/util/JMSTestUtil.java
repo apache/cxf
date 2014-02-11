@@ -44,7 +44,7 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
-import org.springframework.jms.support.destination.JndiDestinationResolver;
+import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
 /**
@@ -141,7 +141,7 @@ public final class JMSTestUtil {
             boolean useJndi = endpoint.getJmsVariant().equals(JMSURIConstants.JNDI);
             if (useJndi) {
                 // Setup Destination jndi destination resolver
-                final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();
+                final JMSDestinationResolver jndiDestinationResolver = new JMSDestinationResolver();
                 jndiDestinationResolver.setJndiTemplate(jt);
                 jmsConfig.setDestinationResolver(jndiDestinationResolver);
                 jmsConfig.setTargetDestination(endpoint.getDestinationName());

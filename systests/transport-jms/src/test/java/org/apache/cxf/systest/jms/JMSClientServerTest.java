@@ -897,7 +897,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         jmsConfig.setJndiConfig(jndiConfig);
         
         TestReceiver receiver = new TestReceiver(jmsConfig.getConnectionFactory(), 
-                                                 "dynamicQueues/SoapService7.replyto.queue");
+                                                 "dynamicQueues/SoapService7.replyto.queue", false);
         receiver.setStaticReplyQueue("dynamicQueues/SoapService7.reply.queue");
         receiver.runAsync();
         

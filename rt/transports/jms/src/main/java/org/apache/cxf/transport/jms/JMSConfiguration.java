@@ -27,14 +27,10 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
 
 @NoJSR250Annotations
 public class JMSConfiguration implements InitializingBean {
@@ -49,8 +45,7 @@ public class JMSConfiguration implements InitializingBean {
     private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver = new JMSDestinationResolver();
-    private PlatformTransactionManager transactionManager;
-    private TaskExecutor taskExecutor;
+    private Executor taskExecutor;
     private boolean reconnectOnException = true;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
@@ -102,8 +97,6 @@ public class JMSConfiguration implements InitializingBean {
     private String requestURI;
 
     private JNDIConfiguration jndiConfig;
-
-    private SingleConnectionFactory singleConnectionFactory;
 
     public void ensureProperlyConfigured() {
         if (connectionFactory == null) {
@@ -264,7 +257,6 @@ public class JMSConfiguration implements InitializingBean {
         }
     }
 
-    @Required
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
@@ -333,12 +325,8 @@ public class JMSConfiguration implements InitializingBean {
         this.sessionTransacted = sessionTransacted;
     }
 
-    public PlatformTransactionManager getTransactionManager() {
-        return transactionManager;
-    }
-
-    public void setTransactionManager(PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
+    @Deprecated
+    public void setTransactionManager(Object transactionManager) {
     }
 
     public int getConcurrentConsumers() {
@@ -377,7 +365,7 @@ public class JMSConfiguration implements InitializingBean {
         return taskExecutor;
     }
 
-    public void setTaskExecutor(TaskExecutor taskExecutor) {
+    public void setTaskExecutor(Executor taskExecutor) {
         this.taskExecutor = taskExecutor;
     }
 
@@ -428,23 +416,13 @@ public class JMSConfiguration implements InitializingBean {
         this.acceptMessagesWhileStopping = acceptMessagesWhileStopping;
     }
 
-    public ConnectionFactory getPlainConnectionFactory() {
+    public ConnectionFactory getConnectionFactory() {
         if (connectionFactory == null) {
             connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
         }
         return connectionFactory;
     }
     
-    public ConnectionFactory getConnectionFactory() {
-        if (singleConnectionFactory == null) {
-            ConnectionFactory cf = getPlainConnectionFactory();
-            singleConnectionFactory = cf instanceof SingleConnectionFactory
-                ? (SingleConnectionFactory)cf : new SingleConnectionFactory(cf);
-            singleConnectionFactory.setClientId(durableSubscriptionClientId);
-        }
-        return singleConnectionFactory;
-    }
-
     public String getDurableSubscriptionClientId() {
         return durableSubscriptionClientId;
     }
@@ -531,4 +509,5 @@ public class JMSConfiguration implements InitializingBean {
     public Destination getReplyDestination(Session session, String replyToName) throws JMSException {
         return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
     }
+
 }

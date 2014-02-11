@@ -120,28 +120,32 @@ public class RequestResponseTest extends AbstractJMSTester {
     public void testRequestQueueResponseTempQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortQueueRequest");
-        sendAndReceiveMessages(ei);
+        sendAndReceiveMessages(ei, true);
+        sendAndReceiveMessages(ei, false);
     }
     
     @Test
     public void testRequestQueueResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortQueueRequestQueueResponse");
-        sendAndReceiveMessages(ei);
+        sendAndReceiveMessages(ei, true);
+        sendAndReceiveMessages(ei, false);
     }
     
     @Test
     public void testRequestTopicResponseTempQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequest");
-        sendAndReceiveMessages(ei);
+        sendAndReceiveMessages(ei, true);
+        sendAndReceiveMessages(ei, false);
     }
     
     @Test
     public void testRequestTopicResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequestQueueResponse");
-        sendAndReceiveMessages(ei);
+        sendAndReceiveMessages(ei, true);
+        sendAndReceiveMessages(ei, false);
     }
     
     private Message createMessage() {
@@ -155,7 +159,8 @@ public class RequestResponseTest extends AbstractJMSTester {
         return outMessage;
     }
 
-    protected void sendAndReceiveMessages(EndpointInfo ei) throws IOException {
+    protected void sendAndReceiveMessages(EndpointInfo ei, boolean synchronous) throws IOException {
+        inMessage = null;
         // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduit(ei, true);
         final Message outMessage = createMessage();
@@ -174,7 +179,7 @@ public class RequestResponseTest extends AbstractJMSTester {
                     backConduit = destination.getBackChannel(m);
                     // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
-                    sendoutMessage(backConduit, replyMessage, true);
+                    sendOneWayMessage(backConduit, replyMessage);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -183,7 +188,7 @@ public class RequestResponseTest extends AbstractJMSTester {
         destination.setMessageObserver(observer);
         
         try {
-            sendoutMessage(conduit, outMessage, false, true);
+            sendMessage(conduit, outMessage, synchronous);
             // wait for the message to be got from the destination,
             // create the thread to handler the Destination incoming message
     

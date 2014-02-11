@@ -21,31 +21,8 @@ package org.apache.cxf.transport.jms.util;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import javax.naming.NamingException;
 
-import org.springframework.jndi.JndiTemplate;
-
-public class JMSDestinationResolver implements DestinationResolver {
-    JndiTemplate jndiTemplate;
-
-    public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain)
-        throws JMSException {
-        if (jndiTemplate != null) {
-            try {
-                return jndiTemplate.lookup(destinationName, Destination.class);
-            } catch (NamingException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
-        if (pubSubDomain) {
-            return session.createTopic(destinationName);
-        } else {
-            return session.createQueue(destinationName);
-        }
-    }
-
-    public void setJndiTemplate(JndiTemplate jt) {
-        this.jndiTemplate = jt;
-    }
-
+public interface DestinationResolver {
+    Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain)
+        throws JMSException;
 }

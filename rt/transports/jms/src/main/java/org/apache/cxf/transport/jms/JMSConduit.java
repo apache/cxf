@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
@@ -49,7 +50,6 @@ import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.jms.connection.SingleConnectionFactory;
 
 /**
  * JMSConduit is instantiated by the JMSTransportFactory which is selected by a client if the transport
@@ -70,6 +70,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private AtomicLong messageCount;
     private JMSBusLifeCycleListener listener;
     private Bus bus;
+    private Connection connection;
     private Destination staticReplyDestination;
 
     public JMSConduit(EndpointReferenceType target,
@@ -97,12 +98,11 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         MessageStreamUtil.closeStreams(msg);
         super.close(msg);
     }
+
     private synchronized void getJMSListener(Destination replyTo) {
         if (jmsListener == null) {
-            jmsListener = JMSFactory.createJmsListener(jmsConfig, 
-                                                       this, 
-                                                       replyTo, 
-                                                       conduitId);
+            jmsListener = JMSFactory
+                .createSimpleJmsListener(jmsConfig, connection, this, replyTo, conduitId);
             addBusListener();
         }
     }
@@ -132,7 +132,11 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
         ResourceCloser closer = new ResourceCloser();
         try {
-            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
+            if (connection == null) {
+                connection = JMSFactory.createConnection(jmsConfig);
+            }
+            Session session = closer.register(connection.createSession(jmsConfig.isSessionTransacted(), 
+                                                                       Session.AUTO_ACKNOWLEDGE));
             Destination targetDest = jmsConfig.getTargetDestination(session);
             
             Destination replyToDestination = null;
@@ -143,6 +147,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 }
                 replyToDestination = jmsConfig.getReplyToDestination(session, headers.getJMSReplyTo());
             }
+            connection.start();
 
             String messageType = jmsConfig.getMessageType();
             String correlationId = createCorrelationId(exchange, userCID);
@@ -301,6 +306,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             String correlationId = jmsMessage.getJMSCorrelationID();
             LOG.log(Level.INFO, "Received reply message with correlation id " + correlationId);
 
+            // Try to correlate the incoming message with some timeout as it may have been
+            // added to the map after the message was sent
             int count = 0;
             Exchange exchange = null;
             while (exchange == null && count < 100) {
@@ -364,11 +371,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
     public synchronized void close() {
-        try {
-            ((SingleConnectionFactory)jmsConfig.getConnectionFactory()).resetConnection();
-        } catch (Exception e) {
-            // Ignore
-        }
+        ResourceCloser.close(connection);
         shutdownListeners();
         LOG.log(Level.FINE, "JMSConduit closed ");
     }

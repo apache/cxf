@@ -20,29 +20,20 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Map;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
-import javax.jms.Session;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
-import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -51,14 +42,10 @@ import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
-import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
-import org.apache.cxf.transport.jms.util.ResourceCloser;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public class JMSDestination extends AbstractMultiplexDestination 
-    implements MessageListener, JMSExchangeSender {
+    implements MessageListener {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
 
@@ -83,8 +70,7 @@ public class JMSDestination extends AbstractMultiplexDestination
      * @return the inbuilt backchannel
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
-        EndpointReferenceType anon = EndpointReferenceUtils.getAnonymousEndpointReference();
-        return new BackChannelConduit(this, anon, inMessage);
+        return new BackChannelConduit(inMessage, jmsConfig);
     }
 
     /**
@@ -94,25 +80,11 @@ public class JMSDestination extends AbstractMultiplexDestination
         getLogger().log(Level.FINE, "JMSDestination activate().... ");
         jmsConfig.ensureProperlyConfigured();
 
-        Destination targetDestination = resolveTargetDestination();
-        jmsListener = JMSFactory.createJmsListener(ei, jmsConfig, this, 
-                                                   targetDestination);
+        jmsListener = JMSFactory.createTargetDestinationListener(ei, jmsConfig, this);
         int restartLimit = jmsConfig.getMaxSuspendedContinuations() * jmsConfig.getReconnectPercentOfMax() / 100;
         this.suspendedContinuations = new ThrottlingCounter(this.jmsListener, 
                                                             restartLimit,
                                                             jmsConfig.getMaxSuspendedContinuations());
-    }
-
-    private Destination resolveTargetDestination() {
-        ResourceCloser closer = new ResourceCloser();
-        try {
-            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
-            return jmsConfig.getTargetDestination(session);
-        } catch (JMSException e) {
-            throw JMSUtil.convertJmsException(e);
-        } finally {
-            closer.close();
-        }
     }
 
     public void deactivate() {
@@ -124,33 +96,6 @@ public class JMSDestination extends AbstractMultiplexDestination
     public void shutdown() {
         getLogger().log(Level.FINE, "JMSDestination shutdown()");
         this.deactivate();
-    }
-
-    public Destination getReplyToDestination(Session session, 
-                                             Message inMessage) throws JMSException {
-        javax.jms.Message message = (javax.jms.Message)inMessage.get(JMSConstants.JMS_REQUEST_MESSAGE);
-        // If WS-Addressing had set the replyTo header.
-        final String replyToName = (String)inMessage.get(JMSConstants.JMS_REBASED_REPLY_TO);
-        if (replyToName != null) {
-            return jmsConfig.getReplyDestination(session, replyToName);
-        } else if (message.getJMSReplyTo() != null) {
-            return message.getJMSReplyTo();
-        } else {
-            return jmsConfig.getReplyDestination(session);
-        }
-    }
-
-    /**
-     * Decides what correlationId to use for the reply by looking at the request headers
-     * 
-     * @param request jms request message
-     * @return correlation id of request if set else message id from request
-     * @throws JMSException
-     */
-    public String determineCorrelationID(javax.jms.Message request) throws JMSException {
-        return StringUtils.isEmpty(request.getJMSCorrelationID())
-            ? request.getJMSMessageID() 
-            : request.getJMSCorrelationID();
     }
 
     /**
@@ -186,14 +131,8 @@ public class JMSDestination extends AbstractMultiplexDestination
             
             origBus = BusFactory.getAndSetThreadDefaultBus(bus);
 
-            
-            Map<Class<?>, ?> mp = JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.get();
-            if (mp != null) {
-                for (Map.Entry<Class<?>, ?> ent : mp.entrySet()) {
-                    inMessage.setContent(ent.getKey(), ent.getValue());
-                }
-                JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.remove();
-            }
+            // FIXME
+            //JCATransactionalMessageListenerContainer.setMessageEndpoint(inMessage);
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
@@ -206,10 +145,12 @@ public class JMSDestination extends AbstractMultiplexDestination
             // need to propagate any exceptions back so transactions can occur
             if (inMessage.getContent(Exception.class) != null) {
                 Exception ex = inMessage.getContent(Exception.class);
-                if (ex.getCause() instanceof RuntimeException) {
-                    throw (RuntimeException)ex.getCause();
-                } else {
-                    throw new RuntimeException(ex);
+                if (!(ex instanceof org.apache.cxf.interceptor.Fault)) {
+                    if (ex.getCause() instanceof RuntimeException) {
+                        throw (RuntimeException)ex.getCause();
+                    } else {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
             
@@ -227,84 +168,6 @@ public class JMSDestination extends AbstractMultiplexDestination
                 origLoader.reset();
             }
         }
-    }
-
-    public void sendExchange(Exchange exchange, final Object replyObj) {
-        if (exchange.isOneWay()) {
-            //Don't need to send anything
-            return;
-        }
-        final Message inMessage = exchange.getInMessage();
-        final Message outMessage = exchange.getOutMessage();
-
-        ResourceCloser closer = new ResourceCloser();
-        try {
-            Session session = JMSFactory.createJmsSessionFactory(jmsConfig, closer).createSession();
-
-            final JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)outMessage
-                .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-            JMSMessageHeadersType inMessageProperties = (JMSMessageHeadersType)inMessage
-                .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-            initResponseMessageProperties(messageProperties, inMessageProperties);
-
-            // setup the reply message
-            final javax.jms.Message request = (javax.jms.Message)inMessage
-                .get(JMSConstants.JMS_REQUEST_MESSAGE);
-            final String msgType = JMSMessageUtils.isMtomEnabled(outMessage)
-                ? JMSConstants.BINARY_MESSAGE_TYPE : JMSMessageUtils.getMessageType(request);
-            if (isTimedOut(request)) {
-                return;
-            }
-
-            Destination replyTo = getReplyToDestination(session, inMessage);
-            if (replyTo == null) {
-                throw new RuntimeException("No replyTo destination set");
-            }
-
-            getLogger().log(Level.FINE, "send out the message!");
-
-            String correlationId = determineCorrelationID(request);
-            javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig, 
-                                      outMessage, 
-                                      replyObj, 
-                                      msgType,
-                                      session,
-                                      correlationId, JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-            JMSSender sender = JMSFactory.createJmsSender(jmsConfig, messageProperties);
-            LOG.log(Level.FINE, "server sending reply: ", reply);
-            sender.sendMessage(closer, session, replyTo, reply);
-        } catch (JMSException ex) {
-            throw JMSUtil.convertJmsException(ex);
-        } finally {
-            closer.close();
-        }
-    }
-    
-    /**
-     * @param messageProperties
-     * @param inMessageProperties
-     */
-    public static void initResponseMessageProperties(JMSMessageHeadersType messageProperties,
-                                                     JMSMessageHeadersType inMessageProperties) {
-        messageProperties.setJMSDeliveryMode(inMessageProperties.getJMSDeliveryMode());
-        messageProperties.setJMSPriority(inMessageProperties.getJMSPriority());
-        messageProperties.setSOAPJMSRequestURI(inMessageProperties.getSOAPJMSRequestURI());
-        messageProperties.setSOAPJMSBindingVersion("1.0");
-    }
-
-
-    private boolean isTimedOut(final javax.jms.Message request) throws JMSException {
-        if (request.getJMSExpiration() > 0) {
-            TimeZone tz = new SimpleTimeZone(0, "GMT");
-            Calendar cal = new GregorianCalendar(tz);
-            long timeToLive = request.getJMSExpiration() - cal.getTimeInMillis();
-            if (timeToLive < 0) {
-                getLogger()
-                    .log(Level.INFO, "Message time to live is already expired skipping response.");
-                return true;
-            }
-        }
-        return false;
     }
 
     protected Logger getLogger() {

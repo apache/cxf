@@ -19,97 +19,59 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.AbstractSequentialList;
 import java.util.LinkedList;
 
+import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 public class ResourceCloser implements Closeable {
-    private AbstractSequentialList<Closeable> resources;
+    private AbstractSequentialList<Object> resources;
 
     public ResourceCloser() {
-        resources = new LinkedList<Closeable>();
+        resources = new LinkedList<Object>();
     }
     
-    public <E extends Closeable> E register(E resource) {
+    public <E> E register(E resource) {
         resources.add(0, resource);
         return resource;
-    }
-    
-    public javax.jms.Connection register(final javax.jms.Connection connection) {
-        resources.add(0, new Closeable() {
-            
-            @Override
-            public void close() throws IOException {
-                try {
-                    connection.close();
-                } catch (JMSException e) {
-                    // Ignore
-                }
-            }
-        });
-        return connection;
-    }
-    
-    public Session register(final Session session) {
-        resources.add(0, new Closeable() {
-            
-            @Override
-            public void close() throws IOException {
-                try {
-                    session.close();
-                } catch (JMSException e) {
-                    // Ignore
-                }
-            }
-        });
-        return session;
-    }
-    
-    public MessageConsumer register(final MessageConsumer consumer) {
-        resources.add(0, new Closeable() {
-            
-            @Override
-            public void close() throws IOException {
-                try {
-                    consumer.close();
-                } catch (JMSException e) {
-                    // Ignore
-                }
-            }
-        });
-        return consumer;
-    }
-    
-    public MessageProducer register(final MessageProducer producer) {
-        resources.add(0, new Closeable() {
-            
-            @Override
-            public void close() throws IOException {
-                try {
-                    producer.close();
-                } catch (JMSException e) {
-                    // Ignore
-                }
-            }
-        });
-        return producer;
     }
 
     @Override
     public void close() {
-        for (Closeable resource : resources) {
-            try {
-                resource.close();
-            } catch (Exception e) {
-                // Ignore
-            }
+        for (Object resource : resources) {
+            close(resource);
         }
     }
     
+    public void close(Object ...resources2) {
+        for (Object resource : resources2) {
+            close(resource);
+        }
+    }
+    
+    public static void close(Object resource) {
+        if (resource == null) {
+            return;
+        }
+        try {
+            if (resource instanceof MessageProducer) {
+                ((MessageProducer)resource).close();
+            } else if (resource instanceof MessageConsumer) {
+                ((MessageConsumer)resource).close();
+            } else if (resource instanceof Session) {
+                ((Session)resource).close();
+            } else if (resource instanceof Connection) {
+                ((Connection)resource).close();
+            } else {
+                throw new IllegalArgumentException("Can not handle resource " + resource.getClass());
+            }
+        } catch (JMSException e) {
+            // Ignore
+        }
+    }
 
 }
