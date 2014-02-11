@@ -94,7 +94,7 @@ public class PerRequestResourceProvider implements ResourceProvider {
     }
 
     private Response serverError(String msg) {
-        return Response.serverError().entity(msg).build();
+        return JAXRSUtils.toResponseBuilder(500).entity(msg).build();
     }
     
     /**

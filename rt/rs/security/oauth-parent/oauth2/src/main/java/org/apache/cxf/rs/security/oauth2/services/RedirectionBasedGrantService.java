@@ -303,7 +303,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext securityContext =  
             (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
         if (securityContext == null || securityContext.getUserPrincipal() == null) {
-            throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         checkTransportSecurity();
         return securityContext;

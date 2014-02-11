@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
@@ -80,7 +81,7 @@ public abstract class AbstractXmlSecInHandler {
     
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
-        Response response = Response.status(400).entity(error).build();
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 

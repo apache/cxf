@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
@@ -122,7 +122,7 @@ public abstract class AbstractOAuthService {
     }
     
     protected void reportInvalidRequestError(OAuthError entity, MediaType mt) {
-        ResponseBuilder rb = Response.status(400);
+        ResponseBuilder rb = JAXRSUtils.toResponseBuilder(400);
         if (mt != null) {
             rb.type(mt);
         }

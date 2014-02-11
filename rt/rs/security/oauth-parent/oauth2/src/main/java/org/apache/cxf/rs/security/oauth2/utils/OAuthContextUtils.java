@@ -21,11 +21,11 @@ package org.apache.cxf.rs.security.oauth2.utils;
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 
@@ -82,7 +82,7 @@ public final class OAuthContextUtils {
      */
     public static void assertRole(final MessageContext mc, final String role) {
         if (!isUserInRole(mc, role)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
+            throw new WebApplicationException(JAXRSUtils.toResponse(Status.FORBIDDEN));
         }
     }
 
@@ -124,7 +124,7 @@ public final class OAuthContextUtils {
     public static void assertClient(MessageContext mc, String client) {
         String cl = resolveClient(mc);
         if ((cl == null) || !cl.equals(client)) {
-            throw new WebApplicationException(Status.FORBIDDEN);
+            throw new WebApplicationException(JAXRSUtils.toResponse(Status.FORBIDDEN));
         }
     }
 
@@ -136,7 +136,7 @@ public final class OAuthContextUtils {
     public static OAuthContext getContext(final MessageContext mc) {
         final OAuthContext oauth = mc.getContent(OAuthContext.class);
         if ((oauth == null) || (oauth.getSubject() == null) || (oauth.getSubject().getLogin() == null)) {
-            throw ExceptionUtils.toNotAuthorizedException(null, Response.status(401).build());
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         return oauth;
     }

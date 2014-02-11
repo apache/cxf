@@ -62,6 +62,7 @@ import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Produces({"application/atom+xml", "application/atom+xml;type=feed", "application/atom+xml;type=entry" })
 @Consumes({"application/atom+xml", "application/atom+xml;type=feed", "application/atom+xml;type=entry" })
@@ -548,7 +549,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
     private void reportError(String message, Exception ex, int status) {
         LOG.warning(message);
-        Response response = Response.status(status).type("text/plain").entity(message).build();
+        Response response = JAXRSUtils.toResponseBuilder(status).type("text/plain").entity(message).build();
         throw ExceptionUtils.toHttpException(ex, response);
     }
     private void reportError(String message, Exception ex) {

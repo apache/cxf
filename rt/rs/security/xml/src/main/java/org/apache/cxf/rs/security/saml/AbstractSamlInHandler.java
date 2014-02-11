@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -177,7 +178,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         // TODO: get bundle resource message once this filter is moved 
         // to rt/rs/security
         LOG.warning(error);
-        Response response = Response.status(401).entity(error).build();
+        Response response = JAXRSUtils.toResponseBuilder(401).entity(error).build();
         throw ExceptionUtils.toNotAuthorizedException(null, response);
     }
     

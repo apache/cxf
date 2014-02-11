@@ -535,7 +535,7 @@ public final class JAXRSUtils {
 
     public static Response createResponse(ClassResourceInfo cri, Message msg,
                                           String responseMessage, int status, boolean addAllow) {
-        ResponseBuilder rb = Response.status(status);
+        ResponseBuilder rb = toResponseBuilder(status);
         if (addAllow) {
             Set<String> allowedMethods = cri.getAllowedMethods();
             for (String m : allowedMethods) {

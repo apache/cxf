@@ -682,7 +682,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected static void handleExceptionEnd(Throwable t, String message, boolean read) {
         Response.Status status = read 
             ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR; 
-        Response r = Response.status(status)
+        Response r = JAXRSUtils.toResponseBuilder(status)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
         WebApplicationException ex = read ? ExceptionUtils.toBadRequestException(t, r) 
             : ExceptionUtils.toInternalServerErrorException(t, r);

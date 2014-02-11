@@ -42,6 +42,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -168,7 +169,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
     }
     
     private static Response getFaultResponse() {
-        return Response.status(401).header(HttpHeaders.WWW_AUTHENTICATE, NEGOTIATE_SCHEME).build();
+        return JAXRSUtils.toResponseBuilder(401).header(HttpHeaders.WWW_AUTHENTICATE, NEGOTIATE_SCHEME).build();
     }
     
     protected String getCompleteServicePrincipalName() {

@@ -475,7 +475,7 @@ public final class InjectionUtils {
         if (logError) {
             LOG.severe(errorMessage.toString());
         }
-        Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        Response r = JAXRSUtils.toResponseBuilder(Response.Status.INTERNAL_SERVER_ERROR)
                          .type(MediaType.TEXT_PLAIN_TYPE)
                          .entity(errorMessage.toString()).build();
         throw ExceptionUtils.toInternalServerErrorException(null, r);
@@ -1235,12 +1235,12 @@ public final class InjectionUtils {
             } catch (InvocationTargetException ex) {
                 String msg = "Method " + method.getName() + " can not be invoked"
                     + " due to InvocationTargetException";
-                throw new WebApplicationException(Response.serverError().entity(msg).build());
+                throw new WebApplicationException(JAXRSUtils.toResponseBuilder(500).entity(msg).build());
             } catch (IllegalAccessException ex) {
                 String msg = "Method " + method.getName() + " can not be invoked"
                     + " due to IllegalAccessException";
                 throw ExceptionUtils.toInternalServerErrorException(ex, 
-                                                                    Response.serverError().entity(msg).build());
+                    JAXRSUtils.toResponseBuilder(500).entity(msg).build());
             } 
         }
     }
