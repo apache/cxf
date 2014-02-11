@@ -54,7 +54,7 @@ import org.apache.olingo.odata2.api.uri.expression.UnaryOperator;
 import org.apache.olingo.odata2.core.uri.expression.FilterParser;
 import org.apache.olingo.odata2.core.uri.expression.FilterParserImpl;
 
-public class OData2Parser<T> extends AbstractSearchConditionParser<T> {
+public class ODataParser<T> extends AbstractSearchConditionParser<T> {
     private final FilterParser parser;
     
     private static class TypedProperty {
@@ -235,7 +235,7 @@ public class OData2Parser<T> extends AbstractSearchConditionParser<T> {
      *            accessible no-arguments constructor and complementary setters to these used in 
      *            OData 2.0 $filter expressions.
      */
-    public OData2Parser(final Class< T > conditionClass) {    
+    public ODataParser(final Class< T > conditionClass) {    
         super(conditionClass);
         this.parser = new FilterParserImpl(null);
     }

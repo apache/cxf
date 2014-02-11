@@ -20,12 +20,13 @@ package org.apache.cxf.jaxrs.ext.search.odata;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class OData2ParserTest extends Assert {
-    private OData2Parser<Person> parser;
+public class ODataParserTest extends Assert {
+    private ODataParser<Person> parser;
 
     public static class Person {
         private String firstName;
@@ -72,7 +73,7 @@ public class OData2ParserTest extends Assert {
 
     @Before
     public void setUp() {
-        parser = new OData2Parser<Person>(Person.class);
+        parser = new ODataParser<Person>(Person.class);
     }
 
     @Test
@@ -95,6 +96,7 @@ public class OData2ParserTest extends Assert {
             parser.parse("FirstName eq 'Tom' or FirstName eq 'Peter' and LastName eq 'Bombadil'");
         assertTrue(filter.isMet(new Person("Tom", "Bombadil")));
         assertTrue(filter.isMet(new Person("Peter", "Bombadil")));
+        assertFalse(filter.isMet(new Person("Barry", "Bombadil")));
     }
     
     @Test
