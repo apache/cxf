@@ -68,5 +68,6 @@ public class RMMessageTest extends Assert {
         byte[] msgbytes = IOUtils.readBytesFromStream(msg.getContent());
         
         assertArrayEquals(DATA, msgbytes);
+        co.close();
     }
 }
