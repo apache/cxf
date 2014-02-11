@@ -133,7 +133,8 @@ public final class OAuthUtils {
         enc = enc == null ? "UTF-8" : enc;
         
         if (params.isEmpty() 
-            && MediaType.APPLICATION_FORM_URLENCODED.equals(oAuthMessage.getBodyType())) {
+            && MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(
+                MediaType.valueOf(oAuthMessage.getBodyType()))) {
             InputStream stream = mc != null 
                 ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
             String body = FormUtils.readBody(stream, enc);
