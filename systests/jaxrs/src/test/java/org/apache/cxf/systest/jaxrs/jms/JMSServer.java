@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.jms;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -26,9 +26,7 @@ public class JMSServer extends AbstractBusTestServerBase {
     ClassPathXmlApplicationContext context;
     
     protected void run()  {
-        // create the application context
-        context = new ClassPathXmlApplicationContext(
-            "org/apache/cxf/systest/jaxrs/resources/jms_server_config.xml");
+        context = new ClassPathXmlApplicationContext("org/apache/cxf/systest/jaxrs/jms/jms_server_config.xml");
         context.start();
     }
 
