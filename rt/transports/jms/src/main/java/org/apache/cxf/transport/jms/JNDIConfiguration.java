@@ -20,8 +20,7 @@ package org.apache.cxf.transport.jms;
 
 import java.util.Properties;
 
-import org.springframework.jndi.JndiTemplate;
-
+import org.apache.cxf.transport.jms.util.JndiHelper;
 
 public class JNDIConfiguration {
     private Properties environment;
@@ -29,10 +28,8 @@ public class JNDIConfiguration {
     private String connectionUserName;
     private String connectionPassword;
     
-    public JndiTemplate createJndiTemple() {
-        JndiTemplate jt = new JndiTemplate();
-        jt.setEnvironment(environment);
-        return jt;
+    public JndiHelper createJndiTemple() {
+        return new JndiHelper(environment);
     }
 
     public String getJndiConnectionFactoryName() {

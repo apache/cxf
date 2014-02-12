@@ -29,11 +29,10 @@ import javax.jms.Session;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jndi.JndiTemplate;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 
 @NoJSR250Annotations
-public class JMSConfiguration implements InitializingBean {
+public class JMSConfiguration {
     /**
      * The use of -1 is to make easier to determine
      * if the setCacheLevel has been called.
@@ -42,7 +41,7 @@ public class JMSConfiguration implements InitializingBean {
 
     private boolean usingEndpointInfo = true;
 
-    private JndiTemplate jndiTemplate;
+    private JndiHelper jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver = new JMSDestinationResolver();
     private Executor taskExecutor;
@@ -384,11 +383,11 @@ public class JMSConfiguration implements InitializingBean {
         return useConduitIdSelector != null;
     }
 
-    public void setJndiTemplate(JndiTemplate jndiTemplate) {
+    public void setJndiTemplate(JndiHelper jndiTemplate) {
         this.jndiTemplate = jndiTemplate;
     }
 
-    public JndiTemplate getJndiTemplate() {
+    public JndiHelper getJndiTemplate() {
         return jndiTemplate;
     }
 

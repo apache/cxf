@@ -197,12 +197,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-            <scope>test</scope>
-            <version>${cxf.spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
             <scope>test</scope>
             <version>${cxf.spring.version}</version>

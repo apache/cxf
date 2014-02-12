@@ -40,6 +40,7 @@ import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.transport.jms.wsdl.DeliveryModeType;
 import org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType;
 import org.apache.cxf.transport.jms.wsdl.JndiContextParameterType;
@@ -50,7 +51,6 @@ import org.apache.cxf.transport.jms.wsdl.ReplyToNameType;
 import org.apache.cxf.transport.jms.wsdl.TimeToLiveType;
 import org.apache.cxf.transport.jms.wsdl.TopicReplyToNameType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.jndi.JndiTemplate;
 
 public class JMSOldConfigHolder {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSOldConfigHolder.class);
@@ -208,8 +208,7 @@ public class JMSOldConfigHolder {
         }
 
         if (jmsConfig.isUsingEndpointInfo()) {
-            JndiTemplate jt = new JndiTemplate();
-            jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(endpoint));
+            JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
             boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSURIConstants.TOPIC);
             JNDIConfiguration jndiConfig = new JNDIConfiguration();
             jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());

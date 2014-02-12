@@ -66,8 +66,8 @@ public final class JMSFactory {
         String userName = jndiConfig.getConnectionUserName();
         String password = jndiConfig.getConnectionPassword();
         try {
-            ConnectionFactory cf = (ConnectionFactory)jmsConfig.getJndiTemplate().
-                lookup(connectionFactoryName);
+            ConnectionFactory cf = jmsConfig.getJndiTemplate().
+                lookup(connectionFactoryName, ConnectionFactory.class);
             if (userName != null) {
                 UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
                 uccf.setUsername(userName);

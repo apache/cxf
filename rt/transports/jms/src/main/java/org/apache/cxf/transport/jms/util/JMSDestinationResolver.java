@@ -23,10 +23,8 @@ import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.naming.NamingException;
 
-import org.springframework.jndi.JndiTemplate;
-
 public class JMSDestinationResolver implements DestinationResolver {
-    JndiTemplate jndiTemplate;
+    JndiHelper jndiTemplate;
 
     public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain)
         throws JMSException {
@@ -44,7 +42,7 @@ public class JMSDestinationResolver implements DestinationResolver {
         }
     }
 
-    public void setJndiTemplate(JndiTemplate jt) {
+    public void setJndiTemplate(JndiHelper jt) {
         this.jndiTemplate = jt;
     }
 

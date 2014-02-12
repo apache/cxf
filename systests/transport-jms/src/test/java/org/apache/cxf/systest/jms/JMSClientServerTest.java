@@ -76,6 +76,7 @@ import org.apache.cxf.transport.jms.JMSPropertyType;
 import org.apache.cxf.transport.jms.JNDIConfiguration;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
@@ -85,7 +86,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jndi.JndiTemplate;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     private static final String BROKER_URI = "vm://JMSClientServerTest" 
@@ -888,8 +888,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         endpoint.setJndiConnectionFactoryName("ConnectionFactory");
 
         final JMSConfiguration jmsConfig = new JMSConfiguration();        
-        JndiTemplate jt = new JndiTemplate();
-        jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(endpoint));
+        JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
         
         JNDIConfiguration jndiConfig = new JNDIConfiguration();
         jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());

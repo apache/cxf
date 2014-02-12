@@ -45,7 +45,7 @@ import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
-import org.springframework.jndi.JndiTemplate;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 
 /**
  * 
@@ -127,8 +127,7 @@ public final class JMSTestUtil {
         }
 
         if (jmsConfig.isUsingEndpointInfo()) {
-            JndiTemplate jt = new JndiTemplate();
-            jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(endpoint));
+            JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
             boolean pubSubDomain = false;
             pubSubDomain = endpoint.getJmsVariant().equals(JMSURIConstants.TOPIC);
             JNDIConfiguration jndiConfig = new JNDIConfiguration();

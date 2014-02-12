@@ -27,11 +27,12 @@
         </jms:address>
         <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" p:brokerURL="${EmbeddedBrokerURL}"/>
-    <bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
-        <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
-    </bean>
-    <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="singleConnectionFactory" p:concurrentConsumers="1" p:maxConcurrentConsumers="1"/>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+		p:brokerURL="${EmbeddedBrokerURL}"/>
+    <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration" 
+    	p:connectionFactory-ref="jmsConnectionFactory" 
+    	p:concurrentConsumers="1" 
+    	p:maxConcurrentConsumers="1"/>
     <jms:destination name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-destination">
         <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text">
             <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
@@ -39,5 +40,11 @@
         </jms:address>
         <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>
     </jms:destination>
-    <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration" p:connectionFactory-ref="jmsConnectionFactory" p:timeToLive="10000" p:concurrentConsumers="1" p:maxConcurrentConsumers="1" p:maxSuspendedContinuations="1" p:cacheLevel="2"/>
+    <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration"
+     	p:connectionFactory-ref="jmsConnectionFactory" 
+     	p:timeToLive="10000" 
+     	p:concurrentConsumers="1" 
+     	p:maxConcurrentConsumers="1" 
+     	p:maxSuspendedContinuations="1" 
+     	p:cacheLevel="2"/>
 </beans>

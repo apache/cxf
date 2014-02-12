@@ -35,11 +35,7 @@
             </bean>
         </cxf:features>
     </cxf:bus>
-    <bean id="jmsConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
-        <property name="targetConnectionFactory">
-            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-                <property name="brokerURL" value="vm://JMSClientServerSoap12Test"/>
-            </bean>
-        </property>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+	    <property name="brokerURL" value="vm://JMSClientServerSoap12Test"/>
     </bean>
 </beans>
