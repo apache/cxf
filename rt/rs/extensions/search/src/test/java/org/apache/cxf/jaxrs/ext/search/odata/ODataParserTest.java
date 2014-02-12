@@ -34,6 +34,9 @@ public class ODataParserTest extends Assert {
         private String firstName;
         private String lastName;
         private int age;
+        private float height;
+        private double hourlyRate;
+        private Long ssn;
 
         public Person() {
         }
@@ -67,8 +70,47 @@ public class ODataParserTest extends Assert {
             this.age = age;
         }
         
+        public float getHeight() {
+            return height;
+        }
+        
+        public void setHeight(float height) {
+            this.height = height;
+        }
+        
+        public double getHourlyRate() {
+            return hourlyRate;
+        }
+        
+        public void setHourlyRate(double hourlyRate) {
+            this.hourlyRate = hourlyRate;
+        }
+        
+        public Long getSsn() {
+            return ssn;
+        }
+        
+        public void setSsn(Long ssn) {
+            this.ssn = ssn;
+        }
+        
         Person withAge(int newAge) {
             setAge(newAge);
+            return this;
+        }
+
+        Person withHeight(float newHeight) {
+            setHeight(newHeight);
+            return this;
+        }
+        
+        Person withHourlyRate(double newHourlyRate) {
+            setHourlyRate(newHourlyRate);
+            return this;
+        }
+        
+        Person withSsn(Long newSsn) {
+            setSsn(newSsn);
             return this;
         }
     }
@@ -130,5 +172,26 @@ public class ODataParserTest extends Assert {
         SearchCondition< Person > filter = parser.parse("Age gt 17");
         assertTrue(filter.isMet(new Person("Tom", "Bombadil").withAge(18)));
         assertFalse(filter.isMet(new Person("Tom", "Bombadil").withAge(16)));
+    }
+    
+    @Test
+    public void testFilterByHeightGreatOrEqualValue() throws SearchParseException {
+        SearchCondition< Person > filter = parser.parse("Height ge 179.5f or Height le 159.5d");
+        assertTrue(filter.isMet(new Person("Tom", "Bombadil").withHeight(185.6f)));
+        assertFalse(filter.isMet(new Person("Tom", "Bombadil").withHeight(166.7f)));
+    }
+    
+    @Test
+    public void testFilterByHourlyRateGreatThanValue() throws SearchParseException {
+        SearchCondition< Person > filter = parser.parse("HourlyRate ge 30.50d or HourlyRate lt 20.50f");
+        assertTrue(filter.isMet(new Person("Tom", "Bombadil").withHourlyRate(45.6)));
+        assertFalse(filter.isMet(new Person("Tom", "Bombadil").withHourlyRate(26.7)));
+    }
+    
+    @Test
+    public void testFilterBySsnNotEqualsToValue() throws SearchParseException {
+        SearchCondition< Person > filter = parser.parse("Ssn ne 748232221");
+        assertTrue(filter.isMet(new Person("Tom", "Bombadil").withSsn(553232222L)));
+        assertFalse(filter.isMet(new Person("Tom", "Bombadil").withHourlyRate(748232221L)));
     }
 }

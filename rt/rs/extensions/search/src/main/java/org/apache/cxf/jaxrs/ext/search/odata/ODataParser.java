@@ -160,7 +160,7 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
             
             Object typedValue = null;
             // If property type and value type are compatible, just use them
-            if (property.typeInfo.getTypeClass().isAssignableFrom(value.typeClass)) {
+            if (property.typeInfo.getWrappedTypeClass().isAssignableFrom(value.typeClass)) {
                 typedValue = value.value;
             } else { // Property type and value type are not compatible and convert / cast are required
                 typedValue = parseType(property.propertyName, null, null, property.propertyName, 
