@@ -54,7 +54,7 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (!StringUtils.isEmpty(callbackValue)) {
             if (getAcceptType() != null) {
                 // may be needed to enforce the selection of 
-                // JSON-awarenprovider
+                // JSON-aware provider
                 message.put(Message.ACCEPT_CONTENT_TYPE, getAcceptType());
             }
             message.getExchange().put(CALLBACK_KEY, callbackValue);
@@ -63,7 +63,7 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     protected String getCallbackValue(Message message) {
         String theQuery = (String)message.get(Message.QUERY_STRING);
-        String callback = JAXRSUtils.getStructuredParams(theQuery, "&", false, false).getFirst(CALLBACK_PARAM);
+        String callback = JAXRSUtils.getStructuredParams(theQuery, "&", false, false).getFirst(callbackParam);
         if (StringUtils.isEmpty(callback)) {
             String httpAcceptType = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
             if (httpAcceptType != null && mediaType.equals(httpAcceptType)) {

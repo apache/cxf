@@ -66,6 +66,28 @@ public class JsonpInterceptorTest extends Assert {
     }
     
     @Test
+    public void testJsonWithPaddingCustomCallbackParam() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.QUERY_STRING, "_customjsonp=myCallback");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, bos);
+        
+        // Process the message
+        try {
+            in.setCallbackParam("_customjsonp");
+            in.handleMessage(message);
+            preStream.handleMessage(message);
+            postStream.handleMessage(message);
+            assertEquals("myCallback();", bos.toString());
+        } finally {
+            in.setCallbackParam("_jsonp");
+        }
+
+    }
+    
+    @Test
     public void testJsonWithDefaultPadding() throws Exception {
         Message message = new MessageImpl();
         message.put(Message.ACCEPT_CONTENT_TYPE, JsonpInInterceptor.JSONP_TYPE);
