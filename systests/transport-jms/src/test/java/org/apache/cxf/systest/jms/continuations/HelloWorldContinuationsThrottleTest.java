@@ -33,16 +33,16 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServerTestBase {
-    static EmbeddedJMSBrokerLauncher broker;
+    private static final String WSDL_PATH = "org/apache/cxf/systest/jms/continuations/test.wsdl";
+    private static final String CONFIG_FILE = "org/apache/cxf/systest/jms/continuations/jms_test_config.xml";
 
-    private static final String CONFIG_FILE =
-        "org/apache/cxf/systest/jms/continuations/jms_test_config.xml";
+    private static EmbeddedJMSBrokerLauncher broker;
+
     
     public static class Server extends AbstractBusTestServerBase {
         public static final String PORT = allocatePort(Server.class);
@@ -51,7 +51,7 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus(CONFIG_FILE);
             BusFactory.setDefaultBus(bus);
-            broker.updateWsdl(bus, "org/apache/cxf/systest/jms/continuations/test2.wsdl");
+            broker.updateWsdl(bus, WSDL_PATH);
             Object implementor = new HelloWorldWithContinuationsJMS2();        
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             Endpoint.publish(address, implementor);
@@ -70,14 +70,14 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
     }
     
     @Test
-    public void testHttpWrappedContinuatuions() throws Exception {
+    public void testHttpWrappedContinuations() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus(CONFIG_FILE);
         BusFactory.setDefaultBus(bus);
         
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
-        URL wsdlURL = getClass().getResource("/org/apache/cxf/systest/jms/continuations/test2.wsdl");
+        URL wsdlURL = getClass().getClassLoader().getResource(WSDL_PATH);
         String wsdlString = wsdlURL.toString().intern();
         broker.updateWsdl(getBus(), wsdlString);
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
@@ -102,7 +102,7 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
                 
         helloDoneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
-        assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());
+        assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());
         ((java.io.Closeable)helloPort).close();
 
         bus.shutdown(true);

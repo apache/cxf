@@ -371,8 +371,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
     public synchronized void close() {
-        ResourceCloser.close(connection);
         shutdownListeners();
+        ResourceCloser.close(connection);
+        connection = null;
         LOG.log(Level.FINE, "JMSConduit closed ");
     }
 

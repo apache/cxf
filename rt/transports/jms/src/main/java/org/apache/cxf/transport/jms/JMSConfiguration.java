@@ -102,10 +102,10 @@ public class JMSConfiguration {
             connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
         }
         if (connectionFactory == null) {
-            throw new IllegalArgumentException("JMSConfiguration.connectionFactory may not be null");
+            throw new IllegalArgumentException("connectionFactory may not be null");
         }
         if (targetDestination == null) {
-            throw new IllegalArgumentException("JMSConfigruation.targetDestination may not be null");
+            throw new IllegalArgumentException("targetDestination may not be null");
         }
     }
 

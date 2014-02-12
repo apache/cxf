@@ -39,7 +39,7 @@ import org.apache.cxf.continuations.ContinuationProvider;
             portName = "HelloContinuationPort", 
             targetNamespace = "http://cxf.apache.org/systest/jaxws",
             endpointInterface = "org.apache.cxf.systest.jms.continuations.HelloContinuation",
-            wsdlLocation = "org/apache/cxf/systest/jms/continuations/test2.wsdl")
+            wsdlLocation = "org/apache/cxf/systest/jms/continuations/test.wsdl")
 public class HelloWorldWithContinuationsJMS2 implements HelloContinuation {    
     
     private Map<String, Continuation> suspended = 
