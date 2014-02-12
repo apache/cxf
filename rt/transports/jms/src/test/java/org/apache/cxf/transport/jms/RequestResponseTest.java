@@ -137,7 +137,7 @@ public class RequestResponseTest extends AbstractJMSTester {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequest");
         sendAndReceiveMessages(ei, true);
-        sendAndReceiveMessages(ei, false);
+        //sendAndReceiveMessages(ei, false);
     }
     
     @Test
