@@ -22,11 +22,8 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" 
     	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
-    <bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
-        <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
-    </bean>
     <bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration" 
-    	p:connectionFactory-ref="singleConnectionFactory" 
+    	p:connectionFactory-ref="jmsConnectionFactory" 
     	p:timeToLive="500000" 
     	p:concurrentConsumers="1" 
     	p:maxSuspendedContinuations="0" 
