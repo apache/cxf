@@ -16,11 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
 
-public interface NonceStore {
+package org.apache.cxf.rs.security.oauth2.utils;
 
-    void storeNonce(String tokenKey, Nonce nonce, long requestTimeDelta);
 
-    NonceHistory getNonceHistory(String tokenKey);
+public enum HmacAlgorithm {
+    HmacSHA1(HmacUtils.ALGO_HMAC_SHA_1),
+    HmacSHA256(HmacUtils.ALGO_HMAC_SHA_256);
+
+    private final String oauthName;
+
+    private HmacAlgorithm(String oauthName) {
+        this.oauthName = oauthName;
+    }
+
+    public String getOAuthName() {
+        return oauthName;
+    }
+
+    public String getJavaName() {
+        return name();
+    }
+
+    public static HmacAlgorithm toHmacAlgorithm(String value) {
+        if (HmacUtils.ALGO_HMAC_SHA_1.equals(value)) {
+            return HmacSHA1;
+        }
+        if (HmacUtils.ALGO_HMAC_SHA_256.equals(value)) {
+            return HmacSHA256;
+        }
+        return null;
+    }
+    
 }

@@ -16,13 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.token.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.Nonce;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.NonceHistory;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.NonceStore;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.NonceVerifierImpl;
 import org.easymock.EasyMock;
 
 import org.junit.Assert;

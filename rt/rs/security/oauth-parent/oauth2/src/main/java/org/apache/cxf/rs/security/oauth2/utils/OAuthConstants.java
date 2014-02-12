@@ -50,7 +50,7 @@ public final class OAuthConstants {
     
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "bearer";
-    public static final String MAC_TOKEN_TYPE = "mac";
+    public static final String HAWK_TOKEN_TYPE = "hawk";
     
     // http://datatracker.ietf.org/doc/draft-sakimura-oauth-tcse
     public static final String AUTHORIZATION_CODE_VERIFIER = "code_verifier";
@@ -61,21 +61,19 @@ public final class OAuthConstants {
         
     // MAC token parameters
     // Set by Access Token Service
-    public static final String MAC_TOKEN_KEY = "mac_key";
-    public static final String MAC_TOKEN_ALGORITHM = "mac_algorithm";
-    public static final String MAC_TOKEN_ALGO_HMAC_SHA_1 = "hmac-sha-1";
-    public static final String MAC_TOKEN_ALGO_HMAC_SHA_256 = "hmac-sha-256";
+    public static final String HAWK_TOKEN_KEY = "secret";
+    public static final String HAWK_TOKEN_ALGORITHM = "algorithm";
     
     // Set in Authorization header
-    public static final String MAC_TOKEN_ID = "id";
-    public static final String MAC_TOKEN_TIMESTAMP = "ts";
-    public static final String MAC_TOKEN_EXTENSION = "ext";
-    public static final String MAC_TOKEN_NONCE = "nonce";
-    public static final String MAC_TOKEN_SIGNATURE = "mac";
+    public static final String HAWK_TOKEN_ID = "id";
+    public static final String HAWK_TOKEN_TIMESTAMP = "ts";
+    public static final String HAWK_TOKEN_EXTENSION = "ext";
+    public static final String HAWK_TOKEN_NONCE = "nonce";
+    public static final String HAWK_TOKEN_SIGNATURE = "mac";
     
     // Token Authorization schemes
     public static final String BEARER_AUTHORIZATION_SCHEME = "Bearer";
-    public static final String MAC_AUTHORIZATION_SCHEME = "MAC";
+    public static final String HAWK_AUTHORIZATION_SCHEME = "Hawk";
     public static final String ALL_AUTH_SCHEMES = "*";
 
     

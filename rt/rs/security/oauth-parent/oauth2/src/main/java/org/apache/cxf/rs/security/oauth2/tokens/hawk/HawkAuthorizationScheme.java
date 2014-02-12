@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.security.SecureRandom;
 import java.util.Map;
@@ -25,9 +25,12 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth2.client.HttpRequestProperties;
 import org.apache.cxf.rs.security.oauth2.common.AccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-
-public class MacAuthorizationScheme {
+// https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-05
+// ->
+// https://github.com/hueniverse/hawk/blob/master/README.md
+public class HawkAuthorizationScheme {
     private static final String SEPARATOR = "\n";
     
     private HttpRequestProperties props;
@@ -35,7 +38,7 @@ public class MacAuthorizationScheme {
     private String timestamp;
     private String nonce;
     
-    public MacAuthorizationScheme(HttpRequestProperties props,
+    public HawkAuthorizationScheme(HttpRequestProperties props,
                                   AccessToken token) {
         this.props = props;
         this.macKey = token.getTokenKey();
@@ -43,12 +46,12 @@ public class MacAuthorizationScheme {
         this.nonce = generateNonce();
     }
     
-    public MacAuthorizationScheme(HttpRequestProperties props,
+    public HawkAuthorizationScheme(HttpRequestProperties props,
                                   Map<String, String> schemeParams) {
         this.props = props;
-        this.macKey = schemeParams.get(OAuthConstants.MAC_TOKEN_ID);
-        this.timestamp = schemeParams.get(OAuthConstants.MAC_TOKEN_TIMESTAMP);
-        this.nonce = schemeParams.get(OAuthConstants.MAC_TOKEN_NONCE);
+        this.macKey = schemeParams.get(OAuthConstants.HAWK_TOKEN_ID);
+        this.timestamp = schemeParams.get(OAuthConstants.HAWK_TOKEN_TIMESTAMP);
+        this.nonce = schemeParams.get(OAuthConstants.HAWK_TOKEN_NONCE);
     }
     
     public String getMacKey() {
@@ -69,12 +72,11 @@ public class MacAuthorizationScheme {
         String signature = HmacUtils.computeSignature(macAlgo, macSecret, data);
         
         StringBuilder sb = new StringBuilder();
-        sb.append(OAuthConstants.MAC_AUTHORIZATION_SCHEME).append(" ");
-        addParameter(sb, OAuthConstants.MAC_TOKEN_ID, macKey, false);
-        addParameter(sb, OAuthConstants.MAC_TOKEN_NONCE, nonce, false);
-        addParameter(sb, OAuthConstants.MAC_TOKEN_SIGNATURE, signature, false);
-        addParameter(sb, OAuthConstants.MAC_TOKEN_TIMESTAMP, timestamp, true);
-        
+        sb.append(OAuthConstants.HAWK_AUTHORIZATION_SCHEME).append(" ");
+        addParameter(sb, OAuthConstants.HAWK_TOKEN_ID, macKey, false);
+        addParameter(sb, OAuthConstants.HAWK_TOKEN_TIMESTAMP, timestamp, false);
+        addParameter(sb, OAuthConstants.HAWK_TOKEN_NONCE, nonce, false);
+        addParameter(sb, OAuthConstants.HAWK_TOKEN_SIGNATURE, signature, true);
         
         return sb.toString();
     }
@@ -100,6 +102,7 @@ public class MacAuthorizationScheme {
             + requestURI + SEPARATOR 
             + props.getHostName() + SEPARATOR 
             + props.getPort() + SEPARATOR
+            + "" + SEPARATOR
             + "" + SEPARATOR;
 
         return value;

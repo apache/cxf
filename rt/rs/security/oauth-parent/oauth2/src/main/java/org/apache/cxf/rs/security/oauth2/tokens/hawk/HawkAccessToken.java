@@ -16,30 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.HmacAlgorithm;
+import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
-//See http://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-01
-public class MacAccessToken extends ServerAccessToken {
+//https://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-05
+//->
+//https://github.com/hueniverse/hawk/blob/master/README.md
+
+public class HawkAccessToken extends ServerAccessToken {
     
     private static final long serialVersionUID = -4331703769692080818L;
 
-    public MacAccessToken(Client client, 
+    public HawkAccessToken(Client client, 
                           long lifetime) {
         this(client, HmacAlgorithm.HmacSHA256, lifetime);
     }
     
-    public MacAccessToken(Client client, 
+    public HawkAccessToken(Client client, 
                           String macAuthAlgo,
                           long lifetime) {
         this(client, HmacAlgorithm.toHmacAlgorithm(macAuthAlgo), lifetime);
     }
     
-    public MacAccessToken(Client client, 
+    public HawkAccessToken(Client client, 
                           HmacAlgorithm macAlgo,
                           long lifetime) {
         this(client, 
@@ -48,34 +53,34 @@ public class MacAccessToken extends ServerAccessToken {
              lifetime, 
              OAuthUtils.getIssuedAt());
     }
-    public MacAccessToken(Client client,
+    public HawkAccessToken(Client client,
                           HmacAlgorithm algo,
                           String tokenKey,
                           long lifetime, 
                           long issuedAt) {
-        super(client, OAuthConstants.MAC_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
+        super(client, OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
         this.setExtraParameters(algo, null);
     }
     
-    public MacAccessToken(Client client,
+    public HawkAccessToken(Client client,
                           HmacAlgorithm algo,
                           String tokenKey,
                           String macKey,
                           long lifetime, 
                           long issuedAt) {
-        super(client, OAuthConstants.MAC_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
+        super(client, OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
         this.setExtraParameters(algo, macKey);
     }
     
-    public MacAccessToken(ServerAccessToken token, String newKey) {
-        super(validateTokenType(token, OAuthConstants.MAC_TOKEN_TYPE), newKey);
+    public HawkAccessToken(ServerAccessToken token, String newKey) {
+        super(validateTokenType(token, OAuthConstants.HAWK_TOKEN_TYPE), newKey);
     }
     
     private void setExtraParameters(HmacAlgorithm algo, String macKey) {
         String theKey = macKey == null ? HmacUtils.generateSecret(algo) : macKey; 
-        super.getParameters().put(OAuthConstants.MAC_TOKEN_KEY,
+        super.getParameters().put(OAuthConstants.HAWK_TOKEN_KEY,
                                   theKey);
-        super.getParameters().put(OAuthConstants.MAC_TOKEN_ALGORITHM,
+        super.getParameters().put(OAuthConstants.HAWK_TOKEN_ALGORITHM,
                                   algo.getOAuthName());
     }
     
@@ -84,10 +89,10 @@ public class MacAccessToken extends ServerAccessToken {
     }
     
     public String getMacKey() {
-        return super.getParameters().get(OAuthConstants.MAC_TOKEN_KEY);
+        return super.getParameters().get(OAuthConstants.HAWK_TOKEN_KEY);
     }
     
     public String getMacAlgorithm() {
-        return super.getParameters().get(OAuthConstants.MAC_TOKEN_ALGORITHM);
+        return super.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
     }
 }

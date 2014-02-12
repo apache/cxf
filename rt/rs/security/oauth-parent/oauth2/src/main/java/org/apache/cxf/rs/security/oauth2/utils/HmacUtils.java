@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
+package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -28,18 +28,18 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public final class HmacUtils {
+    public static final String ALGO_HMAC_SHA_1 = "hmac-sha-1";
+    public static final String ALGO_HMAC_SHA_256 = "hmac-sha-256";
+    
     private HmacUtils() {
         
     }
     
     public static String computeSignature(String macAlgoOAuthName, String macSecret, String data) {
         HmacAlgorithm theAlgo = HmacAlgorithm.toHmacAlgorithm(macAlgoOAuthName);
-        return HmacUtils.computeHmacString(macSecret, 
-                                           theAlgo.getJavaName(), 
-                                           data);
+        return computeHmacString(macSecret, theAlgo.getJavaName(), data);
     }
     
     /**

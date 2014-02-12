@@ -16,27 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
-import java.io.Serializable;
+public interface NonceStore {
 
-public class Nonce implements Serializable {
+    void storeNonce(String tokenKey, Nonce nonce, long requestTimeDelta);
 
-    private static final long serialVersionUID = -6164115071533503490L;
-
-    private String nonceString;
-    private long ts;
-
-    public Nonce(String nonce, long ts) {
-        this.nonceString = nonce;
-        this.ts = ts;
-    }
-
-    public String getNonceString() {
-        return nonceString;
-    }
-
-    public long getTs() {
-        return ts;
-    }
+    NonceHistory getNonceHistory(String tokenKey);
 }

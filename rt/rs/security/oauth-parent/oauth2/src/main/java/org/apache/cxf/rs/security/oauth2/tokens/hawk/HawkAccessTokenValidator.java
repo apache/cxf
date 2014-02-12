@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,14 +34,16 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
+import org.apache.cxf.rs.security.oauth2.utils.HmacAlgorithm;
+import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class MacAccessTokenValidator implements AccessTokenValidator {
+public class HawkAccessTokenValidator implements AccessTokenValidator {
     private OAuthDataProvider dataProvider;
     private NonceVerifier nonceVerifier;
     
     public List<String> getSupportedAuthorizationSchemes() {
-        return Collections.singletonList(OAuthConstants.MAC_AUTHORIZATION_SCHEME);
+        return Collections.singletonList(OAuthConstants.HAWK_AUTHORIZATION_SCHEME);
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
@@ -50,10 +52,10 @@ public class MacAccessTokenValidator implements AccessTokenValidator {
         HttpRequestProperties httpProps = new HttpRequestProperties(mc.getUriInfo().getRequestUri(),
                                                                     mc.getHttpServletRequest().getMethod()); 
         Map<String, String> schemeParams = getSchemeParameters(authSchemeData);
-        MacAuthorizationScheme macAuthInfo = new MacAuthorizationScheme(httpProps, schemeParams);
+        HawkAuthorizationScheme macAuthInfo = new HawkAuthorizationScheme(httpProps, schemeParams);
         
-        MacAccessToken macAccessToken = validateSchemeData(macAuthInfo,
-                                                           schemeParams.get(OAuthConstants.MAC_TOKEN_SIGNATURE));
+        HawkAccessToken macAccessToken = validateSchemeData(macAuthInfo,
+                                                           schemeParams.get(OAuthConstants.HAWK_TOKEN_SIGNATURE));
         validateTimestampNonce(macAccessToken, macAuthInfo.getTimestamp(), macAuthInfo.getNonce());
         return new AccessTokenValidation(macAccessToken);
     }
@@ -68,22 +70,21 @@ public class MacAccessTokenValidator implements AccessTokenValidator {
         return attributeMap;
     }
     
-    protected void validateTimestampNonce(MacAccessToken token, String ts, String nonce) {
-        // (http://tools.ietf.org/html/draft-ietf-oauth-v2-http-mac-01#section-4.1)
+    protected void validateTimestampNonce(HawkAccessToken token, String ts, String nonce) {
         if (nonceVerifier != null) {
             nonceVerifier.verifyNonce(token.getTokenKey(), nonce, ts);
         }
     }
     
-    private MacAccessToken validateSchemeData(MacAuthorizationScheme macAuthInfo,
+    private HawkAccessToken validateSchemeData(HawkAuthorizationScheme macAuthInfo,
                                               String clientMacString) {
         String macKey = macAuthInfo.getMacKey();
         
         ServerAccessToken accessToken = dataProvider.getAccessToken(macKey);
-        if (!(accessToken instanceof MacAccessToken)) {
+        if (!(accessToken instanceof HawkAccessToken)) {
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
         }
-        MacAccessToken macAccessToken = (MacAccessToken)accessToken;
+        HawkAccessToken macAccessToken = (HawkAccessToken)accessToken;
         
         String normalizedString = macAuthInfo.getNormalizedRequestString();
         try {
@@ -95,7 +96,7 @@ public class MacAccessTokenValidator implements AccessTokenValidator {
             boolean validMac = Arrays.equals(serverMacData, clientMacData);
             if (!validMac) {
                 AuthorizationUtils.throwAuthorizationFailure(Collections
-                    .singleton(OAuthConstants.MAC_AUTHORIZATION_SCHEME));
+                    .singleton(OAuthConstants.HAWK_AUTHORIZATION_SCHEME));
             }
         } catch (Base64Exception e) {
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, e);

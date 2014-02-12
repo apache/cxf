@@ -37,7 +37,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.MacAuthorizationScheme;
+import org.apache.cxf.rs.security.oauth2.tokens.hawk.HawkAuthorizationScheme;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
@@ -359,13 +359,13 @@ public final class OAuthClientUtils {
             sb.append(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
             sb.append(" ");
             sb.append(token.getTokenKey());
-        } else if (OAuthConstants.MAC_TOKEN_TYPE.equals(token.getTokenType())) {
+        } else if (OAuthConstants.HAWK_TOKEN_TYPE.equals(token.getTokenType())) {
             if (httpProps == null) {
                 throw new IllegalArgumentException("MAC scheme requires HTTP Request properties");
             }
-            MacAuthorizationScheme macAuthData = new MacAuthorizationScheme(httpProps, token);
-            String macAlgo = token.getParameters().get(OAuthConstants.MAC_TOKEN_ALGORITHM);
-            String macKey = token.getParameters().get(OAuthConstants.MAC_TOKEN_KEY);
+            HawkAuthorizationScheme macAuthData = new HawkAuthorizationScheme(httpProps, token);
+            String macAlgo = token.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
+            String macKey = token.getParameters().get(OAuthConstants.HAWK_TOKEN_KEY);
             sb.append(macAuthData.toAuthorizationHeader(macAlgo, macKey));
         } else {
             throw new ProcessingException(new OAuthServiceException("Unsupported token type"));

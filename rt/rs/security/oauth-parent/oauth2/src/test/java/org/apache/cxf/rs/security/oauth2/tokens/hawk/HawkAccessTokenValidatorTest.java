@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.token.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.net.URI;
 
@@ -28,10 +28,7 @@ import org.apache.cxf.rs.security.oauth2.client.HttpRequestProperties;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.HmacAlgorithm;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.MacAccessToken;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.MacAccessTokenValidator;
-import org.apache.cxf.rs.security.oauth2.tokens.mac.MacAuthorizationScheme;
+import org.apache.cxf.rs.security.oauth2.utils.HmacAlgorithm;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.easymock.EasyMock;
 
@@ -39,9 +36,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MacAccessTokenValidatorTest extends Assert {
+public class HawkAccessTokenValidatorTest extends Assert {
 
-    private MacAccessTokenValidator validator = new MacAccessTokenValidator();
+    private HawkAccessTokenValidator validator = new HawkAccessTokenValidator();
     private OAuthDataProvider dataProvider = EasyMock.createMock(OAuthDataProvider.class);
     private MessageContext messageContext = EasyMock.createMock(MessageContext.class);
     
@@ -52,7 +49,7 @@ public class MacAccessTokenValidatorTest extends Assert {
     
     @Test
     public void testValidateAccessToken() throws Exception {
-        MacAccessToken macAccessToken = new MacAccessToken(new Client("testClientId", "testClientSecret",
+        HawkAccessToken macAccessToken = new HawkAccessToken(new Client("testClientId", "testClientSecret",
                                                                           false), 
                                                                           HmacAlgorithm.HmacSHA256, -1);
         HttpServletRequest httpRequest = mockHttpRequest();
@@ -66,17 +63,17 @@ public class MacAccessTokenValidatorTest extends Assert {
         String authData = getClientAuthHeader(macAccessToken);
         AccessTokenValidation tokenValidation = validator
             .validateAccessToken(messageContext, 
-                                 OAuthConstants.MAC_AUTHORIZATION_SCHEME, 
+                                 OAuthConstants.HAWK_AUTHORIZATION_SCHEME, 
                                  authData.split(" ")[1]);
         assertNotNull(tokenValidation);
         EasyMock.verify(dataProvider, messageContext, httpRequest);
     }
     
-    private static String getClientAuthHeader(MacAccessToken macAccessToken) {
+    private static String getClientAuthHeader(HawkAccessToken macAccessToken) {
         String address = "http://localhost:8080/appContext/oauth2/testResource";
         HttpRequestProperties props = new HttpRequestProperties(URI.create(address), "GET");
         
-        return new MacAuthorizationScheme(props, macAccessToken)
+        return new HawkAuthorizationScheme(props, macAccessToken)
             .toAuthorizationHeader(macAccessToken.getMacAlgorithm(),
                                    macAccessToken.getMacKey());
     }

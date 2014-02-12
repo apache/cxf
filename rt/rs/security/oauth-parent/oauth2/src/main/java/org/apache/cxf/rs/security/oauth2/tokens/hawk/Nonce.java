@@ -16,11 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.tokens.mac;
+package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
-import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import java.io.Serializable;
 
-public interface NonceVerifier {
-    void verifyNonce(String tokenKey, String clientNonce, String clientTimestamp) 
-        throws OAuthServiceException;
+public class Nonce implements Serializable {
+
+    private static final long serialVersionUID = -6164115071533503490L;
+
+    private String nonceString;
+    private long ts;
+
+    public Nonce(String nonce, long ts) {
+        this.nonceString = nonce;
+        this.ts = ts;
+    }
+
+    public String getNonceString() {
+        return nonceString;
+    }
+
+    public long getTs() {
+        return ts;
+    }
 }

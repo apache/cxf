@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.HmacUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.Assert;
@@ -101,14 +102,14 @@ public class OAuthJSONProviderTest extends Assert {
     }
     
     @Test
-    public void testWriteMacClientAccessToken() throws Exception {
-        ClientAccessToken token = new ClientAccessToken("mac", "1234");
+    public void testWriteHawkClientAccessToken() throws Exception {
+        ClientAccessToken token = new ClientAccessToken("hawk", "1234");
         token.setExpiresIn(12345);
         token.setRefreshToken("5678");
         token.setApprovedScope("read");
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(OAuthConstants.MAC_TOKEN_KEY, "test_mac_secret");
-        params.put(OAuthConstants.MAC_TOKEN_ALGORITHM, OAuthConstants.MAC_TOKEN_ALGO_HMAC_SHA_1);
+        params.put(OAuthConstants.HAWK_TOKEN_KEY, "test_mac_secret");
+        params.put(OAuthConstants.HAWK_TOKEN_ALGORITHM, HmacUtils.ALGO_HMAC_SHA_1);
         params.put("my_parameter", "http://abc");
         
         token.setParameters(params);
@@ -118,22 +119,22 @@ public class OAuthJSONProviderTest extends Assert {
         provider.writeTo(token, ClientAccessToken.class, ClientAccessToken.class, new Annotation[] {},
                          MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), bos);
         doReadClientAccessToken(bos.toString(), 
-                                OAuthConstants.MAC_TOKEN_TYPE,
+                                OAuthConstants.HAWK_TOKEN_TYPE,
                                 params);
         
     }
     
     @Test
-    public void testReadMacClientAccessToken() throws Exception {
-        String response = "{" + "\"access_token\":\"1234\"," + "\"token_type\":\"mac\","
+    public void testReadHawkClientAccessToken() throws Exception {
+        String response = "{" + "\"access_token\":\"1234\"," + "\"token_type\":\"hawk\","
             + "\"refresh_token\":\"5678\"," + "\"expires_in\":12345," + "\"scope\":\"read\","
-            + "\"mac_key\":\"adijq39jdlaska9asud\"," + "\"mac_algorithm\":\"hmac-sha-256\","
+            + "\"secret\":\"adijq39jdlaska9asud\"," + "\"algorithm\":\"hmac-sha-256\","
             + "\"my_parameter\":\"http://abc\"" + "}";
-        ClientAccessToken macToken = doReadClientAccessToken(response, "mac", null);
+        ClientAccessToken macToken = doReadClientAccessToken(response, "hawk", null);
         assertEquals("adijq39jdlaska9asud", 
-                     macToken.getParameters().get(OAuthConstants.MAC_TOKEN_KEY));
+                     macToken.getParameters().get(OAuthConstants.HAWK_TOKEN_KEY));
         assertEquals("hmac-sha-256",
-                     macToken.getParameters().get(OAuthConstants.MAC_TOKEN_ALGORITHM));
+                     macToken.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM));
     }
     
 }
