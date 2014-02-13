@@ -482,7 +482,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
     private PolicyEnforcer createPolicyEnforcer(
         EndpointInfo endpointInfo, SoapMessage msg
     ) throws WSSPolicyException {
-
+        EffectivePolicy dispatchPolicy = null;
         List<OperationPolicy> operationPolicies = new ArrayList<OperationPolicy>();
         Collection<BindingOperationInfo> bindingOperationInfos = endpointInfo.getBinding().getOperations();
         for (Iterator<BindingOperationInfo> bindingOperationInfoIterator =
@@ -502,13 +502,25 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             if (MessageUtils.isRequestor(msg)) {
                 policy = 
                     (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-client-response");
-                MessageInfo messageInfo = bindingOperationInfo.getOutput().getMessageInfo();
-                localName = messageInfo.getName().getLocalPart();
-                if (!messageInfo.getMessageParts().isEmpty()) {
-                    localName = messageInfo.getMessagePart(0).getConcreteName().getLocalPart();
+                // Save the Dispatch Policy as it may be used on another BindingOperationInfo
+                if (policy != null 
+                    && "http://cxf.apache.org/jaxws/dispatch".equals(operationName.getNamespaceURI())) {
+                    dispatchPolicy = policy;
+                }
+                if (bindingOperationInfo.getOutput() != null) {
+                    MessageInfo messageInfo = bindingOperationInfo.getOutput().getMessageInfo();
+                    localName = messageInfo.getName().getLocalPart();
+                    if (!messageInfo.getMessageParts().isEmpty()
+                        && messageInfo.getMessagePart(0).getConcreteName() != null) {
+                        localName = messageInfo.getMessagePart(0).getConcreteName().getLocalPart();
+                    }
                 }
             }
             SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
+            if (soapOperationInfo != null && policy == null && dispatchPolicy != null) {
+                policy = dispatchPolicy;
+            }
+            
             if (policy != null && soapOperationInfo != null) {
                 String soapNS;
                 BindingInfo bindingInfo = bindingOperationInfo.getBinding();
