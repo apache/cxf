@@ -21,19 +21,34 @@ package org.apache.cxf.systest.sts.transport;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -277,6 +292,123 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testSAML2Dispatch() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
+       
+        Dispatch<DOMSource> dispatch = 
+            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
+        updateAddressPort(dispatch, test.getPort());
+        
+        // Setup STSClient
+        STSClient stsClient = createDispatchSTSClient(bus);
+        String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
+        stsClient.setWsdlLocation(wsdlLocation);
+        
+        // Creating a DOMSource Object for the request
+        DOMSource request = createDOMRequest();
+        
+        // Make a successful request
+        Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
+        client.getRequestContext().put("ws-security.username", "alice");
+        client.getRequestContext().put("ws-security.sts.client", stsClient);
+        
+        if (test.isStreaming()) {
+            client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+            client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+        }
+        
+        DOMSource response = dispatch.invoke(request);
+        assertNotNull(response);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSAML2DispatchLocation() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
+       
+        Dispatch<DOMSource> dispatch = 
+            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
+        updateAddressPort(dispatch, test.getPort());
+        
+        // Setup STSClient
+        STSClient stsClient = createDispatchSTSClient(bus);
+        String location = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport";
+        stsClient.setLocation(location);
+        stsClient.setPolicy("classpath:/org/apache/cxf/systest/sts/issuer/sts-transport-policy.xml");
+        
+        // Creating a DOMSource Object for the request
+        DOMSource request = createDOMRequest();
+        
+        // Make a successful request
+        Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
+        client.getRequestContext().put("ws-security.username", "alice");
+        client.getRequestContext().put("ws-security.sts.client", stsClient);
+        
+        if (test.isStreaming()) {
+            client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+            client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+        }
+        
+        DOMSource response = dispatch.invoke(request);
+        assertNotNull(response);
+        
+        bus.shutdown(true);
+    }
+    
+    private DOMSource createDOMRequest() throws ParserConfigurationException {
+        // Creating a DOMSource Object for the request
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document requestDoc = db.newDocument();
+        Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
+        root.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
+        Element number = requestDoc.createElementNS(null, "numberToDouble");
+        number.setTextContent("25");
+        root.appendChild(number);
+        requestDoc.appendChild(root);
+        return new DOMSource(requestDoc);
+    }
+    
+    private STSClient createDispatchSTSClient(Bus bus) {
+        STSClient stsClient = new STSClient(bus);
+        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
+        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("ws-security.username", "alice");
+        properties.put("ws-security.callback-handler",
+                       "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put("ws-security.sts.token.username", "myclientkey");
+        properties.put("ws-security.sts.token.properties", "clientKeystore.properties");
+        properties.put("ws-security.sts.token.usecert", "true");
+        stsClient.setProperties(properties);
+        
+        return stsClient;
+    }
+    
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
