@@ -112,6 +112,9 @@ public final class OAuthConstants {
     public static final String REVOKED_TOKEN_TYPE_HINT = "token_type_hint";
     public static final String UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
     
+    // Authorization scheme constants, used internally by AccessTokenValidation client and service
+    public static final String AUTHORIZATION_SCHEME_TYPE = "authScheme";
+    public static final String AUTHORIZATION_SCHEME_DATA = "authSchemeData";
     
     private OAuthConstants() {
     }

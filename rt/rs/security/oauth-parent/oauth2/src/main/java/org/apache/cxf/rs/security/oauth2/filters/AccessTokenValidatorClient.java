@@ -43,7 +43,8 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
                                                      String authSchemeData) 
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
-        Form form = new Form().param("authScheme", authScheme).param("authSchemeData", authSchemeData);
+        Form form = new Form().param(OAuthConstants.AUTHORIZATION_SCHEME_TYPE, authScheme)
+                              .param(OAuthConstants.AUTHORIZATION_SCHEME_DATA, authSchemeData);
         return client.post(form, AccessTokenValidation.class);
     }
 

@@ -28,14 +28,16 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 @Path("validate")
 public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
     @POST
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public AccessTokenValidation getTokenValidationInfo(@FormParam("authScheme") String authScheme, 
-                                                        @Encoded @FormParam("authScheme") String authSchemeData) {
+    public AccessTokenValidation getTokenValidationInfo(
+        @FormParam(OAuthConstants.AUTHORIZATION_SCHEME_TYPE) String authScheme, 
+        @Encoded @FormParam(OAuthConstants.AUTHORIZATION_SCHEME_DATA) String authSchemeData) {
         if (getMessageContext().getSecurityContext().getUserPrincipal() == null) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
