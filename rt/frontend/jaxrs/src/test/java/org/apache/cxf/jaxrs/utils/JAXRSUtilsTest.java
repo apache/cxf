@@ -1852,7 +1852,7 @@ public class JAXRSUtilsTest extends Assert {
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.add("AHeader2", "theAHeader2");
         m.put(Message.PROTOCOL_HEADERS, headers);
-        m.put(Message.QUERY_STRING, "a=aValue&query2=b");
+        m.put(Message.QUERY_STRING, "a_value=aValue&query2=b");
         JAXRSUtils.injectParameters(ori, c, m);
         assertEquals("aValue", c.getQueryParam());
         assertEquals("theAHeader2", c.getAHeader2());

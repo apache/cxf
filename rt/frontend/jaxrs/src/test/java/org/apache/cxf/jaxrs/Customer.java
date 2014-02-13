@@ -281,7 +281,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         return servletContext3;
     }
     
-    @QueryParam("a")
+    @QueryParam("a_value")
     public void setA(String a) {
         queryParam = a;
     }
