@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.filters;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Form;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -43,8 +43,8 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
                                                      String authSchemeData) 
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
-        client.header(HttpHeaders.AUTHORIZATION, authScheme + " " + authSchemeData);
-        return client.get(AccessTokenValidation.class);
+        Form form = new Form().param("authScheme", authScheme).param("authSchemeData", authSchemeData);
+        return client.post(form, AccessTokenValidation.class);
     }
 
     public void setTokenValidatorClient(WebClient tokenValidatorClient) {

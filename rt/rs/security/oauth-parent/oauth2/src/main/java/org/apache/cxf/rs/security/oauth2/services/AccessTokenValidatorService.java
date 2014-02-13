@@ -18,9 +18,10 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -30,8 +31,9 @@ import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 
 @Path("validate")
 public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
-    @GET
+    @POST
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public AccessTokenValidation getTokenValidationInfo(@FormParam("authScheme") String authScheme, 
                                                         @Encoded @FormParam("authScheme") String authSchemeData) {
         if (getMessageContext().getSecurityContext().getUserPrincipal() == null) {
