@@ -59,6 +59,7 @@ public class TestReceiver {
         ResourceCloser closer = new ResourceCloser();
         try {
             Connection connection = closer.register(connectionFactory.createConnection());
+            connection.start();
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session.createQueue(receiveQueueName)));
             javax.jms.Message message = null;
@@ -76,6 +77,7 @@ public class TestReceiver {
         ResourceCloser closer = new ResourceCloser();
         try {
             Connection connection = closer.register(connectionFactory.createConnection());
+            connection.start();
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session
                 .createQueue(receiveQueueName)));
