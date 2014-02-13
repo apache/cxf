@@ -308,9 +308,12 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
             boolean findDispatchOp = Boolean.TRUE.equals(getRequestContext().get("find.dispatch.operation"));
             
+            boolean hasOpName;
             if (opName == null) {
+                hasOpName = false;
                 opName = isOneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME;
             } else {
+                hasOpName = true;
                 BindingOperationInfo bop = client.getEndpoint().getBinding()
                                             .getBindingInfo().getOperation(opName);
                 if (bop == null) {
@@ -340,10 +343,10 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                     }
                 }
             }
-            Map<String, QName> payloadOPMap = 
-                createPayloadEleOpNameMap(client.getEndpoint().getBinding().getBindingInfo());
+            Map<String, QName> payloadOPMap = createPayloadEleOpNameMap(
+                    client.getEndpoint().getBinding().getBindingInfo(), hasOpName);
             if (findDispatchOp && !payloadOPMap.isEmpty()) {
-                String payloadElementName = null;              
+                QName payloadElementName = null;
                 if (obj instanceof javax.xml.transform.Source) {
                     XMLStreamReader reader = null;
                     try {
@@ -367,7 +370,24 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 }
 
                 if (payloadElementName != null) {
-                    QName dispatchedOpName = payloadOPMap.get(payloadElementName);
+                    if (hasOpName) {
+                        // Verify the payload element against the given operation name.
+                        // This allows graceful handling of non-standard WSDL definitions
+                        // where different operations have the same payload element.
+                        QName expectedElementName = payloadOPMap.get(opName.toString());
+                        if (expectedElementName == null || !expectedElementName.toString().equals(
+                                payloadElementName.toString())) {
+                            // Verification of the provided operation name failed.
+                            // Resolve the operation name from the payload element.
+                            hasOpName = false;
+                            payloadOPMap = createPayloadEleOpNameMap(
+                                    client.getEndpoint().getBinding().getBindingInfo(), hasOpName);
+                        }
+                    }
+                    QName dispatchedOpName = null;
+                    if (!hasOpName) {
+                        dispatchedOpName = payloadOPMap.get(payloadElementName.toString());
+                    }
                     if (null != dispatchedOpName) {
                         BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
                           .getOperation(opName);
@@ -436,7 +456,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         return client;
     }
     
-    private String getPayloadElementName(Element ele) {
+    private QName getPayloadElementName(Element ele) {
         XMLStreamReader xmlreader = StaxUtils.createXMLStreamReader(ele);
         DepthXMLStreamReader reader = new DepthXMLStreamReader(xmlreader);
         try {
@@ -444,14 +464,14 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
 
                 StaxUtils.skipToStartOfElement(reader);
 
-                return reader.getName().toString();
+                return reader.getName();
             }
             if (this.mode == Service.Mode.MESSAGE) {
                 StaxUtils.skipToStartOfElement(reader);
                 StaxUtils.toNextTag(reader,
                                     new QName(ele.getNamespaceURI(), "Body"));
                 reader.nextTag();
-                return reader.getName().toString();
+                return reader.getName();
             }
         } catch (XMLStreamException e) {
             // ignore
@@ -461,12 +481,12 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     }
     
     
-    private String getPayloadElementName(SOAPMessage soapMessage) {
+    private QName getPayloadElementName(SOAPMessage soapMessage) {
         try {            
             // we only care about the first element node, not text nodes
             Element element = DOMUtils.getFirstElement(SAAJUtils.getBody(soapMessage));
             if (element != null) {
-                return DOMUtils.getElementQName(element).toString();
+                return DOMUtils.getElementQName(element);
             }
         } catch (Exception e) {
             //ignore
@@ -474,7 +494,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         return null;
     }
     
-    private String getPayloadElementName(Object object) {
+    private QName getPayloadElementName(Object object) {
         JAXBDataBinding dataBinding = new JAXBDataBinding();
         dataBinding.setContext(context);
         DataWriter<XMLStreamWriter> dbwriter = dataBinding.createWriter(XMLStreamWriter.class);
@@ -492,7 +512,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
 
                 StaxUtils.skipToStartOfElement(reader);
 
-                return reader.getName().toString();
+                return reader.getName();
 
             }
         } catch (XMLStreamException e) {
@@ -504,7 +524,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         return null;
     }
     
-    private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo) {
+    private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo, boolean reverseMapping) {
         Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
         // assume a document binding style, which is default according to W3C spec on WSDL
         String bindingStyle = "document";
@@ -526,12 +546,17 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                         && !bop.getOperationInfo().getInput().getMessageParts().isEmpty()) {
                         QName qn = bop.getOperationInfo().getInput().getMessagePartByIndex(0)
                             .getElementQName();
-                        payloadElementMap.put(qn.toString(), bop.getOperationInfo().getName());
+                        QName op = bop.getOperationInfo().getName();
+                        if (reverseMapping) {
+                            payloadElementMap.put(op.toString(), qn);
+                        } else {
+                            payloadElementMap.put(qn.toString(), op);
+                        }
                     }
                 } else if ("rpc".equals(operationStyle)) {
                     // if rpc
-                    payloadElementMap.put(bop.getOperationInfo().getName().toString(), bop.getOperationInfo()
-                        .getName());
+                    QName op = bop.getOperationInfo().getName();
+                    payloadElementMap.put(op.toString(), op);
                 }
             }
         }
@@ -541,5 +566,4 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     public void close() throws IOException {
         client.destroy();
     }
-    
 }
