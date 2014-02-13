@@ -106,7 +106,10 @@ public final class OAuthConstants {
     public static final String INVALID_SCOPE = "invalid_scope";
     public static final String ACCESS_DENIED = "access_denied";
     
-    
+    // Authorization scheme constants, used internally by AccessTokenValidation client and service
+    public static final String AUTHORIZATION_SCHEME_TYPE = "authScheme";
+    public static final String AUTHORIZATION_SCHEME_DATA = "authSchemeData";
+
     private OAuthConstants() {
     }
     

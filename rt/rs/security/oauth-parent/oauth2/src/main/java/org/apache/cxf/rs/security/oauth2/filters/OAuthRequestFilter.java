@@ -40,6 +40,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.services.AbstractAccessTokenValidator;
+import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -63,8 +64,15 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
             return;
         }
         
+        // Get the scheme and its data, Bearer only is supported by default
+        // WWW-Authenticate with the list of supported schemes will be sent back 
+        // if the scheme is not accepted
+        String[] authParts = getAuthorizationParts(m);
+        String authScheme = authParts[0];
+        String authSchemeData = authParts[1];
+        
         // Get the access token
-        AccessTokenValidation accessTokenV = getAccessTokenValidation(); 
+        AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData); 
         
         // Find the scopes which match the current request
         
@@ -188,4 +196,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         this.audienceIsEndpointAddress = audienceIsEndpointAddress;
     }
     
+    protected String[] getAuthorizationParts(Message m) {
+        return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
+    }
 }
