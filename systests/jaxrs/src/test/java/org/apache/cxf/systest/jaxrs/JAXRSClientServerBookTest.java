@@ -283,7 +283,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     private void doTestUseParamBeanWebClient(String address) {
         WebClient wc = WebClient.create(address);
         wc.path("100");
-        wc.query("id2", "20");
+        wc.query("id_2", "20");
         wc.query("id3", "3");
         Book book = wc.get(Book.class);
         assertEquals(123L, book.getId());

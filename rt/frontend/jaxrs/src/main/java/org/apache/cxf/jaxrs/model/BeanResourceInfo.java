@@ -82,7 +82,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
             }
             for (Annotation a : m.getAnnotations()) {
                 if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
-                    checkParamMethod(m, AnnotationUtils.getAnnotationValue(a));
+                    addParamMethod(m);
                     break;
                 }
             }
@@ -109,11 +109,5 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
     public List<Field> getParameterFields() {
         return paramFields == null ? Collections.<Field>emptyList() 
                                     : Collections.unmodifiableList(paramFields);
-    }
-    
-    private void checkParamMethod(Method m, String value) {
-        if (m.getName().equalsIgnoreCase("set" + value)) {
-            addParamMethod(m);
-        }
     }
 }

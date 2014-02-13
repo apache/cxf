@@ -1580,7 +1580,7 @@ public class BookStore {
             return id2;
         }
 
-        @QueryParam("id2")
+        @QueryParam("id_2")
         public void setId2(long id2) {
             this.id2 = id2;
         }
