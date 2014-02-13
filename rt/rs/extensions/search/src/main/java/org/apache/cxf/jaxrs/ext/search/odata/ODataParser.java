@@ -31,6 +31,8 @@ import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckCondition;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.olingo.odata2.api.edm.EdmLiteral;
 import org.apache.olingo.odata2.api.edm.EdmLiteralKind;
 import org.apache.olingo.odata2.api.edm.EdmSimpleType;
@@ -165,6 +167,12 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
             } else { // Property type and value type are not compatible and convert / cast are required
                 typedValue = parseType(property.propertyName, null, null, property.propertyName, 
                     property.typeInfo, value.literal);
+            }
+            
+            final CollectionCheckInfo checkInfo = property.typeInfo.getCollectionCheckInfo();
+            if (checkInfo != null) {
+                return new CollectionCheckCondition< T >(property.propertyName, typedValue, 
+                    property.typeInfo.getGenericType(), conditionType, condition, checkInfo);
             }
                         
             return new PrimitiveSearchCondition< T >(property.propertyName, 

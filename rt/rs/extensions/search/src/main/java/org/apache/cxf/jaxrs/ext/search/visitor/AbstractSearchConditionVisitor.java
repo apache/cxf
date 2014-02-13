@@ -92,7 +92,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
                     valueCls = value.getClass();
                     type = m.getGenericReturnType();
                 } catch (Throwable ex) {
-                    throw new RuntimeException();
+                    throw new RuntimeException(ex);
                 }
                 return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, set);
             }
