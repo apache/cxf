@@ -28,7 +28,6 @@ import javax.persistence.Tuple;
 
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.odata.ODataParser;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorTest {
@@ -53,28 +52,28 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
         assertTrue(10 == books.get(0).getId() && "num10".equals(books.get(0).getBookTitle()));
     }
     
-    @Test @Ignore("Fixing, in progress") 
+    @Test 
     public void testQueryCollection() throws Exception {
         List<Book> books = 
             queryBooks("reviews.authors eq 'Ted'");
         assertEquals(3, books.size());
     }
     
-    @Test @Ignore("Fixing, in progress")
+    @Test
     public void testQueryCollection2() throws Exception {
         List<Book> books = 
             queryBooks("reviews.book.id eq 10");
         assertEquals(1, books.size());
     }
     
-    @Test @Ignore("Fixing, in progress")
+    @Test
     public void testQueryCollection3() throws Exception {
         List<Book> books = 
             queryBooks("reviews.book.ownerInfo.name eq 'Barry'");
         assertEquals(1, books.size());
     }
     
-    @Test @Ignore("Fixing, in progress")
+    @Test
     public void testQueryElementCollection() throws Exception {
         List<Book> books = 
             queryBooks("authors eq 'John'");
@@ -95,14 +94,14 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
         assertEquals(0, books.size());
     }    
     
-    @Test @Ignore("Fixing, in progress")
+    @Test
     public void testQueryCollectionSize2() throws Exception {
         List<Book> books = 
             queryBooks("reviews.authors gt 0");
         assertEquals(3, books.size());
     }
     
-    @Test @Ignore("Fixing, in progress")
+    @Test
     public void testAndQueryCollection() throws Exception {
         List<Book> books = 
             queryBooks("id eq 10 and authors eq 'John' and reviews.review eq 'good' and reviews.authors eq 'Ted'");

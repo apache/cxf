@@ -175,8 +175,8 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
                     property.typeInfo.getGenericType(), conditionType, condition, checkInfo);
             }
                         
-            return new PrimitiveSearchCondition< T >(property.propertyName, 
-                typedValue, conditionType, condition);
+            return new PrimitiveSearchCondition< T >(property.propertyName, typedValue,  
+                property.typeInfo.getGenericType(), conditionType, condition);
         }
 
         @Override
