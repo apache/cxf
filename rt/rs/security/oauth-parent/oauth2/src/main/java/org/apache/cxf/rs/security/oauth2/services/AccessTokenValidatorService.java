@@ -18,18 +18,25 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
+import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 
 @Path("validate")
 public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public AccessTokenValidation getTokenValidationInfo() {
-        return super.getAccessTokenValidation();
+    public AccessTokenValidation getTokenValidationInfo(@FormParam("authScheme") String authScheme, 
+                                                        @Encoded @FormParam("authScheme") String authSchemeData) {
+        if (getMessageContext().getSecurityContext().getUserPrincipal() == null) {
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+        }
+        return super.getAccessTokenValidation(authScheme, authSchemeData);
     }
 }

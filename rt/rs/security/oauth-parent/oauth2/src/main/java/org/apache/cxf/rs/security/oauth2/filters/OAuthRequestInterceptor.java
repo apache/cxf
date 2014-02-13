@@ -34,6 +34,16 @@ public class OAuthRequestInterceptor extends OAuthRequestFilter implements Phase
         validateRequest(message);
     }
 
+    protected String[] getAuthorizationParts(Message message) {
+        return super.getAuthorizationParts(message);
+        
+//        You can customise it, extract the token from the message, example, get 
+//        WS-Security Binary token put on the message by WSS4JInInterceptor
+//    
+//        String token = getTokenFromCurrentMessage(mc);       
+//        return new String[] {"Bearer", token};    
+    }
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
@@ -57,14 +67,4 @@ public class OAuthRequestInterceptor extends OAuthRequestFilter implements Phase
     public void handleFault(Message message) {
     }
 
-//    protected String[] getAuthorizationParts() {
-//        // the current message is wrapped in MessageContext    
-//        MessageContext mc = getMessageContext();
-//
-//        // extract the token from the message, example, get 
-//        // WS-Security Binary token put on the message by WSS4JInInterceptor
-//    
-//        String token = getTokenFromCurrentMessage(mc);       
-//        return new String[] {"Bearer", token};    
-//    }
 }

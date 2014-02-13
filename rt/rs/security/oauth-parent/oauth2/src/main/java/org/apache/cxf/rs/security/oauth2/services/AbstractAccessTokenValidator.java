@@ -43,16 +43,14 @@ public abstract class AbstractAccessTokenValidator {
     
     private static final String DEFAULT_AUTH_SCHEME = OAuthConstants.BEARER_AUTHORIZATION_SCHEME;
     
+
+    protected Set<String> supportedSchemes = new HashSet<String>();
+    protected String realm;
     
     private MessageContext mc;
-
     private List<AccessTokenValidator> tokenHandlers = Collections.emptyList();
     private List<String> audiences = new LinkedList<String>();
-    
-    private Set<String> supportedSchemes = new HashSet<String>();
-    
     private OAuthDataProvider dataProvider;
-    private String realm;
     
     public void setTokenValidator(AccessTokenValidator validator) {
         setTokenValidators(Collections.singletonList(validator));
@@ -92,18 +90,11 @@ public abstract class AbstractAccessTokenValidator {
     /**
      * Get the access token
      */
-    protected AccessTokenValidation getAccessTokenValidation() {
+    protected AccessTokenValidation getAccessTokenValidation(String authScheme, String authSchemeData) {
         AccessTokenValidation accessTokenV = null;
         if (dataProvider == null && tokenHandlers.isEmpty()) {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
-        
-        // Get the scheme and its data, Bearer only is supported by default
-        // WWW-Authenticate with the list of supported schemes will be sent back 
-        // if the scheme is not accepted
-        String[] authParts = getAuthorizationParts();
-        String authScheme = authParts[0];
-        String authSchemeData = authParts[1];
         
         // Get the registered handler capable of processing the token
         AccessTokenValidator handler = findTokenValidator(authScheme);
@@ -164,9 +155,4 @@ public abstract class AbstractAccessTokenValidator {
     public void setAudiences(List<String> audiences) {
         this.audiences = audiences;
     }
-    
-    protected String[] getAuthorizationParts() {
-        return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
-    }
-    
 }
