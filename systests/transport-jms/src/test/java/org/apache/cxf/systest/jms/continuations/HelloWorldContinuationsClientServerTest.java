@@ -68,7 +68,7 @@ public class HelloWorldContinuationsClientServerTest extends AbstractBusClientSe
 
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://HelloWorldContinuationsClientServerTest");
+        broker = new EmbeddedJMSBrokerLauncher();
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
         launchServer(new Server(broker));

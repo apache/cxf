@@ -21,6 +21,7 @@ package org.apache.cxf.transport.jms.uri;
 
 import java.util.Map;
 
+import org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,18 +29,18 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testBasicQueue() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
-        assertEquals(endpoint.getDestinationName(), "Foo.Bar");
-        assertEquals(endpoint.getJmsVariant(), JMSURIConstants.QUEUE);
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
+        assertEquals("Foo.Bar", endpoint.getDestinationName());
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
     }
 
     @Test
     public void testQueueParameters() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?foo=bar&foo2=bar2");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?foo=bar&foo2=bar2");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
-        assertEquals(endpoint.getJmsVariant(), JMSURIConstants.QUEUE);
+        assertEquals(endpoint.getJmsVariant(), JMSEndpoint.QUEUE);
         assertEquals(endpoint.getParameters().size(), 2);
         assertEquals(endpoint.getParameter("foo"), "bar");
         assertEquals(endpoint.getParameter("foo2"), "bar2");
@@ -47,16 +48,16 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testBasicTopic() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:topic:Foo.Bar");
-        assertEquals(JMSURIConstants.TOPIC, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:topic:Foo.Bar");
+        assertEquals(JMSEndpoint.TOPIC, endpoint.getJmsVariant());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
-        assertEquals(endpoint.getJmsVariant(), JMSURIConstants.TOPIC);
+        assertEquals(endpoint.getJmsVariant(), JMSEndpoint.TOPIC);
     }
 
     @Test
     public void testTopicParameters() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:topic:Foo.Bar?foo=bar&foo2=bar2");
-        assertEquals(JMSURIConstants.TOPIC, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:topic:Foo.Bar?foo=bar&foo2=bar2");
+        assertEquals(JMSEndpoint.TOPIC, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 2);
         assertEquals(endpoint.getParameter("foo"), "bar");
         assertEquals(endpoint.getParameter("foo2"), "bar2");
@@ -64,19 +65,19 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testBasicJNDI() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:jndi:Foo.Bar");
-        assertEquals(JMSURIConstants.JNDI, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar");
+        assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
-        assertEquals(endpoint.getJmsVariant(), JMSURIConstants.JNDI);
+        assertEquals(endpoint.getJmsVariant(), JMSEndpoint.JNDI);
     }
 
     @Test
     public void testJNDIParameters() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
-                                               + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                                               + "&jndiConnectionFactoryName=ConnectionFactory"
-                                               + "&jndiURL=tcp://localhost:61616");
-        assertEquals(JMSURIConstants.JNDI, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory"
+            + "&jndiURL=tcp://localhost:61616");
+        assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJndiInitialContextFactory(),
@@ -88,19 +89,19 @@ public class JMSEndpointTest extends Assert {
     
     @Test
     public void testReplyToNameParameters() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("Foo.Bar", endpoint.getDestinationName());
         assertNull(endpoint.getTopicReplyToName());
         assertEquals("FOO.Tar", endpoint.getReplyToName());
         try {
-            resolveEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar&topicReplyToName=FOO.Zar");
+            new JMSEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar&topicReplyToName=FOO.Zar");
             fail("Expecting exception here");
         } catch (IllegalArgumentException ex) {
             // expect the exception
         }
         
-        endpoint = resolveEndpoint("jms:queue:Foo.Bar?topicReplyToName=FOO.Zar");
+        endpoint = new JMSEndpoint("jms:queue:Foo.Bar?topicReplyToName=FOO.Zar");
         assertEquals("Foo.Bar", endpoint.getDestinationName());
         assertNull(endpoint.getReplyToName());
         assertEquals("FOO.Zar", endpoint.getTopicReplyToName());
@@ -108,12 +109,12 @@ public class JMSEndpointTest extends Assert {
     
     @Test
     public void testJNDIWithAdditionalParameters() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
-                                               + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                                               + "&jndiConnectionFactoryName=ConnectionFactory"
-                                               + "&jndiURL=tcp://localhost:61616"
-                                               + "&jndi-com.sun.jndi.someParameter=someValue");
-        assertEquals(JMSURIConstants.JNDI, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory"
+            + "&jndiURL=tcp://localhost:61616"
+            + "&jndi-com.sun.jndi.someParameter=someValue");
+        assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
         assertEquals(endpoint.getJndiInitialContextFactory(),
                      "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
@@ -126,12 +127,12 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testSharedParameters() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?" + "deliveryMode=NON_PERSISTENT"
-                                               + "&timeToLive=100" + "&priority=5" + "&replyToName=foo.bar2");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?" + "deliveryMode=NON_PERSISTENT"
+            + "&timeToLive=100" + "&priority=5" + "&replyToName=foo.bar2");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
-        assertEquals(endpoint.getDeliveryMode().toString(),
-                     JMSURIConstants.DELIVERYMODE_NON_PERSISTENT.toString());
+        assertEquals(endpoint.getDeliveryMode(),
+                     DeliveryModeType.NON_PERSISTENT);
         assertEquals(endpoint.getTimeToLive(), 100);
         assertEquals(endpoint.getPriority(), 5);
         assertEquals(endpoint.getReplyToName(), "foo.bar2");
@@ -139,15 +140,15 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testRequestUri() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
-                                               + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                                               + "&targetService=greetMe"
-                                               + "&replyToName=replyQueue"
-                                               + "&timeToLive=1000"
-                                               + "&priority=3"
-                                               + "&foo=bar"
-                                               + "&foo2=bar2");
-        assertEquals(JMSURIConstants.JNDI, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&targetService=greetMe"
+            + "&replyToName=replyQueue"
+            + "&timeToLive=1000"
+            + "&priority=3"
+            + "&foo=bar"
+            + "&foo2=bar2");
+        assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 3);
         String requestUri = endpoint.getRequestURI();
         // Checking what's the request uri should have
@@ -163,21 +164,24 @@ public class JMSEndpointTest extends Assert {
     
     @Test
     public void testRequestUriWithMessageType() throws Exception {
-        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?messageType=text");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?messageType=text");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("text", endpoint.getMessageType().value());
         
-        endpoint = resolveEndpoint("jms:queue:Foo.Bar");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
+        endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("byte", endpoint.getMessageType().value());
         
-        endpoint = resolveEndpoint("jms:queue:Foo.Bar?messageType=binary");
-        assertEquals(JMSURIConstants.QUEUE, endpoint.getJmsVariant());
+        endpoint = new JMSEndpoint("jms:queue:Foo.Bar?messageType=binary");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("binary", endpoint.getMessageType().value());
         
     }
-    
-    private JMSEndpoint resolveEndpoint(String uri) throws Exception {
-        return JMSEndpointParser.createEndpoint(uri);
+
+    @Test
+    public void nonSoapJMS() throws Exception {
+        JMSEndpoint endpoint = new JMSEndpoint("jms://");
+        assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
     }
+    
 }

@@ -42,8 +42,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
-    private static final String BROKER_URI = "vm://" + JMSClientServerGzipTest.class.getSimpleName() 
-        + "?broker.persistent=false";
     private static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
@@ -65,7 +63,7 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
     }
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
+        broker = new EmbeddedJMSBrokerLauncher();
         launchServer(broker);
         assertTrue("server did not launch correctly", 
                    launchServer(GzipServer.class, true));

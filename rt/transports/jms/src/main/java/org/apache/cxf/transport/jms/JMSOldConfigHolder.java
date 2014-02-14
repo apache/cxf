@@ -30,15 +30,12 @@ import javax.naming.Context;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
-import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
-import org.apache.cxf.transport.jms.uri.JMSURIConstants;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.transport.jms.wsdl.DeliveryModeType;
@@ -131,9 +128,7 @@ public class JMSOldConfigHolder {
         JMSEndpoint endpoint = null;
         String adr = target == null ? endpointInfo.getAddress() : target.getAddress().getValue();
         try {           
-            endpoint = StringUtils.isEmpty(adr) || "jms://".equals(adr) || !adr.startsWith("jms") 
-                ?  new JMSEndpoint()
-                : JMSEndpointParser.createEndpoint(adr);                
+            endpoint = new JMSEndpoint(adr);
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception e) {
@@ -195,21 +190,16 @@ public class JMSOldConfigHolder {
             jmsConfig = new JMSConfiguration();
         }
 
-        if (endpoint.isSetDeliveryMode()) {
-            int deliveryMode = endpoint.getDeliveryMode()
-                .equals(JMSURIConstants.DELIVERYMODE_PERSISTENT)
-                ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
-            jmsConfig.setDeliveryMode(deliveryMode);
-        }
+        int deliveryMode = endpoint.getDeliveryMode() 
+            == org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType.PERSISTENT
+            ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
+        jmsConfig.setDeliveryMode(deliveryMode);
 
-        if (endpoint.isSetPriority()) {
-            int priority = endpoint.getPriority();
-            jmsConfig.setPriority(priority);
-        }
+        jmsConfig.setPriority(endpoint.getPriority());
 
         if (jmsConfig.isUsingEndpointInfo()) {
             JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
-            boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSURIConstants.TOPIC);
+            boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSEndpoint.TOPIC);
             JNDIConfiguration jndiConfig = new JNDIConfiguration();
             jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
             jmsConfig.setJndiTemplate(jt);
@@ -218,9 +208,7 @@ public class JMSOldConfigHolder {
             jndiConfig.setConnectionPassword(endpoint.getPassword());
 
             jmsConfig.setJndiConfig(jndiConfig);
-            if (endpoint.isSetReconnectOnException()) {
-                jmsConfig.setReconnectOnException(endpoint.isReconnectOnException());
-            }
+            jmsConfig.setReconnectOnException(endpoint.isReconnectOnException());
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);
             if (jmsConfig.getMessageSelector() == null) {
@@ -262,17 +250,11 @@ public class JMSOldConfigHolder {
             if (sessionPool.isSetLowWaterMark()) {
                 jmsConfig.setConcurrentConsumers(sessionPool.getLowWaterMark());
             }
-            if (endpoint.isSetTimeToLive()) {
-                long timeToLive = endpoint.getTimeToLive();
-                jmsConfig.setTimeToLive(timeToLive);
-            }
-            if (endpoint.isSetUseJMS11()) {
-                LOG.log(Level.WARNING, "Use of jms:endpoint[@useJms11] is no longer supported");
-            }
+            jmsConfig.setTimeToLive(endpoint.getTimeToLive());
             if (serverBehavior.isSetTransactional()) {
                 jmsConfig.setSessionTransacted(serverBehavior.isTransactional());
             }
-            boolean useJndi = endpoint.getJmsVariant().contains(JMSURIConstants.JNDI);
+            boolean useJndi = endpoint.getJmsVariant().contains(JMSEndpoint.JNDI);
             if (useJndi) {
                 // Setup Destination jndi destination resolver
                 final JMSDestinationResolver jndiDestinationResolver = new JMSDestinationResolver();
@@ -314,9 +296,9 @@ public class JMSOldConfigHolder {
     private static void mapAddressToEndpoint(AddressType address, JMSEndpoint endpoint) {
         boolean pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
         if (address.isSetDestinationStyle()) {
-            endpoint.setJmsVariant(pubSubDomain ? JMSURIConstants.TOPIC : JMSURIConstants.QUEUE);
+            endpoint.setJmsVariant(pubSubDomain ? JMSEndpoint.TOPIC : JMSEndpoint.QUEUE);
         } else {
-            endpoint.setJmsVariant(JMSURIConstants.QUEUE);
+            endpoint.setJmsVariant(JMSEndpoint.QUEUE);
         }
         if (address.isSetJndiConnectionFactoryName()) {
             endpoint.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
@@ -335,7 +317,7 @@ public class JMSOldConfigHolder {
         }
         boolean useJndi = address.isSetJndiDestinationName();
         if (useJndi) {
-            endpoint.setJmsVariant(pubSubDomain ? JMSURIConstants.JNDI_TOPIC : JMSURIConstants.JNDI);
+            endpoint.setJmsVariant(pubSubDomain ? JMSEndpoint.JNDI_TOPIC : JMSEndpoint.JNDI);
             endpoint.setDestinationName(address.getJndiDestinationName());
             endpoint.setReplyToName(address.getJndiReplyDestinationName());
         } else {
@@ -366,14 +348,14 @@ public class JMSOldConfigHolder {
                                               jndiContextParameterType.getValue().trim());
         }
         
-        if (!endpoint.isSetJndiConnectionFactoryName()) {
+        if (endpoint.getJndiConnectionFactoryName() == null) {
             JndiConnectionFactoryNameType jndiConnectionFactoryNameType = getWSDLExtensor(
                 ei, JndiConnectionFactoryNameType.class);
             if (jndiConnectionFactoryNameType != null) {
                 endpoint.setJndiConnectionFactoryName(jndiConnectionFactoryNameType.getValue().trim());
             }
         }
-        if (!endpoint.isSetJndiInitialContextFactory()) {
+        if (endpoint.getJndiInitialContextFactory() == null) {
             JndiInitialContextFactoryType jndiInitialContextFactoryType = 
                 getWSDLExtensor(ei, JndiInitialContextFactoryType.class);
             if (jndiInitialContextFactoryType != null) {
@@ -381,7 +363,7 @@ public class JMSOldConfigHolder {
             }
         }
         
-        if (!endpoint.isSetJndiURL()) {
+        if (endpoint.getJndiURL() == null) {
             JndiURLType jndiURLType = getWSDLExtensor(ei, JndiURLType.class);
             if (jndiURLType != null) {
                 endpoint.setJndiURL(jndiURLType.getValue().trim());
@@ -392,7 +374,7 @@ public class JMSOldConfigHolder {
             DeliveryModeType deliveryModeType = getWSDLExtensor(ei, DeliveryModeType.class);
             if (deliveryModeType != null) {
                 String deliveryMode = deliveryModeType.getValue().trim();
-                endpoint.setDeliveryMode(org.apache.cxf.transport.jms.uri.DeliveryModeType
+                endpoint.setDeliveryMode(org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType
                     .valueOf(deliveryMode));
             }
         }
@@ -404,21 +386,21 @@ public class JMSOldConfigHolder {
             }
         }
         
-        if (!endpoint.isSetTimeToLive()) {
+        if (endpoint.getTimeToLive() == 0) {
             TimeToLiveType timeToLiveType = getWSDLExtensor(ei, TimeToLiveType.class);
             if (timeToLiveType != null) {
                 endpoint.setTimeToLive(timeToLiveType.getValue()); 
             }
         }
         
-        if (!endpoint.isSetReplyToName()) {
+        if (endpoint.getReplyToName() == null) {
             ReplyToNameType replyToNameType = getWSDLExtensor(ei, ReplyToNameType.class);
             if (replyToNameType != null) {
                 endpoint.setReplyToName(replyToNameType.getValue());
             }
         }
         
-        if (!endpoint.isSetTopicReplyToName()) {
+        if (endpoint.getTopicReplyToName() == null) {
             TopicReplyToNameType topicReplyToNameType = getWSDLExtensor(ei, TopicReplyToNameType.class);
             if (topicReplyToNameType != null) {
                 endpoint.setTopicReplyToName(topicReplyToNameType.getValue());
@@ -449,10 +431,10 @@ public class JMSOldConfigHolder {
     
     public static Properties getInitialContextEnv(JMSEndpoint endpoint) {
         Properties env = new Properties();
-        if (endpoint.isSetJndiInitialContextFactory()) {
+        if (endpoint.getJndiInitialContextFactory() != null) {
             env.put(Context.INITIAL_CONTEXT_FACTORY, endpoint.getJndiInitialContextFactory());
         }
-        if (endpoint.isSetJndiURL()) {
+        if (endpoint.getJndiURL() != null) {
             env.put(Context.PROVIDER_URL, endpoint.getJndiURL());
         }
         for (Map.Entry<String, String> ent : endpoint.getJndiParameters().entrySet()) {

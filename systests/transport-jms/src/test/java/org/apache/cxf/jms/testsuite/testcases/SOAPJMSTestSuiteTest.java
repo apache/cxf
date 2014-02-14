@@ -57,6 +57,7 @@ import org.apache.cxf.jms_simple.JMSSimpleService1009;
 import org.apache.cxf.jms_simple.JMSSimpleService1101;
 import org.apache.cxf.jms_simple.JMSSimpleService1105;
 import org.apache.cxf.jms_simple.JMSSimpleService1109;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -65,6 +66,7 @@ import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
+import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
@@ -83,8 +85,9 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://SOAPJMSTestSuiteTest?broker.persistent=false");
+        broker = new EmbeddedJMSBrokerLauncher();
         launchServer(broker);
+        JMSTestUtil.setJndiUrl(broker.getEncodedBrokerURL());
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
@@ -592,25 +595,11 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             if (header.isSetJMSDeliveryMode()) {
                 dm = header.getJMSDeliveryMode();
             }
-            assertEquals(dm, 
-                         messageProperties.getDeliveryMode().intValue());
+            assertEquals(dm, messageProperties.getDeliveryMode().intValue());
         }
         if (messageProperties.isSetPriority()) {
             assertEquals(header.getJMSPriority(), messageProperties.getPriority().intValue());
         }
-        /*
-         * if (messageProperties.isSetExpiration()) { assertEquals(header.getJMSExpiration(),
-         * messageProperties.getExpiration().intValue()); }
-         */
-        /*
-         * if (messageProperties.isSetReplyTo() && !messageProperties.getReplyTo().trim().equals("")) {
-         * assertEquals(header.getJMSReplyTo().toString(), messageProperties.getReplyTo()); }
-         */
-        // correlationid
-        /*
-         * if (messageProperties.isSetDestination() && !messageProperties.getDestination().trim().equals(""))
-         * { assertEquals(header.get.toString(), messageProperties.getDestination()); }
-         */
         if (messageProperties.isSetBindingVersion()
             && !messageProperties.getBindingVersion().trim().equals("")) {
             assertEquals(header.getSOAPJMSBindingVersion(), messageProperties.getBindingVersion());
@@ -639,7 +628,12 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     
     public void twoWayTestWithCreateMessage(final TestCaseType testcase) throws Exception {
         String address = testcase.getAddress();
-        JMSConfiguration jmsConfig = JMSTestUtil.getInitJMSConfiguration(address);
+        
+        EndpointInfo endpointInfo = new EndpointInfo();
+        endpointInfo.setAddress(address);
+        JMSOldConfigHolder oldConfig = new JMSOldConfigHolder();
+        JMSConfiguration jmsConfig = oldConfig
+            .createJMSConfigurationFromEndpointInfo(staticBus, endpointInfo , null, true);
         
         ResourceCloser closer = new ResourceCloser();
         try {

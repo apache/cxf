@@ -51,7 +51,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
-import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.util.JMSMessageConverter;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 
@@ -203,8 +202,8 @@ final class JMSMessageUtils {
                 inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
             }
             try {
-                JMSEndpoint endpoint = JMSEndpointParser.createEndpoint(jmsMessage
-                    .getStringProperty(JMSSpecConstants.REQUESTURI_FIELD));
+                String requestURI = jmsMessage.getStringProperty(JMSSpecConstants.REQUESTURI_FIELD);
+                JMSEndpoint endpoint = new JMSEndpoint(requestURI);
                 if (endpoint.getParameter(JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME) != null) {
                     headers.put(JMSSpecConstants.TARGET_SERVICE_IN_REQUESTURI,
                                 Collections.singletonList("true"));

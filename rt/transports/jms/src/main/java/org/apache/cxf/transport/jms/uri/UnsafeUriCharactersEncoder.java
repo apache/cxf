@@ -28,7 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 /**
  * Encoder for unsafe URI characters.
  */
-public final class UnsafeUriCharactersEncoder {
+final class UnsafeUriCharactersEncoder {
     private static BitSet unsafeCharacters;
     private static final Logger LOG = LogUtils.getL7dLogger(UnsafeUriCharactersEncoder.class);
     private static final char[] HEX_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',

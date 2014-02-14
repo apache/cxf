@@ -43,15 +43,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
-    private static final String BROKER_URI = "vm://SharedQueueTest" 
-        + "?jms.watchTopicAdvisories=false&broker.persistent=false";
+//    private static final String BROKER_URI = "vm://SharedQueueTest" 
+//        + "?jms.watchTopicAdvisories=false&broker.persistent=false";
  
     private static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
+        broker = new EmbeddedJMSBrokerLauncher();
         launchServer(broker);
         launchServer(new Server(broker));
         createStaticBus();

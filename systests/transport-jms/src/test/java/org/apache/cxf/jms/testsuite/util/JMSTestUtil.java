@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -37,15 +36,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testsuite.testcase.TestCasesType;
-import org.apache.cxf.transport.jms.JMSConfiguration;
-import org.apache.cxf.transport.jms.JMSOldConfigHolder;
-import org.apache.cxf.transport.jms.JNDIConfiguration;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
-import org.apache.cxf.transport.jms.uri.JMSEndpoint;
-import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
-import org.apache.cxf.transport.jms.uri.JMSURIConstants;
-import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
-import org.apache.cxf.transport.jms.util.JndiHelper;
 
 /**
  * 
@@ -53,10 +44,15 @@ import org.apache.cxf.transport.jms.util.JndiHelper;
 public final class JMSTestUtil {
 
     private static TestCasesType testcases;
+    private static String jndiUrl;
 
     private JMSTestUtil() {
     }
     
+    public static void setJndiUrl(String jndiUrl) {
+        JMSTestUtil.jndiUrl = jndiUrl;
+    }
+
     public static List<TestCaseType> getTestCases() {
         try {
             if (testcases == null) {
@@ -96,62 +92,12 @@ public final class JMSTestUtil {
                 if (idx != -1) {
                     int idx2 = add.indexOf("&", idx);
                     add = add.substring(0, idx)
-                        + "jndiURL=vm://SOAPJMSTestSuiteTest"
+                        + "jndiURL=" + jndiUrl
                         + (idx2 == -1 ? "" : add.substring(idx2));
                     tct.setAddress(add);
                 }
             }
         }
-    }
-
-    public static JMSConfiguration getInitJMSConfiguration(String address) throws Exception {
-        JMSEndpoint endpoint = JMSEndpointParser.createEndpoint(address);
-
-        JMSConfiguration jmsConfig = new JMSConfiguration();
-
-        if (endpoint.isSetDeliveryMode()) {
-            int deliveryMode = endpoint.getDeliveryMode()
-                .equals(JMSURIConstants.DELIVERYMODE_PERSISTENT)
-                ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
-            jmsConfig.setDeliveryMode(deliveryMode);
-        }
-
-        if (endpoint.isSetPriority()) {
-            int priority = endpoint.getPriority();
-            jmsConfig.setPriority(priority);
-        }
-
-        if (endpoint.isSetTimeToLive()) {
-            long timeToLive = endpoint.getTimeToLive();
-            jmsConfig.setTimeToLive(timeToLive);
-        }
-
-        if (jmsConfig.isUsingEndpointInfo()) {
-            JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
-            boolean pubSubDomain = false;
-            pubSubDomain = endpoint.getJmsVariant().equals(JMSURIConstants.TOPIC);
-            JNDIConfiguration jndiConfig = new JNDIConfiguration();
-            jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
-            jmsConfig.setJndiTemplate(jt);
-            jmsConfig.setJndiConfig(jndiConfig);
-            jmsConfig.setExplicitQosEnabled(true);
-            jmsConfig.setPubSubDomain(pubSubDomain);
-            jmsConfig.setPubSubNoLocal(true);
-            boolean useJndi = endpoint.getJmsVariant().equals(JMSURIConstants.JNDI);
-            if (useJndi) {
-                // Setup Destination jndi destination resolver
-                final JMSDestinationResolver jndiDestinationResolver = new JMSDestinationResolver();
-                jndiDestinationResolver.setJndiTemplate(jt);
-                jmsConfig.setDestinationResolver(jndiDestinationResolver);
-                jmsConfig.setTargetDestination(endpoint.getDestinationName());
-                jmsConfig.setReplyDestination(endpoint.getReplyToName());
-            } else {
-                // Use the default dynamic destination resolver
-                jmsConfig.setTargetDestination(endpoint.getDestinationName());
-                jmsConfig.setReplyDestination(endpoint.getReplyToName());
-            }
-        }
-        return jmsConfig;
     }
 
     /**

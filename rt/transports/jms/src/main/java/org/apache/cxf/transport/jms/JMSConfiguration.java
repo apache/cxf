@@ -49,7 +49,7 @@ public class JMSConfiguration {
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
-    private Long clientReceiveTimeout = 0L;
+    private Long clientReceiveTimeout = 60000L;
     private Long serverReceiveTimeout;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;

@@ -169,13 +169,14 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public final void run() {
         try {             
             broker = new BrokerService();
+            broker.setPersistent(false);
             broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
             broker.setTmpDataDirectory(new File("./target"));
             broker.setUseJmx(false);
             if (brokerName != null) {
                 broker.setBrokerName(brokerName);
             }
-            broker.addConnector(brokerUrl1 + "?daemon=true");
+            broker.addConnector(brokerUrl1);
             broker.start();  
         } catch (Exception e) {
             e.printStackTrace();

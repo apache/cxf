@@ -59,7 +59,7 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
     }
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://HelloWorldContinuationsThrottleTest");
+        broker = new EmbeddedJMSBrokerLauncher();
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
         launchServer(new Server());

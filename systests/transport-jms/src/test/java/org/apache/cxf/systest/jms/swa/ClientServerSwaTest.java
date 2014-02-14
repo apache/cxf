@@ -67,8 +67,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://ClientServerSwaTest" 
-            + "?jms.watchTopicAdvisories=false&broker.persistent=false");
+        broker = new EmbeddedJMSBrokerLauncher();
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
         launchServer(new Server());

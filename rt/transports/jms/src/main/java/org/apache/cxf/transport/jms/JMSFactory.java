@@ -201,12 +201,12 @@ public final class JMSFactory {
         Session session = null;
         try {
             Connection connection = createConnection(jmsConfig);
+            connection.start();
             session = connection.createSession(jmsConfig.isSessionTransacted(), Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
             MessageListenerContainer container = new MessageListenerContainer(connection, destination, listenerHandler);
             container.setMessageSelector(jmsConfig.getMessageSelector());
             container.start();
-            connection.start();
             return container;
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);

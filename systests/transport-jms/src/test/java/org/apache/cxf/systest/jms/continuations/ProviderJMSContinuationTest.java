@@ -57,7 +57,7 @@ public class ProviderJMSContinuationTest extends AbstractBusClientServerTestBase
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://ProviderJMSContinuationTest");
+        broker = new EmbeddedJMSBrokerLauncher();
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
         launchServer(new Server());
