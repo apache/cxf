@@ -126,57 +126,6 @@ cxf.schema.version = ${os}
             </resource>
         </resources>
     </build>
-    <profiles>
-        <profile>
-            <id>deploy</id>
-            <properties>
-                <createSourcesJar>true</createSourcesJar>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>unpack-sources</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>unpack-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <includeGroupIds>org.apache.cxf</includeGroupIds>
-                                    <classifier>sources</classifier>
-                                    <outputDirectory>${project.build.directory}/sources</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>package</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <minmemory>128m</minmemory>
-                            <maxmemory>512m</maxmemory>
-                            <header>Apache CXF API</header>
-                            <footer>Apache CXF API</footer>
-                            <sourcepath>${project.build.directory}/sources</sourcepath>
-                            <notimestamp>true</notimestamp>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <modules>
         <module>all</module>
         <module>compatible</module>
