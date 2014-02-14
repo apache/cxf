@@ -390,5 +390,4 @@
         <bundle start-level="30" dependency="true">mvn:org.glassfish/javax.el/3.0-b1</bundle>  
     </feature>
 
-    <bundle start-level="30" dependency="true">mvn:org.glassfish/javax.el/3.0.0</bundle> 
 </features>
