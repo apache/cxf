@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0-milestone2</version>
         <relativePath>../parent</relativePath>
     </parent>
     <properties>
@@ -505,20 +505,20 @@
                         <phase>process-sources</phase>
                         <configuration>
                             <tasks>
-                                <mkdir dir="${basedir}/target"/>
-                                <pathconvert property="cp" refid="maven.runtime.classpath"/>
+                                <mkdir dir="${basedir}/target" />
+                                <pathconvert property="cp" refid="maven.runtime.classpath" />
                                 <condition property="output.cp" value="set CXF_CLASSPATH=${cp}">
-                                    <os family="windows"/>
+                                    <os family="windows" />
                                 </condition>
                                 <condition property="output.ext" value=".bat">
-                                    <os family="windows"/>
+                                    <os family="windows" />
                                 </condition>
-                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}"/>
-                                <property name="output.ext" value=""/>
-                                <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}"/>
-                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}"/>
-                                <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}"/>
-                                <delete file="build.xml"/>
+                                <property name="output.cp" value="export CXF_CLASSPATH=${cp}" />
+                                <property name="output.ext" value="" />
+                                <echo file="${basedir}/target/srcbuild_env${output.ext}" message="${output.cp}" />
+                                <echo file="${basedir}/target/srcbuild_env.ant" message="${cp}" />
+                                <echo file="${basedir}/target/version.properties" message="cxf.version=${project.version}" />
+                                <delete file="build.xml" />
                             </tasks>
                         </configuration>
                         <goals>
