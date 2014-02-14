@@ -1153,54 +1153,57 @@ public abstract class HTTPConduit
                 }
             };
             HTTPClientPolicy policy = getClient(outMessage);
-            try {
-                Executor ex = outMessage.getExchange().get(Executor.class);
-                if (forceWQ && ex != null) {
-                    final Executor ex2 = ex;
-                    final Runnable origRunnable = runnable;
-                    runnable = new Runnable() {
-                        public void run() {
-                            outMessage.getExchange().put(Executor.class.getName() 
-                                                         + ".USING_SPECIFIED", Boolean.TRUE);
-                            ex2.execute(origRunnable);
+            boolean exceptionSet = outMessage.getContent(Exception.class) != null;
+            if (!exceptionSet) {
+                try {
+                    Executor ex = outMessage.getExchange().get(Executor.class);
+                    if (forceWQ && ex != null) {
+                        final Executor ex2 = ex;
+                        final Runnable origRunnable = runnable;
+                        runnable = new Runnable() {
+                            public void run() {
+                                outMessage.getExchange().put(Executor.class.getName() 
+                                                             + ".USING_SPECIFIED", Boolean.TRUE);
+                                ex2.execute(origRunnable);
+                            }
+                        };
+                    }
+                    if (ex == null || forceWQ) {
+                        WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
+                            .getExtension(WorkQueueManager.class);
+                        AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
+                        if (qu == null) {
+                            qu = mgr.getAutomaticWorkQueue();
                         }
-                    };
-                }
-                if (ex == null || forceWQ) {
-                    WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
-                        .getExtension(WorkQueueManager.class);
-                    AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
-                    if (qu == null) {
-                        qu = mgr.getAutomaticWorkQueue();
-                    }
-                    long timeout = 1000;
-                    if (policy != null && policy.isSetAsyncExecuteTimeout()) {
-                        timeout = policy.getAsyncExecuteTimeout();
-                    }
-                    if (timeout > 0) {
-                        qu.execute(runnable, timeout);
+                        long timeout = 1000;
+                        if (policy != null && policy.isSetAsyncExecuteTimeout()) {
+                            timeout = policy.getAsyncExecuteTimeout();
+                        }
+                        if (timeout > 0) {
+                            qu.execute(runnable, timeout);
+                        } else {
+                            qu.execute(runnable);
+                        }
                     } else {
-                        qu.execute(runnable);
+                        outMessage.getExchange().put(Executor.class.getName() 
+                                                 + ".USING_SPECIFIED", Boolean.TRUE);
+                        ex.execute(runnable);
                     }
-                } else {
-                    outMessage.getExchange().put(Executor.class.getName() 
-                                             + ".USING_SPECIFIED", Boolean.TRUE);
-                    ex.execute(runnable);
+                } catch (RejectedExecutionException rex) {
+                    if (allowCurrentThread
+                        && policy != null 
+                        && policy.isSetAsyncExecuteTimeoutRejection()
+                        && policy.isAsyncExecuteTimeoutRejection()) {
+                        throw rex;
+                    }
+                    if (!hasLoggedAsyncWarning) {
+                        LOG.warning("EXECUTOR_FULL_WARNING");
+                        hasLoggedAsyncWarning = true;
+                    }
+                    LOG.fine("EXECUTOR_FULL");
+                    handleResponseInternal();
                 }
-            } catch (RejectedExecutionException rex) {
-                if (allowCurrentThread
-                    && policy != null 
-                    && policy.isSetAsyncExecuteTimeoutRejection()
-                    && policy.isAsyncExecuteTimeoutRejection()) {
-                    throw rex;
-                }
-                if (!hasLoggedAsyncWarning) {
-                    LOG.warning("EXECUTOR_FULL_WARNING");
-                    hasLoggedAsyncWarning = true;
-                }
-                LOG.fine("EXECUTOR_FULL");
-                handleResponseInternal();
-            }
+            }    
         }
 
         
