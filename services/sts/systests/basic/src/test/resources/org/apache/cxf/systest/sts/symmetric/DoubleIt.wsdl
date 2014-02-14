@@ -41,11 +41,9 @@
             <soap:operation soapAction=""/>
             <wsdl:input>
                 <soap:body use="literal"/>
-                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body use="literal"/>
-                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
@@ -151,6 +149,7 @@
                 <wsam:Addressing wsp:Optional="false">
                     <wsp:Policy/>
                 </wsam:Addressing>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
                 <sp:SymmetricBinding>
                     <wsp:Policy>
                         <sp:ProtectionToken>
