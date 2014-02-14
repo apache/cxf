@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ClassUtils;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 
 /**
@@ -206,10 +205,6 @@ public class Beanspector<T> {
         
         public Class<?> getTypeClass() {
             return cls;
-        }
-        
-        public Class<?> getWrappedTypeClass() {
-            return cls.isPrimitive() ? ClassUtils.primitiveToWrapper(cls) : cls;
         }
         
         public Type getGenericType() {
