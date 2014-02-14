@@ -33,7 +33,6 @@
     <properties>
         <cxf.el.api.version>3.0-b02</cxf.el.api.version>
         <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
-        <cxf.hibernate.validator.version>5.0.1.Final</cxf.hibernate.validator.version>
     </properties>
     <dependencies>
         <dependency>
