@@ -18,66 +18,13 @@
  */
 package org.apache.cxf.jaxrs.ext.search.lucene;
 
-import java.util.Collections;
-
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
-import org.apache.cxf.jaxrs.ext.search.SearchCondition;
-import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
+import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-public class LuceneQueryVisitorTest extends Assert {
-
-    private DirectoryReader ireader;
-    private IndexSearcher isearcher;
-    private Directory directory;
-    private Analyzer analyzer;
-    
-    @Before
-    public void setUp() throws Exception {
-        analyzer = new StandardAnalyzer(Version.LUCENE_40);
-        directory = new RAMDirectory();
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
-        IndexWriter iwriter = new IndexWriter(directory, config);
-        
-        Document doc = new Document();
-        doc.add(new Field("contents", "name=text", TextField.TYPE_STORED));
-        
-        IntField intField = new IntField("intfield", 4, Field.Store.YES);
-        doc.add(intField);
-        iwriter.addDocument(doc);
-        
-        iwriter.close();
-        ireader = DirectoryReader.open(directory);
-        isearcher = new IndexSearcher(ireader);
-    }
-    
-    @After
-    public void tearDown() throws Exception {
-        ireader.close();
-        directory.close();
-    }
-    
+public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
     @Test
     public void testTextContentMatchEqual() throws Exception {
         
@@ -242,92 +189,8 @@ public class LuceneQueryVisitorTest extends Assert {
         doTestTextContentMatchWithQuery(query);
     }
     
-    private void doTestTextContentMatch(String expression) throws Exception {
-        
-        Query query = createTermQuery("contents", expression);
-        doTestTextContentMatchWithQuery(query);
-            
-    }
-    
-    private void doTestNoMatch(Query query) throws Exception {
-        ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
-        assertEquals(0, hits.length);
-    }
-    
-    private void doTestTextContentMatchWithQuery(Query query) throws Exception {
-        ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
-        assertEquals(1, hits.length);
-        // Iterate through the results:
-        for (int i = 0; i < hits.length; i++) {
-            Document hitDoc = isearcher.doc(hits[i].doc);
-            assertEquals("name=text", hitDoc.get("contents"));
-        }
-            
-    }
-    
-    private void doTestIntContentMatch(String expression) throws Exception {
-        
-        Query query = createTermQuery("intfield", expression);
-        doTestIntContentMatchWithQuery(query);
-            
-    }
-    
-    private void doTestIntContentMatchWithQuery(Query query) throws Exception {
-        
-        ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
-        assertEquals(1, hits.length);
-        // Iterate through the results:
-        for (int i = 0; i < hits.length; i++) {
-            Document hitDoc = isearcher.doc(hits[i].doc);
-            IndexableField field = hitDoc.getField("intfield");
-            assertEquals(4, field.numericValue().intValue());
-        }
-            
-    }
-    
-    private Query createTermQuery(String expression) throws Exception {
-        SearchCondition<SearchBean> filter = 
-            new FiqlParser<SearchBean>(SearchBean.class).parse(expression);
-        SearchConditionVisitor<SearchBean, Query> lucene = new LuceneQueryVisitor<SearchBean>();
-        lucene.visit(filter);
-        return lucene.getQuery();
-    }
-    
-    private Query createTermQueryWithFieldClass(String expression, Class<?> cls) throws Exception {
-        SearchCondition<SearchBean> filter = 
-            new FiqlParser<SearchBean>(SearchBean.class).parse(expression);
-        LuceneQueryVisitor<SearchBean> lucene = new LuceneQueryVisitor<SearchBean>();
-        lucene.setPrimitiveFieldTypeMap(Collections.<String, Class<?>>singletonMap("intfield", cls));
-        lucene.visit(filter);
-        return lucene.getQuery();
-    }
-    
-    private Query createTermQuery(String fieldName, String expression) throws Exception {
-        SearchCondition<SearchBean> filter = 
-            new FiqlParser<SearchBean>(SearchBean.class).parse(expression);
-        LuceneQueryVisitor<SearchBean> lucene = 
-            new LuceneQueryVisitor<SearchBean>("ct", fieldName);
-        lucene.visit(filter);
-        return lucene.getQuery();
-    }
-    
-    private Query createTermQueryWithFieldClass(String fieldName, String expression, Class<?> cls) 
-        throws Exception {
-        SearchCondition<SearchBean> filter = 
-            new FiqlParser<SearchBean>(SearchBean.class).parse(expression);
-        LuceneQueryVisitor<SearchBean> lucene = 
-            new LuceneQueryVisitor<SearchBean>("ct", fieldName);
-        lucene.setPrimitiveFieldTypeMap(Collections.<String, Class<?>>singletonMap(fieldName, cls));
-        lucene.visit(filter);
-        return lucene.getQuery();
-    }
-    
-    private Query createPhraseQuery(String fieldName, String expression) throws Exception {
-        SearchCondition<SearchBean> filter = 
-            new FiqlParser<SearchBean>(SearchBean.class).parse(expression);
-        LuceneQueryVisitor<SearchBean> lucene = 
-            new LuceneQueryVisitor<SearchBean>(fieldName);
-        lucene.visit(filter);
-        return lucene.getQuery();
+    @Override
+    protected SearchConditionParser<SearchBean> getParser() {
+        return new FiqlParser<SearchBean>(SearchBean.class);
     }
 }
