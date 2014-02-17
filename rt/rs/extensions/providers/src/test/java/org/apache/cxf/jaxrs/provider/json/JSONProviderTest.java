@@ -73,6 +73,7 @@ import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
 import org.apache.cxf.jaxrs.resources.jaxb.Book2;
+import org.apache.cxf.jaxrs.resources.jaxb.Book2NoRootElement;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -504,6 +505,40 @@ public class JSONProviderTest extends Assert {
         
         String s = os.toString();
         assertEquals("{\"thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+        
+    }
+    
+    @Test
+    public void testIgnoreNamespacesPackageInfo() throws Exception {
+        JSONProvider<Book2> p = new JSONProvider<Book2>();
+        p.setIgnoreNamespaces(true);
+        Book2 book = new Book2(123);
+        book.setName("CXF");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(book, Book2.class, Book2.class, Book2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"thebook2\":{\"id\":123,\"name\":\"CXF\"}}", s);
+        
+    }
+    
+    @Test
+    public void testIgnoreNamespacesPackageInfo2() throws Exception {
+        JSONProvider<Book2NoRootElement> p = new JSONProvider<Book2NoRootElement>();
+        p.setMarshallAsJaxbElement(true);
+        p.setIgnoreNamespaces(true);
+        Book2NoRootElement book = new Book2NoRootElement(123);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(book, Book2NoRootElement.class, Book2NoRootElement.class, 
+                  Book2NoRootElement.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"book2\":{\"id\":123}}", s);
         
     }
     
