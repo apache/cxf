@@ -45,8 +45,20 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServer.class);
- 
-    org.apache.cxf.endpoint.Server server; 
+     
+    org.apache.cxf.endpoint.Server server;
+    private Map< ? extends String, ? extends Object > properties;
+    
+    public BookServer() {
+        this(Collections.< String, Object >emptyMap());
+    }
+    
+    /**
+     * Allow to specified custom contextual properties to be passed to factory bean
+     */
+    public BookServer(final Map< ? extends String, ? extends Object > properties) {
+        this.properties = properties;
+    }
     
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
@@ -97,6 +109,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.getProperties().put("search.visitor", new SQLPrinterVisitor<SearchBean>("books"));
         sf.getProperties().put("org.apache.cxf.http.header.split", true);
         sf.getProperties().put("default.content.type", "*/*");
+        sf.getProperties().putAll(properties);
         server = sf.create();
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);

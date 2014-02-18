@@ -62,6 +62,10 @@
             <version>${cxf.glassfish.el.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.olingo</groupId>
+            <artifactId>olingo-odata2-core-incubating</artifactId>
+        </dependency>
+        <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
         </dependency>
