@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -60,7 +61,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -76,7 +76,6 @@ import org.apache.cxf.jaxrs.resources.jaxb.Book2;
 import org.apache.cxf.jaxrs.resources.jaxb.Book2NoRootElement;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -508,7 +507,7 @@ public class JSONProviderTest extends Assert {
         
     }
     
-    @Test
+    @Test(expected=BadRequestException.class)
     public void testIgnoreNamespacesPackageInfo() throws Exception {
         JSONProvider<Book2> p = new JSONProvider<Book2>();
         p.setIgnoreNamespaces(true);
@@ -522,6 +521,9 @@ public class JSONProviderTest extends Assert {
         
         String s = os.toString();
         assertEquals("{\"thebook2\":{\"id\":123,\"name\":\"CXF\"}}", s);
+        
+        p.readFrom(Book2.class, null, Book2.class.getAnnotations(),
+                   MediaType.APPLICATION_JSON_TYPE, null, new ByteArrayInputStream(s.getBytes()));
         
     }
     
