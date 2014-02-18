@@ -24,18 +24,26 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 public class OSGiBeanLocator implements ConfiguredBeanLocator {
     private static final Logger LOG = LogUtils.getL7dLogger(OSGiBeanLocator.class);
+    private static final String COMPATIBLE_LOCATOR_PROP = "org.apache.cxf.bus.osgi.locator";
+    private static final String COMPATIBLE_LOCATOR_PROP_CHECK = COMPATIBLE_LOCATOR_PROP + ".check";
     
     final ConfiguredBeanLocator cbl;
     final BundleContext context;
+    private boolean checkCompatibleLocators; 
+    
     public OSGiBeanLocator(ConfiguredBeanLocator c, BundleContext ctx) {
         cbl = c;
         context = ctx;
+        
+        Object checkProp = context.getProperty(COMPATIBLE_LOCATOR_PROP_CHECK);
+        checkCompatibleLocators = checkProp == null || PropertyUtils.isTrue(checkProp);  
     }
     public <T> T getBeanOfType(String name, Class<T> type) {
         return cbl.getBeanOfType(name, type);
@@ -56,6 +64,10 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
             ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
             if (refs != null) {
                 for (ServiceReference r : refs) {
+                    if (checkCompatibleLocators 
+                        && !PropertyUtils.isTrue(r.getProperty(COMPATIBLE_LOCATOR_PROP))) {
+                        continue;
+                    }
                     list.add(type.cast(context.getService(r)));
                 }
             }
