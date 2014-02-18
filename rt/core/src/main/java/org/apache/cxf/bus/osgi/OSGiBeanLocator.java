@@ -64,7 +64,8 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
             ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
             if (refs != null) {
                 for (ServiceReference r : refs) {
-                    if (checkCompatibleLocators 
+                    if (type == ClassLoader.class 
+                        && checkCompatibleLocators 
                         && !PropertyUtils.isTrue(r.getProperty(COMPATIBLE_LOCATOR_PROP))) {
                         continue;
                     }
