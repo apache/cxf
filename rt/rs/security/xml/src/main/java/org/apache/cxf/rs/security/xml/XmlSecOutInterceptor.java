@@ -178,9 +178,8 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
             
             properties.setEncryptionUseThisCertificate(sendingCert);
             
-            // TODO Uncomment
-            //properties.setEncryptionKeyIdentifier(
-            //    convertKeyIdentifier(encryptionProperties.getEncryptionKeyIdType()));
+            properties.setEncryptionKeyIdentifier(
+                convertKeyIdentifier(encryptionProperties.getEncryptionKeyIdType()));
                                       
             if (encryptionProperties.getEncryptionKeyTransportAlgo() != null) {
                 properties.setEncryptionKeyTransportAlgorithm(
