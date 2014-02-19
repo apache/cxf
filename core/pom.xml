@@ -31,7 +31,6 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
         <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
         <cxf.osgi.export>
             !org.apache.cxf.internal,
@@ -228,7 +227,6 @@
                         <configuration>
                             <doCheck>false</doCheck>
                             <doUpdate>false</doUpdate>
-                            <urlScm>${buildnumber.connection.url}</urlScm>
                             <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
                         </configuration>
                     </execution>
@@ -366,35 +364,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>package</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!-- default profile enables javadoc stuff -->
-            <id>git.build.number</id>
-            <activation>
-                <file>
-                    <exists>../.git</exists>
-                </file>
-            </activation>
-            <properties>
-                <buildnumber.connection.url>scm:git:http://</buildnumber.connection.url>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
