@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +37,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -73,10 +74,20 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         String contentType = (String)message.get(Message.CONTENT_TYPE);
         
-        if (contentType != null && contentType.contains("text/html")) {
-            String htmlMessage = null;
+        if (contentType != null 
+            && contentType.contains("text/html")
+            && MessageUtils.isRequestor(message)) {
+            StringBuilder htmlMessage = new StringBuilder(1024);
             try {
-                htmlMessage = IOUtils.toString(is, 500);
+                if (reader == null) {
+                    reader = new InputStreamReader(is, (String)message.get(Message.ENCODING));
+                }
+                char s[] = new char[1024];
+                int i = reader.read(s);
+                while (htmlMessage.length() < 64536 && i > 0) {
+                    htmlMessage.append(s, 0, i);
+                    i = reader.read(s);
+                }
             } catch (IOException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_HTML_RESPONSETYPE",
                         LOG, "(none)"));
