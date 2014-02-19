@@ -507,7 +507,7 @@ public class JSONProviderTest extends Assert {
         
     }
     
-    @Test(expected=BadRequestException.class)
+    @Test(expected = BadRequestException.class)
     public void testIgnoreNamespacesPackageInfo() throws Exception {
         JSONProvider<Book2> p = new JSONProvider<Book2>();
         p.setIgnoreNamespaces(true);
