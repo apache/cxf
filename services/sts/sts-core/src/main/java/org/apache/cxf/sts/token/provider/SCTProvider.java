@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
@@ -34,9 +33,8 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
-
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
 /**
@@ -196,7 +194,7 @@ public class SCTProvider implements TokenProvider {
     /**
      * Get the Secure Conversation version from the TokenType parameter
      */
-    private static int getWSCVersion(String tokenType) throws ConversationException {
+    private static int getWSCVersion(String tokenType) throws WSSecurityException {
         if (tokenType == null) {
             return ConversationConstants.DEFAULT_VERSION;
         }
@@ -206,7 +204,8 @@ public class SCTProvider implements TokenProvider {
         } else if (tokenType.startsWith(ConversationConstants.WSC_NS_05_12)) {
             return ConversationConstants.getWSTVersion(ConversationConstants.WSC_NS_05_12);
         } else {
-            throw new ConversationException("unsupportedSecConvVersion");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "unsupportedSecConvVersion");
         }
     }
     

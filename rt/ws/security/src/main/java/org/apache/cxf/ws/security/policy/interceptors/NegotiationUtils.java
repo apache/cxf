@@ -56,7 +56,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -157,7 +157,7 @@ final class NegotiationUtils {
         return null;
     }
     
-    static int getWSCVersion(String tokenTypeValue) throws ConversationException {
+    static int getWSCVersion(String tokenTypeValue) throws WSSecurityException {
         if (tokenTypeValue == null) {
             return ConversationConstants.DEFAULT_VERSION;
         }
@@ -167,7 +167,8 @@ final class NegotiationUtils {
         } else if (tokenTypeValue.startsWith(ConversationConstants.WSC_NS_05_12)) {
             return ConversationConstants.getWSTVersion(ConversationConstants.WSC_NS_05_12);
         } else {
-            throw new ConversationException("unsupportedSecConvVersion");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "unsupportedSecConvVersion");
         }
     }
     

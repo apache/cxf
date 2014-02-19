@@ -498,7 +498,6 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             EffectivePolicy policy = 
                 (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-serve-request");
             //PolicyEngineImpl.POLICY_INFO_REQUEST_SERVER);
-            String localName = operationName.getLocalPart();
             if (MessageUtils.isRequestor(msg)) {
                 policy = 
                     (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-client-response");
@@ -509,13 +508,23 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 }
                 if (bindingOperationInfo.getOutput() != null) {
                     MessageInfo messageInfo = bindingOperationInfo.getOutput().getMessageInfo();
-                    localName = messageInfo.getName().getLocalPart();
+                    operationName = messageInfo.getName();
                     if (!messageInfo.getMessageParts().isEmpty()
                         && messageInfo.getMessagePart(0).getConcreteName() != null) {
-                        localName = messageInfo.getMessagePart(0).getConcreteName().getLocalPart();
+                        operationName = messageInfo.getMessagePart(0).getConcreteName();
+                    }
+                }
+            } else {
+                if (bindingOperationInfo.getInput() != null) {
+                    MessageInfo messageInfo = bindingOperationInfo.getInput().getMessageInfo();
+                    operationName = messageInfo.getName();
+                    if (!messageInfo.getMessageParts().isEmpty()
+                        && messageInfo.getMessagePart(0).getConcreteName() != null) {
+                        operationName = messageInfo.getMessagePart(0).getConcreteName();
                     }
                 }
             }
+            
             SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
             if (soapOperationInfo != null && policy == null && dispatchPolicy != null) {
                 policy = dispatchPolicy;
@@ -532,9 +541,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                     throw new IllegalArgumentException("BindingInfo is not an instance of SoapBindingInfo");
                 }
                 
-                //todo: I think its a bug that we handover only the localPart of the operation. 
-                // Needs to be fixed in ws-security-policy-stax
-                OperationPolicy operationPolicy = new OperationPolicy(localName);
+                OperationPolicy operationPolicy = new OperationPolicy(operationName);
                 operationPolicy.setPolicy(policy.getPolicy());
                 operationPolicy.setOperationAction(soapOperationInfo.getAction());
                 operationPolicy.setSoapMessageVersionNamespace(soapNS);

@@ -44,7 +44,6 @@ import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -700,12 +699,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
         }
         
-        try {
-            dkSign.prepare(doc, secHeader);
-        } catch (ConversationException e) {
-            LOG.log(Level.FINE, e.getMessage(), e);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
+        dkSign.prepare(doc, secHeader);
         
         if (sbinding.isProtectTokens()) {
             String sigTokId = tok.getId();

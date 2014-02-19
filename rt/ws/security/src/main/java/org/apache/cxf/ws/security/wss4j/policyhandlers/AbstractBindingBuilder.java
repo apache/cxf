@@ -83,7 +83,6 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
@@ -1851,7 +1850,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     private void doSymmSignatureDerived(AbstractToken policyToken, SecurityToken tok,
                                  List<WSEncryptionPart> sigParts, boolean isTokenProtection)
-        throws WSSecurityException, ConversationException {
+        throws WSSecurityException {
         
         Document doc = saaj.getSOAPPart();
         WSSecDKSign dkSign = new WSSecDKSign(wssConfig);  
@@ -1933,7 +1932,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     
     private void doSymmSignature(AbstractToken policyToken, SecurityToken tok,
                                          List<WSEncryptionPart> sigParts, boolean isTokenProtection)
-        throws WSSecurityException, ConversationException {
+        throws WSSecurityException {
         
         Document doc = saaj.getSOAPPart();
         WSSecSignature sig = new WSSecSignature(wssConfig);

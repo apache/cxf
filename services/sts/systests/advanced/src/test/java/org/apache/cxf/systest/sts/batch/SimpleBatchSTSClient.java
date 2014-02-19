@@ -93,7 +93,6 @@ import org.apache.neethi.PolicyComponent;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -930,7 +929,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                     }
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
-                    } catch (ConversationException e) {
+                    } catch (WSSecurityException e) {
                         throw new TrustException("DERIVED_KEY_ERROR", LOG, e);
                     }
                 } else {

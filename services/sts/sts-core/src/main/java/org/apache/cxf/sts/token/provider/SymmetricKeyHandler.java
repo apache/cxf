@@ -30,7 +30,6 @@ import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -180,7 +179,7 @@ public class SymmetricKeyHandler {
                     P_SHA1 psha1 = new P_SHA1();
                     secret = psha1.createKey(nonce, entropyBytes, 0, keySize / 8);
                     computedKey = true;
-                } catch (ConversationException ex) {
+                } catch (WSSecurityException ex) {
                     LOG.log(Level.WARNING, "", ex);
                     throw new STSException("Error in creating symmetric key", STSException.INVALID_REQUEST);
                 }

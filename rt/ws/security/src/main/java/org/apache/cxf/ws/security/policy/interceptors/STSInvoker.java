@@ -44,7 +44,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -193,7 +192,7 @@ abstract class STSInvoker implements Invoker {
         W3CDOMStreamWriter writer,
         byte[] clientEntropy,
         int keySize
-    ) throws NoSuchAlgorithmException, WSSecurityException, ConversationException, XMLStreamException {
+    ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
         byte secret[] = null; 
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
         if (clientEntropy == null) {
