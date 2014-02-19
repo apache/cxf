@@ -151,14 +151,20 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
             throwFault("Crypto can not be loaded", ex);
         }
         
-        if (crypto != null && decryptionAlias != null) {
-            CallbackHandler callback = SecurityUtils.getCallbackHandler(message, this.getClass());
-            WSPasswordCallback passwordCallback = 
-                new WSPasswordCallback(decryptionAlias, WSPasswordCallback.DECRYPT);
-            callback.handle(new Callback[] {passwordCallback});
-
-            Key privateKey = crypto.getPrivateKey(decryptionAlias, passwordCallback.getPassword());
-            properties.setDecryptionKey(privateKey);
+        if (crypto != null) {
+            String alias = decryptionAlias;
+            if (alias == null) {
+                alias = crypto.getDefaultX509Identifier();
+            }
+            if (alias != null) {
+                CallbackHandler callback = SecurityUtils.getCallbackHandler(message, this.getClass());
+                WSPasswordCallback passwordCallback = 
+                    new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
+                callback.handle(new Callback[] {passwordCallback});
+    
+                Key privateKey = crypto.getPrivateKey(alias, passwordCallback.getPassword());
+                properties.setDecryptionKey(privateKey);
+            }
         }
     }
     

@@ -28,14 +28,18 @@ import java.util.Map;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.xml.EncryptionProperties;
 import org.apache.cxf.rs.security.xml.XmlEncInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
+import org.apache.cxf.rs.security.xml.XmlSecInInterceptor;
+import org.apache.cxf.rs.security.xml.XmlSecOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -71,32 +75,35 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
        
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(STAX_PORT, false)},
+                                                {new TestParam(PORT, true)},
+                                                {new TestParam(STAX_PORT, true)},
         });
     }
     
     @Test
     public void testPostBookWithEnvelopedSigAndProxy() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsig";
-        doTestSignatureProxy(address, false, null);
+        doTestSignatureProxy(address, false, null, test.streaming);
     }
     
     @Test
     public void testPostBookWithEnvelopedSigAndProxy2() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsig";
-        doTestSignatureProxy(address, false, "");
+        doTestSignatureProxy(address, false, "", test.streaming);
     }
     
     @Test
     public void testPostBookEnvelopingSigAndProxy() throws Exception {
-        if (STAX_PORT.equals(test.port)) {
+        if (test.streaming || STAX_PORT.equals(test.port)) {
             // TODO Supporting Enveloping
             return;
         }
         String address = "https://localhost:" + test.port + "/xmlsig";
-        doTestSignatureProxy(address, true, "file:");
+        doTestSignatureProxy(address, true, "file:", test.streaming);
     }
     
-    private void doTestSignatureProxy(String address, boolean enveloping, String cryptoUrlPrefix) throws Exception {
+    private void doTestSignatureProxy(String address, boolean enveloping,
+                                      String cryptoUrlPrefix, boolean streaming) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -116,11 +123,19 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         }
         properties.put("ws-security.signature.properties", cryptoUrl);
         bean.setProperties(properties);
-        XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
-        if (enveloping) {
-            sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+        
+        if (streaming) {
+            XmlSecOutInterceptor sigInterceptor = new XmlSecOutInterceptor();
+            sigInterceptor.setSignRequest(true);
+            sigInterceptor.addElementToSign(new QName("", "Book"));
+            bean.getOutInterceptors().add(sigInterceptor);
+        } else {
+            XmlSigOutInterceptor sigInterceptor = new XmlSigOutInterceptor();
+            if (enveloping) {
+                sigInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+            }
+            bean.getOutInterceptors().add(sigInterceptor);
         }
-        bean.getOutInterceptors().add(sigInterceptor);
         bean.setServiceClass(BookStore.class);
         
         BookStore store = bean.create(BookStore.class);
@@ -141,23 +156,23 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookWithEnvelopedSig() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsig/bookstore/books";
-        doTestSignature(address, false, false, true);
+        doTestSignature(address, false, false, true, test.streaming);
     }
     
     @Test
     public void testPostBookWithEnvelopedSigNoKeyInfo() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsignokeyinfo/bookstore/books";
-        doTestSignature(address, false, false, false);
+        doTestSignature(address, false, false, false, test.streaming);
     }
     
     @Test
     public void testPostBookWithEnvelopingSig() throws Exception {
-        if (STAX_PORT.equals(test.port)) {
+        if (test.streaming || STAX_PORT.equals(test.port)) {
             // TODO Supporting Enveloping
             return;
         }
         String address = "https://localhost:" + test.port + "/xmlsig/bookstore/books";
-        doTestSignature(address, true, false, true);
+        doTestSignature(address, true, false, true, test.streaming);
     }
     
     @Test
@@ -167,13 +182,14 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             return;
         }
         String address = "https://localhost:" + test.port + "/xmlsig/bookstore/books";
-        doTestSignature(address, true, true, true);
+        doTestSignature(address, true, true, true, test.streaming);
     }
     
     private void doTestSignature(String address, 
                                  boolean enveloping, 
                                  boolean fromResponse,
-                                 boolean useKeyInfo) {
+                                 boolean useKeyInfo,
+                                 boolean streaming) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -189,15 +205,30 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
-        XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
-        if (enveloping) {
-            sigOutInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+        if (streaming) {
+            XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+            sigOutInterceptor.setSignRequest(true);
+            sigOutInterceptor.addElementToSign(new QName("", "Book"));
+            sigOutInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+            
+            XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            if (!useKeyInfo) {
+                sigInInterceptor.setSignatureVerificationAlias("alice");
+            }
+            bean.getInInterceptors().add(sigInInterceptor);
+        } else {
+            XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
+            if (enveloping) {
+                sigOutInterceptor.setStyle(XmlSigOutInterceptor.ENVELOPING_SIG);
+            }
+            sigOutInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+            
+            XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+            sigInInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
+            bean.getInInterceptors().add(sigInInterceptor);
         }
-        sigOutInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
-        bean.getOutInterceptors().add(sigOutInterceptor);
-        XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
-        sigInInterceptor.setKeyInfoMustBeAvailable(useKeyInfo);
-        bean.getInInterceptors().add(sigInInterceptor);
         
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
@@ -229,7 +260,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        doTestPostEncryptedBook(address, false, properties);
+        doTestPostEncryptedBook(address, false, properties, test.streaming);
     }
     
     @Test
@@ -253,8 +284,13 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
+        
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
         String aes128GCM = "http://www.w3.org/2009/xmlenc11#aes128-gcm";
-        doTestPostEncryptedBook(address, false, properties, SecurityUtils.X509_CERT, aes128GCM, null, false);
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(aes128GCM);
+        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        
+        doTestPostEncryptedBook(address, false, properties, encryptionProperties, false, test.streaming);
     }
     
     @Test
@@ -266,8 +302,14 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
+        
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128);
+        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        encryptionProperties.setEncryptionDigestAlgo(XMLCipher.SHA256);
+        
         doTestPostEncryptedBook(
-            address, false, properties, SecurityUtils.X509_CERT, XMLCipher.AES_128, XMLCipher.SHA256, false
+            address, false, properties, encryptionProperties, false, test.streaming
         );
     }
     
@@ -280,8 +322,13 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
+        
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128);
+        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_ISSUER_SERIAL);
+        
         doTestPostEncryptedBook(
-            address, false, properties, SecurityUtils.X509_ISSUER_SERIAL, XMLCipher.AES_128, null, false
+            address, false, properties, encryptionProperties, false, test.streaming
         );
     }
     
@@ -297,7 +344,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
-        doTestPostEncryptedBook(address, true, properties);
+        doTestPostEncryptedBook(address, true, properties, test.streaming);
         
     }
     
@@ -313,9 +360,14 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(
+            "http://www.w3.org/2009/xmlenc11#aes128-gcm");
+        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
+        
         try {
-            doTestPostEncryptedBook(address, true, properties, SecurityUtils.X509_CERT, 
-                                "http://www.w3.org/2009/xmlenc11#aes128-gcm", null, true);
+            doTestPostEncryptedBook(address, true, properties, encryptionProperties, true, test.streaming);
         } catch (BadRequestException ex) {
             assertEquals(400, ex.getResponse().getStatus());
         }
@@ -338,21 +390,25 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.username", "alice");
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
-        doTestPostEncryptedBook(address, true, properties);
+        doTestPostEncryptedBook(address, true, properties, test.streaming);
     }
     
-    public void doTestPostEncryptedBook(String address, boolean sign, Map<String, Object> properties) 
+    public void doTestPostEncryptedBook(String address, boolean sign, Map<String, Object> properties,
+                                        boolean streaming) 
         throws Exception {
+        EncryptionProperties encryptionProperties = new EncryptionProperties();
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128);
+        encryptionProperties.setEncryptionKeyIdType(SecurityUtils.X509_CERT);
         doTestPostEncryptedBook(
-            address, sign, properties, SecurityUtils.X509_CERT, XMLCipher.AES_128, null, false
+            address, sign, properties, encryptionProperties, false, test.streaming
         );
     }
     
     public void doTestPostEncryptedBook(
         String address, boolean sign, Map<String, Object> properties,
-        String keyIdentifierType, String symmetricAlgorithm,
-        String digestAlgorithm,
-        boolean propagateException
+        EncryptionProperties encryptionProperties,
+        boolean propagateException,
+        boolean streaming
     ) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
@@ -363,20 +419,36 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
 
         bean.setProperties(properties);
-        if (sign) {
-            bean.getOutInterceptors().add(new XmlSigOutInterceptor());
+        if (streaming) {
+            XmlSecOutInterceptor encInterceptor = new XmlSecOutInterceptor();
+            encInterceptor.setKeyIdentifierType(encryptionProperties.getEncryptionKeyIdType());
+            encInterceptor.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionSymmetricKeyAlgo());
+            encInterceptor.setEncryptionDigestAlgorithm(encryptionProperties.getEncryptionDigestAlgo());
+            encInterceptor.setEncryptRequest(true);
+            encInterceptor.addElementToEncrypt(new QName("", "Book"));
+            if (sign) {
+                encInterceptor.addElementToSign(new QName("", "Book"));
+                encInterceptor.setSignRequest(true);
+            }
+            bean.getOutInterceptors().add(encInterceptor);
+            
+            XmlSecInInterceptor encInInterceptor = new XmlSecInInterceptor();
+            bean.getInInterceptors().add(encInInterceptor);
+        } else {
+            if (sign) {
+                bean.getOutInterceptors().add(new XmlSigOutInterceptor());
+            }
+            XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
+            encInterceptor.setKeyIdentifierType(encryptionProperties.getEncryptionKeyIdType());
+            encInterceptor.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionSymmetricKeyAlgo());
+            encInterceptor.setDigestAlgorithm(encryptionProperties.getEncryptionDigestAlgo());
+            bean.getOutInterceptors().add(encInterceptor);
+            
+            bean.getInInterceptors().add(new XmlEncInInterceptor());
+            if (sign) {
+                bean.getInInterceptors().add(new XmlSigInInterceptor());
+            }
         }
-        XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
-        encInterceptor.setKeyIdentifierType(keyIdentifierType);
-        encInterceptor.setSymmetricEncAlgorithm(symmetricAlgorithm);
-        encInterceptor.setDigestAlgorithm(digestAlgorithm);
-        bean.getOutInterceptors().add(encInterceptor);
-        
-        bean.getInInterceptors().add(new XmlEncInInterceptor());
-        if (sign) {
-            bean.getInInterceptors().add(new XmlSigInInterceptor());
-        }
-        
         
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
