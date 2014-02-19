@@ -29,8 +29,8 @@
     <url>http://cxf.apache.org</url>
     <packaging>pom</packaging>
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk</developerConnection>
+        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/cxf.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/cxf.git</developerConnection>
     </scm>
     <issueManagement>
         <system>jira</system>
