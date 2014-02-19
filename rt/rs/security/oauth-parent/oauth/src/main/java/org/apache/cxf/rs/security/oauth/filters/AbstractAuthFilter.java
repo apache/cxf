@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.ws.rs.core.MediaType;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
@@ -77,6 +78,7 @@ public class AbstractAuthFilter {
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }
     
+    private boolean ignoreUnknownParameters;
     private boolean useUserSubject;
     private OAuthDataProvider dataProvider;
     private OAuthValidator validator = new DefaultOAuthValidator();
@@ -274,7 +276,15 @@ public class AbstractAuthFilter {
         this.validator = validator;
     }
 
-    private static class CustomHttpServletWrapper extends HttpServletRequestWrapper {
+    public boolean isIgnoreUnknownParameters() {
+        return ignoreUnknownParameters;
+    }
+
+    public void setIgnoreUnknownParameters(boolean ignoreUnknownParameters) {
+        this.ignoreUnknownParameters = ignoreUnknownParameters;
+    }
+
+    private class CustomHttpServletWrapper extends HttpServletRequestWrapper {
         public CustomHttpServletWrapper(HttpServletRequest req) {
             super(req);
         }
@@ -286,9 +296,15 @@ public class AbstractAuthFilter {
                 return params;
             }
             
+            String contentType = super.getRequest().getContentType();
+            boolean formPayload = contentType != null && MediaType.APPLICATION_FORM_URLENCODED_TYPE.
+                isCompatible(MediaType.valueOf(contentType));
+            
+                        
             Map<String, String[]> newParams = new HashMap<String, String[]>();
             for (Map.Entry<String, String[]> entry : params.entrySet()) {
-                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())) {    
+                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())
+                    || formPayload && AbstractAuthFilter.this.isIgnoreUnknownParameters()) {    
                     newParams.put(entry.getKey(), entry.getValue());
                 }
             }
