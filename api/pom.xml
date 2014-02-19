@@ -35,7 +35,6 @@
     
 
     <properties>
-        <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
         <cxf.osgi.export>
             !org.apache.cxf.internal,
             org.apache.cxf.*,
@@ -192,7 +191,6 @@
                             <configuration>
                                 <doCheck>false</doCheck>
                                 <doUpdate>false</doUpdate>
-                                <urlScm>${buildnumber.connection.url}</urlScm>
                                 <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
                             </configuration>
                     </execution>
@@ -388,35 +386,6 @@
                     <artifactId>geronimo-annotation_1.0_spec</artifactId>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <!-- default profile enables javadoc stuff -->
-            <id>git.build.number</id>
-            <activation>
-                <file>
-                    <exists>../.git</exists>
-                </file>
-            </activation>
-            <properties>
-                <buildnumber.connection.url>scm:git:http://</buildnumber.connection.url>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>package</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 
