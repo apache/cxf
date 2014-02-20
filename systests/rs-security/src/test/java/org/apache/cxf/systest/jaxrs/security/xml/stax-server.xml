@@ -66,17 +66,26 @@ under the License.
         <property name="decryptionAlias" value="bob" />
         <property name="signatureVerificationAlias" value="alice" />
     </bean>
-    <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor"/>
-    <bean id="xmlSigOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor">
+    <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
+        <property name="signRequest" value="true"/>
+    </bean>
+    <bean id="xmlSecOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
+        <property name="signRequest" value="true"/>
+        <property name="encryptRequest" value="true"/>
         <property name="signatureProperties" ref="sigProps"/>
+        <property name="encryptionProperties" ref="encProps"/>
     </bean>
-    <bean id="xmlSigOutHandlerNoKeyInfo" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor">
+    <bean id="xmlSigOutHandlerNoKeyInfo" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
+        <property name="signRequest" value="true"/>
     </bean>
-    <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
+    <bean id="xmlSecOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
+        <property name="signRequest" value="true"/>
+        <property name="encryptRequest" value="true"/>
         <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
     </bean>
-    <bean id="xmlEncOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
-        <property name="encryptionProperties" ref="encProps"/>
+    <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
+        <property name="encryptRequest" value="true"/>
+        <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
     </bean>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsig">
         <jaxrs:serviceBeans>
@@ -133,8 +142,7 @@ under the License.
             <ref bean="xmlSecInHandler"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
-            <ref bean="xmlSigOutHandler"/>
-            <ref bean="xmlEncOutHandler"/>
+            <ref bean="xmlSecOutHandler"/>
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
@@ -150,8 +158,7 @@ under the License.
             <ref bean="xmlSecInHandlerWithProps"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
-            <ref bean="xmlSigOutHandlerWithProps"/>
-            <ref bean="xmlEncOutHandlerWithProps"/>
+            <ref bean="xmlSecOutHandlerWithProps"/>
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
@@ -167,8 +174,7 @@ under the License.
             <ref bean="xmlSecInHandler"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
-            <ref bean="xmlSigOutHandler"/>
-            <ref bean="xmlEncOutHandler"/>
+            <ref bean="xmlSecOutHandler"/>
         </jaxrs:outInterceptors>
         <jaxrs:properties>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
