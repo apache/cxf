@@ -23,6 +23,8 @@ package org.apache.cxf.ws.policy.selector;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.neethi.Assertion;
 
@@ -46,12 +48,14 @@ public abstract class BaseAlternativeSelector implements AlternativeSelector {
     }
 
     protected boolean isCompatible(List<Assertion> alternative, List<Assertion> r) {
-        List<Assertion> r2 = new ArrayList<Assertion>(r);
-        for (Assertion a : alternative) {
-            r2.remove(a);
+        // Workaround until Neethi assertions do not override equals()
+        List<QName> rNames = new ArrayList<QName>(r.size());
+        for (Assertion ra : r) {
+            rNames.add(ra.getName());
         }
-        return r2.isEmpty();
+        for (Assertion a : alternative) {
+            rNames.remove(a.getName());
+        }
+        return rNames.isEmpty();
     }
-    
-    
 }
