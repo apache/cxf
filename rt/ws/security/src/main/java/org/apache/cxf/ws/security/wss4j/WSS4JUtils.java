@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 import java.security.Key;
 import java.util.Date;
@@ -43,6 +44,7 @@ import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * Some common functionality that can be shared between the WSS4JInInterceptor and the
@@ -92,12 +94,9 @@ public final class WSS4JUtils {
                 if (replayCache == null) {
                     String cacheKey = instanceKey;
                     if (info.getName() != null) {
-                        int hashcode = info.getName().toString().hashCode();
-                        if (hashcode < 0) {
-                            cacheKey += info.getName().toString().hashCode();
-                        } else {
-                            cacheKey += "-" + info.getName().toString().hashCode();
-                        }
+                        int hashCode = info.getName().toString().hashCode();
+                        cacheKey +=
+                            "-" + Base64.encode(BigInteger.valueOf((long)hashCode));
                     }
                     URL configFile = getConfigFileURL(message);
 
@@ -160,12 +159,9 @@ public final class WSS4JUtils {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
                 if (info.getName() != null) {
-                    int hashcode = info.getName().toString().hashCode();
-                    if (hashcode < 0) {
-                        cacheKey += info.getName().toString().hashCode();
-                    } else {
-                        cacheKey += "-" + info.getName().toString().hashCode();
-                    }
+                    int hashCode = info.getName().toString().hashCode();
+                    cacheKey +=
+                        "-" + Base64.encode(BigInteger.valueOf((long)hashCode));
                 }
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
