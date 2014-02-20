@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
@@ -65,6 +66,7 @@ import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityContextToken;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation 
@@ -111,7 +113,9 @@ public final class NegotiationUtils {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
                 if (info.getName() != null) {
-                    cacheKey += "-" + info.getName().toString().hashCode();
+                    int hashCode = info.getName().toString().hashCode();
+                    cacheKey +=
+                        "-" + Base64.encode(BigInteger.valueOf((long)hashCode));
                 }
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
