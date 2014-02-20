@@ -151,10 +151,6 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     
     private void configureEncryption(Message message, XMLSecurityProperties properties) 
         throws Exception {
-        if (elementsToEncrypt == null || elementsToEncrypt.isEmpty()) {
-            throw new Exception("An Element to Encrypt must be specified");
-        }
-        
         properties.setEncryptionSymAlgorithm(
             encryptionProperties.getEncryptionSymmetricKeyAlgo());
         properties.setEncryptionKey(
@@ -192,9 +188,20 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         }
         
         properties.addAction(XMLSecurityConstants.ENCRYPT);
-        SecurePart securePart = 
-            new SecurePart(elementsToEncrypt.get(0), SecurePart.Modifier.Element);
-        properties.addEncryptionPart(securePart);
+        
+        if (elementsToEncrypt == null || elementsToEncrypt.isEmpty()) {
+            LOG.fine("No Elements to encrypt are specified, so the entire request is encrypt");
+            SecurePart securePart = 
+                new SecurePart((QName)null, SecurePart.Modifier.Element);
+            securePart.setSecureEntireRequest(true);
+            properties.addEncryptionPart(securePart);
+        } else {
+            for (QName element : elementsToEncrypt) {
+                SecurePart securePart = 
+                    new SecurePart(element, SecurePart.Modifier.Element);
+                properties.addEncryptionPart(securePart);
+            }
+        }
     }
     
     private X509Certificate getCertificateFromCrypto(Crypto crypto, String user) throws Exception {
@@ -238,10 +245,6 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     private void configureSignature(
         Message message, XMLSecurityProperties properties
     ) throws Exception {
-        if (elementsToSign == null || elementsToSign.isEmpty()) {
-            throw new Exception("An Element to Sign must be specified");
-        }
-        
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         
         CryptoLoader loader = new CryptoLoader();
@@ -302,14 +305,31 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         if (sigProps.getSignatureC14nTransform() != null) {
             transform = sigProps.getSignatureC14nTransform();
         }
-        SecurePart securePart = 
-            new SecurePart(elementsToSign.get(0), SecurePart.Modifier.Element,
-                           new String[]{
-                               "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
-                               transform
-                           },
-                           digestAlgo);
-        properties.addSignaturePart(securePart);
+        
+        if (elementsToSign == null || elementsToSign.isEmpty()) {
+            LOG.fine("No Elements to sign are specified, so the entire request is signed");
+            SecurePart securePart = 
+                new SecurePart(null, SecurePart.Modifier.Element,
+                               new String[]{
+                                   "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+                                   transform
+                               },
+                               digestAlgo);
+            securePart.setSecureEntireRequest(true);
+            properties.addSignaturePart(securePart);
+        } else {
+            for (QName element : elementsToSign) {
+                SecurePart securePart = 
+                    new SecurePart(element, SecurePart.Modifier.Element,
+                                   new String[]{
+                                       "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+                                       transform
+                                   },
+                                   digestAlgo);
+                properties.addSignaturePart(securePart);
+            }
+        }
+        
     }
     
     protected void throwFault(String error, Exception ex) {
