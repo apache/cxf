@@ -227,6 +227,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 : ExceptionUtils.toInternalServerErrorException(ex, null);
         }
         message.getExchange().put(Response.class, excResponse);
+        message.getExchange().put(Throwable.class, ex);
     }
     
     private void setExchangeProperties(Message message, OperationResourceInfo ori, 

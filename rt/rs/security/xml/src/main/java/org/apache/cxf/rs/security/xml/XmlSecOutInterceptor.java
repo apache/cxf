@@ -102,6 +102,11 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
+        
+        if (message.getExchange().get(Throwable.class) != null) {
+            return;
+        }
+        
         OutputStream os = message.getContent(OutputStream.class);
         String encoding = getEncoding(message);
         
