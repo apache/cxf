@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.builders.PrimitiveAssertion;
 
 
 /**
@@ -48,13 +49,26 @@ public abstract class BaseAlternativeSelector implements AlternativeSelector {
     }
 
     protected boolean isCompatible(List<Assertion> alternative, List<Assertion> r) {
-        // Workaround until Neethi assertions do not override equals()
         List<QName> rNames = new ArrayList<QName>(r.size());
         for (Assertion ra : r) {
             rNames.add(ra.getName());
         }
+        
         for (Assertion a : alternative) {
-            rNames.remove(a.getName());
+            for (Assertion ra : r) {
+                if (a.equals(ra)) {
+                    rNames.remove(ra.getName());
+                    break;
+                } else {
+                    // Workaround until Neethi assertions implementations do not override equals(): 
+                    // objects in lists can be different instances
+                    if ((a instanceof PrimitiveAssertion) && (ra instanceof PrimitiveAssertion) 
+                        && ((PrimitiveAssertion) a).equal(ra)) {
+                        rNames.remove(ra.getName());
+                        break;
+                    }
+                }
+            }
         }
         return rNames.isEmpty();
     }
