@@ -188,6 +188,7 @@
                                             <entry key="org.eclipse.jdt.core.compiler.problem.unusedLocal" value="ignore" />
                                             <entry key="org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation" value="ignore" />
                                             <entry key="org.eclipse.jdt.core.compiler.problem.deprecation" value="ignore" />
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.unusedPrivateMember" value="ignore"/>
                                         </propertyfile>
                                     </target>
                                 </configuration>
