@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
    svn to be available on the path.   If using a git checkout, it also requires
    the command line version of git on the path.
 
-   Basically, svn does all the work, but this little wrapper 
+   Basically, git does all the work, but this little wrapper 
    thing will display the commit logs, prompt if you want to merge/block/ignore
    each commit, prompt for commit (so you can resolve any conflicts first), 
    etc....
@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 
    [R]ecord formally records that a merge occurred, but it does *not* 
    actually merge the commit.  This is useful if you another tool to do
-   the merging (such as Git) but still wish to record a merge did occur.
+   the merging but still wish to record a merge did occur.
 
    [F]lush will permanently save all the [B]'s and [R]'s you've earlier made, 
    useful when you need to stop DoMerges (due to a missed commit or other 
@@ -253,7 +253,6 @@ public class DoMerges {
             if (s.contains("[maven-release-plugin] prepare")) {
                 return;
             }
-                
         }
         map.add(list.toArray(new String[list.size()]));
     }
@@ -387,6 +386,10 @@ public class DoMerges {
                 System.out.println("https://issues.apache.org/jira/browse/" + s);
             }
             StringBuilder log = new StringBuilder();
+            if (isBlocked(logLines)) {
+                records.add("B " + ver);
+                continue;
+            }
             for (String s : logLines) {
                 System.out.println(s);
                 log.append(s).append("\n");
@@ -443,6 +446,17 @@ public class DoMerges {
             }
         }
         flush();
+    }
+    private static boolean isBlocked(String[] logLines) {
+        for (String s: logLines) {
+            if (s.trim().contains("Recording .gitmergeinfo Changes")) {
+                return true;
+            }
+            if (s.contains("[maven-release-plugin] prepare")) {
+                return true;
+            }
+        }
+        return false;
     }
     private static boolean checkPatchId(String ver) throws Exception {
         if (!patchIds.isEmpty()) {
