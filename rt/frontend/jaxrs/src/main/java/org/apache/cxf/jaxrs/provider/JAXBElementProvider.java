@@ -56,6 +56,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
@@ -99,6 +101,10 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     
     public JAXBElementProvider() {
         
+    }
+    
+    protected boolean objectFactoryOrIndexAvailable(Class<?> type) {
+        return !Document.class.isAssignableFrom(type) && super.objectFactoryOrIndexAvailable(type); 
     }
     
     public void setXmlResourceOffset(String value) {

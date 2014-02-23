@@ -23,8 +23,11 @@ package org.apache.cxf.ws.policy.selector;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.ws.policy.AlternativeSelector;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.builders.PrimitiveAssertion;
 
 
 /**
@@ -46,12 +49,27 @@ public abstract class BaseAlternativeSelector implements AlternativeSelector {
     }
 
     protected boolean isCompatible(List<Assertion> alternative, List<Assertion> r) {
-        List<Assertion> r2 = new ArrayList<Assertion>(r);
-        for (Assertion a : alternative) {
-            r2.remove(a);
+        List<QName> rNames = new ArrayList<QName>(r.size());
+        for (Assertion ra : r) {
+            rNames.add(ra.getName());
         }
-        return r2.isEmpty();
+        
+        for (Assertion a : alternative) {
+            for (Assertion ra : r) {
+                if (a.equals(ra)) {
+                    rNames.remove(ra.getName());
+                    break;
+                } else {
+                    // Workaround until Neethi assertions implementations do not override equals(): 
+                    // objects in lists can be different instances
+                    if ((a instanceof PrimitiveAssertion) && (ra instanceof PrimitiveAssertion) 
+                        && ((PrimitiveAssertion) a).equal(ra)) {
+                        rNames.remove(ra.getName());
+                        break;
+                    }
+                }
+            }
+        }
+        return rNames.isEmpty();
     }
-    
-    
 }

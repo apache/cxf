@@ -56,6 +56,9 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
     } 
 
     public void handleMessage(Message message) throws Fault {
+        if (message.getExchange().get(Throwable.class) != null) {
+            return;
+        }
         try {
             Document doc = getDomDocument(message);
             if (doc == null) {

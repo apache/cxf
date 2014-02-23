@@ -278,14 +278,11 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     public void setTrust(Trust10 trust) {
         if (trust != null) {
-            namespace = STSUtils.WST_NS_05_02;
-            requiresEntropy = trust.isRequireClientEntropy();
-        }
-    }
-
-    public void setTrust(Trust13 trust) {
-        if (trust != null) {
-            namespace = STSUtils.WST_NS_05_12;
+            if (trust instanceof Trust13) {
+                namespace = STSUtils.WST_NS_05_12;
+            } else {
+                namespace = STSUtils.WST_NS_05_02;
+            }
             requiresEntropy = trust.isRequireClientEntropy();
         }
     }
@@ -1665,5 +1662,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     public void setUseKeyCertificate(X509Certificate useKeyCertificate) {
         this.useKeyCertificate = useKeyCertificate;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

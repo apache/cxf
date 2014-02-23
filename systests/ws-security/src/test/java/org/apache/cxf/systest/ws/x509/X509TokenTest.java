@@ -128,15 +128,15 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
         
-        // TODO Wait until we pick up WSS4J 2.0.0-SNAPSHOT again
-        if (PORT.equals(test.getPort())) {
-            try {
-                x509Port.doubleIt(25);
-                fail("Failure expected on an incorrect key");
-            } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-                String error = "No certificates were found for decryption";
-                assertTrue(ex.getMessage().contains(error));
+        try {
+            x509Port.doubleIt(25);
+            fail("Failure expected on an incorrect key");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "No certificates were found for decryption";
+            if (STAX_PORT.equals(test.getPort())) {
+                error = "Referenced security token could not be retrieved";
             }
+            assertTrue(ex.getMessage().contains(error));
         }
         
         ((java.io.Closeable)x509Port).close();

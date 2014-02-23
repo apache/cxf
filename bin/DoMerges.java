@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
    svn to be available on the path.   If using a git checkout, it also requires
    the command line version of git on the path.
 
-   Basically, svn does all the work, but this little wrapper 
+   Basically, git does all the work, but this little wrapper 
    thing will display the commit logs, prompt if you want to merge/block/ignore
    each commit, prompt for commit (so you can resolve any conflicts first), 
    etc....
@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 
    [R]ecord formally records that a merge occurred, but it does *not* 
    actually merge the commit.  This is useful if you another tool to do
-   the merging (such as Git) but still wish to record a merge did occur.
+   the merging but still wish to record a merge did occur.
 
    [F]lush will permanently save all the [B]'s and [R]'s you've earlier made, 
    useful when you need to stop DoMerges (due to a missed commit or other 
@@ -64,124 +64,22 @@ import java.util.regex.Pattern;
 */
 
 public class DoMerges {
+    public static final String MERGEINFOFILE = ".gitmergeinfo";
+    
     public static boolean auto = false;
-    public static boolean isGit = false;
     public static Pattern jiraPattern = Pattern.compile("([A-Z]{2,10}+-\\d+)");
-
-    public static String propSource;
-    public static String svnSource;
-    public static String svnDest;
-    public static String svnRoot;
-    public static String gitSource;
-    
-    public static Ranges merged = new Ranges();
-    public static Ranges blocked = new Ranges();
-    
-    public static String maxRev;
     public static String username;
+    public static String fromBranch;
     
-    static class Ranges extends TreeSet<Range> {
-        private static final long serialVersionUID = 1L;
-        
-        public void addRange(Range r) {
-            add(r);
-        }
-        public boolean isInRange(int i) {
-            for (Range r2 : this) {
-                if (r2.contains(i)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public String toProperty() {
-            StringBuilder b = new StringBuilder(propSource);
-            b.append(":");
-            boolean first = true;
-            for (Range r : this) {
-                if (!first) {
-                    b.append(',');
-                } else {
-                    first = false;
-                }
-                b.append(r.toString());
-            }
-            return b.toString();
-        }
-        public void optimize(Ranges blocked, Set<Integer> ignores) {
-            Iterator<Range> it = this.iterator();
-            if (!it.hasNext()) {
-                return;
-            }
-            Range last = it.next();
-            while (it.hasNext()) {
-                Range r = it.next();
-                if ((last.max + 1) == r.min) {
-                    last.max = r.max;
-                    it.remove();
-                } else {
-                    last = r;
-                }
-                /*
-                while (last.max < r.min) {
-                    if (!blocked.isInRange(last.max + 1)
-                        && !ignores.contains(last.max + 1)) {
-                        last.max++;
-                    } else {
-                        break;
-                    }
-                }
-                if (last.max == r.min) {
-                    last.max = r.max;
-                    it.remove();
-                } else {
-                    last = r;
-                }
-                */
-            }
-        }
+    public static Set<String> records = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    public static Set<String> patchIds = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+
+    static int waitFor(Process p) throws Exception  {
+        return waitFor(p, true);
     }
-    
-    static class Range implements Comparable<Range> {
-        int min, max;
-        
-        public Range(int s) {
-            min = s;
-            max = s;
-        }
-        public Range(String s) {
-            int idx = s.indexOf('-');
-            if (idx == -1) {
-                min = Integer.parseInt(s);
-                max = min;
-            } else {
-                min = Integer.parseInt(s.substring(0, idx));
-                max = Integer.parseInt(s.substring(idx + 1));
-            }
-        }
-
-        public boolean contains(int i) {
-            return i >= min && i <= max;
-        }
-        
-        public String toString() {
-            if (min == max) {
-                return Integer.toString(min);
-            } 
-            return Integer.toString(min) + "-" + Integer.toString(max);
-        }
-
-        public int compareTo(Range o) {
-            return Integer.valueOf(min).compareTo(Integer.valueOf(o.min));
-        }
-    }
-
-
-    static void waitFor(Process p) throws Exception  {
-        waitFor(p, true);
-    }
-    static void waitFor(Process p, boolean exit) throws Exception  {
-        if (p.waitFor() != 0) {
+    static int waitFor(Process p, boolean exit) throws Exception  {
+        int i = p.waitFor();
+        if (i != 0) {
             System.out.println("ERROR!");
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             String line = reader.readLine();
@@ -193,138 +91,23 @@ public class DoMerges {
                 System.exit(1);
             }
         }
+        return i;
     }
-    static void runProcess(Process p) throws Exception {
-        runProcess(p, true);
+    static int runProcess(Process p) throws Exception {
+        return runProcess(p, true);
     }
-    static void runProcess(Process p, boolean exit) throws Exception {
+    static int runProcess(Process p, boolean exit) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line = reader.readLine();
         while (line != null) {
             System.out.println(line);
             line = reader.readLine();
         }
-        waitFor(p, exit);
+        return waitFor(p, exit);
     }
     
-    static void initSvnInfo() throws Exception {
-        Process p;
-        if (isGit) { 
-            p = Runtime.getRuntime().exec(new String[] {"git", "svn", "info", "."});
-        } else {
-            p = Runtime.getRuntime().exec(new String[] {"svn", "info", "."});
-        }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line = reader.readLine();
-        while (line != null) {
-            if (line.startsWith("Repository Root: ")) {
-                svnRoot = line.substring("Repository Root: ".length()).trim();
-            } else if (line.startsWith("URL: ")) {
-                svnDest = line.substring(5).trim();
-            }
-            line = reader.readLine();
-        } 
-        p.waitFor();
-        
-        
-        if (isGit) { 
-            p = Runtime.getRuntime().exec(new String[] {"git", "svn", "propget", "svnmerge-integrated", "."});
-        } else {
-            p = Runtime.getRuntime().exec(new String[] {"svn", "propget", "svnmerge-integrated", "."});
-        }
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        while (line != null) {
-            int idx = line.indexOf(':');
-            if (idx != -1) {
-                propSource = line.substring(0, idx);
-                svnSource = svnRoot + propSource;
-                if (isGit) {
-                    gitSource = line.substring(0, idx);
-                    if (gitSource.contains("/")) {
-                        gitSource = gitSource.substring(gitSource.lastIndexOf('/') + 1);
-                    }
-                    gitSource = "origin/" + gitSource;
-                }
-                parseRevs(line.substring(idx + 1), merged);
-            }
-            line = reader.readLine();
-        } 
-        p.waitFor();
-        
-        if (isGit) { 
-            p = Runtime.getRuntime().exec(new String[] {"git", "svn", "propget", "svnmerge-blocked", "."});
-        } else {
-            p = Runtime.getRuntime().exec(new String[] {"svn", "propget", "svnmerge-blocked", "."});
-        }
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        while (line != null) {
-            int idx = line.indexOf(':');
-            if (idx != -1) {
-                parseRevs(line.substring(idx + 1).trim(), blocked);
-            }
-            line = reader.readLine();
-        } 
-        p.waitFor();
-        
-        
-        p = Runtime.getRuntime().exec(new String[] {"svn", "info", svnSource});
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        while (line != null) {
-            if (line.startsWith("Revision: ")) {
-                maxRev = line.substring("Revision: ".length()).trim();
-            }
-            line = reader.readLine();
-        } 
-        p.waitFor();
-    }
-    
-    private static void parseRevs(String revs, Ranges ranges) {
-        String sp[] = revs.split(",");
-        for (String s : sp) {
-            ranges.addRange(new Range(s));
-        }
-    }
 
-
-
-    static void removeSvnMergeInfo() throws Exception {
-        if (isGit) {
-            return;
-        }
-        Process p = Runtime.getRuntime().exec(new String[] {"svn", "st", "."});
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        List<String> list = new ArrayList<String>();
-        String line = reader.readLine();
-        while (line != null) {
-            if (line.charAt(1) == 'M') {
-                list.add(line.substring(5).trim());
-            } else if (line.charAt(1) == 'C' && line.charAt(0) != 'C') {
-                Process p2 = Runtime.getRuntime().exec(new String[] {"svn", "resolved", line.substring(5).trim()});
-                if (p2.waitFor() != 0) {
-                    Thread.sleep(10);
-                }
-
-                list.add(line.substring(5).trim());
-            }
-            line = reader.readLine();
-        }
-        p.waitFor();
-
-        for (String s : list) { 
-            p = Runtime.getRuntime().exec(new String[] {"svn", "propdel", "svn:mergeinfo", s});
-            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            line = reader.readLine();
-            while (line != null) {
-                line = reader.readLine();
-            }
-            p.waitFor();
-        }
-    }
-
-    static boolean doCommit(int ver, String log) throws Exception {
+    static boolean doCommit() throws Exception {
         while (System.in.available() > 0) {
             System.in.read();
         }
@@ -336,250 +119,81 @@ public class DoMerges {
             c = Character.toUpperCase((char)i);
         }
         if (c == 'N') {
+            Process p = Runtime.getRuntime().exec(new String[] {"git", "reset", "--hard"});
+            runProcess(p);
             return false;
         }
-        if (!isGit) {
-            Process p = Runtime.getRuntime().exec(new String[] {"svn", "resolved", "."});
-            if (p.waitFor() != 0) {
-                Thread.sleep(10);
-            }
-        }
         
-        File file = createLog(ver, log);
-        Process p;
-        if (isGit) {
-            p = Runtime.getRuntime().exec(new String[] {"git", "commit", "-a", "-F", file.toString()});
-        } else {
-            p = Runtime.getRuntime().exec(new String[] {"svn", "commit", "-F", file.toString()});
-            runProcess(p);
-            p = Runtime.getRuntime().exec(new String[] {"svn", "up"});
-        }
+        Process p = Runtime.getRuntime().exec(new String[] {"git", "commit", "-a"});
         runProcess(p);
         return true;
     }   
-    
-    
-    private static File getLogFile(String action, String vers, List<VerLog> records) throws Exception {
-        File file = File.createTempFile("domerge", ".log");
-        file.deleteOnExit();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write(action);
-        writer.write(" revisions ");
-        writer.write(vers);
-        writer.write(" via ");
-        if (isGit) {
-            writer.write(" git from\n");
-        } else {
-            writer.write(" svn from\n");            
-        }
-        writer.write(svnSource);
-        writer.write("\n\n");
-        for (VerLog l : records) {
-            writer.write("........\n");
-            BufferedReader reader = new BufferedReader(new StringReader(l.log));
-            String line = reader.readLine();
-            while (line != null) {
-                if (!line.startsWith("--------")) {
-                    writer.write("  ");
-                    writer.write(line);
-                    writer.write("\n");
-                }
-                line = reader.readLine();
-            }
-            writer.write("........\n");
-        }
-        writer.close();
-        return file;
-    }
-    
-    private static File createLog(int ver, String log) throws Exception {
-        File file = File.createTempFile("domerge", ".log");
-        file.deleteOnExit();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        BufferedReader reader = new BufferedReader(new StringReader(log));
-        writer.write("Merged revisions ");
-        writer.write(Integer.toString(ver));
-        writer.write(" via ");
-        if (isGit) {
-            writer.write(" git cherry-pick from\n");
-        } else {
-            writer.write(" svn merge from\n");            
-        }
-        writer.write(svnSource);
-        writer.write("\n\n");
-        writer.write("........\n");
-        String line = reader.readLine();
-        while (line != null) {
-            if (!line.startsWith("--------")) {
-                writer.write("  ");
-                writer.write(line);
-                writer.write("\n");
-            }
-            line = reader.readLine();
-        }
-        writer.write("........\n");
-        writer.close();
-        return file;
-    }
 
-    public static void changes(int ver) throws Exception {
-        Process p;
-        if (isGit) {
-            String id = getGitVersion(ver);
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "diff", "-R", id + "^", id, gitSource}));
-        } else {
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "diff", "-c", Integer.toString(ver), svnRoot}));
-        }
+    public static void changes(String ver) throws Exception {
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "show", ver}));
         runProcess(p);
     }
-
-    private static String getGitVersion(int ver) throws Exception {
-        Process p;
-        BufferedReader reader;
-        String line;
-
-        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "svn", "find-rev", "r" + ver, gitSource}));
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        String version = null;
-        while (line != null) {
-            line = line.trim();
-            if (version == null && line.length() > 0) {
-                version = line;
-            }
-            line = reader.readLine();
+    
+    public static void flush() throws Exception {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(MERGEINFOFILE));
+        writer.write(fromBranch);
+        writer.newLine();
+        for (String s : records) {
+            writer.write(s);
+            writer.newLine();
         }
-        waitFor(p);
-        return version;
+        writer.flush();
+        writer.close();
+        
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "commit", "-m",
+                                                                           "Recording .gitmergeinfo Changes",
+                                                                           MERGEINFOFILE}));
+        runProcess(p);
     }
-
-    public static void flush(List<VerLog> blocks, List<VerLog> records) throws Exception {
-        Process p;
-        BufferedReader reader;
-        String line;
-        File checkout = new File(".");
-        if (isGit) {
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "svn", "dcommit"}));
-            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    public static void doUpdate() throws Exception {
+        Process p = Runtime.getRuntime().exec(new String[] {"git", "pull", "--rebase"});
+        runProcess(p);
+        
+        File file = new File(MERGEINFOFILE);
+        records.clear();
+        if (file.exists()) {
+            BufferedReader reader = new BufferedReader(new FileReader(MERGEINFOFILE));
+            String line = reader.readLine();
+            fromBranch = line;
             line = reader.readLine();
-            String version = null;
             while (line != null) {
-                line = line.trim();
-                if (version == null && line.length() > 0) {
-                    version = line;
-                }
+                records.add(line.trim());
                 line = reader.readLine();
             }
-            waitFor(p);
-            
-            if (!records.isEmpty() || !blocks.isEmpty()) {
-                checkout = File.createTempFile("gitsvn", ".co");
-                checkout.delete();
-                final File deleteDir = checkout;
-                Runtime.getRuntime().addShutdownHook(new Thread() {
-                    public void run() {
-                        deleteDirectory(deleteDir);
-                    }
-                    
-                });
-                
-                p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "co", "--depth", "empty", 
-                                                                           svnDest, checkout.toString()}));
-                runProcess(p);
-            } 
+            reader.close();
         }
-        
-        if (!records.isEmpty()) {
-            StringBuilder ver = new StringBuilder();
-            for (VerLog s : records) {
-                if (ver.length() > 0) {
-                    ver.append(',');
-                }
-                ver.append(Integer.toString(s.ver));
-                merged.addRange(new Range(s.ver));
+        file = new File("patch-info");
+        if (file.exists()) {
+            BufferedReader reader = new BufferedReader(new FileReader("patch-info"));
+            String line = reader.readLine();
+            while (line != null) {
+                patchIds.add(line.trim());
+                line = reader.readLine();
             }
-            System.out.println("Recording " + ver);
-            File logF = getLogFile("Recording", ver.toString(), new ArrayList<VerLog>());
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "propset",
-                                                                       "svnmerge-integrated",
-                                                                       merged.toProperty(),
-                                                                       checkout.toString()}));
-            runProcess(p);
-            
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "commit",
-                                                                       "-F",
-                                                                       logF.toString(),
-                                                                       checkout.toString()}));
-            runProcess(p);
-        }
-
-        if (!blocks.isEmpty()) {
-            StringBuilder ver = new StringBuilder();
-            for (VerLog s : blocks) {
-                if (ver.length() > 0) {
-                    ver.append(',');
-                }
-                ver.append(Integer.toString(s.ver));
-                blocked.addRange(new Range(s.ver));
-            }
-            System.out.println("Blocking " + ver);
-            //File logF = getLogFile("Blocking", ver.toString(), blocks);
-            File logF = getLogFile("Blocking", ver.toString(), new ArrayList<VerLog>());
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "propset",
-                                                                       "svnmerge-blocked",
-                                                                       blocked.toProperty(),
-                                                                       checkout.toString()}));
-            runProcess(p);
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "commit",
-                                                                       "-F",
-                                                                       logF.toString(),
-                                                                       checkout.toString()}));
-            runProcess(p);
-            p = Runtime.getRuntime().exec(new String[] {"svn", "up"});
-            runProcess(p);
-        }
-        blocks.clear();
-        records.clear();
-    }
-
-    public static void doUpdate() throws Exception {
-        if (isGit) {
-            Process p = Runtime.getRuntime().exec(new String[] {"git", "pull"});
-            runProcess(p);
-            p = Runtime.getRuntime().exec(new String[] {"git", "svn", "rebase"});
-            runProcess(p);
-        } else {
-            Process p = Runtime.getRuntime().exec(new String[] {"svn", "up", "-r", "head"});
-            runProcess(p);
+            reader.close();
         }
     }
 
-    public static Set<Integer> getAvailableUpdates() throws Exception {
-        Set<Integer> verList = new TreeSet<Integer>();
+    public static List<String> getAvailableUpdates() throws Exception {
+        List<String> verList = new LinkedList<String>();
         Process p;
         BufferedReader reader;
         String line;
         
-        String min = Integer.toString(merged.first().max);
-        if (isGit) {
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "svn", "log", 
-                                                                       "--oneline", "-r",
-                                                                       min + ":" + maxRev,
-                                                                       gitSource}));
-        } else {
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "log", 
-                                                                       "--quiet", "-r",
-                                                                       min + ":" + maxRev,
-                                                                       svnSource})); 
-        }
-        
+        p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry",
+                                                                   "HEAD", fromBranch})); 
+            
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
         while (line != null) {
-            if (line.charAt(0) == 'r') {
-                line = line.substring(0, line.indexOf(' ')).substring(1).trim();
-                int ver = Integer.parseInt(line);
-                if (!merged.isInRange(ver) && !blocked.isInRange(ver)) {
+            if (line.charAt(0) == '+') {
+                String ver = line.substring(2).trim(); 
+                if (!records.contains("B " + ver) && !records.contains("M " + ver)) {
                     verList.add(ver);
                 }
             }
@@ -589,36 +203,17 @@ public class DoMerges {
         return verList;
     }
 
-
-    public static List<String[]> getGitLogs(Integer starting) throws Exception {
+    public static List<String[]> getGitLogs() throws Exception {
         BufferedReader reader;
         String line;
-        Process p = Runtime.getRuntime().exec(new String[] {"git", "svn", "log", "-r" , starting.toString(), gitSource});
-        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        line = reader.readLine();
-        String date = null;
-        while (line != null && date == null) {
-            if (line.indexOf('|') != -1) {
-                //strip of rev #
-                line = line.substring(line.indexOf('|') + 1).trim();
-                if (line.indexOf('|') != -1) {
-                    //strip off committer
-                    line = line.substring(line.indexOf('|') + 1).trim();
-                }
-                date = line.substring(0, line.indexOf(' '));
-            }
-            line = reader.readLine();
-        }
-        reader.close();
-        
-        p = Runtime.getRuntime().exec(new String[] {"git", "log", "--since=" + date});
+        Process p = Runtime.getRuntime().exec(new String[] {"git", "log", fromBranch + "..HEAD"});
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
 
         List<String[]> map = new LinkedList<String[]>();
         List<String> list = new ArrayList<String>(10);
         while (line != null) {
-            if (line.length() > 0 && line.charAt(0) != ' ') {
+            if (line.length() > 0 && line.startsWith("commit ")) {
                 if (!list.isEmpty()) {
                     addIfNotMergeBlock(map, list);
                     list.clear();
@@ -637,6 +232,7 @@ public class DoMerges {
         }
         return map;
     }
+    
     private static void addIfNotMergeBlock(List<String[]> map, List<String> list) {
         for (String s: list) {
             if (s.trim().startsWith("Merged revision")
@@ -651,130 +247,114 @@ public class DoMerges {
                 && s.contains(" via ")) {
                 return;
             }
+            if (s.trim().contains("Recording .gitmergeinfo Changes")) {
+                return;
+            }
+            if (s.contains("[maven-release-plugin] prepare")) {
+                return;
+            }
         }
         map.add(list.toArray(new String[list.size()]));
     }
-    public static String[] getLog(Integer ver, Set<String> jiras) throws Exception {
+    
+    public static String[] getLog(String ver, Set<String> jiras) throws Exception {
         Process p;
         BufferedReader reader;
         String line;
-        if (isGit) { 
-            p = Runtime.getRuntime().exec(new String[] {"git", "svn", "log", "-r" , ver.toString(), gitSource});
-        } else {
-            p = Runtime.getRuntime().exec(new String[] {"svn", "log", "-r" , ver.toString(), svnRoot});
-        }
+        p = Runtime.getRuntime().exec(new String[] {"git", "log", "--pretty=medium", "-n", "1" , ver});
+
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
         List<String> lines = new ArrayList<String>(10);
         while (line != null) {
-            lines.add(line);
-            Matcher m = jiraPattern.matcher(line);
-            while (m.find()) {
-                jiras.add(m.group());
+            if (!line.startsWith("commit ")) {
+                lines.add(line);
+                Matcher m = jiraPattern.matcher(line);
+                while (m.find()) {
+                    jiras.add(m.group());
+                }
             }
             line = reader.readLine();
         }
         p.waitFor();
         return lines.toArray(new String[lines.size()]);
     }
-    
-    private static void doMerge(int ver, String log, List<VerLog> records) throws Exception {
-        Process p;
-        
-        if (isGit) {
-            String id = getGitVersion(ver);
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick",
-                                                                       "--no-commit", 
-                                                                       id}));
-        } else {
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "merge", "--non-interactive",
-                                                                       "-c", Integer.toString(ver), svnSource}));
-        }
-        runProcess(p, false);
-        
-        if (!isGit) {
-            removeSvnMergeInfo();
-            
-            Range r = new Range(ver);
-            merged.add(r);
-            p = Runtime.getRuntime().exec(new String[] {"svn", "propset", "svnmerge-integrated", 
-                                                        merged.toProperty(), "."});
-            removeSvnMergeInfo();
-            runProcess(p);
-
-            if (!doCommit(ver, log)) {
-                merged.remove(r);                
-            }
-        } else {
+    private static void doMerge(String ver) throws Exception {
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick", ver}));
+        if (runProcess(p, false) != 0) {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "status"}));
             runProcess(p);
-            
-            if (doCommit(ver, log)) {
-                records.add(new VerLog(ver, log));
+                
+            if (doCommit()) {
+                records.add("M " + ver);
             }
+        } else {
+            records.add("M " + ver);
         }
     }
-
-    static class VerLog {
-        int ver;
-        String log;
+    private static String getPatchId(String id) throws Exception {
+       
+        String commands[] = new String[] { "git", "show", id};
+        Process p = Runtime.getRuntime().exec(commands);
+        InputStream in = p.getInputStream();
         
-        public VerLog(int v, String l) {
-            ver = v;
-            log = l;
+        commands = new String[] { "git", "patch-id"};
+        Process p2 = Runtime.getRuntime().exec(commands);
+        OutputStream out = p2.getOutputStream();
+        byte bytes[] = new byte[1024];
+        int len = in.read(bytes);
+        BufferedReader r2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
+        while (len > 0) {
+            out.write(bytes, 0, len);
+            len = in.read(bytes);
         }
+        p.waitFor();
+        out.close();
+        
+        id = r2.readLine();
+        p2.waitFor();
+        
+        id = id.substring(0, id.indexOf(" "));
+        return id;
     }
     
-    public static void main (String args[]) throws Exception {
-        File file = new File("svnmerge-commit-message.txt");
+    private static String getUserName() throws Exception {
+        BufferedReader reader;
+        String line;
+        Process p = Runtime.getRuntime().exec(new String[] {"git", "config", "user.name"});
+
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
+        p.waitFor();
+        return line;
+    }
+    
+    public static void main (String a[]) throws Exception {
+        File file = new File(".git-commit-message.txt");
         if (file.exists()) {
             //make sure we delete this to not cause confusion
             file.delete();
         }
         
-        int onlyVersion = -1;
-        int fromVersion = -1;
-        if (args.length > 0) {
-            if ("-auto".equals(args[0])) { 
-                auto = true;
-            } else if ("-from".equals(args[0])) {
-                fromVersion = Integer.valueOf(args[1]);
-            } else if ("-me".equals(args[0])) {
-                username = System.getProperty("user.name");
-            } else if ("-user".equals(args[0])) {
-                username = args[1];
-            } else {
-                onlyVersion = Integer.valueOf(args[0]);
-            }
-        }
-        file = new File(".git");
-        if (file.exists() && file.isDirectory()) {
-            isGit = true;
-        }
-
         System.out.println("Updating directory");
 
         doUpdate();
-        initSvnInfo();
         
-        Set<Integer> verList = getAvailableUpdates();
-        if (onlyVersion != -1) {
-            if (!verList.contains(onlyVersion)) {
-                System.out.println("Version: " + onlyVersion + " does not need merging");
-                System.exit(0);
-            }
-            verList.clear();
-            verList.add(onlyVersion);
-        }
-        if (fromVersion != -1) {
-            Iterator<Integer> it = verList.iterator();
-            while (it.hasNext()) {
-                Integer i = it.next();
-                if (i < fromVersion) {
-                    it.remove();
-                }
+        List<String> args = new LinkedList<String>(Arrays.asList(a));
+        while (!args.isEmpty()) {
+            String get = args.remove(0);
+            
+            if ("-auto".equals(get)) { 
+                auto = true;
+            } else if ("-me".equals(get)) {
+                username = getUserName();
+            } else if ("-user".equals(get)) {
+                username = args.get(0);
             }
         }
+
+        
+        List<String> verList = getAvailableUpdates();
         if (verList.isEmpty()) {
             System.out.println("Nothing needs to be merged");
             System.exit(0);
@@ -782,45 +362,44 @@ public class DoMerges {
 
         System.out.println("Merging versions (" + verList.size() + "): " + verList);
 
-        Integer verArray[] = verList.toArray(new Integer[verList.size()]);
         List<String[]> gitLogs = null;
-        if (isGit && onlyVersion == -1) {
-            //with GIT, we can relatively quickly check the logs on the current branch 
-            //and compare with what should be merged and check if things are already merged
-            gitLogs = getGitLogs(verArray[0]);
-        }
+        //with GIT, we can relatively quickly check the logs on the current branch 
+        //and compare with what should be merged and check if things are already merged
+        gitLogs = getGitLogs();
         
-        List<VerLog> blocks = new ArrayList<VerLog>();
-        List<VerLog> records = new ArrayList<VerLog>();
-        Set<Integer> ignores = new TreeSet<Integer>();
         Set<String> jiras = new TreeSet<String>();
 
-        for (int cur = 0; cur < verArray.length; cur++) {
+        for (int cur = 0; cur < verList.size(); cur++) {
             jiras.clear();
-            int ver = verArray[cur];
+            String ver = verList.get(cur);
             String[] logLines = getLog(ver, jiras);
             if (logLines.length > 1
                 && username != null
-                && !logLines[1].contains("| " + username + " |")) {
+                && !logLines[0].contains(username)) {
                 continue;
             }
-            
+            System.out.println();
             System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
-            System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
-            
+            //System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
             
             for (String s : jiras) {
                 System.out.println("https://issues.apache.org/jira/browse/" + s);
             }
             StringBuilder log = new StringBuilder();
+            if (isBlocked(logLines)) {
+                records.add("B " + ver);
+                continue;
+            }
             for (String s : logLines) {
                 System.out.println(s);
                 log.append(s).append("\n");
             }
-
             
             char c = auto ? 'M' : 0;
-            if (checkAlreadyMerged(gitLogs, logLines)) {
+            if (checkPatchId(ver)) {
+                continue;
+            }
+            if (checkAlreadyMerged(ver, gitLogs, logLines)) {
                 c = 'R';
             }
 
@@ -832,7 +411,8 @@ public class DoMerges {
                    && c != 'I'
                    && c != 'R'
                    && c != 'F'
-                   && c != 'C') {
+                   && c != 'C'
+                   && c != 'P') {
                 System.out.print("[M]erge, [B]lock, or [I]gnore, [R]ecord only, [F]lush, [C]hanges? ");
                 int i = System.in.read();
                 c = Character.toUpperCase((char)i);
@@ -840,16 +420,20 @@ public class DoMerges {
 
             switch (c) {
             case 'M':
-                doMerge(ver, log.toString(), records);
+                doMerge(ver);
+                break;
+            case 'P':
+                System.out.println("Patch Id: " + getPatchId(ver));
+                cur--;
                 break;
             case 'B':
-                blocks.add(new VerLog(ver, log.toString()));
+                records.add("B " + ver);
                 break;
             case 'R':
-                records.add(new VerLog(ver, log.toString()));
+                records.add("M " + ver);
                 break;
             case 'F':
-                flush(blocks, records);
+                flush();
                 cur--;
                 break;
             case 'C':
@@ -858,15 +442,38 @@ public class DoMerges {
                 break;
             case 'I':
                 System.out.println("Ignoring");
-                ignores.add(Integer.valueOf(ver));
                 break;
             }
         }
-        optimizeRanges(ignores);
-        flush(blocks, records);
+        flush();
     }
-
-    private static boolean checkAlreadyMerged(List<String[]> gitLogs, String[] logLines) throws IOException {
+    private static boolean isBlocked(String[] logLines) {
+        for (String s: logLines) {
+            if (s.trim().contains("Recording .gitmergeinfo Changes")) {
+                return true;
+            }
+            if (s.contains("[maven-release-plugin] prepare")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static boolean checkPatchId(String ver) throws Exception {
+        if (!patchIds.isEmpty()) {
+            String pid = getPatchId(ver);
+            if (patchIds.contains("B " + pid)) {
+                records.add("B " + ver);
+                System.out.println("Already blocked: " + ver);
+                return true;
+            } else if (patchIds.contains("M " + pid)) {
+                records.add("M " + ver);
+                System.out.println("Already merged: " + ver);
+                return true;
+            }
+        }
+        return false;
+    }
+    private static boolean checkAlreadyMerged(String ver, List<String[]> gitLogs, String[] logLines) throws Exception {
         if (gitLogs == null) {
             return false;
         }
@@ -912,10 +519,7 @@ public class DoMerges {
         }
         return false;
     }
-    private static void optimizeRanges(Set<Integer> ignores) {
-        merged.optimize(blocked, ignores);
-        blocked.optimize(merged, ignores);
-    }
+
     private static String[] getCommandLine(String[] args) {
         List<String> argLine = new ArrayList<String>();
         if (isWindows()) {
@@ -943,36 +547,6 @@ public class DoMerges {
     }
     
     
-    private static void deleteDirectory(File d) {
-        String[] list = d.list();
-        if (list == null) {
-            list = new String[0];
-        }
-        for (int i = 0; i < list.length; i++) {
-            String s = list[i];
-            File f = new File(d, s);
-            if (f.isDirectory()) {
-                deleteDirectory(f);
-            } else {
-                delete(f);
-            }
-        }
-        delete(d);
-    }
-
-    public static void delete(File f) {
-        if (!f.delete()) {
-            if (isWindows()) {
-                System.gc();
-            }
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ex) {
-                // Ignore Exception
-            }
-            f.delete();
-        }
-    }
 }
 
 
