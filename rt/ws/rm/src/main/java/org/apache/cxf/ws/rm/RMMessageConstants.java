@@ -45,6 +45,9 @@ public final class RMMessageConstants {
     /** Boolean property TRUE for a chain used only to capture (not send) a message. */
     public static final String MESSAGE_CAPTURE_CHAIN = "org.apache.cxf.rm.captureOnly";
     
+    /** Client callback (must be instance of {@link MessageCallback}). */
+    public static final String RM_CLIENT_CALLBACK = "org.apache.cxf.rm.clientCallback";
+    
     static final String RM_PROTOCOL_VARIATION = "org.apache.cxf.ws.rm.protocol";
 
     // keep this constant in the ws-rm package until it finds a general use outside of ws-rm
