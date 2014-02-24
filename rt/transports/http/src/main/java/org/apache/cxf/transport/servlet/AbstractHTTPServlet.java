@@ -325,7 +325,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         ServletContext sc = super.getServletContext();
         RequestDispatcher rd = dispatcherServletName != null 
             ? sc.getNamedDispatcher(dispatcherServletName) 
-            : sc.getRequestDispatcher(theServletPath + pathInfo);
+            : sc.getRequestDispatcher((theServletPath + pathInfo).replace("//", "/"));
         if (rd == null) {
             String errorMessage = "No RequestDispatcher can be created for path " + pathInfo;
             if (dispatcherServletName != null) {
@@ -377,7 +377,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            return contextPath + servletPath + pathInfo;
+            return contextPath + (servletPath + pathInfo).replace("//", "/");
         }
         
         @Override
