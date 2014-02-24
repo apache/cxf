@@ -415,6 +415,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
     }
 
+    @Test
+    public void testGetDefaultBookJSessionID() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/bookstore/;JSESSIONID=123"; 
+        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+    }
+    
+    
     private void getBook(String endpointAddress, String resource) throws Exception {
         getBook(endpointAddress, resource, "application/json");
     }
