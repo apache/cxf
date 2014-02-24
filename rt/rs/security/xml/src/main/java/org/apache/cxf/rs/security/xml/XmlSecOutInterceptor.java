@@ -58,7 +58,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSec;
@@ -161,18 +160,26 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         properties.setEncryptionKey(
             getSymmetricKey(encryptionProperties.getEncryptionSymmetricKeyAlgo()));
         if (encryptSymmetricKey) {
+            X509Certificate sendingCert = null;
             String userName = 
                 (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-            CryptoLoader loader = new CryptoLoader();
-            Crypto crypto = loader.getCrypto(message, 
-                                      SecurityConstants.ENCRYPT_CRYPTO,
-                                      SecurityConstants.ENCRYPT_PROPERTIES);
-            
-            userName = SecurityUtils.getUserName(crypto, userName);
-            if (StringUtils.isEmpty(userName)) {
-                throw new Exception("User name is not available");
+            if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
+                && !MessageUtils.isRequestor(message)) {
+                sendingCert = 
+                    message.getExchange().getInMessage().getContent(X509Certificate.class);
+            } else {
+                CryptoLoader loader = new CryptoLoader();
+                Crypto crypto = loader.getCrypto(message, 
+                                          SecurityConstants.ENCRYPT_CRYPTO,
+                                          SecurityConstants.ENCRYPT_PROPERTIES);
+                
+                userName = SecurityUtils.getUserName(crypto, userName);
+                if (StringUtils.isEmpty(userName)) {
+                    throw new Exception("User name is not available");
+                }
+                sendingCert = getCertificateFromCrypto(crypto, userName);
             }
-            X509Certificate sendingCert = getCertificateFromCrypto(crypto, userName);
+            
             if (sendingCert == null) {
                 throw new Exception("Sending certificate is not available");
             }
@@ -273,7 +280,7 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-            sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+            sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA_SHA1;
         }
         
         properties.setSignatureAlgorithm(sigAlgo);

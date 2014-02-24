@@ -116,8 +116,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             X509Certificate receiverCert = null;
             
             String userName = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-            if (userName != null 
-                && SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
+            if (SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 XMLSignature sig = message.getExchange().getInMessage().getContent(XMLSignature.class);
                 if (sig != null) {
