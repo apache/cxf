@@ -142,6 +142,12 @@ public class BookStore {
     }
 
     @GET
+    @Path("/")
+    public Book getBookRoot() {
+        return new Book("root", 124L);
+    }
+    
+    @GET
     @Path("/bookarray")
     public String[] getBookStringArray() {
         return new String[]{"Good book"};
