@@ -93,6 +93,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookRoot() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/;JSESSIONID=xxx";
+        WebClient wc = WebClient.create(address);
+        Book book = wc.get(Book.class);
+        assertEquals(124L, book.getId());
+        assertEquals("root", book.getName());
+    }
+    
+    @Test
     public void testGetBookQueryDefault() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/query/default";
         WebClient wc = WebClient.create(address);
