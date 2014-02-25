@@ -29,10 +29,10 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class JettyHTTPHandler extends AbstractHandler {
+    protected JettyHTTPDestination jettyHTTPDestination;
+    protected ServletContext servletContext;
     private String urlName;
     private boolean contextMatchExact;
-    private JettyHTTPDestination jettyHTTPDestination;
-    private ServletContext servletContext;
 
     public JettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         contextMatchExact = cmExact;

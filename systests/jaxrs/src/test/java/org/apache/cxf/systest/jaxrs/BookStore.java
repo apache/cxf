@@ -101,7 +101,6 @@ import org.apache.cxf.systest.jaxrs.BookServer20.PostMatchMode;
 @Path("/bookstore")
 @GZIP(threshold = 1)
 public class BookStore {
-
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private Map<Long, CD> cds = new HashMap<Long, CD>();
     private long bookId = 123;
@@ -1144,6 +1143,30 @@ public class BookStore {
             details.setId(id);
             throw new BookNotFoundFault(details);
         }
+    }
+
+    @GET
+    @Path("/bookbought")
+    @Produces("text/*")
+    public StreamingOutput getBookBought() {
+        return new StreamingOutput() {
+            public void write(final OutputStream out) throws IOException, WebApplicationException {
+                out.write(("Today: " + new java.util.Date()).getBytes());
+                // just for testing, using a thread
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            for (int r = 2, i = 1; i <= 5; r *= 2, i++) {
+                                Thread.sleep(500);
+                                out.write(Integer.toString(r).getBytes());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        };
     }
 
     @POST

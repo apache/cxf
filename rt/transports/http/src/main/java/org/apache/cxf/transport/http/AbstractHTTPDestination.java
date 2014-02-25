@@ -116,6 +116,7 @@ public abstract class AbstractHTTPDestination
     protected CertConstraints certConstraints;
     protected boolean isServlet3;
     protected ContinuationProviderFactory cproviderFactory;
+    protected boolean enableWebSocket;
 
     private volatile boolean serverPolicyCalced; 
 
@@ -859,6 +860,14 @@ public abstract class AbstractHTTPDestination
 
     public void setMultiplexWithAddress(boolean multiplexWithAddress) {
         this.multiplexWithAddress = multiplexWithAddress;
+    }
+
+    public boolean isEnableWebSocket() {
+        return enableWebSocket;
+    }
+
+    public void setEnableWebSocket(boolean enableWebSocket) {
+        this.enableWebSocket = enableWebSocket;
     }
 
     public HTTPServerPolicy getServer() {

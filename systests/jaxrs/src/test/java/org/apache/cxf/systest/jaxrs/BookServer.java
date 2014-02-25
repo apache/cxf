@@ -42,6 +42,7 @@ import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
     
 public class BookServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServer.class);
@@ -111,6 +112,8 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.getProperties().put("default.content.type", "*/*");
         sf.getProperties().putAll(properties);
         server = sf.create();
+        ((JettyHTTPDestination)server.getDestination())
+            .setEnableWebSocket(Boolean.parseBoolean((String)properties.get("enableWebSocket")));
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
     }

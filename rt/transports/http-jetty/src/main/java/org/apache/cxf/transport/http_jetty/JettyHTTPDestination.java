@@ -23,6 +23,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -57,16 +58,29 @@ import org.eclipse.jetty.server.AbstractHttpConnection.Output;
 import org.eclipse.jetty.server.Request;
 import org.springframework.util.ClassUtils;
 
+
 public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPDestination.class);
+    private static Constructor<?> handlerConstructor;
 
     protected JettyHTTPServerEngine engine;
     protected JettyHTTPServerEngineFactory serverEngineFactory;
     protected ServletContext servletContext;
     protected URL nurl;
     protected ClassLoader loader;
+
+
+    static {
+        try {
+            Class<?> cls = ClassUtils.forName("org.apache.cxf.transport.http_jetty.JettyHTTPExtendedHandler",
+                                              JettyHTTPDestination.class.getClassLoader());
+            handlerConstructor = cls.getDeclaredConstructor(new Class<?>[]{JettyHTTPDestination.class, boolean.class});
+        } catch (Throwable t) {
+            //ignore
+        }
+    }
     
     /**
      * This variable signifies that finalizeConfig() has been called.
@@ -168,8 +182,23 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         } catch (Exception e) {
             throw new Fault(e);
         }
-        engine.addServant(url, 
-                          new JettyHTTPHandler(this, contextMatchOnExact()));
+        // pick the handler supportig websocket if jetty-websocket is available otherwise pick the default handler.
+        JettyHTTPHandler jhd = createJettyHTTPHandler(this, contextMatchOnExact());
+        engine.addServant(url, jhd);
+
+    }
+
+    private JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd,
+                                                    boolean cmExact) {
+        if (handlerConstructor != null) {
+            try {
+                return (JettyHTTPHandler)handlerConstructor.newInstance(new Object[]{jhd, cmExact});
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        // use the default handler
+        return new JettyHTTPHandler(jhd, cmExact);
     }
 
     /**
@@ -262,7 +291,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         resp.flushBuffer();
         Request baseRequest = (req instanceof Request) 
             ? (Request)req : getCurrentRequest();
-        baseRequest.setHandled(true);
+        if (baseRequest != null) {
+            baseRequest.setHandled(true);
+        }
         super.invokeComplete(context, req, resp, m);
     }
     
