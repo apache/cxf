@@ -53,6 +53,7 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
@@ -378,6 +379,19 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             
             properties.setEncryptionKeyIdentifier(getKeyIdentifierType(recToken, encrToken));
+            
+            // Find out do we also need to include the token as per the Inclusion requirement
+            WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getEncryptionKeyIdentifier();
+            if (encrToken instanceof X509Token 
+                && isTokenRequired(encrToken.getIncludeTokenType())
+                && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(
+                        keyIdentifier))) {
+                properties.setIncludeEncryptionToken(true);
+            } else {
+                properties.setIncludeEncryptionToken(false);
+            }
 
             properties.setEncryptionKeyTransportAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());

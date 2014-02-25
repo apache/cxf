@@ -475,6 +475,19 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     properties.setEncryptSymmetricEncryptionKey(false);
                 }
             }
+            
+            // Find out do we also need to include the token as per the Inclusion requirement
+            WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getEncryptionKeyIdentifier();
+            if (encrToken instanceof X509Token 
+                && isTokenRequired(encrToken.getIncludeTokenType())
+                && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(
+                        keyIdentifier))) {
+                properties.setIncludeEncryptionToken(true);
+            } else {
+                properties.setIncludeEncryptionToken(false);
+            }
 
             properties.setEncryptionKeyTransportAlgorithm(
                        algorithmSuite.getAlgorithmSuiteType().getAsymmetricKeyWrap());
