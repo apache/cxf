@@ -794,8 +794,32 @@ public abstract class AbstractSupportingTokenPolicyValidator
             List<WSDataRef> dataRefs = 
                 CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             for (WSDataRef dataRef : dataRefs) {
-                if (token == dataRef.getProtectedElement()) {
+                if (token == dataRef.getProtectedElement()
+                    || isEncryptedTokenSigned(token, dataRef)) {
                     return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean isEncryptedTokenSigned(Element token, WSDataRef signedRef) {
+        if (signedRef.getProtectedElement() != null
+            && "EncryptedData".equals(signedRef.getProtectedElement().getLocalName())
+            && WSConstants.ENC_NS.equals(signedRef.getProtectedElement().getNamespaceURI())) {
+            String encryptedDataId = 
+                signedRef.getProtectedElement().getAttributeNS(null, "Id");
+            for (WSSecurityEngineResult result : encryptedResults) {
+                List<WSDataRef> encryptedDataRefs = 
+                    CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                if (encryptedDataRefs != null) {
+                    for (WSDataRef encryptedDataRef : encryptedDataRefs) {
+                        if (token == encryptedDataRef.getProtectedElement()
+                            && (encryptedDataRef.getWsuId() != null 
+                                && encryptedDataRef.getWsuId().equals(encryptedDataId))) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -806,9 +830,9 @@ public abstract class AbstractSupportingTokenPolicyValidator
      * Return true if a token was encrypted, false otherwise.
      */
     private boolean isTokenEncrypted(Element token) {
-        for (WSSecurityEngineResult signedResult : encryptedResults) {
+        for (WSSecurityEngineResult result : encryptedResults) {
             List<WSDataRef> dataRefs = 
-                CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             if (dataRefs == null) {
                 return false;
             }
