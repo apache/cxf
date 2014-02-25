@@ -25,11 +25,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.naming.Context;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -38,15 +40,6 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.apache.cxf.transport.jms.util.JndiHelper;
-import org.apache.cxf.transport.jms.wsdl.DeliveryModeType;
-import org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType;
-import org.apache.cxf.transport.jms.wsdl.JndiContextParameterType;
-import org.apache.cxf.transport.jms.wsdl.JndiInitialContextFactoryType;
-import org.apache.cxf.transport.jms.wsdl.JndiURLType;
-import org.apache.cxf.transport.jms.wsdl.PriorityType;
-import org.apache.cxf.transport.jms.wsdl.ReplyToNameType;
-import org.apache.cxf.transport.jms.wsdl.TimeToLiveType;
-import org.apache.cxf.transport.jms.wsdl.TopicReplyToNameType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class JMSOldConfigHolder {
@@ -114,30 +107,11 @@ public class JMSOldConfigHolder {
     public void setServerBehavior(ServerBehaviorPolicyType serverBehavior) {
         this.serverBehavior = serverBehavior;
     }
-
     
-    /**
-     * Get the extensors from the wsdl and/or configuration that will
-     * then be used to configure the JMSConfiguration object 
-     * @param target 
-     */
-    protected JMSEndpoint getExtensorsAndConfig(Bus bus,
-                           EndpointInfo endpointInfo,
-                           EndpointReferenceType target,
-                           boolean isConduit) throws IOException {
-        JMSEndpoint endpoint = null;
-        String adr = target == null ? endpointInfo.getAddress() : target.getAddress().getValue();
-        try {           
-            endpoint = new JMSEndpoint(adr);
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception e) {
-            IOException e2 = new IOException(e.getMessage());
-            e2.initCause(e);
-            throw e2;
-        }
-        retrieveWSDLInformation(endpoint, endpointInfo);
-
+    public void initFromExtensorsAndSpring(Bus bus, 
+                                           EndpointInfo endpointInfo, 
+                                           EndpointReferenceType target,
+                                           boolean isConduit) {
         address = endpointInfo.getTraversedExtensor(address, AddressType.class);
         clientConfig = endpointInfo.getTraversedExtensor(new ClientConfig(), ClientConfig.class);
         runtimePolicy = endpointInfo.getTraversedExtensor(new ClientBehaviorPolicyType(),
@@ -154,16 +128,18 @@ public class JMSOldConfigHolder {
         // config. Search for a conduit or destination with name=endpoint name + ".jms-conduit"
         // or ".jms-destination"
 
+        // Add conduit or destination config from spring
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
             if (name != null) {
                 configurer.configureBean(name, this);
             }
+            String adr = target == null ? endpointInfo.getAddress() : target.getAddress().getValue();
             if (adr != null) {
                 configurer.configureBean(adr, this);
             }
         }
-        return endpoint;
+
     }
     
     /**
@@ -177,37 +153,24 @@ public class JMSOldConfigHolder {
                                                                    EndpointReferenceType target,
                                                                    boolean isConduit) 
         throws IOException {
-        JMSEndpoint endpoint = getExtensorsAndConfig(bus, endpointInfo, target, isConduit);
-
-        return configureEndpoint(isConduit, endpoint);
-    }
-
-    protected JMSConfiguration configureEndpoint(boolean isConduit, JMSEndpoint endpoint) {
+        JMSEndpoint endpoint = new JMSEndpoint(endpointInfo, target);
+        initFromExtensorsAndSpring(bus, endpointInfo, target, isConduit);
+        ConfiguredBeanLocator locator = bus.getExtension(ConfiguredBeanLocator.class);
         if (address != null) {
             mapAddressToEndpoint(address, endpoint);
         }
         if (jmsConfig == null) {
             jmsConfig = new JMSConfiguration();
         }
-
+        
         int deliveryMode = endpoint.getDeliveryMode() 
             == org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType.PERSISTENT
             ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
         jmsConfig.setDeliveryMode(deliveryMode);
-
+        
         jmsConfig.setPriority(endpoint.getPriority());
-
+        
         if (jmsConfig.isUsingEndpointInfo()) {
-            JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
-            boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSEndpoint.TOPIC);
-            JNDIConfiguration jndiConfig = new JNDIConfiguration();
-            jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
-            jmsConfig.setJndiTemplate(jt);
-
-            jndiConfig.setConnectionUserName(endpoint.getUsername());
-            jndiConfig.setConnectionPassword(endpoint.getPassword());
-
-            jmsConfig.setJndiConfig(jndiConfig);
             jmsConfig.setReconnectOnException(endpoint.isReconnectOnException());
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);
@@ -226,6 +189,7 @@ public class JMSOldConfigHolder {
                     }
                 }
             }
+            boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSEndpoint.TOPIC);
             jmsConfig.setPubSubDomain(pubSubDomain);
             jmsConfig.setPubSubNoLocal(true);
             if (clientConfig.isSetClientReceiveTimeout()) {
@@ -240,23 +204,39 @@ public class JMSOldConfigHolder {
             if (serverConfig.isSetServerReceiveTimeout()) {
                 jmsConfig.setServerReceiveTimeout(serverConfig.getServerReceiveTimeout());
             }
-            jmsConfig.setEnforceSpec(clientConfig.isEnforceSpec());
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setDurableSubscriptionClientId(serverConfig.getDurableSubscriptionClientId());
-            if (sessionPool.isSetHighWaterMark()) {
-                jmsConfig.setMaxConcurrentConsumers(sessionPool.getHighWaterMark());
-            }
-            if (sessionPool.isSetLowWaterMark()) {
-                jmsConfig.setConcurrentConsumers(sessionPool.getLowWaterMark());
-            }
             jmsConfig.setTimeToLive(endpoint.getTimeToLive());
             if (serverBehavior.isSetTransactional()) {
                 jmsConfig.setSessionTransacted(serverBehavior.isTransactional());
             }
-            boolean useJndi = endpoint.getJmsVariant().contains(JMSEndpoint.JNDI);
-            if (useJndi) {
+            
+            if (endpoint.getJndiURL() != null) {
+                // Configure Connection Factory using jndi
+                JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
+                jmsConfig.setJndiTemplate(jt);
+                JNDIConfiguration jndiConfig = new JNDIConfiguration();
+                jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
+                jndiConfig.setConnectionUserName(endpoint.getUsername());
+                jndiConfig.setConnectionPassword(endpoint.getPassword());
+                jmsConfig.setJndiConfig(jndiConfig);
+            } else {
+                // Configure ConnectionFactory using locator 
+                if (locator != null) {
+                    // Lookup connectionFactory in context like blueprint
+                    ConnectionFactory cf = locator.getBeanOfType(endpoint.getJndiConnectionFactoryName(), 
+                                                                 ConnectionFactory.class);
+                    if (cf != null) {
+                        jmsConfig.setConnectionFactory(cf);
+                    }
+                }
+            }
+            
+            boolean resolveUsingJndi = endpoint.getJmsVariant().contains(JMSEndpoint.JNDI);
+            if (resolveUsingJndi) {
                 // Setup Destination jndi destination resolver
+                JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
                 final JMSDestinationResolver jndiDestinationResolver = new JMSDestinationResolver();
                 jndiDestinationResolver.setJndiTemplate(jt);
                 jmsConfig.setDestinationResolver(jndiDestinationResolver);
@@ -274,10 +254,10 @@ public class JMSOldConfigHolder {
                 }
             }
         }
-
+        
         String requestURI = endpoint.getRequestURI();
         jmsConfig.setRequestURI(requestURI);
-
+        
         String targetService = endpoint.getParameter(JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME);
         jmsConfig.setTargetService(targetService);
         return jmsConfig;
@@ -329,81 +309,16 @@ public class JMSOldConfigHolder {
             = address.getJMSNamingProperty().listIterator();
         while (listIter.hasNext()) {
             JMSNamingPropertyType propertyPair = listIter.next();
-            if (null != propertyPair.getValue()) {
-                endpoint.putJndiParameter(propertyPair.getName(), propertyPair.getValue());
-            }
-        }
-    }
-
-    /**
-     * @param endpoint
-     * @param ei
-     */
-    private void retrieveWSDLInformation(JMSEndpoint endpoint, EndpointInfo ei) {
-        JndiContextParameterType jndiContextParameterType = 
-            getWSDLExtensor(ei, JndiContextParameterType.class);
-        if (jndiContextParameterType != null 
-            && endpoint.getJndiParameters().get(jndiContextParameterType.getName()) == null) {
-            endpoint.putJndiParameter(jndiContextParameterType.getName().trim(),
-                                              jndiContextParameterType.getValue().trim());
-        }
-        
-        if (endpoint.getJndiConnectionFactoryName() == null) {
-            JndiConnectionFactoryNameType jndiConnectionFactoryNameType = getWSDLExtensor(
-                ei, JndiConnectionFactoryNameType.class);
-            if (jndiConnectionFactoryNameType != null) {
-                endpoint.setJndiConnectionFactoryName(jndiConnectionFactoryNameType.getValue().trim());
-            }
-        }
-        if (endpoint.getJndiInitialContextFactory() == null) {
-            JndiInitialContextFactoryType jndiInitialContextFactoryType = 
-                getWSDLExtensor(ei, JndiInitialContextFactoryType.class);
-            if (jndiInitialContextFactoryType != null) {
-                endpoint.setJndiInitialContextFactory(jndiInitialContextFactoryType.getValue().trim()); 
-            }
-        }
-        
-        if (endpoint.getJndiURL() == null) {
-            JndiURLType jndiURLType = getWSDLExtensor(ei, JndiURLType.class);
-            if (jndiURLType != null) {
-                endpoint.setJndiURL(jndiURLType.getValue().trim());
-            }
-        }
-        
-        if (!endpoint.isSetDeliveryMode()) {
-            DeliveryModeType deliveryModeType = getWSDLExtensor(ei, DeliveryModeType.class);
-            if (deliveryModeType != null) {
-                String deliveryMode = deliveryModeType.getValue().trim();
-                endpoint.setDeliveryMode(org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType
-                    .valueOf(deliveryMode));
-            }
-        }
-        
-        if (!endpoint.isSetPriority()) {
-            PriorityType priorityType = getWSDLExtensor(ei, PriorityType.class);
-            if (priorityType != null) {
-                endpoint.setPriority(priorityType.getValue());
-            }
-        }
-        
-        if (endpoint.getTimeToLive() == 0) {
-            TimeToLiveType timeToLiveType = getWSDLExtensor(ei, TimeToLiveType.class);
-            if (timeToLiveType != null) {
-                endpoint.setTimeToLive(timeToLiveType.getValue()); 
-            }
-        }
-        
-        if (endpoint.getReplyToName() == null) {
-            ReplyToNameType replyToNameType = getWSDLExtensor(ei, ReplyToNameType.class);
-            if (replyToNameType != null) {
-                endpoint.setReplyToName(replyToNameType.getValue());
-            }
-        }
-        
-        if (endpoint.getTopicReplyToName() == null) {
-            TopicReplyToNameType topicReplyToNameType = getWSDLExtensor(ei, TopicReplyToNameType.class);
-            if (topicReplyToNameType != null) {
-                endpoint.setTopicReplyToName(topicReplyToNameType.getValue());
+            String name = propertyPair.getName();
+            String value = propertyPair.getValue();
+            if (value != null) {
+                if (name.equals(Context.PROVIDER_URL)) {
+                    endpoint.setJndiURL(value);
+                } else if (name.equals(Context.INITIAL_CONTEXT_FACTORY)) {
+                    endpoint.setJndiInitialContextFactory(value);
+                } else {
+                    endpoint.putJndiParameter(propertyPair.getName(), propertyPair.getValue());
+                }
             }
         }
     }

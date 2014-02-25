@@ -60,7 +60,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.AddressType;
-import org.apache.cxf.transport.jms.JMSConduit;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.JMSNamingPropertyType;
@@ -542,8 +541,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays(true);
             requestEndpoint = Endpoint.publish("", requestServant);
             
-            Client client = ClientProxy.getClient(greeter);
-            ((JMSConduit)client.getConduit()).getJmsConfig().setEnforceSpec(true);
             BindingProvider  bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();

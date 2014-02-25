@@ -29,6 +29,9 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+/**
+ * Receiver for integration tests. It simulates the server side of the service
+ */
 public class TestReceiver {
     private ConnectionFactory connectionFactory;
     private String receiveQueueName;
@@ -37,6 +40,12 @@ public class TestReceiver {
     private Throwable ex;
     private boolean forceMessageIdAsCorrelationId;
     
+    /**
+     * 
+     * @param connectionFactory
+     * @param receiveQueueName listen on this queue
+     * @param forceMessageIdAsCorrelationId force the usage of messageId even if correlationId is set
+     */
     public TestReceiver(ConnectionFactory connectionFactory, 
                         String receiveQueueName, 
                         boolean forceMessageIdAsCorrelationId) {
@@ -73,7 +82,7 @@ public class TestReceiver {
         }
     }
 
-    private void receiveAndRespondWithMessageIdAsCorrelationId() {
+    private void receiveAndRespond() {
         ResourceCloser closer = new ResourceCloser();
         try {
             Connection connection = closer.register(connectionFactory.createConnection());
@@ -81,8 +90,9 @@ public class TestReceiver {
             Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
             MessageConsumer consumer = closer.register(session.createConsumer(session
                 .createQueue(receiveQueueName)));
-            final javax.jms.Message inMessage = consumer.receive(1000);
+            final javax.jms.Message inMessage = consumer.receive(10000);
             if (inMessage == null) {
+                System.out.println("TestReceiver timed out");
                 throw new RuntimeException("No message received on destination " + receiveQueueName);
             }
             requestMessageId = inMessage.getJMSMessageID();
@@ -96,7 +106,7 @@ public class TestReceiver {
             if (replyDest != null) {
                 final MessageProducer producer = closer
                     .register(session.createProducer(replyDest));
-                System.out.println("Sending reply to " + replyDest);
+                System.out.println("Sending reply with correlation id " + correlationId + " to " + replyDest);
                 producer.send(replyMessage);
             }
         } catch (Throwable e) {
@@ -110,7 +120,7 @@ public class TestReceiver {
         drainQueue();
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
-                receiveAndRespondWithMessageIdAsCorrelationId();
+                receiveAndRespond();
             }
         });
     }

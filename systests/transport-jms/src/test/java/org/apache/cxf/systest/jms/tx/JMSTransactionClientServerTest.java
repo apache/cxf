@@ -68,7 +68,6 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             jmsConfig.setTargetDestination("greeter.queue.noaop");
             jmsConfig.setSessionTransacted(true);
             jmsConfig.setPubSubDomain(false);
-            jmsConfig.setCacheLevel(3);
     
             JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();
             jmsConfigFeature.setJmsConfig(jmsConfig);

@@ -20,9 +20,10 @@ package org.apache.cxf.transport.jms.uri;
 
 import javax.jms.ConnectionFactory;
 
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -47,37 +48,58 @@ public class URIConfiguredConduitTest {
     private static final String BROKER_URI = "vm://localhost?broker.persistent=false";
     private ConnectionFactory connectionFactory;
 
+    private enum SyncType {
+        sync,
+        async
+    };
+
     @Test
     public void testSendReceive() throws Exception {
-        sendAndReceive(true, "testreply");
+        sendAndReceive(SyncType.sync,
+                       "jms:jndi:dynamicQueues/"
+                           + SERVICE_QUEUE
+                           + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                           + "&replyToName=dynamicQueues/testreply" 
+                           + "&messageType=text"
+                           + "&jndiConnectionFactoryName=ConnectionFactory"
+                           + "&jndiURL=" + BROKER_URI);
     }
-    
-    public void sendAndReceive(boolean synchronous, String replyDestination) throws Exception {
+
+    @Test
+    public void testSendReceiveCFFromContext() throws Exception {
+        sendAndReceive(SyncType.sync, "jms:queue:" + SERVICE_QUEUE + "?replyToName=testreply"
+                                      + "&messageType=text" 
+                                      + "&receiveTimeout=10000"
+                                      + "&jndiConnectionFactoryName=ConnectionFactory");
+    }
+
+    public void sendAndReceive(SyncType syncType, String address) throws Exception {
         BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
-        EndpointReferenceType target = new EndpointReferenceType();
 
-        connectionFactory = new PooledConnectionFactory(BROKER_URI);
-        TestReceiver receiver = new TestReceiver(connectionFactory, SERVICE_QUEUE, true);
+        // Register bean locator for cf lookup
+        ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
+        MyBeanLocator registry = new MyBeanLocator(cbl);
+        bus.setExtension(registry, ConfiguredBeanLocator.class);
+        
+        connectionFactory = new ActiveMQConnectionFactory(BROKER_URI);
+        registry.register("ConnectionFactory", connectionFactory);
+        TestReceiver receiver = new TestReceiver(connectionFactory, SERVICE_QUEUE, false);
         receiver.runAsync();
 
-        JMSOldConfigHolder holder = new JMSOldConfigHolder();
         EndpointInfo ei = new EndpointInfo();
-        String address = "jms:jndi:dynamicQueues/" + SERVICE_QUEUE
-            + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&replyToName=dynamicQueues/" + replyDestination
-            + "&messageType=text"
-            + "&jndiConnectionFactoryName=ConnectionFactory"
-            + "&jndiURL=" + BROKER_URI;
         ei.setAddress(address);
-        JMSConfiguration jmsConfig = holder.createJMSConfigurationFromEndpointInfo(bus, ei , null, true);
-        JMSConduit conduit = new JMSConduit(target, jmsConfig, bus);
+        JMSOldConfigHolder holder = new JMSOldConfigHolder();
+        JMSConfiguration jmsConfig = holder.createJMSConfigurationFromEndpointInfo(bus, ei, null, true);
+        JMSConduit conduit = new JMSConduit(new EndpointReferenceType(), jmsConfig, bus);
+
         Exchange exchange = new ExchangeImpl();
-        exchange.setSynchronous(synchronous);
+        exchange.setSynchronous(syncType == SyncType.sync);
         Message message = new MessageImpl();
         exchange.setOutMessage(message);
         conduit.sendExchange(exchange, "Request");
+
         waitForAsyncReply(exchange);
         receiver.close();
         if (exchange.getInMessage() == null) {

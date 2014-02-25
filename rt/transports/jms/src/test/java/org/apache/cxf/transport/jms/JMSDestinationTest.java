@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -116,14 +117,10 @@ public class JMSDestinationTest extends AbstractJMSTester {
             .getMessageSelector());
         assertEquals("Can't get the right DurableSubscriberName", "cxf_subscriber", jmsConfig
             .getDurableSubscriptionName());
-        
+
         assertEquals("The receiveTimeout should be set", jmsConfig.getReceiveTimeout().longValue(), 1500L);
-        assertEquals("The concurrentConsumer should be set", jmsConfig.getConcurrentConsumers(), 3);
-        assertEquals("The maxConcurrentConsumer should be set", jmsConfig.getMaxConcurrentConsumers(), 5);
         assertEquals("The maxSuspendedContinuations should be set", 
                      jmsConfig.getMaxSuspendedContinuations(), 2);
-        assertTrue("The acceptMessagesWhileStopping should be set to true",
-                   jmsConfig.isAcceptMessagesWhileStopping());
         assertNotNull("The connectionFactory should not be null", jmsConfig.getConnectionFactory());
         assertTrue("Should get the instance of ActiveMQConnectionFactory", 
                    jmsConfig.getConnectionFactory() instanceof ActiveMQConnectionFactory);
@@ -146,6 +143,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
                          "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
 
         JMSDestination destination = setupJMSDestination(ei);
+        ConnectionFactory cf = destination.getJmsConfig().getConnectionFactory();
+        assertNotNull("ConnectionFactory should not be null", cf);
 
         assertEquals("Can't get the right DurableSubscriberName", "CXF_subscriber", destination
             .getJmsConfig().getDurableSubscriptionName());
@@ -220,7 +219,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
         JMSConduit conduit = setupJMSConduit(ei, true);
-        System.out.println(conduit.getJmsConfig().getReplyDestination());
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
         JMSDestination destination = setupJMSDestination(ei);
@@ -235,7 +233,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
         /* 2. Test that replyTo destination set in WSDL IS used 
          * in spec non-compliant mode */
         
-        conduit.getJmsConfig().setEnforceSpec(false);
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         assertTrue("The destination should have got the message ", destMessage != null);

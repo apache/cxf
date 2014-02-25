@@ -80,6 +80,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     private String phase;
     private String decryptionAlias;
     private String signatureVerificationAlias;
+    private boolean persistSignature = true;
 
     public XmlSecInInterceptor() {
         setPhase(Phase.POST_STREAM);
@@ -203,7 +204,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     }
     
     protected SecurityEventListener configureSecurityEventListener(
-        final Crypto sigCrypto, Message msg, XMLSecurityProperties securityProperties
+        final Crypto sigCrypto, final Message msg, XMLSecurityProperties securityProperties
     ) {
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
@@ -218,7 +219,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
                     }
                 } else if (securityEvent.getSecurityEventType() != SecurityEventConstants.EncryptedKeyToken
                     && securityEvent instanceof TokenSecurityEvent<?>) {
-                    checkSignatureTrust(sigCrypto, (TokenSecurityEvent<?>)securityEvent);
+                    checkSignatureTrust(sigCrypto, msg, (TokenSecurityEvent<?>)securityEvent);
                 }
                 incomingSecurityEventList.add(securityEvent);
             }
@@ -277,7 +278,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     }
     
     private void checkSignatureTrust(
-        Crypto sigCrypto, TokenSecurityEvent<?> event
+        Crypto sigCrypto, Message msg, TokenSecurityEvent<?> event
     ) throws XMLSecurityException {
         SecurityToken token = event.getSecurityToken();
         if (token != null) {
@@ -294,6 +295,10 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
             } catch (WSSecurityException e) {
                 throw new XMLSecurityException("empty", "Error during Signature Trust "
                                                + "validation: " + e.getMessage());
+            }
+            
+            if (persistSignature) {
+                msg.setContent(X509Certificate.class, cert);
             }
         }
     }
@@ -360,4 +365,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
         this.signatureVerificationAlias = signatureVerificationAlias;
     }
     
+    public void setPersistSignature(boolean persist) {
+        this.persistSignature = persist;
+    }
 }
