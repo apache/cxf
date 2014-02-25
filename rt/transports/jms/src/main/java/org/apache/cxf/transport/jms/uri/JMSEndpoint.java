@@ -25,7 +25,9 @@ import java.util.Map;
 import javax.jms.Message;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
  * 
@@ -70,19 +72,43 @@ public class JMSEndpoint {
     private Integer priority;
     private String replyToName;
     private String topicReplyToName;
-    private String jndiConnectionFactoryName;
+    private String jndiConnectionFactoryName = "ConnectionFactory";
     private String jndiInitialContextFactory;
     private String jndiURL;
     private String username;
     private String password;
     private boolean reconnectOnException = true;
+    private String durableSubscriptionName;
+    private long receiveTimeout = 60000L;
 
     /**
      * @param uri
      * @param subject
      */
     public JMSEndpoint(String endpointUri) {
-        this();
+        this(null, endpointUri);
+    }
+    
+    /**
+     * Get the extensors from the wsdl and/or configuration that will
+     * then be used to configure the JMSConfiguration object 
+     * @param target 
+     */
+    public JMSEndpoint(EndpointInfo endpointInfo, EndpointReferenceType target) {
+        this(endpointInfo,  target == null ? endpointInfo.getAddress() : target.getAddress().getValue());
+    }
+    
+    /**
+     * @param uri
+     * @param subject
+     */
+    public JMSEndpoint(EndpointInfo ei, String endpointUri) {
+        this.jmsVariant = JMSEndpoint.QUEUE;
+        
+        if (ei != null) {
+            JMSEndpointWSDLUtil.retrieveWSDLInformation(this, ei);
+            
+        }
         if (!(StringUtils.isEmpty(endpointUri) || "jms://".equals(endpointUri) || !endpointUri.startsWith("jms"))) {
             this.endpointUri = endpointUri;
             JMSURIParser parsed = new JMSURIParser(endpointUri);
@@ -90,10 +116,6 @@ public class JMSEndpoint {
             this.destinationName = parsed.getDestination();
             configureProperties(this, parsed.parseQuery());
         }
-    }
-    
-    public JMSEndpoint() {
-        this.jmsVariant = JMSEndpoint.QUEUE;
     }
 
     /**
@@ -339,6 +361,21 @@ public class JMSEndpoint {
     public void setReconnectOnException(boolean reconnectOnException) {
         this.reconnectOnException = reconnectOnException;
     }
+    public String getDurableSubscriptionName() {
+        return durableSubscriptionName;
+    }
+
+    public void setDurableSubscriptionName(String durableSubscriptionName) {
+        this.durableSubscriptionName = durableSubscriptionName;
+    }
+
+    public long getReceiveTimeout() {
+        return receiveTimeout;
+    }
+    public void setReceiveTimeout(long receiveTimeout) {
+        this.receiveTimeout = receiveTimeout;
+    }
+
     public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };
     
     public enum MessageType {

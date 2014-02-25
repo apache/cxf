@@ -223,7 +223,7 @@ public class SoapJmsSpecTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testReplyToConfig() throws Exception {
-        JMSEndpoint endpoint = new JMSEndpoint();
+        JMSEndpoint endpoint = new JMSEndpoint("");
         endpoint.setJndiInitialContextFactory("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         endpoint.setJndiURL(broker.getBrokerURL());
         endpoint.setJndiConnectionFactoryName("ConnectionFactory");
