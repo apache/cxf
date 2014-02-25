@@ -44,6 +44,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         
     @Test
     // seems to cause PermGen issue to another systests/jaxrs later in some system. the code under analysis
+    @org.junit.Ignore 
     public void testBookWithWebSocket() throws Exception {
         String address = "ws://localhost:" + PORT + "/bookstore";
 
