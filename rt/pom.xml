@@ -63,9 +63,7 @@
         <module>rs/security/oauth-parent</module>
         <module>rs/security/cors</module>
         <module>management</module>
-<!--
         <module>management-web</module>
--->
         <module>javascript</module>
         <module>security</module>
     </modules>
