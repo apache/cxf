@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.io.IOException;
 import java.util.ArrayList;

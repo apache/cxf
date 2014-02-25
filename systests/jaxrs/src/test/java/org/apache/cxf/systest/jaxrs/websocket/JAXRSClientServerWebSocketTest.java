@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = BookServer.PORT;
+    public static final String PORT = BookServerWebSocket.PORT;
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -38,7 +38,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         properties.put("enableWebSocket", "true");
 
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(new BookServer(properties)));
+        assertTrue("server did not launch correctly", launchServer(new BookServerWebSocket(properties)));
         createStaticBus();
     }
         
