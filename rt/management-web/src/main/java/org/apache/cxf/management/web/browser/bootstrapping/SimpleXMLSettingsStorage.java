@@ -154,7 +154,6 @@ public class SimpleXMLSettingsStorage implements SettingsStorage {
     }
 
     @XmlRootElement(namespace = "http://cxf.apache.org/log")
-    @SuppressWarnings("unused")
     private static class Entry {
         private Settings settings;
         private String username;

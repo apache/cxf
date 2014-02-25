@@ -28,6 +28,7 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 public class MessageListenerContainer implements JMSListenerContainer {
     
@@ -41,6 +42,8 @@ public class MessageListenerContainer implements JMSListenerContainer {
     private MessageConsumer consumer;
     private Session session;
     private ExecutorService executor;
+    private String durableSubscriptionName;
+    private boolean pubSubNoLocal;
 
     public MessageListenerContainer(Connection connection, 
                                     Destination replyTo,
@@ -62,10 +65,46 @@ public class MessageListenerContainer implements JMSListenerContainer {
     public void setMessageSelector(String messageSelector) {
         this.messageSelector = messageSelector;
     }
+    
+    private ExecutorService getExecutor() {
+        if (executor == null) {
+            executor = Executors.newFixedThreadPool(10);
+        }
+        return executor;
+    }
+
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
+
+    public void setDurableSubscriptionName(String durableSubscriptionName) {
+        this.durableSubscriptionName = durableSubscriptionName;
+    }
+
+    public void setPubSubNoLocal(boolean pubSubNoLocal) {
+        this.pubSubNoLocal = pubSubNoLocal;
+    }
 
     @Override
     public boolean isRunning() {
         return running;
+    }
+    
+    @Override
+    public void start() {
+        try {
+            session = connection.createSession(transacted, acknowledgeMode);
+            if (durableSubscriptionName != null) {
+                consumer = session.createDurableSubscriber((Topic)replyTo, durableSubscriptionName,
+                                                           messageSelector, pubSubNoLocal);
+            } else {
+                consumer = session.createConsumer(replyTo, messageSelector);
+            }
+            consumer.setMessageListener(listenerHandler);
+            running = true;
+        } catch (JMSException e) {
+            throw JMSUtil.convertJmsException(e);
+        }
     }
 
     @Override
@@ -78,18 +117,6 @@ public class MessageListenerContainer implements JMSListenerContainer {
     }
 
     @Override
-    public void start() {
-        try {
-            session = connection.createSession(transacted, acknowledgeMode);
-            consumer = session.createConsumer(replyTo, messageSelector);
-            consumer.setMessageListener(listenerHandler);
-            running = true;
-        } catch (JMSException e) {
-            throw JMSUtil.convertJmsException(e);
-        }
-    }
-
-    @Override
     public void shutdown() {
         stop();
         ResourceCloser.close(connection);
@@ -99,7 +126,7 @@ public class MessageListenerContainer implements JMSListenerContainer {
 
         @Override
         public void onMessage(final Message message) {
-            executor.execute(new Runnable() {
+            getExecutor().execute(new Runnable() {
                 
                 @Override
                 public void run() {

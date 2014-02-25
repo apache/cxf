@@ -29,6 +29,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMEndpoint;
+import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -51,11 +52,13 @@ import org.junit.Test;
  * Test resend logic.
  */
 public class RetransmissionQueueImplTest extends Assert {
-    private static final Long ONE = new Long(1);
-    private static final Long TEN = new Long(10);
+    private static final Long ONE = Long.valueOf(1);
+    private static final Long TWO = Long.valueOf(2);
+    private static final Long TEN = Long.valueOf(10);
 
     private IMocksControl control;
     private RMManager manager;
+    private RMEndpoint endpoint;
     private Executor executor;
     private RetransmissionQueueImpl queue;
     private TestResender resender;
@@ -66,9 +69,11 @@ public class RetransmissionQueueImplTest extends Assert {
     private List<Object> mocks = new ArrayList<Object>();
     
     @Before
-    public void setUp() {
+    public void setUp() throws RMException {
         control = EasyMock.createNiceControl();
         manager = createMock(RMManager.class);
+        endpoint = createMock(RMEndpoint.class);
+        EasyMock.expect(manager.getReliableEndpoint(EasyMock.anyObject(Message.class))).andReturn(endpoint).anyTimes();
         queue = new RetransmissionQueueImpl(manager);
         resender = new TestResender();
         queue.replaceResender(resender);
@@ -160,13 +165,20 @@ public class RetransmissionQueueImplTest extends Assert {
     
     @Test
     public void testCacheUnacknowledged() {
-        SoapMessage message1 = setUpMessage("sequence1");
-        SoapMessage message2 = setUpMessage("sequence2");
-        SoapMessage message3 = setUpMessage("sequence1");
+        SoapMessage message1 = setUpMessage("sequence1", ONE);
+        SoapMessage message2 = setUpMessage("sequence2", ONE);
+        SoapMessage message3 = setUpMessage("sequence1", TWO);
         
         setupMessagePolicies(message1);
         setupMessagePolicies(message2);
         setupMessagePolicies(message3);
+        
+        endpoint.handleAccept("sequence1", 1, message1);
+        EasyMock.expectLastCall();
+        endpoint.handleAccept("sequence2", 1, message2);
+        EasyMock.expectLastCall();
+        endpoint.handleAccept("sequence1", 2, message3);
+        EasyMock.expectLastCall();
         
         ready(false);
         
@@ -220,6 +232,9 @@ public class RetransmissionQueueImplTest extends Assert {
         setupMessagePolicies(message1);        
         SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);
+        
+        endpoint.handleAcknowledgment("sequence1", TEN, message1);
+        EasyMock.expectLastCall();
         ready(false);
         
         sequenceList.add(queue.createResendCandidate(message1));
@@ -274,6 +289,11 @@ public class RetransmissionQueueImplTest extends Assert {
         setupMessagePolicies(message1);
         SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);
+        
+        endpoint.handleAcknowledgment("sequence1", TEN, message1);
+        EasyMock.expectLastCall();
+        endpoint.handleAcknowledgment("sequence1", ONE, message2);
+        EasyMock.expectLastCall();
         ready(false);
 
         sequenceList.add(queue.createResendCandidate(message1));
@@ -336,10 +356,6 @@ public class RetransmissionQueueImplTest extends Assert {
         control.replay();
         queue.start();
     }
-    
-    private SoapMessage setUpMessage(String sid) {
-        return setUpMessage(sid, null);
-    }
 
     private SoapMessage setUpMessage(String sid, Long messageNumber) {
         return setUpMessage(sid, messageNumber, true);
@@ -391,16 +407,12 @@ public class RetransmissionQueueImplTest extends Assert {
             EasyMock.expectLastCall().andReturn(sequence);
         }
         if (messageNumber != null) {
-            sequence.getMessageNumber();
-            EasyMock.expectLastCall().andReturn(messageNumber);
-        } else {
-            Identifier id = createMock(Identifier.class);
-            sequence.getIdentifier();
-            EasyMock.expectLastCall().andReturn(id);
-            id.getValue();
-            EasyMock.expectLastCall().andReturn(sid);
-            identifiers.add(id);
+            EasyMock.expect(sequence.getMessageNumber()).andReturn(messageNumber).anyTimes();
         }
+        Identifier id = createMock(Identifier.class);
+        EasyMock.expect(sequence.getIdentifier()).andReturn(id).anyTimes();
+        EasyMock.expect(id.getValue()).andReturn(sid).anyTimes();
+        identifiers.add(id);
         sequences.add(sequence);
         return sequence;
     }
@@ -416,9 +428,8 @@ public class RetransmissionQueueImplTest extends Assert {
         Source source = createMock(Source.class);
         sequence.getSource();
         EasyMock.expectLastCall().andReturn(source).anyTimes();
-        RMEndpoint rme = createMock(RMEndpoint.class);
         source.getReliableEndpoint();
-        EasyMock.expectLastCall().andReturn(rme).anyTimes();
+        EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
         boolean includesAcked = false;
         for (int i = 0; isAcked != null && i < isAcked.length; i++) {
             sequence.isAcknowledged(messageNumbers[i]);

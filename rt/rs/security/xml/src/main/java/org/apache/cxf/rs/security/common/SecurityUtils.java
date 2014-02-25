@@ -28,7 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
@@ -38,6 +37,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.utils.Constants;
@@ -66,7 +66,12 @@ public final class SecurityUtils {
         throws Exception {
         String base64Value = certNode.getTextContent().trim();
         byte[] certBytes = Base64Utility.decode(base64Value);
-        return crypto.loadCertificate(new ByteArrayInputStream(certBytes));
+        
+        Crypto certCrypto = crypto;
+        if (certCrypto == null) {
+            certCrypto = new Merlin();
+        }
+        return certCrypto.loadCertificate(new ByteArrayInputStream(certBytes));
     }
     
     public static X509Certificate loadX509IssuerSerial(Crypto crypto, Element certNode) 

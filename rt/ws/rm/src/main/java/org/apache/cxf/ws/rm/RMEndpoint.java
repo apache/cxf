@@ -289,24 +289,40 @@ public class RMEndpoint {
     }
     
     /**
-     * Handle message acknowledgement for source sequence. This generates a notification of the acknowledgement if JMX
-     * is being used.
+     * Handle message accepted for source sequence. This generates a callback if a receiver is set on the message.
+     * @param ssid
+     * @param number
+     * @param msg
+     */
+    public void handleAccept(String ssid, long number, Message msg) {
+        Object value = msg.get(RMMessageConstants.RM_CLIENT_CALLBACK);
+        if (value instanceof MessageCallback) {
+            ((MessageCallback)value).messageAccepted(ssid, number);
+        }
+    }
+    
+    /**
+     * Handle message acknowledgment for source sequence. This generates a notification of the acknowledgment if JMX
+     * is being used, and also generates a callback if a receiver is set on the message.
      * 
      * @param ssid
      * @param number
+     * @param msg
      */
-    public void handleAcknowledgement(String ssid, long number) {
+    public void handleAcknowledgment(String ssid, long number, Message msg) {
         if (modelMBean != null) {
             int seq = acknowledgementSequence.incrementAndGet();
             try {
                 modelMBean.sendNotification(new AcknowledgementNotification(this, seq, ssid, number));
             } catch (RuntimeOperationsException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.log(Level.WARNING, "Error handling JMX notification", e);
             } catch (MBeanException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.log(Level.WARNING, "Error handling JMX notification", e);
             }
+        }
+        Object value = msg.get(RMMessageConstants.RM_CLIENT_CALLBACK);
+        if (value instanceof MessageCallback) {
+            ((MessageCallback)value).messageAcknowledged(ssid, number);
         }
     }
 

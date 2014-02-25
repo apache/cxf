@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.transport.jms;
 
-import java.util.concurrent.Executor;
-
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -34,8 +32,7 @@ import org.apache.cxf.transport.jms.util.JndiHelper;
 @NoJSR250Annotations
 public class JMSConfiguration {
     /**
-     * The use of -1 is to make easier to determine
-     * if the setCacheLevel has been called.
+     * Default value to mark as unset
      */
     public static final int DEFAULT_VALUE = -1;
 
@@ -44,10 +41,7 @@ public class JMSConfiguration {
     private JndiHelper jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver = new JMSDestinationResolver();
-    private Executor taskExecutor;
     private boolean reconnectOnException = true;
-    private boolean messageIdEnabled = true;
-    private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
     private Long clientReceiveTimeout = 60000L;
     private Long serverReceiveTimeout;
@@ -57,8 +51,6 @@ public class JMSConfiguration {
     private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
     private boolean sessionTransacted;
 
-    private int concurrentConsumers = 1;
-    private int maxConcurrentConsumers = 1;
     private int maxSuspendedContinuations = DEFAULT_VALUE;
     private int reconnectPercentOfMax = 70;
 
@@ -84,14 +76,9 @@ public class JMSConfiguration {
     private boolean replyPubSubDomain;
     private Boolean useConduitIdSelector;
     private String conduitSelectorPrefix;
-    private long recoveryInterval = DEFAULT_VALUE;
-    private int cacheLevel = DEFAULT_VALUE;
-    private String cacheLevelName;
-    private Boolean enforceSpec;
-    private boolean acceptMessagesWhileStopping;
     private boolean jmsProviderTibcoEms;
 
-    //For jms spec.
+    // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
 
@@ -109,52 +96,12 @@ public class JMSConfiguration {
         }
     }
 
-    public String getCacheLevelName() {
-        return cacheLevelName;
-    }
-
-    public void setCacheLevelName(String cacheLevelName) {
-        this.cacheLevelName = cacheLevelName;
-    }
-
-    public int getCacheLevel() {
-        return cacheLevel;
-    }
-
-    public void setCacheLevel(int cacheLevel) {
-        this.cacheLevel = cacheLevel;
-    }
-
-    public long getRecoveryInterval() {
-        return recoveryInterval;
-    }
-
-    public void setRecoveryInterval(long recoveryInterval) {
-        this.recoveryInterval = recoveryInterval;
-    }
-
     public boolean isUsingEndpointInfo() {
         return this.usingEndpointInfo;
     }
 
     public void setUsingEndpointInfo(boolean usingEndpointInfo) {
         this.usingEndpointInfo = usingEndpointInfo;
-    }
-
-    public boolean isMessageIdEnabled() {
-        return messageIdEnabled;
-    }
-
-    public void setMessageIdEnabled(boolean messageIdEnabled) {
-        this.messageIdEnabled = messageIdEnabled;
-    }
-
-    public boolean isMessageTimestampEnabled() {
-        return messageTimestampEnabled;
-    }
-
-    public void setMessageTimestampEnabled(boolean messageTimestampEnabled) {
-        this.messageTimestampEnabled = messageTimestampEnabled;
     }
 
     public boolean isPubSubNoLocal() {
@@ -328,22 +275,6 @@ public class JMSConfiguration {
     public void setTransactionManager(Object transactionManager) {
     }
 
-    public int getConcurrentConsumers() {
-        return concurrentConsumers;
-    }
-
-    public void setConcurrentConsumers(int concurrentConsumers) {
-        this.concurrentConsumers = concurrentConsumers;
-    }
-
-    public int getMaxConcurrentConsumers() {
-        return maxConcurrentConsumers;
-    }
-
-    public void setMaxConcurrentConsumers(int maxConcurrentConsumers) {
-        this.maxConcurrentConsumers = maxConcurrentConsumers;
-    }
-
     public int getMaxSuspendedContinuations() {
         return maxSuspendedContinuations;
     }
@@ -358,14 +289,6 @@ public class JMSConfiguration {
 
     public void setReconnectPercentOfMax(int reconnectPercentOfMax) {
         this.reconnectPercentOfMax = reconnectPercentOfMax;
-    }
-
-    public Executor getTaskExecutor() {
-        return taskExecutor;
-    }
-
-    public void setTaskExecutor(Executor taskExecutor) {
-        this.taskExecutor = taskExecutor;
     }
 
     public void setUseConduitIdSelector(boolean useConduitIdSelector) {
@@ -407,14 +330,6 @@ public class JMSConfiguration {
         this.reconnectOnException = reconnectOnException;
     }
 
-    public boolean isAcceptMessagesWhileStopping() {
-        return acceptMessagesWhileStopping;
-    }
-
-    public void setAcceptMessagesWhileStopping(boolean acceptMessagesWhileStopping) {
-        this.acceptMessagesWhileStopping = acceptMessagesWhileStopping;
-    }
-
     public ConnectionFactory getConnectionFactory() {
         if (connectionFactory == null) {
             connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
@@ -444,21 +359,6 @@ public class JMSConfiguration {
 
     public String getRequestURI() {
         return requestURI;
-    }
-
-    public boolean isEnforceSpec() {
-        if (!isSetEnforceSpec()) {
-            return true;
-        }
-        return enforceSpec;
-    }
-
-    public void setEnforceSpec(boolean enforceSpec) {
-        this.enforceSpec = enforceSpec;
-    }
-
-    public boolean isSetEnforceSpec() {
-        return this.enforceSpec != null;
     }
 
     /** * @return Returns the jmsProviderTibcoEms.

@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     <beans:bean id="authenticationSuccHandler" class="demo.oauth.server.spring.AuthenticationSuccessfullHandler">
         <beans:property name="defaultTargetUrl" value="/app/newClientForm.jsp"/>
         <beans:property name="confirmationUrl" value="/auth/oauth/authorize/decision"/>
@@ -29,13 +29,21 @@
     <beans:bean id="entryPoint" class="demo.oauth.server.CustomAuth">
         <beans:property name="loginFormUrl" value="/index.jsp"/>
     </beans:bean>
+
+    <http pattern="/oAuthLogin.jsp" security="none" />
+    <http pattern="/index.jsp" security="none" />
+    <http pattern="/" security="none" />
+    <http pattern="/favicon.ico" security="none" />
+    <http pattern="/auth/oauth/**" security="none" />
+    <http pattern="/auth/resources/**" security="none" />
+
     <http auto-config="false" entry-point-ref="entryPoint">
-        <intercept-url pattern="/oAuthLogin.jsp" filters="none"/>
-        <intercept-url pattern="/index.jsp" filters="none"/>
-        <intercept-url pattern="/" filters="none"/>
-        <intercept-url pattern="/favicon.ico" filters="none"/>
-        <intercept-url pattern="/auth/oauth/**" filters="none"/>
-        <intercept-url pattern="/auth/resources/**" filters="none"/>
+        <intercept-url pattern="/oAuthLogin.jsp" />
+        <intercept-url pattern="/index.jsp"/>
+        <intercept-url pattern="/"/>
+        <intercept-url pattern="/favicon.ico"/>
+        <intercept-url pattern="/auth/oauth/**"/>
+        <intercept-url pattern="/auth/resources/**"/>
         <intercept-url pattern="/**" access="ROLE_USER"/>
         <form-login authentication-success-handler-ref="authenticationSuccHandler" authentication-failure-handler-ref="authenticationFailHandler" login-page="/index.jsp" authentication-failure-url="/auth/oauth/authorize" default-target-url="/app/newClientForm.jsp"/>
         <logout invalidate-session="true" logout-url="/logout.htm" logout-success-url="/login.jsp?loggedout=true"/>

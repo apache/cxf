@@ -47,20 +47,23 @@ public interface RetransmissionQueue {
     boolean isEmpty();
     
     /**
-     * Accepts a new message for possible future retransmission. 
+     * Accepts a new message for possible future retransmission. Implementations must call the
+     * RMEndpoint.handleAccepted() method for each accepted message.
+     * 
      * @param message the message context.
      */
     void addUnacknowledged(Message message);
     
     /**
-     * Purge all candidates for the given sequence that have been acknowledged.
+     * Purge all candidates for the given sequence that have been acknowledged. Implementations must call the
+     * RMEndpoint.handleAcknowledgment() method for each acknowledged message.
      * 
      * @param seq the sequence object.
      */
     void purgeAcknowledged(SourceSequence seq);
     
     /**
-     * Purge all candiates for the given sequence.
+     * Purge all candidates for the given sequence.
      * 
      * @param seq the sequence object
      */

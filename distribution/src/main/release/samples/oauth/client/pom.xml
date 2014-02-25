@@ -69,6 +69,11 @@
             <artifactId>spring-beans</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>net.oauth.core</groupId>
             <artifactId>oauth-consumer</artifactId>
             <version>20100527</version>

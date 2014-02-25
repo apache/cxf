@@ -28,8 +28,6 @@
     	p:connectionFactory-ref="jmsConnectionFactory" 
     	p:targetDestination="test.jmstransport.text"
      	p:replyDestination="test.jmstransport.text.reply"
-    	p:concurrentConsumers="1" 
-    	p:maxConcurrentConsumers="1"
     	p:usingEndpointInfo="false"/>
     <jms:destination name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-destination">
         <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>
@@ -39,9 +37,6 @@
      	p:targetDestination="test.jmstransport.text"
      	p:replyDestination="test.jmstransport.text.reply"
      	p:timeToLive="10000" 
-     	p:concurrentConsumers="1" 
-     	p:maxConcurrentConsumers="1" 
      	p:maxSuspendedContinuations="1" 
-     	p:cacheLevel="2"
      	p:usingEndpointInfo="false"/>
 </beans>

@@ -285,6 +285,49 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // TODO See CXF-5567
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testUsernameTokenSAML1Dispatch() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
+       
+        Dispatch<DOMSource> dispatch = 
+            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
+        updateAddressPort(dispatch, test.getPort());
+        
+        // Setup STSClient
+        STSClient stsClient = createDispatchSTSClient(bus);
+        String wsdlLocation = "http://localhost:" + test.getStsPort() + "/SecurityTokenService/UT?wsdl";
+        stsClient.setWsdlLocation(wsdlLocation);
+        
+        // Creating a DOMSource Object for the request
+        DOMSource request = createDOMRequest();
+        
+        // Make a successful request
+        Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
+        client.getRequestContext().put("ws-security.sts.client", stsClient);
+        
+        if (test.isStreaming()) {
+            client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+            client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
+        }
+        
+        DOMSource response = dispatch.invoke(request);
+        assertNotNull(response);
+        
+        bus.shutdown(true);
+    }
+    
     private DOMSource createDOMRequest() throws ParserConfigurationException {
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

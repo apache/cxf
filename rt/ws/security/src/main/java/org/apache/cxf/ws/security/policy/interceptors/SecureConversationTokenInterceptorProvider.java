@@ -21,9 +21,12 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -45,6 +48,8 @@ import org.apache.wss4j.policy.model.SupportingTokens;
 public class SecureConversationTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
     private static final long serialVersionUID = 8739057200687855383L;
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(SecureConversationTokenInterceptorProvider.class);
 
 
     public SecureConversationTokenInterceptorProvider() {
@@ -63,6 +68,10 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             AssertionInfoMap aim,
                             SecureConversationToken itok,
                             boolean endorse) {
+        if (itok.getBootstrapPolicy() == null || itok.getBootstrapPolicy().getPolicy() == null) {
+            throw new Fault("The SecureConversationToken does not define a BootstrapPolicy", LOG);
+        }
+        
         client.setTrust(NegotiationUtils.getTrust10(aim));
         client.setTrust(NegotiationUtils.getTrust13(aim));
         Policy pol = itok.getBootstrapPolicy().getPolicy();

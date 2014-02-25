@@ -85,6 +85,9 @@ public abstract class AbstractJMSTester extends Assert {
 
     protected EndpointInfo setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
+        if (wsdlUrl == null) {
+            throw new IllegalArgumentException("Wsdl file not found on class path " + wsdl);
+        }
         String wsdlURL = wsdlUrl.toString();
         assertNotNull(wsdlUrl);
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlURL);

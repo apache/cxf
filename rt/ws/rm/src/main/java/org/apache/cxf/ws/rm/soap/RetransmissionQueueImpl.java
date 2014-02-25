@@ -84,6 +84,7 @@ import org.apache.cxf.ws.rm.RMCaptureOutInterceptor;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMEndpoint;
+import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
@@ -172,6 +173,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     
     private void purgeCandidates(SourceSequence seq, boolean any) {
         Collection<Long> purged = new ArrayList<Long>();
+        Collection<ResendCandidate> resends = new ArrayList<ResendCandidate>();
+        Identifier sid = seq.getIdentifier();
         synchronized (this) {
             LOG.fine("Start purging resend candidates.");
             List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
@@ -184,10 +187,11 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                         candidate.resolved();
                         unacknowledgedCount--;
                         purged.add(m);
+                        resends.add(candidate);
                     }
                 }
                 if (sequenceCandidates.isEmpty()) {
-                    candidates.remove(seq.getIdentifier().getValue());
+                    candidates.remove(sid.getValue());
                 }
             }
             LOG.fine("Completed purging resend candidates.");
@@ -195,11 +199,11 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         if (purged.size() > 0) {
             RMStore store = manager.getStore();
             if (null != store) {
-                store.removeMessages(seq.getIdentifier(), purged, true);
+                store.removeMessages(sid, purged, true);
             }
-            for (Long number : purged) {
-                RMEndpoint rmEndpoint = seq.getSource().getReliableEndpoint();
-                rmEndpoint.handleAcknowledgement(seq.getIdentifier().getValue(), number);
+            RMEndpoint rmEndpoint = seq.getSource().getReliableEndpoint();
+            for (ResendCandidate resend: resends) {
+                rmEndpoint.handleAcknowledgment(sid.getValue(), resend.getNumber(), resend.getMessage());
             }
         }
     }
@@ -348,6 +352,12 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             unacknowledgedCount++;
         }
         LOG.fine("Cached unacknowledged message.");
+        try {
+            RMEndpoint rme = manager.getReliableEndpoint(message);
+            rme.handleAccept(key, st.getMessageNumber(), message);
+        } catch (RMException e) {
+            LOG.log(Level.WARNING, "Could not find reliable endpoint for message");
+        }
         return candidate;
     }
 

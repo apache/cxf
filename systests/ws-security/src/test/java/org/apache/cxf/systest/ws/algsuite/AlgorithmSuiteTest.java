@@ -137,9 +137,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO @Ignore'ing this test due to a recent merge from Andrei
     @org.junit.Test
-    @org.junit.Ignore
     public void testCombinedPolicy() throws Exception {
         
         if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {

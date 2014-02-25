@@ -211,7 +211,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     protected Reference getReference(XMLSignature sig) {
         int count = sig.getSignedInfo().getLength();
         if (count != 1) {
-            throwFault("Multiple Signature Reference are not currently supported", null);
+            throwFault("Multiple Signature References are not currently supported", null);
         }
         try {
             return sig.getSignedInfo().item(0);
