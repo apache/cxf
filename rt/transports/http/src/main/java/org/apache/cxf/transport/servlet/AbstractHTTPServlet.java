@@ -339,8 +339,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     
     protected void redirect(HttpServletRequest request, HttpServletResponse response, String pathInfo) 
         throws ServletException {
-        
-        String theServletPath = dispatcherServletPath == null ? "/" : dispatcherServletPath;
+        boolean customServletPath = dispatcherServletPath != null;
+        String theServletPath = customServletPath ? dispatcherServletPath : "/";
         
         ServletContext sc = super.getServletContext();
         RequestDispatcher rd = dispatcherServletName != null 
@@ -358,7 +358,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 request.setAttribute(entry.getKey(), entry.getValue());
             }
             HttpServletRequestFilter servletRequest = 
-                new HttpServletRequestFilter(request, pathInfo, theServletPath);
+                new HttpServletRequestFilter(request, pathInfo, theServletPath, customServletPath);
             rd.forward(servletRequest, response);
         } catch (Throwable ex) {
             throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed");
@@ -376,10 +376,14 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         
         public HttpServletRequestFilter(HttpServletRequest request, 
                                         String pathInfo,
-                                        String servletPath) {
+                                        String servletPath,
+                                        boolean customServletPath) {
             super(request);
             this.pathInfo = pathInfo;
             this.servletPath = servletPath;
+            if (pathInfo != null && "/".equals(this.servletPath) && !customServletPath) {
+                this.servletPath = "";
+            }
         }
         
         @Override
