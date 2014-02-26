@@ -253,8 +253,8 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     
     private void checkSignatureAlgorithms(AlgorithmSuiteSecurityEvent event) 
         throws XMLSecurityException {
-        if (XMLSecurityConstants.Asym_Sig.equals(event.getAlgorithmUsage())
-            || XMLSecurityConstants.Sym_Sig.equals(event.getAlgorithmUsage())
+        if ((XMLSecurityConstants.Asym_Sig.equals(event.getAlgorithmUsage())
+            || XMLSecurityConstants.Sym_Sig.equals(event.getAlgorithmUsage()))
             && sigProps.getSignatureAlgo() != null
             && !sigProps.getSignatureAlgo().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature algorithm "
@@ -270,6 +270,7 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
             throw new XMLSecurityException("empty", "The signature c14n algorithm "
                 + event.getAlgorithmURI() + " is not allowed");
         } else if (XMLSecurityConstants.SigTransform.equals(event.getAlgorithmUsage())
+            && !XMLSecurityConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE.equals(event.getAlgorithmURI())
             && sigProps.getSignatureC14nTransform() != null
             && !sigProps.getSignatureC14nTransform().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", "The signature transformation algorithm "
