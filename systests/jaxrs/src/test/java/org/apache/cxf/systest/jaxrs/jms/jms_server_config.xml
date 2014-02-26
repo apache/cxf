@@ -25,9 +25,7 @@
     <bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration" 
     	p:connectionFactory-ref="jmsConnectionFactory" 
     	p:timeToLive="500000" 
-    	p:concurrentConsumers="1" 
-    	p:maxSuspendedContinuations="0" 
-    	p:maxConcurrentConsumers="1"/>
+    	p:maxSuspendedContinuations="0"/>
     <jms:destination name="{http://books.com}BookService.jms-destination">
         <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text">
             <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
