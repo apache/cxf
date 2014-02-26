@@ -23,11 +23,8 @@ import java.io.InputStream;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
@@ -43,8 +40,8 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
@@ -62,6 +59,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
@@ -69,27 +67,23 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 /**
  * A new StAX-based interceptor for processing messages with XML Signature + Encryption content.
  */
-public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
+public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecInInterceptor.class);
     
-    private Set<String> before = new HashSet<String>();
-    private Set<String> after = new HashSet<String>();
     private EncryptionProperties encryptionProperties;
     private SignatureProperties sigProps;
-    private String phase;
     private String decryptionAlias;
     private String signatureVerificationAlias;
     private boolean persistSignature = true;
+    private boolean requireSignature;
+    private boolean requireEncryption;
 
     public XmlSecInInterceptor() {
-        setPhase(Phase.POST_STREAM);
+        super(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
     
-    public void handleFault(Message message) {
-    }
-
     public void handleMessage(Message message) throws Fault {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         if ("GET".equals(method)) {
@@ -106,6 +100,9 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
                 originalXmlStreamReader = StaxUtils.createXMLStreamReader(is);
             }
         }
+        
+        inMsg.getInterceptorChain().add(
+            new StaxActionInInterceptor(requireSignature, requireEncryption));
         
         try {
             XMLSecurityProperties properties = new XMLSecurityProperties();
@@ -310,38 +307,6 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 
-    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
-        return null;
-    }
-
-    public Set<String> getAfter() {
-        return after;
-    }
-
-    public void setAfter(Set<String> after) {
-        this.after = after;
-    }
-
-    public Set<String> getBefore() {
-        return before;
-    }
-
-    public void setBefore(Set<String> before) {
-        this.before = before;
-    }
-
-    public String getId() {
-        return getClass().getName();
-    }
-
-    public String getPhase() {
-        return phase;
-    }
-
-    public void setPhase(String phase) {
-        this.phase = phase;
-    }
-
     public void setEncryptionProperties(EncryptionProperties properties) {
         this.encryptionProperties = properties;
     }
@@ -369,4 +334,98 @@ public class XmlSecInInterceptor implements PhaseInterceptor<Message> {
     public void setPersistSignature(boolean persist) {
         this.persistSignature = persist;
     }
+
+    public boolean isRequireSignature() {
+        return requireSignature;
+    }
+
+    public void setRequireSignature(boolean requireSignature) {
+        this.requireSignature = requireSignature;
+    }
+
+    public boolean isRequireEncryption() {
+        return requireEncryption;
+    }
+
+    public void setRequireEncryption(boolean requireEncryption) {
+        this.requireEncryption = requireEncryption;
+    }
+    
+    /**
+     * This interceptor handles parsing the StaX results (events) + checks to see whether the 
+     * required (if any) Actions (signature or encryption) were fulfilled.
+     */
+    private static class StaxActionInInterceptor extends AbstractPhaseInterceptor<Message> {
+        
+        private static final Logger LOG = 
+            LogUtils.getL7dLogger(StaxActionInInterceptor.class);
+                                                                
+        private final boolean signatureRequired;
+        private final boolean encryptionRequired;
+        
+        public StaxActionInInterceptor(boolean signatureRequired, boolean encryptionRequired) {
+            super(Phase.PRE_PROTOCOL);
+            this.signatureRequired = signatureRequired;
+            this.encryptionRequired = encryptionRequired;
+        }
+        
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            
+            if (!(signatureRequired || encryptionRequired)) {
+                return;
+            }
+            
+            @SuppressWarnings("unchecked")
+            final List<SecurityEvent> incomingSecurityEventList = 
+                (List<SecurityEvent>)message.get(SecurityEvent.class.getName() + ".in");
+
+            if (incomingSecurityEventList == null) {
+                LOG.warning("Security processing failed (actions mismatch)");
+                XMLSecurityException ex = 
+                    new XMLSecurityException("empty", "The request was not signed or encrypted");
+                throwFault(ex.getMessage(), ex);
+            }
+            
+            if (signatureRequired) {
+                Event requiredEvent = SecurityEventConstants.SignatureValue;
+                if (!isEventInResults(requiredEvent, incomingSecurityEventList)) {
+                    LOG.warning("The request was not signed");
+                    XMLSecurityException ex = 
+                        new XMLSecurityException("empty", "The request was not signed");
+                    throwFault(ex.getMessage(), ex);
+                }
+            }
+            
+            if (encryptionRequired) {
+                boolean foundEncryptionPart = 
+                    isEventInResults(SecurityEventConstants.EncryptedElement, incomingSecurityEventList);
+                if (!foundEncryptionPart) {
+                    LOG.warning("The request was not encrypted");
+                    XMLSecurityException ex = 
+                        new XMLSecurityException("empty", "The request was not encrypted");
+                    throwFault(ex.getMessage(), ex);
+                }
+            }
+            
+        }
+        
+        private boolean isEventInResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
+            for (SecurityEvent incomingEvent : incomingSecurityEventList) {
+                if (event == incomingEvent.getSecurityEventType()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        protected void throwFault(String error, Exception ex) {
+            LOG.warning(error);
+            Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
+            throw ExceptionUtils.toBadRequestException(null, response);
+        }
+        
+
+    }
+
 }

@@ -65,6 +65,8 @@ under the License.
         <property name="encryptionProperties" ref="encProps"/>
         <property name="decryptionAlias" value="bob" />
         <property name="signatureVerificationAlias" value="alice" />
+        <property name="requireSignature" value="true"/>
+        <property name="requireEncryption" value="true"/>
     </bean>
     <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
         <property name="signRequest" value="true"/>

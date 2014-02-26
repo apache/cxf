@@ -23,10 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
@@ -48,7 +45,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -71,17 +67,14 @@ import org.opensaml.xml.signature.SignatureConstants;
 /**
  * A new StAX-based interceptor for creating messages with XML Signature + Encryption content.
  */
-public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
+public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String OUTPUT_STREAM_HOLDER = 
         XmlSecOutInterceptor.class.getName() + ".outputstream";
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecOutInterceptor.class);
     
     private XmlSecStaxOutInterceptorInternal ending;
-    private Set<String> before = new HashSet<String>();
-    private Set<String> after = new HashSet<String>();
     private EncryptionProperties encryptionProperties = new EncryptionProperties();
     private SignatureProperties sigProps = new SignatureProperties();
-    private String phase;
     private boolean encryptSymmetricKey = true;
     private SecretKey symmetricKey;
     private boolean signRequest;
@@ -91,15 +84,12 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
     private boolean keyInfoMustBeAvailable = true;
 
     public XmlSecOutInterceptor() {
-        setPhase(Phase.PRE_STREAM);
+        super(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         
         ending = createEndingInterceptor();
     }
     
-    public void handleFault(Message message) {
-    }
-
     public void handleMessage(Message message) throws Fault {
         
         if (message.getExchange().get(Throwable.class) != null) {
@@ -348,38 +338,6 @@ public class XmlSecOutInterceptor implements PhaseInterceptor<Message> {
         LOG.warning(error);
         Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
         throw ExceptionUtils.toBadRequestException(null, response);
-    }
-
-    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
-        return null;
-    }
-
-    public Set<String> getAfter() {
-        return after;
-    }
-
-    public void setAfter(Set<String> after) {
-        this.after = after;
-    }
-
-    public Set<String> getBefore() {
-        return before;
-    }
-
-    public void setBefore(Set<String> before) {
-        this.before = before;
-    }
-
-    public String getId() {
-        return getClass().getName();
-    }
-
-    public String getPhase() {
-        return phase;
-    }
-
-    public void setPhase(String phase) {
-        this.phase = phase;
     }
 
     public void setEncryptionProperties(EncryptionProperties properties) {
