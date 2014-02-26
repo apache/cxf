@@ -78,12 +78,16 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     }
 
     public Bus getBus() {
-        if (bus == null) {
+        return getBus(true);
+    }
+    
+    public Bus getBus(boolean createIfNeeded) {
+        if (bus == null && createIfNeeded) {
             bus = BusFactory.getThreadDefaultBus();
         }
         return bus;
     }
-
+    
     public void setBus(Bus bus) {
         this.bus = bus;
     }
