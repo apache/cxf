@@ -57,7 +57,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals(1, received.size());
             String value = new String(received.get(0));
             assertEquals("CXF in Action", value);
-
+            
             // call another GET service
             wsclient.reset(1);
             wsclient.sendMessage("GET /web/bookstore/books/123".getBytes());
@@ -84,6 +84,25 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             for (int r = 2, i = 1; i < 6; r *= 2, i++) {
                 assertEquals(r, Integer.parseInt(new String(received.get(i))));
             }
+        } finally {
+            wsclient.close();
+        }
+    }
+    
+    @Test
+    @Ignore
+    public void testBookWithWebSocketServletStream() throws Exception {
+        String address = "ws://localhost:" + PORT + "/web/bookstore";
+
+        WebSocketTestClient wsclient = new WebSocketTestClient(address, 1);
+        wsclient.connect();
+        try {
+            wsclient.sendMessage("GET /web/bookstore/booknames/servletstream".getBytes());
+            assertTrue("one book must be returned", wsclient.await(3));
+            List<byte[]> received = wsclient.getReceivedBytes();
+            assertEquals(1, received.size());
+            String value = new String(received.get(0));
+            assertEquals("CXF in Action", value);
         } finally {
             wsclient.close();
         }

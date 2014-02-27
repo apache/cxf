@@ -23,6 +23,7 @@ package org.apache.cxf.systest.jaxrs.websocket;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,6 +31,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.cxf.systest.jaxrs.Book;
@@ -42,6 +44,15 @@ public class BookStoreWebSocket {
     @Produces("text/plain")
     public byte[] getBookName() {
         return "CXF in Action".getBytes();
+    }
+    
+    @GET
+    @Path("/booknames/servletstream")
+    @Produces("text/plain")
+    public void getBookNameStream(@Context HttpServletResponse response) throws Exception {
+        OutputStream os = response.getOutputStream(); 
+        os.write("CXF in Action".getBytes());
+        os.flush();
     }
     
     @GET
