@@ -179,6 +179,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.TRUE);
             
             String theServletPath = servletPath == null ? "/" : servletPath;
+            if ("/".equals(theServletPath) && path != null && path.startsWith("/")) {
+                theServletPath = "";
+            }
             HttpServletRequestFilter servletRequest = 
                 new HttpServletRequestFilter(mc.getHttpServletRequest(), path, 
                                              theServletPath, saveParametersAsAttributes);
