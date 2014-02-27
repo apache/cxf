@@ -819,7 +819,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     
                     getTokenStore().add(tempTok);
-                    message.setContextualProperty(SecurityConstants.TOKEN, tempTok);
+                    message.setContextualProperty(SecurityConstants.TOKEN_ID, tempTok.getId());
                     
                     return id;
                 }

@@ -796,18 +796,20 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         //
         Object o = message.getContextualProperty(SecurityConstants.SAML_CALLBACK_HANDLER);
     
-        if (o == null && message.getContextualProperty(SecurityConstants.TOKEN) != null) {
-            SecurityToken securityToken = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-            Element tokenElement = (Element)securityToken.getToken();
-            String namespace = tokenElement.getNamespaceURI();
-            String localname = tokenElement.getLocalName();
-            SamlTokenType tokenType = token.getSamlTokenType();
-            if ((tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11)
-                && WSConstants.SAML_NS.equals(namespace) && "Assertion".equals(localname)) {
-                return new SamlAssertionWrapper(tokenElement);
-            } else if (tokenType == SamlTokenType.WssSamlV20Token11
-                && WSConstants.SAML2_NS.equals(namespace) && "Assertion".equals(localname)) {
-                return new SamlAssertionWrapper(tokenElement);
+        if (o == null) {
+            SecurityToken securityToken = getSecurityToken();
+            if (securityToken != null) {
+                Element tokenElement = (Element)securityToken.getToken();
+                String namespace = tokenElement.getNamespaceURI();
+                String localname = tokenElement.getLocalName();
+                SamlTokenType tokenType = token.getSamlTokenType();
+                if ((tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11)
+                    && WSConstants.SAML_NS.equals(namespace) && "Assertion".equals(localname)) {
+                    return new SamlAssertionWrapper(tokenElement);
+                } else if (tokenType == SamlTokenType.WssSamlV20Token11
+                    && WSConstants.SAML2_NS.equals(namespace) && "Assertion".equals(localname)) {
+                    return new SamlAssertionWrapper(tokenElement);
+                }
             }
         }
         
