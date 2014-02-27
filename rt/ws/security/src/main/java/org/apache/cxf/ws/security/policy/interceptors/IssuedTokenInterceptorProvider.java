@@ -521,6 +521,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     return;
                 }
                 if (!isRequestor(message)) {
+                    message.getExchange().remove(SecurityConstants.TOKEN);
                     List<WSHandlerResult> results = 
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && results.size() > 0) {
@@ -551,9 +552,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
                 if (valid) {
                     SecurityToken token = createSecurityToken(assertionWrapper);
-                    getTokenStore(message).add(token);
-                    message.getExchange().remove(SecurityConstants.TOKEN);
-                    message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
+                    message.getExchange().put(SecurityConstants.TOKEN, token);
                     return;
                 }
             }
@@ -561,9 +560,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 boolean valid = issuedValidator.validatePolicy(issuedAis, binarySecurityToken);
                 if (valid) {
                     SecurityToken token = createSecurityToken(binarySecurityToken);
-                    getTokenStore(message).add(token);
-                    message.getExchange().remove(SecurityConstants.TOKEN);
-                    message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
+                    message.getExchange().put(SecurityConstants.TOKEN, token);
                     return;
                 }
             }
