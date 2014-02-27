@@ -90,7 +90,6 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     }
     
     @Test
-    @Ignore
     public void testBookWithWebSocketServletStream() throws Exception {
         String address = "ws://localhost:" + PORT + "/web/bookstore";
 

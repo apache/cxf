@@ -38,8 +38,17 @@ public class ServletOutputStreamFilter extends ServletOutputStream {
     
     @Override
     public void write(int b) throws IOException {
-        m.getExchange().put(AbstractHTTPDestination.RESPONSE_COMMITED, Boolean.TRUE);
+        setComittedStatus();
+        os.write(b);
+    }
+    
+    @Override
+    public void write(byte[] b) throws IOException {
+        setComittedStatus();
         os.write(b);
     }
 
+    private void setComittedStatus() {
+        m.getExchange().put(AbstractHTTPDestination.RESPONSE_COMMITED, Boolean.TRUE);
+    }
 }
