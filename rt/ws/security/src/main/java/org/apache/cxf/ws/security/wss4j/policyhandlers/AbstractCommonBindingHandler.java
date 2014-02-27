@@ -498,11 +498,7 @@ public abstract class AbstractCommonBindingHandler {
                 st = WSS4JUtils.getTokenStore(message).getToken(id);
             }
         }
-        if (st != null) {
-            WSS4JUtils.getTokenStore(message).add(st);
-            return st;
-        }
-        return null;
+        return st;
     }
     
     protected Collection<Assertion> findAndAssertPolicy(QName n) {
