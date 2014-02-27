@@ -1318,31 +1318,7 @@ public class BookStore {
     public Long echoBookId(long theBookId) {
         return new Long(theBookId);
     }
-    
-    @GET
-    @Path("/bookbought")
-    @Produces("text/*")
-    public StreamingOutput getBookBought() {
-        return new StreamingOutput() {
-            public void write(final OutputStream out) throws IOException, WebApplicationException {
-                out.write(("Today: " + new java.util.Date()).getBytes());
-                // just for testing, using a thread
-                new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            for (int r = 2, i = 1; i <= 5; r *= 2, i++) {
-                                Thread.sleep(500);
-                                out.write(Integer.toString(r).getBytes());
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-        };
-    }
-    
+       
     @POST
     @Path("/booksecho")
     @Consumes("text/plain")

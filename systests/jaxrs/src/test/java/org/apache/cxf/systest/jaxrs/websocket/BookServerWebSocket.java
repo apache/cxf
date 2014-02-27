@@ -26,7 +26,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
     
@@ -52,9 +51,9 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         setBus(bus);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
-        sf.setResourceClasses(BookStore.class);
-        sf.setResourceProvider(BookStore.class,
-                               new SingletonResourceProvider(new BookStore(), true));
+        sf.setResourceClasses(BookStoreWebSocket.class);
+        sf.setResourceProvider(BookStoreWebSocket.class,
+                               new SingletonResourceProvider(new BookStoreWebSocket(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
         server = sf.create();
         ((JettyHTTPDestination)server.getDestination())

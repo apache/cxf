@@ -50,7 +50,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         wsclient.connect();
         try {
             // call the GET service
-            wsclient.sendMessage("GET /bookstore/booknames/123".getBytes());
+            wsclient.sendMessage("GET /bookstore/booknames".getBytes());
             assertTrue("one book must be returned", wsclient.await(3));
             List<byte[]> received = wsclient.getReceivedBytes();
             assertEquals(1, received.size());
