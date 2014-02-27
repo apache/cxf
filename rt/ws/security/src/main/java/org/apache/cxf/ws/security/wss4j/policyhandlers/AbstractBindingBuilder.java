@@ -622,11 +622,8 @@ public abstract class AbstractBindingBuilder {
                 st = getTokenStore().getToken(id);
             }
         }
-        if (st != null) {
-            getTokenStore().add(st);
-            return st;
-        }
-        return null;
+        
+        return st;
     }
 
     protected void addSignatureParts(Map<Token, Object> tokenMap,
