@@ -34,6 +34,7 @@
         <cxf.bundle.activator>org.apache.cxf.transport.http_jetty.osgi.HTTPJettyTransportActivator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            org.eclipse.jetty.websocket;version="${cxf.jetty.osgi.version}";resolution:=optional,
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
