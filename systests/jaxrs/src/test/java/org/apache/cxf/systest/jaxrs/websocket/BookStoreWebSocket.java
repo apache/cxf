@@ -34,7 +34,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.cxf.systest.jaxrs.Book;
 
-@Path("/bookstore")
+@Path("/web/bookstore")
 public class BookStoreWebSocket {
     
     @GET
