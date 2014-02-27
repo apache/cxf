@@ -48,6 +48,12 @@ public class ServletOutputStreamFilter extends ServletOutputStream {
         os.write(b);
     }
 
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        setComittedStatus();
+        os.write(b, off, len);
+    }
+
     private void setComittedStatus() {
         m.getExchange().put(AbstractHTTPDestination.RESPONSE_COMMITED, Boolean.TRUE);
     }
