@@ -799,30 +799,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
     
     protected DocumentDepthProperties getDepthProperties() {
-        if (depthProperties != null) {
-            return depthProperties;
-        }
-        if (getContext() != null) {
-            String totalElementCountStr = (String)getContext().getContextualProperty(
-                DocumentDepthProperties.TOTAL_ELEMENT_COUNT);
-            String innerElementCountStr = (String)getContext().getContextualProperty(
-                DocumentDepthProperties.INNER_ELEMENT_COUNT);
-            String elementLevelStr = (String)getContext().getContextualProperty(
-                DocumentDepthProperties.INNER_ELEMENT_LEVEL);
-            if (totalElementCountStr != null || innerElementCountStr != null || elementLevelStr != null) {
-                try {
-                    int totalElementCount = totalElementCountStr != null 
-                        ? Integer.valueOf(totalElementCountStr) : -1;
-                    int elementLevel = elementLevelStr != null ? Integer.valueOf(elementLevelStr) : -1;
-                    int innerElementCount = innerElementCountStr != null 
-                        ? Integer.valueOf(innerElementCountStr) : -1;
-                    return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
-                } catch (Exception ex) {
-                    throw ExceptionUtils.toInternalServerErrorException(ex, null);
-                }
-            }
-        }
-        return null;
+        return depthProperties;
     }
     
     public void setValidateBeforeWrite(boolean validateBeforeWrite) {
