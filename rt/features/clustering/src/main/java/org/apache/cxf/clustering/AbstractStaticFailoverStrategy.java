@@ -78,9 +78,12 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         String selected = null;
         if (alternates != null && alternates.size() > 0) {
             selected = getNextAlternate(alternates);
-            LOG.log(Level.WARNING,
-                    "FAILING_OVER_TO_ADDRESS_OVERRIDE",
-                    selected);
+            Level level = getLogLevel();
+            if (LOG.isLoggable(level)) {
+                LOG.log(level,
+                        "FAILING_OVER_TO_ADDRESS_OVERRIDE",
+                        selected);
+            }
         } else {
             LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
         }
@@ -107,10 +110,13 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         Endpoint selected = null;
         if (alternates != null && alternates.size() > 0) {
             selected = getNextAlternate(alternates);
-            LOG.log(Level.WARNING,
-                    "FAILING_OVER_TO_ALTERNATE_ENDPOINT",
-                     new Object[] {selected.getEndpointInfo().getName(),
-                                   selected.getEndpointInfo().getAddress()});
+            Level level = getLogLevel();
+            if (LOG.isLoggable(level)) {
+                LOG.log(level,
+                        "FAILING_OVER_TO_ALTERNATE_ENDPOINT",
+                         new Object[] {selected.getEndpointInfo().getName(),
+                                       selected.getEndpointInfo().getAddress()});
+            }
         } else {
             LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
         }
@@ -138,15 +144,15 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
                              endpoint.getEndpointInfo().getAddress())) {
                         Endpoint alternate =
                             endpoint.getService().getEndpoints().get(candidate.getName());
-                        if (alternate != null) {
-                            LOG.log(Level.INFO,
+                        if (alternate != null && LOG.isLoggable(Level.FINE)) {
+                            LOG.log(Level.FINE,
                                     "FAILOVER_CANDIDATE_ACCEPTED",
                                     candidate.getName());
                             alternates.add(alternate);
                         }
                     }
-                } else {
-                    LOG.log(Level.INFO,
+                } else if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE,
                             "FAILOVER_CANDIDATE_REJECTED",
                             new Object[] {candidate.getName(), candidateBinding});
                 }
@@ -162,4 +168,12 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      * @return
      */
     protected abstract <T> T getNextAlternate(List<T> alternates);
+    
+    /**
+     * Get the log level for reporting the selection of the new alternative address or endpoint 
+     * @return the log level
+     */
+    protected Level getLogLevel() {
+        return Level.WARNING;    
+    }
 }
