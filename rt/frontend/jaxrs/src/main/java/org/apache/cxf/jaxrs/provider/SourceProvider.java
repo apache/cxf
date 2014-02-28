@@ -27,7 +27,6 @@ import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -49,6 +48,9 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -95,7 +97,13 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
                 Document doc = StaxUtils.read(reader);
                 return source.cast(docRequired ? doc : new DOMSource(doc));
             } catch (DepthExceededStaxException e) {
-                throw new WebApplicationException(413);
+                throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
+            } catch (XMLStreamException e) {
+                if (e.getMessage() != null && e.getMessage().startsWith("Maximum Number")) {
+                    throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
+                } else {
+                    throw ExceptionUtils.toBadRequestException(e, null);
+                }
             } catch (Exception e) {
                 IOException ioex = new IOException("Problem creating a Source object");
                 ioex.setStackTrace(e.getStackTrace());
@@ -122,7 +130,23 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
 
     protected XMLStreamReader getReader(InputStream is) {
         XMLStreamReader reader = getReaderFromMessage();
-        return reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
+        if (reader == null) {
+            reader = StaxUtils.createXMLStreamReader(is);
+        }
+        return configureReaderRestrictions(reader);
+    }
+    
+    protected XMLStreamReader configureReaderRestrictions(XMLStreamReader reader) {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message != null) {
+            try {
+                return StaxUtils.configureReader(reader, message);
+            } catch (XMLStreamException ex) {
+                throw ExceptionUtils.toInternalServerErrorException(ex, null);
+            }
+        } else {
+            return reader;
+        }
     }
     
     protected InputStream getRealStream(InputStream is) throws IOException {

@@ -43,6 +43,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
@@ -232,8 +233,10 @@ public class BookStoreSpring {
             StaxUtils.copy(source, new ByteArrayOutputStream());
         } catch (DepthExceededStaxException ex) {
             throw new WebApplicationException(413); 
-        } catch (Exception ex) {
-            // ignore for now
+        } catch (XMLStreamException ex) {
+            if (ex.getMessage().startsWith("Maximum Number")) {
+                throw new WebApplicationException(413);
+            }
         }
         throw new WebApplicationException(500);
     }

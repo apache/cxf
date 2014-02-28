@@ -91,7 +91,7 @@ public final class ExceptionUtils {
     }
     
     public static WebApplicationException toWebApplicationException(Throwable cause, Response response) {
-        return new WebApplicationException(cause);
+        return new WebApplicationException(cause, response);
     }
     
     //TODO: we can simply use the reflection, investigate 

@@ -302,9 +302,28 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testBookDepthExceededXMLStax() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks9stax/depth"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        Response r = wc.post(new Book("CXF", 123L));
+        assertEquals(413, r.getStatus());
+    }
+    
+    @Test
     public void testBookDepthExceededXMLSource() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9/depth-source"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = wc.post(new Book("CXF", 123L));
+        assertEquals(413, r.getStatus());
+    }
+    
+    @Test
+    public void testBookDepthExceededXMLSourceStax() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks9stax/depth-source"; 
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
@@ -315,7 +334,15 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9/depth-dom"; 
         WebClient wc = WebClient.create(endpointAddress);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = wc.post(new Book("CXF", 123L));
+        assertEquals(413, r.getStatus());
+    }
+    
+    @Test
+    public void testBookDepthExceededXMLDomStax() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks9stax/depth-dom"; 
+        WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }

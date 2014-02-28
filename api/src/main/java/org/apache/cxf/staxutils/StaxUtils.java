@@ -84,10 +84,12 @@ import org.xml.sax.XMLReader;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.message.Message;
 
 public final class StaxUtils {
     // System properies for defaults, but also contextual properties usable
@@ -1843,6 +1845,19 @@ public final class StaxUtils {
         }
     }
     
+    public static XMLStreamReader configureReader(XMLStreamReader xreader, Message message) throws XMLStreamException {
+        Integer messageMaxChildElements = PropertyUtils.getInteger(message, MAX_CHILD_ELEMENTS);
+        Integer messageMaxElementDepth = PropertyUtils.getInteger(message, MAX_ELEMENT_DEPTH);
+        Integer messageMaxAttributeCount = PropertyUtils.getInteger(message, MAX_ATTRIBUTE_COUNT); 
+        Integer messageMaxAttributeSize = PropertyUtils.getInteger(message, MAX_ATTRIBUTE_SIZE);
+        Integer messageMaxTextLength = PropertyUtils.getInteger(message, MAX_TEXT_LENGTH); 
+        Long messageMaxElementCount = PropertyUtils.getLong(message, MAX_ELEMENT_COUNT);
+        Long messageMaxXMLCharacters = PropertyUtils.getLong(message, MAX_XML_CHARACTERS);
+        return configureReader(xreader, messageMaxChildElements, messageMaxElementDepth,
+                               messageMaxAttributeCount, messageMaxAttributeSize, messageMaxTextLength,
+                               messageMaxElementCount, messageMaxXMLCharacters);
+    }
+
     //CHECKSTYLE:OFF - lots of params to configure
     public static XMLStreamReader configureReader(XMLStreamReader reader, Integer maxChildElements,
                                        Integer maxElementDepth, Integer maxAttributeCount,

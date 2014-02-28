@@ -21,6 +21,8 @@ package org.apache.cxf.common.util;
 
 import java.util.Map;
 
+import org.apache.cxf.message.Message;
+
 /**
  * Holder of generic property related methods
  */
@@ -88,5 +90,29 @@ public final class PropertyUtils {
         }
         
         return false;
+    }
+    
+    public static Long getLong(Message message, String key) {
+        Object o = message.getContextualProperty(key);
+        if (o instanceof Long) {
+            return (Long)o;
+        } else if (o instanceof Number) {
+            return ((Number)o).longValue();
+        } else if (o instanceof String) {
+            return Long.valueOf(o.toString());
+        }
+        return null;
+    }
+    
+    public static Integer getInteger(Message message, String key) {
+        Object o = message.getContextualProperty(key);
+        if (o instanceof Integer) {
+            return (Integer)o;
+        } else if (o instanceof Number) {
+            return ((Number)o).intValue();
+        } else if (o instanceof String) {
+            return Integer.valueOf((String)o);
+        }
+        return null;
     }
 }

@@ -80,6 +80,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DepthRestrictingStreamReader;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
 public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvider
@@ -691,11 +692,14 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     protected void handleJAXBException(JAXBException e, boolean read) {
         StringBuilder sb = handleExceptionStart(e);
-        if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
-            sb.append(e.getLinkedException().getMessage()).append(". ");
+        Throwable linked = e.getLinkedException();
+        if (linked != null && linked.getMessage() != null) {
+            if (read && linked instanceof XMLStreamException && linked.getMessage().startsWith("Maximum Number")) {
+                throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413)); 
+            }
+            sb.append(linked.getMessage()).append(". ");
         }
-        Throwable t = e.getLinkedException() != null 
-            ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
+        Throwable t = linked != null ? linked : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
                              BUNDLE, sb.toString()).toString();
         handleExceptionEnd(t, message, read);
@@ -765,9 +769,24 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         DocumentDepthProperties props = getDepthProperties();
         if (props != null && props.isEffective()) {
             reader = TransformUtils.createNewReaderIfNeeded(reader, is);
-            return new DepthRestrictingStreamReader(reader, props);
+            reader = new DepthRestrictingStreamReader(reader, props);
+        } else if (reader != null) {
+            reader = configureReaderRestrictions(reader);
         }
         return reader;
+    }
+    
+    protected XMLStreamReader configureReaderRestrictions(XMLStreamReader reader) {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message != null) {
+            try {
+                return StaxUtils.configureReader(reader, message);
+            } catch (XMLStreamException ex) {
+                throw ExceptionUtils.toInternalServerErrorException(ex, null);
+            }
+        } else {
+            return reader;
+        }
     }
     
     protected DocumentDepthProperties getDepthProperties() {

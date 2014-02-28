@@ -233,6 +233,15 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:properties>
         
   </jaxrs:server>
+
+  <jaxrs:server id="bookservice9stax" address="/thebooks9stax">
+      <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+      </jaxrs:serviceBeans>
+      <jaxrs:properties>
+          <entry key="org.apache.cxf.stax.maxChildElements" value="1"/>
+      </jaxrs:properties>
+ </jaxrs:server>  
   
   <jaxrs:server id="bookservice10"
 		        address="/thebooks10">
