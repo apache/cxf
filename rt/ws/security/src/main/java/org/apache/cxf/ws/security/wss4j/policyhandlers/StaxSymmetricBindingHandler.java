@@ -272,6 +272,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             removeSignatureIfSignedSAML();
             enforceEncryptBeforeSigningWithSignedSAML();
+            prependSignatureToSC();
             
             // Reshuffle so that a IssuedToken is above a Signature that references it
             if (customTokenAdded) {
@@ -377,6 +378,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             
             addSupportingTokens();
             removeSignatureIfSignedSAML();
+            prependSignatureToSC();
 
             //Encryption
             List<SecurePart> enc = getEncryptedParts();
@@ -539,12 +541,11 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
         
         List<WSSConstants.Action> actionList = properties.getActions();
-        // Add a Signature directly before a Kerberos or SCT, otherwise just append it
+        // Add a Signature directly before Kerberos, otherwise just append it
         boolean actionAdded = false;
         for (int i = 0; i < actionList.size(); i++) {
             WSSConstants.Action action = actionList.get(i);
-            if (action.equals(WSSConstants.KERBEROS_TOKEN)
-                || action.equals(WSSConstants.SIGNATURE_CONFIRMATION)) {
+            if (action.equals(WSSConstants.KERBEROS_TOKEN)) {
                 actionList.add(i, actionToPerform);
                 actionAdded = true;
                 break;
