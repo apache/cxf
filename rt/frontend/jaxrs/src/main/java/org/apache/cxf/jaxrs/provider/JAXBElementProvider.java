@@ -69,6 +69,7 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.DepthExceededStaxException;
@@ -203,7 +204,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (JAXBException e) {
             handleJAXBException(e, true);
         } catch (DepthExceededStaxException e) {
-            throw new WebApplicationException(413);
+            throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -283,6 +284,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             } else {
                 xmlReader = StaxUtils.createXMLStreamReader(is);
             }
+            configureReaderRestrictions(xmlReader);
             return unmarshaller.unmarshal(xmlReader);
         } finally {
             try {
@@ -292,7 +294,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             }
         }
     }
-
+    
     protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 
         throws JAXBException {
         return unmarshaller.unmarshal(reader);
