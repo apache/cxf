@@ -121,6 +121,7 @@ public class ThreadLocalClientState implements ClientState {
             cs = new LocalClientState(initialState);
             state.put(Thread.currentThread(), cs);
             if (timeToKeepState > 0) {
+                prepareCheckpointMap();
                 long currentTime = System.currentTimeMillis();
                 checkpointMap.put(Thread.currentThread(), currentTime);
                 new CleanupThread(Thread.currentThread(), currentTime).start();
@@ -132,6 +133,12 @@ public class ThreadLocalClientState implements ClientState {
     public void setTimeToKeepState(long timeToKeepState) {
         this.timeToKeepState = timeToKeepState;
         if (timeToKeepState > 0) {
+            prepareCheckpointMap();
+        }
+    }
+
+    private void prepareCheckpointMap() {
+        if (checkpointMap == null) {
             checkpointMap = new ConcurrentHashMap<Thread, Long>();
         }
     }
