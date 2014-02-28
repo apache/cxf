@@ -1016,6 +1016,23 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
     }
     
+    // Put the Signature action before the SignatureConfirmation action
+    protected void prependSignatureToSC() {
+        if (properties.getActions() != null) {
+            List<WSSConstants.Action> actionList = properties.getActions();
+            boolean sigConf = actionList.contains(WSSConstants.SIGNATURE_CONFIRMATION);
+            if (sigConf && actionList.contains(WSSConstants.SIGNATURE)) {
+                actionList.remove(WSSConstants.SIGNATURE_CONFIRMATION);
+                actionList.add(actionList.indexOf(WSSConstants.SIGNATURE) + 1, 
+                               WSSConstants.SIGNATURE_CONFIRMATION);
+            } else if (sigConf && actionList.contains(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+                actionList.remove(WSSConstants.SIGNATURE_CONFIRMATION);
+                actionList.add(actionList.indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY) + 1, 
+                               WSSConstants.SIGNATURE_CONFIRMATION);
+            }
+        }
+    }
+    
     // If we have EncryptBeforeSigning, then we want to have the Signature component after
     // the Encrypt action, which is not the case if we have a Signed SAML Supporting Token
     protected void enforceEncryptBeforeSigningWithSignedSAML() {

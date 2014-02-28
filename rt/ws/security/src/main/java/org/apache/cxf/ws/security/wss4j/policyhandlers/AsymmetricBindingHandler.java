@@ -338,7 +338,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             policyNotAsserted(encryptionToken, ex);
         }
-        addSignatureConfirmation(sigParts);
+        
+        if (!isRequestor()) {
+            addSignatureConfirmation(sigParts);
+        }
 
         try {
             if (sigParts.size() > 0) {

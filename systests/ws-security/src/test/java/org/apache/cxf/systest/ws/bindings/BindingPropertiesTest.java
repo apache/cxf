@@ -565,4 +565,32 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testSignatureConfirmationEncBeforeSigning() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfirmationEncBeforeSigningPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+        
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+        
+        port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    
 }
