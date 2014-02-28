@@ -22,6 +22,8 @@ package org.apache.cxf.systest.jaxrs.websocket;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -38,6 +40,8 @@ import org.apache.cxf.systest.jaxrs.Book;
 
 @Path("/web/bookstore")
 public class BookStoreWebSocket {
+    private static ExecutorService executor = Executors.newSingleThreadExecutor();
+
     
     @GET
     @Path("/booknames")
@@ -50,7 +54,8 @@ public class BookStoreWebSocket {
     @Path("/booknames/servletstream")
     @Produces("text/plain")
     public void getBookNameStream(@Context HttpServletResponse response) throws Exception {
-        OutputStream os = response.getOutputStream(); 
+        OutputStream os = response.getOutputStream();
+        response.setContentType("text/plain");
         os.write("CXF in Action".getBytes());
         os.flush();
     }
@@ -78,7 +83,7 @@ public class BookStoreWebSocket {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
                 out.write(("Today: " + new java.util.Date()).getBytes());
                 // just for testing, using a thread
-                new Thread(new Runnable() {
+                executor.execute(new Runnable() {
                     public void run() {
                         try {
                             for (int r = 2, i = 1; i <= 5; r *= 2, i++) {
@@ -89,7 +94,7 @@ public class BookStoreWebSocket {
                             e.printStackTrace();
                         }
                     }
-                }).start();
+                });
             }
         };
     }

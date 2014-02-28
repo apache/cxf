@@ -27,7 +27,6 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestBase {
@@ -55,7 +54,10 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertTrue("one book must be returned", wsclient.await(3));
             List<byte[]> received = wsclient.getReceivedBytes();
             assertEquals(1, received.size());
-            String value = new String(received.get(0));
+            Response resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            String value = new String(resp.getEntity());
             assertEquals("CXF in Action", value);
             
             // call another GET service
@@ -63,7 +65,10 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.sendMessage("GET /web/bookstore/books/123".getBytes());
             assertTrue("response expected", wsclient.await(3));
             received = wsclient.getReceivedBytes();
-            value = new String(received.get(0));
+            resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("application/xml", resp.getContentType());
+            value = new String(resp.getEntity());
             assertTrue(value.startsWith("<?xml ") && value.endsWith("</Book>"));
             
             // call the POST service
@@ -71,17 +76,25 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.sendMessage("POST /web/bookstore/booksplain\r\nContent-Type: text/plain\r\n\r\n123".getBytes());
             assertTrue("response expected", wsclient.await(3));
             received = wsclient.getReceivedBytes();
-            value = new String(received.get(0));
+            resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            value = new String(resp.getEntity());
             assertEquals("123", value);
             
             // call the GET service returning a continous stream output
             wsclient.reset(6);
             wsclient.sendMessage("GET /web/bookstore/bookbought".getBytes());
-            assertTrue("wrong method, no response expected", wsclient.await(5));
+            assertTrue("response expected", wsclient.await(5));
             received = wsclient.getReceivedBytes();
             assertEquals(6, received.size());
-            assertTrue((new String(received.get(0))).startsWith("Today:"));
+            resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("application/octet-stream", resp.getContentType());
+            value = new String(resp.getEntity());
+            assertTrue(value.startsWith("Today:"));
             for (int r = 2, i = 1; i < 6; r *= 2, i++) {
+                // subsequent data should not carry headers
                 assertEquals(r, Integer.parseInt(new String(received.get(i))));
             }
         } finally {
@@ -100,7 +113,10 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertTrue("one book must be returned", wsclient.await(3));
             List<byte[]> received = wsclient.getReceivedBytes();
             assertEquals(1, received.size());
-            String value = new String(received.get(0));
+            Response resp = new Response(received.get(0));
+            assertEquals(200, resp.getStatusCode());
+            assertEquals("text/plain", resp.getContentType());
+            String value = new String(resp.getEntity());
             assertEquals("CXF in Action", value);
         } finally {
             wsclient.close();
@@ -108,7 +124,6 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
     }
     
     @Test
-    @Ignore
     public void testWrongMethod() throws Exception {
         String address = "ws://localhost:" + PORT + "/web/bookstore";
 
@@ -117,13 +132,17 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         try {
             // call the GET service using POST
             wsclient.sendMessage("POST /web/bookstore/booknames".getBytes());
+            assertTrue("error response expected", wsclient.await(3));
+            List<byte[]> received = wsclient.getReceivedBytes();
+            assertEquals(1, received.size());
+            Response resp = new Response(received.get(0));
+            assertEquals(405, resp.getStatusCode());
         } finally {
             wsclient.close();
         }
     }
     
     @Test
-    @Ignore
     public void testPathRestriction() throws Exception {
         String address = "ws://localhost:" + PORT + "/web/bookstore";
 
@@ -132,9 +151,81 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         try {
             // call the GET service over the different path
             wsclient.sendMessage("GET /bookstore2".getBytes());
+            assertTrue("error response expected", wsclient.await(3));
+            List<byte[]> received = wsclient.getReceivedBytes();
+            assertEquals(1, received.size());
+            Response resp = new Response(received.get(0));
+            assertEquals(404, resp.getStatusCode());
         } finally {
             wsclient.close();
         }
     }
+    
+    //TODO this is a temporary way to verify the response; we should come up with something better.
+    private static class Response {
+        private byte[] data;
+        private int pos; 
+        private int statusCode;
+        private String contentType;
+        private byte[] entity;
         
+        public Response(byte[] data) {
+            this.data = data;
+            String line = readLine();
+            statusCode = Integer.parseInt(line);
+            while ((line = readLine()) != null) {
+                if (line.length() > 0) {
+                    int del = line.indexOf(':');
+                    String h = line.substring(0, del).trim();
+                    String v = line.substring(del + 1).trim();
+                    if ("Content-Type".equalsIgnoreCase(h)) {
+                        contentType = v;
+                    }
+                }
+            }
+            entity = new byte[data.length - pos];
+            System.arraycopy(data, pos, entity, 0, entity.length);
+        }
+                
+            
+        
+        public int getStatusCode() {
+            return statusCode;
+        }
+        
+        public String getContentType() {
+            return contentType;
+        }
+        
+        public byte[] getEntity() {
+            return entity;
+        }
+        
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append("Status: ").append(statusCode).append("\r\n");
+            sb.append("Type: ").append(contentType).append("\r\n");
+            sb.append("Entity: ").append(new String(entity)).append("\r\n");
+            return sb.toString();
+        }
+        
+        private String readLine() {
+            StringBuilder sb = new StringBuilder();
+            while (pos < data.length) {
+                int c = 0xff & data[pos++];
+                if (c == '\n') {
+                    break;
+                } else if (c == '\r') {
+                    continue;
+                } else {
+                    sb.append((char)c);
+                }
+            }
+            if (sb.length() == 0) {
+                return null;
+            }
+            return sb.toString();
+        }
+    }
+    
 }

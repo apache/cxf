@@ -147,9 +147,28 @@ class WebSocketTestClient {
         StringBuilder xbuf = new StringBuilder().append("\nHEX: ");
         StringBuilder cbuf = new StringBuilder().append("\nASC: ");
         for (byte b : data) {
-            xbuf.append(Integer.toHexString(0xff & b)).append(' ');
-            cbuf.append((0x80 & b) != 0 ? '.' : (char)b).append("  ");
+            writeHex(xbuf, 0xff & b);
+            writePrintable(cbuf, 0xff & b);
         }
         return xbuf.append(cbuf);
+    }
+    
+    private static void writeHex(StringBuilder buf, int b) {
+        buf.append(Integer.toHexString(0x100 | (0xff & b)).substring(1)).append(' ');
+    }
+    
+    private static void writePrintable(StringBuilder buf, int b) {
+        if (b == 0x0d) {
+            buf.append("\\r");
+        } else if (b == 0x0a) {
+            buf.append("\\n");
+        } else if (b == 0x09) {
+            buf.append("\\t");
+        } else if ((0x80 & b) != 0) {
+            buf.append('.').append(' ');
+        } else {
+            buf.append((char)b).append(' ');
+        }
+        buf.append(' ');
     }
 }

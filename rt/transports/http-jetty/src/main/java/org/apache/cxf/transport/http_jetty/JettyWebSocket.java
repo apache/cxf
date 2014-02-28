@@ -60,7 +60,8 @@ import org.eclipse.jetty.websocket.WebSocket;
 
 class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessage {
     private static final Logger LOG = LogUtils.getL7dLogger(JettyWebSocket.class);
-
+    private static final String CRLF = "\r\n";
+    
     private JettyHTTPDestination jettyHTTPDestination;
     private ServletContext servletContext;
     private Connection webSocketConnection;
@@ -142,9 +143,8 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         }
     }
     
-    @SuppressWarnings("unchecked")
-    <T> T getRequestProperty(String name, Class<T> cls) {
-        return (T)requestProperties.get(name);
+    private <T> T getRequestProperty(String name, Class<T> cls) {
+        return getValue(requestProperties, name, cls);
     }
     
     private WebSocketVirtualServletRequest createServletRequest(byte[] data, int offset, int length) 
@@ -163,14 +163,34 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
      * @param offset
      * @param length
      */
-    public void write(byte[] data, int offset, int length) throws IOException {
+    void write(byte[] data, int offset, int length) throws IOException {
         LOG.log(Level.INFO, "write(byte[], offset, length)");
         webSocketConnection.sendMessage(data, offset, length);
     }
 
-    public ServletOutputStream getServletOutputStream() {
+    private static byte[] buildResponse(Map<String, String> headers, byte[] data, int offset, int length) {
+        StringBuilder sb = new StringBuilder();
+        String v = headers.get("$sc");
+        sb.append(v == null ? "200" : v).append(CRLF);
+        v = headers.get("Content-Type");
+        if (v != null) {
+            sb.append("Content-Type: ").append(v).append(CRLF);
+        }
+        sb.append(CRLF);
+        
+        byte[] hb = sb.toString().getBytes();
+        byte[] longdata = new byte[hb.length + length];
+        System.arraycopy(hb, 0, longdata, 0, hb.length);
+        if (data != null && length > 0) {
+            System.arraycopy(data, offset, longdata, hb.length, length);
+        }
+        return longdata;
+    }
+    
+    ServletOutputStream getServletOutputStream(final Map<String, String> headers) {
         LOG.log(Level.INFO, "getServletOutputStream()");
         return new ServletOutputStream() {
+
             @Override
             public void write(int b) throws IOException {
                 byte[] data = new byte[1];
@@ -180,14 +200,21 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
             @Override
             public void write(byte[] data, int offset, int length) throws IOException {
+                if (headers.get("$flushed") == null) {
+                    data = buildResponse(headers, data, offset, length);
+                    offset = 0;
+                    length = data.length;
+                    headers.put("$flushed", "true");
+                }
                 webSocketConnection.sendMessage(data, offset, length);
             }
         };
     }
     
-    public OutputStream getOutputStream() {
+    OutputStream getOutputStream(final Map<String, String> headers) {
         LOG.log(Level.INFO, "getServletOutputStream()");
         return new OutputStream() {
+
             @Override
             public void write(int b) throws IOException {
                 byte[] data = new byte[1];
@@ -197,6 +224,12 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             
             @Override
             public void write(byte[] data, int offset, int length) throws IOException {
+                if (headers.get("$flushed") == null) {
+                    data = buildResponse(headers, data, offset, length);
+                    offset = 0;
+                    length = data.length;
+                    headers.put("$flushed", "true");
+                }
                 webSocketConnection.sendMessage(data, offset, length);
             }
         };
@@ -219,9 +252,9 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             requestHeaders = readHeaders(in);
             String path = requestHeaders.get("$path");
             String origin = websocket.getRequestProperty("requestURI", String.class);
-            if (path.length() < origin.length()) {
-                //TODO use a more appropriate exception (invalidxxx?);
-                throw new IOException("invalid path: " + path + " not within " + origin);
+            if (path.startsWith(origin)) {
+                //REVISIT for now, log it here and reject the request later.  
+                LOG.log(Level.WARNING, "invalid path: {0} not within {1}", new Object[]{path, origin});
             }
         }
 
@@ -518,16 +551,16 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
         @Override
         public Enumeration<String> getHeaders(String name) {
-            // TODO Auto-generated method stub
             LOG.log(Level.INFO, "getHeaders");
+            // our protocol assumes no multiple headers
             return Collections.enumeration(Arrays.asList(requestHeaders.get(name)));
         }
 
         @Override
         public int getIntHeader(String name) {
-            // TODO Auto-generated method stub
             LOG.log(Level.INFO, "getIntHeader");
-            return 0;
+            String v = requestHeaders.get(name);
+            return v == null ? -1 : Integer.parseInt(v);
         }
 
         @Override
@@ -587,9 +620,16 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         @Override
         public StringBuffer getRequestURL() {
             LOG.log(Level.INFO, "getRequestURL");
+            String url = websocket.getRequestProperty("requestURL", String.class);
             String origin = websocket.getRequestProperty("requestURI", String.class);
             StringBuffer sb = new StringBuffer();
-            sb.append(origin).append(getRequestURI().substring(origin.length()));
+            String uri = getRequestURI();
+            //REVISIT the way to reject the requeist uri that does not match the original request
+            if (!uri.startsWith(origin)) {
+                sb.append(url).append("invalid").append(uri);
+            } else {
+                sb.append(url).append(uri.substring(origin.length()));
+            }
             
             return sb;
         }
@@ -677,20 +717,31 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             LOG.log(Level.INFO, "logout");
             
         }
-        
     }
 
     //TODO need to make the header setting to be written to the body (as symmetric to the request behavior)
     static class WebSocketVirtualServletResponse implements HttpServletResponse {
         private JettyWebSocket websocket;
-        
+        private Map<String, String> responseHeaders;
+        private boolean flushed;
+
         public WebSocketVirtualServletResponse(JettyWebSocket websocket) {
             this.websocket = websocket;
+            this.responseHeaders = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
         }
 
         @Override
         public void flushBuffer() throws IOException {
             LOG.log(Level.INFO, "flushBuffer()");
+            if (!flushed) {
+                //REVISIT this mechanism to determine if the headers have been flushed
+                if (responseHeaders.get("$flushed") == null) {
+                    byte[] data = buildResponse(responseHeaders, null, 0, 0);
+                    websocket.write(data, 0, data.length);
+                    responseHeaders.put("$flushed", "true");
+                }
+                flushed = true;
+            }
         }
 
         @Override
@@ -708,9 +759,8 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
         @Override
         public String getContentType() {
-            // TODO Auto-generated method stub
             LOG.log(Level.INFO, "getContentType()");
-            return null;
+            return responseHeaders.get("Content-Type");
         }
 
         @Override
@@ -723,13 +773,13 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
             LOG.log(Level.INFO, "getOutputStream()");
-            return websocket.getServletOutputStream();
+            return websocket.getServletOutputStream(responseHeaders);
         }
 
         @Override
         public PrintWriter getWriter() throws IOException {
             LOG.log(Level.INFO, "getWriter()");
-            return new PrintWriter(websocket.getOutputStream());
+            return new PrintWriter(websocket.getOutputStream(responseHeaders));
         }
 
         @Override
@@ -763,18 +813,18 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
         @Override
         public void setContentLength(int len) {
-            // TODO
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "setContentLength({0})", len);
             }
+            responseHeaders.put("Content-Length", Integer.toString(len));
         }
 
         @Override
         public void setContentType(String type) {
-            // TODO Auto-generated method stub
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "setContentType({0})", type);
             }
+            responseHeaders.put("Content-Type", type);
         }
 
         @Override
@@ -801,18 +851,18 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
         @Override
         public void addHeader(String name, String value) {
-            // TODO
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "addHeader({0}, {1})", new Object[]{name, value});
             }
+            responseHeaders.put(name, value);
         }
 
         @Override
         public void addIntHeader(String name, int value) {
-            // TODO
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "addIntHeader({0}, {1})", new Object[]{name, value});
             }
+            responseHeaders.put(name, Integer.toString(value));
         }
 
         @Override
@@ -887,25 +937,26 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
         @Override
         public int getStatus() {
-            // TODO Auto-generated method stub
             LOG.log(Level.INFO, "getStatus()");
-            return 0;
+            String v = responseHeaders.get("$sc");
+            return v == null ? 200 : Integer.parseInt(v);
         }
 
         @Override
         public void sendError(int sc) throws IOException {
-            // TODO Auto-generated method stub
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "sendError{0}", sc);
             }
+            responseHeaders.put("$sc", Integer.toString(sc));
         }
 
         @Override
         public void sendError(int sc, String msg) throws IOException {
-            // TODO Auto-generated method stub
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "sendError({0}, {1})", new Object[]{sc, msg});
             }
+            responseHeaders.put("$sc", Integer.toString(sc));
+            responseHeaders.put("$sm", msg);
         }
 
         @Override
@@ -942,17 +993,19 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
 
         @Override
         public void setStatus(int sc) {
-            // TODO Auto-generated method stub
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "setStatus({0})", sc);
             }
+            responseHeaders.put("$sc", Integer.toString(sc));
         }
 
         @Override
         public void setStatus(int sc, String sm) {
-            // TODO Auto-generated method stub
-            LOG.log(Level.INFO, "setStatus({0}, {1})", new Object[]{sc, sm});
-            
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.log(Level.INFO, "setStatus({0}, {1})", new Object[]{sc, sm});
+            }
+            responseHeaders.put("$sc", Integer.toString(sc));
+            responseHeaders.put("$sm", sm);
         }
     }
 
@@ -987,9 +1040,15 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         return headers;
     }
 
-    ///// this is copied from AttachmentDeserializer. we may think about putting this method to IOUtils
+    @SuppressWarnings("unchecked")
+    private static <T> T getValue(Map<String, Object> properties, String name, Class<T> cls) {
+        return (T)properties.get(name);
+    }
+    
+
+    ///// this is copied from AttachmentDeserializer with a minor change. think about putting this method to IOUtils
     private static String readLine(InputStream in) throws IOException {
-        StringBuffer buffer = new StringBuffer(128);
+        StringBuilder buffer = new StringBuilder(128);
 
         int c;
 
