@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -47,7 +48,9 @@ public class JMSContinuationsClientServerTest {
         cff = new ConnectionFactoryFeature(cfp);
         Object implementor = new GreeterImplWithContinuationsJMS();        
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
-        Endpoint.publish(address, implementor, cff);
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
+        ep.getFeatures().add(cff);
+        ep.publish(address);
     }
 
     @AfterClass

@@ -31,6 +31,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -51,12 +52,13 @@ public class HelloWorldContinuationsClientServerTest {
         PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
         cff = new ConnectionFactoryFeature(cfp);
         Object implementor = new HelloWorldWithContinuationsJMS();        
-        Endpoint.publish(null, implementor, cff);
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(null, implementor);
+        ep.getFeatures().add(cff);
+        ep.publish();
     }
     
     @AfterClass
-    public static void clearProperty() {
-        
+    public static void stopServers() {
         bus.shutdown(false);
     }
 

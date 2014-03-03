@@ -49,22 +49,20 @@ public class ConnectionFactoryFeature extends AbstractFeature {
     @Override
     public void initialize(Client client, Bus bus) {
         Conduit conduit = client.getConduit();
-        if (!(conduit instanceof JMSConduit)) {
-            throw new IllegalArgumentException("This feature only works for jms transport");
+        if (conduit instanceof JMSConduit) {
+            JMSConduit jmsConduit = (JMSConduit)conduit;
+            jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
         }
-        JMSConduit jmsConduit = (JMSConduit)conduit;
-        jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
         super.initialize(client, bus);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
         Destination destination = server.getDestination();
-        if (!(destination instanceof JMSDestination)) {
-            throw new IllegalArgumentException("This feature only works for jms transport");
+        if (destination instanceof JMSDestination) {
+            JMSDestination jmsDestination = (JMSDestination)destination;
+            jmsDestination.getJmsConfig().setConnectionFactory(connectionFactory);
         }
-        JMSDestination jmsDestination = (JMSDestination)destination;
-        jmsDestination.getJmsConfig().setConnectionFactory(connectionFactory);
         super.initialize(server, bus);
     }
     

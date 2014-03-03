@@ -26,6 +26,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
@@ -42,15 +43,16 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
     
     
     public static class GzipServer extends AbstractBusTestServerBase {
-        Endpoint ep;
+        EndpointImpl ep;
         protected void run()  {
             Object impleDoc = new GreeterImplDoc();
             Bus bus = BusFactory.getDefaultBus();
             bus.getFeatures().add(new GZIPFeature());
             setBus(bus);
             broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
-            ep = Endpoint.publish(null, impleDoc,
-                                  new GZIPFeature());
+            ep = (EndpointImpl)Endpoint.create(null, impleDoc);
+            ep.getFeatures().add(new GZIPFeature());
+            ep.publish();
         }
         public void tearDown() {
             ep.stop();

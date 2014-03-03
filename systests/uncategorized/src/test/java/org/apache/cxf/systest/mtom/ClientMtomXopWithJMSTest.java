@@ -25,6 +25,7 @@ import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
@@ -32,9 +33,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.mime.TestMtom;
@@ -60,14 +58,15 @@ public class ClientMtomXopWithJMSTest {
         PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
         cff = new ConnectionFactoryFeature(cfp);
 
-        EndpointImpl jaxep = (EndpointImpl)javax.xml.ws.Endpoint.publish(null, implementor, cff);
-        Endpoint ep = jaxep.getServer().getEndpoint();
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
+        ep.getFeatures().add(cff);
         ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
         ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
-        ep.getInInterceptors().add(new LoggingInInterceptor());
-        ep.getOutInterceptors().add(new LoggingOutInterceptor());
-        SOAPBinding jaxWsSoapBinding = (SOAPBinding)jaxep.getBinding();
+        //ep.getInInterceptors().add(new LoggingInInterceptor());
+        //ep.getOutInterceptors().add(new LoggingOutInterceptor());
+        SOAPBinding jaxWsSoapBinding = (SOAPBinding)ep.getBinding();
         jaxWsSoapBinding.setMTOMEnabled(true);
+        ep.publish();
     }
 
     @AfterClass

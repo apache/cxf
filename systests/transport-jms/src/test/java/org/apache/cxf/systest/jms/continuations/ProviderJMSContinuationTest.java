@@ -48,9 +48,10 @@ public class ProviderJMSContinuationTest {
         cff = new ConnectionFactoryFeature(cfp);
         Object implementor = new HWSoapMessageDocProvider();        
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
-        Endpoint endpoint = Endpoint.publish(address, implementor, cff);
-        ((EndpointImpl)endpoint).getInInterceptors().add(new IncomingMessageCounterInterceptor());
-
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(address, implementor);
+        ep.getInInterceptors().add(new IncomingMessageCounterInterceptor());
+        ep.getFeatures().add(cff);
+        ep.publish();
     }
     @AfterClass
     public static void clearProperty() {

@@ -28,6 +28,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.hello_world_doc_lit.Greeter;
@@ -57,11 +58,11 @@ public class MultiTransportClientServerTest {
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
         PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
         cff = new ConnectionFactoryFeature(cfp);
-        Object implementor = new HTTPGreeterImpl();
         String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
-        Endpoint.publish(address, implementor);
-        implementor = new JMSGreeterImpl();
-        Endpoint.publish(null, implementor, cff);
+        Endpoint.publish(address, new HTTPGreeterImpl());
+        EndpointImpl ep1 = (EndpointImpl)Endpoint.create(new JMSGreeterImpl());
+        ep1.getFeatures().add(cff);
+        ep1.publish();
     }
     
     @AfterClass

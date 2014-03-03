@@ -30,6 +30,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.interceptor.TibcoSoapActionInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.SOAPService2;
@@ -54,7 +55,9 @@ public class JaxWsAPITest {
         cff = new ConnectionFactoryFeature(cfp);
 
         Object impleDoc = new GreeterImplDoc();
-        Endpoint.publish(null, impleDoc, cff);
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(impleDoc);
+        ep.getFeatures().add(cff);
+        ep.publish();
     }
     
     @AfterClass
