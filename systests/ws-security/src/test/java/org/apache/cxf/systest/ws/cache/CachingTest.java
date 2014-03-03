@@ -20,8 +20,6 @@
 package org.apache.cxf.systest.ws.cache;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -31,31 +29,22 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.systest.ws.cache.server.Server;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for token caching on the client side
  */
-@RunWith(value = org.junit.runners.Parameterized.class)
 public class CachingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
-    final TestParam test;
-    
-    public CachingTest(TestParam type) {
-        this.test = type;
-    }
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -65,14 +54,6 @@ public class CachingTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(Server.class, true)
         );
-    }
-    
-    @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-        });
     }
     
     @org.junit.AfterClass
@@ -85,7 +66,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
     public void testSymmetric() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CachingTest.class.getResource("client.xml");
+        URL busFile = CachingTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -98,11 +79,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         // First invocation
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
+        updateAddressPort(port, PORT);
         
         port.doubleIt(25);
 
@@ -112,16 +89,12 @@ public class CachingTest extends AbstractBusClientServerTestBase {
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
         assertNotNull(tokenStore);
-        // We expect two tokens as the identifier + SHA-1 are cached
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        // We expect 1 token
+        assertEquals(tokenStore.getTokenIdentifiers().size(), 1);
         
         // Second invocation
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
+        updateAddressPort(port, PORT);
         
         port.doubleIt(35);
 
@@ -131,8 +104,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
         assertNotNull(tokenStore);
-        // There should now be 4 tokens as both proxies share the same TokenStore
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 4);
+        // There should now be 2 tokens as both proxies share the same TokenStore
+        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -142,7 +115,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
     public void testCachePerProxySymmetric() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CachingTest.class.getResource("client.xml");
+        URL busFile = CachingTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
@@ -155,18 +128,14 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         // First invocation
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.CACHE_IDENTIFIER, "proxy1"
         );
         ((BindingProvider)port).getRequestContext().put(
-            SecurityConstants.CACHE_CONFIG_FILE, "per-proxy-cache.xml"
+            SecurityConstants.CACHE_CONFIG_FILE, "client/per-proxy-cache.xml"
         );
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
         
         port.doubleIt(25);
 
@@ -176,23 +145,19 @@ public class CachingTest extends AbstractBusClientServerTestBase {
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
         assertNotNull(tokenStore);
-        // We expect two tokens as the identifier + SHA-1 are cached
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        // We expect 1 token
+        assertEquals(tokenStore.getTokenIdentifiers().size(), 1);
         
         // Second invocation
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, test.getPort());
+        updateAddressPort(port, PORT);
         
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.CACHE_IDENTIFIER, "proxy2"
         );
         ((BindingProvider)port).getRequestContext().put(
-            SecurityConstants.CACHE_CONFIG_FILE, "per-proxy-cache.xml"
+            SecurityConstants.CACHE_CONFIG_FILE, "client/per-proxy-cache.xml"
         );
-        
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(port);
-        }
         
         port.doubleIt(35);
 
@@ -202,8 +167,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
                 SecurityConstants.TOKEN_STORE_CACHE_INSTANCE
             );
         assertNotNull(tokenStore);
-        // We expect two tokens as the identifier + SHA-1 are cached
-        assertEquals(tokenStore.getTokenIdentifiers().size(), 2);
+        // We expect 1 token
+        assertEquals(tokenStore.getTokenIdentifiers().size(), 1);
         
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
