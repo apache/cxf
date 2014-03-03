@@ -64,12 +64,9 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     /**
      * {@inheritDoc}
      */
-    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus) throws IOException {
-        JMSOldConfigHolder old = new JMSOldConfigHolder();
-        JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus,
-                                                                              endpointInfo,
-                                                                              target,
-                                                                              true);
+    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
+        throws IOException {
+        JMSConfiguration jmsConf = JMSConfigFactory.createFromEndpointInfo(bus, endpointInfo, target);
         return new JMSConduit(target, jmsConf, bus);
     }
 
@@ -77,8 +74,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
      * {@inheritDoc}
      */
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
-        JMSOldConfigHolder old = new JMSOldConfigHolder();
-        JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo, null, false);
+        JMSConfiguration jmsConf = JMSConfigFactory.createFromEndpointInfo(bus, endpointInfo, null);
         return new JMSDestination(bus, endpointInfo, jmsConf);
     }
     

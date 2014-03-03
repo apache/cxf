@@ -33,7 +33,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
-import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.wsdl.JAXBExtensibilityElement;
 
 import org.junit.Assert;
@@ -98,30 +97,4 @@ public class JAXWSDefinitionBuilderTest extends Assert {
                    obj instanceof XMLBindingMessageFormat);
     }
 
-    @Test
-    public void testBuildDefinitionWithJMSTransport() {
-        String qname = "http://cxf.apache.org/hello_world_jms";
-        String wsdlUrl = getClass().getResource("resources/jms_test.wsdl").toString();
-
-        JAXWSDefinitionBuilder builder = new JAXWSDefinitionBuilder();
-        builder.setBus(BusFactory.getDefaultBus());
-        builder.setContext(env);
-        Definition def = builder.build(wsdlUrl);
-        assertNotNull(def);
-
-        Map<?, ?> services = def.getServices();
-        assertNotNull(services);
-        assertEquals(8, services.size());
-        Service service = (Service)services.get(new QName(qname, "HelloWorldQueueBinMsgService"));
-        assertNotNull(service);
-
-        Map<?, ?> ports = service.getPorts();
-        assertNotNull(ports);
-        assertEquals(1, ports.size());
-        Port port = service.getPort("HelloWorldQueueBinMsgPort");
-        assertNotNull(port);
-
-        assertEquals(3, port.getExtensibilityElements().size());
-        assertTrue(port.getExtensibilityElements().get(0) instanceof AddressType);
-    }
 }

@@ -19,24 +19,6 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ct="http://cxf.apache.org/configuration/types" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation=" http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    <jms:conduit name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-conduit">
-        <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
-    </jms:conduit>
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+    <bean id="ConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
 		p:brokerURL="${EmbeddedBrokerURL}"/>
-    <bean id="jmsConf1" class="org.apache.cxf.transport.jms.JMSConfiguration" 
-    	p:connectionFactory-ref="jmsConnectionFactory" 
-    	p:targetDestination="test.jmstransport.text"
-     	p:replyDestination="test.jmstransport.text.reply"
-    	p:usingEndpointInfo="false"/>
-    <jms:destination name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-destination">
-        <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>
-    </jms:destination>
-    <bean id="jmsConf2" class="org.apache.cxf.transport.jms.JMSConfiguration"
-     	p:connectionFactory-ref="jmsConnectionFactory" 
-     	p:targetDestination="test.jmstransport.text"
-     	p:replyDestination="test.jmstransport.text.reply"
-     	p:timeToLive="10000" 
-     	p:maxSuspendedContinuations="1" 
-     	p:usingEndpointInfo="false"/>
 </beans>

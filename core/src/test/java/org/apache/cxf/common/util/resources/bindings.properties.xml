@@ -21,5 +21,4 @@
 <properties>
     <entry key="http://schemas.xmlsoap.org/wsdl/soap/">org.apache.cxf.bindings.soap.SOAPBindingFactory</entry>
     <entry key="http://schemas.xmlsoap.org/wsdl/soap/http">org.apache.cxf.bindings.soap.SOAPBindingFactory</entry>
-    <entry key="http://cxf.apache.org/transports/jms">org.apache.cxf.bindings.soap.SOAPBindingFactory</entry>
 </properties>

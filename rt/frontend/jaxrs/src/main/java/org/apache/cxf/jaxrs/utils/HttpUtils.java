@@ -433,7 +433,7 @@ public final class HttpUtils {
                 && HttpUtils.isHttpRequest(m)) {
                 path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
             }
-            return path.length() == 0 ? "/" : path;
+            return (path == null || path.length() == 0) ? "/" : path;
         } catch (URISyntaxException ex) {
             return endpointAddress == null ? "/" : endpointAddress;
         }

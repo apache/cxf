@@ -47,10 +47,6 @@ public class PropertiesLoaderUtilsTest extends Assert {
         assertEquals(soapBindingFactory,
                      properties.getProperty("http://schemas.xmlsoap.org/wsdl/soap/http"));
 
-        assertEquals(soapBindingFactory,
-                     properties.getProperty("http://cxf.apache.org/transports/jms"));
-        
-
     }
 
 }

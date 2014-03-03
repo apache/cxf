@@ -35,73 +35,23 @@ public final class JMSWSDLExtensionLoader implements WSDLExtensionLoader {
     
     public JMSWSDLExtensionLoader(Bus b) {
         WSDLManager manager = b.getExtension(WSDLManager.class);
+        Class<?>[] extensors = new Class[] {
+            org.apache.cxf.transport.jms.wsdl.JndiContextParameterType.class,
+            org.apache.cxf.transport.jms.wsdl.JndiInitialContextFactoryType.class,
+            org.apache.cxf.transport.jms.wsdl.JndiURLType.class,
+            org.apache.cxf.transport.jms.wsdl.DeliveryModeType.class,
+            org.apache.cxf.transport.jms.wsdl.PriorityType.class,
+            org.apache.cxf.transport.jms.wsdl.TimeToLiveType.class,
+            org.apache.cxf.transport.jms.wsdl.ReplyToNameType.class
+        };
         
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.AddressType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.ClientBehaviorPolicyType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.ServerBehaviorPolicyType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.ClientConfig.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.ServerConfig.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.SessionPoolType.class);
-
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiContextParameterType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiInitialContextFactoryType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiURLType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.DeliveryModeType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.PriorityType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.TimeToLiveType.class);
-        createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.transport.jms.wsdl.ReplyToNameType.class);
-
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiContextParameterType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiInitialContextFactoryType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiURLType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.DeliveryModeType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.PriorityType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.TimeToLiveType.class);
-        createExtensor(manager, javax.wsdl.Port.class,
-                       org.apache.cxf.transport.jms.wsdl.ReplyToNameType.class);
-            
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiContextParameterType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiConnectionFactoryNameType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiInitialContextFactoryType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.JndiURLType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.DeliveryModeType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.PriorityType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.TimeToLiveType.class);
-        createExtensor(manager, javax.wsdl.Service.class,
-                       org.apache.cxf.transport.jms.wsdl.ReplyToNameType.class);
-        
-        
+        for (Class<?> extensor : extensors) {
+            createExtensor(manager, javax.wsdl.Binding.class, extensor);
+            createExtensor(manager, javax.wsdl.Port.class, extensor);
+            createExtensor(manager, javax.wsdl.Service.class, extensor);
+        }
     }
+
     public void createExtensor(WSDLManager manager,
                                 Class<?> parentType,
                                 Class<?> elementType) {

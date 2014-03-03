@@ -19,7 +19,16 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns:types="http://cxf.apache.org/mime/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/mime" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" name="SOAPBuilders-mime-cr-test" targetNamespace="http://cxf.apache.org/mime">
+<wsdl:definitions 
+	xmlns:types="http://cxf.apache.org/mime/types"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://cxf.apache.org/mime"
+	xmlns:jms="http://www.w3.org/2010/soapjms/"
+	xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+	name="SOAPBuilders-mime-cr-test"
+	targetNamespace="http://cxf.apache.org/mime">
     <wsdl:types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/mime/types" elementFormDefault="qualified">
             <complexType name="XopType">
@@ -90,10 +99,7 @@
     </wsdl:service>
     <wsdl:service name="TestMtomJMSService">
         <wsdl:port name="TestMtomJMSPort" binding="tns:TestMtomBinding">
-            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/person.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+        	<soap:address location="jms:queue:person.queue"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

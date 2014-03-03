@@ -27,62 +27,44 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServerTestBase {
+public class HelloWorldContinuationsThrottleTest {
     private static final String WSDL_PATH = "org/apache/cxf/systest/jms/continuations/test.wsdl";
-    private static final String CONFIG_FILE = "org/apache/cxf/systest/jms/continuations/jms_test_config.xml";
+    private static Bus bus;
+    private static ConnectionFactoryFeature cff;
 
-    private static EmbeddedJMSBrokerLauncher broker;
-
-    
-    public static class Server extends AbstractBusTestServerBase {
-        public static final String PORT = allocatePort(Server.class);
-
-        protected void run()  {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus(CONFIG_FILE);
-            BusFactory.setDefaultBus(bus);
-            broker.updateWsdl(bus, WSDL_PATH);
-            Object implementor = new HelloWorldWithContinuationsJMS2();        
-            String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-            Endpoint.publish(address, implementor);
-        }
-    }
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher();
-        System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
-        launchServer(broker);
-        launchServer(new Server());
+        bus = BusFactory.getDefaultBus();
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
+        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
+        cff = new ConnectionFactoryFeature(cfp);
+        Object implementor = new HelloWorldWithContinuationsJMS2();        
+        String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
+        Endpoint.publish(address, implementor, cff);
     }
+
     @AfterClass
     public static void clearProperty() {
-        System.clearProperty("EmbeddedBrokerURL");
+        bus.shutdown(false);
     }
     
     @Test
-    public void testHttpWrappedContinuations() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus(CONFIG_FILE);
-        BusFactory.setDefaultBus(bus);
-        
+    public void testThrottleContinuations() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
         URL wsdlURL = getClass().getClassLoader().getResource(WSDL_PATH);
-        String wsdlString = wsdlURL.toString().intern();
-        broker.updateWsdl(getBus(), wsdlString);
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
-        assertNotNull(service);
-        final HelloContinuation helloPort = service.getHelloContinuationPort();
+        final HelloContinuation helloPort = service.getPort(HelloContinuation.class, cff);
         
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
@@ -102,10 +84,7 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
                 
         helloDoneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
-        assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());
-        ((java.io.Closeable)helloPort).close();
-
-        bus.shutdown(true);
+        Assert.assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());
     }
         
 }

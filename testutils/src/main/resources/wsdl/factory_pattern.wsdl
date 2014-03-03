@@ -17,7 +17,17 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:ns1="http://factory_pattern.cxf.apache.org/" xmlns:tns="http://cxf.apache.org/factory_pattern" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="NumberFactoryService" targetNamespace="http://cxf.apache.org/factory_pattern">
+<wsdl:definitions 
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:jms="http://www.w3.org/2010/soapjms/"
+	xmlns:ns1="http://factory_pattern.cxf.apache.org/"
+	xmlns:tns="http://cxf.apache.org/factory_pattern"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	name="NumberFactoryService"
+	targetNamespace="http://cxf.apache.org/factory_pattern">
     <wsdl:types>
         <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://factory_pattern.cxf.apache.org/">
             <xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="/schemas/wsdl/ws-addr.xsd"/>
@@ -91,7 +101,7 @@
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="NumberServiceSoapJmsBinding" type="tns:Number">
-        <wsdlsoap:binding style="document" transport="http://cxf.apache.org/transports/jms"/>
+        <wsdlsoap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         <wsdl:operation name="isEven">
             <wsdlsoap:operation soapAction="" style="document"/>
             <wsdl:input>
@@ -114,10 +124,9 @@
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
         <wsdl:port name="NumberPortJMS" binding="tns:NumberServiceSoapJmsBinding">
-            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.cxf.factory_pattern.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+        	<jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+            <soap:address location="jms:jndi:dynamicQueues/test.cxf.factory_pattern.queue" />
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </wsdl:port>
     </wsdl:service>

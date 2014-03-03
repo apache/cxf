@@ -30,7 +30,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Allows to configure the JMSConfiguration directly at the Client or Server. Simply add this class to the
@@ -71,7 +70,6 @@ public class JMSConfigFeature extends AbstractFeature {
         return jmsConfig;
     }
 
-    @Required
     public void setJmsConfig(JMSConfiguration jmsConfig) {
         this.jmsConfig = jmsConfig;
     }

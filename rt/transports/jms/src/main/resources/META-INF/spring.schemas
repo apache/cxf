@@ -19,4 +19,3 @@
 #
 #
 http\://cxf.apache.org/schemas/wsdl/jms.xsd=schemas/wsdl/jms.xsd
-http\://cxf.apache.org/schemas/configuration/jms.xsd=schemas/configuration/jms.xsd

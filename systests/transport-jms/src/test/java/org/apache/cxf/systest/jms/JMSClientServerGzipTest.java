@@ -26,15 +26,10 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.AddressType;
-import org.apache.cxf.transport.jms.JMSNamingPropertyType;
+import org.apache.cxf.transport.common.gzip.GZIPFeature;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
@@ -50,12 +45,12 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
         Endpoint ep;
         protected void run()  {
             Object impleDoc = new GreeterImplDoc();
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("org/apache/cxf/systest/jms/gzipBus.xml");
-            BusFactory.setDefaultBus(bus);
+            Bus bus = BusFactory.getDefaultBus();
+            bus.getFeatures().add(new GZIPFeature());
             setBus(bus);
             broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
-            ep = Endpoint.publish(null, impleDoc);
+            ep = Endpoint.publish(null, impleDoc,
+                                  new GZIPFeature());
         }
         public void tearDown() {
             ep.stop();
@@ -87,34 +82,18 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGzipEncodingWithJms() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus("org/apache/cxf/systest/jms/gzipBus.xml");
-        BusFactory.setDefaultBus(bus);
         QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
                                  "SOAPService2"));
         QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort2"));
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
-
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        assertNotNull(service);
 
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
         try {
-            Greeter greeter = service.getPort(portName, Greeter.class);
-            
-            Client client = ClientProxy.getClient(greeter);
-            EndpointInfo ei = client.getEndpoint().getEndpointInfo();
-            AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
-            JMSNamingPropertyType name = new JMSNamingPropertyType();
-            JMSNamingPropertyType password = new JMSNamingPropertyType();
-            name.setName("java.naming.security.principal");
-            name.setValue("ivan");
-            password.setName("java.naming.security.credentials");
-            password.setValue("the-terrible");
-            address.getJMSNamingProperty().add(name);
-            address.getJMSNamingProperty().add(password);
+            Greeter greeter = service.getPort(portName, Greeter.class, new GZIPFeature());
+
             for (int idx = 0; idx < 5; idx++) {
 
                 greeter.greetMeOneWay("test String");
@@ -139,6 +118,5 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-        bus.shutdown(true);
     }
 }

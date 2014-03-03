@@ -24,16 +24,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
 import javax.xml.ws.Response;
 import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -50,19 +46,12 @@ import org.apache.cxf.hello_world_jms.HelloWorldPubSubService;
 import org.apache.cxf.hello_world_jms.HelloWorldQueueDecoupledOneWaysService;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jms_mtom.JMSMTOMPortType;
-import org.apache.cxf.jms_mtom.JMSMTOMService;
-import org.apache.cxf.jms_mtom.JMSOutMTOMService;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSNamingPropertyType;
 import org.apache.cxf.transport.jms.JMSPropertyType;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
@@ -111,16 +100,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             client.getEndpoint().getOutInterceptors().add(new TibcoSoapActionInterceptor());
             client.getOutInterceptors().add(new LoggingOutInterceptor());
             client.getInInterceptors().add(new LoggingInInterceptor());
-            EndpointInfo ei = client.getEndpoint().getEndpointInfo();
-            AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
-            JMSNamingPropertyType name = new JMSNamingPropertyType();
-            JMSNamingPropertyType password = new JMSNamingPropertyType();
-            name.setName("java.naming.security.principal");
-            name.setValue("ivan");
-            password.setName("java.naming.security.credentials");
-            password.setValue("the-terrible");
-            address.getJMSNamingProperty().add(name);
-            address.getJMSNamingProperty().add(password);
             for (int idx = 0; idx < 5; idx++) {
 
                 greeter.greetMeOneWay("test String");
@@ -192,6 +171,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    @Ignore
     @Test
     public void testAsyncCall() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -539,7 +519,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         try {
             HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays(true);
-            requestEndpoint = Endpoint.publish("", requestServant);
+            requestEndpoint = Endpoint.publish(null, requestServant);
             
             BindingProvider  bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
@@ -578,7 +558,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testContextPropogation() throws Exception {
+    public void testContextPropagation() throws Exception {
         final String testReturnPropertyName = "Test_Prop";
         final String testIgnoredPropertyName = "Test_Prop_No_Return";
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -631,47 +611,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     }
     
-    @Test
-    public void testMTOM() throws Exception {
-        QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
-        QName portName = new QName("http://cxf.apache.org/jms_mtom", "MTOMPort");
 
-        URL wsdl = getWSDLURL("/wsdl/jms_test_mtom.wsdl");
-        JMSMTOMService service = new JMSMTOMService(wsdl, serviceName);
-
-        JMSMTOMPortType mtom = service.getPort(portName, JMSMTOMPortType.class);
-        Binding binding = ((BindingProvider)mtom).getBinding();
-        ((SOAPBinding)binding).setMTOMEnabled(true);
-
-        Holder<String> name = new Holder<String>("Sam");
-        URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
-        Holder<DataHandler> handler1 = new Holder<DataHandler>();
-        handler1.value = new DataHandler(fileURL);
-        int size = handler1.value.getInputStream().available();
-        mtom.testDataHandler(name, handler1);
-        
-        byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
-        assertEquals("The response file is not same with the sent file.", size, bytes.length);
-    }
-    
-    
-    @Test
-    public void testOutMTOM() throws Exception {
-        QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
-        QName portName = new QName("http://cxf.apache.org/jms_mtom", "MTOMPort");
-
-        URL wsdl = getWSDLURL("/wsdl/jms_test_mtom.wsdl");
-        JMSOutMTOMService service = new JMSOutMTOMService(wsdl, serviceName);
-
-        JMSMTOMPortType mtom = service.getPort(portName, JMSMTOMPortType.class);
-        URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
-        DataHandler handler1 = new DataHandler(fileURL);
-        int size = handler1.getInputStream().available();
-        DataHandler ret = mtom.testOutMtom();
-        
-        byte bytes[] = IOUtils.readBytesFromStream(ret.getInputStream());
-        assertEquals("The response file is not same with the original file.", size, bytes.length);
-    }
     
 
 }

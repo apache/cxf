@@ -20,19 +20,10 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.ws.BindingProvider;
-
-import org.apache.cxf.common.util.ReflectionUtil;
-import org.apache.cxf.endpoint.Client;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -126,60 +117,13 @@ public abstract class AbstractClientServerTestBase extends Assert {
         return ok;
     }
     
-    
-    // extra methods to help support the dynamic port allocations
     protected void setAddress(Object o, String address) {
-        if (o instanceof BindingProvider) {
-            ((BindingProvider)o).getRequestContext()
-                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                     address);
-        }
-        Client c = null;
-        if (o instanceof Client) {
-            c = (Client)o;
-        }
-        if (c == null) {
-            try {
-                InvocationHandler i = Proxy.getInvocationHandler(o);
-                c = (Client)i.getClass().getMethod("getClient").invoke(i);
-            } catch (Throwable t) {
-                //ignore
-            }
-        }
-        if (c == null) {
-            try {
-                final Method m = o.getClass().getDeclaredMethod("getClient");
-                ReflectionUtil.setAccessible(m);
-
-                c = (Client)m.invoke(o);
-            } catch (Throwable t) {
-                //ignore
-            }
-        }
-        if (c != null) {
-            c.getEndpoint().getEndpointInfo().setAddress(address);
-        }
+        TestUtil.setAddress(o, address);
     }
+    
     protected void updateAddressPort(Object o, String port) 
         throws NumberFormatException, MalformedURLException {
-        updateAddressPort(o, Integer.parseInt(port));
-    }
-    protected void updateAddressPort(Object o, int port) throws MalformedURLException {
-        String address = null;
-        if (o instanceof BindingProvider) {
-            address = ((BindingProvider)o).getRequestContext()
-                .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY).toString();
-        } else if (o instanceof Client) {
-            Client c = (Client)o;
-            address = c.getEndpoint().getEndpointInfo().getAddress();
-        }
-        if (address != null) {
-            URL url = new URL(address);
-            url = new URL(url.getProtocol(), url.getHost(),
-                          port, url.getFile());
-            setAddress(o, url.toString());
-        }
-        //maybe simple frontend proxy?
+        TestUtil.updateAddressPort(o, port);
     }
     
     protected static String allocatePort(String s) {

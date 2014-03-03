@@ -27,14 +27,9 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.AddressType;
-import org.apache.cxf.transport.jms.JMSNamingPropertyType;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
@@ -56,7 +51,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
             BusFactory.setDefaultBus(bus);
             setBus(bus);
             broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
-            Endpoint.publish(null, impleDoc);
+            Endpoint.publish("jms:queue:routertest.SOAPService2Q.text", impleDoc);
         }
     }
 
@@ -102,7 +97,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
-            
+            /*
             Client client = ClientProxy.getClient(greeter);
             EndpointInfo ei = client.getEndpoint().getEndpointInfo();
             AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
@@ -114,6 +109,7 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
             password.setValue("the-terrible");
             address.getJMSNamingProperty().add(name);
             address.getJMSNamingProperty().add(password);
+            */
             for (int idx = 0; idx < 5; idx++) {
 
                 greeter.greetMeOneWay("test String");

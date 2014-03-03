@@ -98,6 +98,7 @@ public class NumberFactoryImpl implements NumberFactory {
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlLocation);        
         ep = new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPortJMS"));
+        ep.setAddress("jms:jndi:dynamicQueues/test.cxf.factory_pattern.queue");
         ep.publish();
         ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
         ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());

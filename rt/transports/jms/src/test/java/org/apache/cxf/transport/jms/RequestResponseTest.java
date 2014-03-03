@@ -19,15 +19,10 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
 
 import javax.jms.DeliveryMode;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -35,57 +30,12 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RequestResponseTest extends AbstractJMSTester {
-    private static final int MAX_RECEIVE_TIME = 10;
-
-    public RequestResponseTest() {
-    }
-    
-    @BeforeClass
-    public static void createAndStartBroker() throws Exception {
-        startBroker(new JMSBrokerSetup("tcp://localhost:" + JMS_PORT));
-    }
-
-    private void waitForReceiveInMessage() {
-        int waitTime = 0;
-        while (inMessage == null && waitTime < MAX_RECEIVE_TIME) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // do nothing here
-            }
-            waitTime++;
-        }
-        assertTrue("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds",
-                   inMessage != null);
-    }
 
     private void verifyReceivedMessage(Message message) {
-        ByteArrayInputStream bis = (ByteArrayInputStream)message.getContent(InputStream.class);
-        String response = "<not found>";
-        if (bis != null) {
-            byte bytes[] = new byte[bis.available()];
-            try {
-                bis.read(bytes);
-            } catch (IOException ex) {
-                assertFalse("Read the Destination recieved Message error ", false);
-                ex.printStackTrace();
-            }
-            response = IOUtils.newStringFromBytes(bytes);
-        } else {
-            StringReader reader = (StringReader)message.getContent(Reader.class);
-            char buffer[] = new char[5000];
-            try {
-                int i = reader.read(buffer);
-                response = new String(buffer, 0 , i);
-            } catch (IOException e) {
-                assertFalse("Read the Destination recieved Message error ", false);
-                e.printStackTrace();
-            }
-        }
+        String response = getContent(message);
         assertEquals("The response content should be equal", AbstractJMSTester.MESSAGE_CONTENT, response);
     }
 
@@ -101,12 +51,6 @@ public class RequestResponseTest extends AbstractJMSTester {
     }
 
     private void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
-        /*
-         * if (outHeader.getJMSCorrelationID() != null) { // only check if the correlation id was explicitly
-         * set as // otherwise the in header will contain an automatically // generated correlation id
-         * assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals", outHeader
-         * .getJMSCorrelationID(), inHeader.getJMSCorrelationID()); }
-         */
         assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
             .getJMSPriority(), inHeader.getJMSPriority());
         assertEquals("The inMessage and outMessage JMS Header's JMSDeliveryMode should be equals", outHeader
@@ -137,7 +81,6 @@ public class RequestResponseTest extends AbstractJMSTester {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequest");
         sendAndReceiveMessages(ei, true);
-        //sendAndReceiveMessages(ei, false);
     }
     
     @Test
@@ -162,7 +105,7 @@ public class RequestResponseTest extends AbstractJMSTester {
     protected void sendAndReceiveMessages(EndpointInfo ei, boolean synchronous) throws IOException {
         inMessage = null;
         // set up the conduit send to be true
-        JMSConduit conduit = setupJMSConduit(ei, true);
+        JMSConduit conduit = setupJMSConduitWithObserver(ei);
         final Message outMessage = createMessage();
         final JMSDestination destination = setupJMSDestination(ei);
 

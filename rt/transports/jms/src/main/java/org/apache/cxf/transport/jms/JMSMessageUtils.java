@@ -204,7 +204,7 @@ final class JMSMessageUtils {
             try {
                 String requestURI = jmsMessage.getStringProperty(JMSSpecConstants.REQUESTURI_FIELD);
                 JMSEndpoint endpoint = new JMSEndpoint(requestURI);
-                if (endpoint.getParameter(JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME) != null) {
+                if (endpoint.getTargetService() != null) {
                     headers.put(JMSSpecConstants.TARGET_SERVICE_IN_REQUESTURI,
                                 Collections.singletonList("true"));
                 }

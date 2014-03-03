@@ -18,15 +18,10 @@
  */
 package org.apache.cxf.systest.jms;
 
-import javax.xml.ws.Binding;
 import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
@@ -57,7 +52,6 @@ public class Server extends AbstractBusTestServerBase {
         Object i6 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales();
         Object i7 = new GreeterImplTwoWayJMSAppCorrelationIDEng();
         Object i8 = new GreeterImplTwoWayJMSAppCorrelationIDSales();
-        Object mtom = new JMSMTOMImpl();
         
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
@@ -67,28 +61,25 @@ public class Server extends AbstractBusTestServerBase {
         broker.updateWsdl(bus, "testutils/jms_test_mtom.wsdl");
         
         Endpoint.publish(null, impleDoc);
-        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
+
+        String address = null;
         Endpoint.publish(address, implementor);
-        Endpoint.publish("http://testaddr.not.required/", impl2);
-        Endpoint.publish("http://testaddr.not.required.topic/", impl3);
-        Endpoint.publish("http://testaddr.not.required.byte/", impl4);
-        Endpoint.publish("http://testaddr.not.required.jms/", impl5);
-        Endpoint.publish("http://ignore", impl6);
-        Endpoint.publish("", impl7);
-        Endpoint.publish("", i1);
-        Endpoint.publish("", i2);
-        Endpoint.publish("", i3);
-        Endpoint.publish("", i4);
-        Endpoint.publish("", i5);
-        Endpoint.publish("", i6);
-        Endpoint.publish("", i7);
-        Endpoint.publish("", i8);
-        EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://cxf.apache.org/transports/jms", mtom);
-        Binding binding = ep.getBinding();        
-        ((SOAPBinding)binding).setMTOMEnabled(true); 
-        ep.getInInterceptors().add(new LoggingInInterceptor());
-        ep.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+        Endpoint.publish(null, impl2);
+        Endpoint.publish(null, impl3);
+        Endpoint.publish(null, impl4);
+        Endpoint.publish(null, impl5);
+        Endpoint.publish(null, impl6);
+
+        Endpoint.publish(null, impl7);
+        Endpoint.publish(null, i1);
+        Endpoint.publish(null, i2);
+        Endpoint.publish(null, i3);
+        Endpoint.publish(null, i4);
+        Endpoint.publish(null, i5);
+        Endpoint.publish(null, i6);
+        Endpoint.publish(null, i7);
+        Endpoint.publish(null, i8);
+
         Object spec1 = new GreeterSpecImpl();
         String address1 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2"
                          + "?jndiInitialContextFactory"

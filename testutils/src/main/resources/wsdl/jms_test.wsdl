@@ -17,7 +17,16 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:x1="http://cxf.apache.org/hello_world_jms/types" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/hello_world_jms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HelloWorldService" targetNamespace="http://cxf.apache.org/hello_world_jms">
+<definitions name="HelloWorldService" 
+	targetNamespace="http://cxf.apache.org/hello_world_jms"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:jms="http://www.w3.org/2010/soapjms/" 
+	xmlns:x1="http://cxf.apache.org/hello_world_jms/types" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:tns="http://cxf.apache.org/hello_world_jms" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.w3.org/2010/soapjms/ http://svn.apache.org/repos/asf/cxf/tags/cxf-2.7.7/rt/transports/jms/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xsd ">
     <types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/hello_world_jms/types" targetNamespace="http://cxf.apache.org/hello_world_jms/types" elementFormDefault="qualified">
             <complexType name="ErrorCode">
@@ -104,7 +113,10 @@
         </operation>
     </portType>
     <binding name="HelloWorldPortBinding" type="tns:HelloWorldPortType">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
@@ -146,7 +158,10 @@
         </operation>
     </binding>
     <binding name="HelloWorldQueueBinMsgBinding" type="tns:HelloWorldPortType">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+    	<jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+ 
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
@@ -173,7 +188,10 @@
         </operation>
     </binding>
     <binding name="HWStaticReplyQTextPortBinding" type="tns:HelloWorldPortType">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
@@ -200,7 +218,10 @@
         </operation>
     </binding>
     <binding name="HWStaticReplyQBinMsgBinding" type="tns:HelloWorldPortType">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
@@ -227,7 +248,9 @@
         </operation>
     </binding>
     <binding name="HWJMSAddressingBinding" type="tns:HelloWorldPortType">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
@@ -254,7 +277,9 @@
         </operation>
     </binding>
     <binding name="HelloWorldOneWayBinding" type="tns:HelloWorldOneWayPort">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <operation name="greetMeOneWay">
             <soap:operation style="rpc"/>
             <input name="greetMeOneWay">
@@ -263,7 +288,9 @@
         </operation>
     </binding>
     <binding name="HelloWorldPubSubBinding" type="tns:HelloWorldPubSubPort">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <operation name="greetMeOneWay">
             <soap:operation style="rpc"/>
             <input name="greetMeOneWay">
@@ -273,187 +300,100 @@
     </binding>
     <service name="HelloWorldQueueBinMsgService">
         <port binding="tns:HelloWorldQueueBinMsgBinding" name="HelloWorldQueueBinMsgPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.binary">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:client messageType="binary"/>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
+        	<soap:address location="jms:jndi:dynamicQueues/test.jmstransport.binary?replyToQueueName=dynamicQueues/test.jms.addr.reply.queue&amp;messageType=binary&amp;receiveTimeout=500&amp;timeTolive=600" />
+            <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
         </port>
     </service>
     <service name="HelloWorldService">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
-            <jms:clientConfig useConduitIdSelector="false"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text" connectionUserName="testUser" connectionPassword="testPassword">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
-            <jms:sessionPool hightWaterMark="5" lowWaterMark="5"/>
+            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text?username=testUser&amp;password=testPassword&amp;useConduitIdSelector=false" />
         </port>
     </service>
     <service name="HelloWorldServiceAppCorrelationID">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDEng">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.reply" />
         </port>
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDSales">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.reply" />
         </port>
     </service>
     <service name="HelloWorldServiceAppCorrelationIDStaticPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDStaticPrefixEng">
-            <jms:clientConfig conduitSelectorPrefix="com.mycompany.eng:" useConduitIdSelector="false"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+            <jms:clientConfig  useConduitIdSelector="false"/>
+            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.eng:" />
         </port>
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDStaticPrefixSales">
-            <jms:clientConfig conduitSelectorPrefix="com.mycompany.sales:" useConduitIdSelector="false"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.sales:&amp;useConduitIdSelector=false" />
         </port>
     </service>
     <service name="HelloWorldServiceAppCorrelationIDNoPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDNoPrefix">
-            <jms:clientConfig clientReceiveTimeout="5000" useConduitIdSelector="true"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix.reply&amp;receiveTimeout=5000" />
         </port>
     </service>
     <service name="HelloWorldServiceRuntimeCorrelationIDStaticPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortRuntimeCorrelationIDStaticPrefixEng">
-            <jms:clientConfig conduitSelectorPrefix="com.mycompany.eng:" useConduitIdSelector="true"/>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.eng:&amp;useConduitIdSelector=true" />
             <jms:server messageSelector="JMSCorrelationID LIKE 'com.mycompany.eng:%'"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
         </port>
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortRuntimeCorrelationIDStaticPrefixSales">
-            <jms:clientConfig conduitSelectorPrefix="com.mycompany.sales:" useConduitIdSelector="true"/>
             <jms:server messageSelector="JMSCorrelationID LIKE 'com.mycompany.sales:%'"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.sales:&amp;useConduitIdSelector=true" />
         </port>
     </service>
     <service name="HelloWorldServiceRuntimeCorrelationIDDynamicPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortRuntimeCorrelationIDDynamicPrefix">
-            <jms:clientConfig useConduitIdSelector="true"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text.runtime.correlation.id.dynamic.prefix" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.runtime.correlation.id.dynamic.prefix.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+        	<soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.runtime.correlation.id.dynamic.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.runtime.correlation.id.dynamic.prefix.reply" />
         </port>
     </service>
     <service name="HelloWorldServiceLoop">
         <port binding="tns:HWStaticReplyQBinMsgBinding" name="HelloWorldPortLoop">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.binary" jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:client messageType="binary"/>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.binary?replyToQueueName=dynamicQueues/test.jmstransport.binary.reply&amp;messageType=binary" />
         </port>
     </service>
     <service name="HWStaticReplyQBinMsgService">
         <port binding="tns:HWStaticReplyQBinMsgBinding" name="HWStaticReplyQBinMsgPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.binary" jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:client messageType="binary"/>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.binary?replyToQueueName=dynamicQueues/test.jmstransport.binary.reply&amp;messageType=binary" />
         </port>
     </service>
     <service name="HWByteMsgService">
         <port binding="tns:HelloWorldPortBinding" name="HWSByteMsgPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.binary" jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:client messageType="byte"/>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.binary?replyToQueueName=dynamicQueues/test.jmstransport.binary.reply&amp;messageType=byte" />
         </port>
     </service>
     <service name="HWStaticReplyQTextMsgService">
         <port binding="tns:HWStaticReplyQTextPortBinding" name="HWStaticReplyQTextPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.text" jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
+	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text?replyToQueueName=dynamicQueues/test.jmstransport.text.reply" />
         </port>
     </service>
     <service name="HelloWorldOneWayQueueService">
         <port binding="tns:HelloWorldOneWayBinding" name="HelloWorldOneWayQueuePort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.oneway">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
+            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.oneway" />
         </port>
     </service>
     <service name="HelloWorldQueueDecoupledOneWaysService">
         <port binding="tns:HelloWorldOneWayBinding" name="HelloWorldQueueDecoupledOneWaysPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.oneway.with.set.replyto">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.oneway.with.set.replyto" />
             <jms:clientConfig enforceSpec="false"/>
         </port>
         <port binding="tns:HelloWorldOneWayBinding" name="HelloWorldQueueDecoupledOneWaysReplyPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+			<soap:address location="jms:jndi:dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply" />
         </port>
     </service>
     <service name="HelloWorldPubSubService">
         <port binding="tns:HelloWorldPubSubBinding" name="HelloWorldPubSubPort">
-            <jms:address destinationStyle="topic" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicTopics/test.jmstransport.oneway.topic">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+	        <soap:address location="jms:jndi-topic:dynamicTopics/test.jmstransport.oneway.topic" />
         </port>
     </service>
     <service name="JmsDestinationPubSubService">
         <port binding="tns:HelloWorldPubSubBinding" name="JmsDestinationPubSubPort">
-            <jms:address destinationStyle="topic" jndiConnectionFactoryName="ConnectionFactory" jmsDestinationName="dynamicTopics/test.jmstransport.oneway.topic.jmsdest">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+	        <soap:address location="jms:jndi-topic:dynamicTopics/test.jmstransport.oneway.topic.jmsdest" />
         </port>
     </service>
     <service name="JMSSOAPServiceAddressing">
         <port binding="tns:HWJMSAddressingBinding" name="HWJMSAddressingPort">
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.jms.addr.queue" jndiReplyDestinationName="dynamicQueues/test.jms.addr.reply.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+        	<soap:address location="jms:jndi:dynamicQueues/test.jms.addr.queue&amp;replyToQueueName=dynamicQueues/test.jms.addr.reply.queue" />
             <wswa:UsingAddressing xmlns:wswa="http://www.w3.org/2005/02/addressing/wsdl"/>
-        </port>
-    </service>
-    <service name="HelloWorldServiceSpringICF">
-        <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortSpringICF">
-            <jms:clientConfig useConduitIdSelector="false"/>
-            <jms:address jndiConnectionFactoryName="ConnectionFactory" jmsDestinationName="dynamicQueues/test.jmstransport.text">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.xbean.spring.jndi.SpringInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="classpath:/jms_test_jndi.xml"/>
-            </jms:address>
-            <jms:server durableSubscriberName="CXF_subscriber"/>
         </port>
     </service>
 </definitions>

@@ -80,10 +80,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromWebClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-             + "&replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiURL=tcp://localhost:" + JMS_PORT
-             + "&jndiConnectionFactoryName=ConnectionFactory";
+             + "?replyToName=dynamicQueues/test.jmstransport.response"
+             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiURL=tcp://localhost:" + JMS_PORT;
                
         WebClient client = WebClient.create(endpointAddressUrlEncoded);
         WebClient.getConfig(client).getRequestContext()

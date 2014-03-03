@@ -29,8 +29,4 @@
             </bean>
         </cxf:features>
     </cxf:bus>
-    <jms:conduit name="{http://apache.org/hello_world_doc_lit}SoapPort2.jms-conduit">
-        <!--must use binary message format for gzip compress-->
-        <jms:runtimePolicy messageType="binary"/>
-    </jms:conduit>
 </beans>

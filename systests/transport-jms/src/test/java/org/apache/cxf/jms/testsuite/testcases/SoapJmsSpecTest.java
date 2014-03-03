@@ -35,14 +35,12 @@ import org.apache.cxf.systest.jms.Hello;
 import org.apache.cxf.systest.jms.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.transport.jms.JMSConfigFactory;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSOldConfigHolder;
-import org.apache.cxf.transport.jms.JNDIConfiguration;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
-import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.SOAPService7;
@@ -172,10 +170,8 @@ public class SoapJmsSpecTest extends AbstractBusClientServerTestBase {
     
     private void specNoWsdlService(String messageType) throws Exception {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
-            + "?jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=" 
-            + broker.getEncodedBrokerURL();
+            + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=" + broker.getEncodedBrokerURL();
         if (messageType != null) {
             address = address + "&messageType=" + messageType;
         }
@@ -229,12 +225,8 @@ public class SoapJmsSpecTest extends AbstractBusClientServerTestBase {
         endpoint.setJndiConnectionFactoryName("ConnectionFactory");
 
         final JMSConfiguration jmsConfig = new JMSConfiguration();        
-        JndiHelper jt = new JndiHelper(JMSOldConfigHolder.getInitialContextEnv(endpoint));
-        
-        JNDIConfiguration jndiConfig = new JNDIConfiguration();
-        jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
-        jmsConfig.setJndiTemplate(jt);
-        jmsConfig.setJndiConfig(jndiConfig);
+        jmsConfig.setJndiEnvironment(JMSConfigFactory.getInitialContextEnv(endpoint));
+        jmsConfig.setConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
         
         TestReceiver receiver = new TestReceiver(jmsConfig.getConnectionFactory(), 
                                                  "dynamicQueues/SoapService7.replyto.queue", false);

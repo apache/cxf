@@ -30,9 +30,9 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.transport.jms.util.MessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
-import org.apache.cxf.transport.jms.util.UserCredentialsConnectionFactoryAdapter;
 
 /**
  * Factory to create jms helper objects from configuration and context information
@@ -55,27 +55,12 @@ public final class JMSFactory {
      * @return
      */
     static ConnectionFactory getConnectionFactoryFromJndi(JMSConfiguration jmsConfig) {
-        JNDIConfiguration jndiConfig = jmsConfig.getJndiConfig();
-        if (jndiConfig == null) {
+        if (jmsConfig.getJndiEnvironment() == null || jmsConfig.getConnectionFactoryName() == null) {
             return null;
         }
-        String connectionFactoryName = jndiConfig.getJndiConnectionFactoryName();
-        if (connectionFactoryName == null) {
-            return null;
-        }
-        String userName = jndiConfig.getConnectionUserName();
-        String password = jndiConfig.getConnectionPassword();
         try {
-            ConnectionFactory cf = jmsConfig.getJndiTemplate().
-                lookup(connectionFactoryName, ConnectionFactory.class);
-            if (userName != null) {
-                UserCredentialsConnectionFactoryAdapter uccf = new UserCredentialsConnectionFactoryAdapter();
-                uccf.setUsername(userName);
-                uccf.setPassword(password);
-                uccf.setTargetConnectionFactory(cf);
-                cf = uccf;
-            }
-            
+            ConnectionFactory cf = new JndiHelper(jmsConfig.getJndiEnvironment()).
+                lookup(jmsConfig.getConnectionFactoryName(), ConnectionFactory.class);
             return cf;
         } catch (NamingException e) {
             throw new RuntimeException(e);
@@ -228,7 +213,8 @@ public final class JMSFactory {
     }
 
     public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
-        Connection connection = jmsConfig.getConnectionFactory().createConnection();
+        Connection connection = jmsConfig.getConnectionFactory().createConnection(jmsConfig.getUserName(),
+                                                                                  jmsConfig.getPassword());
         if (jmsConfig.getDurableSubscriptionClientId() != null) {
             connection.setClientID(jmsConfig.getDurableSubscriptionClientId());
         }

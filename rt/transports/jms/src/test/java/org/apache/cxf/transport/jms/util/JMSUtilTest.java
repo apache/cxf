@@ -19,9 +19,20 @@
 
 package org.apache.cxf.transport.jms.util;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.jms.BytesMessage;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Session;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.cxf.transport.jms.JMSConfiguration;
+import org.apache.cxf.transport.jms.JMSConstants;
+import org.apache.cxf.transport.jms.JMSFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,5 +64,25 @@ public class JMSUtilTest extends Assert {
         String correlationID = JMSUtil.createCorrelationId(prefix, sequenceNum);
         assertEquals("The correlationID value does not match expected value",
                      prefix + expectedIndex, correlationID);
+    }
+    
+    @Test
+    public void testJMSMessageMarshal() throws IOException, JMSException {
+        String testMsg = "Test Message";
+        final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset().name()); // TODO encoding
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+        jmsConfig.setConnectionFactory(new ActiveMQConnectionFactory("vm://tesstMarshal?broker.persistent=false"));
+        
+        ResourceCloser closer = new ResourceCloser();
+        try {
+            Connection connection = JMSFactory.createConnection(jmsConfig);
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            javax.jms.Message jmsMessage = 
+                JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
+            assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
+        } finally {
+            closer.close();
+        }
+        
     }
 }

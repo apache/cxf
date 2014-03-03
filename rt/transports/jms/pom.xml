@@ -31,22 +31,9 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <cxf.osgi.import>
-            org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}"
-        </cxf.osgi.import>
         <cxf.spi-dir>spi-2.1</cxf.spi-dir>
     </properties>
     <dependencies>
-        <dependency>
-        	<groupId>org.springframework</groupId>
-        	<artifactId>spring-beans</artifactId>
-        	<optional />
-        </dependency>
-        <dependency>
-        	<groupId>org.springframework</groupId>
-        	<artifactId>spring-core</artifactId>
-        	<optional />
-        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -146,17 +133,6 @@
                         <configuration>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/jms.xsd</xsd>
-                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/jms.xjb</bindingFile>
-                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
-                                    <deleteDirs>
-                                        <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
-                                    </deleteDirs>
-                                    <extensionArgs>
-                                        <extensionArg>-Xdv</extensionArg>
-                                    </extensionArgs>
-                                </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xjb</bindingFile>

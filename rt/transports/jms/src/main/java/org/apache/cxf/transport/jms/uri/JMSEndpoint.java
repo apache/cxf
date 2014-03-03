@@ -19,14 +19,15 @@
 
 package org.apache.cxf.transport.jms.uri;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
@@ -64,6 +65,7 @@ public class JMSEndpoint {
     Map<String, String> parameters = new HashMap<String, String>();
     
     private String endpointUri;
+    private ConnectionFactory connectionFactory;
     private String jmsVariant;
     private String destinationName;
     private DeliveryModeType deliveryMode;
@@ -80,6 +82,10 @@ public class JMSEndpoint {
     private boolean reconnectOnException = true;
     private String durableSubscriptionName;
     private long receiveTimeout = 60000L;
+    private String targetService;
+    private boolean sessionTransacted;
+    private String conduitIdSelectorPrefix;
+    private boolean useConduitIdSelector = true;
 
     /**
      * @param uri
@@ -107,97 +113,75 @@ public class JMSEndpoint {
         
         if (ei != null) {
             JMSEndpointWSDLUtil.retrieveWSDLInformation(this, ei);
-            
         }
         if (!(StringUtils.isEmpty(endpointUri) || "jms://".equals(endpointUri) || !endpointUri.startsWith("jms"))) {
             this.endpointUri = endpointUri;
             JMSURIParser parsed = new JMSURIParser(endpointUri);
             setJmsVariant(parsed.getVariant());
             this.destinationName = parsed.getDestination();
-            configureProperties(this, parsed.parseQuery());
+            Map<String, Object> query = parsed.parseQuery();
+            configureProperties(query);
+            
+            // Use the properties like e.g. from JAXWS properties
+            if (ei != null && ei.getBinding() != null && ei.getBinding().getProperties() != null) {
+                configureProperties(ei.getBinding().getProperties());
+            }
         }
     }
 
+    private boolean trySetProperty(String name, Object value) {
+        try {
+            Method method = this.getClass().getMethod(getPropSetterName(name), value.getClass());
+            method.invoke(this, value);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error setting property " + name + ":" + e.getMessage(), e);
+        }
+    }
+    
+    private String getPropSetterName(String name) {
+        String first = name.substring(0, 1);
+        String rest = name.substring(1);
+        return "set" + first.toUpperCase() + rest;
+    }
+
     /**
+     * Configure properties form map.
+     * For each key of the map first a property with the same name in the endpoint is tried.
+     * If that does not match then the value is either stored in the jndiParameters or the parameters
+     * depending on the prefix of the key. If it matches JNDI_PARAMETER_NAME_PREFIX it is stored in the 
+     * jndiParameters else in the parameters
+     * 
      * @param endpoint
      * @param params
      */
-    private static void configureProperties(JMSEndpoint endpoint, Map<String, String> params) {
-        String deliveryMode = getAndRemoveParameter(params,
-                                                    JMSEndpoint.DELIVERYMODE_PARAMETER_NAME);
-        String timeToLive = getAndRemoveParameter(params,
-                                                  JMSEndpoint.TIMETOLIVE_PARAMETER_NAME);
-        String priority = getAndRemoveParameter(params, JMSEndpoint.PRIORITY_PARAMETER_NAME);
-        String replyToName = getAndRemoveParameter(params,
-                                                   JMSEndpoint.REPLYTONAME_PARAMETER_NAME);
-        String topicReplyToName = getAndRemoveParameter(params,
-                                                   JMSEndpoint.TOPICREPLYTONAME_PARAMETER_NAME);
-        String jndiConnectionFactoryName = getAndRemoveParameter(
-                                                                 params,
-                                                JMSEndpoint.JNDICONNECTIONFACTORYNAME_PARAMETER_NAME);
-        String jndiInitialContextFactory = getAndRemoveParameter(
-                                                                 params,
-                                                JMSEndpoint.JNDIINITIALCONTEXTFACTORY_PARAMETER_NAME);
-        String jndiUrl = getAndRemoveParameter(params, JMSEndpoint.JNDIURL_PARAMETER_NAME);
-
-        String messageType = getAndRemoveParameter(params, JMSEndpoint.MESSAGE_TYPE_PARAMETER_NAME);
+    private void configureProperties(Map<String, Object> params) {
+        for (String key : params.keySet()) {
+            Object value = params.get(key);
+            if (value == null || value.equals("")) {
+                continue;
+            }
+            if (trySetProperty(key, value)) {
+                continue;
+            }
+            if (!(value instanceof String)) {
+                continue;
+            }
+            String valueSt = (String)value;
+            if (key.startsWith(JMSEndpoint.JNDI_PARAMETER_NAME_PREFIX)) {
+                key = key.substring(5);
+                putJndiParameter(key, valueSt);
+            } else {
+                putParameter(key, valueSt);
+            }
+        }
         
-        if (deliveryMode != null) {
-            endpoint.setDeliveryMode(DeliveryModeType.valueOf(deliveryMode));
-        }
-        if (timeToLive != null) {
-            endpoint.setTimeToLive(Long.valueOf(timeToLive));
-        }
-        if (priority != null) {
-            endpoint.setPriority(Integer.valueOf(priority));
-        }
         if (replyToName != null && topicReplyToName != null) {
             throw new IllegalArgumentException(
                 "The replyToName and topicReplyToName should not be defined at the same time.");
         }
-        if (replyToName != null) {
-            endpoint.setReplyToName(replyToName);
-        }
-        if (topicReplyToName != null) {
-            endpoint.setTopicReplyToName(topicReplyToName);
-        }
-        if (jndiConnectionFactoryName != null) {
-            endpoint.setJndiConnectionFactoryName(jndiConnectionFactoryName);
-        }
-        if (jndiInitialContextFactory != null) {
-            endpoint.setJndiInitialContextFactory(jndiInitialContextFactory);
-        }
-        if (jndiUrl != null) {
-            endpoint.setJndiURL(jndiUrl);
-        }
-        if (messageType != null) {
-            endpoint.setMessageType(MessageType.fromValue(messageType));
-        }
-
-        for (String key : params.keySet()) {
-            String value = params.get(key);
-            if (value == null || value.equals("")) {
-                continue;
-            }
-            if (key.startsWith(JMSEndpoint.JNDI_PARAMETER_NAME_PREFIX)) {
-                key = key.substring(5);
-                endpoint.putJndiParameter(key, value);
-            } else {
-                endpoint.putParameter(key, value);
-            }
-        }
-    }
-
-    /**
-     * @param parameters
-     * @param deliverymodeParameterName
-     * @return
-     */
-    private static String getAndRemoveParameter(Map<String, String> parameters,
-                                                String parameterName) {
-        String value = parameters.get(parameterName);
-        parameters.remove(parameterName);
-        return value;
     }
 
     public String getRequestURI() {
@@ -210,12 +194,6 @@ public class JMSEndpoint {
         requestUri.append(":" + destinationName);
         boolean first = true;
         for (String key : parameters.keySet()) {
-            // now we just skip the MESSAGE_TYPE_PARAMETER_NAME 
-            // and TARGETSERVICE_PARAMETER_NAME
-            if (JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME.equals(key) 
-                || MESSAGE_TYPE_PARAMETER_NAME.equals(key)) {
-                continue;
-            }
             String value = parameters.get(key);
             if (first) {
                 requestUri.append("?" + key + "=" + value);
@@ -264,6 +242,13 @@ public class JMSEndpoint {
     public void setEndpointUri(String endpointUri) {
         this.endpointUri = endpointUri;
     }
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
     public String getJmsVariant() {
         return jmsVariant;
     }
@@ -292,17 +277,26 @@ public class JMSEndpoint {
     public void setDeliveryMode(DeliveryModeType deliveryMode) {
         this.deliveryMode = deliveryMode;
     }
+    public void setDeliveryMode(String deliveryMode) {
+        this.deliveryMode = DeliveryModeType.valueOf(deliveryMode);
+    }
     public MessageType getMessageType() {
         return messageType == null ? MessageType.BYTE : messageType;
     }
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
     }
+    public void setMessageType(String messageType) {
+        this.messageType = MessageType.fromValue(messageType);
+    }
     public long getTimeToLive() {
         return timeToLive;
     }
     public void setTimeToLive(long timeToLive) {
         this.timeToLive = timeToLive;
+    }
+    public void setTimeToLive(String timeToLive) {
+        this.timeToLive = Long.valueOf(timeToLive);
     }
     public boolean isSetPriority() {
         return priority != null;
@@ -312,6 +306,9 @@ public class JMSEndpoint {
     }
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+    public void setPriority(String priority) {
+        this.priority = Integer.valueOf(priority);
     }
     public String getReplyToName() {
         return replyToName;
@@ -372,8 +369,40 @@ public class JMSEndpoint {
     public long getReceiveTimeout() {
         return receiveTimeout;
     }
+
     public void setReceiveTimeout(long receiveTimeout) {
         this.receiveTimeout = receiveTimeout;
+    }
+    
+    public void setReceiveTimeout(String receiveTimeout) {
+        this.receiveTimeout = Long.valueOf(receiveTimeout);
+    }
+    public String getTargetService() {
+        return targetService;
+    }
+    public void setTargetService(String targetService) {
+        this.targetService = targetService;
+    }
+    public boolean isSessionTransacted() {
+        return sessionTransacted;
+    }
+    public void setSessionTransacted(boolean sessionTransacted) {
+        this.sessionTransacted = sessionTransacted;
+    }
+    public void setSessionTransacted(String sessionTransacted) {
+        this.sessionTransacted = Boolean.valueOf(sessionTransacted);
+    }
+    public String getConduitIdSelectorPrefix() {
+        return conduitIdSelectorPrefix;
+    }
+    public void setConduitIdSelectorPrefix(String conduitIdSelectorPrefix) {
+        this.conduitIdSelectorPrefix = conduitIdSelectorPrefix;
+    }
+    public boolean isUseConduitIdSelector() {
+        return useConduitIdSelector;
+    }
+    public void setUseConduitIdSelector(boolean useConduitIdSelector) {
+        this.useConduitIdSelector = useConduitIdSelector;
     }
 
     public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };

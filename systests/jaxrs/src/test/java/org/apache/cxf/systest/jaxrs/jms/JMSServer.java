@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.jms;
 
+import org.apache.activemq.broker.BrokerService;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -36,6 +37,10 @@ public class JMSServer extends AbstractBusTestServerBase {
     
     public static void main(String[] args) {
         try {
+            BrokerService broker = new BrokerService();
+            broker.addConnector("tcp://localhost:61500");
+            broker.start();
+            System.setProperty("testutil.ports.EmbeddedJMSBrokerLauncher", "61500");
             JMSServer s = new JMSServer();
             s.start();
         } catch (Exception ex) {

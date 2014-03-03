@@ -15,7 +15,17 @@
                 the specific language governing permissions and limitations under the
                 License.
         -->
-<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/jms_mtom" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:x1="http://cxf.apache.org/jms_mtom/types" name="JMSMTOMService" targetNamespace="http://cxf.apache.org/jms_mtom">
+<wsdl:definitions 
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:jms="http://www.w3.org/2010/soapjms/" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://cxf.apache.org/jms_mtom"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+	xmlns:x1="http://cxf.apache.org/jms_mtom/types"
+	name="JMSMTOMService" 
+	targetNamespace="http://cxf.apache.org/jms_mtom">
     <wsdl:types>
         <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/jms_mtom/types" elementFormDefault="qualified">
             <complexType name="DataHandlerType">
@@ -60,7 +70,10 @@
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="JMSMTOMPortBinding" type="tns:JMSMTOMPortType">
-        <soap:binding style="document" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        
         <wsdl:operation name="testDataHandler">
             <soap:operation soapAction=""/>
             <wsdl:input>
@@ -82,19 +95,12 @@
     </wsdl:binding>
     <wsdl:service name="JMSMTOMService">
         <wsdl:port binding="tns:JMSMTOMPortBinding" name="MTOMPort">
-            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.cxf.jmstransport.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
-            <jms:client messageType="byte"/>
+	        <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue?messageType=byte&amp;receiveTimeout=10000" />
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="JMSOutMTOMService">
         <wsdl:port binding="tns:JMSMTOMPortBinding" name="MTOMPort">
-            <jms:address destinationStyle="queue" jndiConnectionFactoryName="ConnectionFactory" jndiDestinationName="dynamicQueues/test.cxf.jmstransport.queue">
-                <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
-            </jms:address>
+            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue&amp;receiveTimeout=10000" />
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

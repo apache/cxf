@@ -23,20 +23,20 @@ import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.JMSConduit;
+import org.apache.cxf.transport.jms.JMSConfigFactory;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -45,13 +45,18 @@ import org.junit.Test;
  */
 public class URIConfiguredConduitTest {
     private static final String SERVICE_QUEUE = "test";
-    private static final String BROKER_URI = "vm://localhost?broker.persistent=false";
-    private ConnectionFactory connectionFactory;
+    private static final String BROKER_URI = "vm://URIConfiguredConduitTest?broker.persistent=false";
+    private static ConnectionFactory cf;
 
     private enum SyncType {
         sync,
         async
     };
+    
+    @BeforeClass
+    public static void initConnectionFactory() {
+        cf = new ActiveMQConnectionFactory(BROKER_URI);
+    }
 
     @Test
     public void testSendReceive() throws Exception {
@@ -74,24 +79,15 @@ public class URIConfiguredConduitTest {
     }
 
     public void sendAndReceive(SyncType syncType, String address) throws Exception {
-        BusFactory bf = BusFactory.newInstance();
-        Bus bus = bf.createBus();
-        BusFactory.setDefaultBus(bus);
-
         // Register bean locator for cf lookup
-        ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
-        MyBeanLocator registry = new MyBeanLocator(cbl);
-        bus.setExtension(registry, ConfiguredBeanLocator.class);
-        
-        connectionFactory = new ActiveMQConnectionFactory(BROKER_URI);
-        registry.register("ConnectionFactory", connectionFactory);
-        TestReceiver receiver = new TestReceiver(connectionFactory, SERVICE_QUEUE, false);
+        TestReceiver receiver = new TestReceiver(cf, SERVICE_QUEUE, false);
         receiver.runAsync();
 
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(address);
-        JMSOldConfigHolder holder = new JMSOldConfigHolder();
-        JMSConfiguration jmsConfig = holder.createJMSConfigurationFromEndpointInfo(bus, ei, null, true);
+        Bus bus = BusFactory.getDefaultBus();
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
+        jmsConfig.setConnectionFactory(cf);
         JMSConduit conduit = new JMSConduit(new EndpointReferenceType(), jmsConfig, bus);
 
         Exchange exchange = new ExchangeImpl();
@@ -109,7 +105,6 @@ public class URIConfiguredConduitTest {
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         Assert.assertEquals(receiver.getRequestMessageId(), inHeaders.getJMSCorrelationID());
         conduit.close();
-        bus.shutdown(true);
     }
 
     private void waitForAsyncReply(Exchange exchange) throws InterruptedException {

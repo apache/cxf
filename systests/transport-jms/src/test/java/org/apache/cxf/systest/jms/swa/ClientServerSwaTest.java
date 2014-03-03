@@ -26,6 +26,7 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -33,7 +34,6 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,10 +51,10 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         protected void run() {
             try {
                 JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-                factory.setWsdlLocation("classpath:wsdl/swa-mime.wsdl");
-                factory.setTransportId("http://cxf.apache.org/transports/jms");
+                factory.setWsdlLocation("classpath:wsdl/swa-mime-jms.wsdl");
+                factory.setTransportId(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
                 factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
-                factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
+                factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceJMSPort"));
                 factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());
                 factory.setServiceBean(new SwAServiceImpl());
                 factory.create().start();
@@ -80,8 +80,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     @Test
     public void testSwa() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setWsdlLocation("classpath:wsdl/swa-mime.wsdl");
-        factory.setTransportId("http://cxf.apache.org/transports/jms");
+        factory.setWsdlLocation("classpath:wsdl/swa-mime-jms.wsdl");
+        factory.setTransportId(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
         factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
         factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
         factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());

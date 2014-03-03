@@ -62,11 +62,11 @@ import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.transport.jms.JMSConfigFactory;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
@@ -631,9 +631,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         
         EndpointInfo endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(address);
-        JMSOldConfigHolder oldConfig = new JMSOldConfigHolder();
-        JMSConfiguration jmsConfig = oldConfig
-            .createJMSConfigurationFromEndpointInfo(staticBus, endpointInfo , null, true);
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(staticBus, endpointInfo , null);
         
         ResourceCloser closer = new ResourceCloser();
         try {

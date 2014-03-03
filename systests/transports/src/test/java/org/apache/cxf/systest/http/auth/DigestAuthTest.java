@@ -28,11 +28,11 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPException;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         
-        setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
+        TestUtil.setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
         
         Client client = ClientProxy.getClient(mortimer);
         
@@ -94,7 +94,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         
-        setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
+        TestUtil.setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
 
         try {
             String answer = mortimer.sayHi();

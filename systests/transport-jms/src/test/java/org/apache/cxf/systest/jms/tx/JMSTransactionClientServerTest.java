@@ -25,6 +25,9 @@ import javax.jms.ConnectionFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -45,6 +48,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Test transactions based on spring transactions.
  * These will not be supported anymore in cxf >= 3
  */
+@Ignore
 public class JMSTransactionClientServerTest extends AbstractBusClientServerTestBase {
     private static final String BROKER_URI = "vm://JMSTransactionClientServerTest?broker.persistent=false";
     private static EmbeddedJMSBrokerLauncher broker;
@@ -53,25 +57,11 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         ClassPathXmlApplicationContext context;
         EndpointImpl endpoint;
         protected void run()  {
-            // create the application context
-            context = 
-                new ClassPathXmlApplicationContext("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
-            context.start();
-            
-            endpoint = new EndpointImpl(new GreeterImplWithTransaction());
-            endpoint.setAddress("jms://");
-            JMSConfiguration jmsConfig = new JMSConfiguration();
-    
-            ConnectionFactory connectionFactory
-                = context.getBean("jmsConnectionFactory", ConnectionFactory.class);
-            jmsConfig.setConnectionFactory(connectionFactory);
-            jmsConfig.setTargetDestination("greeter.queue.noaop");
-            jmsConfig.setSessionTransacted(true);
-            jmsConfig.setPubSubDomain(false);
-    
-            JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();
-            jmsConfigFeature.setJmsConfig(jmsConfig);
-            endpoint.getFeatures().add(jmsConfigFeature);
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus bus = bf.createBus("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
+            BusFactory.setDefaultBus(bus);
+            endpoint = new EndpointImpl(bus, new GreeterImplWithTransaction());
+            endpoint.setAddress("jms:queue:greeter.queue.noaop?sessionTransacted=true");
             endpoint.publish();
         }
         public void tearDown() {

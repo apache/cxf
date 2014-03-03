@@ -23,76 +23,50 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-
+import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ProviderJMSContinuationTest extends AbstractBusClientServerTestBase {
-    static final String PORT = Server.PORT;
-
-    static EmbeddedJMSBrokerLauncher broker;
+public class ProviderJMSContinuationTest {
     
-    public static class Server extends AbstractBusTestServerBase {
-        public static final String PORT = allocatePort(Server.class);
+    private static Bus bus;
+    private static ConnectionFactoryFeature cff;
 
-        protected void run()  {
-            setBus(BusFactory.getDefaultBus());
-            broker.updateWsdl(getBus(),
-                "/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
-
-            Object implementor = new HWSoapMessageDocProvider();        
-            String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-            Endpoint endpoint = Endpoint.publish(address, implementor);
-            ((EndpointImpl)endpoint).getInInterceptors().add(new IncomingMessageCounterInterceptor());
-        }
-    }
-    
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher();
-        System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
-        launchServer(broker);
-        launchServer(new Server());
-        createStaticBus();
+        bus = BusFactory.getDefaultBus();
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
+        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
+        cff = new ConnectionFactoryFeature(cfp);
+        Object implementor = new HWSoapMessageDocProvider();        
+        String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
+        Endpoint endpoint = Endpoint.publish(address, implementor, cff);
+        ((EndpointImpl)endpoint).getInInterceptors().add(new IncomingMessageCounterInterceptor());
+
     }
     @AfterClass
     public static void clearProperty() {
-        System.clearProperty("EmbeddedBrokerURL");
+        bus.shutdown(false);
     }
 
     public URL getWSDLURL(String s) throws Exception {
         return getClass().getResource(s);
     }
-    public QName getServiceName(QName q) {
-        return q;
-    }
-    public QName getPortName(QName q) {
-        return q;
-    }
-    
         
     @Test
     public void testProviderContinuation() throws Exception {
-        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
-                             "HelloWorldService"));
-        QName portName = getPortName(
-                new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
+        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
-        assertNotNull(wsdl);
-        String wsdlString = wsdl.toString();
-        broker.updateWsdl(getStaticBus(), wsdlString);
-
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
-        assertNotNull(service);
-        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        HelloWorldPortType greeter = service.getPort(HelloWorldPortType.class, cff);
         greeter.greetMe("ffang");
         ((java.io.Closeable)greeter).close();
     }

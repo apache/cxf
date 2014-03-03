@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.util.Properties;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -27,7 +29,6 @@ import javax.jms.Session;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
-import org.apache.cxf.transport.jms.util.JndiHelper;
 
 @NoJSR250Annotations
 public class JMSConfiguration {
@@ -36,10 +37,11 @@ public class JMSConfiguration {
      */
     public static final int DEFAULT_VALUE = -1;
 
-    private boolean usingEndpointInfo = true;
-
-    private JndiHelper jndiTemplate;
     private ConnectionFactory connectionFactory;
+    private Properties jndiEnvironment;
+    private String connectionFactoryName;
+    private String userName;
+    private String password;
     private DestinationResolver destinationResolver = new JMSDestinationResolver();
     private boolean reconnectOnException = true;
     private boolean pubSubNoLocal;
@@ -82,8 +84,6 @@ public class JMSConfiguration {
     private String targetService;
     private String requestURI;
 
-    private JNDIConfiguration jndiConfig;
-
     public void ensureProperlyConfigured() {
         if (connectionFactory == null) {
             connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
@@ -95,13 +95,37 @@ public class JMSConfiguration {
             throw new IllegalArgumentException("targetDestination may not be null");
         }
     }
-
-    public boolean isUsingEndpointInfo() {
-        return this.usingEndpointInfo;
+    
+    public Properties getJndiEnvironment() {
+        return jndiEnvironment;
     }
 
-    public void setUsingEndpointInfo(boolean usingEndpointInfo) {
-        this.usingEndpointInfo = usingEndpointInfo;
+    public void setJndiEnvironment(Properties jndiEnvironment) {
+        this.jndiEnvironment = jndiEnvironment;
+    }
+
+    public String getConnectionFactoryName() {
+        return connectionFactoryName;
+    }
+
+    public void setConnectionFactoryName(String connectionFactoryName) {
+        this.connectionFactoryName = connectionFactoryName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public boolean isPubSubNoLocal() {
@@ -304,22 +328,6 @@ public class JMSConfiguration {
 
     public boolean isSetUseConduitIdSelector() {
         return useConduitIdSelector != null;
-    }
-
-    public void setJndiTemplate(JndiHelper jndiTemplate) {
-        this.jndiTemplate = jndiTemplate;
-    }
-
-    public JndiHelper getJndiTemplate() {
-        return jndiTemplate;
-    }
-
-    public JNDIConfiguration getJndiConfig() {
-        return jndiConfig;
-    }
-
-    public void setJndiConfig(JNDIConfiguration jndiConfig) {
-        this.jndiConfig = jndiConfig;
     }
 
     public boolean isReconnectOnException() {

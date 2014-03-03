@@ -113,16 +113,18 @@ public class JMSEndpointTest extends Assert {
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory"
             + "&jndiURL=tcp://localhost:61616"
-            + "&jndi-com.sun.jndi.someParameter=someValue");
+            + "&jndi-com.sun.jndi.someParameter=someValue"
+            + "&durableSubscriptionName=dur");
         assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
-        assertEquals(endpoint.getJndiInitialContextFactory(),
-                     "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        assertEquals(endpoint.getJndiConnectionFactoryName(), "ConnectionFactory");
-        assertEquals(endpoint.getJndiURL(), "tcp://localhost:61616");
+        assertEquals("org.apache.activemq.jndi.ActiveMQInitialContextFactory", 
+                     endpoint.getJndiInitialContextFactory());
+        assertEquals("ConnectionFactory", endpoint.getJndiConnectionFactoryName());
+        assertEquals("tcp://localhost:61616", endpoint.getJndiURL());
+        assertEquals("dur", endpoint.getDurableSubscriptionName());
         Map<String, String> addParas = endpoint.getJndiParameters();
-        assertEquals(addParas.size(), 1);
-        assertEquals(addParas.get("com.sun.jndi.someParameter"), "someValue");
+        assertEquals(1, addParas.size());
+        assertEquals("someValue", addParas.get("com.sun.jndi.someParameter"));
     }
 
     @Test
@@ -130,18 +132,17 @@ public class JMSEndpointTest extends Assert {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?" + "deliveryMode=NON_PERSISTENT"
             + "&timeToLive=100" + "&priority=5" + "&replyToName=foo.bar2");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
-        assertEquals(endpoint.getParameters().size(), 0);
-        assertEquals(endpoint.getDeliveryMode(),
-                     DeliveryModeType.NON_PERSISTENT);
-        assertEquals(endpoint.getTimeToLive(), 100);
-        assertEquals(endpoint.getPriority(), 5);
-        assertEquals(endpoint.getReplyToName(), "foo.bar2");
+        assertEquals(0, endpoint.getParameters().size());
+        assertEquals(DeliveryModeType.NON_PERSISTENT, endpoint.getDeliveryMode());
+        assertEquals(100, endpoint.getTimeToLive());
+        assertEquals(5, endpoint.getPriority());
+        assertEquals("foo.bar2", endpoint.getReplyToName());
     }
 
     @Test
     public void testRequestUri() throws Exception {
-        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar" 
+            + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&targetService=greetMe"
             + "&replyToName=replyQueue"
             + "&timeToLive=1000"
@@ -149,7 +150,7 @@ public class JMSEndpointTest extends Assert {
             + "&foo=bar"
             + "&foo2=bar2");
         assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
-        assertEquals(endpoint.getParameters().size(), 3);
+        assertEquals(2, endpoint.getParameters().size());
         String requestUri = endpoint.getRequestURI();
         // Checking what's the request uri should have
         assertTrue(requestUri.startsWith("jms:jndi:Foo.Bar?"));

@@ -17,7 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/systest/jaxws" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jms="http://cxf.apache.org/transports/jms" name="HelloContinuationService" targetNamespace="http://cxf.apache.org/systest/jaxws">
+<definitions 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:tns="http://cxf.apache.org/systest/jaxws" 
+	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:jms="http://www.w3.org/2010/soapjms/" 
+	name="HelloContinuationService" 
+	targetNamespace="http://cxf.apache.org/systest/jaxws">
     <message name="isRequestSuspended">
         <part name="arg0" type="xsd:string"/>
     </message>
@@ -50,7 +57,7 @@
         </operation>
     </portType>
     <binding name="HelloContinuationServiceSoapBinding" type="tns:HelloContinuation">
-        <soap:binding style="rpc" transport="http://cxf.apache.org/transports/jms"/>
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <operation name="isRequestSuspended">
             <soap:operation soapAction="" style="rpc"/>
             <input name="isRequestSuspended">
@@ -80,6 +87,8 @@
         </operation>
     </binding>
     <service name="HelloContinuationService">
-        <port binding="tns:HelloContinuationServiceSoapBinding" name="HelloContinuationPort"/>
+        <port binding="tns:HelloContinuationServiceSoapBinding" name="HelloContinuationPort">
+        	<soap:address location="jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply&amp;timeToLive=10000&amp;maxSuspendedContinuations=1"/>
+        </port>
     </service>
 </definitions>

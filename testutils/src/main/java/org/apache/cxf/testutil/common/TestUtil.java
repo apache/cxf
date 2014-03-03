@@ -21,7 +21,10 @@ package org.apache.cxf.testutil.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -30,7 +33,11 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import javax.xml.ws.BindingProvider;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.endpoint.Client;
 
 
 public final class TestUtil {
@@ -166,5 +173,62 @@ public final class TestUtil {
         System.setProperty("testutil.ports." + fullName, p);
         System.setProperty("testutil.ports." + simpleName, p);
         return p;
+    }
+    
+    public static void updateAddressPort(Object o, String port) 
+        throws NumberFormatException, MalformedURLException {
+        updateAddressPort(o, Integer.parseInt(port));
+    }
+
+    public static void updateAddressPort(Object o, int port) throws MalformedURLException {
+        String address = null;
+        if (o instanceof BindingProvider) {
+            address = ((BindingProvider)o).getRequestContext()
+                .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY).toString();
+        } else if (o instanceof Client) {
+            Client c = (Client)o;
+            address = c.getEndpoint().getEndpointInfo().getAddress();
+        }
+        if (address != null && address.startsWith("http:")) {
+            URL url = new URL(address);
+            url = new URL(url.getProtocol(), url.getHost(),
+                          port, url.getFile());
+            setAddress(o, url.toString());
+        }
+        //maybe simple frontend proxy?
+    }
+    
+    // extra methods to help support the dynamic port allocations
+    public static void setAddress(Object o, String address) {
+        if (o instanceof BindingProvider) {
+            ((BindingProvider)o).getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                     address);
+        }
+        Client c = null;
+        if (o instanceof Client) {
+            c = (Client)o;
+        }
+        if (c == null) {
+            try {
+                InvocationHandler i = Proxy.getInvocationHandler(o);
+                c = (Client)i.getClass().getMethod("getClient").invoke(i);
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+        if (c == null) {
+            try {
+                final Method m = o.getClass().getDeclaredMethod("getClient");
+                ReflectionUtil.setAccessible(m);
+
+                c = (Client)m.invoke(o);
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+        if (c != null) {
+            c.getEndpoint().getEndpointInfo().setAddress(address);
+        }
     }
 }

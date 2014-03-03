@@ -33,7 +33,6 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.WSDLToService;
-import org.apache.cxf.transport.jms.AddressType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -181,125 +180,6 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
             fail("Exception Encountered when parsing wsdl, error: " + e.getMessage());
         }
     }
-
-    @Test
-    public void testJMSNewService() throws Exception {
-        String[] args = new String[] {"-transport", "jms", "-e", "serviceins", "-p", "portins", "-n",
-                                      "HelloWorldPortBinding", "-jpu", "tcp://localhost:91919", "-jcf",
-                                      "org.activemq.jndi.ActiveMQInitialContextFactory", "-jfn",
-                                      "ConnectionFactory", "-jdn",
-                                      "dynamicQueues/test.cxf.jmstransport.queue", "-jmt", "text", "-jmc",
-                                      "false", "-jsn", "cxf_Queue_subscriber", "-d",
-                                      output.getCanonicalPath(),
-                                      getLocation("/misctools_wsdl/jms_test.wsdl")};
-        WSDLToService.main(args);
-        File outputFile = new File(output, "jms_test-service.wsdl");
-        assertTrue("New wsdl file is not generated", outputFile.exists());
-        WSDLToServiceProcessor processor = new WSDLToServiceProcessor();
-        processor.setEnvironment(env);
-        try {
-            processor.parseWSDL(outputFile.getAbsolutePath());
-            Service service = processor.getWSDLDefinition().getService(
-                                                                       new QName(processor
-                                                                           .getWSDLDefinition()
-                                                                           .getTargetNamespace(),
-                                                                                 "serviceins"));
-            if (service == null) {
-                fail("Element wsdl:service serviceins Missed!");
-            }
-            Iterator<?> it = service.getPort("portins").getExtensibilityElements().iterator();
-            if (it == null || !it.hasNext()) {
-                fail("Element wsdl:port portins Missed!");
-            }
-            boolean found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
-                if (obj instanceof AddressType) {
-                    AddressType jmsAddress = (AddressType)obj;
-                    if (!(jmsAddress.getDestinationStyle() != null
-                          && "queue".equalsIgnoreCase(jmsAddress.getDestinationStyle().toString()))) {
-                        break;
-                    }
-                    if (!(jmsAddress.getJndiDestinationName() != null && jmsAddress.getJndiDestinationName()
-                        .equals("dynamicQueues/test.cxf.jmstransport.queue"))) {
-                        break;
-                    }
-
-                    assertEquals(2, jmsAddress.getJMSNamingProperty().size());
-                    assertEquals("java.naming.factory.initial",
-                                 jmsAddress.getJMSNamingProperty().get(0).getName());
-                    assertEquals("tcp://localhost:91919",
-                                 jmsAddress.getJMSNamingProperty().get(1).getValue());
-
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                fail("Element jms:address of service port Missed!");
-            }
-        } catch (ToolException e) {
-            fail("Exception Encountered when parsing wsdl, error: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testJMSDefaultValue() throws Exception {
-        String[] args = new String[] {"-transport", "jms", "-e", "serviceins", "-p", "portins", "-n",
-                                      "HelloWorldPortBinding",
-                                      "-d", output.getCanonicalPath(),
-                                      getLocation("/misctools_wsdl/jms_test.wsdl")};
-        WSDLToService.main(args);
-        File outputFile = new File(output, "jms_test-service.wsdl");
-        assertTrue("New wsdl file is not generated", outputFile.exists());
-        WSDLToServiceProcessor processor = new WSDLToServiceProcessor();
-        processor.setEnvironment(env);
-        try {
-            processor.parseWSDL(outputFile.getAbsolutePath());
-            Service service = processor.getWSDLDefinition().getService(
-                                                                       new QName(processor
-                                                                           .getWSDLDefinition()
-                                                                           .getTargetNamespace(),
-                                                                                 "serviceins"));
-            if (service == null) {
-                fail("Element wsdl:service serviceins Missed!");
-            }
-            Iterator<?> it = service.getPort("portins").getExtensibilityElements().iterator();
-            if (it == null || !it.hasNext()) {
-                fail("Element wsdl:port portins Missed!");
-            }
-            boolean found = false;
-            while (it.hasNext()) {
-                Object obj = it.next();
-                if (obj instanceof AddressType) {
-                    AddressType jmsAddress = (AddressType)obj;
-                    if (!(jmsAddress.getDestinationStyle() != null
-                          && "queue".equalsIgnoreCase(jmsAddress.getDestinationStyle().toString()))) {
-                        break;
-                    }
-                    if (!(jmsAddress.getJndiDestinationName() != null && jmsAddress.getJndiDestinationName()
-                        .equals("dynamicQueues/test.cxf.jmstransport.queue"))) {
-                        break;
-                    }
-
-                    assertEquals(2, jmsAddress.getJMSNamingProperty().size());
-                    assertEquals("java.naming.factory.initial",
-                                 jmsAddress.getJMSNamingProperty().get(0).getName());
-                    assertEquals("tcp://localhost:61616",
-                                 jmsAddress.getJMSNamingProperty().get(1).getValue());
-
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                fail("Element jms:address of service port Missed!");
-            }
-        } catch (ToolException e) {
-            fail("Exception Encountered when parsing wsdl, error: " + e.getMessage());
-        }
-    }
-
 
     @Test
     public void testServiceExist() throws Exception {
