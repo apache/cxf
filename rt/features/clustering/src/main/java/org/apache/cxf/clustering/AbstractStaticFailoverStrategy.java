@@ -144,10 +144,12 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
                              endpoint.getEndpointInfo().getAddress())) {
                         Endpoint alternate =
                             endpoint.getService().getEndpoints().get(candidate.getName());
-                        if (alternate != null && LOG.isLoggable(Level.FINE)) {
-                            LOG.log(Level.FINE,
-                                    "FAILOVER_CANDIDATE_ACCEPTED",
-                                    candidate.getName());
+                        if (alternate != null) {
+                            if (LOG.isLoggable(Level.FINE)) {
+                                LOG.log(Level.FINE,
+                                        "FAILOVER_CANDIDATE_ACCEPTED",
+                                        candidate.getName());
+                            }
                             alternates.add(alternate);
                         }
                     }
