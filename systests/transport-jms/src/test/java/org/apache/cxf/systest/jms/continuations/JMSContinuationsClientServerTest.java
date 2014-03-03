@@ -71,7 +71,8 @@ public class JMSContinuationsClientServerTest {
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
 
-        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class, cff);
+        // FIXME add cff feature
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
         Assert.assertEquals("Hi Fred Ruby", greeter.greetMe("Fred"));
     }
         

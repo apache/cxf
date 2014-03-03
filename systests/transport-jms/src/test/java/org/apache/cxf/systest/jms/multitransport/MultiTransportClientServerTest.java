@@ -102,9 +102,8 @@ public class MultiTransportClientServerTest {
 
         }
 
-        greeter = null;
-
-        greeter = service.getPort(portName2, Greeter.class, cff);
+        // FIXME add cff feature
+        greeter = service.getPort(portName2, Greeter.class);
         for (int idx = 0; idx < 5; idx++) {
             String greeting = greeter.greetMe("Milestone-" + idx);
             Assert.assertNotNull("no response received from service", greeting);

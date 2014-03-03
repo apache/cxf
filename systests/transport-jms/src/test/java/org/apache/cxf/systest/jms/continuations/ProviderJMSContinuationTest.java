@@ -67,7 +67,9 @@ public class ProviderJMSContinuationTest {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
-        HelloWorldPortType greeter = service.getPort(HelloWorldPortType.class, cff);
+        
+        // FIXME add cff feature
+        HelloWorldPortType greeter = service.getPort(HelloWorldPortType.class);
         greeter.greetMe("ffang");
         ((java.io.Closeable)greeter).close();
     }
