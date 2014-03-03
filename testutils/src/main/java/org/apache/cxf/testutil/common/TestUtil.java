@@ -189,7 +189,8 @@ public final class TestUtil {
             Client c = (Client)o;
             address = c.getEndpoint().getEndpointInfo().getAddress();
         }
-        if (address != null && address.startsWith("http:")) {
+        if (address != null && address.startsWith("http")) {
+            // http and https are ok
             URL url = new URL(address);
             url = new URL(url.getProtocol(), url.getHost(),
                           port, url.getFile());
