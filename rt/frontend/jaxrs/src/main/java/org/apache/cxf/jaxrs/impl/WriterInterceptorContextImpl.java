@@ -108,6 +108,7 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
         if (!getMediaType().isCompatible(mt)) {
             providerSelectionPropertyChanged();
         }
+        m.put(Message.CONTENT_TYPE, JAXRSUtils.mediaTypeToString(mt));
         getHeaders().putSingle(HttpHeaders.CONTENT_TYPE, mt);
     }
 

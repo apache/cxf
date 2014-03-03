@@ -166,6 +166,25 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:outInterceptors> 
   </jaxrs:server> 
   
+  <jaxrs:server id="bookJsonp2" address="/jsonp2">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+            <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
+        </jaxrs:providers>
+        <jaxrs:inInterceptors>
+            <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpInInterceptor">
+                <property name="acceptType" value="application/json"/>
+            </bean>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPostStreamInterceptor"/>
+        </jaxrs:outInterceptors>
+  </jaxrs:server>
+
+
   <util:map id="outTemplates">
       <entry key="application/xhtml+xml" value="classpath:/WEB-INF/templates/template.xsl"/>
       <entry key="application/xml" value="classpath:/org/apache/cxf/systest/jaxrs/resources/template2.xsl"/>
@@ -311,5 +330,6 @@ http://cxf.apache.org/schemas/core.xsd">
       <property name="produceMediaTypes" ref="jsonTypes"/>
       <property name="consumeMediaTypes" ref="jsonTypes"/>
   </bean>
+  
 </beans>
 <!-- END SNIPPET: beans -->

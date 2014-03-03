@@ -382,6 +382,22 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testGetBookJsonpJackson() throws Exception {
+        String url = "http://localhost:" + PORT + "/the/jsonp2/books/123";
+        WebClient client = WebClient.create(url);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        client.accept("application/json, application/x-javascript");
+        client.query("_jsonp", "callback");
+        Response r = client.get();
+        assertEquals("application/x-javascript", r.getMetadata().getFirst("Content-Type"));
+        String response = IOUtils.readStringFromStream((InputStream)r.getEntity());
+        assertTrue(response.startsWith("callback({\"class\":\"org.apache.cxf.systest.jaxrs.Book\","));
+        assertTrue(response.endsWith("});"));
+        assertTrue(response.contains("\"id\":123"));
+        assertTrue(response.contains("\"name\":\"CXF in Action\""));
+    }
+    
+    @Test
     public void testGetBookWithoutJsonpCallback() throws Exception {
         String url = "http://localhost:" + PORT + "/the/jsonp/books/123";
         WebClient client = WebClient.create(url);
