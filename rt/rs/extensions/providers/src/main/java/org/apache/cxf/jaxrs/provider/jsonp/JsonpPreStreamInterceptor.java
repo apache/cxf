@@ -19,20 +19,28 @@
 
 package org.apache.cxf.jaxrs.provider.jsonp;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 /**
  * Appends the jsonp callback to json responses when the '_jsonp' parameter has been set in the querystring.
  */
-public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor {
+public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor implements WriterInterceptor {
 
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
     private String paddingEnd = "(";
@@ -73,5 +81,13 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor {
 
     public String getPaddingEnd() {
         return paddingEnd;
+    }
+
+    @Override
+    public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
+        handleMessage(PhaseInterceptorChain.getCurrentMessage());
+        context.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+        context.proceed();
+        context.setMediaType(JAXRSUtils.toMediaType(getMediaType()));
     }
 }
