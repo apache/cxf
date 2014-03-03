@@ -69,9 +69,7 @@ public class HelloWorldContinuationsClientServerTest {
         URL wsdlURL = getClass().getClassLoader().getResource(WSDL_PATH);
         
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
-        
-        // FIXME add cff feature
-        final HelloContinuation helloPort = service.getPort(HelloContinuation.class);
+        final HelloContinuation helloPort = service.getPort(HelloContinuation.class, cff);
         ExecutorService executor = Executors.newCachedThreadPool();
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch helloDoneSignal = new CountDownLatch(5);
