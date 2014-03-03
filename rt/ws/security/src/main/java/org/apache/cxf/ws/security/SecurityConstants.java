@@ -292,6 +292,18 @@ public final class SecurityConstants {
      */
     public static final String TOKEN_STORE_CACHE_INSTANCE = 
         "org.apache.cxf.ws.security.tokenstore.TokenStore";
+    
+    /**
+     * The Cache Identifier to use with the TokenStore. CXF uses the following key to retrieve a
+     * token store: "org.apache.cxf.ws.security.tokenstore.TokenStore-<identifier>". This key can be 
+     * used to configure service-specific cache configuration. If the identifier does not match, then it 
+     * falls back to a cache configuration with key "org.apache.cxf.ws.security.tokenstore.TokenStore".
+     * 
+     * The default "<identifier>" is the QName of the service in question. However to pick up a 
+     * custom cache configuration (for example, if you want to specify a TokenStore per-client proxy),
+     * it can be configured with this identifier instead.
+     */
+    public static final String CACHE_IDENTIFIER = "ws-security.cache.identifier";
 
     /**
      * A comma separated String of regular expressions which will be applied to the subject DN of 
@@ -527,7 +539,8 @@ public final class SecurityConstants {
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE, MUST_UNDERSTAND,
-            ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE
+            ASYMMETRIC_SIGNATURE_ALGORITHM, ENABLE_SAML_ONE_TIME_USE_CACHE, SAML_ONE_TIME_USE_CACHE_INSTANCE,
+            CACHE_IDENTIFIER
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
