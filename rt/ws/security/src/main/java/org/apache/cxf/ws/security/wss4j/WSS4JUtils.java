@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.math.BigInteger;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -29,7 +28,6 @@ import org.apache.cxf.ws.security.cache.ReplayCacheFactory;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.cache.ReplayCache;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Some common functionality that can be shared between the WSS4JInInterceptor and the
@@ -96,9 +94,7 @@ public final class WSS4JUtils {
                     ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
                     String cacheKey = instanceKey;
                     if (info.getName() != null) {
-                        int hashCode = info.getName().toString().hashCode();
-                        cacheKey +=
-                            "-" + Base64.encode(BigInteger.valueOf((long)hashCode));
+                        cacheKey += "-" + info.getName().toString();
                     }
                     replayCache = replayCacheFactory.newReplayCache(cacheKey, message);
                     info.setProperty(instanceKey, replayCache);
