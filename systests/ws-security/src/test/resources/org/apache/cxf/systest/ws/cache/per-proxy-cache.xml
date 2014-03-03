@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true" name="perProxyCache">
+    <diskStore path="java.io.tmpdir"/>
+    <defaultCache maxEntriesLocalHeap="5000" eternal="false" timeToIdleSeconds="3600" timeToLiveSeconds="3600" overflowToDisk="true" maxElementsOnDisk="10000000" diskPersistent="false" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU"/>
+    
+    <cache name="org.apache.cxf.ws.security.tokenstore.TokenStore-proxy1" overflowToDisk="false" maxEntriesLocalHeap="1000" timeToIdleSeconds="3600" timeToLiveSeconds="3600"/>
+    
+    <cache name="org.apache.cxf.ws.security.tokenstore.TokenStore-proxy2" overflowToDisk="false" maxEntriesLocalHeap="500" timeToIdleSeconds="3600" timeToLiveSeconds="3600"/>
+    
+</ehcache>

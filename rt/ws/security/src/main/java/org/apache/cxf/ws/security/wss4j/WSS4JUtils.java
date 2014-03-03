@@ -154,7 +154,11 @@ public final class WSS4JUtils {
             if (create && tokenStore == null) {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-                if (info.getName() != null) {
+                String cacheIdentifier = 
+                    (String)message.getContextualProperty(SecurityConstants.CACHE_IDENTIFIER);
+                if (cacheIdentifier != null) {
+                    cacheKey += "-" + cacheIdentifier;
+                } else if (info.getName() != null) {
                     cacheKey += "-" + info.getName().toString();
                 }
                 tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
