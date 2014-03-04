@@ -1298,7 +1298,8 @@ public abstract class HTTPConduit
                     buffer = null;
                     super.write(tmp.getRawBytes(), 0, tmp.size());
                 }
-                if (!written) {
+                boolean exceptionSet = outMessage.getContent(Exception.class) != null;
+                if (!written && !exceptionSet) {
                     handleHeadersTrustCaching();
                 }
                 if (!cachingForRetransmission) {
