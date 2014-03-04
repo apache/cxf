@@ -273,10 +273,8 @@
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="SOAPService8">
-	    <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <wsdl:port name="SoapPort8" binding="tns:Greeter_SOAPBinding_soap12">
-        	<soap:address location="jms:jndi:dynamicQueues/routertest.SOAPService2Q.text" />
+        	<soap:address location="jms:queue:routertest.SOAPService2Q.text" />
         </wsdl:port>
     </wsdl:service>
     <!-- XML Binding based Services-->

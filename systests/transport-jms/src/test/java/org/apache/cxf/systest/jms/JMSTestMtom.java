@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
+import java.io.Closeable;
 import java.net.URL;
 
 import javax.activation.DataHandler;
@@ -86,6 +87,7 @@ public class JMSTestMtom {
         
         byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
         Assert.assertEquals("The response file is not same with the sent file.", size, bytes.length);
+        ((Closeable)mtom).close();
     }
     
     
@@ -105,6 +107,7 @@ public class JMSTestMtom {
         
         byte bytes[] = IOUtils.readBytesFromStream(ret.getInputStream());
         Assert.assertEquals("The response file is not same with the original file.", size, bytes.length);
+        ((Closeable)mtom).close();
     }
     
     public static URL getWSDLURL(String s) throws Exception {

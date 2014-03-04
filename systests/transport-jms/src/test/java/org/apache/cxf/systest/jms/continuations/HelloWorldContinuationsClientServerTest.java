@@ -53,6 +53,7 @@ public class HelloWorldContinuationsClientServerTest {
         cff = new ConnectionFactoryFeature(cfp);
         Object implementor = new HelloWorldWithContinuationsJMS();        
         EndpointImpl ep = (EndpointImpl)Endpoint.create(null, implementor);
+        ep.setBus(bus);
         ep.getFeatures().add(cff);
         ep.publish();
     }

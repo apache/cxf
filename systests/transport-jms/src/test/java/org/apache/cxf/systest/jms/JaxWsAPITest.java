@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
+import java.io.Closeable;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -50,13 +51,13 @@ public class JaxWsAPITest {
     @BeforeClass
     public static void startServer() {
         bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://JaxWsAPITest?broker.persistent=false");
         PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
         cff = new ConnectionFactoryFeature(cfp);
 
-        Object impleDoc = new GreeterImplDoc();
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(impleDoc);
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(new GreeterImplDoc());
         ep.getFeatures().add(cff);
+        ep.setBus(bus);
         ep.publish();
     }
     
@@ -79,6 +80,7 @@ public class JaxWsAPITest {
 
         String greeting = greeter.greetMe("Chris");
         Assert.assertEquals("Hello Chris", greeting);
+        ((Closeable)greeter).close();
     }
 
     public URL getWSDLURL(String s) throws Exception {

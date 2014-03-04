@@ -37,7 +37,7 @@ import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.jms.testsuite.services.Server;
+import org.apache.cxf.jms.testsuite.services.TestSuiteServer;
 import org.apache.cxf.jms.testsuite.util.JMSTestUtil;
 import org.apache.cxf.jms_simple.JMSSimplePortType;
 import org.apache.cxf.jms_simple.JMSSimpleService0001;
@@ -88,7 +88,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         broker = new EmbeddedJMSBrokerLauncher();
         launchServer(broker);
         JMSTestUtil.setJndiUrl(broker.getEncodedBrokerURL());
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(TestSuiteServer.class, true));
         createStaticBus();
     }
     @After

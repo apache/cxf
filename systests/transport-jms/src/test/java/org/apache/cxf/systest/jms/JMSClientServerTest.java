@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
+import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.Map;
@@ -31,6 +32,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.soap.AddressingFeature;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.interceptor.TibcoSoapActionInterceptor;
@@ -53,22 +55,26 @@ import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.JMSPropertyType;
+import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
+import org.apache.hello_world_doc_lit.SOAPService7;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(JMSClientServerTest.class);
  
     private static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher();
+        broker = new EmbeddedJMSBrokerLauncher("tcp://localhost:" + PORT);
         launchServer(broker);
         launchServer(new Server(broker));
         createStaticBus();
@@ -93,40 +99,34 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
-        try {
-            Greeter greeter = service.getPort(portName, Greeter.class);
-            
-            Client client = ClientProxy.getClient(greeter);
-            client.getEndpoint().getOutInterceptors().add(new TibcoSoapActionInterceptor());
-            client.getOutInterceptors().add(new LoggingOutInterceptor());
-            client.getInInterceptors().add(new LoggingInInterceptor());
-            for (int idx = 0; idx < 5; idx++) {
+        Greeter greeter = service.getPort(portName, Greeter.class);
 
-                greeter.greetMeOneWay("test String");
-                
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
-                assertEquals(exResponse, greeting);
+        Client client = ClientProxy.getClient(greeter);
+        client.getEndpoint().getOutInterceptors().add(new TibcoSoapActionInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        for (int idx = 0; idx < 5; idx++) {
 
+            greeter.greetMeOneWay("test String");
 
-                
-                String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
-                
-                try {
-                    greeter.pingMe();
-                    fail("Should have thrown FaultException");
-                } catch (PingMeFault ex) {
-                    assertNotNull(ex.getFaultInfo());
-                }
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            assertNotNull("no response received from service", greeting);
+            String exResponse = response1 + idx;
+            assertEquals(exResponse, greeting);
+
+            String reply = greeter.sayHi();
+            assertNotNull("no response received from service", reply);
+            assertEquals(response2, reply);
+
+            try {
+                greeter.pingMe();
+                fail("Should have thrown FaultException");
+            } catch (PingMeFault ex) {
+                assertNotNull(ex.getFaultInfo());
             }
-            
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
         }
+
+        ((java.io.Closeable)greeter).close();
     }
 
     @Test
@@ -136,39 +136,26 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
 
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        assertNotNull(service);
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        for (int idx = 0; idx < 5; idx++) {
 
-        String response1 = new String("Hello Milestone-");
-        String response2 = new String("Bonjour");
-        try {
-            Greeter greeter = service.getPort(portName, Greeter.class);
-            for (int idx = 0; idx < 5; idx++) {
+            greeter.greetMeOneWay("test String");
 
-                greeter.greetMeOneWay("test String");
-                
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
-                assertEquals(exResponse, greeting);
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            assertEquals("Hello Milestone-" + idx, greeting);
 
+            String reply = greeter.sayHi();
+            assertEquals("Bonjour", reply);
 
-                
-                String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
-                
-                try {
-                    greeter.pingMe();
-                    fail("Should have thrown FaultException");
-                } catch (PingMeFault ex) {
-                    assertNotNull(ex.getFaultInfo());
-                }                
-              
+            try {
+                greeter.pingMe();
+                fail("Should have thrown FaultException");
+            } catch (PingMeFault ex) {
+                assertNotNull(ex.getFaultInfo());
             }
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+
         }
+        ((java.io.Closeable)greeter).close();
     }
 
     @Ignore
@@ -243,6 +230,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         System.gc();
     }
     
+    @Ignore
     @Test
     public void testBasicConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -252,38 +240,34 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
-        try {
-            HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
-            for (int idx = 0; idx < 5; idx++) {
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
-                assertEquals(exResponse, greeting);
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        for (int idx = 0; idx < 5; idx++) {
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            assertNotNull("no response received from service", greeting);
+            String exResponse = response1 + idx;
+            assertEquals(exResponse, greeting);
 
-                String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
-                
-                try {
-                    greeter.testRpcLitFault("BadRecordLitFault");
-                    fail("Should have thrown BadRecoedLitFault");
-                } catch (BadRecordLitFault ex) {
-                    assertNotNull(ex.getFaultInfo());
-                }
-                
-                try {
-                    greeter.testRpcLitFault("NoSuchCodeLitFault");
-                    fail("Should have thrown NoSuchCodeLitFault exception");
-                } catch (NoSuchCodeLitFault nslf) {
-                    assertNotNull(nslf.getFaultInfo());
-                    assertNotNull(nslf.getFaultInfo().getCode());
-                } 
-                
+            String reply = greeter.sayHi();
+            assertNotNull("no response received from service", reply);
+            assertEquals(response2, reply);
+
+            try {
+                greeter.testRpcLitFault("BadRecordLitFault");
+                fail("Should have thrown BadRecoedLitFault");
+            } catch (BadRecordLitFault ex) {
+                assertNotNull(ex.getFaultInfo());
             }
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+
+            try {
+                greeter.testRpcLitFault("NoSuchCodeLitFault");
+                fail("Should have thrown NoSuchCodeLitFault exception");
+            } catch (NoSuchCodeLitFault nslf) {
+                assertNotNull(nslf.getFaultInfo());
+                assertNotNull(nslf.getFaultInfo().getCode());
+            }
+
         }
+        ((java.io.Closeable)greeter).close();
     }
     
     @Test
@@ -294,22 +278,18 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
-        try {
-            HelloWorldPortType greeter = service.getHWSByteMsgPort();
-            for (int idx = 0; idx < 2; idx++) {
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
-                assertEquals(exResponse, greeting);
+        HelloWorldPortType greeter = service.getHWSByteMsgPort();
+        for (int idx = 0; idx < 2; idx++) {
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            assertNotNull("no response received from service", greeting);
+            String exResponse = response1 + idx;
+            assertEquals(exResponse, greeting);
 
-                String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
-            }
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+            String reply = greeter.sayHi();
+            assertNotNull("no response received from service", reply);
+            assertEquals(response2, reply);
         }
+        ((java.io.Closeable)greeter).close();
     }
 
     @Test
@@ -319,17 +299,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         HelloWorldPubSubService service = new HelloWorldPubSubService(wsdl, serviceName);
 
-        try {
-            HelloWorldPubSubPort greeter = service.getPort(portName, HelloWorldPubSubPort.class);
-            for (int idx = 0; idx < 5; idx++) {
-                greeter.greetMeOneWay("JMS:PubSub:Milestone-" + idx);
-            }
-            //Give some time to complete one-way calls.
-            Thread.sleep(50L);
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+        HelloWorldPubSubPort greeter = service.getPort(portName, HelloWorldPubSubPort.class);
+        for (int idx = 0; idx < 5; idx++) {
+            greeter.greetMeOneWay("JMS:PubSub:Milestone-" + idx);
         }
+        // Give some time to complete one-way calls.
+        Thread.sleep(50L);
+        ((java.io.Closeable)greeter).close();
     }
     
     @Test
@@ -339,17 +315,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         HelloWorldPubSubService service = new HelloWorldPubSubService(wsdl, serviceName);
 
-        try {
-            HelloWorldPubSubPort greeter = service.getPort(portName, HelloWorldPubSubPort.class);
-            for (int idx = 0; idx < 5; idx++) {
-                greeter.greetMeOneWay("JMS:PubSub:Milestone-" + idx);
-            }
-            //Give some time to complete one-way calls.
-            Thread.sleep(50L);
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+        HelloWorldPubSubPort greeter = service.getPort(portName, HelloWorldPubSubPort.class);
+        for (int idx = 0; idx < 5; idx++) {
+            greeter.greetMeOneWay("JMS:PubSub:Milestone-" + idx);
         }
+        // Give some time to complete one-way calls.
+        Thread.sleep(50L);
+        ((java.io.Closeable)greeter).close();
     }
     
     @Test 
@@ -363,21 +335,17 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String wsdlString2 = "classpath:wsdl/jms_test.wsdl";
         broker.updateWsdl((Bus)ctx.getBean("cxf"), wsdlString2);
         HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
-        assertNotNull(greeter);
         
-        String response1 = new String("Hello Milestone-");
-        String response2 = new String("Bonjour");
         try {
             
             for (int idx = 0; idx < 5; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
+                String exResponse = "Hello Milestone-" + idx;
                 assertEquals(exResponse, greeting);
 
                 String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
+                assertEquals("Bonjour", reply);
                 
                 try {
                     greeter.testRpcLitFault("BadRecordLitFault");
@@ -418,18 +386,14 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         HelloWorldOneWayQueueService service = new HelloWorldOneWayQueueService(wsdl, serviceName);
 
-        try {
-            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class,
-                                                           new AddressingFeature(true, true));
-            for (int idx = 0; idx < 5; idx++) {
-                greeter.greetMeOneWay("JMS:Queue:Milestone-" + idx);
-            }
-            //Give some time to complete one-way calls.
-            Thread.sleep(100L);
-            ((java.io.Closeable)greeter).close();
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+        HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class,
+                                                       new AddressingFeature(true, true));
+        for (int idx = 0; idx < 5; idx++) {
+            greeter.greetMeOneWay("JMS:Queue:Milestone-" + idx);
         }
+        // Give some time to complete one-way calls.
+        Thread.sleep(100L);
+        ((java.io.Closeable)greeter).close();
     }
 
     @Test
@@ -443,11 +407,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         HelloWorldQueueDecoupledOneWaysService service = 
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
-        assertNotNull(service);
         Endpoint requestEndpoint = null;
         Endpoint replyEndpoint = null;
+        HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
         try {
-            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays();
             requestEndpoint = Endpoint.publish("", requestServant);
             GreeterImplQueueDecoupledOneWaysDeferredReply replyServant = 
@@ -488,7 +451,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 }
             }
             assertEquals(expectedReply, reply);
-            ((java.io.Closeable)greeter).close();
         } catch (Exception ex) {
             throw ex;
         } finally {
@@ -498,6 +460,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             if (replyEndpoint != null) {
                 replyEndpoint.stop();
             }
+            ((java.io.Closeable)greeter).close();
         }
     }
     
@@ -516,8 +479,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
         assertNotNull(service);
         Endpoint requestEndpoint = null;
+        HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
         try {
-            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays(true);
             requestEndpoint = Endpoint.publish(null, requestServant);
             
@@ -546,15 +509,14 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     fail("The decoupled one-way reply was sent");
                 }
             }
-            ((java.io.Closeable)greeter).close();
         } catch (Exception ex) {
             throw ex;
         } finally {
             if (requestEndpoint != null) {
                 requestEndpoint.stop();
             }
+            ((java.io.Closeable)greeter).close();
         }
-
     }
 
     @Test
@@ -565,53 +527,65 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort");
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
 
-        try {
-            HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
-            Map<String, Object> requestContext = ((BindingProvider)greeter).getRequestContext();
-            JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
-            requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
-            requestHeader.setJMSExpiration(3600000L);
-            JMSPropertyType propType = new JMSPropertyType();
-            propType.setName(testReturnPropertyName);
-            propType.setValue("mustReturn");
-            requestHeader.getProperty().add(propType);
-            propType = new JMSPropertyType();
-            propType.setName(testIgnoredPropertyName);
-            propType.setValue("mustNotReturn");
-            requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
- 
-            String greeting = greeter.greetMe("Milestone-");
-            assertNotNull("no response received from service", greeting);
+        Map<String, Object> requestContext = ((BindingProvider)greeter).getRequestContext();
+        JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+        requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
+        requestHeader.setJMSExpiration(3600000L);
+        JMSPropertyType propType = new JMSPropertyType();
+        propType.setName(testReturnPropertyName);
+        propType.setValue("mustReturn");
+        requestHeader.getProperty().add(propType);
+        propType = new JMSPropertyType();
+        propType.setName(testIgnoredPropertyName);
+        propType.setValue("mustNotReturn");
+        requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
 
-            assertEquals("Hello Milestone-", greeting);
+        String greeting = greeter.greetMe("Milestone-");
+        assertNotNull("no response received from service", greeting);
 
-            Map<String, Object> responseContext = ((BindingProvider)greeter).getResponseContext();
-            JMSMessageHeadersType responseHdr = 
-                 (JMSMessageHeadersType)responseContext.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-            if (responseHdr == null) {
-                fail("response Header should not be null");
-            }
-            
-            assertTrue("CORRELATION ID should match :", 
-                       "JMS_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID()));
-            assertTrue("response Headers must conain the app property set in request context.", 
-                       responseHdr.getProperty() != null);
-            
-            boolean found = false;
-            for (JMSPropertyType p : responseHdr.getProperty()) {
-                if (testReturnPropertyName.equals(p.getName())) {
-                    found = true;
-                }
-            }
-            assertTrue("response Headers must match the app property set in request context.",
-                         found);
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+        assertEquals("Hello Milestone-", greeting);
+
+        Map<String, Object> responseContext = ((BindingProvider)greeter).getResponseContext();
+        JMSMessageHeadersType responseHdr = (JMSMessageHeadersType)responseContext
+            .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+        if (responseHdr == null) {
+            fail("response Header should not be null");
         }
-    }
-    
 
-    
+        assertTrue("CORRELATION ID should match :",
+                   "JMS_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID()));
+        assertTrue("response Headers must conain the app property set in request context.",
+                   responseHdr.getProperty() != null);
+
+        boolean found = false;
+        for (JMSPropertyType p : responseHdr.getProperty()) {
+            if (testReturnPropertyName.equals(p.getName())) {
+                found = true;
+            }
+        }
+        assertTrue("response Headers must match the app property set in request context.", found);
+        ((Closeable)greeter).close();
+    }
+
+    @Test
+    public void testReplyToConfig() throws Exception {
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory(broker.getBrokerURL());
+        TestReceiver receiver = new TestReceiver(cf, "SoapService7.replyto.queue", false);
+        receiver.setStaticReplyQueue("SoapService7.reply.queue");
+        receiver.runAsync();
+
+        QName serviceName = new QName("http://apache.org/hello_world_doc_lit", "SOAPService7");
+        QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort7");
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        SOAPService7 service = new SOAPService7(wsdl, serviceName);
+        Greeter greeter = service.getPort(portName, Greeter.class);
+
+        String name = "FooBar";
+        String reply = greeter.greetMe(name);
+        Assert.assertEquals("Hello " + name, reply);
+        ((Closeable)greeter).close();
+    }
 
 }

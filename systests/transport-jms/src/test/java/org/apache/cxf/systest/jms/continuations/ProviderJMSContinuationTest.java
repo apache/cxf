@@ -50,6 +50,7 @@ public class ProviderJMSContinuationTest {
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
         EndpointImpl ep = (EndpointImpl)Endpoint.create(address, implementor);
         ep.getInInterceptors().add(new IncomingMessageCounterInterceptor());
+        ep.setBus(bus);
         ep.getFeatures().add(cff);
         ep.publish();
     }

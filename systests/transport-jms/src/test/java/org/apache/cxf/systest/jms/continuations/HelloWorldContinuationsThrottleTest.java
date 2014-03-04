@@ -53,6 +53,7 @@ public class HelloWorldContinuationsThrottleTest {
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
         EndpointImpl ep = (EndpointImpl)Endpoint.create(address, implementor);
         ep.getFeatures().add(cff);
+        ep.setBus(bus);
         ep.publish();
     }
 
@@ -83,10 +84,11 @@ public class HelloWorldContinuationsThrottleTest {
         executor.execute(new HelloWorker(helloPort, "Harry", "", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Rob", "Davidson", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "James", "ServiceMix", startSignal, helloDoneSignal));
-        
                 
         helloDoneSignal.await(60, TimeUnit.SECONDS);
+        ((java.io.Closeable)helloPort).close();
         executor.shutdownNow();
+        
         Assert.assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());
     }
         

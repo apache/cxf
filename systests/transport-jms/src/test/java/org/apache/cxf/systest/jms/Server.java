@@ -22,10 +22,8 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
@@ -36,23 +34,6 @@ public class Server extends AbstractBusTestServerBase {
     }
     
     protected void run()  {
-        Object implementor = new GreeterImplTwoWayJMS();
-        Object impl2 =  new GreeterImplQueueOneWay();
-        Object impl3  = new GreeterImplTopicOneWay();
-        Object impleDoc = new GreeterImplDoc();
-        Object impl4 = new GreeterByteMessageImpl();
-        Object impl5 =  new SoapService6SoapPort6Impl();
-        Object impl6 = new JmsDestPubSubImpl();
-        Object impl7 =  new SoapService7SoapPort7Impl();
-        Object i1 = new GreeterImplTwoWayJMSAppCorrelationIDNoPrefix();
-        Object i2 = new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixEng();
-        Object i3 = new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixSales();
-        Object i4 = new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix();
-        Object i5 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng();
-        Object i6 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales();
-        Object i7 = new GreeterImplTwoWayJMSAppCorrelationIDEng();
-        Object i8 = new GreeterImplTwoWayJMSAppCorrelationIDSales();
-        
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
         
@@ -60,63 +41,26 @@ public class Server extends AbstractBusTestServerBase {
         broker.updateWsdl(bus, "testutils/jms_test.wsdl");
         broker.updateWsdl(bus, "testutils/jms_test_mtom.wsdl");
         
-        Endpoint.publish(null, impleDoc);
+        Endpoint.publish(null, new GreeterImplDoc());
 
         String address = null;
-        Endpoint.publish(address, implementor);
-        Endpoint.publish(null, impl2);
-        Endpoint.publish(null, impl3);
-        Endpoint.publish(null, impl4);
-        Endpoint.publish(null, impl5);
-        Endpoint.publish(null, impl6);
+        Endpoint.publish(address, new GreeterImplTwoWayJMS());
+        Endpoint.publish(null, new GreeterImplQueueOneWay());
+        Endpoint.publish(null, new GreeterImplTopicOneWay());
+        Endpoint.publish(null, new GreeterByteMessageImpl());
+        Endpoint.publish(null, new SoapService6SoapPort6Impl());
+        Endpoint.publish(null, new JmsDestPubSubImpl());
 
-        Endpoint.publish(null, impl7);
-        Endpoint.publish(null, i1);
-        Endpoint.publish(null, i2);
-        Endpoint.publish(null, i3);
-        Endpoint.publish(null, i4);
-        Endpoint.publish(null, i5);
-        Endpoint.publish(null, i6);
-        Endpoint.publish(null, i7);
-        Endpoint.publish(null, i8);
+        Endpoint.publish(null, new SoapService7SoapPort7Impl());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDNoPrefix());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixEng());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixSales());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDEng());
+        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDSales());
 
-        Object spec1 = new GreeterSpecImpl();
-        String address1 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2"
-                         + "?jndiInitialContextFactory"
-                         + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
-                         + broker.getEncodedBrokerURL();
-        Endpoint.publish(address1, spec1);
-        
-        Object spec2 = new GreeterSpecWithPortError();
-        String address2 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5"
-            + "?jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
-            + broker.getEncodedBrokerURL();
-        Endpoint.publish(address2, spec2);
-        
-        initNoWsdlServer();
     }
-
-
-    /**
-     * 
-     */
-    private void initNoWsdlServer() {
-        String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
-            + "?jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
-            +  broker.getEncodedBrokerURL();
-        Hello implementor = new HelloImpl();
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(Hello.class);
-        svrFactory.setAddress(address);
-        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
-        svrFactory.setServiceBean(implementor);
-        svrFactory.create();
-    }
-
 
 }

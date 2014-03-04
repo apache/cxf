@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms;
+package org.apache.cxf.jms.testsuite.services;
 
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 

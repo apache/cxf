@@ -27,7 +27,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.jms.testsuite.util.JMSTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class Server extends AbstractBusTestServerBase {
+public class TestSuiteServer extends AbstractBusTestServerBase {
     List<Endpoint> endpoints = new LinkedList<Endpoint>();
     protected void run() {
         setBus(BusFactory.getDefaultBus());
@@ -120,7 +120,7 @@ public class Server extends AbstractBusTestServerBase {
     }
     public static void main(String[] args) {
         try {
-            Server s = new Server();
+            TestSuiteServer s = new TestSuiteServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

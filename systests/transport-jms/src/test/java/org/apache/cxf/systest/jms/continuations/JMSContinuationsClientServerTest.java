@@ -49,6 +49,7 @@ public class JMSContinuationsClientServerTest {
         Object implementor = new GreeterImplWithContinuationsJMS();        
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
         EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
+        ep.setBus(bus);
         ep.getFeatures().add(cff);
         ep.publish(address);
     }
@@ -73,6 +74,7 @@ public class JMSContinuationsClientServerTest {
 
         HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class, cff);
         Assert.assertEquals("Hi Fred Ruby", greeter.greetMe("Fred"));
+        ((java.io.Closeable)greeter).close();
     }
         
 }

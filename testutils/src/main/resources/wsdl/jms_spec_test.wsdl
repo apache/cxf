@@ -95,13 +95,6 @@
     <wsdl:binding name="JMSGreeterPortBinding" type="tns:JMSGreeterPortType">
         <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         <soapjms:jndiContextParameter name="name" value="value"/>
-        <soapjms:jndiConnectionFactoryName>ConnectionFactory
-        </soapjms:jndiConnectionFactoryName>
-        <soapjms:jndiInitialContextFactory>
-                        org.apache.activemq.jndi.ActiveMQInitialContextFactory
-        </soapjms:jndiInitialContextFactory>
-        <soapjms:jndiURL>tcp://localhost:61500
-        </soapjms:jndiURL>
         <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
         <soapjms:priority>5</soapjms:priority>
         <soapjms:timeToLive>1000</soapjms:timeToLive>
@@ -133,21 +126,14 @@
     </wsdl:binding>
     <wsdl:service name="JMSGreeterService">
         <soapjms:jndiContextParameter name="name2" value="value2"/>
-        <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
-        <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
-        <soapjms:jndiURL>tcp://localhost:61500
-        </soapjms:jndiURL>
         <soapjms:deliveryMode>NON_PERSISTENT
         </soapjms:deliveryMode>
         <soapjms:priority>6</soapjms:priority>
         <soapjms:timeToLive>2000</soapjms:timeToLive>
         <!--<soapjms:replyToName>replytoname2</soapjms:replyToName>-->
         <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort">
-            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+            <soap:address location="jms:queue:test.cxf.jmstransport.queue2"/>
             <soapjms:jndiContextParameter name="name3" value="value3"/>
-            <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
-            <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
-            <soapjms:jndiURL>tcp://localhost:61500</soapjms:jndiURL>
             <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
             <soapjms:priority>7</soapjms:priority>
             <soapjms:timeToLive>3000</soapjms:timeToLive>
@@ -158,10 +144,6 @@
     </wsdl:service>
     <wsdl:service name="JMSGreeterService2">
         <soapjms:jndiContextParameter name="name2" value="value2"/>
-        <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
-        <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
-        <soapjms:jndiURL>tcp://localhost:61500
-        </soapjms:jndiURL>
         <soapjms:deliveryMode>NON_PERSISTENT
         </soapjms:deliveryMode>
         <soapjms:priority>6</soapjms:priority>
@@ -169,10 +151,8 @@
         <!--<soapjms:replyToName>replytoname2</soapjms:replyToName>-->
         <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort2">
             <soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
-            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+            <soap:address location="jms:queue:test.cxf.jmstransport.queue5"/>
             <soapjms:jndiContextParameter name="name3" value="value3"/>
-            <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
-            <soapjms:jndiURL>tcp://localhost:61500</soapjms:jndiURL>
             <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
             <soapjms:priority>7</soapjms:priority>
             <soapjms:timeToLive>3000</soapjms:timeToLive>

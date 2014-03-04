@@ -61,6 +61,7 @@ public class MultiTransportClientServerTest {
         String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
         Endpoint.publish(address, new HTTPGreeterImpl());
         EndpointImpl ep1 = (EndpointImpl)Endpoint.create(new JMSGreeterImpl());
+        ep1.setBus(bus);
         ep1.getFeatures().add(cff);
         ep1.publish();
     }
@@ -101,7 +102,7 @@ public class MultiTransportClientServerTest {
             }
 
         }
-
+        ((java.io.Closeable)greeter).close();
         greeter = null;
 
         greeter = service.getPort(portName2, Greeter.class, cff);
@@ -123,6 +124,7 @@ public class MultiTransportClientServerTest {
             }
 
         }
+        ((java.io.Closeable)greeter).close();
     }
 
 }

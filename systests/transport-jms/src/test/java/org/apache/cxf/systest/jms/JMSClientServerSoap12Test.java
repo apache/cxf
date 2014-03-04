@@ -18,122 +18,81 @@
  */
 package org.apache.cxf.systest.jms;
 
-import java.lang.reflect.UndeclaredThrowableException;
+import java.io.Closeable;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
+import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
+public class JMSClientServerSoap12Test {
     private static final String BROKER_URI = "vm://JMSClientServerSoap12Test?broker.persistent=false";
-    private static EmbeddedJMSBrokerLauncher broker;
-    private String wsdlString;
-    
-    public static class Soap12Server extends AbstractBusTestServerBase {
-        public static final String PORT = allocatePort(Soap12Server.class);
-       
-        protected void run()  {
-            Object impleDoc = new GreeterImplSoap12();
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("org/apache/cxf/systest/jms/soap12Bus.xml");
-            BusFactory.setDefaultBus(bus);
-            setBus(bus);
-            broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
-            Endpoint.publish("jms:queue:routertest.SOAPService2Q.text", impleDoc);
-        }
-    }
-
-    
+    private static Bus bus;
+    private static ConnectionFactoryFeature cff;
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher(BROKER_URI);
-        assertTrue("server did not launch correctly", 
-                   launchServer(Soap12Server.class, true));
+        bus = BusFactory.getDefaultBus();
+        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory(BROKER_URI);
+        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
+        cff = new ConnectionFactoryFeature(cfp);
+
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(new GreeterImplSoap12());
+        ep.setBus(bus);
+        ep.getFeatures().add(cff);
+        ep.publish("jms:queue:routertest.SOAPService2Q.text");
+    }
+    
+    @AfterClass
+    public static void stopServers() throws Exception {
+        bus.shutdown(false);
     }
     
     public URL getWSDLURL(String s) throws Exception {
-        URL u = getClass().getResource(s);
-        wsdlString = u.toString().intern();
-        broker.updateWsdl(getBus(), wsdlString);
-        System.gc();
-        System.gc();
-        return u;
-    }
-    public QName getServiceName(QName q) {
-        return q;
-    }
-    public QName getPortName(QName q) {
-        return q;
+        return getClass().getResource(s);
     }
     
     @Test
     public void testGzipEncodingWithJms() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus("org/apache/cxf/systest/jms/soap12Bus.xml");
-        BusFactory.setDefaultBus(bus);
-        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
-                                 "SOAPService8"));
-        QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort8"));
+        QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
+                                 "SOAPService8");
+        QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort8");
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
-        assertNotNull(wsdl);
-
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        assertNotNull(service);
-
         String response1 = new String("Hello Milestone-");
-        String response2 = new String("Bonjour");
-        try {
-            Greeter greeter = service.getPort(portName, Greeter.class);
-            /*
-            Client client = ClientProxy.getClient(greeter);
-            EndpointInfo ei = client.getEndpoint().getEndpointInfo();
-            AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
-            JMSNamingPropertyType name = new JMSNamingPropertyType();
-            JMSNamingPropertyType password = new JMSNamingPropertyType();
-            name.setName("java.naming.security.principal");
-            name.setValue("ivan");
-            password.setName("java.naming.security.credentials");
-            password.setValue("the-terrible");
-            address.getJMSNamingProperty().add(name);
-            address.getJMSNamingProperty().add(password);
-            */
-            for (int idx = 0; idx < 5; idx++) {
+        Greeter greeter = service.getPort(portName, Greeter.class, cff);
 
-                greeter.greetMeOneWay("test String");
+        for (int idx = 0; idx < 5; idx++) {
 
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
-                assertEquals(exResponse, greeting);
+            greeter.greetMeOneWay("test String");
 
-                String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            Assert.assertEquals(response1 + idx, greeting);
 
-                try {
-                    greeter.pingMe();
-                    fail("Should have thrown FaultException");
-                } catch (PingMeFault ex) {
-                    assertNotNull(ex.getFaultInfo());
-                }
+            String reply = greeter.sayHi();
+            Assert.assertEquals("Bonjour", reply);
 
+            try {
+                greeter.pingMe();
+                Assert.fail("Should have thrown FaultException");
+            } catch (PingMeFault ex) {
+                Assert.assertNotNull(ex.getFaultInfo());
             }
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+
         }
-        bus.shutdown(true);
+        ((Closeable)greeter).close();
     }
 }

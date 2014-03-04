@@ -18,13 +18,10 @@
  */
 package org.apache.cxf.transport.jms;
 
-import java.util.logging.Logger;
-
 import javax.jms.ConnectionFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
@@ -38,9 +35,7 @@ import org.apache.cxf.transport.Destination;
  */
 @NoJSR250Annotations
 public class ConnectionFactoryFeature extends AbstractFeature {
-    static final Logger LOG = LogUtils.getL7dLogger(ConnectionFactoryFeature.class);
-
-    ConnectionFactory connectionFactory;
+    private ConnectionFactory connectionFactory;
 
     public ConnectionFactoryFeature(ConnectionFactory cf) {
         this.connectionFactory = cf;
