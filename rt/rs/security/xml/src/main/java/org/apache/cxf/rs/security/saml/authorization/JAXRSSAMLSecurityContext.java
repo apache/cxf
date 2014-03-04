@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.rs.security.saml.assertion.Claims;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 
 public class JAXRSSAMLSecurityContext extends SAMLSecurityContext {
     

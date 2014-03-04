@@ -28,7 +28,7 @@ import javax.security.auth.Subject;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 

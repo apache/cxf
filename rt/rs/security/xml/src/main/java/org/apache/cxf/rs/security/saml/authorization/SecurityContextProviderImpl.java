@@ -19,13 +19,12 @@
 package org.apache.cxf.rs.security.saml.authorization;
 
 import org.w3c.dom.Element;
-
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.rs.security.saml.assertion.Claims;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
