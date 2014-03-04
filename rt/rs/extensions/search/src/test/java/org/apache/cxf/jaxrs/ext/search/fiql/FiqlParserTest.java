@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.ext.search.fiql;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -301,6 +302,16 @@ public class FiqlParserTest extends Assert {
         assertTrue(filter.isMet(new Condition("foobar", 20, null)));
         assertFalse(filter.isMet(new Condition("fooxxxbar", 0, null)));
     }
+    
+    @Test
+    public void testMultipleLists() throws SearchParseException {
+        FiqlParser<Job> jobParser = new FiqlParser<Job>(Job.class, 
+                                                        Collections.<String, String>emptyMap(),
+                                                        Collections.singletonMap("itemName", "tasks.items.itemName"));
+        SearchCondition<Job> jobCondition = jobParser.parse("itemName==myitem");
+        Job job = jobCondition.getCondition();
+        assertEquals("myitem", job.getTasks().get(0).getItems().get(0).getItemName());
+    }
 
     @Ignore
     public static class Condition {
@@ -358,6 +369,36 @@ public class FiqlParserTest extends Assert {
             return name2;
         }
 
+    }
+
+    
+    public static class Job {
+        private List<Task> tasks;
+        public List<Task> getTasks() {
+            return tasks;
+        }
+        public void setTasks(List<Task> tasks) {
+            this.tasks = tasks;
+            
+        }
+    }
+    public static class Task {
+        private List<Item> items;
+        public List<Item> getItems() {
+            return items;
+        }
+        public void setItems(List<Item> items) {
+            this.items = items;
+        }
+    }
+    public static class Item {
+        private String name;
+        public String getItemName() {
+            return name;
+        }
+        public void setItemName(String itemName) {
+            this.name = itemName;
+        }
     }
 
 }

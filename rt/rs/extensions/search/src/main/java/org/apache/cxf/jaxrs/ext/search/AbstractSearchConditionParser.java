@@ -154,7 +154,8 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 Class<?> actualReturnType = !returnCollection ? returnType 
                     : InjectionUtils.getActualType(getterM.getGenericReturnType());
                 
-                boolean isPrimitive = InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
+                boolean isPrimitive = !returnCollection 
+                    && InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
                 boolean lastTry = names.length == 2 
                     && (isPrimitive || returnType == Date.class || returnCollection);
                 
@@ -179,12 +180,15 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                             nextObject = getEmptyCollection(valueType);
                         }
                     }
-                } else {
+                } else if (!returnCollection) {
                     nextObject = returnType.newInstance();
+                } else {
+                    nextObject = actualReturnType.newInstance();
                 }
-                
                 Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
-                setterM.invoke(valueObject, new Object[]{nextObject});
+                Object valueObjectValue = lastTry || !returnCollection 
+                    ? nextObject : getCollectionSingleton(valueType, nextObject); 
+                setterM.invoke(valueObject, new Object[]{valueObjectValue});
                 
                 if (lastTry) {
                     lastCastedValue = lastCastedValue == null ? valueObject : lastCastedValue;
@@ -193,7 +197,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                     lastCastedValue = valueObject;
                 }
                 
-                TypeInfo nextTypeInfo = new TypeInfo(nextObject.getClass(), getterM.getGenericReturnType()); 
+                TypeInfo nextTypeInfo = new TypeInfo(valueObjectValue.getClass(), getterM.getGenericReturnType()); 
                 Object response = parseType(originalPropName,
                                  nextObject, 
                                  lastCastedValue, 
