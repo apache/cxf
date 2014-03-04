@@ -31,7 +31,11 @@
     <description>Apache CXF JAX-RS System Tests</description>
     <version>2.7.11-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
-    
+
+    <properties>
+        <cxf.surefire.fork.vmargs>-XX:MaxPermSize=192m</cxf.surefire.fork.vmargs>
+        <cxf.server.launcher.vmargs>-XX:MaxPermSize=192m</cxf.server.launcher.vmargs>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>xalan</groupId>
