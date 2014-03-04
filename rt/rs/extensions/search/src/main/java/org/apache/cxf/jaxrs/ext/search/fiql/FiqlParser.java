@@ -311,7 +311,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             Object object = parseType(originalName, null, null, setter, typeInfo, value);
             return new TypeInfoObject(object, typeInfo);
         } catch (Exception e) {
-            return null;
+            throw new SearchParseException(e);
         }
         
     }
@@ -379,7 +379,8 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 Class<?> actualReturnType = !returnCollection ? returnType 
                     : InjectionUtils.getActualType(getterM.getGenericReturnType());
                 
-                boolean isPrimitive = InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
+                boolean isPrimitive = !returnCollection 
+                    && InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
                 boolean lastTry = names.length == 2 
                     && (isPrimitive || returnType == Date.class || returnCollection);
                 
@@ -404,12 +405,16 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                             nextObject = getEmptyCollection(valueType);
                         }
                     }
-                } else {
+                } else if (!returnCollection) {
                     nextObject = returnType.newInstance();
+                } else {
+                    nextObject = actualReturnType.newInstance();
                 }
                 
                 Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
-                setterM.invoke(valueObject, new Object[]{nextObject});
+                Object valueObjectValue = lastTry || !returnCollection 
+                    ? nextObject : getCollectionSingleton(valueType, nextObject); 
+                setterM.invoke(valueObject, new Object[]{valueObjectValue});
                 
                 if (lastTry) {
                     lastCastedValue = lastCastedValue == null ? valueObject : lastCastedValue;
@@ -418,7 +423,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                     lastCastedValue = valueObject;
                 }
                 
-                TypeInfo nextTypeInfo = new TypeInfo(nextObject.getClass(), getterM.getGenericReturnType()); 
+                TypeInfo nextTypeInfo = new TypeInfo(valueObjectValue.getClass(), getterM.getGenericReturnType()); 
                 Object response = parseType(originalPropName,
                                  nextObject, 
                                  lastCastedValue, 
