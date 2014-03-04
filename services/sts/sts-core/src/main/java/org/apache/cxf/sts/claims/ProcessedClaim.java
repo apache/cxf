@@ -19,25 +19,45 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
+import java.security.Principal;
+
+import org.apache.cxf.rt.security.claims.Claim;
 
 /**
- * This holds a collection of RequestClaims.
+ * This represents a Claim that has been processed by a ClaimsHandler instance.
  */
-public class RequestClaimCollection extends java.util.ArrayList<RequestClaim> {
-    
+public class ProcessedClaim extends Claim {
+
     /**
      * 
      */
-    private static final long serialVersionUID = 6013920740410651546L;
-    private URI dialect;
-    
-    public URI getDialect() {
-        return dialect;
+    private static final long serialVersionUID = -336574019841442184L;
+    private String issuer;
+    private String originalIssuer;
+    private transient Principal principal;
+
+    public String getIssuer() {
+        return issuer;
     }
-    
-    public void setDialect(URI dialect) {
-        this.dialect = dialect;
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getOriginalIssuer() {
+        return originalIssuer;
+    }
+
+    public void setOriginalIssuer(String originalIssuer) {
+        this.originalIssuer = originalIssuer;
+    }
+
+    public Principal getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
     }
 
 }

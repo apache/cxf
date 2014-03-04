@@ -44,18 +44,17 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsParser;
 import org.apache.cxf.sts.claims.IdentityClaimsParser;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.BinarySecretType;
 import org.apache.cxf.ws.security.sts.provider.model.CancelTargetType;
@@ -298,7 +297,7 @@ public class RequestParser {
             LOG.fine("Found CancelTarget token");
         } else if (QNameConstants.CLAIMS.equals(jaxbElement.getName())) {
             ClaimsType claimsType = (ClaimsType)jaxbElement.getValue();
-            RequestClaimCollection requestedClaims = parseClaims(claimsType, claimsParsers);
+            ClaimCollection requestedClaims = parseClaims(claimsType, claimsParsers);
             tokenRequirements.setPrimaryClaims(requestedClaims);
             LOG.fine("Found Primary Claims token");
         } else if (QNameConstants.RENEWING.equals(jaxbElement.getName())) {
@@ -555,7 +554,7 @@ public class RequestParser {
                 keyRequirements.setKeyType(keyType);
             } else if ("Claims".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
                 LOG.fine("Found Secondary Claims element");
-                RequestClaimCollection requestedClaims = parseClaims(child, claimsParsers);
+                ClaimCollection requestedClaims = parseClaims(child, claimsParsers);
                 tokenRequirements.setSecondaryClaims(requestedClaims);
             } else {
                 LOG.fine("Found unknown element: " + localName + " " + namespace);
@@ -565,11 +564,11 @@ public class RequestParser {
     }
     
     /**
-     * Create a RequestClaimCollection from a DOM Element
+     * Create a ClaimCollection from a DOM Element
      */
-    private RequestClaimCollection parseClaims(Element claimsElement, List<ClaimsParser> claimsParsers) {
+    private ClaimCollection parseClaims(Element claimsElement, List<ClaimsParser> claimsParsers) {
         String dialectAttr = null;
-        RequestClaimCollection requestedClaims = new RequestClaimCollection();
+        ClaimCollection requestedClaims = new ClaimCollection();
         try {
             dialectAttr = claimsElement.getAttributeNS(null, "Dialect");
             if (dialectAttr != null && !"".equals(dialectAttr)) {
@@ -585,7 +584,7 @@ public class RequestParser {
         
         Element childClaimType = DOMUtils.getFirstElement(claimsElement);
         while (childClaimType != null) {
-            RequestClaim requestClaim = parseChildClaimType(childClaimType, dialectAttr, claimsParsers);
+            Claim requestClaim = parseChildClaimType(childClaimType, dialectAttr, claimsParsers);
             if (requestClaim != null) {
                 requestedClaims.add(requestClaim);
             }
@@ -596,13 +595,13 @@ public class RequestParser {
     }
     
     /**
-     * Create a RequestClaimCollection from a JAXB ClaimsType object
+     * Create a ClaimCollection from a JAXB ClaimsType object
      */
-    private static RequestClaimCollection parseClaims(
+    private static ClaimCollection parseClaims(
         ClaimsType claimsType, List<ClaimsParser> claimsParsers
     ) {
         String dialectAttr = null;
-        RequestClaimCollection requestedClaims = new RequestClaimCollection();
+        ClaimCollection requestedClaims = new ClaimCollection();
         try {
             dialectAttr = claimsType.getDialect();
             if (dialectAttr != null && !"".equals(dialectAttr)) {
@@ -618,7 +617,7 @@ public class RequestParser {
         
         for (Object claim : claimsType.getAny()) {
             if (claim instanceof Element) {
-                RequestClaim requestClaim = parseChildClaimType((Element)claim, dialectAttr, claimsParsers);
+                Claim requestClaim = parseChildClaimType((Element)claim, dialectAttr, claimsParsers);
                 if (requestClaim != null) {
                     requestedClaims.add(requestClaim);
                 }
@@ -629,9 +628,9 @@ public class RequestParser {
     }
     
     /**
-     * Parse a child ClaimType into a RequestClaim object.
+     * Parse a child ClaimType into a Claim object.
      */
-    private static RequestClaim parseChildClaimType(
+    private static Claim parseChildClaimType(
         Element childClaimType, String dialect, List<ClaimsParser> claimsParsers
     ) {
         if (claimsParsers != null) {

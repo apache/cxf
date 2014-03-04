@@ -20,9 +20,9 @@
 package org.apache.cxf.sts.claims;
 
 /**
- * This holds a collection of Claims.
+ * This holds a collection of Claims that have been processed by a ClaimsHandler implementation
  */
-public class ClaimCollection extends java.util.ArrayList<Claim> {
+public class ProcessedClaimCollection extends java.util.ArrayList<ProcessedClaim> {
 
     /**
      * 

@@ -28,6 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 
 public class StaticClaimsHandler implements ClaimsHandler {
 
@@ -57,13 +59,13 @@ public class StaticClaimsHandler implements ClaimsHandler {
         return uriList;
     }    
     
-    public ClaimCollection retrieveClaimValues(
-            RequestClaimCollection claims, ClaimsParameters parameters) {
+    public ProcessedClaimCollection retrieveClaimValues(
+            ClaimCollection claims, ClaimsParameters parameters) {
         
-        ClaimCollection claimsColl = new ClaimCollection();
-        for (RequestClaim claim : claims) {
+        ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
+        for (Claim claim : claims) {
             if (getGlobalClaims().keySet().contains(claim.getClaimType().toString())) {
-                Claim c = new Claim();
+                ProcessedClaim c = new ProcessedClaim();
                 c.setClaimType(claim.getClaimType());
                 c.setPrincipal(parameters.getPrincipal());
                 c.addValue(getGlobalClaims().get(claim.getClaimType().toString()));

@@ -19,10 +19,10 @@
 
 package org.apache.cxf.sts.operation;
 
-import org.apache.cxf.sts.claims.Claim;
-import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsMapper;
 import org.apache.cxf.sts.claims.ClaimsParameters;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 
 /**
  * A test implementation of ClaimsMapper.
@@ -32,14 +32,14 @@ public class CustomClaimsMapper implements ClaimsMapper {
     /**
      * transforms the claim values to upper-case
      */
-    public ClaimCollection mapClaims(String sourceRealm,
-            ClaimCollection sourceClaims, String targetRealm,
+    public ProcessedClaimCollection mapClaims(String sourceRealm,
+            ProcessedClaimCollection sourceClaims, String targetRealm,
             ClaimsParameters parameters) {
         
-        ClaimCollection targetClaims = new ClaimCollection();
+        ProcessedClaimCollection targetClaims = new ProcessedClaimCollection();
         
-        for (Claim c : sourceClaims) {
-            Claim nc = new Claim();
+        for (ProcessedClaim c : sourceClaims) {
+            ProcessedClaim nc = new ProcessedClaim();
             nc.setClaimType(c.getClaimType());
             nc.setIssuer(c.getIssuer());
             nc.setOriginalIssuer(c.getOriginalIssuer());

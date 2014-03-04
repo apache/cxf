@@ -24,9 +24,9 @@ import java.util.Map;
 
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
@@ -43,8 +43,8 @@ public class TokenProviderParameters {
     private EncryptionProperties encryptionProperties;
     private Principal principal;
     private WebServiceContext webServiceContext;
-    private RequestClaimCollection requestedPrimaryClaims;
-    private RequestClaimCollection requestedSecondaryClaims;
+    private ClaimCollection requestedPrimaryClaims;
+    private ClaimCollection requestedSecondaryClaims;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private String appliesToAddress;
@@ -141,19 +141,19 @@ public class TokenProviderParameters {
         return realm;
     }
 
-    public RequestClaimCollection getRequestedPrimaryClaims() {
+    public ClaimCollection getRequestedPrimaryClaims() {
         return requestedPrimaryClaims;
     }
 
-    public void setRequestedPrimaryClaims(RequestClaimCollection requestedPrimaryClaims) {
+    public void setRequestedPrimaryClaims(ClaimCollection requestedPrimaryClaims) {
         this.requestedPrimaryClaims = requestedPrimaryClaims;
     }
 
-    public RequestClaimCollection getRequestedSecondaryClaims() {
+    public ClaimCollection getRequestedSecondaryClaims() {
         return requestedSecondaryClaims;
     }
 
-    public void setRequestedSecondaryClaims(RequestClaimCollection requestedSecondaryClaims) {
+    public void setRequestedSecondaryClaims(ClaimCollection requestedSecondaryClaims) {
         this.requestedSecondaryClaims = requestedSecondaryClaims;
     }
     

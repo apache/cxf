@@ -27,18 +27,17 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.claims.StaticClaimsHandler;
 import org.apache.cxf.sts.claims.StaticEndpointClaimsHandler;
 import org.apache.cxf.sts.common.CustomAttributeProvider;
@@ -89,7 +88,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection claims = createClaims();
+        ClaimCollection claims = createClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
         
         List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
@@ -128,11 +127,11 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection primaryClaims = createClaims();
+        ClaimCollection primaryClaims = createClaims();
         providerParameters.setRequestedPrimaryClaims(primaryClaims);
         
-        RequestClaimCollection secondaryClaims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection secondaryClaims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.STREETADDRESS);
         secondaryClaims.add(claim);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
@@ -175,12 +174,12 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection primaryClaims = createClaims();
+        ClaimCollection primaryClaims = createClaims();
         primaryClaims.setDialect(ClaimTypes.URI_BASE);
         providerParameters.setRequestedPrimaryClaims(primaryClaims);
         
-        RequestClaimCollection secondaryClaims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection secondaryClaims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.STREETADDRESS);
         secondaryClaims.add(claim);
         secondaryClaims.setDialect(ClaimTypes.URI_BASE);
@@ -224,8 +223,8 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(CLAIM_STATIC_COMPANY);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
@@ -281,8 +280,8 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(CLAIM_APPLICATION);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
@@ -340,8 +339,8 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(CLAIM_APPLICATION);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
@@ -373,8 +372,8 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
         
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.MOBILEPHONE);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
@@ -456,18 +455,18 @@ public class SAMLClaimsTest extends org.junit.Assert {
     /**
      * Create a set of parsed Claims
      */
-    private RequestClaimCollection createClaims() {
-        RequestClaimCollection claims = new RequestClaimCollection();
+    private ClaimCollection createClaims() {
+        ClaimCollection claims = new ClaimCollection();
         
-        RequestClaim claim = new RequestClaim();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.FIRSTNAME);
         claims.add(claim);
         
-        claim = new RequestClaim();
+        claim = new Claim();
         claim.setClaimType(ClaimTypes.LASTNAME);
         claims.add(claim);
         
-        claim = new RequestClaim();
+        claim = new Claim();
         claim.setClaimType(ClaimTypes.EMAILADDRESS);
         claims.add(claim);
         

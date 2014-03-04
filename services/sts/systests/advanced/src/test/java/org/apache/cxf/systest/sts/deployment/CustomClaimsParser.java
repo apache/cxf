@@ -21,16 +21,14 @@ package org.apache.cxf.systest.sts.deployment;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimsParser;
-import org.apache.cxf.sts.claims.RequestClaim;
 
 /**
  * A Custom ClaimsParser implementation.
@@ -42,17 +40,17 @@ public class CustomClaimsParser implements ClaimsParser {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CustomClaimsParser.class);
 
-    public RequestClaim parse(Element claim) {
+    public Claim parse(Element claim) {
         return parseClaimType(claim);
     }
 
-    public static RequestClaim parseClaimType(Element claimType) {
+    public static Claim parseClaimType(Element claimType) {
         String claimLocalName = claimType.getLocalName();
         String claimNS = claimType.getNamespaceURI();
         if ("ClaimType".equals(claimLocalName)) {
             String claimTypeUri = claimType.getAttributeNS(null, "Uri");
             String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
-            RequestClaim requestClaim = new RequestClaim();
+            Claim requestClaim = new Claim();
             try {
                 requestClaim.setClaimType(new URI(claimTypeUri));
             } catch (URISyntaxException e) {
@@ -67,7 +65,7 @@ public class CustomClaimsParser implements ClaimsParser {
         } else if ("ClaimValue".equals(claimLocalName)) {
             String claimTypeUri = claimType.getAttributeNS(null, "Uri");
             String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
-            RequestClaim requestClaim = new RequestClaim();
+            Claim requestClaim = new Claim();
             try {
                 requestClaim.setClaimType(new URI(claimTypeUri));
             } catch (URISyntaxException e) {
@@ -81,7 +79,7 @@ public class CustomClaimsParser implements ClaimsParser {
             Node valueNode = claimType.getFirstChild();
             if (valueNode != null) {
                 if ("Value".equals(valueNode.getLocalName())) {
-                    requestClaim.setClaimValue(valueNode.getTextContent().trim());
+                    requestClaim.addValue(valueNode.getTextContent().trim());
                 } else {
                     LOG.warning("Unsupported child element of ClaimValue element "
                             + valueNode.getLocalName());
