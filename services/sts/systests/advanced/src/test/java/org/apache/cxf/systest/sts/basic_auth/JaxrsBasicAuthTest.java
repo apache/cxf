@@ -71,13 +71,24 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
 
         doubleIt("alice", "trombon", true);
     }
+    
+    @org.junit.Test
+    public void testNoBasicAuth() throws Exception {
+
+        doubleIt(null, null, true);
+    }
 
     private static void doubleIt(String username, String password, boolean authFailureExpected) {
         final String configLocation = "org/apache/cxf/systest/sts/basic_auth/cxf-client.xml";
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;  
        
-        WebClient client = WebClient.create(address, username, password, configLocation);
+        WebClient client = null;
+        if (username != null && password != null) {
+            client = WebClient.create(address, username, password, configLocation);
+        } else {
+            client = WebClient.create(address, configLocation);
+        }
         client.type("text/plain").accept("text/plain");
         try {
             int resp = client.post(numToDouble, Integer.class);

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -61,7 +60,7 @@ public class STSTokenValidator implements Validator {
             return credential;
         }
         
-        return validateWithSTS(credential, (SoapMessage)data.getMsgContext());
+        return validateWithSTS(credential, (Message)data.getMsgContext());
     }
     
     public Credential validateWithSTS(Credential credential, Message message) throws WSSecurityException {

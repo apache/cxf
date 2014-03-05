@@ -18,31 +18,33 @@
  */
 package org.apache.cxf.ws.security.trust;
 
+import java.security.Principal;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
-
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.SecurityContext;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.Validator;
 
 public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AuthPolicyValidatingInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(AuthPolicyValidatingInterceptor.class);
     
-    private STSTokenValidator validator;
+    private Validator validator;
     
     public AuthPolicyValidatingInterceptor() {
         this(Phase.UNMARSHAL);
@@ -74,7 +76,20 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
             UsernameToken token = convertPolicyToToken(policy);
             Credential credential = new Credential();
             credential.setUsernametoken(token);
-            validator.validateWithSTS(credential, message);
+            
+            RequestData data = new RequestData();
+            data.setMsgContext(message);
+            credential = validator.validate(credential, data);
+            
+            // Create a Principal/SecurityContext
+            Principal p = null;
+            if (credential != null && credential.getPrincipal() != null) {
+                p = credential.getPrincipal();
+            } else {
+                p = new WSUsernameTokenPrincipalImpl(policy.getUserName(), false);
+                ((WSUsernameTokenPrincipalImpl)p).setPassword(policy.getPassword());
+            }
+            message.put(SecurityContext.class, createSecurityContext(p));
         } catch (Exception ex) {
             throw new Fault(ex);
         }
@@ -83,18 +98,28 @@ public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Me
     protected UsernameToken convertPolicyToToken(AuthorizationPolicy policy) 
         throws Exception {
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.newDocument();
-        
+        Document doc = DOMUtils.createDocument();
         UsernameToken token = new UsernameToken(false, doc, 
                                                 WSConstants.PASSWORD_TEXT);
         token.setName(policy.getUserName());
         token.setPassword(policy.getPassword());
         return token;
     }
+    
+    protected SecurityContext createSecurityContext(final Principal p) {
+        return new SecurityContext() {
 
-    public void setValidator(STSTokenValidator validator) {
+            public Principal getUserPrincipal() {
+                return p;
+            }
+
+            public boolean isUserInRole(String arg0) {
+                return false;
+            }
+        };
+    }
+
+    public void setValidator(Validator validator) {
         this.validator = validator;
     }
     
