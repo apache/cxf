@@ -211,7 +211,7 @@ public class ClientProxyImpl extends AbstractClient implements
         if (bodyIndex != -1) {
             body = params[bodyIndex];
         } else if (types.containsKey(ParameterType.FORM))  {
-            body = handleForm(types, beanParamsList, params);
+            body = handleForm(m, params, types, beanParamsList);
         } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
             body = handleMultipart(types, ori, params);
         }
@@ -461,7 +461,7 @@ public class ClientProxyImpl extends AbstractClient implements
             for (Map.Entry<String, Object> entry : values.entrySet()) {
                 if (entry.getValue() != null) {
                     addMatrixQueryParamsToBuilder(ub, entry.getKey(), ParameterType.QUERY,
-                                                  getParamAnnotations(m, p), entry.getValue());
+                                                  null, entry.getValue());
                 }
             }
         }
@@ -504,42 +504,44 @@ public class ClientProxyImpl extends AbstractClient implements
             for (Map.Entry<String, Object> entry : values.entrySet()) {
                 if (entry.getValue() != null) {
                     addMatrixQueryParamsToBuilder(ub, entry.getKey(), ParameterType.MATRIX,
-                                                  getParamAnnotations(m, p), entry.getValue());
+                                                  null, entry.getValue());
                 }
             }
         }
     }
 
-    private MultivaluedMap<String, String> handleForm(MultivaluedMap<ParameterType, Parameter> map, 
-                                                      List<Parameter> beanParams,
-                                                      Object[] params) {
+    private MultivaluedMap<String, String> handleForm(Method m,
+                                                      Object[] params, 
+                                                      MultivaluedMap<ParameterType, Parameter> map, 
+                                                      List<Parameter> beanParams) {
         
         MultivaluedMap<String, String> form = new MetadataMap<String, String>();
         
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
-            addFormValue(form, p.getName(), params[p.getIndex()]);
+            addFormValue(form, p.getName(), params[p.getIndex()], getParamAnnotations(m, p));
         }
         for (Parameter p : beanParams) {
             Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], FormParam.class);
             for (Map.Entry<String, Object> entry : values.entrySet()) {
-                addFormValue(form, entry.getKey(), entry.getValue());
+                addFormValue(form, entry.getKey(), entry.getValue(), null);
             }
         }
         
         return form;
     }
     
-    private void addFormValue(MultivaluedMap<String, String> form, String name, Object pValue) {
+    private void addFormValue(MultivaluedMap<String, String> form, String name,
+                              Object pValue, Annotation[] anns) {
         if (pValue != null) {
             if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
                 Collection<?> c = pValue.getClass().isArray() 
                     ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
                 for (Iterator<?> it = c.iterator(); it.hasNext();) {
-                    FormUtils.addPropertyToForm(form, name, convertParamValue(it.next(), null));
+                    FormUtils.addPropertyToForm(form, name, convertParamValue(it.next(), anns));
                 }
             } else { 
-                FormUtils.addPropertyToForm(form, name, name.isEmpty() ? pValue : convertParamValue(pValue, null)); 
+                FormUtils.addPropertyToForm(form, name, name.isEmpty() ? pValue : convertParamValue(pValue, anns)); 
             }
             
         }
