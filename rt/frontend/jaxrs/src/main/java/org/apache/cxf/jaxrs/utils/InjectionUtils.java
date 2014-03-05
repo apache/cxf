@@ -350,7 +350,7 @@ public final class InjectionUtils {
         
         value = decodeValue(value, decoded, pType);
         
-        Object result = createFromParameterHandler(value, pClass, message);
+        Object result = createFromParameterHandler(value, pClass, paramAnns, message);
         if (result != null) {
             return pClass.cast(result);
         }
@@ -435,11 +435,12 @@ public final class InjectionUtils {
     
     private static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
+                                                    Annotation[] anns,
                                                     Message message) {
         T result = null;
         if (message != null) {
             ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
-            ParamConverter<T> pm = pf.createParameterHandler(pClass);
+            ParamConverter<T> pm = pf.createParameterHandler(pClass, anns);
             if (pm != null) {
                 result = pm.fromString(value);
             }

@@ -614,7 +614,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient path(Object path) {
-        getCurrentBuilder().path(convertParamValue(path));
+        getCurrentBuilder().path(convertParamValue(path, null));
         
         return this;
     }
@@ -643,7 +643,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient matrix(String name, Object ...values) {
-        addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.MATRIX, values);
+        addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.MATRIX, null, values);
         return this;
     }
     

@@ -267,11 +267,12 @@ public abstract class ProviderFactory {
         return null;
     }
     
-    public <T> ParamConverter<T> createParameterHandler(Class<T> paramType) {
+    public <T> ParamConverter<T> createParameterHandler(Class<T> paramType, Annotation[] anns) {
         
         if (newParamConverters != null) {
+            anns = anns != null ? anns : new Annotation[]{};
             for (ParamConverterProvider newParamConverter : newParamConverters) {
-                ParamConverter<T> converter = newParamConverter.getConverter(paramType, null, null);
+                ParamConverter<T> converter = newParamConverter.getConverter(paramType, paramType, anns);
                 if (converter != null) {
                     return converter;
                 }
