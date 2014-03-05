@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
@@ -82,6 +83,20 @@ public class BookStoreSpring {
     @Path("/books/webex")
     public Books getBookWebEx() {
         throw new WebApplicationException(new RuntimeException("Book web exception")); 
+    }
+    
+    @GET
+    @Path("/books/redirectStart")
+    public Book getBookRedirectStart() {
+        return new Book("Redirect start", 123L); 
+    }
+    
+    @GET
+    @Path("/books/redirectComplete")
+    public Book getBookRedirectComplete(@Context HttpServletRequest request) {
+        Book book = (Book)request.getAttribute(Book.class.getSimpleName().toLowerCase());
+        book.setName("Redirect complete");
+        return book; 
     }
     
     @GET

@@ -406,11 +406,6 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             return path;
         }
         
-        @Override
-        public String getRequestURI() {
-            return path;
-        }
-        
         public void setParameter(String name, String value) {
             doSetParameters(name, new String[]{value});
         }
