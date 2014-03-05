@@ -69,6 +69,13 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testBroadcastUDP() throws Exception {
+        // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
+        if (System.getProperties().getProperty("os.name").equals("Linux") 
+            && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
+            System.out.println("Skipping broadcast test for REL");
+            return;
+        }
+        
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
         while (interfaces.hasMoreElements()) {
@@ -83,8 +90,7 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
             System.out.println("Skipping broadcast test");
             return;
         }
-
-        
+            
         JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
         fact.setAddress("udp://:" + PORT + "/foo");
         Greeter g = fact.create(Greeter.class);
