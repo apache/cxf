@@ -94,8 +94,10 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             value = new String(resp.getEntity());
             assertTrue(value.startsWith("Today:"));
             for (int r = 2, i = 1; i < 6; r *= 2, i++) {
-                // subsequent data should not carry headers
-                assertEquals(r, Integer.parseInt(new String(received.get(i))));
+                // subsequent data should not carry the headers nor the status.
+                resp = new Response(received.get(i));
+                assertEquals(0, resp.getStatusCode());
+                assertEquals(r, Integer.parseInt(new String(resp.getEntity())));
             }
         } finally {
             wsclient.close();
@@ -172,14 +174,16 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         public Response(byte[] data) {
             this.data = data;
             String line = readLine();
-            statusCode = Integer.parseInt(line);
-            while ((line = readLine()) != null) {
-                if (line.length() > 0) {
-                    int del = line.indexOf(':');
-                    String h = line.substring(0, del).trim();
-                    String v = line.substring(del + 1).trim();
-                    if ("Content-Type".equalsIgnoreCase(h)) {
-                        contentType = v;
+            if (line != null) {
+                statusCode = Integer.parseInt(line);
+                while ((line = readLine()) != null) {
+                    if (line.length() > 0) {
+                        int del = line.indexOf(':');
+                        String h = line.substring(0, del).trim();
+                        String v = line.substring(del + 1).trim();
+                        if ("Content-Type".equalsIgnoreCase(h)) {
+                            contentType = v;
+                        }
                     }
                 }
             }

@@ -186,6 +186,14 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
         }
         return longdata;
     }
+
+    private static byte[] buildResponse(byte[] data, int offset, int length) {
+        byte[] longdata = new byte[length + 2];
+        longdata[0] = 0x0d;
+        longdata[1] = 0x0a;
+        System.arraycopy(data, offset, longdata, 2, length);
+        return longdata;
+    }
     
     ServletOutputStream getServletOutputStream(final Map<String, String> headers) {
         LOG.log(Level.INFO, "getServletOutputStream()");
@@ -202,11 +210,11 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             public void write(byte[] data, int offset, int length) throws IOException {
                 if (headers.get("$flushed") == null) {
                     data = buildResponse(headers, data, offset, length);
-                    offset = 0;
-                    length = data.length;
                     headers.put("$flushed", "true");
+                } else {
+                    data = buildResponse(data, offset, length);
                 }
-                webSocketConnection.sendMessage(data, offset, length);
+                webSocketConnection.sendMessage(data, 0, data.length);
             }
         };
     }
@@ -226,11 +234,11 @@ class JettyWebSocket implements WebSocket.OnBinaryMessage, WebSocket.OnTextMessa
             public void write(byte[] data, int offset, int length) throws IOException {
                 if (headers.get("$flushed") == null) {
                     data = buildResponse(headers, data, offset, length);
-                    offset = 0;
-                    length = data.length;
                     headers.put("$flushed", "true");
+                } else {
+                    data = buildResponse(data, offset, length);
                 }
-                webSocketConnection.sendMessage(data, offset, length);
+                webSocketConnection.sendMessage(data, 0, data.length);
             }
         };
         
