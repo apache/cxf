@@ -151,6 +151,34 @@ public class DefaultSubjectProvider implements SubjectProvider {
             }
         } else if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
             ReceivedKey receivedKey = keyRequirements.getReceivedKey();
+            
+            // Validate UseKey trust
+            if (stsProperties.isValidateUseKey() && stsProperties.getSignatureCrypto() != null) {
+                if (receivedKey.getX509Cert() != null) {
+                    try {
+                        if (!stsProperties.getSignatureCrypto().verifyTrust(
+                            new X509Certificate[]{receivedKey.getX509Cert()}, false)) {
+                            LOG.log(Level.FINE, "Error in trust validation of UseKey");
+                            throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
+                        }
+                    } catch (WSSecurityException e) {
+                        LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
+                        throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
+                    }
+                }
+                if (receivedKey.getPublicKey() != null) {
+                    try {
+                        if (!stsProperties.getSignatureCrypto().verifyTrust(receivedKey.getPublicKey())) {
+                            LOG.log(Level.FINE, "Error in trust validation of UseKey");
+                            throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
+                        }
+                    } catch (WSSecurityException e) {
+                        LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
+                        throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
+                    }
+                }
+            }
+            
             KeyInfoBean keyInfo = createKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
             subjectBean.setKeyInfo(keyInfo);
         }

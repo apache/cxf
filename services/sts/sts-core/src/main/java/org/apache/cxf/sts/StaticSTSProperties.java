@@ -66,6 +66,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private RelationshipResolver relationshipResolver;
     private SAMLRealmCodec samlRealmCodec;
     private Bus bus;
+    private boolean validateUseKey;
 
 
 
@@ -410,5 +411,24 @@ public class StaticSTSProperties implements STSPropertiesMBean {
 
     public void setBus(Bus bus) {
         this.bus = bus;
+    }
+    
+    /**
+     * Get whether to validate a client Public Key or Certificate presented as part of a 
+     * UseKey element. This is true by default.
+     */
+    public boolean isValidateUseKey() {
+        return validateUseKey;
+    }
+    
+    /**
+     * Set whether to validate a client Public Key or Certificate presented as part of a 
+     * UseKey element. If this is set to true (the default), the public key must be trusted
+     * by the Signature Crypto of the STS.
+     * 
+     * @param validateUseKey whether to validate a client UseKey or not.
+     */
+    public void setValidateUseKey(boolean validateUseKey) {
+        this.validateUseKey = validateUseKey;
     }
 }
