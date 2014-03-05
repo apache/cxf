@@ -47,8 +47,7 @@ public final class JMSFactory {
     }
 
     /**
-     * Retrieve connection factory from jndi, wrap it in a UserCredentialsConnectionFactoryAdapter,
-     * set username and password and return the ConnectionFactory
+     * Retrieve connection factory from JNDI
      * 
      * @param jmsConfig
      * @param jndiConfig
@@ -68,11 +67,11 @@ public final class JMSFactory {
     }
     
     /**
-     * Create JmsTemplate from configuration information. Most settings are taken from jmsConfig. The QoS
-     * settings in headers override the settings from jmsConfig
+     * Create JmsSender from configuration information. Most settings are taken from jmsConfig. The QoS
+     * settings in messageProperties override the settings from jmsConfig
      * 
      * @param jmsConfig configuration information
-     * @param messageProperties context headers
+     * @param messageProperties context headers override config settings
      * @return
      */
     public static JMSSender createJmsSender(JMSConfiguration jmsConfig,
@@ -91,89 +90,6 @@ public final class JMSFactory {
         return sender;
     }
 
-    /**
-     * Create and start listener using configuration information from jmsConfig. Uses
-     * resolveOrCreateDestination to determine the destination for the listener.
-     * 
-     * @param ei the EndpointInfo for the listener
-     * @param jmsConfig configuration information
-     * @param listenerHandler object to be called when a message arrives
-     * @param destination to listen on
-     * @return
-     */
-    /*
-    protected static JMSListenerContainer createJmsListener(EndpointInfo ei,
-                                                                    JMSConfiguration jmsConfig,
-                                                                    MessageListener listenerHandler,
-                                                                    Destination destination) {
-        
-        DefaultMessageListenerContainer jmsListener = null;
-        
-        //Check to see if transport is being used in JCA RA with XA
-        Method method = ei.getProperty(MDB_TRANSACTED_METHOD,
-                                       java.lang.reflect.Method.class);
-        MessageEndpointFactory factory = ei.getProperty(MESSAGE_ENDPOINT_FACTORY, 
-                                      MessageEndpointFactory.class);
-        if (method != null 
-            && jmsConfig.getConnectionFactory() instanceof XAConnectionFactory) {
-            jmsListener = new JCATransactionalMessageListenerContainer(factory, method); 
-        } else {
-            jmsListener = new DefaultMessageListenerContainer();
-        }
-        
-        jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
-        jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
-        
-        jmsListener.setPubSubNoLocal(jmsConfig.isPubSubNoLocal());
-        
-        jmsListener.setConnectionFactory(jmsConfig.getConnectionFactory());
-        jmsListener.setSubscriptionDurable(jmsConfig.isSubscriptionDurable());
-        jmsListener.setClientId(jmsConfig.getDurableSubscriptionClientId());
-        jmsListener.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
-        jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
-        jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
-        jmsListener.setMessageListener(listenerHandler);
-        if (listenerHandler instanceof JMSDestination) {
-            //timeout on server side?
-            if (jmsConfig.getServerReceiveTimeout() != null) {
-                jmsListener.setReceiveTimeout(jmsConfig.getServerReceiveTimeout());
-            }
-            jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
-        } else {
-            if (jmsConfig.getReceiveTimeout() != null) {
-                jmsListener.setReceiveTimeout(jmsConfig.getReceiveTimeout());
-            }
-            jmsListener.setPubSubDomain(jmsConfig.isReplyPubSubDomain());
-        }
-        if (jmsConfig.getRecoveryInterval() != JMSConfiguration.DEFAULT_VALUE) {
-            jmsListener.setRecoveryInterval(jmsConfig.getRecoveryInterval());
-        }
-        if (jmsConfig.getCacheLevelName() != null && (jmsConfig.getCacheLevelName().trim().length() > 0)) {
-            jmsListener.setCacheLevelName(jmsConfig.getCacheLevelName());
-        } else if (jmsConfig.getCacheLevel() != JMSConfiguration.DEFAULT_VALUE) {
-            jmsListener.setCacheLevel(jmsConfig.getCacheLevel());
-        }
-        if (jmsListener.getCacheLevel() >= DefaultMessageListenerContainer.CACHE_CONSUMER
-            && jmsConfig.getMaxSuspendedContinuations() > 0) {
-            LOG.info("maxSuspendedContinuations value will be ignored - "
-                     + ", please set cacheLevel to the value less than "
-                     + " org.springframework.jms.listener.DefaultMessageListenerContainer.CACHE_CONSUMER");
-        }
-        if (jmsConfig.isAcceptMessagesWhileStopping()) {
-            jmsListener.setAcceptMessagesWhileStopping(jmsConfig.isAcceptMessagesWhileStopping());
-        }
-        String messageSelector = getMessageSelector(jmsConfig, null);
-        jmsListener.setMessageSelector(messageSelector);
-        
-        jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
-        
-        jmsListener.setDestination(destination);
-        jmsListener.initialize();
-        jmsListener.start();
-        return new SpringJMSListenerAdapter(jmsListener);
-    }
-    */
-
     private static String getMessageSelector(JMSConfiguration jmsConfig, String conduitId) {
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
         String conduitIdSt = jmsConfig.isUseConduitIdSelector() && conduitId != null ? conduitId : "";
@@ -181,8 +97,9 @@ public final class JMSFactory {
         return correlationIdPrefix.isEmpty() ? null : "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
     }
     
-    public static JMSListenerContainer createTargetDestinationListener(EndpointInfo ei, JMSConfiguration jmsConfig,
-                                                               MessageListener listenerHandler) {
+    public static JMSListenerContainer createTargetDestinationListener(EndpointInfo ei, 
+                                                                       JMSConfiguration jmsConfig,
+                                                                       MessageListener listenerHandler) {
         Session session = null;
         try {
             Connection connection = createConnection(jmsConfig);
@@ -200,7 +117,7 @@ public final class JMSFactory {
         }
     }
 
-    public static JMSListenerContainer createSimpleJmsListener(JMSConfiguration jmsConfig,
+    public static JMSListenerContainer createListenerContainer(JMSConfiguration jmsConfig,
                                                                Connection connection,
                                                                MessageListener listenerHandler, 
                                                                Destination destination,

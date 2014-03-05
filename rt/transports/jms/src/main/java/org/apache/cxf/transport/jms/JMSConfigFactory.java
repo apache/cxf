@@ -31,9 +31,7 @@ import javax.naming.Context;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
 import org.apache.cxf.transport.jms.util.JndiHelper;
@@ -138,27 +136,6 @@ public final class JMSConfigFactory {
         }
     }
 
-    public static <T> T getWSDLExtensor(EndpointInfo ei, Class<T> cls) {
-        ServiceInfo si = ei.getService();
-        BindingInfo bi = ei.getBinding();
-        
-        Object o = ei.getExtensor(cls);
-        if (o == null && si != null) {
-            o = si.getExtensor(cls);
-        }
-        if (o == null && bi != null) {
-            o = bi.getExtensor(cls);
-        }
-        
-        if (o == null) {
-            return null;
-        }
-        if (cls.isInstance(o)) {
-            return cls.cast(o);
-        }
-        return null;
-    }
-    
     public static Properties getInitialContextEnv(JMSEndpoint endpoint) {
         Properties env = new Properties();
         if (endpoint.getJndiInitialContextFactory() != null) {
