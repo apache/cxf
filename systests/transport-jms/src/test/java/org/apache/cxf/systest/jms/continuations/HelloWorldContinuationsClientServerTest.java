@@ -25,52 +25,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
-import org.junit.AfterClass;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class HelloWorldContinuationsClientServerTest {
+public class HelloWorldContinuationsClientServerTest extends AbstractVmJMSTest {
     private static final String WSDL_PATH = "org/apache/cxf/systest/jms/continuations/test.wsdl";
-
-    private static ConnectionFactoryFeature cff;
-
-    private static Bus bus;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
-        cff = new ConnectionFactoryFeature(cfp);
-        Object implementor = new HelloWorldWithContinuationsJMS();        
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(null, implementor);
-        ep.setBus(bus);
-        ep.getFeatures().add(cff);
-        ep.publish();
+        publish(new HelloWorldWithContinuationsJMS());        
     }
     
-    @AfterClass
-    public static void stopServers() {
-        bus.shutdown(false);
-    }
-
     @Test
-    public void testHttpWrappedContinuations() throws Exception {
+    public void testHelloWorldContinuations() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
         URL wsdlURL = getClass().getClassLoader().getResource(WSDL_PATH);
         
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
-        final HelloContinuation helloPort = service.getPort(HelloContinuation.class, cff);
+        final HelloContinuation helloPort = markForClose(service.getPort(HelloContinuation.class, cff));
         ExecutorService executor = Executors.newCachedThreadPool();
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch helloDoneSignal = new CountDownLatch(5);
@@ -84,7 +60,6 @@ public class HelloWorldContinuationsClientServerTest {
         startSignal.countDown();
         helloDoneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
-        ((java.io.Closeable)helloPort).close();
         Assert.assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());
 
     }

@@ -91,6 +91,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(TestSuiteServer.class, true));
         createStaticBus();
     }
+
     @After
     public void close() throws Exception {
         if (closeable != null) {

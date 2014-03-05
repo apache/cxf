@@ -21,50 +21,23 @@ package org.apache.cxf.systest.jms.continuations;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
-import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
-import org.junit.AfterClass;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JMSContinuationsClientServerTest {
-    private static Bus bus;
-    private static ConnectionFactoryFeature cff;
+public class JMSContinuationsClientServerTest extends AbstractVmJMSTest {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
-        cff = new ConnectionFactoryFeature(cfp);
-        Object implementor = new GreeterImplWithContinuationsJMS();        
-        String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
-        ep.setBus(bus);
-        ep.getFeatures().add(cff);
-        ep.publish(address);
+        startBusAndJMS(JMSContinuationsClientServerTest.class);
+        publish("jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply",
+                new GreeterImplWithContinuationsJMS());        
     }
 
-    @AfterClass
-    public static void clearProperty() {
-        bus.shutdown(false);
-    }
-
-    public URL getWSDLURL(String s) throws Exception {
-        URL wsdl = getClass().getResource(s);
-        Assert.assertNotNull(wsdl);
-        return wsdl;
-    }
-        
     @Test
     public void testContinuationWithTimeout() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -72,9 +45,8 @@ public class JMSContinuationsClientServerTest {
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
 
-        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class, cff);
+        HelloWorldPortType greeter = markForClose(service.getPort(portName, HelloWorldPortType.class, cff));
         Assert.assertEquals("Hi Fred Ruby", greeter.greetMe("Fred"));
-        ((java.io.Closeable)greeter).close();
     }
         
 }

@@ -145,9 +145,7 @@
     </binding>
     <service name="HelloWorldService">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
-        	<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
-            <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text?receiveTimeout=500000&amp;messageTimeToLive=500000"/>
+            <soap:address location="jms:queue:test.jmstransport.text?receiveTimeout=500000&amp;messageTimeToLive=500000"/>
         </port>
     </service>
 </definitions>

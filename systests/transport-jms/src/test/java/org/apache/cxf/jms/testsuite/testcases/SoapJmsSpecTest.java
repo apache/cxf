@@ -18,21 +18,15 @@
  */
 package org.apache.cxf.jms.testsuite.testcases;
 
-import java.io.Closeable;
 import java.net.URL;
 import java.util.Map;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jms.testsuite.services.GreeterSpecImpl;
@@ -40,36 +34,21 @@ import org.apache.cxf.jms.testsuite.services.GreeterSpecWithPortError;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
 import org.apache.cxf.jms_greeter.JMSGreeterService2;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.common.gzip.GZIPFeature;
-import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SoapJmsSpecTest {
+public class SoapJmsSpecTest extends AbstractVmJMSTest {
     private static final String SERVICE_NS = "http://cxf.apache.org/jms_greeter";
     private static final String WSDL = "/wsdl/jms_spec_test.wsdl";
-    private static Bus bus;
-    private static ConnectionFactoryFeature cff;
-    private static ConnectionFactory cf;
-
-    public URL getWSDLURL(String s) throws Exception {
-        URL u = getClass().getResource(s);
-        if (u == null) {
-            throw new IllegalArgumentException("WSDL classpath resource not found " + s);
-        }
-        return u;
-    }
 
     @BeforeClass
     public static void startServers() throws Exception {
-        bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        cf = new PooledConnectionFactory(cf1);
-        cff = new ConnectionFactoryFeature(cf);
+        startBusAndJMS(SoapJmsSpecTest.class);
 
         publish("jms:queue:test.cxf.jmstransport.queue2", new GreeterSpecImpl());
         publish("jms:queue:test.cxf.jmstransport.queue5", new GreeterSpecWithPortError());
@@ -81,18 +60,6 @@ public class SoapJmsSpecTest {
         ep.publish("jms:queue:test.cxf.jmstransport.queue6");
     }
     
-    private static void publish(String address, Object impl) {
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(impl);
-        ep.setBus(bus);
-        ep.getFeatures().add(cff);
-        ep.publish(address);
-    }
-
-    @AfterClass
-    public static void stopServers() {
-        bus.shutdown(false);
-    }
-
     @Test
     public void testSpecJMS() throws Exception {
         QName serviceName = new QName(SERVICE_NS, "JMSGreeterService");
@@ -100,19 +67,17 @@ public class SoapJmsSpecTest {
         URL wsdl = getWSDLURL(WSDL);
         JMSGreeterService service = new JMSGreeterService(wsdl, serviceName);
 
-        String response1 = new String("Hello Milestone-");
-        JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class, cff);
+        JMSGreeterPortType greeter = markForClose(service.getPort(portName, JMSGreeterPortType.class, cff));
         for (int idx = 0; idx < 5; idx++) {
 
             greeter.greetMeOneWay("test String");
 
             String greeting = greeter.greetMe("Milestone-" + idx);
-            Assert.assertEquals(response1 + idx, greeting);
+            Assert.assertEquals("Hello Milestone-" + idx, greeting);
 
             String reply = greeter.sayHi();
             Assert.assertEquals(new String("Bonjour"), reply);
         }
-        ((Closeable)greeter).close();
     }
 
     @Test
@@ -121,7 +86,7 @@ public class SoapJmsSpecTest {
         QName portName = new QName(SERVICE_NS, "GreeterPort");
         URL wsdl = getWSDLURL(WSDL);
         JMSGreeterService service = new JMSGreeterService(wsdl, serviceName);
-        JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class, cff);
+        JMSGreeterPortType greeter = markForClose(service.getPort(portName, JMSGreeterPortType.class, cff));
         Map<String, Object> requestContext = ((BindingProvider)greeter).getRequestContext();
         JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
         requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
@@ -144,7 +109,6 @@ public class SoapJmsSpecTest {
         Assert.assertEquals(null, responseHeader.getSOAPJMSSOAPAction());
         Assert.assertEquals(DeliveryMode.PERSISTENT, responseHeader.getJMSDeliveryMode());
         Assert.assertEquals(7, responseHeader.getJMSPriority());
-        ((Closeable)greeter).close();
     }
 
     @Test
@@ -153,10 +117,9 @@ public class SoapJmsSpecTest {
         QName portName = new QName(SERVICE_NS, "GreeterPort2");
         URL wsdl = getWSDLURL(WSDL);
         JMSGreeterService2 service = new JMSGreeterService2(wsdl, serviceName);
-        JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class, cff);
+        JMSGreeterPortType greeter = markForClose(service.getPort(portName, JMSGreeterPortType.class, cff));
 
         String reply = greeter.sayHi();
-        ((Closeable)greeter).close();
         Assert.assertEquals("Bonjour", reply);
     }
 
@@ -167,7 +130,7 @@ public class SoapJmsSpecTest {
         URL wsdl = getWSDLURL(WSDL);
         JMSGreeterService service = new JMSGreeterService(wsdl, serviceName);
 
-        JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class, cff);
+        JMSGreeterPortType greeter = markForClose(service.getPort(portName, JMSGreeterPortType.class, cff));
         BindingProvider bp = (BindingProvider)greeter;
 
         Map<String, Object> requestContext = bp.getRequestContext();
@@ -187,10 +150,7 @@ public class SoapJmsSpecTest {
                 Assert.fail("response Header should not be null");
             }
             Assert.assertTrue(responseHdr.isSOAPJMSIsFault());
-        } finally {
-            ((Closeable)greeter).close();
         }
-
     }
     
     @Test
@@ -203,7 +163,7 @@ public class SoapJmsSpecTest {
         factory.getFeatures().add(cff);
         factory.getFeatures().add(new GZIPFeature());
         factory.setAddress("jms:queue:test.cxf.jmstransport.queue6");
-        JMSGreeterPortType greeter = (JMSGreeterPortType)factory.create(); 
+        JMSGreeterPortType greeter = (JMSGreeterPortType)markForClose(factory.create()); 
         
         for (int idx = 0; idx < 5; idx++) {
 
@@ -215,7 +175,6 @@ public class SoapJmsSpecTest {
             String reply = greeter.sayHi();
             Assert.assertEquals("Bonjour", reply);
         }
-        ((Closeable)greeter).close();
     }
 
 }

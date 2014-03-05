@@ -311,39 +311,39 @@
     </service>
     <service name="HelloWorldServiceAppCorrelationID">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDEng">
-	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.reply" />
+	        <soap:address location="jms:queue:test.jmstransport.text.app.correlation.id?replyToQueueName=test.jmstransport.text.app.correlation.id.reply" />
         </port>
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDSales">
-	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.reply" />
+	        <soap:address location="jms:queue:test.jmstransport.text.app.correlation.id?replyToQueueName=test.jmstransport.text.app.correlation.id.reply" />
         </port>
     </service>
     <service name="HelloWorldServiceAppCorrelationIDStaticPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDStaticPrefixEng">
             <jms:clientConfig  useConduitIdSelector="false"/>
-            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.eng:" />
+            <soap:address location="jms:queue:test.jmstransport.text.app.correlation.id.static.prefix?replyToQueueName=test.jmstransport.text.app.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.eng:" />
         </port>
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDStaticPrefixSales">
-	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.sales:&amp;useConduitIdSelector=false" />
+	        <soap:address location="jms:queue:test.jmstransport.text.app.correlation.id.static.prefix?replyToQueueName=test.jmstransport.text.app.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.sales:&amp;useConduitIdSelector=false" />
         </port>
     </service>
     <service name="HelloWorldServiceAppCorrelationIDNoPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDNoPrefix">
-	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix.reply&amp;receiveTimeout=5000" />
+	        <soap:address location="jms:queue:test.jmstransport.text.app.correlation.id.no.prefix?replyToQueueName=test.jmstransport.text.app.correlation.id.no.prefix.reply&amp;receiveTimeout=5000" />
         </port>
     </service>
     <service name="HelloWorldServiceRuntimeCorrelationIDStaticPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortRuntimeCorrelationIDStaticPrefixEng">
-	        <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.eng:&amp;useConduitIdSelector=true" />
+	        <soap:address location="jms:queue:test.jmstransport.text.runtime.correlation.id.static.prefix?replyToQueueName=test.jmstransport.text.runtime.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.eng:&amp;useConduitIdSelector=true" />
             <jms:server messageSelector="JMSCorrelationID LIKE 'com.mycompany.eng:%'"/>
         </port>
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortRuntimeCorrelationIDStaticPrefixSales">
             <jms:server messageSelector="JMSCorrelationID LIKE 'com.mycompany.sales:%'"/>
-            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.runtime.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.sales:&amp;useConduitIdSelector=true" />
+            <soap:address location="jms:queue:test.jmstransport.text.runtime.correlation.id.static.prefix?replyToQueueName=test.jmstransport.text.runtime.correlation.id.static.prefix.reply&amp;conduitSelectorPrefix=com.mycompany.sales:&amp;useConduitIdSelector=true" />
         </port>
     </service>
     <service name="HelloWorldServiceRuntimeCorrelationIDDynamicPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortRuntimeCorrelationIDDynamicPrefix">
-        	<soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text.runtime.correlation.id.dynamic.prefix?replyToQueueName=dynamicQueues/test.jmstransport.text.runtime.correlation.id.dynamic.prefix.reply" />
+        	<soap:address location="jms:queue:test.jmstransport.text.runtime.correlation.id.dynamic.prefix?replyToQueueName=test.jmstransport.text.runtime.correlation.id.dynamic.prefix.reply" />
         </port>
     </service>
     <service name="HelloWorldServiceLoop">

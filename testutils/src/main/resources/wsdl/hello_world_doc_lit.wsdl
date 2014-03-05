@@ -238,7 +238,7 @@
         <wsdl:port name="SoapPort2" binding="tns:Greeter_SOAPBinding">
 	        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
     	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
-    	    <soap:address location="jms:jndi:dynamicQueues/routertest.SOAPService2Q.text" />
+    	    <soap:address location="jms:jndi:dynamicQueues/routertest.SOAPService2Q.text?replyToQueueName=dynamicQueues/routertest.SOAPService2Q.text.reply" />
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="SOAPService3">

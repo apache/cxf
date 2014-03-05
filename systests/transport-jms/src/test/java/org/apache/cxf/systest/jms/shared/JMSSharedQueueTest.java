@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms;
+package org.apache.cxf.systest.jms.shared;
 
-import java.io.Closeable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,37 +35,30 @@ import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDNoPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDStaticPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDDynamicPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDStaticPrefix;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(JMSSharedQueueTest.class); 
+public class JMSSharedQueueTest extends AbstractVmJMSTest {
+    private static final String WSDL = "/wsdl/jms_test.wsdl";
     private static final String SERVICE_NS = "http://cxf.apache.org/hello_world_jms";
-    private static EmbeddedJMSBrokerLauncher broker;
-    private String wsdlString;
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("tcp://localhost:" + PORT);
-        launchServer(broker);
-        launchServer(new Server(broker));
-        createStaticBus();
+        startBusAndJMS(JMSSharedQueueTest.class);
+        publish(new GreeterImplTwoWayJMSAppCorrelationIDNoPrefix());
+        publish(new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixEng());
+        publish(new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixSales());
+        publish(new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix());
+        publish(new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng());
+        publish(new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales());
+        publish(new GreeterImplTwoWayJMSAppCorrelationIDEng());
+        publish(new GreeterImplTwoWayJMSAppCorrelationIDSales());
     }
     
-    public URL getWSDLURL(String s) throws Exception {
-        URL u = getClass().getResource(s);
-        if (u == null) {
-            throw new IllegalArgumentException("WSDL classpath resource not found " + s);
-        }
-        wsdlString = u.toString().intern();
-        broker.updateWsdl(getBus(), wsdlString);
-        return u;
-    }
-
     private interface CorrelationIDFactory {
         String createCorrealtionID();
     }
@@ -119,13 +111,13 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
             }
             String expected = "Hello " + request;
             String response = port.greetMe(request);
-            assertEquals("Response didn't match expected request", expected, response);
+            Assert.assertEquals("Response didn't match expected request", expected, response);
             if (corrFactory != null) {
                 Map<String, Object> responseContext = bp.getResponseContext();
                 JMSMessageHeadersType responseHeader = 
                     (JMSMessageHeadersType)responseContext.get(
                             JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-                assertEquals("Request and Response CorrelationID didn't match", 
+                Assert.assertEquals("Request and Response CorrelationID didn't match", 
                               correlationID, responseHeader.getJMSCorrelationID());
             }
         }
@@ -154,10 +146,10 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
         QName portNameEng = new QName(SERVICE_NS, "HelloWorldPortAppCorrelationIDEng");
         QName portNameSales = new QName(SERVICE_NS, "HelloWorldPortAppCorrelationIDSales");
 
-        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL(WSDL);
         HelloWorldServiceAppCorrelationID service = new HelloWorldServiceAppCorrelationID(wsdl, serviceName);
 
-        HelloWorldPortType portEng = service.getPort(portNameEng, HelloWorldPortType.class);
+        HelloWorldPortType portEng = markForClose(service.getPort(portNameEng, HelloWorldPortType.class, cff));
         ClientRunnable engClient = 
             new ClientRunnable(portEng,
                 new CorrelationIDFactory() {
@@ -167,7 +159,7 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
                     }
                 });
         
-        HelloWorldPortType portSales = service.getPort(portNameSales, HelloWorldPortType.class);
+        HelloWorldPortType portSales = markForClose(service.getPort(portNameSales, HelloWorldPortType.class, cff));
         ClientRunnable salesClient = 
              new ClientRunnable(portSales,
                 new CorrelationIDFactory() {
@@ -178,32 +170,22 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
                 });
      
         executeAsync(engClient, salesClient);
-        ((Closeable)portEng).close();
-        ((Closeable)portSales).close();
     }
     
     @Test
     public void testTwoWayQueueAppCorrelationIDStaticPrefix() throws Throwable {
-        QName serviceName = new QName(SERVICE_NS, 
-            "HelloWorldServiceAppCorrelationIDStaticPrefix");
-        QName portNameEng = new QName(SERVICE_NS, 
-            "HelloWorldPortAppCorrelationIDStaticPrefixEng");
-        QName portNameSales = new QName(SERVICE_NS, 
-            "HelloWorldPortAppCorrelationIDStaticPrefixSales");
+        QName serviceName = new QName(SERVICE_NS, "HelloWorldServiceAppCorrelationIDStaticPrefix");
+        QName portNameEng = new QName(SERVICE_NS, "HelloWorldPortAppCorrelationIDStaticPrefixEng");
+        QName portNameSales = new QName(SERVICE_NS, "HelloWorldPortAppCorrelationIDStaticPrefixSales");
 
-        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL(WSDL);
         HelloWorldServiceAppCorrelationIDStaticPrefix service = 
             new HelloWorldServiceAppCorrelationIDStaticPrefix(wsdl, serviceName);
 
-        HelloWorldPortType portEng = service.getPort(portNameEng, HelloWorldPortType.class);
-        ClientRunnable engClient = new ClientRunnable(portEng);
-        
-        HelloWorldPortType portSales = service.getPort(portNameSales, HelloWorldPortType.class);
-        ClientRunnable salesClient = new ClientRunnable(portSales);
+        HelloWorldPortType portEng = markForClose(service.getPort(portNameEng, HelloWorldPortType.class, cff));
+        HelloWorldPortType portSales = markForClose(service.getPort(portNameSales, HelloWorldPortType.class, cff));
 
-        executeAsync(engClient, salesClient);
-        ((Closeable)portEng).close();
-        ((Closeable)portSales).close();
+        executeAsync(new ClientRunnable(portEng), new ClientRunnable(portSales));
     }
 
     /* TO DO:
@@ -216,22 +198,19 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
      */
     @Test
     public void testTwoWayQueueAppCorrelationIDNoPrefix() throws Throwable {
-        QName serviceName = new QName(SERVICE_NS, 
-            "HelloWorldServiceAppCorrelationIDNoPrefix");
-        QName portName = new QName(SERVICE_NS, 
-            "HelloWorldPortAppCorrelationIDNoPrefix");
-        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        QName serviceName = new QName(SERVICE_NS, "HelloWorldServiceAppCorrelationIDNoPrefix");
+        QName portName = new QName(SERVICE_NS, "HelloWorldPortAppCorrelationIDNoPrefix");
+        URL wsdl = getWSDLURL(WSDL);
         HelloWorldServiceAppCorrelationIDNoPrefix service = 
             new HelloWorldServiceAppCorrelationIDNoPrefix(wsdl, serviceName);
         
-        HelloWorldPortType port = service.getPort(portName, HelloWorldPortType.class);
+        HelloWorldPortType port = markForClose(service.getPort(portName, HelloWorldPortType.class, cff));
 
         Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();
         for (int i = 0; i < 1; ++i) {
             clients.add(new ClientRunnable(port));            
         }
         executeAsync(clients);
-        ((Closeable)port).close();
     }
 
     /*
@@ -262,20 +241,16 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
      */
     @Test
     public void testTwoWayQueueRuntimeCorrelationIDStaticPrefix() throws Throwable {
-        QName serviceName = new QName(SERVICE_NS, 
-            "HelloWorldServiceRuntimeCorrelationIDStaticPrefix");
-        
-        QName portNameEng = new QName(SERVICE_NS, 
-            "HelloWorldPortRuntimeCorrelationIDStaticPrefixEng");
-        QName portNameSales = new QName(SERVICE_NS, 
-            "HelloWorldPortRuntimeCorrelationIDStaticPrefixSales");
+        QName serviceName = new QName(SERVICE_NS, "HelloWorldServiceRuntimeCorrelationIDStaticPrefix");
+        QName portNameEng = new QName(SERVICE_NS, "HelloWorldPortRuntimeCorrelationIDStaticPrefixEng");
+        QName portNameSales = new QName(SERVICE_NS, "HelloWorldPortRuntimeCorrelationIDStaticPrefixSales");
 
-        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL(WSDL);
         HelloWorldServiceRuntimeCorrelationIDStaticPrefix service = 
             new HelloWorldServiceRuntimeCorrelationIDStaticPrefix(wsdl, serviceName);
         
-        HelloWorldPortType portEng = service.getPort(portNameEng, HelloWorldPortType.class);
-        HelloWorldPortType portSales = service.getPort(portNameSales, HelloWorldPortType.class);
+        HelloWorldPortType portEng = markForClose(service.getPort(portNameEng, HelloWorldPortType.class, cff));
+        HelloWorldPortType portSales = markForClose(service.getPort(portNameSales, HelloWorldPortType.class, cff));
 
         Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();
         for (int i = 0; i < 10; ++i) {
@@ -283,31 +258,23 @@ public class JMSSharedQueueTest extends AbstractBusClientServerTestBase {
             clients.add(new ClientRunnable(portSales, "com.mycompany.sales:"));
         }
         executeAsync(clients);
-        ((Closeable)portEng).close();
-        ((Closeable)portSales).close();
     }
-
-
 
     @Test
     public void testTwoWayQueueRuntimeCorrelationDynamicPrefix() throws Throwable {
-        QName serviceName = new QName(SERVICE_NS, 
-            "HelloWorldServiceRuntimeCorrelationIDDynamicPrefix");
+        QName serviceName = new QName(SERVICE_NS, "HelloWorldServiceRuntimeCorrelationIDDynamicPrefix");
+        QName portName = new QName(SERVICE_NS, "HelloWorldPortRuntimeCorrelationIDDynamicPrefix");
         
-        QName portName = new QName(SERVICE_NS, 
-            "HelloWorldPortRuntimeCorrelationIDDynamicPrefix");
-        
-        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL(WSDL);
         HelloWorldServiceRuntimeCorrelationIDDynamicPrefix service = 
             new HelloWorldServiceRuntimeCorrelationIDDynamicPrefix(wsdl, serviceName);
-        HelloWorldPortType port = service.getPort(portName, HelloWorldPortType.class);
+        HelloWorldPortType port = markForClose(service.getPort(portName, HelloWorldPortType.class));
 
         Collection<ClientRunnable> clients = new ArrayList<ClientRunnable>();        
         for (int i = 0; i < 10; ++i) {
             clients.add(new ClientRunnable(port));
         }
         executeAsync(clients);
-        ((Closeable)port).close();
     }
     
 }

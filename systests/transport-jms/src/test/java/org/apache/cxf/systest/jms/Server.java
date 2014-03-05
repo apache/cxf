@@ -42,25 +42,13 @@ public class Server extends AbstractBusTestServerBase {
         broker.updateWsdl(bus, "testutils/jms_test_mtom.wsdl");
         
         Endpoint.publish(null, new GreeterImplDoc());
-
-        String address = null;
-        Endpoint.publish(address, new GreeterImplTwoWayJMS());
+        Endpoint.publish(null, new GreeterImplTwoWayJMS());
         Endpoint.publish(null, new GreeterImplQueueOneWay());
         Endpoint.publish(null, new GreeterImplTopicOneWay());
         Endpoint.publish(null, new GreeterByteMessageImpl());
         Endpoint.publish(null, new SoapService6SoapPort6Impl());
         Endpoint.publish(null, new JmsDestPubSubImpl());
-
         Endpoint.publish(null, new SoapService7SoapPort7Impl());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDNoPrefix());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixEng());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixSales());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDEng());
-        Endpoint.publish(null, new GreeterImplTwoWayJMSAppCorrelationIDSales());
-
     }
 
 }

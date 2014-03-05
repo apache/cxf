@@ -18,35 +18,22 @@
  */
 package org.apache.cxf.jms.testsuite.testcases;
 
-import java.io.Closeable;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.systest.jms.Hello;
 import org.apache.cxf.systest.jms.HelloImpl;
-import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JavaFirstNoWsdlTest {
+public class JavaFirstNoWsdlTest extends AbstractVmJMSTest {
     private static final String SERVICE_ADDRESS = "jms:queue:test.cxf.jmstransport.queue3?receivetTimeOut=5000";
-    private static Bus bus;
-    private static ConnectionFactoryFeature cff;
 
     @BeforeClass
     public static void startServer() {
-        bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
-        cff = new ConnectionFactoryFeature(cfp);
-
+        startBusAndJMS(JavaFirstNoWsdlTest.class);
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setBus(bus);
         svrFactory.getFeatures().add(cff);
@@ -55,11 +42,6 @@ public class JavaFirstNoWsdlTest {
         svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         svrFactory.setServiceBean(new HelloImpl());
         svrFactory.create();
-    }
-
-    @AfterClass
-    public static void stopServers() {
-        bus.shutdown(false);
     }
 
     @Test
@@ -81,11 +63,10 @@ public class JavaFirstNoWsdlTest {
         factory.getFeatures().add(cff);
         factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         factory.setServiceClass(Hello.class);
-        factory.setAddress(address);
-        Hello client = (Hello)factory.create();
+        factory.setAddress(address); 
+        Hello client = (Hello)markForClose(factory.create());
         String reply = client.sayHi(" HI");
         Assert.assertEquals("get HI", reply);
-        ((Closeable)client).close();
     }
 
 }

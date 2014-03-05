@@ -25,50 +25,29 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
-import org.junit.AfterClass;
+import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class HelloWorldContinuationsThrottleTest {
+public class HelloWorldContinuationsThrottleTest extends AbstractVmJMSTest {
     private static final String WSDL_PATH = "org/apache/cxf/systest/jms/continuations/test.wsdl";
-    private static Bus bus;
-    private static ConnectionFactoryFeature cff;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        bus = BusFactory.getDefaultBus();
-        ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
-        cff = new ConnectionFactoryFeature(cfp);
-        Object implementor = new HelloWorldWithContinuationsJMS2();        
-        String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(address, implementor);
-        ep.getFeatures().add(cff);
-        ep.setBus(bus);
-        ep.publish();
+        startBusAndJMS(HelloWorldContinuationsThrottleTest.class);
+        publish("jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply",
+                new HelloWorldWithContinuationsJMS2());        
     }
 
-    @AfterClass
-    public static void clearProperty() {
-        bus.shutdown(false);
-    }
-    
     @Test
     public void testThrottleContinuations() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
         URL wsdlURL = getClass().getClassLoader().getResource(WSDL_PATH);
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
-        final HelloContinuation helloPort = service.getPort(HelloContinuation.class, cff);
+        final HelloContinuation helloPort = markForClose(service.getPort(HelloContinuation.class, cff));
         
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
@@ -86,7 +65,6 @@ public class HelloWorldContinuationsThrottleTest {
         executor.execute(new HelloWorker(helloPort, "James", "ServiceMix", startSignal, helloDoneSignal));
                 
         helloDoneSignal.await(60, TimeUnit.SECONDS);
-        ((java.io.Closeable)helloPort).close();
         executor.shutdownNow();
         
         Assert.assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());

@@ -16,17 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms;
+package org.apache.cxf.systest.jms.shared;
 
 import javax.jws.WebService;
 
+import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
 
 
-@WebService(serviceName = "HelloWorldServiceAppCorrelationID", 
-            portName = "HelloWorldPortAppCorrelationIDEng",
+
+@WebService(serviceName = "HelloWorldServiceRuntimeCorrelationIDStaticPrefix", 
+            portName = "HelloWorldPortRuntimeCorrelationIDStaticPrefixSales",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterImplTwoWayJMSAppCorrelationIDEng extends TwoWayJMSImplBase {    
+public class GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales extends TwoWayJMSImplBase {    
     
 }

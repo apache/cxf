@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms;
+package org.apache.cxf.systest.jms.shared;
 
 import javax.jws.WebService;
+
+import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
 
 
 
