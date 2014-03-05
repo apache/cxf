@@ -382,7 +382,7 @@ public final class InjectionUtils {
             adapterHasToBeUsed = true;
         }
         
-        Object result = instantiateFromParameterHandler(value, cls, message);
+        Object result = instantiateFromParameterHandler(value, cls, paramAnns, message);
         if (result != null) {
             return pClass.cast(result);
         }
@@ -395,7 +395,7 @@ public final class InjectionUtils {
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (Exception ex) {
-            result = createFromParameterHandler(value, cls, message);
+            result = createFromParameterHandler(value, cls, paramAnns, message);
             if (result == null) {
                 LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                    BUNDLE, 
@@ -418,7 +418,7 @@ public final class InjectionUtils {
         }
         
         if (result == null) {
-            result = createFromParameterHandler(value, cls, message);
+            result = createFromParameterHandler(value, cls, paramAnns, message);
         }
         
         if (adapterHasToBeUsed) {
@@ -440,10 +440,11 @@ public final class InjectionUtils {
 
     private static <T> T instantiateFromParameterHandler(String value, 
                                                      Class<T> pClass,
+                                                     Annotation[] anns,  
                                                      Message m) {
         if (Date.class == pClass || Locale.class == pClass 
             || m != null && MessageUtils.isTrue(m.getContextualProperty(PARAM_HANDLERS_FIRST))) {
-            return createFromParameterHandler(value, pClass, m);
+            return createFromParameterHandler(value, pClass, anns, m);
         } else {
             return null;
         }
@@ -451,11 +452,12 @@ public final class InjectionUtils {
     
     private static <T> T createFromParameterHandler(String value, 
                                                     Class<T> pClass,
+                                                    Annotation[] anns,
                                                     Message message) {
         T result = null;
         if (message != null) {
             ParamConverter<T> pm = ProviderFactory.getInstance(message)
-                .createParameterHandler(pClass);
+                .createParameterHandler(pClass, anns);
             if (pm != null) {
                 result = pm.fromString(value);
             }

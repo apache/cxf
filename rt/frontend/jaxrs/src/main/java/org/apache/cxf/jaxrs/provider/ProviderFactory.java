@@ -383,18 +383,18 @@ public final class ProviderFactory {
         return (ExceptionMapper<T>) candidates.get(0);
     }
     
-    public <T> ParamConverter<T> createParameterHandler(Class<T> paramType) {
+    public <T> ParamConverter<T> createParameterHandler(Class<T> paramType, Annotation[] anns) {
         
         if (newParamConverter != null) {
-            return newParamConverter.getConverter(paramType, null, null);
+            anns = anns != null ? anns : new Annotation[]{};
+            return newParamConverter.getConverter(paramType, paramType, anns);
         } else if (legacyParamConverter != null) {
             return legacyParamConverter.getConverter(paramType, null, null);
         } else {
             return null;
         }
-        
     }
-    
+        
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
                                  Class<?> paramType) {

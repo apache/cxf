@@ -420,7 +420,7 @@ public class ProviderFactoryTest extends Assert {
         ProviderFactory pf = ProviderFactory.getInstance();
         ParameterHandler<Customer> h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
-        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class);
+        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, null);
         
         assertSame(((LegacyParamConverter<Customer>)h2).getHandler(), h);
     }

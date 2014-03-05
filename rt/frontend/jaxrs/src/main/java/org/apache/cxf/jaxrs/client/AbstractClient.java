@@ -127,10 +127,10 @@ public abstract class AbstractClient implements Client, Retryable {
             if (values.length > 1) {
                 throw new IllegalArgumentException("Content-Type can have a single value only");
             }
-            type(convertParamValue(values[0]));
+            type(convertParamValue(values[0], null));
         } else {
             for (Object o : values) {
-                possiblyAddHeader(name, convertParamValue(o));
+                possiblyAddHeader(name, convertParamValue(o, null));
             }
         }
         return this;
@@ -674,6 +674,7 @@ public abstract class AbstractClient implements Client, Retryable {
     protected void addMatrixQueryParamsToBuilder(UriBuilder ub, 
                                                  String paramName, 
                                                  ParameterType pt,
+                                                 Annotation[] anns,
                                                  Object... pValues) {
         if (pt != ParameterType.MATRIX && pt != ParameterType.QUERY) {
             throw new IllegalArgumentException("This method currently deal "
@@ -686,10 +687,10 @@ public abstract class AbstractClient implements Client, Retryable {
                         Collection<?> c = pValue.getClass().isArray() 
                             ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
                         for (Iterator<?> it = c.iterator(); it.hasNext();) {
-                            convertMatrixOrQueryToBuilder(ub, paramName, it.next(), pt);
+                            convertMatrixOrQueryToBuilder(ub, paramName, it.next(), pt, anns);
                         }
                     } else { 
-                        convertMatrixOrQueryToBuilder(ub, paramName, pValue, pt); 
+                        convertMatrixOrQueryToBuilder(ub, paramName, pValue, pt, anns); 
                     }
                 }
             } else {
@@ -701,7 +702,7 @@ public abstract class AbstractClient implements Client, Retryable {
                 InjectionUtils.extractValuesFromBean(pValue, "");
             for (Map.Entry<String, List<Object>> entry : values.entrySet()) {
                 for (Object v : entry.getValue()) {
-                    convertMatrixOrQueryToBuilder(ub, entry.getKey(), v, pt);
+                    convertMatrixOrQueryToBuilder(ub, entry.getKey(), v, pt, anns);
                 }
             }
         }
@@ -710,8 +711,9 @@ public abstract class AbstractClient implements Client, Retryable {
     private void convertMatrixOrQueryToBuilder(UriBuilder ub, 
                                            String paramName, 
                                            Object pValue,
-                                           ParameterType pt) {
-        Object convertedValue = convertParamValue(pValue);
+                                           ParameterType pt,
+                                           Annotation[] anns) {
+        Object convertedValue = convertParamValue(pValue, anns);
         addMatrixOrQueryToBuilder(ub, paramName, pt, convertedValue);
     }
     
@@ -727,24 +729,15 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     
-    protected String convertParamValue(Object pValue) {
+    protected String convertParamValue(Object pValue, Annotation[] anns) {
         if (pValue == null) {
             return null;
         }
-        Class<?> pClass = pValue.getClass();
-        if (pClass == String.class || pClass.isPrimitive()) {
-            return pValue.toString();
-        }
-        
-        // A little scope for some optimization exists, particularly,
-        // it is feasible a complex object may need to be repeatedly converted
-        // so we can keep a map of ParamConverter on the bus, that said
-        // it seems an over-optimization at this stage, it's a 5% case;
-        // typical requests have a limited number of simple URI parameters
         ProviderFactory pf = ProviderFactory.getInstance(cfg.getBus());
         if (pf != null) {
+            Class<?> pClass = pValue.getClass();
             @SuppressWarnings("unchecked")
-            ParamConverter<Object> prov = (ParamConverter<Object>)pf.createParameterHandler(pClass);
+            ParamConverter<Object> prov = (ParamConverter<Object>)pf.createParameterHandler(pClass, anns);
             if (prov != null) {
                 return prov.toString(pValue);
             }
