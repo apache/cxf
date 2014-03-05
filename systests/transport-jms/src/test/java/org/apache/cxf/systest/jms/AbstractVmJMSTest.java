@@ -52,7 +52,7 @@ public abstract class AbstractVmJMSTest {
 
     public static void startBusAndJMS(Class<?> testClass) {
         bus = BusFactory.getDefaultBus();
-        String brokerURI = "vm://" + testClass.getName() +"?broker.persistent=false";
+        String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false";
         ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerURI);
         cf = new PooledConnectionFactory(cf1);
         cff = new ConnectionFactoryFeature(cf);
