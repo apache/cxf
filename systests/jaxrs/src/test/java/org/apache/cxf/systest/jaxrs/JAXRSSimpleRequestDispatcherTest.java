@@ -55,5 +55,15 @@ public class JAXRSSimpleRequestDispatcherTest extends AbstractBusClientServerTes
         assertEquals("Welcome", welcome);
     }
     
+    @Test
+    public void testGetRedirectedBook() throws Exception {
+        String address = "http://localhost:" + PORT + "/dispatch/bookstore2/books/redirectStart";
+        WebClient client = WebClient.create(address);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        client.accept("application/json");
+        Book book = client.get(Book.class);
+        assertEquals("Redirect complete", book.getName());
+    }
+    
     
 }

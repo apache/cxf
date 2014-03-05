@@ -20,15 +20,21 @@
 -->
 <!-- START SNIPPET: webxml -->
 <web-app>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>WEB-INF/beans.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+                        org.springframework.web.context.ContextLoaderListener
+                </listener-class>
+    </listener>
     <servlet>
-    <servlet-name>CXFServlet</servlet-name>
-    <servlet-class>org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet</servlet-class>
-    <init-param>
-      <param-name>jaxrs.serviceClasses</param-name>
-      <param-value>
-           org.apache.cxf.systest.jaxrs.BookStore
-      </param-value>
-    </init-param>  
+        <servlet-name>CXFServlet</servlet-name>
+        <display-name>CXF Servlet</display-name>
+        <servlet-class>
+                        org.apache.cxf.transport.servlet.CXFServlet
+                </servlet-class>  
     <init-param>
         <param-name>redirects-list</param-name>
         <param-value>/welcome.txt</param-value>
@@ -36,10 +42,6 @@
     <init-param>
         <param-name>redirect-servlet-name</param-name>
         <param-value>default</param-value>
-    </init-param>
-    <init-param>
-        <param-name>redirect-attributes</param-name>
-        <param-value>javax.servlet.include.request_uri</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
    </servlet>
