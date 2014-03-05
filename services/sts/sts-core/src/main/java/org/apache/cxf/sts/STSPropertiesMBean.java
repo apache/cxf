@@ -193,5 +193,20 @@ public interface STSPropertiesMBean {
      * @param samlRealmCodec the SAMLRealmCodec object to use.
      */
     void setSamlRealmCodec(SAMLRealmCodec samlRealmCodec);
+    
+    /**
+     * Get whether to validate a client Public Key or Certificate presented as part of a 
+     * UseKey element. This is true by default.
+     */
+    boolean isValidateUseKey();
+    
+    /**
+     * Set whether to validate a client Public Key or Certificate presented as part of a 
+     * UseKey element. If this is set to true (the default), the public key must be trusted
+     * by the Signature Crypto of the STS.
+     * 
+     * @param validateUseKey whether to validate a client UseKey or not.
+     */
+    void setValidateUseKey(boolean validateUseKey);
 
 }

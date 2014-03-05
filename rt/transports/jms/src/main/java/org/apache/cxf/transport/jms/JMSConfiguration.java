@@ -85,10 +85,8 @@ public class JMSConfiguration {
     private String requestURI;
 
     public void ensureProperlyConfigured() {
-        if (connectionFactory == null) {
-            connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
-        }
-        if (connectionFactory == null) {
+        ConnectionFactory cf = getConnectionFactory();
+        if (cf == null) {
             throw new IllegalArgumentException("connectionFactory may not be null");
         }
         if (targetDestination == null) {

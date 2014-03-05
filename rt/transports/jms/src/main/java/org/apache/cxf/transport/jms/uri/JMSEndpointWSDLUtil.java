@@ -43,13 +43,13 @@ public final class JMSEndpointWSDLUtil {
      * @param ei
      */
     static void retrieveWSDLInformation(JMSEndpoint endpoint, EndpointInfo ei) {
+        // TODO We could have more than one parameter
         JndiContextParameterType jndiContextParameterType = 
             getWSDLExtensor(ei, JndiContextParameterType.class);
         if (jndiContextParameterType != null) {
             endpoint.putJndiParameter(jndiContextParameterType.getName().trim(),
                                       jndiContextParameterType.getValue().trim());
         }
-        
         
         JndiConnectionFactoryNameType jndiConnectionFactoryNameType 
             = getWSDLExtensor(ei, JndiConnectionFactoryNameType.class);

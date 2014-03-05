@@ -159,7 +159,7 @@ public class JMSDestination extends AbstractMultiplexDestination
         } catch (UnsupportedEncodingException ex) {
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } catch (JMSException e) {
-            JMSUtil.convertJmsException(e);
+            throw JMSUtil.convertJmsException(e);
         } finally {
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);

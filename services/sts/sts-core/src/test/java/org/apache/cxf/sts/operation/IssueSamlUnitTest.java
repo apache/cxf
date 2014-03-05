@@ -479,7 +479,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         }
         
         // Now add UseKey
-        UseKeyType useKey = createUseKey(crypto);
+        UseKeyType useKey = createUseKey(crypto, "myclientkey");
         JAXBElement<UseKeyType> useKeyType = 
             new JAXBElement<UseKeyType>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
         request.getAny().add(useKeyType);
@@ -971,6 +971,115 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
     }
     
+    /**
+     * Test to UseKey validation
+     */
+    @org.junit.Test
+    public void testUseKey() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new SAMLTokenProvider());
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        JAXBElement<String> keyType = 
+            new JAXBElement<String>(
+                QNameConstants.KEY_TYPE, String.class, STSConstants.PUBLIC_KEY_KEYTYPE
+            );
+        request.getAny().add(keyType);
+        
+        UseKeyType useKey = createUseKey(crypto, "myclientkey");
+        JAXBElement<UseKeyType> useKeyType = 
+            new JAXBElement<UseKeyType>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
+        request.getAny().add(useKeyType);
+        
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Issue a token
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+            }
+        }
+        
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_HOLDER_KEY));
+        
+        // Now remove the UseKey + send a non-trusted UseKey certificate
+        request.getAny().remove(useKeyType);
+        
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
+        );
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "evespass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
+        
+        useKey = createUseKey(CryptoFactory.getInstance(properties), "eve");
+        useKeyType = new JAXBElement<UseKeyType>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
+        request.getAny().add(useKeyType);
+        
+        // This should fail as the UseKey certificate is not trusted
+        try {
+            issueOperation.issue(request, webServiceContext);
+            fail("Failure expected as the UseKey certificate is not trusted");
+        } catch (STSException ex) {
+            // expected
+        }
+        
+        // Now allow non-trusted UseKey certificates...
+        stsProperties.setValidateUseKey(false);
+        response = issueOperation.issue(request, webServiceContext);
+        securityTokenResponse = response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+    }
+    
     /*
      * Create a security context object
      */
@@ -1005,9 +1114,9 @@ public class IssueSamlUnitTest extends org.junit.Assert {
     /*
      * Mock up a UseKeyType object
      */
-    private UseKeyType createUseKey(Crypto crypto) throws Exception {
+    private UseKeyType createUseKey(Crypto crypto, String alias) throws Exception {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-        cryptoType.setAlias("myclientkey");
+        cryptoType.setAlias(alias);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         Document doc = DOMUtils.createDocument();
         Element x509Data = doc.createElementNS(WSConstants.SIG_NS, "ds:X509Data");
