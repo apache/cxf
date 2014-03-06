@@ -22,22 +22,26 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
+import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.rs.security.saml.assertion.Subject;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.claims.authorization.Claim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
 import org.apache.cxf.security.claims.authorization.Claims;
-
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -176,8 +180,11 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         in.handleMessage(m);
         
         ClaimsAuthorizingInterceptor in2 = new ClaimsAuthorizingInterceptor();
-        org.apache.cxf.rs.security.saml.assertion.Claim claim =
-            new org.apache.cxf.rs.security.saml.assertion.Claim("a", "b", "c");
+        org.apache.cxf.rt.security.claims.SAMLClaim claim =
+            new org.apache.cxf.rt.security.claims.SAMLClaim();
+        claim.setNameFormat("a");
+        claim.setName("b");
+        claim.addValue("c");
         in2.setClaims(Collections.singletonMap("test", 
                 Collections.singletonList(
                    new ClaimBean(claim))));
@@ -194,7 +201,7 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
     
     
     private void doTestClaims(String methodName,
-            org.apache.cxf.rs.security.saml.assertion.Claim... claim) 
+            org.apache.cxf.rt.security.claims.Claim... claim) 
         throws Exception {
         Message m = prepareMessage(TestService.class, methodName, claim);
         interceptor.handleMessage(m);
@@ -202,12 +209,16 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
     
     private Message prepareMessage(Class<?> cls,
             String methodName,
-            org.apache.cxf.rs.security.saml.assertion.Claim... claim) 
+            org.apache.cxf.rt.security.claims.Claim... claim) 
         throws Exception {
-        List<org.apache.cxf.rs.security.saml.assertion.Claim> claims =
-            new ArrayList<org.apache.cxf.rs.security.saml.assertion.Claim>(Arrays.asList(claim));
-        SecurityContext sc = new JAXRSSAMLSecurityContext(
-                new Subject("user"), claims);
+        ClaimCollection claims = new ClaimCollection();
+        claims.addAll(Arrays.asList(claim));
+        
+        Set<Principal> roles = 
+            SAMLUtils.parseRolesFromClaims(claims, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT, 
+                                           SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
+        
+        SecurityContext sc = new SAMLSecurityContext(new SimplePrincipal("user"), roles, claims);
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         m.put(SecurityContext.class, sc);
@@ -216,17 +227,16 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         return m;
     }
     
-    private org.apache.cxf.rs.security.saml.assertion.Claim createDefaultClaim(
-            String... values) {
-        return createClaim(org.apache.cxf.rs.security.saml.assertion.Claim.DEFAULT_ROLE_NAME, 
-                           org.apache.cxf.rs.security.saml.assertion.Claim.DEFAULT_NAME_FORMAT, 
+    private org.apache.cxf.rt.security.claims.Claim createDefaultClaim(
+            Object... values) {
+        return createClaim(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
+                           SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED,
                            values);
     }
     
-    private org.apache.cxf.rs.security.saml.assertion.Claim createClaim(
-            String name, String format, String... values) {
-        org.apache.cxf.rs.security.saml.assertion.Claim claim = 
-            new org.apache.cxf.rs.security.saml.assertion.Claim();
+    private org.apache.cxf.rt.security.claims.Claim createClaim(
+            String name, String format, Object... values) {
+        SAMLClaim claim = new SAMLClaim();
         claim.setName(name);
         claim.setNameFormat(format);
         claim.setValues(Arrays.asList(values));

@@ -38,13 +38,6 @@ import org.opensaml.xml.XMLObject;
 
 public final class SAMLUtils {
     
-    /**
-     * This configuration tag specifies the default attribute name where the roles are present
-     * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
-     */
-    public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-    
     private SAMLUtils() {
         
     }
@@ -114,7 +107,7 @@ public final class SAMLUtils {
     ) {
         String roleAttributeName = name;
         if (roleAttributeName == null) {
-            roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
+            roleAttributeName = SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
         }
         
         Set<Principal> roles = new HashSet<Principal>();

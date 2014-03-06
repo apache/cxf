@@ -21,18 +21,18 @@ package org.apache.cxf.rs.security.oauth2.grants.saml;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.saml.assertion.Claims;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 
 public class SamlUserSubject extends UserSubject {
     private static final long serialVersionUID = -1135272749329239037L;
-    private Claims claims;
+    private ClaimCollection claims;
     public SamlUserSubject(String user, 
                            List<String> roles,
-                           Claims claims) {
+                           ClaimCollection claims) {
         super(user, roles);
         this.claims = claims;
     }
-    public Claims getClaims() {
+    public ClaimCollection getClaims() {
         return claims;
     }
 }

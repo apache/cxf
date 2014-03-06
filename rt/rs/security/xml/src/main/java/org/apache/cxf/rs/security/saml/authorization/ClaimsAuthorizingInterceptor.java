@@ -36,6 +36,8 @@ import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.claims.authorization.Claim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
@@ -67,13 +69,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     
     public void handleMessage(Message message) throws Fault {
         SecurityContext sc = message.get(SecurityContext.class);
-        if (!(sc instanceof JAXRSSAMLSecurityContext)) {
+        if (!(sc instanceof SAMLSecurityContext)) {
             throw new AccessDeniedException("Security Context is unavailable or unrecognized");
         }
         
         Method method = getTargetMethod(message);
         
-        if (authorize((JAXRSSAMLSecurityContext)sc, method)) {
+        if (authorize((SAMLSecurityContext)sc, method)) {
             return;
         }
         
@@ -98,14 +100,21 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         throw new AccessDeniedException("Method is not available : Unauthorized");
     }
 
-    protected boolean authorize(JAXRSSAMLSecurityContext sc, Method method) {
+    protected boolean authorize(SAMLSecurityContext sc, Method method) {
         List<ClaimBean> list = claims.get(method.getName());
-        org.apache.cxf.rs.security.saml.assertion.Claims actualClaims = sc.getClaims();
+        org.apache.cxf.rt.security.claims.ClaimCollection actualClaims = sc.getClaims();
         
         for (ClaimBean claimBean : list) {
-            org.apache.cxf.rs.security.saml.assertion.Claim claim =  claimBean.getClaim();
-            org.apache.cxf.rs.security.saml.assertion.Claim matchingClaim = 
-                actualClaims.findClaimByFormatAndName(claim.getNameFormat(), claim.getName());
+            org.apache.cxf.rt.security.claims.Claim claim = claimBean.getClaim();
+            org.apache.cxf.rt.security.claims.Claim matchingClaim = null;
+            for (org.apache.cxf.rt.security.claims.Claim cl : actualClaims) {
+                if (cl instanceof SAMLClaim
+                    && ((SAMLClaim)cl).getName().equals(((SAMLClaim)claim).getName())
+                    && ((SAMLClaim)cl).getNameFormat().equals(((SAMLClaim)claim).getNameFormat())) {
+                    matchingClaim = cl;
+                    break;
+                }
+            }
             if (matchingClaim == null) {
                 if (claimBean.getClaimMode() == ClaimMode.STRICT) {
                     return false;
@@ -113,14 +122,14 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
                     continue;
                 }
             }
-            List<String> claimValues = claim.getValues();
-            List<String> matchingClaimValues = matchingClaim.getValues();
+            List<Object> claimValues = claim.getValues();
+            List<Object> matchingClaimValues = matchingClaim.getValues();
             if (claimBean.isMatchAll() 
                 && !matchingClaimValues.containsAll(claimValues)) {    
                 return false;
             } else {
                 boolean matched = false;
-                for (String value : matchingClaimValues) {
+                for (Object value : matchingClaimValues) {
                     if (claimValues.contains(value)) {
                         matched = true;    
                         break;
@@ -201,8 +210,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             annClaims.add(claimAnn);
         }
         for (Claim ann : annClaims) {
-            org.apache.cxf.rs.security.saml.assertion.Claim claim = 
-                new org.apache.cxf.rs.security.saml.assertion.Claim();
+            SAMLClaim claim = new SAMLClaim();
             
             String claimName = ann.name();
             if (nameAliases.containsKey(claimName)) {
@@ -215,7 +223,9 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             
             claim.setName(claimName);
             claim.setNameFormat(claimFormat);
-            claim.setValues(Arrays.asList(ann.value()));
+            for (String value : ann.value()) {
+                claim.addValue(value);
+            }
             
             claimsList.add(new ClaimBean(claim, ann.mode(), ann.matchAll()));
         }

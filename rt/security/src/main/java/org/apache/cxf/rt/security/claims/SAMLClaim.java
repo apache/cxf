@@ -25,6 +25,13 @@ package org.apache.cxf.rt.security.claims;
  */
 public class SAMLClaim extends Claim {
     
+    /**
+     * This configuration tag specifies the default attribute name where the roles are present
+     * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
+     */
+    public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+    
     private static final long serialVersionUID = 5530712294179589442L;
 
     private String nameFormat;
