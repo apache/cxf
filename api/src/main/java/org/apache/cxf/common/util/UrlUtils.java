@@ -20,7 +20,6 @@
 package org.apache.cxf.common.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,13 +107,12 @@ public final class UrlUtils {
      * @return the trailing 
      */
     public static String getStem(String baseURI) {
-        URI uri = URI.create(baseURI);
-        baseURI = uri.getRawPath();
         int idx = baseURI.lastIndexOf('/');
+        String result = baseURI;
         if (idx != -1) {
-            baseURI = baseURI.substring(0, idx);
+            result = baseURI.substring(0, idx);
         }
-        return URI.create(baseURI).getPath();
+        return result;
     }
     
     
