@@ -470,7 +470,6 @@ public class SamlTokenTest extends AbstractSecurityTest {
      * This test creates a SAML1 Assertion and sends it in the security header to the provider.
      */
     @Test
-    //@Ignore
     public void testSaml1TokenWithRoles() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
