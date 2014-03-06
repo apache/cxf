@@ -907,7 +907,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         
         String at = ((Element)nd).getAttribute("type");
         assertTrue(at.contains("myClass2"));
-        assertEquals("true", ((Element)nd).getAttribute("nillable"));
+        assertEquals("0", ((Element)nd).getAttribute("minOccurs"));
     }
     
     
