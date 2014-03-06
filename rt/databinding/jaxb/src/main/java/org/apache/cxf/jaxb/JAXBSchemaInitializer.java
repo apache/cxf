@@ -40,6 +40,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorOrder;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -552,7 +553,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             } else {
                 JAXBBeanInfo beanInfo = getBeanInfo(type);
                 if (beanInfo != null) {
-                    addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
+                    XmlElement xmlElementAnno = f.getAnnotation(XmlElement.class);
+                    addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type), xmlElementAnno);
                 }
             }
         }
@@ -574,7 +576,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                     int idx = m.getName().startsWith("get") ? 3 : 2;
                     String name = m.getName().substring(idx);
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                    addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type));
+                    XmlElement  xmlElementAnno =  m.getAnnotation(XmlElement.class);
+                    addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type), xmlElementAnno);
                 }
             }
         }
@@ -723,16 +726,20 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
     protected void addElement(XmlSchema schema,
                               XmlSchemaSequence seq, JAXBBeanInfo beanInfo,
-                              QName name, boolean isArray) {
+                              QName name, boolean isArray, XmlElement xmlElementAnno) {
         XmlSchemaElement el = new XmlSchemaElement(schema, false);
-
         if (isArray) {
             el.setMinOccurs(0);
             el.setMaxOccurs(Long.MAX_VALUE);
         } else {
-            el.setMinOccurs(1);
-            el.setMaxOccurs(1);
-            el.setNillable(true);
+            if (xmlElementAnno == null) {
+                el.setMinOccurs(0);
+                el.setNillable(false);
+            } else {
+                el.setNillable(xmlElementAnno.nillable());
+                int minOccurs = xmlElementAnno.required() ? 1 : 0;
+                el.setMinOccurs(minOccurs);
+            }
         }
 
         if (beanInfo.isElement()) {
@@ -742,7 +749,11 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             el.setNillable(false);
             el.getRef().setTargetQName(el2.getQName());
         } else {
-            el.setName(name.getLocalPart());
+            if (xmlElementAnno != null && !StringUtils.isEmpty(xmlElementAnno.name())) {
+                el.setName(xmlElementAnno.name());
+            } else {
+                el.setName(name.getLocalPart());
+            }
             Iterator<QName> itr = beanInfo.getTypeNames().iterator();
             if (!itr.hasNext()) {
                 return;

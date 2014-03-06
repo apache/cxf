@@ -35,6 +35,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XPathUtils;
@@ -907,7 +908,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         
         String at = ((Element)nd).getAttribute("type");
         assertTrue(at.contains("myClass2"));
-        assertEquals("true", ((Element)nd).getAttribute("nillable"));
+        assertEquals("0", ((Element)nd).getAttribute("minOccurs"));
     }
     
     
