@@ -22,6 +22,7 @@ package org.apache.cxf.frontend;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collection;
@@ -56,6 +57,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
@@ -66,6 +68,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
+import org.springframework.util.StringUtils;
 
 /**
  * 
@@ -142,7 +145,6 @@ public class WSDLGetUtils {
             if (prop != null) {
                 base = String.valueOf(prop);
             }
-
             String wsdl = params.get("wsdl");
             if (wsdl != null) {
                 // Always use the URL decoded version to ensure that we have a
@@ -188,7 +190,7 @@ public class WSDLGetUtils {
                 Definition def = builder.build(new HashMap<String, SchemaInfo>());
 
                 mp.put("", def);
-                updateDefinition(bus, def, mp, smp, base, endpointInfo);
+                updateDefinition(bus, def, mp, smp, base, endpointInfo, "");
             }
             
             
@@ -258,7 +260,7 @@ public class WSDLGetUtils {
                 }
             }
             
-            updateDoc(doc, base, mp, smp, message);
+            updateDoc(doc, base, mp, smp, message, xsd, wsdl);
             
             return doc;
         } catch (WSDLQueryException wex) {
@@ -270,11 +272,19 @@ public class WSDLGetUtils {
         }
     }
     
-    protected String mapUri(String base, Map<String, SchemaReference> smp, String loc)
+    protected String mapUri(String base, Map<String, SchemaReference> smp, String loc, String xsd)
         throws UnsupportedEncodingException {
-        SchemaReference ref = smp.get(URLDecoder.decode(loc, "utf-8"));
+        String key = loc;
+        try {
+            if (!(new URI(loc).isAbsolute()) && xsd != null && !UrlUtils.getStem(xsd).equals(xsd)) {
+                key = UrlUtils.getStem(xsd) + "/" + loc;
+            }
+        } catch (URISyntaxException e) {
+           //ignore
+        }
+        SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
         if (ref != null) {
-            return base + "?xsd=" + ref.getSchemaLocationURI().replace(" ", "%20");
+            return base + "?xsd=" + key.replace(" ", "%20");
         }
         return null;
     }
@@ -283,16 +293,17 @@ public class WSDLGetUtils {
                            String base,
                            Map<String, Definition> mp,
                            Map<String, SchemaReference> smp,
-                           Message message) {        
+                           Message message,
+                           String xsd,
+                           String wsdl) {        
         List<Element> elementList = null;
         
         try {
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                                           "http://www.w3.org/2001/XMLSchema",
-                                                                           "import");
+                                                              "http://www.w3.org/2001/XMLSchema", "import");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(base, smp, sl);
+                sl = mapUri(base, smp, sl, xsd);
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -321,6 +332,13 @@ public class WSDLGetUtils {
                                                               "import");
             for (Element el : elementList) {
                 String sl = el.getAttribute("location");
+                try {
+                    if (!StringUtils.isEmpty(wsdl) && !(new URI(sl).isAbsolute())) {
+                        sl = UrlUtils.getStem(wsdl) + "/" + sl;
+                    }
+                } catch (URISyntaxException e) {
+                    //ignore
+                }
                 if (mp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
                     el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
                 }
@@ -419,19 +437,19 @@ public class WSDLGetUtils {
     protected void updateDefinition(Bus bus,
                                  Definition def, Map<String, Definition> done,
                                  Map<String, SchemaReference> doneSchemas,
-                                 String base, EndpointInfo ei) {
+                                 String base, EndpointInfo ei, String docBase) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
         
         Collection<List<?>> imports = CastUtils.cast((Collection<?>)def.getImports().values());
         for (List<?> lst : imports) {
             List<Import> impLst = CastUtils.cast(lst);
             for (Import imp : impLst) {
-                
                 String start = imp.getLocationURI();
                 String decodedStart = null;
                 // Always use the URL decoded version to ensure that we have a
                 // canonical representation of the import URL for lookup. 
-                try {
+                
+                try {    
                     decodedStart = URLDecoder.decode(start, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     throw new WSDLQueryException(
@@ -447,14 +465,23 @@ public class WSDLGetUtils {
                         //check to see if it's already in a URL format.  If so, leave it.
                         new URL(start);
                     } catch (MalformedURLException e) {
+                        try {
+                            if (!(new URI(docBase).isAbsolute()) && !(new URI(start).isAbsolute())
+                                && !StringUtils.isEmpty(docBase)) {
+                                start = UrlUtils.getStem(docBase) + "/" + start;
+                                decodedStart = URLDecoder.decode(start, "utf-8");
+                            }
+                        } catch (Exception e1) {
+                            //ignore
+                        } 
                         if (done.put(decodedStart, imp.getDefinition()) == null) {
-                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei);
+                            updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei, start);
                         }
                     }
                 } else {
                     if (done.put(decodedStart, imp.getDefinition()) == null) {
                         done.put(resolvedSchemaLocation, imp.getDefinition());
-                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei);
+                        updateDefinition(bus, imp.getDefinition(), done, doneSchemas, base, ei, start);
                     }
                 }
             }
@@ -470,7 +497,7 @@ public class WSDLGetUtils {
                 : CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class)) {
                 if (el instanceof Schema) {
                     Schema see = (Schema)el;
-                    updateSchemaImports(bus, see, doneSchemas, base);
+                    updateSchemaImports(bus, see, see.getDocumentBaseURI(), doneSchemas, base);
                 }
             }
         }
@@ -523,6 +550,7 @@ public class WSDLGetUtils {
     
     protected void updateSchemaImports(Bus bus, 
                                        Schema schema,
+                                       String docBase,
                                        Map<String, SchemaReference> doneSchemas,
                                        String base) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
@@ -530,7 +558,7 @@ public class WSDLGetUtils {
         for (List<?> lst : imports) {
             List<SchemaImport> impLst = CastUtils.cast(lst);
             for (SchemaImport imp : impLst) {
-                String start = findSchemaLocation(doneSchemas, imp);
+                String start = findSchemaLocation(doneSchemas, imp, docBase);
                 
                 if (start != null) {
                     String decodedStart = null;
@@ -553,13 +581,13 @@ public class WSDLGetUtils {
                                 new URL(start);
                             } catch (MalformedURLException e) {
                                 if (doneSchemas.put(decodedStart, imp) == null) {
-                                    updateSchemaImports(bus, imp.getReferencedSchema(), doneSchemas, base);
+                                    updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base);
                                 }
                             }
                         } else {
                             if (doneSchemas.put(decodedStart, imp) == null) {
                                 doneSchemas.put(resolvedSchemaLocation, imp);
-                                updateSchemaImports(bus, imp.getReferencedSchema(), doneSchemas, base);
+                                updateSchemaImports(bus, imp.getReferencedSchema(), docBase, doneSchemas, base);
                             }
                         }
                     }
@@ -569,7 +597,7 @@ public class WSDLGetUtils {
         
         List<SchemaReference> includes = CastUtils.cast(schema.getIncludes());
         for (SchemaReference included : includes) {
-            String start = findSchemaLocation(doneSchemas, included);
+            String start = findSchemaLocation(doneSchemas, included, docBase);
 
             if (start != null) {
                 String decodedStart = null;
@@ -592,7 +620,7 @@ public class WSDLGetUtils {
                             new URL(start);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
-                                updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
+                                updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
                             }
                         }
                     }
@@ -600,13 +628,13 @@ public class WSDLGetUtils {
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
-                    updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
+                    updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
                 }
             }
         }
         List<SchemaReference> redefines = CastUtils.cast(schema.getRedefines());
         for (SchemaReference included : redefines) {
-            String start = findSchemaLocation(doneSchemas, included);
+            String start = findSchemaLocation(doneSchemas, included, docBase);
 
             if (start != null) {
                 String decodedStart = null;
@@ -629,7 +657,7 @@ public class WSDLGetUtils {
                             new URL(start);
                         } catch (MalformedURLException e) {
                             if (doneSchemas.put(decodedStart, included) == null) {
-                                updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
+                                updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
                             }
                         }
                     }
@@ -637,24 +665,38 @@ public class WSDLGetUtils {
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
                     doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
-                    updateSchemaImports(bus, included.getReferencedSchema(), doneSchemas, base);
+                    updateSchemaImports(bus, included.getReferencedSchema(), docBase, doneSchemas, base);
                 }
             }
         }
     }
 
-    private String findSchemaLocation(Map<String, SchemaReference> doneSchemas, SchemaReference imp) {
+    private String findSchemaLocation(Map<String, SchemaReference> doneSchemas, SchemaReference imp, String docBase) {
+        String schemaLocationURI = imp.getSchemaLocationURI();
+        if (docBase != null && imp.getReferencedSchema() != null) {
+            try {
+                String baseURI = URLDecoder.decode(UrlUtils.getStem(docBase), "utf-8");
+                String importURI = URLDecoder.decode(imp.getReferencedSchema().getDocumentBaseURI(), "utf-8");
+                if (importURI.contains(baseURI)) {
+                    schemaLocationURI = importURI.substring(baseURI.length() + 1);
+                }
+            } catch (Exception e) {
+                //ignore
+            }
+                    
+        }
+        
         if (imp.getReferencedSchema() != null) {
             for (Map.Entry<String, SchemaReference> e : doneSchemas.entrySet()) {
                 if (e.getValue().getReferencedSchema().getElement() 
                     == imp.getReferencedSchema().getElement()) {
-                    doneSchemas.put(imp.getSchemaLocationURI(), imp);
+                    doneSchemas.put(schemaLocationURI, imp);
                     imp.setSchemaLocationURI(e.getKey());
                     return e.getKey();
                 }
             }
         }
-        return imp.getSchemaLocationURI();
+        return schemaLocationURI;
     }
 
 }
