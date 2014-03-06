@@ -719,9 +719,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "exception_prop_order.wsdl");
         assertTrue(wsdlFile.exists());
         String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        int summaryIndex = wsdlContent.indexOf("<xs:element name=\"summary\"");
-        int fromIndex = wsdlContent.indexOf("<xs:element name=\"from\"");
-        int idIndex = wsdlContent.indexOf("<xs:element name=\"id\"");
+        int summaryIndex = wsdlContent.indexOf("name=\"summary\"");
+        int fromIndex = wsdlContent.indexOf("name=\"from\"");
+        int idIndex = wsdlContent.indexOf("name=\"id\"");
         
         assertTrue(summaryIndex > -1);
         assertTrue(fromIndex > -1);
@@ -744,9 +744,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
         String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
 
-        int fromIndex = wsdlContent.indexOf("<xs:element name=\"from\"");
-        int idIndex = wsdlContent.indexOf("<xs:element name=\"id\"");
-        int summaryIndex = wsdlContent.indexOf("<xs:element name=\"summary\"");
+        int fromIndex = wsdlContent.indexOf("name=\"from\"");
+        int idIndex = wsdlContent.indexOf("name=\"id\"");
+        int summaryIndex = wsdlContent.indexOf("name=\"summary\"");
         
         
         assertTrue(fromIndex > -1);
@@ -793,7 +793,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "exception-ref-nillable.wsdl");
         assertTrue(wsdlFile.exists());
         String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        int refElement = wsdlContent.indexOf("<xs:element ref=\"tns:item\"/>");
+        int refElement = wsdlContent.indexOf("ref=\"tns:item\"/>");
         assertTrue(refElement > -1);
 
     }
@@ -815,9 +815,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
         int class2Element = wsdlContent.indexOf("<xs:complexType name=\"myClass2\">");
         assertTrue(class2Element > -1);
-        int refElement = wsdlContent.indexOf("<xs:element name=\"adapted\" nillable=\"true\" type=\"tns:myClass2\"/>");
+        int refElement = wsdlContent.indexOf("<xs:element minOccurs=\"0\" name=\"adapted\" type=\"tns:myClass2\"/>");
         assertTrue(refElement > -1);
-
     }
     
     
