@@ -26,6 +26,8 @@ import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.WrappedFeature;
+import org.apache.cxf.resource.ClassLoaderResolver;
+import org.apache.cxf.resource.ResourceManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -66,9 +68,12 @@ public class BlueprintBus extends ExtensionManagerBus {
     
     public void setBundleContext(BundleContext c) {
         context = c;
-        super.setExtension(new BundleDelegatingClassLoader(c.getBundle(), 
-                                                           this.getClass().getClassLoader()),
-                           ClassLoader.class);
+        ClassLoader bundleClassLoader = new BundleDelegatingClassLoader(c.getBundle(),
+                    this.getClass().getClassLoader());
+        super.setExtension(bundleClassLoader, ClassLoader.class);
+        // Setup the resource resolver with the bundle classloader
+        ResourceManager rm = super.getExtension(ResourceManager.class);
+        rm.addResourceResolver(new ClassLoaderResolver(bundleClassLoader));
         super.setExtension(c, BundleContext.class);
     }
     public void setBlueprintContainer(BlueprintContainer con) {
