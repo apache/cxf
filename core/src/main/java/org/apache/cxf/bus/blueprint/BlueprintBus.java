@@ -25,6 +25,8 @@ import java.security.PrivilegedAction;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.resource.ClassLoaderResolver;
+import org.apache.cxf.resource.ResourceManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 
@@ -54,6 +56,9 @@ public class BlueprintBus extends ExtensionManagerBus {
                 }
             });
         super.setExtension(bundleClassLoader, ClassLoader.class);
+        // Setup the resource resolver with the bundle classloader
+        ResourceManager rm = super.getExtension(ResourceManager.class);
+        rm.addResourceResolver(new ClassLoaderResolver(bundleClassLoader));
         super.setExtension(c, BundleContext.class);
     }
     public void setBlueprintContainer(BlueprintContainer con) {
