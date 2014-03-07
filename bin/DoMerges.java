@@ -124,7 +124,7 @@ public class DoMerges {
             return false;
         }
         
-        Process p = Runtime.getRuntime().exec(new String[] {"git", "commit", "-a"});
+        Process p = Runtime.getRuntime().exec(new String[] {"git", "commit", "--no-edit", "-a"});
         runProcess(p);
         return true;
     }   
