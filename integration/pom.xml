@@ -31,5 +31,6 @@
     </parent>
     <modules>
         <module>jca</module>
+        <module>cdi</module>
     </modules>
 </project>
