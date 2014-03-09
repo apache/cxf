@@ -44,5 +44,6 @@
         <module>ws-security-examples</module>
         <module>rs-security</module>
         <module>wsdl_maven</module>
+        <module>cdi</module>
     </modules>
 </project>
