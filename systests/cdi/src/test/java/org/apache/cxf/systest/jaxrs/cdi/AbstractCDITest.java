@@ -79,5 +79,5 @@ public abstract class AbstractCDITest extends AbstractBusClientServerTestBase {
         return wc;
     }
     
-    abstract protected int getPort();
+    protected abstract int getPort();
 }
