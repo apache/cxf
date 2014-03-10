@@ -21,14 +21,13 @@ package org.apache.cxf.sts.claims;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.Claim;
 
 public class IdentityClaimsParser implements ClaimsParser {
     
@@ -37,17 +36,18 @@ public class IdentityClaimsParser implements ClaimsParser {
 
     private static final Logger LOG = LogUtils.getL7dLogger(IdentityClaimsParser.class);
 
-    public RequestClaim parse(Element claim) {
+    public Claim parse(Element claim) {
         return parseClaimType(claim);
     }
 
-    public static RequestClaim parseClaimType(Element claimType) {
+    public static Claim parseClaimType(Element claimType) {
         String claimLocalName = claimType.getLocalName();
         String claimNS = claimType.getNamespaceURI();
-        if ("ClaimType".equals(claimLocalName)) {
+        
+        if ("ClaimType".equals(claimLocalName) || "ClaimValue".equals(claimLocalName)) {
             String claimTypeUri = claimType.getAttributeNS(null, "Uri");
             String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
-            RequestClaim requestClaim = new RequestClaim();
+            Claim requestClaim = new Claim();
             try {
                 requestClaim.setClaimType(new URI(claimTypeUri));
             } catch (URISyntaxException e) {
@@ -58,36 +58,22 @@ public class IdentityClaimsParser implements ClaimsParser {
                 );
             }
             requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
-            return requestClaim;
-        } else if ("ClaimValue".equals(claimLocalName)) {
-            String claimTypeUri = claimType.getAttributeNS(null, "Uri");
-            String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
-            RequestClaim requestClaim = new RequestClaim();
-            try {
-                requestClaim.setClaimType(new URI(claimTypeUri));
-            } catch (URISyntaxException e) {
-                LOG.log(
-                    Level.WARNING, 
-                    "Cannot create URI from the given ClaimTye attribute value " + claimTypeUri,
-                    e
-                );
-            }
             
-            Node valueNode = claimType.getFirstChild();
-            if (valueNode != null) {
-                if ("Value".equals(valueNode.getLocalName())) {
-                    requestClaim.setClaimValue(valueNode.getTextContent().trim());
+            if ("ClaimValue".equals(claimLocalName)) {
+                Node valueNode = claimType.getFirstChild();
+                if (valueNode != null) {
+                    if ("Value".equals(valueNode.getLocalName())) {
+                        requestClaim.addValue(valueNode.getTextContent().trim());
+                    } else {
+                        LOG.warning("Unsupported child element of ClaimValue element "
+                                + valueNode.getLocalName());
+                        return null;
+                    }
                 } else {
-                    LOG.warning("Unsupported child element of ClaimValue element "
-                            + valueNode.getLocalName());
+                    LOG.warning("No child element of ClaimValue element available");
                     return null;
                 }
-            } else {
-                LOG.warning("No child element of ClaimValue element available");
-                return null;
             }
-             
-            requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
             
             return requestClaim;
         }

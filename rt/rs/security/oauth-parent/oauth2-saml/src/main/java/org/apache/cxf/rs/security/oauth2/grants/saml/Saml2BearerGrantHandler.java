@@ -50,9 +50,9 @@ import org.apache.cxf.rs.security.oauth2.saml.SamlOAuthValidator;
 import org.apache.cxf.rs.security.oauth2.utils.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
-import org.apache.cxf.rs.security.saml.authorization.JAXRSSAMLSecurityContext;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -133,8 +133,8 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
 
     protected UserSubject getGrantSubject(Message message, SamlAssertionWrapper wrapper) {
         SecurityContext sc = scProvider.getSecurityContext(message, wrapper);
-        if (sc instanceof JAXRSSAMLSecurityContext) {
-            JAXRSSAMLSecurityContext jaxrsSc = (JAXRSSAMLSecurityContext)sc;
+        if (sc instanceof SAMLSecurityContext) {
+            SAMLSecurityContext jaxrsSc = (SAMLSecurityContext)sc;
             Set<Principal> rolesP = jaxrsSc.getUserRoles();
             List<String> roles = new ArrayList<String>();
             if (roles != null) {

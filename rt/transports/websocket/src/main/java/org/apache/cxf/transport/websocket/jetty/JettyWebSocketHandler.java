@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http_jetty;
+package org.apache.cxf.transport.websocket.jetty;
 
 import java.io.IOException;
 
@@ -24,6 +24,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
+import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketFactory;
@@ -31,23 +33,24 @@ import org.eclipse.jetty.websocket.WebSocketFactory;
 /**
  * The extended version of JettyHTTPHandler that can support websocket.
  */
-class JettyHTTPExtendedHandler extends JettyHTTPHandler implements WebSocketFactory.Acceptor {
-    private final WebSocketFactory webSocketFactory = new WebSocketFactory(this);
+class JettyWebSocketHandler extends JettyHTTPHandler implements WebSocketFactory.Acceptor {
+    private JettyWebSocketManager webSocketManager;
 
-    public JettyHTTPExtendedHandler(JettyHTTPDestination jhd, boolean cmExact) {
+    public JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
         super(jhd, cmExact);
+        webSocketManager = new JettyWebSocketManager();
+        webSocketManager.init(this, jhd);
     }
 
     public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-        return new JettyWebSocket(jettyHTTPDestination, servletContext, request, protocol);
+        return new JettyWebSocket(webSocketManager, request, protocol);
     }
     
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
         // only switch to websocket if websocket is enabled for this destination 
-        if (jettyHTTPDestination != null && jettyHTTPDestination.isEnableWebSocket()
-            && (webSocketFactory.acceptWebSocket(request, response) || response.isCommitted())) {
+        if (webSocketManager.acceptWebSocket(request, response)) {
             baseRequest.setHandled(true);
         } else {
             super.handle(target, baseRequest, request, response);

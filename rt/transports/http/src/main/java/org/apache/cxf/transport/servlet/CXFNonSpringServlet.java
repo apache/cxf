@@ -80,7 +80,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
             resourceManager.addResourceResolver(new ServletContextResourceResolver(sc.getServletContext()));
             if (destinationRegistry == null) {
-                this.destinationRegistry = getDestinationRegistryFromBus(this.bus);
+                this.destinationRegistry = getDestinationRegistryFromBus();
             }
         }
 
@@ -92,7 +92,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         return bus.getExtension(ClassLoader.class);
     }
     
-    private static DestinationRegistry getDestinationRegistryFromBus(Bus bus) {
+    protected DestinationRegistry getDestinationRegistryFromBus() {
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         try {
             DestinationFactory df = dfm

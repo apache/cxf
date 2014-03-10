@@ -19,7 +19,7 @@
 package org.apache.cxf.sts.request;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 
 /**
  * This class contains values that have been extracted from a RequestSecurityToken corresponding to 
@@ -36,8 +36,8 @@ public class TokenRequirements {
     private ReceivedToken cancelTarget;
     private ReceivedToken renewTarget;
     private Lifetime lifetime;
-    private RequestClaimCollection primaryClaims;
-    private RequestClaimCollection secondaryClaims;
+    private ClaimCollection primaryClaims;
+    private ClaimCollection secondaryClaims;
     private Renewing renewing;
     
     public Renewing getRenewing() {
@@ -120,27 +120,19 @@ public class TokenRequirements {
         this.lifetime = lifetime;
     }
     
-    @Deprecated
-    public RequestClaimCollection getClaims() {
-        if (primaryClaims != null) {
-            return primaryClaims;
-        }
-        return secondaryClaims;
-    }
-    
-    public RequestClaimCollection getPrimaryClaims() {
+    public ClaimCollection getPrimaryClaims() {
         return primaryClaims;
     }
 
-    public void setPrimaryClaims(RequestClaimCollection primaryClaims) {
+    public void setPrimaryClaims(ClaimCollection primaryClaims) {
         this.primaryClaims = primaryClaims;
     }
 
-    public RequestClaimCollection getSecondaryClaims() {
+    public ClaimCollection getSecondaryClaims() {
         return secondaryClaims;
     }
 
-    public void setSecondaryClaims(RequestClaimCollection secondaryClaims) {
+    public void setSecondaryClaims(ClaimCollection secondaryClaims) {
         this.secondaryClaims = secondaryClaims;
     }
 

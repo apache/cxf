@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.cxf.sts.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.ClaimsParameters;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.common.RealmSupportClaimsHandler;
 import org.apache.cxf.sts.operation.CustomIdentityMapper;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
@@ -63,12 +63,12 @@ public class RealmSupportTest extends org.junit.Assert {
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
         
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createClaimCollection();
         
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("A");
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        ClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
+        ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 3, claims.size());
     }
     
@@ -97,12 +97,12 @@ public class RealmSupportTest extends org.junit.Assert {
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
         
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createClaimCollection();
         
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("B");
         parameters.setPrincipal(new CustomTokenPrincipal("ALICE"));
-        ClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
+        ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 3, claims.size());
     }
 
@@ -132,12 +132,12 @@ public class RealmSupportTest extends org.junit.Assert {
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
         
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createClaimCollection();
         
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("A");
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        ClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
+        ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 3, claims.size());
         
         //Asserts in RealmSupportClaimsHandler must succeed
@@ -171,29 +171,29 @@ public class RealmSupportTest extends org.junit.Assert {
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
         
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createClaimCollection();
         
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("B");
         parameters.setPrincipal(new CustomTokenPrincipal("ALICE"));
-        ClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
+        ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 2, claims.size());
         
         //Asserts in RealmSupportClaimsHandler must succeed
         
     }
     
-    private RequestClaimCollection createRequestClaimCollection() {
-        RequestClaimCollection requestedClaims = new RequestClaimCollection();
-        RequestClaim requestClaimA = new RequestClaim();
+    private ClaimCollection createClaimCollection() {
+        ClaimCollection requestedClaims = new ClaimCollection();
+        Claim requestClaimA = new Claim();
         requestClaimA.setClaimType(URI.create("Claim-A"));
         requestClaimA.setOptional(false);
         requestedClaims.add(requestClaimA);
-        RequestClaim requestClaimB = new RequestClaim();
+        Claim requestClaimB = new Claim();
         requestClaimB.setClaimType(URI.create("Claim-B"));
         requestClaimB.setOptional(false);
         requestedClaims.add(requestClaimB);
-        RequestClaim requestClaimC = new RequestClaim();
+        Claim requestClaimC = new Claim();
         requestClaimC.setClaimType(URI.create("Claim-C"));
         requestClaimC.setOptional(true);
         requestedClaims.add(requestClaimC);

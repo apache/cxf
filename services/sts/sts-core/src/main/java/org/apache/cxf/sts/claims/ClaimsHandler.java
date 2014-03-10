@@ -22,6 +22,8 @@ package org.apache.cxf.sts.claims;
 import java.net.URI;
 import java.util.List;
 
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+
 /**
  * This interface provides a pluggable way to handle Claims.
  */
@@ -29,7 +31,7 @@ public interface ClaimsHandler {
 
     List<URI> getSupportedClaimTypes();
 
-    ClaimCollection retrieveClaimValues(RequestClaimCollection claims, ClaimsParameters parameters);
+    ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters);
 
 }
  

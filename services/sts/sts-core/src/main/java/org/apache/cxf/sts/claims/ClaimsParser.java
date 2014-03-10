@@ -21,13 +21,15 @@ package org.apache.cxf.sts.claims;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.rt.security.claims.Claim;
+
 public interface ClaimsParser {
 
     /**
      * @param claim Element to parse claim request from
-     * @return RequestClaim parsed from claim
+     * @return Claim parsed from claim
      */
-    RequestClaim parse(Element claim);
+    Claim parse(Element claim);
 
     /**
      * This method indicates the claims dialect this Parser can handle.

@@ -39,14 +39,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.event.AbstractSTSEvent;
 import org.apache.cxf.sts.event.STSEventListener;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -480,7 +480,7 @@ public abstract class AbstractOperation {
         }
         
         // Set the requested Claims
-        RequestClaimCollection claims = tokenRequirements.getPrimaryClaims();
+        ClaimCollection claims = tokenRequirements.getPrimaryClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
         claims = tokenRequirements.getSecondaryClaims();
         providerParameters.setRequestedSecondaryClaims(claims);
@@ -665,10 +665,10 @@ public abstract class AbstractOperation {
         }
     }
     
-    protected void checkClaimsSupport(RequestClaimCollection requestedClaims) {
+    protected void checkClaimsSupport(ClaimCollection requestedClaims) {
         if (requestedClaims != null) {
             List<URI> unhandledClaimTypes = new ArrayList<URI>();
-            for (RequestClaim requestedClaim : requestedClaims) {
+            for (Claim requestedClaim : requestedClaims) {
                 if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
                         && !requestedClaim.isOptional()) {
                     unhandledClaimTypes.add(requestedClaim.getClaimType());

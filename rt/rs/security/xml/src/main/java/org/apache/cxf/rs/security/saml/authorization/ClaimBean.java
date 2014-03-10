@@ -18,19 +18,20 @@
  */
 package org.apache.cxf.rs.security.saml.authorization;
 
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
 
 
 public class ClaimBean {
-    private org.apache.cxf.rs.security.saml.assertion.Claim claim;
+    private SAMLClaim claim;
     private ClaimMode claimMode;
     private boolean matchAll;
     
-    public ClaimBean(org.apache.cxf.rs.security.saml.assertion.Claim claim) {
+    public ClaimBean(SAMLClaim claim) {
         this.claim = claim;
     }
     
-    public ClaimBean(org.apache.cxf.rs.security.saml.assertion.Claim claim,
+    public ClaimBean(SAMLClaim claim,
                      ClaimMode claimMode, 
                      boolean matchAll) {
         this.claim = claim;
@@ -38,7 +39,7 @@ public class ClaimBean {
         this.matchAll = matchAll;
     }
     
-    public org.apache.cxf.rs.security.saml.assertion.Claim getClaim() {
+    public SAMLClaim getClaim() {
         return claim;
     }
     

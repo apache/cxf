@@ -22,13 +22,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.sts.claims.Claim;
-import org.apache.cxf.sts.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsParameters;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 
 /**
  * A custom ClaimsHandler implementation for use in the tests.
@@ -45,13 +45,13 @@ public class CustomUserClaimsHandler implements ClaimsHandler {
         return knownURIs;
     }    
     
-    public ClaimCollection retrieveClaimValues(
-            RequestClaimCollection claims, ClaimsParameters parameters) {
+    public ProcessedClaimCollection retrieveClaimValues(
+            ClaimCollection claims, ClaimsParameters parameters) {
         
         if (claims != null && claims.size() > 0) {
-            ClaimCollection claimCollection = new ClaimCollection();
-            for (RequestClaim requestClaim : claims) {
-                Claim claim = new Claim();
+            ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
+            for (Claim requestClaim : claims) {
+                ProcessedClaim claim = new ProcessedClaim();
                 claim.setClaimType(requestClaim.getClaimType());
                 if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
                     

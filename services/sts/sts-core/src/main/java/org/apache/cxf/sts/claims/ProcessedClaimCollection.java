@@ -19,38 +19,14 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
-
 /**
- * This represents a Claim that has been processed by the RequestParser.
+ * This holds a collection of Claims that have been processed by a ClaimsHandler implementation
  */
-public class RequestClaim {
+public class ProcessedClaimCollection extends java.util.ArrayList<ProcessedClaim> {
 
-    private URI claimType;
-    private boolean optional;
-    private String claimValue;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4630183900697336428L;
 
-    public URI getClaimType() {
-        return claimType;
-    }
-
-    public void setClaimType(URI claimType) {
-        this.claimType = claimType;
-    }
-
-    public boolean isOptional() {
-        return optional;
-    }
-
-    public void setOptional(boolean optional) {
-        this.optional = optional;
-    }
-
-    public String getClaimValue() {
-        return claimValue;
-    }
-
-    public void setClaimValue(String claimValue) {
-        this.claimValue = claimValue;
-    }
 }

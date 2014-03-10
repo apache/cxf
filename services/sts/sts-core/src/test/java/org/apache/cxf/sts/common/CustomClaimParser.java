@@ -21,15 +21,14 @@ package org.apache.cxf.sts.common;
 import java.net.URI;
 
 import org.w3c.dom.Element;
-
+import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimsParser;
-import org.apache.cxf.sts.claims.RequestClaim;
 
 public class CustomClaimParser implements ClaimsParser {
 
     public static final String CLAIMS_DIALECT = "http://my.custom.org/my/custom/namespace";
     
-    public RequestClaim parse(Element claim) {
+    public Claim parse(Element claim) {
         
         String claimLocalName = claim.getLocalName();
         String claimNS = claim.getNamespaceURI();
@@ -38,7 +37,7 @@ public class CustomClaimParser implements ClaimsParser {
             CustomRequestClaim response = new CustomRequestClaim();
             response.setClaimType(URI.create(claimTypeUri));
             String claimValue = claim.getAttributeNS(null, "value");
-            response.setClaimValue(claimValue);
+            response.addValue(claimValue);
             String scope = claim.getAttributeNS(null, "scope");
             response.setScope(scope);
             return response;
@@ -53,7 +52,11 @@ public class CustomClaimParser implements ClaimsParser {
     /**
      * Extends RequestClaim class to add additional attributes
      */
-    public class CustomRequestClaim extends RequestClaim {
+    public class CustomRequestClaim extends Claim {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 7407723714936495457L;
         private String scope;
         
         public String getScope() {

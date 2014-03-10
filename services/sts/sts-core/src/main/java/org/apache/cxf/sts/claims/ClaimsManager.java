@@ -29,8 +29,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
-
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.apache.cxf.sts.token.realm.Relationship;
@@ -97,9 +98,9 @@ public class ClaimsManager {
         }
     }
 
-    public ClaimCollection retrieveClaimValues(
-        RequestClaimCollection primaryClaims,
-        RequestClaimCollection secondaryClaims,
+    public ProcessedClaimCollection retrieveClaimValues(
+        ClaimCollection primaryClaims,
+        ClaimCollection secondaryClaims,
         ClaimsParameters parameters
     ) {
         if (primaryClaims == null && secondaryClaims == null) {
@@ -114,13 +115,13 @@ public class ClaimsManager {
         if (primaryClaims.getDialect() != null
             && primaryClaims.getDialect().equals(secondaryClaims.getDialect())) {
             // Matching dialects - so we must merge them
-            RequestClaimCollection mergedClaims = mergeClaims(primaryClaims, secondaryClaims);
+            ClaimCollection mergedClaims = mergeClaims(primaryClaims, secondaryClaims);
             return retrieveClaimValues(mergedClaims, parameters);
         } else {
             // If the dialects don't match then just return all Claims
-            ClaimCollection claims = retrieveClaimValues(primaryClaims, parameters);
-            ClaimCollection claims2 = retrieveClaimValues(secondaryClaims, parameters);
-            ClaimCollection returnedClaims = new ClaimCollection();
+            ProcessedClaimCollection claims = retrieveClaimValues(primaryClaims, parameters);
+            ProcessedClaimCollection claims2 = retrieveClaimValues(secondaryClaims, parameters);
+            ProcessedClaimCollection returnedClaims = new ProcessedClaimCollection();
             if (claims != null) {
                 returnedClaims.addAll(claims);
             }
@@ -131,7 +132,7 @@ public class ClaimsManager {
         }
     }
     
-    public ClaimCollection retrieveClaimValues(RequestClaimCollection claims, ClaimsParameters parameters) {
+    public ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters) {
         Relationship relationship = null;
         if (parameters.getAdditionalProperties() != null) {
             relationship = (Relationship)parameters.getAdditionalProperties().get(
@@ -148,10 +149,10 @@ public class ClaimsManager {
                 return null;
             }
             Principal originalPrincipal = parameters.getPrincipal();
-            ClaimCollection returnCollection = new ClaimCollection();
+            ProcessedClaimCollection returnCollection = new ProcessedClaimCollection();
             for (ClaimsHandler handler : claimHandlers) {
                 
-                RequestClaimCollection supportedClaims = 
+                ClaimCollection supportedClaims = 
                     filterHandlerClaims(claims, handler.getSupportedClaimTypes());
                 if (supportedClaims.isEmpty()) {
                     continue;
@@ -212,7 +213,7 @@ public class ClaimsManager {
                     }
                 }
                 
-                ClaimCollection claimCollection = null;
+                ProcessedClaimCollection claimCollection = null;
                 try {
                     claimCollection = handler.retrieveClaimValues(supportedClaims, parameters);
                 } catch (RuntimeException ex) {
@@ -247,16 +248,16 @@ public class ClaimsManager {
             // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
             SamlAssertionWrapper assertion = 
                 (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
-            List<Claim> claimList = null;
+            List<ProcessedClaim> claimList = null;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 claimList = this.parseClaimsInAssertion(assertion.getSaml2());
             } else {
                 claimList = this.parseClaimsInAssertion(assertion.getSaml1());
             }
-            ClaimCollection sourceClaims = new ClaimCollection();
+            ProcessedClaimCollection sourceClaims = new ProcessedClaimCollection();
             sourceClaims.addAll(claimList);
             
-            ClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
+            ProcessedClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
                     sourceClaims, relationship.getTargetRealm(), parameters);
             validateClaimValues(claims, targetClaims);
             return targetClaims;
@@ -264,11 +265,11 @@ public class ClaimsManager {
 
     }
 
-    private RequestClaimCollection filterHandlerClaims(RequestClaimCollection claims,
+    private ClaimCollection filterHandlerClaims(ClaimCollection claims,
                                                          List<URI> handlerClaimTypes) {
-        RequestClaimCollection supportedClaims = new RequestClaimCollection(); 
+        ClaimCollection supportedClaims = new ClaimCollection(); 
         supportedClaims.setDialect(claims.getDialect());
-        for (RequestClaim claim : claims) {
+        for (Claim claim : claims) {
             if (handlerClaimTypes.contains(claim.getClaimType())) {
                 supportedClaims.add(claim);
             }
@@ -276,12 +277,12 @@ public class ClaimsManager {
         return supportedClaims;
     }
     
-    private boolean validateClaimValues(RequestClaimCollection requestedClaims, ClaimCollection claims) {
-        for (RequestClaim claim : requestedClaims) {
+    private boolean validateClaimValues(ClaimCollection requestedClaims, ProcessedClaimCollection claims) {
+        for (Claim claim : requestedClaims) {
             URI claimType = claim.getClaimType();
             boolean found = false;
             if (!claim.isOptional()) {
-                for (Claim c : claims) {
+                for (ProcessedClaim c : claims) {
                     if (c.getClaimType().equals(claimType)) {
                         found = true;
                         break;
@@ -298,7 +299,7 @@ public class ClaimsManager {
     }
 
 
-    protected List<Claim> parseClaimsInAssertion(org.opensaml.saml1.core.Assertion assertion) {
+    protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml1.core.Assertion assertion) {
         List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
@@ -307,7 +308,7 @@ public class ClaimsManager {
             }            
             return Collections.emptyList();
         }
-        ClaimCollection collection = new ClaimCollection();
+        ProcessedClaimCollection collection = new ProcessedClaimCollection();
 
         for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -319,7 +320,7 @@ public class ClaimsManager {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.finest("parsing attribute: " + attribute.getAttributeName());
                 }
-                Claim c = new Claim();
+                ProcessedClaim c = new ProcessedClaim();
                 c.setIssuer(assertion.getIssuer());
                 c.setClaimType(URI.create(attribute.getAttributeName()));
                 try {
@@ -343,7 +344,7 @@ public class ClaimsManager {
         return collection;
     }
 
-    protected List<Claim> parseClaimsInAssertion(org.opensaml.saml2.core.Assertion assertion) {
+    protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml2.core.Assertion assertion) {
         List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
@@ -353,7 +354,7 @@ public class ClaimsManager {
             return Collections.emptyList();
         }
 
-        List<Claim> collection = new ArrayList<Claim>();
+        List<ProcessedClaim> collection = new ArrayList<ProcessedClaim>();
 
         for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -364,7 +365,7 @@ public class ClaimsManager {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.finest("parsing attribute: " + attribute.getName());
                 }
-                Claim c = new Claim();
+                ProcessedClaim c = new ProcessedClaim();
                 c.setClaimType(URI.create(attribute.getName()));
                 c.setIssuer(assertion.getIssuer().getNameQualifier());
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
@@ -388,20 +389,20 @@ public class ClaimsManager {
      * This facilitates handling claims from a service via wst:SecondaryParameters/wst:Claims 
      * with any client-specific claims sent in wst:RequestSecurityToken/wst:Claims
      */
-    private RequestClaimCollection mergeClaims(
-        RequestClaimCollection primaryClaims, RequestClaimCollection secondaryClaims
+    private ClaimCollection mergeClaims(
+        ClaimCollection primaryClaims, ClaimCollection secondaryClaims
     ) {
-        RequestClaimCollection parsedClaims = new RequestClaimCollection();
+        ClaimCollection parsedClaims = new ClaimCollection();
         parsedClaims.addAll(secondaryClaims);
         
         // Merge claims
-        RequestClaimCollection mergedClaims = new RequestClaimCollection();
+        ClaimCollection mergedClaims = new ClaimCollection();
         mergedClaims.setDialect(primaryClaims.getDialect());
         
-        for (RequestClaim claim : primaryClaims) {
-            RequestClaim matchingClaim = null;
+        for (Claim claim : primaryClaims) {
+            Claim matchingClaim = null;
             // Search for a matching claim via the ClaimType URI
-            for (RequestClaim secondaryClaim : parsedClaims) {
+            for (Claim secondaryClaim : parsedClaims) {
                 if (secondaryClaim.getClaimType().equals(claim.getClaimType())) {
                     matchingClaim = secondaryClaim;
                     break;
@@ -411,16 +412,16 @@ public class ClaimsManager {
             if (matchingClaim == null) {
                 mergedClaims.add(claim);
             } else {
-                RequestClaim mergedClaim = new RequestClaim();
+                Claim mergedClaim = new Claim();
                 mergedClaim.setClaimType(claim.getClaimType());
-                if (claim.getClaimValue() != null) {
-                    mergedClaim.setClaimValue(claim.getClaimValue());
-                    if (matchingClaim.getClaimValue() != null) {
-                        LOG.log(Level.WARNING, "Secondary claim value " + matchingClaim.getClaimValue()
+                if (claim.getValues() != null && !claim.getValues().isEmpty()) {
+                    mergedClaim.setValues(claim.getValues());
+                    if (matchingClaim.getValues() != null && !matchingClaim.getValues().isEmpty()) {
+                        LOG.log(Level.WARNING, "Secondary claim value " + matchingClaim.getValues()
                                 + " ignored in favour of primary claim value");
                     }
-                } else if (matchingClaim.getClaimValue() != null) {
-                    mergedClaim.setClaimValue(matchingClaim.getClaimValue());
+                } else if (matchingClaim.getValues() != null && !matchingClaim.getValues().isEmpty()) {
+                    mergedClaim.setValues(matchingClaim.getValues());
                 }
                 mergedClaims.add(mergedClaim);
                 
