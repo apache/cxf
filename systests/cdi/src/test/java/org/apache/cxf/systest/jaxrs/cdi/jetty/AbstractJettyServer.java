@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.cdi;
+package org.apache.cxf.systest.jaxrs.cdi.jetty;
 
 
 import org.apache.cxf.cdi.CXFCdiServlet;
@@ -29,6 +29,8 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.jboss.weld.environment.Container;
+import org.jboss.weld.environment.jetty.JettyContainer;
 import org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener;
 import org.jboss.weld.environment.servlet.Listener;
 
@@ -52,6 +54,7 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
     protected void run() {
         System.setProperty("java.naming.factory.url", "org.eclipse.jetty.jndi");
         System.setProperty("java.naming.factory.initial", "org.eclipse.jetty.jndi.InitialContextFactory");
+        System.setProperty(Container.class.getName(), JettyContainer.class.getName());
  
         server = new Server(port);
             

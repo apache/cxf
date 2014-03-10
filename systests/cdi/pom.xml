@@ -150,6 +150,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${cxf.tomcat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-logging-juli</artifactId>
+            <version>${cxf.tomcat.version}</version>
+        </dependency>        
+        <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
             <version>${cxf.ahc.version}</version>

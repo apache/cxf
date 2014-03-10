@@ -17,26 +17,26 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.cdi;
+package org.apache.cxf.systest.jaxrs.cdi.jetty;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.systest.jaxrs.cdi.AbstractCDITest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-public class JettyEmbeddedTest extends AbstractCDITest {  
+public class JettyWarTest extends AbstractCDITest {  
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
 
         public EmbeddedJettyServer() {
-            super("/", PORT);
+            super("/jaxrs_cdi", "/", PORT);
         }
     }
     
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
@@ -45,4 +45,5 @@ public class JettyEmbeddedTest extends AbstractCDITest {
     protected int getPort() {
         return EmbeddedJettyServer.PORT;
     }
+
 }
