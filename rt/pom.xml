@@ -50,6 +50,7 @@
         <module>transports/http-netty/netty-client</module>
         <module>transports/jms</module>
         <module>transports/udp</module>
+        <module>transports/websocket</module>
         <module>ws/policy</module>
         <module>ws/addr</module>
         <module>ws/security</module>

@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.sts.claims.Claim;
-import org.apache.cxf.sts.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.ClaimsParameters;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
@@ -58,7 +58,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         
         // Handle Claims
         ClaimsManager claimsManager = providerParameters.getClaimsManager();
-        ClaimCollection retrievedClaims = new ClaimCollection();
+        ProcessedClaimCollection retrievedClaims = new ProcessedClaimCollection();
         if (claimsManager != null) {
             ClaimsParameters params = new ClaimsParameters();
             params.setAdditionalProperties(providerParameters.getAdditionalProperties());
@@ -80,7 +80,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         }
         
         AttributeStatementBean attrBean = new AttributeStatementBean();
-        Iterator<Claim> claimIterator = retrievedClaims.iterator();
+        Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
             // If no Claims have been processed then create a default attribute
             AttributeBean attributeBean = createDefaultAttribute(tokenType);
@@ -88,7 +88,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         }
         
         while (claimIterator.hasNext()) {
-            Claim claim = claimIterator.next();
+            ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = createAttributeFromClaim(claim, tokenType);
             attributeList.add(attributeBean);
         }
@@ -173,7 +173,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
     /**
      * Create an Attribute from a claim.
      */
-    private AttributeBean createAttributeFromClaim(Claim claim, String tokenType) {
+    private AttributeBean createAttributeFromClaim(ProcessedClaim claim, String tokenType) {
         AttributeBean attributeBean = new AttributeBean();
         if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
             || WSConstants.SAML2_NS.equals(tokenType)) {

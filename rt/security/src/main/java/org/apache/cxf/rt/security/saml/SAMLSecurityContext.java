@@ -16,32 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.interceptor.security;
+package org.apache.cxf.rt.security.saml;
 
 import java.security.Principal;
 import java.util.Set;
 
 import org.w3c.dom.Element;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.ClaimsSecurityContext;
 
-import org.apache.cxf.security.LoginSecurityContext;
-
-public class SAMLSecurityContext implements LoginSecurityContext {
+public class SAMLSecurityContext implements ClaimsSecurityContext {
     
     private final Principal principal;
     private Set<Principal> roles;
     private Element assertionElement;
     private String issuer;
+    private ClaimCollection claims;
     
     public SAMLSecurityContext(Principal principal) {
-        this.principal = principal;
+        this(principal, null);
     }
     
     public SAMLSecurityContext(
         Principal principal, 
         Set<Principal> roles
     ) {
+        this(principal, roles, null);
+    }
+    
+    public SAMLSecurityContext(
+        Principal principal, 
+        Set<Principal> roles,
+        ClaimCollection claims
+    ) {
         this.principal = principal;
         this.roles = roles;
+        this.claims = claims;
+    }
+    
+    public ClaimCollection getClaims() {
+        return claims;
     }
     
     public Principal getUserPrincipal() {

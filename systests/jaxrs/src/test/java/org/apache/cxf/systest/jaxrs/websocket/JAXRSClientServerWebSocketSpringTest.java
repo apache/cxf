@@ -17,27 +17,27 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.claims;
+package org.apache.cxf.systest.jaxrs.websocket;
 
-import java.net.URI;
+import org.junit.BeforeClass;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * This holds a collection of RequestClaims.
+ * JAXRSClientServerWebSocket test with jaxrs:server using the embedded jetty server.
  */
-public class RequestClaimCollection extends java.util.ArrayList<RequestClaim> {
-    
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6013920740410651546L;
-    private URI dialect;
-    
-    public URI getDialect() {
-        return dialect;
-    }
-    
-    public void setDialect(URI dialect) {
-        this.dialect = dialect;
+public class JAXRSClientServerWebSocketSpringTest extends JAXRSClientServerWebSocketTest {
+    public static final String PORT = BookServerWebSocket.PORT;
+    @BeforeClass
+    public static void startServers() throws Exception {
+
+        @SuppressWarnings("unused")
+        ApplicationContext appctxt = 
+            new ClassPathXmlApplicationContext(
+                JAXRSClientServerWebSocketSpringTest.class.getResource(
+                    "/jaxrs_websocket/beans-embedded.xml").toString());
+        
     }
 
 }

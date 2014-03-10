@@ -32,7 +32,7 @@ public interface ClaimsMapper {
      * @param targetRealm the target realm of the Principal
      * @return claims collection of the target realm
      */
-    ClaimCollection mapClaims(String sourceRealm,
-            ClaimCollection sourceClaims, String targetRealm, ClaimsParameters parameters);
+    ProcessedClaimCollection mapClaims(String sourceRealm,
+            ProcessedClaimCollection sourceClaims, String targetRealm, ClaimsParameters parameters);
 
 }

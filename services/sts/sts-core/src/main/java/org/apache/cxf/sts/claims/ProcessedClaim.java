@@ -19,26 +19,22 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.io.Serializable;
-import java.net.URI;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.apache.cxf.rt.security.claims.Claim;
 
 /**
  * This represents a Claim that has been processed by a ClaimsHandler instance.
  */
-public class Claim implements Serializable {
+public class ProcessedClaim extends Claim {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -1151700035195497499L;
-    private URI claimType;
+    private static final long serialVersionUID = -336574019841442184L;
     private String issuer;
     private String originalIssuer;
     private transient Principal principal;
-    private List<Object> values = new ArrayList<Object>(1);
 
     public String getIssuer() {
         return issuer;
@@ -56,33 +52,12 @@ public class Claim implements Serializable {
         this.originalIssuer = originalIssuer;
     }
 
-    public URI getClaimType() {
-        return claimType;
-    }
-
-    public void setClaimType(URI claimType) {
-        this.claimType = claimType;
-    }
-
     public Principal getPrincipal() {
         return principal;
     }
 
     public void setPrincipal(Principal principal) {
         this.principal = principal;
-    }
-
-    public void setValues(List<Object> values) {
-        this.values.clear();
-        this.values.addAll(values);
-    }
-
-    public void addValue(Object s) {
-        this.values.add(s);
-    }
-    
-    public List<Object> getValues() {
-        return values;
     }
 
 }

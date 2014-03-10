@@ -34,13 +34,13 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.sts.claims.Claim;
-import org.apache.cxf.sts.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.Claim;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.LdapClaimsHandler;
-import org.apache.cxf.sts.claims.RequestClaim;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.claims.ProcessedClaim;
+import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.junit.BeforeClass;
@@ -83,7 +83,7 @@ public class LDAPClaimsTest {
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
 
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createRequestClaimCollection();
 
         List<URI> expectedClaims = new ArrayList<URI>();
         expectedClaims.add(ClaimTypes.FIRSTNAME);
@@ -92,7 +92,7 @@ public class LDAPClaimsTest {
        
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
-        ClaimCollection retrievedClaims = 
+        ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
         Assert.isTrue(
@@ -101,7 +101,7 @@ public class LDAPClaimsTest {
                       + "] doesn't match with expected [" + expectedClaims.size() + "]"
         );
 
-        for (Claim c : retrievedClaims) {
+        for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
@@ -120,9 +120,9 @@ public class LDAPClaimsTest {
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
 
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createRequestClaimCollection();
         // add unsupported but mandatory claim
-        RequestClaim claim = new RequestClaim();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.GENDER);
         claim.setOptional(false);
         requestedClaims.add(claim);
@@ -140,9 +140,9 @@ public class LDAPClaimsTest {
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
 
-        RequestClaimCollection requestedClaims = createRequestClaimCollection();
+        ClaimCollection requestedClaims = createRequestClaimCollection();
         // add unsupported but optional unsupported claim
-        RequestClaim claim = new RequestClaim();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.GENDER);
         claim.setOptional(true);
         requestedClaims.add(claim);
@@ -155,7 +155,7 @@ public class LDAPClaimsTest {
         
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
-        ClaimCollection retrievedClaims = 
+        ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
         Assert.isTrue(
@@ -164,7 +164,7 @@ public class LDAPClaimsTest {
                       + "] doesn't match with expected [" + expectedClaims.size() + "]"
         );
 
-        for (Claim c : retrievedClaims) {
+        for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
@@ -173,17 +173,17 @@ public class LDAPClaimsTest {
         }
     }
 
-    private RequestClaimCollection createRequestClaimCollection() {
-        RequestClaimCollection claims = new RequestClaimCollection();
-        RequestClaim claim = new RequestClaim();
+    private ClaimCollection createRequestClaimCollection() {
+        ClaimCollection claims = new ClaimCollection();
+        Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.FIRSTNAME);
         claim.setOptional(true);
         claims.add(claim);
-        claim = new RequestClaim();
+        claim = new Claim();
         claim.setClaimType(ClaimTypes.LASTNAME);
         claim.setOptional(true);
         claims.add(claim);
-        claim = new RequestClaim();
+        claim = new Claim();
         claim.setClaimType(ClaimTypes.EMAILADDRESS);
         claim.setOptional(true);
         claims.add(claim);

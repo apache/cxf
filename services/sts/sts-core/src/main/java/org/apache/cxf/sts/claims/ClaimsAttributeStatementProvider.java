@@ -37,7 +37,7 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
         // Handle Claims
         ClaimsManager claimsManager = providerParameters.getClaimsManager();
-        ClaimCollection retrievedClaims = new ClaimCollection();
+        ProcessedClaimCollection retrievedClaims = new ProcessedClaimCollection();
         if (claimsManager != null) {
             ClaimsParameters params = new ClaimsParameters();
             params.setAdditionalProperties(providerParameters.getAdditionalProperties());
@@ -67,7 +67,7 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             return null;
         }
         
-        Iterator<Claim> claimIterator = retrievedClaims.iterator();
+        Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
             return null;
         }
@@ -77,7 +77,7 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
         
         AttributeStatementBean attrBean = new AttributeStatementBean();
         while (claimIterator.hasNext()) {
-            Claim claim = claimIterator.next();
+            ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
             
             URI claimType = claim.getClaimType();

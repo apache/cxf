@@ -23,7 +23,6 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,15 +52,16 @@ import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -544,15 +544,20 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     receivedAssertion  = o.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
                 }
                 
-                List<String> roles = null;
                 if (receivedAssertion instanceof SamlAssertionWrapper) {
                     String roleAttributeName = (String)msg.getContextualProperty(
                             SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
                     if (roleAttributeName == null || roleAttributeName.length() == 0) {
                         roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                     }
-                    roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
-                    SAMLSecurityContext context = createSecurityContext(p, roles);
+                    
+                    ClaimCollection claims = 
+                        SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);
+                    Set<Principal> roles = 
+                        SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
+                    
+                    SAMLSecurityContext context = 
+                        new SAMLSecurityContext(p, roles, claims);
                     context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
                     context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
                     msg.put(SecurityContext.class, context);
@@ -608,20 +613,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 return false;
             }
         };
-    }
-    
-    protected SAMLSecurityContext createSecurityContext(final Principal p, final List<String> roles) {
-        final Set<Principal> userRoles;
-        if (roles != null) {
-            userRoles = new HashSet<Principal>();
-            for (String role : roles) {
-                userRoles.add(new SimplePrincipal(role));
-            }
-        } else {
-            userRoles = null;
-        }
-        
-        return new SAMLSecurityContext(p, userRoles);
     }
     
     private String getAction(SoapMessage msg, SoapVersion version) {

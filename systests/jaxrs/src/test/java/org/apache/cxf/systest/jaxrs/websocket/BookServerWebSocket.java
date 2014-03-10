@@ -19,32 +19,19 @@
 
 package org.apache.cxf.systest.jaxrs.websocket;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.systest.jaxrs.BookStorePerRequest;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
     
 public class BookServerWebSocket extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerWebSocket.class);
      
     org.apache.cxf.endpoint.Server server;
-    private Map< ? extends String, ? extends Object > properties;
     
     public BookServerWebSocket() {
-        this(Collections.< String, Object >emptyMap());
-    }
-    
-    /**
-     * Allow to specified custom contextual properties to be passed to factory bean
-     */
-    public BookServerWebSocket(final Map< ? extends String, ? extends Object > properties) {
-        this.properties = properties;
     }
     
     protected void run() {
@@ -55,10 +42,9 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         sf.setResourceClasses(BookStoreWebSocket.class, BookStorePerRequest.class);
         sf.setResourceProvider(BookStoreWebSocket.class,
                                new SingletonResourceProvider(new BookStoreWebSocket(), true));
-        sf.setAddress("http://localhost:" + PORT + "/");
+        sf.setAddress("ws://localhost:" + PORT + "/");
         server = sf.create();
-        ((JettyHTTPDestination)server.getDestination())
-            .setEnableWebSocket(Boolean.parseBoolean((String)properties.get("enableWebSocket")));
+
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
     }

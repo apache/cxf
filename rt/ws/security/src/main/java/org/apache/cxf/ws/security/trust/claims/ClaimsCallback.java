@@ -21,19 +21,19 @@ package org.apache.cxf.ws.security.trust.claims;
 
 import javax.security.auth.callback.Callback;
 
-import org.w3c.dom.Element;
-
 import org.apache.cxf.message.Message;
 
 /**
  * This Callback class provides a pluggable way of sending Claims to the STS. A CallbackHandler
  * instance will be supplied with this class, which contains a reference to the current
- * Message. The CallbackHandler implementation is required to set the claims Element to be
- * sent in the request. 
+ * Message. The CallbackHandler implementation is required to set the claims Object to be
+ * sent in the request. This object can be either a DOM Element to be written out "as is", or else
+ * a org.apache.cxf.rt.security.claims.ClaimCollection Object which will be serialized in the 
+ * request.
  */
 public class ClaimsCallback implements Callback {
     
-    private Element claims;
+    private Object claims;
     
     private Message currentMessage;
     
@@ -45,11 +45,11 @@ public class ClaimsCallback implements Callback {
         this.currentMessage = currentMessage;
     }
     
-    public void setClaims(Element claims) {
+    public void setClaims(Object claims) {
         this.claims = claims;
     }
     
-    public Element getClaims() {
+    public Object getClaims() {
         return claims;
     }
     

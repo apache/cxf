@@ -48,5 +48,24 @@
             </bean>
         </jaxrs:providers>
     </jaxrs:server>
+    <jaxrs:server id="bookservice3" address="/bookstore3">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+                <property name="produceMediaTypes">
+                    <list>
+                      <value>application/json</value>
+                    </list>
+                </property>
+                <property name="resourcePath" value="/bookstore/books/redirectComplete"/>
+                <property name="useCurrentServlet" value="true"/>
+                <!--
+                <property name="servletPath" value="/redirect"/>
+                -->
+            </bean>
+        </jaxrs:providers>
+    </jaxrs:server>
 </beans>
 <!-- END SNIPPET: beans -->

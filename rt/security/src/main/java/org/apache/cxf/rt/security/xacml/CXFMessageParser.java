@@ -21,8 +21,8 @@ package org.apache.cxf.rt.security.xacml;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;

@@ -23,7 +23,6 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -63,7 +62,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     private static final Logger LOG =
         LogUtils.getL7dLogger(JettyHTTPDestination.class);
-    private static Constructor<?> handlerConstructor;
 
     protected JettyHTTPServerEngine engine;
     protected JettyHTTPServerEngineFactory serverEngineFactory;
@@ -71,17 +69,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     protected URL nurl;
     protected ClassLoader loader;
 
-
-    static {
-        try {
-            Class<?> cls = ClassUtils.forName("org.apache.cxf.transport.http_jetty.JettyHTTPExtendedHandler",
-                                              JettyHTTPDestination.class.getClassLoader());
-            handlerConstructor = cls.getDeclaredConstructor(new Class<?>[]{JettyHTTPDestination.class, boolean.class});
-        } catch (Throwable t) {
-            //ignore
-        }
-    }
-    
     /**
      * This variable signifies that finalizeConfig() has been called.
      * It gets called after this object has been spring configured.
@@ -108,7 +95,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         //Add the default port if the address is missing it
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
-        nurl = new URL(endpointInfo.getAddress());
+        nurl = new URL(getAddress(endpointInfo));
         loader = bus.getExtension(ClassLoader.class);
     }
 
@@ -169,6 +156,10 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
         configFinalized = true;
     }
+
+    protected String getAddress(EndpointInfo endpointInfo) {
+        return endpointInfo.getAddress();
+    }
     
     /**
      * Activate receipt of incoming messages.
@@ -178,7 +169,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
         URL url = null;
         try {
-            url = new URL(endpointInfo.getAddress());
+            url = new URL(getAddress(endpointInfo));
         } catch (Exception e) {
             throw new Fault(e);
         }
@@ -188,16 +179,8 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
 
     }
 
-    private JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd,
+    protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd,
                                                     boolean cmExact) {
-        if (handlerConstructor != null) {
-            try {
-                return (JettyHTTPHandler)handlerConstructor.newInstance(new Object[]{jhd, cmExact});
-            } catch (Exception e) {
-                //ignore
-            }
-        }
-        // use the default handler
         return new JettyHTTPHandler(jhd, cmExact);
     }
 

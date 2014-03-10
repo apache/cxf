@@ -31,7 +31,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.saml.assertion.Claim;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -112,8 +112,8 @@ public class SamlCallbackHandler implements CallbackHandler {
                 List<AttributeBean> claims = new ArrayList<AttributeBean>();
                 AttributeBean roleClaim = new AttributeBean();
                 roleClaim.setSimpleName("subject-role");
-                roleClaim.setQualifiedName(Claim.DEFAULT_ROLE_NAME);
-                roleClaim.setNameFormat(Claim.DEFAULT_NAME_FORMAT);
+                roleClaim.setQualifiedName(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
+                roleClaim.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
                 roleClaim.setAttributeValues(new ArrayList<Object>(roles));
                 claims.add(roleClaim);
                 

@@ -16,17 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.rt.security.claims;
 
-package org.apache.cxf.sts.claims;
+import org.apache.cxf.security.LoginSecurityContext;
 
-/**
- * This holds a collection of Claims.
- */
-public class ClaimCollection extends java.util.ArrayList<Claim> {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4630183900697336428L;
-
+public interface ClaimsSecurityContext extends LoginSecurityContext {
+    
+    ClaimCollection getClaims();
+    
 }

@@ -72,6 +72,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -159,7 +160,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected int keySize = 256;
     protected boolean requiresEntropy = true;
     protected Element template;
-    protected Element claims;
+    protected Object claims;
     protected CallbackHandler claimsCallbackHandler;
     protected AlgorithmSuite algorithmSuite;
     protected String namespace = STSUtils.WST_NS_05_12;
@@ -1264,15 +1265,18 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
     
     protected void addClaims(XMLStreamWriter writer) throws Exception {
-        if (claims != null) {
-            StaxUtils.copy(claims, writer);
-        } else if (claimsCallbackHandler != null) {
+        Object claimsToSerialize = claims;
+        if (claimsToSerialize == null && claimsCallbackHandler != null) {
             ClaimsCallback callback = new ClaimsCallback(message);
             claimsCallbackHandler.handle(new Callback[]{callback});
-            Element claimsElement = callback.getClaims();
-            if (claimsElement != null) {
-                StaxUtils.copy(claimsElement, writer);
-            }
+            claimsToSerialize = callback.getClaims();
+        }
+        
+        if (claimsToSerialize instanceof Element) {
+            StaxUtils.copy((Element)claimsToSerialize, writer);
+        } else if (claimsToSerialize instanceof ClaimCollection) {
+            ClaimCollection claimCollection = (ClaimCollection)claims;
+            claimCollection.serialize(writer, "wst", namespace);
         }
     }
 
@@ -1547,12 +1551,13 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         template = rstTemplate;
     }
 
-    public void setClaims(Element rstClaims) {
+    /**
+     * Set a Claims Object to be included in the request. This Object can be either a DOM Element, 
+     * which will be copied "as is" into the request, or else a 
+     * org.apache.cxf.rt.security.claims.ClaimCollection Object.
+     */
+    public void setClaims(Object rstClaims) {
         claims = rstClaims;
-    }
-    
-    public Element getClaims() {
-        return claims;
     }
     
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {

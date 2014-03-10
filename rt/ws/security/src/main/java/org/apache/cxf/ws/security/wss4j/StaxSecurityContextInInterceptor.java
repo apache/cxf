@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,18 +27,20 @@ import javax.security.auth.Subject;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
-import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
-import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.saml.SAMLSecurityContext;
+import org.apache.cxf.rt.security.saml.SAMLUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
@@ -110,7 +111,6 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
 
                     Object receivedAssertion = null;
                     
-                    List<String> roles = null;
                     if (event.getSecurityEventType() == WSSecurityEventConstants.SamlToken) {
                         String roleAttributeName = (String)msg.getContextualProperty(
                                 SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
@@ -121,10 +121,14 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                         SamlTokenSecurityEvent samlEvent = (SamlTokenSecurityEvent)event;
                         receivedAssertion = samlEvent.getSamlAssertionWrapper();
                         if (receivedAssertion != null) {
-                            roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
-                            SAMLSecurityContext context = createSecurityContext(p, roles);
-                            context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
-                            context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
+                            ClaimCollection claims = 
+                                SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);
+                            Set<Principal> roles = 
+                                SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
+                            
+                            SAMLSecurityContext context = 
+                                new SAMLSecurityContext(p, roles, claims);
+                            
                             msg.put(SecurityContext.class, context);
                         }
                     } else {
@@ -180,20 +184,6 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                 return false;
             }
         };
-    }
-    
-    private SAMLSecurityContext createSecurityContext(final Principal p, final List<String> roles) {
-        final Set<Principal> userRoles;
-        if (roles != null) {
-            userRoles = new HashSet<Principal>();
-            for (String role : roles) {
-                userRoles.add(new SimplePrincipal(role));
-            }
-        } else {
-            userRoles = null;
-        }
-        
-        return new SAMLSecurityContext(p, userRoles);
     }
     
     /**
