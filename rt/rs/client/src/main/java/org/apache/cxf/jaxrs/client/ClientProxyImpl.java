@@ -460,18 +460,18 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         for (Parameter p : beanParams) {
-            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], QueryParam.class);
-            for (Map.Entry<String, Object> entry : values.entrySet()) {
+            Map<String, BeanPair> values = getValuesFromBeanParam(params[p.getIndex()], QueryParam.class);
+            for (Map.Entry<String, BeanPair> entry : values.entrySet()) {
                 if (entry.getValue() != null) {
                     addMatrixQueryParamsToBuilder(ub, entry.getKey(), ParameterType.QUERY, 
-                                                  null, entry.getValue());
+                                                  entry.getValue().getAnns(), entry.getValue().getValue());
                 }
             }
         }
     }
     
-    private Map<String, Object> getValuesFromBeanParam(Object bean, Class<? extends Annotation> annClass) {
-        Map<String, Object> values = new HashMap<String, Object>();
+    private Map<String, BeanPair> getValuesFromBeanParam(Object bean, Class<? extends Annotation> annClass) {
+        Map<String, BeanPair> values = new HashMap<String, BeanPair>();
         
         for (Method m : bean.getClass().getMethods()) {
             Annotation annotation = m.getAnnotation(annClass);
@@ -481,7 +481,7 @@ public class ClientProxyImpl extends AbstractClient implements
                     Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
                     Object value = getter.invoke(bean, new Object[]{});
                     String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
-                    values.put(annotationValue, value);
+                    values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
                 } catch (Throwable t) {
                     // ignore
                 }
@@ -503,11 +503,11 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         for (Parameter p : beanParams) {
-            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], MatrixParam.class);
-            for (Map.Entry<String, Object> entry : values.entrySet()) {
+            Map<String, BeanPair> values = getValuesFromBeanParam(params[p.getIndex()], MatrixParam.class);
+            for (Map.Entry<String, BeanPair> entry : values.entrySet()) {
                 if (entry.getValue() != null) {
                     addMatrixQueryParamsToBuilder(ub, entry.getKey(), ParameterType.MATRIX, 
-                                                  null, entry.getValue());
+                                                  entry.getValue().getAnns(), entry.getValue().getValue());
                 }
             }
         }
@@ -525,9 +525,9 @@ public class ClientProxyImpl extends AbstractClient implements
             addFormValue(form, p.getName(), params[p.getIndex()], getParamAnnotations(m, p));
         }
         for (Parameter p : beanParams) {
-            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], FormParam.class);
-            for (Map.Entry<String, Object> entry : values.entrySet()) {
-                addFormValue(form, entry.getKey(), entry.getValue(), null);
+            Map<String, BeanPair> values = getValuesFromBeanParam(params[p.getIndex()], FormParam.class);
+            for (Map.Entry<String, BeanPair> entry : values.entrySet()) {
+                addFormValue(form, entry.getKey(), entry.getValue().getValue(), entry.getValue().getAnns());
             }
         }
         
@@ -579,11 +579,11 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         for (Parameter p : beanParams) {
-            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], HeaderParam.class);
-            for (Map.Entry<String, Object> entry : values.entrySet()) {
+            Map<String, BeanPair> values = getValuesFromBeanParam(params[p.getIndex()], HeaderParam.class);
+            for (Map.Entry<String, BeanPair> entry : values.entrySet()) {
                 if (entry.getValue() != null) {
                     headers.add(entry.getKey(), 
-                                convertParamValue(entry.getValue(), getParamAnnotations(m, p)));
+                                convertParamValue(entry.getValue().getValue(), entry.getValue().getAnns()));
                 }
             }
         }
@@ -609,12 +609,13 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         for (Parameter p : beanParams) {
-            Map<String, Object> values = getValuesFromBeanParam(params[p.getIndex()], CookieParam.class);
-            for (Map.Entry<String, Object> entry : values.entrySet()) {
+            Map<String, BeanPair> values = getValuesFromBeanParam(params[p.getIndex()], CookieParam.class);
+            for (Map.Entry<String, BeanPair> entry : values.entrySet()) {
                 if (entry.getValue() != null) {
                     headers.add(HttpHeaders.COOKIE, 
                                 entry.getKey() + "=" 
-                                + convertParamValue(entry.getValue(), getParamAnnotations(m, p)));
+                                + convertParamValue(entry.getValue().getValue(), 
+                                                    entry.getValue().getAnns()));
                 }
             }
         }
@@ -805,4 +806,18 @@ public class ClientProxyImpl extends AbstractClient implements
         
     }
     
+    private static class BeanPair {
+        private Object value;
+        private Annotation[] anns;
+        public BeanPair(Object value, Annotation[] anns) {
+            this.value = value;
+            this.anns = anns;
+        }
+        public Object getValue() {
+            return value;
+        }
+        public Annotation[] getAnns() {
+            return anns;
+        }
+    }
 }
